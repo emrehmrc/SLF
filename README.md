@@ -1,4 +1,4 @@
 # SLF
 
-The readme file for SLF project. Instructions will be written here.
+Bu dosyada SLF projesinin dökümantasyonu yer almaktadýr.
 
