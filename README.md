@@ -26,9 +26,8 @@ Proje içerisinde hatalý commitler, Linux/Mac/Windows satýr sonu, dosya izinleri 
 	autocrlf = true
 	filemode = false
 ```
+jhjlkjkljkljk
 
-
-Bu ayarlar, projenin kök dizininde yer alan `.gitattributes` ve `.gitignore` dosyalarýdýr. Bu dosyalar, projenin Git üzerinde nasýl davranacaðýný belirler. `.gitattributes` dosyasý, dosya izinleri, satýr sonu karakterleri gibi dosya bazlý ayarlarý belirler. `.gitignore` dosyasý ise Git'in takip etmemesi gereken dosya ve klasörleri belirler. Bu dosyalarý projenin kök dizininde bulabilirsiniz. Bu dosyalarý açarak içeriklerini inceleyebilirsiniz. Eðer bu dosyalarý deðiþtirmeniz gerekiyorsa, deðiþiklikleri yaparak commit etmeyi unutmayýn.
 
 ### Branchler
 Projede 2 tane ana branch bulunmaktadýr. Bunlar `main` ve `development` branchleridir. `main` branchi, projenin stabil ve çalýþýr durumda olduðu branchdir. `development` branchi ise projenin geliþtirme aþamasýnda olduðu branch'tir. Branchleri deðiþtirmek için Visual Studio'da sað alt köþede yer alan branch ismine sað týklayýp checkout diyerek deðiþtirebilirsiniz. Branchleri deðiþtirirken dikkatli olunmalýdýr. Halihazýrda kaydedilmemiþ ya da commit edilmemiþ deðiþiklikler varsa, branch deðiþtirme iþlemi yapýlmamalýdýr. Zaten aþaðýda da bahsedeceðim üzere deðiþikliklerinizi kendi branchlerinizde yapacaksýnýz.
