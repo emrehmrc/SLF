@@ -8,12 +8,19 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Web.WebView2.WinForms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Header;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using SLF;
 
 namespace SLF
 {
     public partial class ModülFormu : Form
     {
         public GirişFormu gir1;
+        List<string> veri_listesi_requires_xlsx = new List<string> { 
+            "Ekonometrik Yük Tahmini Verileri" 
+        };
+
         public ModülFormu()
         {
             
@@ -43,7 +50,36 @@ namespace SLF
         private void button1_Click(object sender, EventArgs e)
         {
             OpenFileDialog fileDialog1 = new OpenFileDialog();
-            fileDialog1.ShowDialog();
+
+            // Modül seçimine göre dosya uzantısını belirle
+            string selectedItem = girdi_veri_secimi_dropdown.SelectedItem.ToString();
+            if (veri_listesi_requires_xlsx.Contains(selectedItem))
+            {
+                // Constructor'daki veri_listesi_requires_xlsx listesindeki verilerin uzantısını xlsx olarak belirle
+                fileDialog1.Filter = "Excel files (*.xlsx)|*.xlsx|All files (*.*)|*.*";
+                if (fileDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    // Bu if bloğu dosya seçildiğinde çalışır
+                    // Selected file path
+                    string selectedFileName = fileDialog1.FileName;
+                    ExcelImporter importer = new ExcelImporter();
+                    DataTable dataTable = importer.ImportExcelFile(selectedFileName);
+                    dataGridView1.DataSource = dataTable;
+
+                    // Process the selected file (e.g., upload it)
+                }
+            }
+            else
+            {
+                // Değilse şimdilik tüm dosya uzantılarını kabul et
+                fileDialog1.Filter = "All files (*.*)|*.*";
+                if (fileDialog1.ShowDialog() == DialogResult.OK) { 
+                    // TODO
+                }
+            }
+
+            fileDialog1.Title = "Select a file";
+
         }
 
         private void button3_Click_1(object sender, EventArgs e)
