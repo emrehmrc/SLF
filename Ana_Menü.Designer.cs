@@ -138,6 +138,7 @@
             this.roundButton2.TabIndex = 5;
             this.roundButton2.Text = "Yardım";
             this.roundButton2.UseVisualStyleBackColor = false;
+            this.roundButton2.Click += new System.EventHandler(this.roundButton2_Click);
             // 
             // roundButton1
             // 
@@ -151,6 +152,7 @@
             this.roundButton1.TabIndex = 4;
             this.roundButton1.Text = "Hakkında";
             this.roundButton1.UseVisualStyleBackColor = false;
+            this.roundButton1.Click += new System.EventHandler(this.roundButton1_Click);
             // 
             // GirişFormu
             // 

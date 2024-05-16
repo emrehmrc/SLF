@@ -14,16 +14,18 @@ namespace SLF
     public partial class GirişFormu : Form
     {
         public ModülFormu mod1;
+        public Hakkında mod2;
 
         public GirişFormu()
         {
             InitializeComponent();
-            mod1 = new ModülFormu();
-            mod1.Tag = this;
+
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            mod1 = new ModülFormu();
+            mod1.Tag = this;
             mod1.Show();
             this.Hide();
         }
@@ -36,6 +38,19 @@ namespace SLF
         private void label2_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void roundButton2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void roundButton1_Click(object sender, EventArgs e)
+        {
+            mod2 = new Hakkında();
+            mod2.Tag = this;
+            mod2.Show();
+            this.Hide();
         }
     }
 }
