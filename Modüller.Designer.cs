@@ -1,4 +1,6 @@
-﻿namespace SLF
+﻿using System;
+
+namespace SLF
 {
     partial class ModülFormu
     {
@@ -27,7 +29,7 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
-        {
+        {   
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ModülFormu));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -47,6 +49,14 @@
             this.label9 = new System.Windows.Forms.Label();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.tab_ea = new System.Windows.Forms.TabPage();
+            this.btnTamamla = new System.Windows.Forms.Button();
+            this.btnplgn = new System.Windows.Forms.Button();
+            this.tbar1 = new System.Windows.Forms.TrackBar();
+            this.label12 = new System.Windows.Forms.Label();
+            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.button6 = new System.Windows.Forms.Button();
+            this.mapControl = new GMap.NET.WindowsForms.GMapControl();
+            this.button7 = new System.Windows.Forms.Button();
             this.tab_ekonometrik = new System.Windows.Forms.TabPage();
             this.button5 = new System.Windows.Forms.Button();
             this.checkBox8 = new System.Windows.Forms.CheckBox();
@@ -81,15 +91,18 @@
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.tab_rapor = new System.Windows.Forms.TabPage();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
             this.button2 = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.fileSystemWatcher1 = new System.IO.FileSystemWatcher();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.oznitelikAc = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tab_girdi.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.tab_dek.SuspendLayout();
+            this.tab_ea.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tbar1)).BeginInit();
             this.tab_ekonometrik.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.tab_yükHaritası.SuspendLayout();
@@ -169,7 +182,7 @@
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.Padding = new System.Drawing.Point(20, 3);
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1480, 698);
+            this.tabControl1.Size = new System.Drawing.Size(1479, 684);
             this.tabControl1.TabIndex = 2;
             // 
             // tab_girdi
@@ -184,7 +197,7 @@
             this.tab_girdi.Location = new System.Drawing.Point(4, 62);
             this.tab_girdi.Name = "tab_girdi";
             this.tab_girdi.Padding = new System.Windows.Forms.Padding(3);
-            this.tab_girdi.Size = new System.Drawing.Size(1472, 632);
+            this.tab_girdi.Size = new System.Drawing.Size(1471, 618);
             this.tab_girdi.TabIndex = 0;
             this.tab_girdi.Text = "Girdi Modülü";
             this.tab_girdi.UseVisualStyleBackColor = true;
@@ -267,9 +280,9 @@
             // 
             this.tab_dek.Controls.Add(this.label9);
             this.tab_dek.Controls.Add(this.comboBox2);
-            this.tab_dek.Location = new System.Drawing.Point(4, 33);
+            this.tab_dek.Location = new System.Drawing.Point(4, 62);
             this.tab_dek.Name = "tab_dek";
-            this.tab_dek.Size = new System.Drawing.Size(1472, 661);
+            this.tab_dek.Size = new System.Drawing.Size(1471, 618);
             this.tab_dek.TabIndex = 6;
             this.tab_dek.Text = "DEK Modülü";
             this.tab_dek.UseVisualStyleBackColor = true;
@@ -293,12 +306,118 @@
             // 
             // tab_ea
             // 
-            this.tab_ea.Location = new System.Drawing.Point(4, 33);
+            this.tab_ea.Controls.Add(this.oznitelikAc);
+            this.tab_ea.Controls.Add(this.btnTamamla);
+            this.tab_ea.Controls.Add(this.btnplgn);
+            this.tab_ea.Controls.Add(this.tbar1);
+            this.tab_ea.Controls.Add(this.label12);
+            this.tab_ea.Controls.Add(this.listBox1);
+            this.tab_ea.Controls.Add(this.button6);
+            this.tab_ea.Controls.Add(this.mapControl);
+            this.tab_ea.Controls.Add(this.button7);
+            this.tab_ea.Location = new System.Drawing.Point(4, 62);
             this.tab_ea.Name = "tab_ea";
-            this.tab_ea.Size = new System.Drawing.Size(1472, 661);
+            this.tab_ea.Size = new System.Drawing.Size(1471, 618);
             this.tab_ea.TabIndex = 5;
             this.tab_ea.Text = "EA Şarj Modülü";
             this.tab_ea.UseVisualStyleBackColor = true;
+            // 
+            // btnTamamla
+            // 
+            this.btnTamamla.Location = new System.Drawing.Point(267, 91);
+            this.btnTamamla.Name = "btnTamamla";
+            this.btnTamamla.Size = new System.Drawing.Size(95, 75);
+            this.btnTamamla.TabIndex = 28;
+            this.btnTamamla.Text = "Poligon Tamamla";
+            this.btnTamamla.UseVisualStyleBackColor = true;
+            this.btnTamamla.Click += new System.EventHandler(this.btnTamamla_Click_1);
+            // 
+            // btnplgn
+            // 
+            this.btnplgn.Location = new System.Drawing.Point(267, 9);
+            this.btnplgn.Name = "btnplgn";
+            this.btnplgn.Size = new System.Drawing.Size(95, 75);
+            this.btnplgn.TabIndex = 27;
+            this.btnplgn.Text = "Poligona Başla";
+            this.btnplgn.UseVisualStyleBackColor = true;
+            this.btnplgn.Click += new System.EventHandler(this.btnplgn_Click_1);
+            // 
+            // tbar1
+            // 
+            this.tbar1.Location = new System.Drawing.Point(391, 3);
+            this.tbar1.Name = "tbar1";
+            this.tbar1.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.tbar1.Size = new System.Drawing.Size(56, 163);
+            this.tbar1.TabIndex = 24;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(40, 127);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(180, 24);
+            this.label12.TabIndex = 21;
+            this.label12.Text = "Seçili CVS Dosyaları";
+            // 
+            // listBox1
+            // 
+            this.listBox1.FormattingEnabled = true;
+            this.listBox1.ItemHeight = 24;
+            this.listBox1.Location = new System.Drawing.Point(35, 172);
+            this.listBox1.Name = "listBox1";
+            this.listBox1.Size = new System.Drawing.Size(244, 220);
+            this.listBox1.TabIndex = 20;
+            this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
+            // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(70, 72);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(122, 39);
+            this.button6.TabIndex = 19;
+            this.button6.Text = "Temizle";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
+            // 
+            // mapControl
+            // 
+            this.mapControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.mapControl.Bearing = 0F;
+            this.mapControl.CanDragMap = true;
+            this.mapControl.EmptyTileColor = System.Drawing.Color.Navy;
+            this.mapControl.GrayScaleMode = false;
+            this.mapControl.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
+            this.mapControl.LevelsKeepInMemory = 5;
+            this.mapControl.Location = new System.Drawing.Point(382, 3);
+            this.mapControl.MarkersEnabled = true;
+            this.mapControl.MaxZoom = 2;
+            this.mapControl.MinZoom = 2;
+            this.mapControl.MouseWheelZoomEnabled = false;
+            this.mapControl.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
+            this.mapControl.Name = "mapControl";
+            this.mapControl.NegativeMode = false;
+            this.mapControl.PolygonsEnabled = true;
+            this.mapControl.RetryLoadTile = 0;
+            this.mapControl.RoutesEnabled = true;
+            this.mapControl.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
+            this.mapControl.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
+            this.mapControl.ShowTileGridLines = false;
+            this.mapControl.Size = new System.Drawing.Size(1096, 576);
+            this.mapControl.TabIndex = 18;
+            this.mapControl.Zoom = 0D;
+            this.mapControl.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(this.mapControl_OnMarkerClick_edited);
+            // 
+            // button7
+            // 
+            this.button7.Location = new System.Drawing.Point(61, 26);
+            this.button7.Name = "button7";
+            this.button7.Size = new System.Drawing.Size(143, 40);
+            this.button7.TabIndex = 17;
+            this.button7.Text = "CSV Yükle";
+            this.button7.UseVisualStyleBackColor = true;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
             // tab_ekonometrik
             // 
@@ -309,10 +428,10 @@
             this.tab_ekonometrik.Controls.Add(this.label10);
             this.tab_ekonometrik.Controls.Add(this.comboBox3);
             this.tab_ekonometrik.Controls.Add(this.dataGridView2);
-            this.tab_ekonometrik.Location = new System.Drawing.Point(4, 33);
+            this.tab_ekonometrik.Location = new System.Drawing.Point(4, 62);
             this.tab_ekonometrik.Name = "tab_ekonometrik";
             this.tab_ekonometrik.Padding = new System.Windows.Forms.Padding(3);
-            this.tab_ekonometrik.Size = new System.Drawing.Size(1472, 661);
+            this.tab_ekonometrik.Size = new System.Drawing.Size(1471, 618);
             this.tab_ekonometrik.TabIndex = 1;
             this.tab_ekonometrik.Text = "Ekonometrik Talep Tahmini Modülü";
             this.tab_ekonometrik.UseVisualStyleBackColor = true;
@@ -382,18 +501,18 @@
             // 
             // tab_imar
             // 
-            this.tab_imar.Location = new System.Drawing.Point(4, 33);
+            this.tab_imar.Location = new System.Drawing.Point(4, 62);
             this.tab_imar.Name = "tab_imar";
-            this.tab_imar.Size = new System.Drawing.Size(1472, 661);
+            this.tab_imar.Size = new System.Drawing.Size(1471, 618);
             this.tab_imar.TabIndex = 4;
             this.tab_imar.Text = "İmar Analizleri";
             this.tab_imar.UseVisualStyleBackColor = true;
             // 
             // tab_optDTR
             // 
-            this.tab_optDTR.Location = new System.Drawing.Point(4, 33);
+            this.tab_optDTR.Location = new System.Drawing.Point(4, 62);
             this.tab_optDTR.Name = "tab_optDTR";
-            this.tab_optDTR.Size = new System.Drawing.Size(1472, 661);
+            this.tab_optDTR.Size = new System.Drawing.Size(1471, 618);
             this.tab_optDTR.TabIndex = 7;
             this.tab_optDTR.Text = "Optimal DTR Konumlandırma";
             this.tab_optDTR.UseVisualStyleBackColor = true;
@@ -402,7 +521,7 @@
             // 
             this.tab_senaryo.Location = new System.Drawing.Point(4, 62);
             this.tab_senaryo.Name = "tab_senaryo";
-            this.tab_senaryo.Size = new System.Drawing.Size(1472, 632);
+            this.tab_senaryo.Size = new System.Drawing.Size(1471, 618);
             this.tab_senaryo.TabIndex = 3;
             this.tab_senaryo.Text = "Senaryo Oluşturma Modülü";
             this.tab_senaryo.UseVisualStyleBackColor = true;
@@ -411,7 +530,7 @@
             // 
             this.tab_stokastik.Location = new System.Drawing.Point(4, 62);
             this.tab_stokastik.Name = "tab_stokastik";
-            this.tab_stokastik.Size = new System.Drawing.Size(1472, 632);
+            this.tab_stokastik.Size = new System.Drawing.Size(1471, 618);
             this.tab_stokastik.TabIndex = 2;
             this.tab_stokastik.Text = "Stokastik Yük Tahmini Modülü";
             this.tab_stokastik.UseVisualStyleBackColor = true;
@@ -432,7 +551,7 @@
             this.tab_yükHaritası.Controls.Add(this.panel1);
             this.tab_yükHaritası.Location = new System.Drawing.Point(4, 62);
             this.tab_yükHaritası.Name = "tab_yükHaritası";
-            this.tab_yükHaritası.Size = new System.Drawing.Size(1472, 632);
+            this.tab_yükHaritası.Size = new System.Drawing.Size(1471, 618);
             this.tab_yükHaritası.TabIndex = 9;
             this.tab_yükHaritası.Text = "Yük Haritası Modülü";
             this.tab_yükHaritası.UseVisualStyleBackColor = true;
@@ -642,10 +761,19 @@
             // 
             this.tab_rapor.Location = new System.Drawing.Point(4, 62);
             this.tab_rapor.Name = "tab_rapor";
-            this.tab_rapor.Size = new System.Drawing.Size(1472, 632);
+            this.tab_rapor.Size = new System.Drawing.Size(1471, 618);
             this.tab_rapor.TabIndex = 8;
             this.tab_rapor.Text = "Raporlama";
             this.tab_rapor.UseVisualStyleBackColor = true;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Location = new System.Drawing.Point(4, 62);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Size = new System.Drawing.Size(1471, 618);
+            this.tabPage1.TabIndex = 10;
+            this.tabPage1.Text = "Validasyon Modülü";
+            this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // button2
             // 
@@ -670,14 +798,15 @@
             this.fileSystemWatcher1.EnableRaisingEvents = true;
             this.fileSystemWatcher1.SynchronizingObject = this;
             // 
-            // tabPage1
+            // oznitelikAc
             // 
-            this.tabPage1.Location = new System.Drawing.Point(4, 62);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Size = new System.Drawing.Size(1472, 632);
-            this.tabPage1.TabIndex = 10;
-            this.tabPage1.Text = "Validasyon Modülü";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.oznitelikAc.Location = new System.Drawing.Point(52, 418);
+            this.oznitelikAc.Name = "oznitelikAc";
+            this.oznitelikAc.Size = new System.Drawing.Size(194, 38);
+            this.oznitelikAc.TabIndex = 29;
+            this.oznitelikAc.Text = "Öznitelikleri Göster";
+            this.oznitelikAc.UseVisualStyleBackColor = true;
+            this.oznitelikAc.Click += new System.EventHandler(this.oznitelikAc_Click);
             // 
             // ModülFormu
             // 
@@ -707,6 +836,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.tab_dek.ResumeLayout(false);
             this.tab_dek.PerformLayout();
+            this.tab_ea.ResumeLayout(false);
+            this.tab_ea.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tbar1)).EndInit();
             this.tab_ekonometrik.ResumeLayout(false);
             this.tab_ekonometrik.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
@@ -719,6 +851,16 @@
             this.ResumeLayout(false);
             this.PerformLayout();
 
+        }
+
+        private void btnTamamla_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void btnplgn_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -779,5 +921,14 @@
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.CheckBox checkBox8;
         private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.Button button6;
+        private GMap.NET.WindowsForms.GMapControl mapControl;
+        private System.Windows.Forms.Button button7;
+        private System.Windows.Forms.TrackBar tbar1;
+        private System.Windows.Forms.Button btnTamamla;
+        private System.Windows.Forms.Button btnplgn;
+        private System.Windows.Forms.Button oznitelikAc;
     }
 }
