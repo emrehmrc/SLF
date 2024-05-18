@@ -82,7 +82,6 @@
             this.label2.TabIndex = 3;
             this.label2.Text = "Jeo-Uzamsal Yük Tahmini";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // button1
             // 
@@ -177,7 +176,6 @@
             this.MaximizeBox = false;
             this.Name = "GirişFormu";
             this.Text = "JEO UZAMSAL YÜK TAHMİNİ YAZILIMI";
-            this.Load += new System.EventHandler(this.GirişFormu_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
