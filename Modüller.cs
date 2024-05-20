@@ -42,21 +42,18 @@ namespace SLF
         // default extents of the axMap object in the stokastik_haritası module
         public Extents stokastik_default_extents;
 
-
         public ModülFormu()
         {
             // modül initialization constructor
             InitializeComponent();
 
             // Girdi Modülü'nde default olarak "Abone Verileri" seçeneğini göster
-            veri_listesi_seçimi.SelectedIndex = 0;
-
-            
+            veri_listesi_seçimi.SelectedIndex = 0;    
 
             // stokastik haritasına ait initialization parametreleri
             stokastik_haritası.Latitude = 38.5f;
             stokastik_haritası.Longitude = 27.2f;
-            stokastik_haritası.CurrentZoom = 11;
+            stokastik_haritası.CurrentZoom = 13;
             stokastik_haritası.MapCursor = MapWinGIS.tkCursor.crsrArrow;
             stokastik_haritası_checkboxes_init();
 
@@ -81,8 +78,7 @@ namespace SLF
             OpenFileDialog vektorel_veri_seçimi = new OpenFileDialog();
 
             vektorel_veri_seçimi.Filter = "Shapefile |*.shp|MapInfo File|*.tab|Google Earth File|*.kml";
-            vektorel_veri_seçimi.InitialDirectory = "C:\\Users\\emre.hangul\\MRC\\MRC - 1.1.3_T&SI\\" +
-                "MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\09_Alinan Veriler\\GDZ\\CBS";
+            vektorel_veri_seçimi.InitialDirectory = "C:\\Users\\Zekiye\\Desktop\\CBS";
 
             DialogResult result = vektorel_veri_seçimi.ShowDialog();
 
@@ -147,6 +143,67 @@ namespace SLF
             }
         }
 
+        private void rengiDeğiştirToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            ToolStripMenuItem rengini_degistir_menu_item = sender as ToolStripMenuItem;
+
+            if (rengini_degistir_menu_item != null)
+            {
+                System.Windows.Forms.CheckBox checkBox = rengini_degistir_menu_item.Tag as System.Windows.Forms.CheckBox;
+                int checkbox_index = int.Parse(checkBox.Tag.ToString()) - 1;
+
+                ColorDialog stokastik_color = new ColorDialog();
+                stokastik_color.AnyColor = true;
+                stokastik_color.AllowFullOpen = true;
+                stokastik_color.FullOpen = true;
+                stokastik_color.Color = stokastik_haritası.get_ShapeLayerFillColor(checkbox_index);
+
+                if (stokastik_color.ShowDialog() == DialogResult.OK)
+                {
+                    // Get the color components
+                    byte a = stokastik_color.Color.A;
+                    byte r = stokastik_color.Color.R;
+                    byte g = stokastik_color.Color.G;
+                    byte b = stokastik_color.Color.B;
+
+                    // Combine them into a single uint in the order expected by MapWinGIS (ABGR)
+                    uint abgr = (uint)(a << 24 | b << 16 | g << 8 | r);
+
+                    stokastik_haritası.set_ShapeLayerFillColor(checkbox_index, abgr);
+                    stokastik_haritası.Redraw(); // Redraw the map to reflect the changes
+                }
+            }
+        }
+
+        private void kaydetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            ToolStripMenuItem kaydet_menu_item = sender as ToolStripMenuItem;
+
+            if (kaydet_menu_item != null)
+            {
+                System.Windows.Forms.CheckBox checkBox = kaydet_menu_item.Tag as System.Windows.Forms.CheckBox;
+                int checkbox_index = int.Parse(checkBox.Tag.ToString()) - 1;
+
+                SaveFileDialog kaydet_file_dialog = new SaveFileDialog();
+                kaydet_file_dialog.Filter = "Shapefile |*.shp|MapInfo File|*.tab|Google Earth File|*.kml";
+                kaydet_file_dialog.InitialDirectory = "C:\\Users\\Zekiye\\Desktop\\CBS";
+
+                DialogResult kaydet_result = kaydet_file_dialog.ShowDialog();
+
+                if (kaydet_result == DialogResult.OK)
+                {
+                    string filepath = kaydet_file_dialog.FileName;
+                    shapefile_array[checkbox_index].SaveAsEx(filepath, true, false);
+                    MessageBox.Show("Dosya başarıyla kaydedildi.");
+
+                }
+
+            }
+
+        }
+
         private void temizleToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
@@ -172,6 +229,7 @@ namespace SLF
                         shapefile_array[checkbox_index] = null;
                         checkBox.Checked = false;
                         checkBox.Visible = false;
+                        stokastik_haritası.Redraw();
 
                     }
                 }
@@ -186,6 +244,7 @@ namespace SLF
             int checkbox_index = int.Parse(sender_checkbox.Tag.ToString()) - 1;
             temizleToolStripMenuItem.Tag = sender_checkbox;
             rengiDeğiştirToolStripMenuItem.Tag = sender_checkbox;
+            kaydetToolStripMenuItem.Tag = sender_checkbox;
 
             if (shapefile_array[checkbox_index] != null)
             {
@@ -554,35 +613,5 @@ namespace SLF
             }
         }
 
-        private void rengiDeğiştirToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-            ToolStripMenuItem rengini_degistir_menu_item = sender as ToolStripMenuItem;
-
-            if (rengini_degistir_menu_item != null)
-            {
-                System.Windows.Forms.CheckBox checkBox = rengini_degistir_menu_item.Tag as System.Windows.Forms.CheckBox;
-                int checkbox_index = int.Parse(checkBox.Tag.ToString()) - 1;
-
-                ColorDialog stokastik_color = new ColorDialog();
-                stokastik_color.AnyColor = true;
-                stokastik_color.Color = stokastik_haritası.get_ShapeLayerFillColor(checkbox_index);
-                
-                if(stokastik_color.ShowDialog() == DialogResult.OK)
-                {
-                    // Get the color components
-                    byte a = stokastik_color.Color.A;
-                    byte r = stokastik_color.Color.R;
-                    byte g = stokastik_color.Color.G;
-                    byte b = stokastik_color.Color.B;
-
-                    // Combine them into a single uint in the order expected by MapWinGIS (ABGR)
-                    uint abgr = (uint)(a << 24 | b << 16 | g << 8 | r);
-
-                    stokastik_haritası.set_ShapeLayerFillColor(checkbox_index, abgr);
-                    stokastik_haritası.Redraw(); // Redraw the map to reflect the changes
-                }
-            }
-        }
     }
 }
