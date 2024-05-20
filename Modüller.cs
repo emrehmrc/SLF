@@ -52,7 +52,7 @@ namespace SLF
             OpenFileDialog fileDialog1 = new OpenFileDialog();
 
             // Modül seçimine göre dosya uzantısını belirle
-            string selectedItem = girdi_veri_secimi_dropdown.SelectedItem.ToString();
+            string selectedItem = veri_listesi_seçimi.SelectedItem.ToString();
             if (veri_listesi_requires_xlsx.Contains(selectedItem))
             {
                 // Constructor'daki veri_listesi_requires_xlsx listesindeki verilerin uzantısını xlsx olarak belirle
