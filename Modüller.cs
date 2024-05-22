@@ -14,12 +14,15 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Aspose.Gis.SpatialReferencing;
+using Aspose.Gis;
 using AxMapWinGIS;
 using EO.WebBrowser;
 using MapWinGIS;
 using Microsoft.Web.WebView2.WinForms;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
+using Avalonia.Media;
 
 namespace SLF
 {
@@ -62,8 +65,8 @@ namespace SLF
             veri_listesi_seçimi.SelectedIndex = 0;    
 
             // stokastik haritasına ait initialization parametreleri
-            stokastik_haritası.Latitude = 38.5f;
-            stokastik_haritası.Longitude = 27.2f;
+            stokastik_haritası.Latitude = 38.27f;
+            stokastik_haritası.Longitude = 27.0f;
             stokastik_haritası.CurrentZoom = 13;
             stokastik_haritası.MapCursor = MapWinGIS.tkCursor.crsrArrow;
             stokastik_haritası_checkboxes_init();
@@ -77,10 +80,11 @@ namespace SLF
 
         private void ConfigureTileCaching()
         {
-            //stokastik_haritası.Tiles.DiskCacheFilename = "C:\\Users\\Zekiye\\source\\repos\\emrehmrc\\SLF\\Tiles\\tiles.db3";
-            stokastik_haritası.Tiles.UseCache[tkCacheType.RAM] = true;
-            stokastik_haritası.Tiles.MaxCacheSize[tkCacheType.RAM] = 2000;
-            stokastik_haritası.Tiles.DoCaching[tkCacheType.RAM] = true;
+            stokastik_haritası.Tiles.DiskCacheFilename = "C:\\Users\\Zekiye\\source\\repos\\emrehmrc\\SLF\\Tiles\\tiles.txt";
+            stokastik_haritası.Tiles.UseCache[tkCacheType.Disk] = true;
+            stokastik_haritası.Tiles.MaxCacheSize[tkCacheType.Disk] = 2000000;
+            stokastik_haritası.Tiles.DoCaching[tkCacheType.Disk] = true;
+            stokastik_haritası.Tiles.UseServer = true;
         }
 
         private void stokastik_dosya_seçimi_Click(object sender, EventArgs e)
@@ -105,12 +109,12 @@ namespace SLF
             if (result == DialogResult.OK)
             {
                 string filepath = vektorel_veri_seçimi.FileName;
-                string extension = filepath.Substring(filepath.Length - 3);
+                string filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
+                string extension = filename.Substring(filename.Length - 3);
 
                 if (extension == "shp")
                 {
                     Shapefile added_shapefile = new Shapefile();
-                    string filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
 
                     if (added_shapefile.Open(filepath, null))
                     {
@@ -131,6 +135,44 @@ namespace SLF
                     {
                         MessageBox.Show($"Dosya yüklenemedi: {filepath}");
                     }
+                }
+                else if (extension == "kml")
+                {
+
+                    // Create ConversionOptions if required
+                    ConversionOptions options = new ConversionOptions();
+
+                    // This options assigns Wgs84 to the destination layer.
+                    // Conversion may throw error If destination layer does not support the Wgs84 spatial reference. So need to check.
+                    // 
+                    if (Drivers.Shapefile.SupportsSpatialReferenceSystem(SpatialReferenceSystem.Wgs84))
+                        options.DestinationSpatialReferenceSystem = SpatialReferenceSystem.Wgs84;
+
+                    // Convert file format from KML to Shapefile.
+                    VectorLayer.Convert(filepath, Drivers.Kml, "C:\\Users\\Zekiye\\Desktop\\trial.shp", Drivers.Shapefile, options);
+
+                    Shapefile added_shapefile = new Shapefile();
+
+                    if (added_shapefile.Open("C:\\Users\\Zekiye\\Desktop\\trial.shp", null))
+                    {
+                        shapefile_array[index] = added_shapefile;
+                        shapefile_names[index] = filename;
+                        layerHandles[index] = stokastik_haritası.AddLayer(added_shapefile, true);
+                        stokastik_haritası.ZoomToLayer(layerHandles[index]);
+
+                        System.Windows.Forms.CheckBox associatedCheckBox = GetCheckBoxByIndex(index);
+                        if (associatedCheckBox != null)
+                        {
+                            associatedCheckBox.Checked = true;
+                            associatedCheckBox.Visible = true;
+                            associatedCheckBox.Text = shapefile_names[index];
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Dosya yüklenemedi: {filepath}");
+                    }
+                    MessageBox.Show(".kml uzantılı dosya .shp uzantısına çevrildi.");
                 }
 
                 /*OgrDatasource ds = new OgrDatasource();*/
@@ -569,7 +611,7 @@ namespace SLF
 
             // Get the checkbox associated with the context menu strip and set its font to bold
             System.Windows.Forms.CheckBox clickedCheckBox = (System.Windows.Forms.CheckBox)contextMenuStrip.SourceControl; 
-            clickedCheckBox.Font = new Font(clickedCheckBox.Font, FontStyle.Bold);
+            clickedCheckBox.Font = new Font(clickedCheckBox.Font, System.Drawing.FontStyle.Bold);
 
         }
 
@@ -580,7 +622,7 @@ namespace SLF
 
             // Get the checkbox associated with the context menu strip and set its font to regular
             System.Windows.Forms.CheckBox clickedCheckBox = contextMenuStrip.SourceControl as System.Windows.Forms.CheckBox;
-            clickedCheckBox.Font = new Font(clickedCheckBox.Font, FontStyle.Regular);
+            clickedCheckBox.Font = new Font(clickedCheckBox.Font, System.Drawing.FontStyle.Regular);
 
         }
 
@@ -647,9 +689,45 @@ namespace SLF
 
         private void stokastik_haritası_ExtentsChanged(object sender, EventArgs e)
         {
-            this.Cursor = Cursors.WaitCursor;
-            Thread.Sleep(1000);
-            this.Cursor = Cursors.Default;
+
+            try
+            {
+                // Optional: Additional handling during zoom events
+                this.Cursor = Cursors.WaitCursor;
+                //Thread.Sleep(500);
+                this.Cursor = Cursors.Default;
+            }
+            catch (Exception ex)
+            {
+                HandleMapException(ex);
+            }
+
+        }
+
+        private void HandleMapException(Exception ex)
+        {
+            // Log the exception (consider using a logging library)
+            Console.WriteLine($"Error: {ex.Message}");
+
+            // Attempt to reinitialize the map
+            try
+            {
+                stokastik_haritası.Clear();
+                stokastik_haritası.Redraw();
+                stokastik_haritası.TileProvider = tkTileProvider.OpenStreetMap;
+                stokastik_haritası.Latitude = 38.27f;
+                stokastik_haritası.Longitude = 27.0f;
+                stokastik_haritası.CurrentZoom = 13;
+                stokastik_haritası.MapCursor = MapWinGIS.tkCursor.crsrArrow;
+                stokastik_haritası_checkboxes_init();
+
+                // Optionally reconfigure tile caching and other settings
+                ConfigureTileCaching();
+            }
+            catch (Exception reinitEx)
+            {
+                Console.WriteLine($"Reinitialization failed: {reinitEx.Message}");
+            }
         }
     }
 }

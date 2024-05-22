@@ -70,6 +70,7 @@
             this.tab_optDTR = new System.Windows.Forms.TabPage();
             this.tab_senaryo = new System.Windows.Forms.TabPage();
             this.tab_stokastik = new System.Windows.Forms.TabPage();
+            this.button9 = new System.Windows.Forms.Button();
             this.checkBox18 = new System.Windows.Forms.CheckBox();
             this.katmanlar_right_click = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tabloyuGörToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -130,7 +131,6 @@
             this.tab_validasyon = new System.Windows.Forms.TabPage();
             this.fileSystemWatcher1 = new System.IO.FileSystemWatcher();
             this.button2 = new System.Windows.Forms.Button();
-            this.button9 = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tab_girdi.SuspendLayout();
@@ -162,7 +162,7 @@
             this.yardımToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1482, 30);
+            this.menuStrip1.Size = new System.Drawing.Size(1482, 28);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -173,7 +173,7 @@
             this.exportToolStripMenuItem,
             this.saToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(64, 26);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(64, 24);
             this.fileToolStripMenuItem.Text = "Dosya";
             // 
             // importToolStripMenuItem
@@ -197,7 +197,7 @@
             // yardımToolStripMenuItem
             // 
             this.yardımToolStripMenuItem.Name = "yardımToolStripMenuItem";
-            this.yardımToolStripMenuItem.Size = new System.Drawing.Size(69, 26);
+            this.yardımToolStripMenuItem.Size = new System.Drawing.Size(69, 24);
             this.yardımToolStripMenuItem.Text = "Yardım";
             // 
             // tabControl1
@@ -239,7 +239,7 @@
             this.tab_girdi.Location = new System.Drawing.Point(4, 62);
             this.tab_girdi.Name = "tab_girdi";
             this.tab_girdi.Padding = new System.Windows.Forms.Padding(3);
-            this.tab_girdi.Size = new System.Drawing.Size(1472, 682);
+            this.tab_girdi.Size = new System.Drawing.Size(1472, 634);
             this.tab_girdi.TabIndex = 0;
             this.tab_girdi.Text = "Girdi Modülü";
             this.tab_girdi.UseVisualStyleBackColor = true;
@@ -328,7 +328,7 @@
             this.tab_dek.Controls.Add(this.dataGridView4);
             this.tab_dek.Location = new System.Drawing.Point(4, 62);
             this.tab_dek.Name = "tab_dek";
-            this.tab_dek.Size = new System.Drawing.Size(1472, 682);
+            this.tab_dek.Size = new System.Drawing.Size(1472, 634);
             this.tab_dek.TabIndex = 6;
             this.tab_dek.Text = "DEK Modülü";
             this.tab_dek.UseVisualStyleBackColor = true;
@@ -372,7 +372,7 @@
             this.tab_ea.Controls.Add(this.dataGridView3);
             this.tab_ea.Location = new System.Drawing.Point(4, 62);
             this.tab_ea.Name = "tab_ea";
-            this.tab_ea.Size = new System.Drawing.Size(1472, 682);
+            this.tab_ea.Size = new System.Drawing.Size(1472, 634);
             this.tab_ea.TabIndex = 5;
             this.tab_ea.Text = "EA Şarj Modülü";
             this.tab_ea.UseVisualStyleBackColor = true;
@@ -421,7 +421,7 @@
             this.tab_ekonometrik.Location = new System.Drawing.Point(4, 62);
             this.tab_ekonometrik.Name = "tab_ekonometrik";
             this.tab_ekonometrik.Padding = new System.Windows.Forms.Padding(3);
-            this.tab_ekonometrik.Size = new System.Drawing.Size(1472, 682);
+            this.tab_ekonometrik.Size = new System.Drawing.Size(1472, 634);
             this.tab_ekonometrik.TabIndex = 1;
             this.tab_ekonometrik.Text = "Ekonometrik Talep Tahmini Modülü";
             this.tab_ekonometrik.UseVisualStyleBackColor = true;
@@ -546,7 +546,7 @@
             this.tab_imar.Controls.Add(this.button6);
             this.tab_imar.Location = new System.Drawing.Point(4, 62);
             this.tab_imar.Name = "tab_imar";
-            this.tab_imar.Size = new System.Drawing.Size(1472, 682);
+            this.tab_imar.Size = new System.Drawing.Size(1472, 634);
             this.tab_imar.TabIndex = 4;
             this.tab_imar.Text = "İmar Analizleri";
             this.tab_imar.UseVisualStyleBackColor = true;
@@ -565,7 +565,7 @@
             // 
             this.tab_optDTR.Location = new System.Drawing.Point(4, 62);
             this.tab_optDTR.Name = "tab_optDTR";
-            this.tab_optDTR.Size = new System.Drawing.Size(1472, 682);
+            this.tab_optDTR.Size = new System.Drawing.Size(1472, 634);
             this.tab_optDTR.TabIndex = 7;
             this.tab_optDTR.Text = "Optimal DTR Konumlandırma";
             this.tab_optDTR.UseVisualStyleBackColor = true;
@@ -574,7 +574,7 @@
             // 
             this.tab_senaryo.Location = new System.Drawing.Point(4, 62);
             this.tab_senaryo.Name = "tab_senaryo";
-            this.tab_senaryo.Size = new System.Drawing.Size(1472, 682);
+            this.tab_senaryo.Size = new System.Drawing.Size(1472, 634);
             this.tab_senaryo.TabIndex = 3;
             this.tab_senaryo.Text = "Senaryo Oluşturma Modülü";
             this.tab_senaryo.UseVisualStyleBackColor = true;
@@ -602,6 +602,17 @@
             this.tab_stokastik.TabIndex = 2;
             this.tab_stokastik.Text = "Stokastik Yük Tahmini Modülü";
             this.tab_stokastik.UseVisualStyleBackColor = true;
+            // 
+            // button9
+            // 
+            this.button9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.button9.Location = new System.Drawing.Point(15, 582);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(167, 34);
+            this.button9.TabIndex = 29;
+            this.button9.Text = "Google Earth";
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
             // 
             // checkBox18
             // 
@@ -1042,10 +1053,10 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.stokastik_haritası.Enabled = true;
-            this.stokastik_haritası.Location = new System.Drawing.Point(215, 47);
+            this.stokastik_haritası.Location = new System.Drawing.Point(217, 47);
             this.stokastik_haritası.Name = "stokastik_haritası";
             this.stokastik_haritası.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("stokastik_haritası.OcxState")));
-            this.stokastik_haritası.Size = new System.Drawing.Size(1251, 578);
+            this.stokastik_haritası.Size = new System.Drawing.Size(1249, 578);
             this.stokastik_haritası.TabIndex = 0;
             this.stokastik_haritası.MouseDownEvent += new AxMapWinGIS._DMapEvents_MouseDownEventHandler(this.stokastik_haritası_MouseDownEvent);
             this.stokastik_haritası.ExtentsChanged += new System.EventHandler(this.stokastik_haritası_ExtentsChanged);
@@ -1066,7 +1077,7 @@
             this.tab_yükHaritası.Controls.Add(this.panel1);
             this.tab_yükHaritası.Location = new System.Drawing.Point(4, 62);
             this.tab_yükHaritası.Name = "tab_yükHaritası";
-            this.tab_yükHaritası.Size = new System.Drawing.Size(1472, 682);
+            this.tab_yükHaritası.Size = new System.Drawing.Size(1472, 634);
             this.tab_yükHaritası.TabIndex = 9;
             this.tab_yükHaritası.Text = "Yük Haritası Modülü";
             this.tab_yükHaritası.UseVisualStyleBackColor = true;
@@ -1276,7 +1287,7 @@
             // 
             this.tab_rapor.Location = new System.Drawing.Point(4, 62);
             this.tab_rapor.Name = "tab_rapor";
-            this.tab_rapor.Size = new System.Drawing.Size(1472, 682);
+            this.tab_rapor.Size = new System.Drawing.Size(1472, 634);
             this.tab_rapor.TabIndex = 8;
             this.tab_rapor.Text = "Raporlama";
             this.tab_rapor.UseVisualStyleBackColor = true;
@@ -1285,7 +1296,7 @@
             // 
             this.tab_validasyon.Location = new System.Drawing.Point(4, 62);
             this.tab_validasyon.Name = "tab_validasyon";
-            this.tab_validasyon.Size = new System.Drawing.Size(1472, 682);
+            this.tab_validasyon.Size = new System.Drawing.Size(1472, 634);
             this.tab_validasyon.TabIndex = 10;
             this.tab_validasyon.Text = "Validasyon Modülü";
             this.tab_validasyon.UseVisualStyleBackColor = true;
@@ -1305,17 +1316,6 @@
             this.button2.Text = "Ana Sayfa";
             this.button2.UseVisualStyleBackColor = false;
             this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // button9
-            // 
-            this.button9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button9.Location = new System.Drawing.Point(15, 582);
-            this.button9.Name = "button9";
-            this.button9.Size = new System.Drawing.Size(167, 34);
-            this.button9.TabIndex = 29;
-            this.button9.Text = "Google Earth";
-            this.button9.UseVisualStyleBackColor = true;
-            this.button9.Click += new System.EventHandler(this.button9_Click);
             // 
             // ModülFormu
             // 
