@@ -172,6 +172,12 @@
     <Compile Include="Attribute_Table.Designer.cs">
       <DependentUpon>Attribute_Table.cs</DependentUpon>
     </Compile>
+    <Compile Include="Google_Earth.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Google_Earth.Designer.cs">
+      <DependentUpon>Google_Earth.cs</DependentUpon>
+    </Compile>
     <Compile Include="Hakkında.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -200,6 +206,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Attribute_Table.resx">
       <DependentUpon>Attribute_Table.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Google_Earth.resx">
+      <DependentUpon>Google_Earth.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Hakkında.resx">
       <DependentUpon>Hakkında.cs</DependentUpon>

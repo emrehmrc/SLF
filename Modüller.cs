@@ -8,20 +8,26 @@ using System.Drawing.Text;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using AxMapWinGIS;
 using EO.WebBrowser;
 using MapWinGIS;
 using Microsoft.Web.WebView2.WinForms;
+using static System.Net.Mime.MediaTypeNames;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 
 namespace SLF
 {
     public partial class ModülFormu : Form
     {
+        public bool is_panning = false;
+        private double startX = 0, startY = 0;
+
         // form objeleri
         public GirişFormu gir1;
 
@@ -44,8 +50,13 @@ namespace SLF
 
         public ModülFormu()
         {
+            
             // modül initialization constructor
             InitializeComponent();
+
+            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+
+            ConfigureTileCaching();
 
             // Girdi Modülü'nde default olarak "Abone Verileri" seçeneğini göster
             veri_listesi_seçimi.SelectedIndex = 0;    
@@ -62,6 +73,14 @@ namespace SLF
             // initialize the previously declared tablo_formu instance.
             tablo_formu = new Tablo_Formu();
 
+        }
+
+        private void ConfigureTileCaching()
+        {
+            //stokastik_haritası.Tiles.DiskCacheFilename = "C:\\Users\\Zekiye\\source\\repos\\emrehmrc\\SLF\\Tiles\\tiles.db3";
+            stokastik_haritası.Tiles.UseCache[tkCacheType.RAM] = true;
+            stokastik_haritası.Tiles.MaxCacheSize[tkCacheType.RAM] = 2000;
+            stokastik_haritası.Tiles.DoCaching[tkCacheType.RAM] = true;
         }
 
         private void stokastik_dosya_seçimi_Click(object sender, EventArgs e)
@@ -110,7 +129,7 @@ namespace SLF
                     }
                     else
                     {
-                        MessageBox.Show($"Failed to load shapefile: {filepath}");
+                        MessageBox.Show($"Dosya yüklenemedi: {filepath}");
                     }
                 }
 
@@ -339,8 +358,7 @@ namespace SLF
 
         private void stokastik_haritası_MouseDownEvent(object sender, _DMapEvents_MouseDownEvent e)
         {
-
-            if (adding_points && e.button == 1) // Left mouse button
+            /*if (e.button == 1 && adding_points == true) // Left mouse button
             {
                 double x = 0, y = 0;
                 stokastik_haritası.PixelToProj(e.x, e.y, ref x, ref y);
@@ -355,10 +373,10 @@ namespace SLF
                 pointShape.InsertPoint(point, ref point_index);
                 pointsList.Add(pointShape);
                 point_index++;
-                /*
+                    
                 MessageBox.Show(my_shp.NumFields.ToString());
                 MessageBox.Show(my_shp.NumShapes.ToString());
-                
+
                 if (my_shp == null)
                 {
                     my_shp = new Shapefile();
@@ -369,9 +387,12 @@ namespace SLF
                 int shapeIndex = my_shp.NumShapes;
                 MessageBox.Show(shapeIndex.ToString());
                 my_shp.EditInsertShape(pointShape, ref shapeIndex);
-                my_shp.RefreshExtents();*/
-            }
+                my_shp.RefreshExtents();
+            
+            }*/
         }
+
+
 
         private void InitializeContextMenu_Nokta()
         {
@@ -422,6 +443,8 @@ namespace SLF
         {
             OpenFileDialog fileDialog1 = new OpenFileDialog();
             fileDialog1.ShowDialog();      
+
+            
         }
 
         private void button3_Click_1(object sender, EventArgs e)
@@ -462,7 +485,7 @@ namespace SLF
             if (result == DialogResult.Yes)
             {
                 stokastik_haritası.RemoveAllLayers();
-                Application.Exit();
+                System.Windows.Forms.Application.Exit();
             }
         }
 
@@ -510,14 +533,17 @@ namespace SLF
 
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
+            is_panning = false;
             stokastik_haritası.CursorMode = MapWinGIS.tkCursorMode.cmSelection;
             stokastik_haritası.MapCursor = MapWinGIS.tkCursor.crsrArrow;
         }
 
         private void toolStripButton2_Click(object sender, EventArgs e)
         {
+            is_panning = true;
             stokastik_haritası.CursorMode = MapWinGIS.tkCursorMode.cmPan;
             stokastik_haritası.MapCursor = MapWinGIS.tkCursor.crsrHand;
+
         }
 
         private void toolStripButton3_Click(object sender, EventArgs e)
@@ -613,5 +639,17 @@ namespace SLF
             }
         }
 
+        private void button9_Click(object sender, EventArgs e)
+        {
+            Google_Earth ge_formu = new Google_Earth();
+            ge_formu.Show();
+        }
+
+        private void stokastik_haritası_ExtentsChanged(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.WaitCursor;
+            Thread.Sleep(1000);
+            this.Cursor = Cursors.Default;
+        }
     }
 }

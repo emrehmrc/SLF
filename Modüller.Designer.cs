@@ -71,6 +71,11 @@
             this.tab_senaryo = new System.Windows.Forms.TabPage();
             this.tab_stokastik = new System.Windows.Forms.TabPage();
             this.checkBox18 = new System.Windows.Forms.CheckBox();
+            this.katmanlar_right_click = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.tabloyuGörToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rengiDeğiştirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.temizleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.kaydetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkBox17 = new System.Windows.Forms.CheckBox();
             this.checkBox16 = new System.Windows.Forms.CheckBox();
             this.checkBox15 = new System.Windows.Forms.CheckBox();
@@ -125,11 +130,7 @@
             this.tab_validasyon = new System.Windows.Forms.TabPage();
             this.fileSystemWatcher1 = new System.IO.FileSystemWatcher();
             this.button2 = new System.Windows.Forms.Button();
-            this.tabloyuGörToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.rengiDeğiştirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.temizleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.kaydetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.katmanlar_right_click = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.button9 = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tab_girdi.SuspendLayout();
@@ -143,13 +144,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.tab_imar.SuspendLayout();
             this.tab_stokastik.SuspendLayout();
+            this.katmanlar_right_click.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.stokastik_haritası)).BeginInit();
             this.tab_yükHaritası.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.webView21)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).BeginInit();
-            this.katmanlar_right_click.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -161,7 +162,7 @@
             this.yardımToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1482, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(1482, 30);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -172,7 +173,7 @@
             this.exportToolStripMenuItem,
             this.saToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(64, 24);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(64, 26);
             this.fileToolStripMenuItem.Text = "Dosya";
             // 
             // importToolStripMenuItem
@@ -196,7 +197,7 @@
             // yardımToolStripMenuItem
             // 
             this.yardımToolStripMenuItem.Name = "yardımToolStripMenuItem";
-            this.yardımToolStripMenuItem.Size = new System.Drawing.Size(69, 24);
+            this.yardımToolStripMenuItem.Size = new System.Drawing.Size(69, 26);
             this.yardımToolStripMenuItem.Text = "Yardım";
             // 
             // tabControl1
@@ -217,12 +218,13 @@
             this.tabControl1.Controls.Add(this.tab_validasyon);
             this.tabControl1.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabControl1.HotTrack = true;
-            this.tabControl1.Location = new System.Drawing.Point(0, 100);
+            this.tabControl1.Location = new System.Drawing.Point(0, 86);
+            this.tabControl1.MinimumSize = new System.Drawing.Size(1480, 700);
             this.tabControl1.Multiline = true;
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.Padding = new System.Drawing.Point(20, 3);
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1480, 748);
+            this.tabControl1.Size = new System.Drawing.Size(1480, 700);
             this.tabControl1.TabIndex = 2;
             // 
             // tab_girdi
@@ -579,6 +581,7 @@
             // 
             // tab_stokastik
             // 
+            this.tab_stokastik.Controls.Add(this.button9);
             this.tab_stokastik.Controls.Add(this.checkBox18);
             this.tab_stokastik.Controls.Add(this.checkBox17);
             this.tab_stokastik.Controls.Add(this.checkBox16);
@@ -595,10 +598,9 @@
             this.tab_stokastik.Controls.Add(this.stokastik_haritası);
             this.tab_stokastik.Location = new System.Drawing.Point(4, 62);
             this.tab_stokastik.Name = "tab_stokastik";
-            this.tab_stokastik.Size = new System.Drawing.Size(1472, 682);
+            this.tab_stokastik.Size = new System.Drawing.Size(1472, 634);
             this.tab_stokastik.TabIndex = 2;
             this.tab_stokastik.Text = "Stokastik Yük Tahmini Modülü";
-            this.tab_stokastik.ToolTipText = "ergergr";
             this.tab_stokastik.UseVisualStyleBackColor = true;
             // 
             // checkBox18
@@ -612,6 +614,52 @@
             this.checkBox18.Text = "checkBox18";
             this.checkBox18.UseVisualStyleBackColor = true;
             this.checkBox18.Visible = false;
+            // 
+            // katmanlar_right_click
+            // 
+            this.katmanlar_right_click.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.katmanlar_right_click.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tabloyuGörToolStripMenuItem,
+            this.rengiDeğiştirToolStripMenuItem,
+            this.temizleToolStripMenuItem,
+            this.kaydetToolStripMenuItem});
+            this.katmanlar_right_click.Name = "katmanlar_right_click";
+            this.katmanlar_right_click.Size = new System.Drawing.Size(177, 108);
+            this.katmanlar_right_click.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.katmanlar_right_click_Closing);
+            this.katmanlar_right_click.Opening += new System.ComponentModel.CancelEventHandler(this.katmanlar_right_click_Opening);
+            // 
+            // tabloyuGörToolStripMenuItem
+            // 
+            this.tabloyuGörToolStripMenuItem.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.tabloyuGörToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("tabloyuGörToolStripMenuItem.Image")));
+            this.tabloyuGörToolStripMenuItem.Name = "tabloyuGörToolStripMenuItem";
+            this.tabloyuGörToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
+            this.tabloyuGörToolStripMenuItem.Text = "Tabloyu Gör";
+            this.tabloyuGörToolStripMenuItem.Click += new System.EventHandler(this.tabloyuGörToolStripMenuItem_Click);
+            // 
+            // rengiDeğiştirToolStripMenuItem
+            // 
+            this.rengiDeğiştirToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("rengiDeğiştirToolStripMenuItem.Image")));
+            this.rengiDeğiştirToolStripMenuItem.Name = "rengiDeğiştirToolStripMenuItem";
+            this.rengiDeğiştirToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
+            this.rengiDeğiştirToolStripMenuItem.Text = "Rengi Değiştir";
+            this.rengiDeğiştirToolStripMenuItem.Click += new System.EventHandler(this.rengiDeğiştirToolStripMenuItem_Click);
+            // 
+            // temizleToolStripMenuItem
+            // 
+            this.temizleToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("temizleToolStripMenuItem.Image")));
+            this.temizleToolStripMenuItem.Name = "temizleToolStripMenuItem";
+            this.temizleToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
+            this.temizleToolStripMenuItem.Text = "Temizle";
+            this.temizleToolStripMenuItem.Click += new System.EventHandler(this.temizleToolStripMenuItem_Click);
+            // 
+            // kaydetToolStripMenuItem
+            // 
+            this.kaydetToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("kaydetToolStripMenuItem.Image")));
+            this.kaydetToolStripMenuItem.Name = "kaydetToolStripMenuItem";
+            this.kaydetToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
+            this.kaydetToolStripMenuItem.Text = "Kaydet";
+            this.kaydetToolStripMenuItem.Click += new System.EventHandler(this.kaydetToolStripMenuItem_Click);
             // 
             // checkBox17
             // 
@@ -997,9 +1045,10 @@
             this.stokastik_haritası.Location = new System.Drawing.Point(215, 47);
             this.stokastik_haritası.Name = "stokastik_haritası";
             this.stokastik_haritası.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("stokastik_haritası.OcxState")));
-            this.stokastik_haritası.Size = new System.Drawing.Size(1251, 585);
+            this.stokastik_haritası.Size = new System.Drawing.Size(1251, 578);
             this.stokastik_haritası.TabIndex = 0;
             this.stokastik_haritası.MouseDownEvent += new AxMapWinGIS._DMapEvents_MouseDownEventHandler(this.stokastik_haritası_MouseDownEvent);
+            this.stokastik_haritası.ExtentsChanged += new System.EventHandler(this.stokastik_haritası_ExtentsChanged);
             // 
             // tab_yükHaritası
             // 
@@ -1257,51 +1306,16 @@
             this.button2.UseVisualStyleBackColor = false;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
-            // tabloyuGörToolStripMenuItem
+            // button9
             // 
-            this.tabloyuGörToolStripMenuItem.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.tabloyuGörToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("tabloyuGörToolStripMenuItem.Image")));
-            this.tabloyuGörToolStripMenuItem.Name = "tabloyuGörToolStripMenuItem";
-            this.tabloyuGörToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
-            this.tabloyuGörToolStripMenuItem.Text = "Tabloyu Gör";
-            this.tabloyuGörToolStripMenuItem.Click += new System.EventHandler(this.tabloyuGörToolStripMenuItem_Click);
-            // 
-            // rengiDeğiştirToolStripMenuItem
-            // 
-            this.rengiDeğiştirToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("rengiDeğiştirToolStripMenuItem.Image")));
-            this.rengiDeğiştirToolStripMenuItem.Name = "rengiDeğiştirToolStripMenuItem";
-            this.rengiDeğiştirToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
-            this.rengiDeğiştirToolStripMenuItem.Text = "Rengi Değiştir";
-            this.rengiDeğiştirToolStripMenuItem.Click += new System.EventHandler(this.rengiDeğiştirToolStripMenuItem_Click);
-            // 
-            // temizleToolStripMenuItem
-            // 
-            this.temizleToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("temizleToolStripMenuItem.Image")));
-            this.temizleToolStripMenuItem.Name = "temizleToolStripMenuItem";
-            this.temizleToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
-            this.temizleToolStripMenuItem.Text = "Temizle";
-            this.temizleToolStripMenuItem.Click += new System.EventHandler(this.temizleToolStripMenuItem_Click);
-            // 
-            // kaydetToolStripMenuItem
-            // 
-            this.kaydetToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("kaydetToolStripMenuItem.Image")));
-            this.kaydetToolStripMenuItem.Name = "kaydetToolStripMenuItem";
-            this.kaydetToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
-            this.kaydetToolStripMenuItem.Text = "Kaydet";
-            this.kaydetToolStripMenuItem.Click += new System.EventHandler(this.kaydetToolStripMenuItem_Click);
-            // 
-            // katmanlar_right_click
-            // 
-            this.katmanlar_right_click.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.katmanlar_right_click.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tabloyuGörToolStripMenuItem,
-            this.rengiDeğiştirToolStripMenuItem,
-            this.temizleToolStripMenuItem,
-            this.kaydetToolStripMenuItem});
-            this.katmanlar_right_click.Name = "katmanlar_right_click";
-            this.katmanlar_right_click.Size = new System.Drawing.Size(215, 136);
-            this.katmanlar_right_click.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.katmanlar_right_click_Closing);
-            this.katmanlar_right_click.Opening += new System.ComponentModel.CancelEventHandler(this.katmanlar_right_click_Opening);
+            this.button9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.button9.Location = new System.Drawing.Point(15, 582);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(167, 34);
+            this.button9.TabIndex = 29;
+            this.button9.Text = "Google Earth";
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
             // 
             // ModülFormu
             // 
@@ -1341,6 +1355,7 @@
             this.tab_imar.ResumeLayout(false);
             this.tab_stokastik.ResumeLayout(false);
             this.tab_stokastik.PerformLayout();
+            this.katmanlar_right_click.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.stokastik_haritası)).EndInit();
@@ -1350,7 +1365,6 @@
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).EndInit();
-            this.katmanlar_right_click.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1458,5 +1472,6 @@
         private System.Windows.Forms.ToolStripMenuItem rengiDeğiştirToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem temizleToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem kaydetToolStripMenuItem;
+        private System.Windows.Forms.Button button9;
     }
 }
