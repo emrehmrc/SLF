@@ -1,6 +1,9 @@
-﻿using Excel = Microsoft.Office.Interop.Excel; // Alias for the Excel namespace
+﻿//using Excel = Microsoft.Office.Interop.Excel; // Alias for the Excel namespace
+using OfficeOpenXml; // Import the EPPlus library
 using System;
 using System.Data;
+using System.Diagnostics;
+using System.IO;
 using DT = System.Data;
 
 namespace SLF
@@ -9,62 +12,45 @@ namespace SLF
     {
         public DT.DataTable ImportExcelFile(string filePath)
         {
-            // Create a new instance of Excel Application
-            Excel.Application excel = new Excel.Application();
-            Excel.Workbook workbook = null;
-            Excel.Worksheet worksheet = null;
             DT.DataTable dataTable = new DT.DataTable();
 
-            try
+            // Example of measuring import time
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
             {
-                // Open the Excel file
-                workbook = excel.Workbooks.Open(filePath);
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // Assuming data is in the first worksheet
 
-                // Assuming data is in the first worksheet
-                worksheet = (Excel.Worksheet)workbook.Worksheets[1];
-
-                // Get the used range of cells
-                Excel.Range usedRange = worksheet.UsedRange;
-
-                // Get the number of rows and columns
-                int rowCount = usedRange.Rows.Count;
-                int colCount = usedRange.Columns.Count;
-                int previewCount = 100;  // Preview first 100 rows
+                int rowCount = worksheet.Dimension.Rows;
+                int colCount = worksheet.Dimension.Columns;
+                int previewCount = rowCount; // 100;  // Preview first 100 rows
                 int minCount = Math.Min(previewCount, rowCount);
 
                 // Create columns in DataTable
                 for (int col = 1; col <= colCount; col++)
                 {
+                    string columnHeader = worksheet.Cells[1, col].Value?.ToString() ?? $"Column{col}";
                     DataColumn column = new DataColumn();
-                    column.ColumnName = $"Column{col}";
+                    column.ColumnName = columnHeader;
                     dataTable.Columns.Add(column);
                 }
 
                 // Populate DataTable with Excel data
-                for (int row = 1; row <= minCount; row++)
+                for (int row = 2; row <= minCount; row++)
                 {
                     DataRow dataRow = dataTable.NewRow();
                     for (int col = 1; col <= colCount; col++)
                     {
-                        dataRow[col - 1] = (usedRange.Cells[row, col] as Excel.Range).Value2;
+                        dataRow[col - 1] = worksheet.Cells[row, col].Value;
                     }
                     dataTable.Rows.Add(dataRow);
                 }
             }
-            finally
-            {
-                // Close the workbook and Excel application
-                workbook?.Close(false);
-                excel.Quit();
+            stopwatch.Stop();
 
-                // Release COM objects to avoid memory leaks
-                ReleaseObject(worksheet);
-                ReleaseObject(workbook);
-                ReleaseObject(excel);
-            }
+            Console.WriteLine($"Excel file import took: {stopwatch.ElapsedMilliseconds} ms");
             return dataTable;
         }
-
         private void ReleaseObject(object obj)
         {
             try
