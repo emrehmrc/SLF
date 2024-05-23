@@ -21,7 +21,6 @@ using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
 using System.Xml;
 using System.Data.SqlTypes;
-using EO.WebBrowser;
 using Microsoft.Web.WebView2.WinForms;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
@@ -93,18 +92,22 @@ namespace SLF
 
         private void InitializeGMap(GMap.NET.WindowsForms.GMapControl gmap)
         {
-
             gmap.MapProvider = GMapProviders.GoogleSatelliteMap;
-            gmap.Zoom = 10;
+            gmap.ShowCenter = false;
             gmap.Position = new PointLatLng(38.4237, 27.1428);
-            gmap.MinZoom = 5;
-            gmap.MaxZoom = 100;
+            gmap.MinZoom = 8;
+            gmap.MaxZoom = 20;
+            gmap.Zoom = 12;
             gmap.DragButton = MouseButtons.Left;
         }
 
         public ModülFormu() {
+            
+            InitializeComponent();
 
+            // about Stokastik_Yuk_Haritası module
             InitializeGMap(gMapControl_EA);
+            buton_stokastik_harita_katmanlar.BringToFront();
 
             // Yeni bir overlay oluşturun
             markerOverlay = new GMapOverlay("markers");
@@ -118,27 +121,18 @@ namespace SLF
             tbar1.ValueChanged += TrackBar1_ValueChanged;
 
             // Başlangıç zoom seviyesini ayarlayın
-            gMapControl_EA.Zoom = tbar1.Value;
+            //gMapControl_EA.Zoom = tbar1.Value;
 
             // TrackBar'ın minimum ve maksimum değerlerini ayarlayın
             tbar1.Minimum = 5;
             tbar1.Maximum = 20;
             tbar1.SmallChange = 1;
             tbar1.LargeChange = 3; 
-
+            
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
-
-            ConfigureTileCaching();
 
             // Girdi Modülü'nde default olarak "Abone Verileri" seçeneğini göster
             veri_listesi_seçimi.SelectedIndex = 0;    
-
-            // stokastik haritasına ait initialization parametreleri
-            /*stokastik_haritası.Latitude = 38.27f;
-            stokastik_haritası.Longitude = 27.0f;
-            stokastik_haritası.CurrentZoom = 13;
-            stokastik_haritası.MapCursor = MapWinGIS.tkCursor.crsrArrow;
-            stokastik_haritası_checkboxes_init();*/
 
             InitializeContextMenu_Nokta();
 
@@ -147,13 +141,65 @@ namespace SLF
 
         }
 
-        private void ConfigureTileCaching()
+        /* private void button7_Click(object sender, EventArgs e)
+ {
+     OpenFileDialog openFileDialog = new OpenFileDialog();
+     openFileDialog.Filter = "CSV Dosyaları (*.csv)|*.csv|Tüm Dosyalar (*.*)|*.*";
+     openFileDialog.Title = "CSV Dosyasını Seç";
+
+     if (openFileDialog.ShowDialog() == DialogResult.OK)
+     {
+         string dosyaYolu = openFileDialog.FileName;
+         CSVYukle(dosyaYolu);
+         loadedFiles.Add(new YüklenenDosya { DosyaAdi = Path.GetFileName(dosyaYolu), DosyaTuru = DosyaTuru.CSV });
+         UpdateListBox();
+     }
+ }*/
+
+        private void CSVYukle(string dosyaYolu)
         {
-            /*stokastik_haritası.Tiles.DiskCacheFilename = "C:\\Users\\Zekiye\\source\\repos\\emrehmrc\\SLF\\Tiles\\tiles.txt";
-            stokastik_haritası.Tiles.UseCache[tkCacheType.Disk] = true;
-            stokastik_haritası.Tiles.MaxCacheSize[tkCacheType.Disk] = 2000000;
-            stokastik_haritası.Tiles.DoCaching[tkCacheType.Disk] = true;
-            stokastik_haritası.Tiles.UseServer = true;*/
+            string[] satirlar = File.ReadAllLines(dosyaYolu);
+            double ilkNoktaEnlem = 0;
+            double ilkNoktaBoylam = 0;
+            bool ilkNoktaBelirlendi = false;
+
+
+            foreach (string satir in satirlar)
+            {
+                string[] parcalar = satir.Split(',');
+                if (parcalar.Length >= 4 && double.TryParse(parcalar[0], out double enlem) && double.TryParse(parcalar[1], out double boylam)
+                    && double.TryParse(parcalar[2], out double binaDem) && int.TryParse(parcalar[3], out int aboneSayisi))
+                {
+                    if (!ilkNoktaBelirlendi)
+                    {
+                        ilkNoktaEnlem = enlem;
+                        ilkNoktaBoylam = boylam;
+                        ilkNoktaBelirlendi = true;
+                    }
+
+                    NoktaVeri noktaVeri = new NoktaVeri
+                    {
+                        Enlem = enlem,
+                        Boylam = boylam,
+                        BinaDem = binaDem,
+                        AboneSayisi = aboneSayisi
+                    };
+
+                    PointLatLng nokta = new PointLatLng(enlem, boylam);
+                    GMapMarker marker = new GMarkerGoogle(nokta, GMarkerGoogleType.orange_dot);
+                    marker.ToolTipText = Path.GetFileName(dosyaYolu); // Dosya adını ToolTipText olarak ayarla
+                    marker.Tag = noktaVeri;
+                    markerOverlay.Markers.Add(marker);
+                }
+            }
+
+            if (ilkNoktaBelirlendi)
+            {
+                gMapControl_EA.Position = new PointLatLng(ilkNoktaEnlem, ilkNoktaBoylam);
+                gMapControl_EA.Zoom = 15;
+            }
+
+            gMapControl_EA.Refresh();
         }
 
         private void stokastik_dosya_seçimi_Click(object sender, EventArgs e)
@@ -169,7 +215,7 @@ namespace SLF
 
             OpenFileDialog vektorel_veri_seçimi = new OpenFileDialog();
 
-            vektorel_veri_seçimi.Filter = "Shapefile |*.shp|MapInfo File|*.tab|Google Earth File|*.kml";
+            vektorel_veri_seçimi.Filter = "Shapefile|*.shp|MapInfo File|*.tab|Google Earth File|*.kml|CSV File|*.csv";
             vektorel_veri_seçimi.InitialDirectory = "C:\\Users\\Zekiye\\Desktop\\CBS";
 
             DialogResult result = vektorel_veri_seçimi.ShowDialog();
@@ -671,69 +717,6 @@ namespace SLF
             dataGridView.DataSource = dataTable;
         }*/
 
-        private void ModülFormu_Load(object sender, EventArgs e) { }
-
-        /* private void button7_Click(object sender, EventArgs e)
-         {
-             OpenFileDialog openFileDialog = new OpenFileDialog();
-             openFileDialog.Filter = "CSV Dosyaları (*.csv)|*.csv|Tüm Dosyalar (*.*)|*.*";
-             openFileDialog.Title = "CSV Dosyasını Seç";
-
-             if (openFileDialog.ShowDialog() == DialogResult.OK)
-             {
-                 string dosyaYolu = openFileDialog.FileName;
-                 CSVYukle(dosyaYolu);
-                 loadedFiles.Add(new YüklenenDosya { DosyaAdi = Path.GetFileName(dosyaYolu), DosyaTuru = DosyaTuru.CSV });
-                 UpdateListBox();
-             }
-         }*/
-
-        private void CSVYukle(string dosyaYolu)
-        {
-            string[] satirlar = File.ReadAllLines(dosyaYolu);
-            double ilkNoktaEnlem = 0;
-            double ilkNoktaBoylam = 0;
-            bool ilkNoktaBelirlendi = false;
-
-
-            foreach (string satir in satirlar)
-            {
-                string[] parcalar = satir.Split(',');
-                if (parcalar.Length >= 4 && double.TryParse(parcalar[0], out double enlem) && double.TryParse(parcalar[1], out double boylam)
-                    && double.TryParse(parcalar[2], out double binaDem) && int.TryParse(parcalar[3], out int aboneSayisi))
-                {
-                    if (!ilkNoktaBelirlendi)
-                    {
-                        ilkNoktaEnlem = enlem;
-                        ilkNoktaBoylam = boylam;
-                        ilkNoktaBelirlendi = true;
-                    }
-
-                    NoktaVeri noktaVeri = new NoktaVeri
-                    {
-                        Enlem = enlem,
-                        Boylam = boylam,
-                        BinaDem = binaDem,
-                        AboneSayisi = aboneSayisi
-                    };
-
-                    PointLatLng nokta = new PointLatLng(enlem, boylam);
-                    GMapMarker marker = new GMarkerGoogle(nokta, GMarkerGoogleType.orange_dot);
-                    marker.ToolTipText = Path.GetFileName(dosyaYolu); // Dosya adını ToolTipText olarak ayarla
-                    marker.Tag = noktaVeri;
-                    markerOverlay.Markers.Add(marker);
-                }
-            }
-
-            if (ilkNoktaBelirlendi)
-            {
-                gMapControl_EA.Position = new PointLatLng(ilkNoktaEnlem, ilkNoktaBoylam);
-                gMapControl_EA.Zoom = 15;
-            }
-
-            gMapControl_EA.Refresh();
-        }
-
         private void UpdateListBox()
         {
             listBox1.Items.Clear();
@@ -977,17 +960,28 @@ namespace SLF
             mapControl.Refresh();
         }
 
-
-        private void gMapControlEA_Click(PointLatLng point, MouseEventArgs e)
+        private void Arazi_Click(object sender, EventArgs e)
         {
-            if (isSelecting)
-            {
-                polygonPoints.Add(point);
-                GMapMarker marker = new GMarkerGoogle(point, GMarkerGoogleType.black_small);
-                markerOverlay.Markers.Add(marker);
-                gMapControl_EA.Refresh();
-            }
+            gMapControl_EA.MapProvider = GMapProviders.GoogleTerrainMap;
+        }
 
+        private void Harita_Click(object sender, EventArgs e)
+        {
+            gMapControl_EA.MapProvider = GMapProviders.GoogleMap;
+        }
+
+        private void Uydu_Click(object sender, EventArgs e)
+        {
+            gMapControl_EA.MapProvider = GMapProviders.GoogleSatelliteMap;
+        }
+
+        private void Google_Earth_Click(object sender, EventArgs e)
+        {
+            Google_Earth google_earth_form = new Google_Earth();
+            google_earth_form.Owner = this;
+            google_earth_form.Show();
+            google_earth_form.BringToFront();
+            google_earth_form.Focus();
         }
 
         private void toolStripButton8_MouseDown(object sender, MouseEventArgs e)
