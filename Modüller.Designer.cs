@@ -49,9 +49,6 @@
             this.label16 = new System.Windows.Forms.Label();
             this.dataGridView4 = new System.Windows.Forms.DataGridView();
             this.tab_ea = new System.Windows.Forms.TabPage();
-            this.button7 = new System.Windows.Forms.Button();
-            this.label15 = new System.Windows.Forms.Label();
-            this.dataGridView3 = new System.Windows.Forms.DataGridView();
             this.tab_ekonometrik = new System.Windows.Forms.TabPage();
             this.panel2 = new System.Windows.Forms.Panel();
             this.button5 = new System.Windows.Forms.Button();
@@ -105,7 +102,6 @@
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripButton6 = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
-            this.stokastik_haritası = new AxMapWinGIS.AxMap();
             this.tab_yükHaritası = new System.Windows.Forms.TabPage();
             this.checkBox7 = new System.Windows.Forms.CheckBox();
             this.checkBox6 = new System.Windows.Forms.CheckBox();
@@ -137,8 +133,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.tab_dek.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView4)).BeginInit();
-            this.tab_ea.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView3)).BeginInit();
             this.tab_ekonometrik.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
@@ -146,7 +140,6 @@
             this.tab_stokastik.SuspendLayout();
             this.katmanlar_right_click.SuspendLayout();
             this.toolStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.stokastik_haritası)).BeginInit();
             this.tab_yükHaritası.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.webView21)).BeginInit();
             this.panel1.SuspendLayout();
@@ -367,47 +360,12 @@
             // 
             // tab_ea
             // 
-            this.tab_ea.Controls.Add(this.button7);
-            this.tab_ea.Controls.Add(this.label15);
-            this.tab_ea.Controls.Add(this.dataGridView3);
             this.tab_ea.Location = new System.Drawing.Point(4, 62);
             this.tab_ea.Name = "tab_ea";
             this.tab_ea.Size = new System.Drawing.Size(1472, 634);
             this.tab_ea.TabIndex = 5;
             this.tab_ea.Text = "EA Şarj Modülü";
             this.tab_ea.UseVisualStyleBackColor = true;
-            // 
-            // button7
-            // 
-            this.button7.Location = new System.Drawing.Point(20, 51);
-            this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(159, 44);
-            this.button7.TabIndex = 17;
-            this.button7.Text = "Dosya Seç";
-            this.button7.UseVisualStyleBackColor = true;
-            this.button7.Click += new System.EventHandler(this.button7_Click);
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(364, 14);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(148, 24);
-            this.label15.TabIndex = 13;
-            this.label15.Text = "Veri Ön İzleme:";
-            // 
-            // dataGridView3
-            // 
-            this.dataGridView3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridView3.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView3.Location = new System.Drawing.Point(368, 51);
-            this.dataGridView3.Name = "dataGridView3";
-            this.dataGridView3.RowHeadersWidth = 51;
-            this.dataGridView3.RowTemplate.Height = 24;
-            this.dataGridView3.Size = new System.Drawing.Size(1098, 528);
-            this.dataGridView3.TabIndex = 12;
             // 
             // tab_ekonometrik
             // 
@@ -595,7 +553,6 @@
             this.tab_stokastik.Controls.Add(this.label13);
             this.tab_stokastik.Controls.Add(this.stokastik_dosya_seçimi);
             this.tab_stokastik.Controls.Add(this.toolStrip1);
-            this.tab_stokastik.Controls.Add(this.stokastik_haritası);
             this.tab_stokastik.Location = new System.Drawing.Point(4, 62);
             this.tab_stokastik.Name = "tab_stokastik";
             this.tab_stokastik.Size = new System.Drawing.Size(1472, 634);
@@ -1047,20 +1004,6 @@
             this.toolStripSeparator8.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
             this.toolStripSeparator8.Size = new System.Drawing.Size(6, 32);
             // 
-            // stokastik_haritası
-            // 
-            this.stokastik_haritası.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.stokastik_haritası.Enabled = true;
-            this.stokastik_haritası.Location = new System.Drawing.Point(217, 47);
-            this.stokastik_haritası.Name = "stokastik_haritası";
-            this.stokastik_haritası.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("stokastik_haritası.OcxState")));
-            this.stokastik_haritası.Size = new System.Drawing.Size(1249, 578);
-            this.stokastik_haritası.TabIndex = 0;
-            this.stokastik_haritası.MouseDownEvent += new AxMapWinGIS._DMapEvents_MouseDownEventHandler(this.stokastik_haritası_MouseDownEvent);
-            this.stokastik_haritası.ExtentsChanged += new System.EventHandler(this.stokastik_haritası_ExtentsChanged);
-            // 
             // tab_yükHaritası
             // 
             this.tab_yükHaritası.Controls.Add(this.checkBox7);
@@ -1344,9 +1287,6 @@
             this.tab_dek.ResumeLayout(false);
             this.tab_dek.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView4)).EndInit();
-            this.tab_ea.ResumeLayout(false);
-            this.tab_ea.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView3)).EndInit();
             this.tab_ekonometrik.ResumeLayout(false);
             this.tab_ekonometrik.PerformLayout();
             this.panel2.ResumeLayout(false);
@@ -1358,7 +1298,6 @@
             this.katmanlar_right_click.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.stokastik_haritası)).EndInit();
             this.tab_yükHaritası.ResumeLayout(false);
             this.tab_yükHaritası.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.webView21)).EndInit();
@@ -1424,11 +1363,8 @@
         private System.Windows.Forms.TabPage tab_validasyon;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.DataGridView dataGridView4;
-        private System.Windows.Forms.Label label15;
-        private System.Windows.Forms.DataGridView dataGridView3;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Button button8;
-        private System.Windows.Forms.Button button7;
         private System.Windows.Forms.Button button10;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Panel panel2;
@@ -1439,7 +1375,6 @@
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripButton toolStripButton2;
-        private AxMapWinGIS.AxMap stokastik_haritası;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripButton toolStripButton3;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;

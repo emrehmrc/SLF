@@ -65,11 +65,11 @@ namespace SLF
             veri_listesi_seçimi.SelectedIndex = 0;    
 
             // stokastik haritasına ait initialization parametreleri
-            stokastik_haritası.Latitude = 38.27f;
+            /*stokastik_haritası.Latitude = 38.27f;
             stokastik_haritası.Longitude = 27.0f;
             stokastik_haritası.CurrentZoom = 13;
             stokastik_haritası.MapCursor = MapWinGIS.tkCursor.crsrArrow;
-            stokastik_haritası_checkboxes_init();
+            stokastik_haritası_checkboxes_init();*/
 
             InitializeContextMenu_Nokta();
 
@@ -80,11 +80,11 @@ namespace SLF
 
         private void ConfigureTileCaching()
         {
-            stokastik_haritası.Tiles.DiskCacheFilename = "C:\\Users\\Zekiye\\source\\repos\\emrehmrc\\SLF\\Tiles\\tiles.txt";
+            /*stokastik_haritası.Tiles.DiskCacheFilename = "C:\\Users\\Zekiye\\source\\repos\\emrehmrc\\SLF\\Tiles\\tiles.txt";
             stokastik_haritası.Tiles.UseCache[tkCacheType.Disk] = true;
             stokastik_haritası.Tiles.MaxCacheSize[tkCacheType.Disk] = 2000000;
             stokastik_haritası.Tiles.DoCaching[tkCacheType.Disk] = true;
-            stokastik_haritası.Tiles.UseServer = true;
+            stokastik_haritası.Tiles.UseServer = true;*/
         }
 
         private void stokastik_dosya_seçimi_Click(object sender, EventArgs e)
@@ -105,13 +105,13 @@ namespace SLF
 
             DialogResult result = vektorel_veri_seçimi.ShowDialog();
 
-
+            /*
             if (result == DialogResult.OK)
             {
                 string filepath = vektorel_veri_seçimi.FileName;
                 string filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
                 string extension = filename.Substring(filename.Length - 3);
-
+                
                 if (extension == "shp")
                 {
                     Shapefile added_shapefile = new Shapefile();
@@ -177,38 +177,38 @@ namespace SLF
 
                 /*OgrDatasource ds = new OgrDatasource();*/
 
-                // Open the .map file
-                /*ds.Open(filename);
-                stokastik_haritası.AddLayer(ds, true);
-                ds.*/
+            // Open the .map file
+            /*ds.Open(filename);
+            stokastik_haritası.AddLayer(ds, true);
+            ds.*/
 
-                /*
-                var sf = new Shapefile();
-                var ds = new OgrDatasource();
+            /*
+            var sf = new Shapefile();
+            var ds = new OgrDatasource();
 
-                ds.Open(filename);
+            ds.Open(filename);
 
-                if (sf.Open(filename, null))
-                {
-                    int layerHandle = stokastik_haritası.AddLayer(sf, true);
-                }
-                else
-                {
-                    Debug.WriteLine("Failed to open shapefile: " + sf.get_ErrorMsg(sf.LastErrorCode));
-                }*/
-
+            if (sf.Open(filename, null))
+            {
+                int layerHandle = stokastik_haritası.AddLayer(sf, true);
             }
             else
             {
-                vektorel_veri_seçimi.Dispose();
+                Debug.WriteLine("Failed to open shapefile: " + sf.get_ErrorMsg(sf.LastErrorCode));
             }
+
+        }
+        else
+        {
+            vektorel_veri_seçimi.Dispose();
+        }*/
         }
 
         private void rengiDeğiştirToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
             ToolStripMenuItem rengini_degistir_menu_item = sender as ToolStripMenuItem;
-
+            /*
             if (rengini_degistir_menu_item != null)
             {
                 System.Windows.Forms.CheckBox checkBox = rengini_degistir_menu_item.Tag as System.Windows.Forms.CheckBox;
@@ -234,7 +234,7 @@ namespace SLF
                     stokastik_haritası.set_ShapeLayerFillColor(checkbox_index, abgr);
                     stokastik_haritası.Redraw(); // Redraw the map to reflect the changes
                 }
-            }
+            }*/
         }
 
         private void kaydetToolStripMenuItem_Click(object sender, EventArgs e)
@@ -269,7 +269,7 @@ namespace SLF
         {
 
             ToolStripMenuItem delete_menu_item = sender as ToolStripMenuItem;
-
+            /*
             if (delete_menu_item != null)
             {
                 System.Windows.Forms.CheckBox checkBox = delete_menu_item.Tag as System.Windows.Forms.CheckBox;
@@ -294,7 +294,7 @@ namespace SLF
 
                     }
                 }
-            }
+            }*/
         }
 
         // mouse down event of the checkboxes which displays the related data table with the corresponding
@@ -319,7 +319,7 @@ namespace SLF
         {
             System.Windows.Forms.CheckBox checkBox = (System.Windows.Forms.CheckBox) sender;
             int index = int.Parse(checkBox.Tag.ToString()) - 1;
-
+            /*
             if (shapefile_array[index] != null)
             {
                 int layerHandle = layerHandles[index];
@@ -329,7 +329,7 @@ namespace SLF
                     stokastik_haritası.set_LayerVisible(layerHandle, checkBox.Checked);
                     stokastik_haritası.Redraw();
                 }
-            }
+            }*/
         }
 
         private System.Windows.Forms.CheckBox GetCheckBoxByIndex(int index)
@@ -524,11 +524,11 @@ namespace SLF
                                       MessageBoxButtons.YesNo,
                                       MessageBoxIcon.Warning); // Added an icon for better visual indication
 
-            if (result == DialogResult.Yes)
+            /*if (result == DialogResult.Yes)
             {
                 stokastik_haritası.RemoveAllLayers();
                 System.Windows.Forms.Application.Exit();
-            }
+            }*/
         }
 
         private void button10_Click(object sender, EventArgs e)
@@ -576,31 +576,31 @@ namespace SLF
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
             is_panning = false;
-            stokastik_haritası.CursorMode = MapWinGIS.tkCursorMode.cmSelection;
-            stokastik_haritası.MapCursor = MapWinGIS.tkCursor.crsrArrow;
+            /*stokastik_haritası.CursorMode = MapWinGIS.tkCursorMode.cmSelection;
+            stokastik_haritası.MapCursor = MapWinGIS.tkCursor.crsrArrow;*/
         }
 
         private void toolStripButton2_Click(object sender, EventArgs e)
         {
             is_panning = true;
-            stokastik_haritası.CursorMode = MapWinGIS.tkCursorMode.cmPan;
-            stokastik_haritası.MapCursor = MapWinGIS.tkCursor.crsrHand;
+            /*stokastik_haritası.CursorMode = MapWinGIS.tkCursorMode.cmPan;
+            stokastik_haritası.MapCursor = MapWinGIS.tkCursor.crsrHand;*/
 
         }
 
         private void toolStripButton3_Click(object sender, EventArgs e)
         {
-            stokastik_haritası.Measuring.AreaUnits = tkAreaDisplayMode.admMetric;
+            /*stokastik_haritası.Measuring.AreaUnits = tkAreaDisplayMode.admMetric;
             stokastik_haritası.CursorMode = MapWinGIS.tkCursorMode.cmMeasure;
-            stokastik_haritası.Measuring.MeasuringType = MapWinGIS.tkMeasuringType.MeasureDistance;
+            stokastik_haritası.Measuring.MeasuringType = MapWinGIS.tkMeasuringType.MeasureDistance;*/
             
         }
 
         private void toolStripButton4_Click(object sender, EventArgs e)
         {
-            stokastik_haritası.Measuring.AreaUnits = tkAreaDisplayMode.admMetric;
+            /*stokastik_haritası.Measuring.AreaUnits = tkAreaDisplayMode.admMetric;
             stokastik_haritası.CursorMode = MapWinGIS.tkCursorMode.cmMeasure;
-            stokastik_haritası.Measuring.MeasuringType = MapWinGIS.tkMeasuringType.MeasureArea;
+            stokastik_haritası.Measuring.MeasuringType = MapWinGIS.tkMeasuringType.MeasureArea;*/
             
         }
 
@@ -685,49 +685,6 @@ namespace SLF
         {
             Google_Earth ge_formu = new Google_Earth();
             ge_formu.Show();
-        }
-
-        private void stokastik_haritası_ExtentsChanged(object sender, EventArgs e)
-        {
-
-            try
-            {
-                // Optional: Additional handling during zoom events
-                this.Cursor = Cursors.WaitCursor;
-                //Thread.Sleep(500);
-                this.Cursor = Cursors.Default;
-            }
-            catch (Exception ex)
-            {
-                HandleMapException(ex);
-            }
-
-        }
-
-        private void HandleMapException(Exception ex)
-        {
-            // Log the exception (consider using a logging library)
-            Console.WriteLine($"Error: {ex.Message}");
-
-            // Attempt to reinitialize the map
-            try
-            {
-                stokastik_haritası.Clear();
-                stokastik_haritası.Redraw();
-                stokastik_haritası.TileProvider = tkTileProvider.OpenStreetMap;
-                stokastik_haritası.Latitude = 38.27f;
-                stokastik_haritası.Longitude = 27.0f;
-                stokastik_haritası.CurrentZoom = 13;
-                stokastik_haritası.MapCursor = MapWinGIS.tkCursor.crsrArrow;
-                stokastik_haritası_checkboxes_init();
-
-                // Optionally reconfigure tile caching and other settings
-                ConfigureTileCaching();
-            }
-            catch (Exception reinitEx)
-            {
-                Console.WriteLine($"Reinitialization failed: {reinitEx.Message}");
-            }
         }
     }
 }
