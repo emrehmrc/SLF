@@ -30,7 +30,9 @@ namespace SLF
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.oznitelik = new System.Windows.Forms.DataGridView();
+            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.oznitelik)).BeginInit();
             this.SuspendLayout();
             // 
@@ -43,6 +45,13 @@ namespace SLF
             this.oznitelik.RowTemplate.Height = 24;
             this.oznitelik.Size = new System.Drawing.Size(790, 450);
             this.oznitelik.TabIndex = 0;
+            this.oznitelik.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.oznitelik_CellContentClick);
+            // 
+            // imageList1
+            // 
+            this.imageList1.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.imageList1.ImageSize = new System.Drawing.Size(16, 16);
+            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // formOznitelik
             // 
@@ -52,7 +61,6 @@ namespace SLF
             this.Controls.Add(this.oznitelik);
             this.Name = "formOznitelik";
             this.Text = "Form2";
-           // this.Load += new System.EventHandler(this.formOznitelik_Load);
             ((System.ComponentModel.ISupportInitialize)(this.oznitelik)).EndInit();
             this.ResumeLayout(false);
 
@@ -63,5 +71,6 @@ namespace SLF
         #endregion
 
         private System.Windows.Forms.DataGridView oznitelik;
+        private System.Windows.Forms.ImageList imageList1;
     }
 }

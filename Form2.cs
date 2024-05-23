@@ -17,5 +17,10 @@ namespace SLF
         {
             oznitelik.DataSource = noktalar;
         }
+
+        private void oznitelik_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
     }
 }

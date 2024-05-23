@@ -49,6 +49,7 @@ namespace SLF
             this.label9 = new System.Windows.Forms.Label();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.tab_ea = new System.Windows.Forms.TabPage();
+            this.oznitelikAc = new System.Windows.Forms.Button();
             this.btnTamamla = new System.Windows.Forms.Button();
             this.btnplgn = new System.Windows.Forms.Button();
             this.tbar1 = new System.Windows.Forms.TrackBar();
@@ -95,7 +96,7 @@ namespace SLF
             this.button2 = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.fileSystemWatcher1 = new System.IO.FileSystemWatcher();
-            this.oznitelikAc = new System.Windows.Forms.Button();
+            this.ButtonKml = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tab_girdi.SuspendLayout();
@@ -280,9 +281,9 @@ namespace SLF
             // 
             this.tab_dek.Controls.Add(this.label9);
             this.tab_dek.Controls.Add(this.comboBox2);
-            this.tab_dek.Location = new System.Drawing.Point(4, 62);
+            this.tab_dek.Location = new System.Drawing.Point(4, 33);
             this.tab_dek.Name = "tab_dek";
-            this.tab_dek.Size = new System.Drawing.Size(1471, 618);
+            this.tab_dek.Size = new System.Drawing.Size(1471, 647);
             this.tab_dek.TabIndex = 6;
             this.tab_dek.Text = "DEK Modülü";
             this.tab_dek.UseVisualStyleBackColor = true;
@@ -306,6 +307,7 @@ namespace SLF
             // 
             // tab_ea
             // 
+            this.tab_ea.Controls.Add(this.ButtonKml);
             this.tab_ea.Controls.Add(this.oznitelikAc);
             this.tab_ea.Controls.Add(this.btnTamamla);
             this.tab_ea.Controls.Add(this.btnplgn);
@@ -321,6 +323,16 @@ namespace SLF
             this.tab_ea.TabIndex = 5;
             this.tab_ea.Text = "EA Şarj Modülü";
             this.tab_ea.UseVisualStyleBackColor = true;
+            // 
+            // oznitelikAc
+            // 
+            this.oznitelikAc.Location = new System.Drawing.Point(53, 457);
+            this.oznitelikAc.Name = "oznitelikAc";
+            this.oznitelikAc.Size = new System.Drawing.Size(194, 38);
+            this.oznitelikAc.TabIndex = 29;
+            this.oznitelikAc.Text = "Öznitelikleri Göster";
+            this.oznitelikAc.UseVisualStyleBackColor = true;
+            this.oznitelikAc.Click += new System.EventHandler(this.oznitelikAc_Click);
             // 
             // btnTamamla
             // 
@@ -353,7 +365,7 @@ namespace SLF
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(40, 127);
+            this.label12.Location = new System.Drawing.Point(49, 204);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(180, 24);
             this.label12.TabIndex = 21;
@@ -363,7 +375,7 @@ namespace SLF
             // 
             this.listBox1.FormattingEnabled = true;
             this.listBox1.ItemHeight = 24;
-            this.listBox1.Location = new System.Drawing.Point(35, 172);
+            this.listBox1.Location = new System.Drawing.Point(27, 231);
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(244, 220);
             this.listBox1.TabIndex = 20;
@@ -371,7 +383,7 @@ namespace SLF
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(70, 72);
+            this.button6.Location = new System.Drawing.Point(67, 151);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(122, 39);
             this.button6.TabIndex = 19;
@@ -411,7 +423,7 @@ namespace SLF
             // 
             // button7
             // 
-            this.button7.Location = new System.Drawing.Point(61, 26);
+            this.button7.Location = new System.Drawing.Point(8, 9);
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(143, 40);
             this.button7.TabIndex = 17;
@@ -428,10 +440,10 @@ namespace SLF
             this.tab_ekonometrik.Controls.Add(this.label10);
             this.tab_ekonometrik.Controls.Add(this.comboBox3);
             this.tab_ekonometrik.Controls.Add(this.dataGridView2);
-            this.tab_ekonometrik.Location = new System.Drawing.Point(4, 62);
+            this.tab_ekonometrik.Location = new System.Drawing.Point(4, 33);
             this.tab_ekonometrik.Name = "tab_ekonometrik";
             this.tab_ekonometrik.Padding = new System.Windows.Forms.Padding(3);
-            this.tab_ekonometrik.Size = new System.Drawing.Size(1471, 618);
+            this.tab_ekonometrik.Size = new System.Drawing.Size(1471, 647);
             this.tab_ekonometrik.TabIndex = 1;
             this.tab_ekonometrik.Text = "Ekonometrik Talep Tahmini Modülü";
             this.tab_ekonometrik.UseVisualStyleBackColor = true;
@@ -501,18 +513,18 @@ namespace SLF
             // 
             // tab_imar
             // 
-            this.tab_imar.Location = new System.Drawing.Point(4, 62);
+            this.tab_imar.Location = new System.Drawing.Point(4, 33);
             this.tab_imar.Name = "tab_imar";
-            this.tab_imar.Size = new System.Drawing.Size(1471, 618);
+            this.tab_imar.Size = new System.Drawing.Size(1471, 647);
             this.tab_imar.TabIndex = 4;
             this.tab_imar.Text = "İmar Analizleri";
             this.tab_imar.UseVisualStyleBackColor = true;
             // 
             // tab_optDTR
             // 
-            this.tab_optDTR.Location = new System.Drawing.Point(4, 62);
+            this.tab_optDTR.Location = new System.Drawing.Point(4, 33);
             this.tab_optDTR.Name = "tab_optDTR";
-            this.tab_optDTR.Size = new System.Drawing.Size(1471, 618);
+            this.tab_optDTR.Size = new System.Drawing.Size(1471, 647);
             this.tab_optDTR.TabIndex = 7;
             this.tab_optDTR.Text = "Optimal DTR Konumlandırma";
             this.tab_optDTR.UseVisualStyleBackColor = true;
@@ -798,15 +810,15 @@ namespace SLF
             this.fileSystemWatcher1.EnableRaisingEvents = true;
             this.fileSystemWatcher1.SynchronizingObject = this;
             // 
-            // oznitelikAc
+            // ButtonKml
             // 
-            this.oznitelikAc.Location = new System.Drawing.Point(52, 418);
-            this.oznitelikAc.Name = "oznitelikAc";
-            this.oznitelikAc.Size = new System.Drawing.Size(194, 38);
-            this.oznitelikAc.TabIndex = 29;
-            this.oznitelikAc.Text = "Öznitelikleri Göster";
-            this.oznitelikAc.UseVisualStyleBackColor = true;
-            this.oznitelikAc.Click += new System.EventHandler(this.oznitelikAc_Click);
+            this.ButtonKml.Location = new System.Drawing.Point(8, 65);
+            this.ButtonKml.Name = "ButtonKml";
+            this.ButtonKml.Size = new System.Drawing.Size(143, 40);
+            this.ButtonKml.TabIndex = 30;
+            this.ButtonKml.Text = "KML Yükle";
+            this.ButtonKml.UseVisualStyleBackColor = true;
+            this.ButtonKml.Click += new System.EventHandler(this.ButtonKml_Click);
             // 
             // ModülFormu
             // 
@@ -930,5 +942,6 @@ namespace SLF
         private System.Windows.Forms.Button btnTamamla;
         private System.Windows.Forms.Button btnplgn;
         private System.Windows.Forms.Button oznitelikAc;
+        private System.Windows.Forms.Button ButtonKml;
     }
 }
