@@ -51,13 +51,12 @@ namespace SLF
             this.label16 = new System.Windows.Forms.Label();
             this.dataGridView4 = new System.Windows.Forms.DataGridView();
             this.tab_ea = new System.Windows.Forms.TabPage();
+            this.ButtonKml = new System.Windows.Forms.Button();
             this.oznitelikAc = new System.Windows.Forms.Button();
             this.btnTamamla = new System.Windows.Forms.Button();
             this.btnplgn = new System.Windows.Forms.Button();
             this.tbar1 = new System.Windows.Forms.TrackBar();
-            this.label12 = new System.Windows.Forms.Label();
             this.listBox1 = new System.Windows.Forms.ListBox();
-            this.button6 = new System.Windows.Forms.Button();
             this.mapControl = new GMap.NET.WindowsForms.GMapControl();
             this.button7 = new System.Windows.Forms.Button();
             this.tab_ekonometrik = new System.Windows.Forms.TabPage();
@@ -78,6 +77,7 @@ namespace SLF
             this.tab_optDTR = new System.Windows.Forms.TabPage();
             this.tab_senaryo = new System.Windows.Forms.TabPage();
             this.tab_stokastik = new System.Windows.Forms.TabPage();
+            this.gMapControl_EA = new GMap.NET.WindowsForms.GMapControl();
             this.button9 = new System.Windows.Forms.Button();
             this.checkBox18 = new System.Windows.Forms.CheckBox();
             this.katmanlar_right_click = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -135,20 +135,18 @@ namespace SLF
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.tab_rapor = new System.Windows.Forms.TabPage();
+            this.tab_validasyon = new System.Windows.Forms.TabPage();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.button2 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.tab_validasyon = new System.Windows.Forms.TabPage();
             this.fileSystemWatcher1 = new System.IO.FileSystemWatcher();
-            this.ButtonKml = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tab_girdi.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.tab_dek.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView4)).BeginInit();
             this.tab_ea.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tbar1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView4)).BeginInit();
             this.tab_ekonometrik.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
@@ -296,7 +294,6 @@ namespace SLF
             this.button1.Size = new System.Drawing.Size(76, 67);
             this.button1.TabIndex = 2;
             this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // label1
             // 
@@ -381,9 +378,7 @@ namespace SLF
             this.tab_ea.Controls.Add(this.btnTamamla);
             this.tab_ea.Controls.Add(this.btnplgn);
             this.tab_ea.Controls.Add(this.tbar1);
-            this.tab_ea.Controls.Add(this.label12);
             this.tab_ea.Controls.Add(this.listBox1);
-            this.tab_ea.Controls.Add(this.button6);
             this.tab_ea.Controls.Add(this.mapControl);
             this.tab_ea.Controls.Add(this.button7);
             this.tab_ea.Location = new System.Drawing.Point(4, 62);
@@ -392,6 +387,16 @@ namespace SLF
             this.tab_ea.TabIndex = 5;
             this.tab_ea.Text = "EA Şarj Modülü";
             this.tab_ea.UseVisualStyleBackColor = true;
+            // 
+            // ButtonKml
+            // 
+            this.ButtonKml.Location = new System.Drawing.Point(8, 65);
+            this.ButtonKml.Name = "ButtonKml";
+            this.ButtonKml.Size = new System.Drawing.Size(143, 40);
+            this.ButtonKml.TabIndex = 30;
+            this.ButtonKml.Text = "KML Yükle";
+            this.ButtonKml.UseVisualStyleBackColor = true;
+            this.ButtonKml.Click += new System.EventHandler(this.ButtonKml_Click);
             // 
             // oznitelikAc
             // 
@@ -431,15 +436,6 @@ namespace SLF
             this.tbar1.Size = new System.Drawing.Size(56, 163);
             this.tbar1.TabIndex = 24;
             // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(49, 204);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(180, 24);
-            this.label12.TabIndex = 21;
-            this.label12.Text = "Seçili CVS Dosyaları";
-            // 
             // listBox1
             // 
             this.listBox1.FormattingEnabled = true;
@@ -448,17 +444,6 @@ namespace SLF
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(244, 220);
             this.listBox1.TabIndex = 20;
-            this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
-            // 
-            // button6
-            // 
-            this.button6.Location = new System.Drawing.Point(67, 151);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(122, 39);
-            this.button6.TabIndex = 19;
-            this.button6.Text = "Temizle";
-            this.button6.UseVisualStyleBackColor = true;
-            this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // mapControl
             // 
@@ -644,11 +629,11 @@ namespace SLF
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(45, 40);
+            this.button6.Location = new System.Drawing.Point(67, 151);
             this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(159, 44);
-            this.button6.TabIndex = 18;
-            this.button6.Text = "Dosya Seç";
+            this.button6.Size = new System.Drawing.Size(122, 39);
+            this.button6.TabIndex = 19;
+            this.button6.Text = "Temizle";
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
@@ -672,6 +657,7 @@ namespace SLF
             // 
             // tab_stokastik
             // 
+            this.tab_stokastik.Controls.Add(this.gMapControl_EA);
             this.tab_stokastik.Controls.Add(this.button9);
             this.tab_stokastik.Controls.Add(this.checkBox18);
             this.tab_stokastik.Controls.Add(this.checkBox17);
@@ -693,6 +679,32 @@ namespace SLF
             this.tab_stokastik.Text = "Stokastik Yük Tahmini Modülü";
             this.tab_stokastik.UseVisualStyleBackColor = true;
             // 
+            // gMapControl_EA
+            // 
+            this.gMapControl_EA.Bearing = 0F;
+            this.gMapControl_EA.CanDragMap = true;
+            this.gMapControl_EA.EmptyTileColor = System.Drawing.Color.Navy;
+            this.gMapControl_EA.GrayScaleMode = false;
+            this.gMapControl_EA.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
+            this.gMapControl_EA.LevelsKeepInMemory = 5;
+            this.gMapControl_EA.Location = new System.Drawing.Point(273, 70);
+            this.gMapControl_EA.MarkersEnabled = true;
+            this.gMapControl_EA.MaxZoom = 2;
+            this.gMapControl_EA.MinZoom = 2;
+            this.gMapControl_EA.MouseWheelZoomEnabled = true;
+            this.gMapControl_EA.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
+            this.gMapControl_EA.Name = "gMapControl_EA";
+            this.gMapControl_EA.NegativeMode = false;
+            this.gMapControl_EA.PolygonsEnabled = true;
+            this.gMapControl_EA.RetryLoadTile = 0;
+            this.gMapControl_EA.RoutesEnabled = true;
+            this.gMapControl_EA.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
+            this.gMapControl_EA.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
+            this.gMapControl_EA.ShowTileGridLines = false;
+            this.gMapControl_EA.Size = new System.Drawing.Size(727, 264);
+            this.gMapControl_EA.TabIndex = 30;
+            this.gMapControl_EA.Zoom = 0D;
+            // 
             // button9
             // 
             this.button9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -702,7 +714,6 @@ namespace SLF
             this.button9.TabIndex = 29;
             this.button9.Text = "Google Earth";
             this.button9.UseVisualStyleBackColor = true;
-            this.button9.Click += new System.EventHandler(this.button9_Click);
             // 
             // checkBox18
             // 
@@ -1377,11 +1388,6 @@ namespace SLF
             this.tab_validasyon.Text = "Validasyon Modülü";
             this.tab_validasyon.UseVisualStyleBackColor = true;
             // 
-            // fileSystemWatcher1
-            // 
-            this.fileSystemWatcher1.EnableRaisingEvents = true;
-            this.fileSystemWatcher1.SynchronizingObject = this;
-            // 
             // tabPage1
             // 
             this.tabPage1.Location = new System.Drawing.Point(4, 62);
@@ -1400,29 +1406,11 @@ namespace SLF
             this.button2.TabIndex = 4;
             this.button2.Text = "Ana Sayfa";
             this.button2.UseVisualStyleBackColor = false;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(163, 47);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(277, 22);
-            this.textBox1.TabIndex = 5;
             // 
             // fileSystemWatcher1
             // 
             this.fileSystemWatcher1.EnableRaisingEvents = true;
             this.fileSystemWatcher1.SynchronizingObject = this;
-            // 
-            // ButtonKml
-            // 
-            this.ButtonKml.Location = new System.Drawing.Point(8, 65);
-            this.ButtonKml.Name = "ButtonKml";
-            this.ButtonKml.Size = new System.Drawing.Size(143, 40);
-            this.ButtonKml.TabIndex = 30;
-            this.ButtonKml.Text = "KML Yükle";
-            this.ButtonKml.UseVisualStyleBackColor = true;
-            this.ButtonKml.Click += new System.EventHandler(this.ButtonKml_Click);
             // 
             // ModülFormu
             // 
@@ -1450,10 +1438,10 @@ namespace SLF
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.tab_dek.ResumeLayout(false);
             this.tab_dek.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView4)).EndInit();
             this.tab_ea.ResumeLayout(false);
             this.tab_ea.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tbar1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView4)).EndInit();
             this.tab_ekonometrik.ResumeLayout(false);
             this.tab_ekonometrik.PerformLayout();
             this.panel2.ResumeLayout(false);
@@ -1586,9 +1574,9 @@ namespace SLF
         private System.Windows.Forms.ToolStripMenuItem kaydetToolStripMenuItem;
         private System.Windows.Forms.Button button9;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.Label label12;
+        //private System.Windows.Forms.Label label12;
         private System.Windows.Forms.ListBox listBox1;
-        private System.Windows.Forms.Button button6;
+        //private System.Windows.Forms.Button button6;
         private GMap.NET.WindowsForms.GMapControl mapControl;
         private System.Windows.Forms.Button button7;
         private System.Windows.Forms.TrackBar tbar1;
@@ -1596,5 +1584,6 @@ namespace SLF
         private System.Windows.Forms.Button btnplgn;
         private System.Windows.Forms.Button oznitelikAc;
         private System.Windows.Forms.Button ButtonKml;
+        private GMap.NET.WindowsForms.GMapControl gMapControl_EA;
     }
 }

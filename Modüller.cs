@@ -25,7 +25,6 @@ using EO.WebBrowser;
 using Microsoft.Web.WebView2.WinForms;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
-using Avalonia.Media;
 
 namespace SLF
 {
@@ -44,7 +43,7 @@ namespace SLF
         public int eklenmiş_katman_sayısı = 0;
 
         // stokastik haritasına eklenecek olan shapefile'lar ile alakalı arrayler
-        public Shapefile[] shapefile_array = new Shapefile[10]; // shapefile array to hold .shp files/data
+        //public Shapefile[] shapefile_array = new Shapefile[10]; // shapefile array to hold .shp files/data
         public string[] shapefile_names = new string[10]; // names of the .shp files
         public int[] layerHandles = new int[10]; // array to hold int values to control the layers
 
@@ -52,7 +51,7 @@ namespace SLF
         public Tablo_Formu tablo_formu;
 
         // default extents of the axMap object in the stokastik_haritası module
-        public Extents stokastik_default_extents;
+        //public Extents stokastik_default_extents;
 
         private GMapOverlay markerOverlay;
         private GMapOverlay polygonOverlay;
@@ -92,28 +91,34 @@ namespace SLF
             public List<NoktaVeri> Noktalar { get; set; }
         }
 
+        private void InitializeGMap(GMap.NET.WindowsForms.GMapControl gmap)
+        {
+
+            gmap.MapProvider = GMapProviders.GoogleSatelliteMap;
+            gmap.Zoom = 10;
+            gmap.Position = new PointLatLng(38.4237, 27.1428);
+            gmap.MinZoom = 5;
+            gmap.MaxZoom = 100;
+            gmap.DragButton = MouseButtons.Left;
+        }
+
         public ModülFormu() {
-            // GMapControl özelliklerini ayarlayın
-            mapControl.MapProvider = GMapProviders.GoogleSatelliteMap;
-            mapControl.Zoom = 10;
-            mapControl.Position = new PointLatLng(38.4237, 27.1428);
-            mapControl.MinZoom = 5;
-            mapControl.MaxZoom = 100;
-            mapControl.DragButton = MouseButtons.Left;
+
+            InitializeGMap(gMapControl_EA);
 
             // Yeni bir overlay oluşturun
             markerOverlay = new GMapOverlay("markers");
-            mapControl.Overlays.Add(markerOverlay);
+            gMapControl_EA.Overlays.Add(markerOverlay);
 
             // Yeni bir poligon overlay oluşturun
             polygonOverlay = new GMapOverlay("polygonOverlay");
-            mapControl.Overlays.Add(polygonOverlay);
+            gMapControl_EA.Overlays.Add(polygonOverlay);
 
             // Zoom Bar'a olayları bağlayın
             tbar1.ValueChanged += TrackBar1_ValueChanged;
 
             // Başlangıç zoom seviyesini ayarlayın
-            mapControl.Zoom = tbar1.Value;
+            gMapControl_EA.Zoom = tbar1.Value;
 
             // TrackBar'ın minimum ve maksimum değerlerini ayarlayın
             tbar1.Minimum = 5;
@@ -121,15 +126,7 @@ namespace SLF
             tbar1.SmallChange = 1;
             tbar1.LargeChange = 3; 
 
-            int shapeIndex = my_shp.NumShapes;
-        MessageBox.Show(shapeIndex.ToString());
-                my_shp.EditInsertShape(pointShape, ref shapeIndex);
-                my_shp.RefreshExtents();
-        
-
-
-
-        Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
 
             ConfigureTileCaching();
 
@@ -162,13 +159,13 @@ namespace SLF
         private void stokastik_dosya_seçimi_Click(object sender, EventArgs e)
         {
             // Find the first available slot
-            int index = Array.FindIndex(shapefile_array, s => s == null);
+            //int index = Array.FindIndex(shapefile_array, s => s == null);
 
-            if (index == -1)
+           /* if (index == -1)
             {
                 MessageBox.Show("En fazla 10 adet katman seçilebilmektedir.");
                 return;
-            }
+            }*/
 
             OpenFileDialog vektorel_veri_seçimi = new OpenFileDialog();
 
@@ -328,7 +325,7 @@ namespace SLF
                 if (kaydet_result == DialogResult.OK)
                 {
                     string filepath = kaydet_file_dialog.FileName;
-                    shapefile_array[checkbox_index].SaveAsEx(filepath, true, false);
+                    //shapefile_array[checkbox_index].SaveAsEx(filepath, true, false);
                     MessageBox.Show("Dosya başarıyla kaydedildi.");
 
                 }
@@ -379,11 +376,11 @@ namespace SLF
             rengiDeğiştirToolStripMenuItem.Tag = sender_checkbox;
             kaydetToolStripMenuItem.Tag = sender_checkbox;
 
-            if (shapefile_array[checkbox_index] != null)
+           /* if (shapefile_array[checkbox_index] != null)
             {
                 tablo_formu.Text = "Veri Tablosu - " + shapefile_names[checkbox_index];
                 LoadAttributeTable(shapefile_array[checkbox_index], tablo_formu.dataGridView_objesi);
-            }
+            }*/
         }
 
         // display or hide the layers by checkboxes of the stokastik_yuk_tahmini form
@@ -426,7 +423,7 @@ namespace SLF
         public ContextMenuStrip nokta_menüsü;
 
         // noktaların eklenip çıkarılacağı liste
-        private List<Shape> pointsList = new List<Shape>();
+        //private List<Shape> pointsList = new List<Shape>();
 
         // sol tıkla nokta ekleyebilme kontrolü
         public bool adding_points = false;
@@ -470,90 +467,23 @@ namespace SLF
             checkBox18.MouseDown += stokastik_checkBox_MouseDown;
         }
 
-        private void stokastik_haritası_MouseDownEvent(object sender, _DMapEvents_MouseDownEvent e)
-        {
-            /*if (e.button == 1 && adding_points == true) // Left mouse button
-            {
-                double x = 0, y = 0;
-                stokastik_haritası.PixelToProj(e.x, e.y, ref x, ref y);
-
-                Shape pointShape = new Shape();
-                pointShape.Create(ShpfileType.SHP_POINT);
-
-                MapWinGIS.Point point = new MapWinGIS.Point();
-                point.x = x;
-                point.y = y;
-
-                pointShape.InsertPoint(point, ref point_index);
-                pointsList.Add(pointShape);
-                point_index++;
-                    
-                MessageBox.Show(my_shp.NumFields.ToString());
-                MessageBox.Show(my_shp.NumShapes.ToString());
-
-                if (my_shp == null)
-                {
-                    my_shp = new Shapefile();
-                    my_shp.CreateNewWithShapeID("", ShpfileType.SHP_POINT);
-                    stokastik_haritası.AddLayer(my_shp, true);
-                }
-
-
-
-        
-  
-            
-            }*/
-        }
-
         private void TrackBar1_ValueChanged(object sender, EventArgs e)
         {
             // Zoom Bar'ın değeri değiştiğinde harita zoom seviyesini güncelleyin
-            mapControl.Zoom = tbar1.Value;
+            gMapControl_EA.Zoom = tbar1.Value;
         }
-
-        private void saToolStripMenuItem_Click(object sender, EventArgs e) { }
-
 
         private void InitializeContextMenu_Nokta()
         {
-            
-
-
-            // Yeni bir overlay oluşturun
-
-
-
-      
-       
-        
-            
-
-  
-
-
-            
             // Initialize the ContextMenuStrip
             nokta_menüsü = new ContextMenuStrip();
 
             // Add items to the ContextMenuStrip
-            nokta_menüsü.Items.Add("Nokta Oluştur", null, nokta_ekle_click);
+            /*nokta_menüsü.Items.Add("Nokta Oluştur", null, nokta_ekle_click);
             nokta_menüsü.Items.Add("Nokta Sil", null, nokta_sil_click);
             nokta_menüsü.Items.Add("Tümünü Temizle", null, noktaları_sil_click);
-            nokta_menüsü.Items.Add("Kaydet", null, noktaları_kaydet_click);
+            nokta_menüsü.Items.Add("Kaydet", null, noktaları_kaydet_click);*/
         }
-
-
-
-
-
-
-
-
-    
-
-            
-        
 
         private void button3_Click_1(object sender, EventArgs e)
         {
@@ -581,17 +511,6 @@ namespace SLF
             else
             {
                 panel1.Visible = false;
-            }
-        }
-
-        private void MapControl_OnMapClick(PointLatLng point, MouseEventArgs e)
-        {
-            if (isSelecting)
-            {
-                polygonPoints.Add(point);
-                GMapMarker marker = new GMarkerGoogle(point, GMarkerGoogleType.black_small);
-                markerOverlay.Markers.Add(marker);
-                mapControl.Refresh();
             }
         }
 
@@ -718,7 +637,7 @@ namespace SLF
         /// 
 
 
-        private void LoadAttributeTable(Shapefile shapefile, DataGridView dataGridView)
+        /*private void LoadAttributeTable(Shapefile shapefile, DataGridView dataGridView)
         {
             DataTable dataTable = new DataTable();
 
@@ -750,24 +669,24 @@ namespace SLF
 
             // Bind the DataTable to the DataGridView
             dataGridView.DataSource = dataTable;
-        }
+        }*/
 
         private void ModülFormu_Load(object sender, EventArgs e) { }
 
-        private void button7_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "CSV Dosyaları (*.csv)|*.csv|Tüm Dosyalar (*.*)|*.*";
-            openFileDialog.Title = "CSV Dosyasını Seç";
+        /* private void button7_Click(object sender, EventArgs e)
+         {
+             OpenFileDialog openFileDialog = new OpenFileDialog();
+             openFileDialog.Filter = "CSV Dosyaları (*.csv)|*.csv|Tüm Dosyalar (*.*)|*.*";
+             openFileDialog.Title = "CSV Dosyasını Seç";
 
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                string dosyaYolu = openFileDialog.FileName;
-                CSVYukle(dosyaYolu);
-                loadedFiles.Add(new YüklenenDosya { DosyaAdi = Path.GetFileName(dosyaYolu), DosyaTuru = DosyaTuru.CSV });
-                UpdateListBox();
-            }
-        }
+             if (openFileDialog.ShowDialog() == DialogResult.OK)
+             {
+                 string dosyaYolu = openFileDialog.FileName;
+                 CSVYukle(dosyaYolu);
+                 loadedFiles.Add(new YüklenenDosya { DosyaAdi = Path.GetFileName(dosyaYolu), DosyaTuru = DosyaTuru.CSV });
+                 UpdateListBox();
+             }
+         }*/
 
         private void CSVYukle(string dosyaYolu)
         {
@@ -808,11 +727,11 @@ namespace SLF
 
             if (ilkNoktaBelirlendi)
             {
-                mapControl.Position = new PointLatLng(ilkNoktaEnlem, ilkNoktaBoylam);
-                mapControl.Zoom = 15;
+                gMapControl_EA.Position = new PointLatLng(ilkNoktaEnlem, ilkNoktaBoylam);
+                gMapControl_EA.Zoom = 15;
             }
 
-            mapControl.Refresh();
+            gMapControl_EA.Refresh();
         }
 
         private void UpdateListBox()
@@ -824,11 +743,9 @@ namespace SLF
             }
         }
 
-
         private void btnplgn_Click_1(object sender, EventArgs e)
         {
             isSelecting = true;
-            mapControl.OnMapClick += MapControl_OnMapClick;
         }
 
         private void btnTamamla_Click_1(object sender, EventArgs e)
@@ -837,7 +754,7 @@ namespace SLF
             {
                 string poligonIsim = $"poligon_{poligonlar.Count + 1}";
                 GMapPolygon polygon = new GMapPolygon(polygonPoints, poligonIsim);
-                polygon.Stroke = new Pen(Color.Red, 2);
+                //polygon.Stroke = new Pen(Color.Red, 2);
                 polygonOverlay.Polygons.Add(polygon);
 
                 PoligonVeri poligonVeri = new PoligonVeri
@@ -866,7 +783,6 @@ namespace SLF
                 MessageBox.Show("Poligon oluşturmak için en az 3 nokta seçmelisiniz.");
             }
         }
-
 
         private void ButtonKml_Click(object sender, EventArgs e)
         {
@@ -960,7 +876,6 @@ namespace SLF
             }
         }
 
-
         private void mapControl_OnMarkerClick_edited(GMapMarker item, MouseEventArgs e)
         {
             if (item.Tag != null && item.Tag is NoktaVeri)
@@ -995,7 +910,7 @@ namespace SLF
         }
 
 
-        private void button6_Click(object sender, EventArgs e)
+        /*private void button6_Click(object sender, EventArgs e)
         {
             Temizle();
 
@@ -1004,7 +919,7 @@ namespace SLF
                 loadedFiles.RemoveAt(listBox1.SelectedIndex);
                 UpdateListBox();
             }
-        }
+        }*/
 
         private void Temizle()
         {
@@ -1062,6 +977,19 @@ namespace SLF
             mapControl.Refresh();
         }
 
+
+        private void gMapControlEA_Click(PointLatLng point, MouseEventArgs e)
+        {
+            if (isSelecting)
+            {
+                polygonPoints.Add(point);
+                GMapMarker marker = new GMarkerGoogle(point, GMarkerGoogleType.black_small);
+                markerOverlay.Markers.Add(marker);
+                gMapControl_EA.Refresh();
+            }
+
+        }
+
         private void toolStripButton8_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -1070,18 +998,6 @@ namespace SLF
                 nokta_menüsü.Show(Cursor.Position);
             }
         }
-
-        private void listBox1_SelectedIndexChanged(object sender, EventArgs e) { }
     }
 }
 
-
-
-            
-
-        private void ModülFormu_Load(object sender, EventArgs e)
-        {
-
-        }
-    }
-}
