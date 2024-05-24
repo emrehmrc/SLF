@@ -61,6 +61,7 @@ namespace SLF
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
                     dataGridView1.DataSource = dataTable;
+                    girdiModülü.ReportNullCounts(dataTable);
                 }
                 else
                 {

@@ -99,6 +99,25 @@ namespace SLF
             // TODO: Implement tabular file processing
             return new DataTable();
         }
+        public void ReportNullCounts(DataTable dataTable)
+        {
+            // StringBuilder to build the report message
+            StringBuilder reportMessage = new StringBuilder();
+
+            foreach (DataColumn column in dataTable.Columns)
+            {
+                // Count the number of null or DBNull values in the current column
+                
+                // TODO: COUNT NULL STRINGS OR N/A VALUES AS NULLS AS WELL
+                int nullCount = dataTable.AsEnumerable().Count(row => row.IsNull(column));
+
+                // Append the column name and null count to the report message
+                reportMessage.AppendLine($"{column.ColumnName}: {nullCount} null(s)");
+            }
+
+            // Display the report message in a MessageBox
+            MessageBox.Show(reportMessage.ToString(), "Null Counts Per Column", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
     }
 }
 
