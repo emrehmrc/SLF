@@ -51,13 +51,38 @@ namespace SLF
             this.label16 = new System.Windows.Forms.Label();
             this.dataGridView4 = new System.Windows.Forms.DataGridView();
             this.tab_ea = new System.Windows.Forms.TabPage();
+            this.mesafe_metre_ea = new System.Windows.Forms.Label();
+            this.Mesafe_ea = new System.Windows.Forms.Label();
+            this.toolStrip2 = new System.Windows.Forms.ToolStrip();
+            this.toolStripButton9 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripButton10 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripButton11 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator11 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripButton12 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator12 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripButton13 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator13 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripButton14 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator14 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripButton15 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator15 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripButton16 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator16 = new System.Windows.Forms.ToolStripSeparator();
+            this.buton_ea_harita_katmanlar = new System.Windows.Forms.Button();
+            this.harita_katmanları_right_click = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.Arazi = new System.Windows.Forms.ToolStripMenuItem();
+            this.Google_Earth = new System.Windows.Forms.ToolStripMenuItem();
+            this.Harita = new System.Windows.Forms.ToolStripMenuItem();
+            this.OSM = new System.Windows.Forms.ToolStripMenuItem();
+            this.Uydu = new System.Windows.Forms.ToolStripMenuItem();
             this.ButtonKml = new System.Windows.Forms.Button();
             this.oznitelikAc = new System.Windows.Forms.Button();
             this.btnTamamla = new System.Windows.Forms.Button();
             this.btnplgn = new System.Windows.Forms.Button();
-            this.tbar1 = new System.Windows.Forms.TrackBar();
             this.listBox1 = new System.Windows.Forms.ListBox();
-            this.mapControl = new GMap.NET.WindowsForms.GMapControl();
+            this.gMapControl_EA = new GMap.NET.WindowsForms.GMapControl();
             this.button7 = new System.Windows.Forms.Button();
             this.tab_ekonometrik = new System.Windows.Forms.TabPage();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -77,7 +102,9 @@ namespace SLF
             this.tab_optDTR = new System.Windows.Forms.TabPage();
             this.tab_senaryo = new System.Windows.Forms.TabPage();
             this.tab_stokastik = new System.Windows.Forms.TabPage();
-            this.gMapControl_EA = new GMap.NET.WindowsForms.GMapControl();
+            this.mesafe_metre_stokastik = new System.Windows.Forms.Label();
+            this.Mesafe_stokastik = new System.Windows.Forms.Label();
+            this.gMapControl_stokastik = new GMap.NET.WindowsForms.GMapControl();
             this.buton_stokastik_harita_katmanlar = new System.Windows.Forms.Button();
             this.checkBox18 = new System.Windows.Forms.CheckBox();
             this.katmanlar_right_click = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -139,11 +166,6 @@ namespace SLF
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.button2 = new System.Windows.Forms.Button();
             this.fileSystemWatcher1 = new System.IO.FileSystemWatcher();
-            this.harita_katmanları_right_click = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.Arazi = new System.Windows.Forms.ToolStripMenuItem();
-            this.Harita = new System.Windows.Forms.ToolStripMenuItem();
-            this.Uydu = new System.Windows.Forms.ToolStripMenuItem();
-            this.Google_Earth = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tab_girdi.SuspendLayout();
@@ -151,7 +173,8 @@ namespace SLF
             this.tab_dek.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView4)).BeginInit();
             this.tab_ea.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tbar1)).BeginInit();
+            this.toolStrip2.SuspendLayout();
+            this.harita_katmanları_right_click.SuspendLayout();
             this.tab_ekonometrik.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
@@ -163,7 +186,6 @@ namespace SLF
             ((System.ComponentModel.ISupportInitialize)(this.webView21)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).BeginInit();
-            this.harita_katmanları_right_click.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -379,13 +401,16 @@ namespace SLF
             // 
             // tab_ea
             // 
+            this.tab_ea.Controls.Add(this.mesafe_metre_ea);
+            this.tab_ea.Controls.Add(this.Mesafe_ea);
+            this.tab_ea.Controls.Add(this.toolStrip2);
+            this.tab_ea.Controls.Add(this.buton_ea_harita_katmanlar);
             this.tab_ea.Controls.Add(this.ButtonKml);
             this.tab_ea.Controls.Add(this.oznitelikAc);
             this.tab_ea.Controls.Add(this.btnTamamla);
             this.tab_ea.Controls.Add(this.btnplgn);
-            this.tab_ea.Controls.Add(this.tbar1);
             this.tab_ea.Controls.Add(this.listBox1);
-            this.tab_ea.Controls.Add(this.mapControl);
+            this.tab_ea.Controls.Add(this.gMapControl_EA);
             this.tab_ea.Controls.Add(this.button7);
             this.tab_ea.Location = new System.Drawing.Point(4, 62);
             this.tab_ea.Name = "tab_ea";
@@ -394,9 +419,338 @@ namespace SLF
             this.tab_ea.Text = "EA Şarj Modülü";
             this.tab_ea.UseVisualStyleBackColor = true;
             // 
+            // mesafe_metre_ea
+            // 
+            this.mesafe_metre_ea.AutoSize = true;
+            this.mesafe_metre_ea.Location = new System.Drawing.Point(467, 41);
+            this.mesafe_metre_ea.Name = "mesafe_metre_ea";
+            this.mesafe_metre_ea.Size = new System.Drawing.Size(0, 24);
+            this.mesafe_metre_ea.TabIndex = 34;
+            this.mesafe_metre_ea.Visible = false;
+            // 
+            // Mesafe_ea
+            // 
+            this.Mesafe_ea.AutoSize = true;
+            this.Mesafe_ea.Location = new System.Drawing.Point(383, 41);
+            this.Mesafe_ea.Name = "Mesafe_ea";
+            this.Mesafe_ea.Size = new System.Drawing.Size(78, 24);
+            this.Mesafe_ea.TabIndex = 33;
+            this.Mesafe_ea.Text = "Mesafe:";
+            this.Mesafe_ea.Visible = false;
+            // 
+            // toolStrip2
+            // 
+            this.toolStrip2.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripButton9,
+            this.toolStripSeparator9,
+            this.toolStripButton10,
+            this.toolStripSeparator10,
+            this.toolStripButton11,
+            this.toolStripSeparator11,
+            this.toolStripButton12,
+            this.toolStripSeparator12,
+            this.toolStripButton13,
+            this.toolStripSeparator13,
+            this.toolStripButton14,
+            this.toolStripSeparator14,
+            this.toolStripButton15,
+            this.toolStripSeparator15,
+            this.toolStripButton16,
+            this.toolStripSeparator16});
+            this.toolStrip2.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip2.Name = "toolStrip2";
+            this.toolStrip2.Size = new System.Drawing.Size(1472, 32);
+            this.toolStrip2.TabIndex = 32;
+            this.toolStrip2.Text = "toolStrip2";
+            // 
+            // toolStripButton9
+            // 
+            this.toolStripButton9.AccessibleDescription = "";
+            this.toolStripButton9.AccessibleName = "";
+            this.toolStripButton9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(250)))), ((int)(((byte)(249)))));
+            this.toolStripButton9.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.toolStripButton9.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.toolStripButton9.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton9.Image")));
+            this.toolStripButton9.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolStripButton9.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton9.Margin = new System.Windows.Forms.Padding(204, 1, 0, 2);
+            this.toolStripButton9.Name = "toolStripButton9";
+            this.toolStripButton9.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.toolStripButton9.Size = new System.Drawing.Size(73, 29);
+            this.toolStripButton9.Tag = "";
+            this.toolStripButton9.Text = "Seç";
+            this.toolStripButton9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.toolStripButton9.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.toolStripButton9.ToolTipText = "Harita üzerinde seçim yapar.";
+            this.toolStripButton9.Click += new System.EventHandler(this.toolStripButton9_Click);
+            // 
+            // toolStripSeparator9
+            // 
+            this.toolStripSeparator9.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            this.toolStripSeparator9.Name = "toolStripSeparator9";
+            this.toolStripSeparator9.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
+            this.toolStripSeparator9.Size = new System.Drawing.Size(6, 32);
+            // 
+            // toolStripButton10
+            // 
+            this.toolStripButton10.AccessibleDescription = "";
+            this.toolStripButton10.AccessibleName = "";
+            this.toolStripButton10.BackColor = System.Drawing.Color.LightGoldenrodYellow;
+            this.toolStripButton10.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.toolStripButton10.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.toolStripButton10.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton10.Image")));
+            this.toolStripButton10.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolStripButton10.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton10.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.toolStripButton10.Name = "toolStripButton10";
+            this.toolStripButton10.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.toolStripButton10.Size = new System.Drawing.Size(95, 29);
+            this.toolStripButton10.Tag = "";
+            this.toolStripButton10.Text = "Kaydır";
+            this.toolStripButton10.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.toolStripButton10.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.toolStripButton10.ToolTipText = "Harita üzerine basılı tutup farklı yönlerde hareketi sağlar.";
+            this.toolStripButton10.Click += new System.EventHandler(this.toolStripButton10_Click);
+            // 
+            // toolStripSeparator10
+            // 
+            this.toolStripSeparator10.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            this.toolStripSeparator10.Name = "toolStripSeparator10";
+            this.toolStripSeparator10.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
+            this.toolStripSeparator10.Size = new System.Drawing.Size(6, 32);
+            // 
+            // toolStripButton11
+            // 
+            this.toolStripButton11.AccessibleDescription = "";
+            this.toolStripButton11.AccessibleName = "";
+            this.toolStripButton11.BackColor = System.Drawing.Color.Honeydew;
+            this.toolStripButton11.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.toolStripButton11.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.toolStripButton11.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton11.Image")));
+            this.toolStripButton11.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolStripButton11.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton11.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.toolStripButton11.Name = "toolStripButton11";
+            this.toolStripButton11.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.toolStripButton11.Size = new System.Drawing.Size(134, 29);
+            this.toolStripButton11.Tag = "";
+            this.toolStripButton11.Text = "Mesafe Ölç";
+            this.toolStripButton11.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.toolStripButton11.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.toolStripButton11.ToolTipText = "Noktalar arası doğrusal uzaklığı hesaplar.";
+            this.toolStripButton11.Click += new System.EventHandler(this.toolStripButton11_Click);
+            // 
+            // toolStripSeparator11
+            // 
+            this.toolStripSeparator11.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            this.toolStripSeparator11.Name = "toolStripSeparator11";
+            this.toolStripSeparator11.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
+            this.toolStripSeparator11.Size = new System.Drawing.Size(6, 32);
+            // 
+            // toolStripButton12
+            // 
+            this.toolStripButton12.AccessibleDescription = "";
+            this.toolStripButton12.AccessibleName = "";
+            this.toolStripButton12.BackColor = System.Drawing.Color.Azure;
+            this.toolStripButton12.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.toolStripButton12.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.toolStripButton12.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton12.Image")));
+            this.toolStripButton12.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolStripButton12.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton12.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.toolStripButton12.Name = "toolStripButton12";
+            this.toolStripButton12.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.toolStripButton12.Size = new System.Drawing.Size(112, 29);
+            this.toolStripButton12.Tag = "";
+            this.toolStripButton12.Text = "Alan Ölç";
+            this.toolStripButton12.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.toolStripButton12.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.toolStripButton12.ToolTipText = "Çizilen bir poligonun alansal büyüklüğünü hesaplar.";
+            // 
+            // toolStripSeparator12
+            // 
+            this.toolStripSeparator12.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            this.toolStripSeparator12.Name = "toolStripSeparator12";
+            this.toolStripSeparator12.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
+            this.toolStripSeparator12.Size = new System.Drawing.Size(6, 32);
+            // 
+            // toolStripButton13
+            // 
+            this.toolStripButton13.AccessibleDescription = "";
+            this.toolStripButton13.AccessibleName = "";
+            this.toolStripButton13.BackColor = System.Drawing.Color.Thistle;
+            this.toolStripButton13.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.toolStripButton13.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.toolStripButton13.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton13.Image")));
+            this.toolStripButton13.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolStripButton13.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton13.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.toolStripButton13.Name = "toolStripButton13";
+            this.toolStripButton13.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.toolStripButton13.Size = new System.Drawing.Size(106, 29);
+            this.toolStripButton13.Tag = "";
+            this.toolStripButton13.Text = "Poligon";
+            this.toolStripButton13.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.toolStripButton13.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.toolStripButton13.ToolTipText = "Çizilen bir poligonun alansal büyüklüğünü hesaplar.";
+            // 
+            // toolStripSeparator13
+            // 
+            this.toolStripSeparator13.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            this.toolStripSeparator13.Name = "toolStripSeparator13";
+            this.toolStripSeparator13.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
+            this.toolStripSeparator13.Size = new System.Drawing.Size(6, 32);
+            // 
+            // toolStripButton14
+            // 
+            this.toolStripButton14.AccessibleDescription = "";
+            this.toolStripButton14.AccessibleName = "";
+            this.toolStripButton14.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
+            this.toolStripButton14.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.toolStripButton14.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.toolStripButton14.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton14.Image")));
+            this.toolStripButton14.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolStripButton14.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton14.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.toolStripButton14.Name = "toolStripButton14";
+            this.toolStripButton14.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.toolStripButton14.Size = new System.Drawing.Size(94, 29);
+            this.toolStripButton14.Tag = "";
+            this.toolStripButton14.Text = "Nokta";
+            this.toolStripButton14.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.toolStripButton14.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.toolStripButton14.ToolTipText = "Çizilen bir poligonun alansal büyüklüğünü hesaplar.";
+            // 
+            // toolStripSeparator14
+            // 
+            this.toolStripSeparator14.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            this.toolStripSeparator14.Name = "toolStripSeparator14";
+            this.toolStripSeparator14.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
+            this.toolStripSeparator14.Size = new System.Drawing.Size(6, 32);
+            // 
+            // toolStripButton15
+            // 
+            this.toolStripButton15.AccessibleDescription = "";
+            this.toolStripButton15.AccessibleName = "";
+            this.toolStripButton15.BackColor = System.Drawing.Color.Beige;
+            this.toolStripButton15.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.toolStripButton15.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.toolStripButton15.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton15.Image")));
+            this.toolStripButton15.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolStripButton15.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton15.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.toolStripButton15.Name = "toolStripButton15";
+            this.toolStripButton15.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.toolStripButton15.Size = new System.Drawing.Size(142, 29);
+            this.toolStripButton15.Tag = "";
+            this.toolStripButton15.Text = "Grid Oluştur";
+            this.toolStripButton15.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.toolStripButton15.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.toolStripButton15.ToolTipText = "Çizilen bir poligonun alansal büyüklüğünü hesaplar.";
+            // 
+            // toolStripSeparator15
+            // 
+            this.toolStripSeparator15.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            this.toolStripSeparator15.Name = "toolStripSeparator15";
+            this.toolStripSeparator15.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
+            this.toolStripSeparator15.Size = new System.Drawing.Size(6, 32);
+            // 
+            // toolStripButton16
+            // 
+            this.toolStripButton16.AccessibleDescription = "";
+            this.toolStripButton16.AccessibleName = "";
+            this.toolStripButton16.BackColor = System.Drawing.Color.LightBlue;
+            this.toolStripButton16.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.toolStripButton16.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.toolStripButton16.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton16.Image")));
+            this.toolStripButton16.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolStripButton16.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton16.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.toolStripButton16.Name = "toolStripButton16";
+            this.toolStripButton16.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.toolStripButton16.Size = new System.Drawing.Size(146, 29);
+            this.toolStripButton16.Tag = "";
+            this.toolStripButton16.Text = "Fonksiyonlar";
+            this.toolStripButton16.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.toolStripButton16.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.toolStripButton16.ToolTipText = "Çizilen bir poligonun alansal büyüklüğünü hesaplar.";
+            // 
+            // toolStripSeparator16
+            // 
+            this.toolStripSeparator16.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            this.toolStripSeparator16.Name = "toolStripSeparator16";
+            this.toolStripSeparator16.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
+            this.toolStripSeparator16.Size = new System.Drawing.Size(6, 32);
+            // 
+            // buton_ea_harita_katmanlar
+            // 
+            this.buton_ea_harita_katmanlar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buton_ea_harita_katmanlar.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buton_ea_harita_katmanlar.BackgroundImage")));
+            this.buton_ea_harita_katmanlar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.buton_ea_harita_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
+            this.buton_ea_harita_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.buton_ea_harita_katmanlar.Location = new System.Drawing.Point(373, 579);
+            this.buton_ea_harita_katmanlar.Name = "buton_ea_harita_katmanlar";
+            this.buton_ea_harita_katmanlar.Size = new System.Drawing.Size(62, 52);
+            this.buton_ea_harita_katmanlar.TabIndex = 31;
+            this.buton_ea_harita_katmanlar.UseVisualStyleBackColor = true;
+            // 
+            // harita_katmanları_right_click
+            // 
+            this.harita_katmanları_right_click.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.harita_katmanları_right_click.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.Arazi,
+            this.Google_Earth,
+            this.Harita,
+            this.OSM,
+            this.Uydu});
+            this.harita_katmanları_right_click.Name = "harita_katmanları_right_click";
+            this.harita_katmanları_right_click.Size = new System.Drawing.Size(196, 134);
+            // 
+            // Arazi
+            // 
+            this.Arazi.Image = ((System.Drawing.Image)(resources.GetObject("Arazi.Image")));
+            this.Arazi.Name = "Arazi";
+            this.Arazi.Size = new System.Drawing.Size(195, 26);
+            this.Arazi.Text = "Arazi";
+            this.Arazi.Click += new System.EventHandler(this.Arazi_Click);
+            // 
+            // Google_Earth
+            // 
+            this.Google_Earth.Image = ((System.Drawing.Image)(resources.GetObject("Google_Earth.Image")));
+            this.Google_Earth.Name = "Google_Earth";
+            this.Google_Earth.Size = new System.Drawing.Size(195, 26);
+            this.Google_Earth.Text = "Google Earth";
+            this.Google_Earth.Click += new System.EventHandler(this.Google_Earth_Click);
+            // 
+            // Harita
+            // 
+            this.Harita.Image = ((System.Drawing.Image)(resources.GetObject("Harita.Image")));
+            this.Harita.Name = "Harita";
+            this.Harita.Size = new System.Drawing.Size(195, 26);
+            this.Harita.Text = "Harita";
+            this.Harita.Click += new System.EventHandler(this.Harita_Click);
+            // 
+            // OSM
+            // 
+            this.OSM.Image = ((System.Drawing.Image)(resources.GetObject("OSM.Image")));
+            this.OSM.Name = "OSM";
+            this.OSM.Size = new System.Drawing.Size(195, 26);
+            this.OSM.Text = "Open Street Map";
+            this.OSM.Click += new System.EventHandler(this.OSM_Click);
+            // 
+            // Uydu
+            // 
+            this.Uydu.Image = ((System.Drawing.Image)(resources.GetObject("Uydu.Image")));
+            this.Uydu.Name = "Uydu";
+            this.Uydu.Size = new System.Drawing.Size(195, 26);
+            this.Uydu.Text = "Uydu";
+            this.Uydu.Click += new System.EventHandler(this.Uydu_Click);
+            // 
             // ButtonKml
             // 
-            this.ButtonKml.Location = new System.Drawing.Point(8, 65);
+            this.ButtonKml.Location = new System.Drawing.Point(8, 126);
             this.ButtonKml.Name = "ButtonKml";
             this.ButtonKml.Size = new System.Drawing.Size(143, 40);
             this.ButtonKml.TabIndex = 30;
@@ -406,7 +760,7 @@ namespace SLF
             // 
             // oznitelikAc
             // 
-            this.oznitelikAc.Location = new System.Drawing.Point(53, 457);
+            this.oznitelikAc.Location = new System.Drawing.Point(17, 541);
             this.oznitelikAc.Name = "oznitelikAc";
             this.oznitelikAc.Size = new System.Drawing.Size(194, 38);
             this.oznitelikAc.TabIndex = 29;
@@ -416,7 +770,7 @@ namespace SLF
             // 
             // btnTamamla
             // 
-            this.btnTamamla.Location = new System.Drawing.Point(267, 91);
+            this.btnTamamla.Location = new System.Drawing.Point(272, 153);
             this.btnTamamla.Name = "btnTamamla";
             this.btnTamamla.Size = new System.Drawing.Size(95, 75);
             this.btnTamamla.TabIndex = 28;
@@ -426,7 +780,7 @@ namespace SLF
             // 
             // btnplgn
             // 
-            this.btnplgn.Location = new System.Drawing.Point(267, 9);
+            this.btnplgn.Location = new System.Drawing.Point(272, 41);
             this.btnplgn.Name = "btnplgn";
             this.btnplgn.Size = new System.Drawing.Size(95, 75);
             this.btnplgn.TabIndex = 27;
@@ -434,56 +788,50 @@ namespace SLF
             this.btnplgn.UseVisualStyleBackColor = true;
             this.btnplgn.Click += new System.EventHandler(this.btnplgn_Click_1);
             // 
-            // tbar1
-            // 
-            this.tbar1.Location = new System.Drawing.Point(391, 3);
-            this.tbar1.Name = "tbar1";
-            this.tbar1.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.tbar1.Size = new System.Drawing.Size(56, 163);
-            this.tbar1.TabIndex = 24;
-            // 
             // listBox1
             // 
             this.listBox1.FormattingEnabled = true;
             this.listBox1.ItemHeight = 24;
-            this.listBox1.Location = new System.Drawing.Point(27, 231);
+            this.listBox1.Location = new System.Drawing.Point(17, 271);
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(244, 220);
             this.listBox1.TabIndex = 20;
             // 
-            // mapControl
+            // gMapControl_EA
             // 
-            this.mapControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.gMapControl_EA.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.mapControl.Bearing = 0F;
-            this.mapControl.CanDragMap = true;
-            this.mapControl.EmptyTileColor = System.Drawing.Color.Navy;
-            this.mapControl.GrayScaleMode = false;
-            this.mapControl.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
-            this.mapControl.LevelsKeepInMemory = 5;
-            this.mapControl.Location = new System.Drawing.Point(382, 3);
-            this.mapControl.MarkersEnabled = true;
-            this.mapControl.MaxZoom = 2;
-            this.mapControl.MinZoom = 2;
-            this.mapControl.MouseWheelZoomEnabled = false;
-            this.mapControl.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
-            this.mapControl.Name = "mapControl";
-            this.mapControl.NegativeMode = false;
-            this.mapControl.PolygonsEnabled = true;
-            this.mapControl.RetryLoadTile = 0;
-            this.mapControl.RoutesEnabled = true;
-            this.mapControl.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
-            this.mapControl.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
-            this.mapControl.ShowTileGridLines = false;
-            this.mapControl.Size = new System.Drawing.Size(1096, 576);
-            this.mapControl.TabIndex = 18;
-            this.mapControl.Zoom = 0D;
-            this.mapControl.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(this.mapControl_OnMarkerClick_edited);
+            this.gMapControl_EA.Bearing = 0F;
+            this.gMapControl_EA.CanDragMap = true;
+            this.gMapControl_EA.EmptyTileColor = System.Drawing.Color.Navy;
+            this.gMapControl_EA.GrayScaleMode = false;
+            this.gMapControl_EA.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
+            this.gMapControl_EA.LevelsKeepInMemory = 5;
+            this.gMapControl_EA.Location = new System.Drawing.Point(373, 41);
+            this.gMapControl_EA.MarkersEnabled = true;
+            this.gMapControl_EA.MaxZoom = 2;
+            this.gMapControl_EA.MinZoom = 2;
+            this.gMapControl_EA.MouseWheelZoomEnabled = true;
+            this.gMapControl_EA.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
+            this.gMapControl_EA.Name = "gMapControl_EA";
+            this.gMapControl_EA.NegativeMode = false;
+            this.gMapControl_EA.PolygonsEnabled = true;
+            this.gMapControl_EA.RetryLoadTile = 0;
+            this.gMapControl_EA.RoutesEnabled = true;
+            this.gMapControl_EA.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
+            this.gMapControl_EA.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
+            this.gMapControl_EA.ShowTileGridLines = false;
+            this.gMapControl_EA.Size = new System.Drawing.Size(1096, 590);
+            this.gMapControl_EA.TabIndex = 18;
+            this.gMapControl_EA.Zoom = 0D;
+            this.gMapControl_EA.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(this.mapControl_OnMarkerClick_edited);
+            this.gMapControl_EA.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_EA_MouseDown);
+            this.gMapControl_EA.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_EA_MouseMove);
             // 
             // button7
             // 
-            this.button7.Location = new System.Drawing.Point(8, 9);
+            this.button7.Location = new System.Drawing.Point(8, 41);
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(143, 40);
             this.button7.TabIndex = 17;
@@ -663,7 +1011,9 @@ namespace SLF
             // 
             // tab_stokastik
             // 
-            this.tab_stokastik.Controls.Add(this.gMapControl_EA);
+            this.tab_stokastik.Controls.Add(this.mesafe_metre_stokastik);
+            this.tab_stokastik.Controls.Add(this.Mesafe_stokastik);
+            this.tab_stokastik.Controls.Add(this.gMapControl_stokastik);
             this.tab_stokastik.Controls.Add(this.buton_stokastik_harita_katmanlar);
             this.tab_stokastik.Controls.Add(this.checkBox18);
             this.tab_stokastik.Controls.Add(this.checkBox17);
@@ -685,35 +1035,56 @@ namespace SLF
             this.tab_stokastik.Text = "Stokastik Yük Tahmini Modülü";
             this.tab_stokastik.UseVisualStyleBackColor = true;
             // 
-            // gMapControl_EA
+            // mesafe_metre_stokastik
             // 
-            this.gMapControl_EA.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.mesafe_metre_stokastik.AutoSize = true;
+            this.mesafe_metre_stokastik.Location = new System.Drawing.Point(363, 57);
+            this.mesafe_metre_stokastik.Name = "mesafe_metre_stokastik";
+            this.mesafe_metre_stokastik.Size = new System.Drawing.Size(0, 24);
+            this.mesafe_metre_stokastik.TabIndex = 32;
+            this.mesafe_metre_stokastik.Visible = false;
+            // 
+            // Mesafe_stokastik
+            // 
+            this.Mesafe_stokastik.AutoSize = true;
+            this.Mesafe_stokastik.Location = new System.Drawing.Point(279, 57);
+            this.Mesafe_stokastik.Name = "Mesafe_stokastik";
+            this.Mesafe_stokastik.Size = new System.Drawing.Size(78, 24);
+            this.Mesafe_stokastik.TabIndex = 31;
+            this.Mesafe_stokastik.Text = "Mesafe:";
+            this.Mesafe_stokastik.Visible = false;
+            // 
+            // gMapControl_stokastik
+            // 
+            this.gMapControl_stokastik.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.gMapControl_EA.Bearing = 0F;
-            this.gMapControl_EA.CanDragMap = true;
-            this.gMapControl_EA.Cursor = System.Windows.Forms.Cursors.Default;
-            this.gMapControl_EA.EmptyTileColor = System.Drawing.Color.Navy;
-            this.gMapControl_EA.GrayScaleMode = false;
-            this.gMapControl_EA.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
-            this.gMapControl_EA.LevelsKeepInMemory = 5;
-            this.gMapControl_EA.Location = new System.Drawing.Point(273, 47);
-            this.gMapControl_EA.MarkersEnabled = true;
-            this.gMapControl_EA.MaxZoom = 2;
-            this.gMapControl_EA.MinZoom = 2;
-            this.gMapControl_EA.MouseWheelZoomEnabled = true;
-            this.gMapControl_EA.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
-            this.gMapControl_EA.Name = "gMapControl_EA";
-            this.gMapControl_EA.NegativeMode = false;
-            this.gMapControl_EA.PolygonsEnabled = true;
-            this.gMapControl_EA.RetryLoadTile = 0;
-            this.gMapControl_EA.RoutesEnabled = true;
-            this.gMapControl_EA.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
-            this.gMapControl_EA.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
-            this.gMapControl_EA.ShowTileGridLines = false;
-            this.gMapControl_EA.Size = new System.Drawing.Size(1193, 584);
-            this.gMapControl_EA.TabIndex = 30;
-            this.gMapControl_EA.Zoom = 0D;
+            this.gMapControl_stokastik.Bearing = 0F;
+            this.gMapControl_stokastik.CanDragMap = false;
+            this.gMapControl_stokastik.Cursor = System.Windows.Forms.Cursors.Default;
+            this.gMapControl_stokastik.EmptyTileColor = System.Drawing.Color.Navy;
+            this.gMapControl_stokastik.GrayScaleMode = false;
+            this.gMapControl_stokastik.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
+            this.gMapControl_stokastik.LevelsKeepInMemory = 5;
+            this.gMapControl_stokastik.Location = new System.Drawing.Point(273, 47);
+            this.gMapControl_stokastik.MarkersEnabled = true;
+            this.gMapControl_stokastik.MaxZoom = 2;
+            this.gMapControl_stokastik.MinZoom = 2;
+            this.gMapControl_stokastik.MouseWheelZoomEnabled = true;
+            this.gMapControl_stokastik.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
+            this.gMapControl_stokastik.Name = "gMapControl_stokastik";
+            this.gMapControl_stokastik.NegativeMode = false;
+            this.gMapControl_stokastik.PolygonsEnabled = true;
+            this.gMapControl_stokastik.RetryLoadTile = 0;
+            this.gMapControl_stokastik.RoutesEnabled = true;
+            this.gMapControl_stokastik.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
+            this.gMapControl_stokastik.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
+            this.gMapControl_stokastik.ShowTileGridLines = false;
+            this.gMapControl_stokastik.Size = new System.Drawing.Size(1193, 584);
+            this.gMapControl_stokastik.TabIndex = 30;
+            this.gMapControl_stokastik.Zoom = 0D;
+            this.gMapControl_stokastik.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_stokastik_MouseDown);
+            this.gMapControl_stokastik.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_stokastik_MouseMove);
             // 
             // buton_stokastik_harita_katmanlar
             // 
@@ -1425,49 +1796,6 @@ namespace SLF
             this.fileSystemWatcher1.EnableRaisingEvents = true;
             this.fileSystemWatcher1.SynchronizingObject = this;
             // 
-            // harita_katmanları_right_click
-            // 
-            this.harita_katmanları_right_click.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.harita_katmanları_right_click.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.Arazi,
-            this.Google_Earth,
-            this.Harita,
-            this.Uydu});
-            this.harita_katmanları_right_click.Name = "harita_katmanları_right_click";
-            this.harita_katmanları_right_click.Size = new System.Drawing.Size(215, 136);
-            // 
-            // Arazi
-            // 
-            this.Arazi.Image = ((System.Drawing.Image)(resources.GetObject("Arazi.Image")));
-            this.Arazi.Name = "Arazi";
-            this.Arazi.Size = new System.Drawing.Size(214, 26);
-            this.Arazi.Text = "Arazi";
-            this.Arazi.Click += new System.EventHandler(this.Arazi_Click);
-            // 
-            // Harita
-            // 
-            this.Harita.Image = ((System.Drawing.Image)(resources.GetObject("Harita.Image")));
-            this.Harita.Name = "Harita";
-            this.Harita.Size = new System.Drawing.Size(214, 26);
-            this.Harita.Text = "Harita";
-            this.Harita.Click += new System.EventHandler(this.Harita_Click);
-            // 
-            // Uydu
-            // 
-            this.Uydu.Image = ((System.Drawing.Image)(resources.GetObject("Uydu.Image")));
-            this.Uydu.Name = "Uydu";
-            this.Uydu.Size = new System.Drawing.Size(214, 26);
-            this.Uydu.Text = "Uydu";
-            this.Uydu.Click += new System.EventHandler(this.Uydu_Click);
-            // 
-            // Google_Earth
-            // 
-            this.Google_Earth.Image = ((System.Drawing.Image)(resources.GetObject("Google_Earth.Image")));
-            this.Google_Earth.Name = "Google_Earth";
-            this.Google_Earth.Size = new System.Drawing.Size(214, 26);
-            this.Google_Earth.Text = "Google Earth";
-            this.Google_Earth.Click += new System.EventHandler(this.Google_Earth_Click);
-            // 
             // ModülFormu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -1497,7 +1825,9 @@ namespace SLF
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView4)).EndInit();
             this.tab_ea.ResumeLayout(false);
             this.tab_ea.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tbar1)).EndInit();
+            this.toolStrip2.ResumeLayout(false);
+            this.toolStrip2.PerformLayout();
+            this.harita_katmanları_right_click.ResumeLayout(false);
             this.tab_ekonometrik.ResumeLayout(false);
             this.tab_ekonometrik.PerformLayout();
             this.panel2.ResumeLayout(false);
@@ -1515,7 +1845,6 @@ namespace SLF
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).EndInit();
-            this.harita_katmanları_right_click.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1634,18 +1963,40 @@ namespace SLF
         //private System.Windows.Forms.Label label12;
         private System.Windows.Forms.ListBox listBox1;
         //private System.Windows.Forms.Button button6;
-        private GMap.NET.WindowsForms.GMapControl mapControl;
+        private GMap.NET.WindowsForms.GMapControl gMapControl_EA;
         private System.Windows.Forms.Button button7;
-        private System.Windows.Forms.TrackBar tbar1;
         private System.Windows.Forms.Button btnTamamla;
         private System.Windows.Forms.Button btnplgn;
         private System.Windows.Forms.Button oznitelikAc;
         private System.Windows.Forms.Button ButtonKml;
-        private GMap.NET.WindowsForms.GMapControl gMapControl_EA;
+        private GMap.NET.WindowsForms.GMapControl gMapControl_stokastik;
         private System.Windows.Forms.ContextMenuStrip harita_katmanları_right_click;
         private System.Windows.Forms.ToolStripMenuItem Arazi;
         private System.Windows.Forms.ToolStripMenuItem Harita;
         private System.Windows.Forms.ToolStripMenuItem Uydu;
         private System.Windows.Forms.ToolStripMenuItem Google_Earth;
+        private System.Windows.Forms.ToolStripMenuItem OSM;
+        private System.Windows.Forms.Label mesafe_metre_stokastik;
+        private System.Windows.Forms.Label Mesafe_stokastik;
+        private System.Windows.Forms.Button buton_ea_harita_katmanlar;
+        private System.Windows.Forms.ToolStrip toolStrip2;
+        private System.Windows.Forms.ToolStripButton toolStripButton9;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator9;
+        private System.Windows.Forms.ToolStripButton toolStripButton10;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator10;
+        private System.Windows.Forms.ToolStripButton toolStripButton11;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator11;
+        private System.Windows.Forms.ToolStripButton toolStripButton12;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator12;
+        private System.Windows.Forms.ToolStripButton toolStripButton13;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator13;
+        private System.Windows.Forms.ToolStripButton toolStripButton14;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator14;
+        private System.Windows.Forms.ToolStripButton toolStripButton15;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator15;
+        private System.Windows.Forms.ToolStripButton toolStripButton16;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator16;
+        private System.Windows.Forms.Label mesafe_metre_ea;
+        private System.Windows.Forms.Label Mesafe_ea;
     }
 }

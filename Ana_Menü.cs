@@ -34,7 +34,6 @@ namespace SLF
         {
             Yardım yardım_formu = new Yardım();
             yardım_formu.Show();
-            this.Hide();
         }
 
         private void roundButton1_Click(object sender, EventArgs e)
