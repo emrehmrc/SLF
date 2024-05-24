@@ -39,12 +39,16 @@ namespace SLF
 
 
         // variables to be used to create "ruler" in Stochastic/EA modules
-        private List<PointLatLng> rulerPoints = new List<PointLatLng>();
-        private GMapOverlay rulerOverlay = new GMapOverlay("rulerOverlay");
-        private GMapRoute rulerRoute;
+        private List<PointLatLng> rulerPoints_stokastik = new List<PointLatLng>();
+        private List<PointLatLng> rulerPoints_ea = new List<PointLatLng>();
+        private GMapOverlay rulerOverlay_stokastik = new GMapOverlay("rulerOverlay_stokastik");
+        private GMapOverlay rulerOverlay_ea = new GMapOverlay("rulerOverlay_ea");
+        private GMapRoute rulerRoute_stokastik;
+        private GMapRoute rulerRoute_ea;
         private bool isRulerActive = false;
         private bool isRulerEnabled = false;    
-        private GMapOverlay markerOverlay = new GMapOverlay("markerOverlay");
+        private GMapOverlay markerOverlay_stokastik = new GMapOverlay("markerOverlay_stokastik");
+        private GMapOverlay markerOverlay_ea = new GMapOverlay("markerOverlay_ea");
         private GMapOverlay polygonOverlay = new GMapOverlay("polygonOverlay");
         private List<PointLatLng> polygonPoints = new List<PointLatLng>();
         private List<YüklenenDosya> loadedFiles = new List<YüklenenDosya>();
@@ -104,13 +108,13 @@ namespace SLF
             buton_ea_harita_katmanlar.BringToFront();
 
             // stokastik haritası cetvel, nokta, poligon üst katmanları
-            gMapControl_stokastik.Overlays.Add(rulerOverlay);
-            gMapControl_stokastik.Overlays.Add(markerOverlay);
+            gMapControl_stokastik.Overlays.Add(rulerOverlay_stokastik);
+            gMapControl_stokastik.Overlays.Add(markerOverlay_stokastik);
             gMapControl_stokastik.Overlays.Add(polygonOverlay);
 
             // EA haritası cetvel, nokta, poligon üst katmanları
-            gMapControl_EA.Overlays.Add(rulerOverlay);
-            gMapControl_EA.Overlays.Add(markerOverlay);
+            gMapControl_EA.Overlays.Add(rulerOverlay_ea);
+            gMapControl_EA.Overlays.Add(markerOverlay_ea);
             gMapControl_EA.Overlays.Add(polygonOverlay);
 
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
@@ -173,7 +177,7 @@ namespace SLF
                     GMapMarker marker = new GMarkerGoogle(nokta, GMarkerGoogleType.orange_dot);
                     marker.ToolTipText = Path.GetFileName(dosyaYolu); // Dosya adını ToolTipText olarak ayarla
                     marker.Tag = noktaVeri;
-                    markerOverlay.Markers.Add(marker);
+                    markerOverlay_stokastik.Markers.Add(marker);
                 }
             }
 
@@ -598,14 +602,14 @@ namespace SLF
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
             // cetveli ve cetvele ait noktaları/markerları sil
-            if (markerOverlay != null)
+            if (markerOverlay_stokastik != null)
             {
-                markerOverlay.Markers.Clear();
+                markerOverlay_stokastik.Markers.Clear();
             }
 
-            if (rulerRoute != null)
+            if (rulerRoute_stokastik != null)
             {
-                rulerRoute.Dispose();
+                rulerRoute_stokastik.Dispose();
             }
 
             this.gMapControl_stokastik.CanDragMap = false;
@@ -621,14 +625,14 @@ namespace SLF
         private void toolStripButton2_Click(object sender, EventArgs e)
         {
             // cetveli ve cetvele ait noktaları/markerları sil
-            if (markerOverlay != null)
+            if (markerOverlay_stokastik != null)
             {
-                markerOverlay.Markers.Clear();
+                markerOverlay_stokastik.Markers.Clear();
             }
 
-            if(rulerRoute != null)
+            if(rulerRoute_stokastik != null)
             {
-                rulerRoute.Dispose();
+                rulerRoute_stokastik.Dispose();
             }
             
             this.gMapControl_stokastik.CanDragMap = true;
@@ -653,14 +657,14 @@ namespace SLF
         private void toolStripButton9_Click(object sender, EventArgs e)
         {
             // cetveli ve cetvele ait noktaları/markerları sil
-            if (markerOverlay != null)
+            if (markerOverlay_ea != null)
             {
-                markerOverlay.Markers.Clear();
+                markerOverlay_ea.Markers.Clear();
             }
 
-            if (rulerRoute != null)
+            if (rulerRoute_ea != null)
             {
-                rulerRoute.Dispose();
+                rulerRoute_ea.Dispose();
             }
 
             this.gMapControl_EA.CanDragMap = false;
@@ -676,14 +680,14 @@ namespace SLF
         private void toolStripButton10_Click(object sender, EventArgs e)
         {
             // cetveli ve cetvele ait noktaları/markerları sil
-            if (markerOverlay != null)
+            if (markerOverlay_ea != null)
             {
-                markerOverlay.Markers.Clear();
+                markerOverlay_ea.Markers.Clear();
             }
 
-            if (rulerRoute != null)
+            if (rulerRoute_ea != null)
             {
-                rulerRoute.Dispose();
+                rulerRoute_ea.Dispose();
             }
 
             this.gMapControl_EA.CanDragMap = true;
@@ -752,42 +756,54 @@ namespace SLF
                 var point = gMapControl_EA.FromLocalToLatLng(e.X, e.Y);
 
                 // seçilen noktaları bir listeye koy
-                rulerPoints.Add(point);
+                rulerPoints_ea.Add(point);
 
                 // bir marker objesi oluştur ve seçilen noktalara marker ata
                 GMapMarker marker_ea = new GMarkerGoogle(point, GMarkerGoogleType.orange_dot);
-                markerOverlay.Markers.Add(marker_ea);
+                markerOverlay_ea.Markers.Add(marker_ea);
 
                 // 2 adet nokta seçildiği anda aralarındaki mesafeyi hesapla, göster, sonrasında
                 // ise noktaların tutulduğu listeyi temizle
-                if (rulerPoints.Count == 2)
+                if (rulerPoints_ea.Count == 2)
                 {
-                    markerOverlay.Markers.Clear();
+                    markerOverlay_ea.Markers.Clear();
 
-                    foreach (var rulerPoint in rulerPoints)
+                    foreach (var rulerPoint in rulerPoints_ea)
                     {
                         GMapMarker marker_1 = new GMarkerGoogle(rulerPoint, GMarkerGoogleType.orange_dot);
-                        markerOverlay.Markers.Add(marker_1);
+                        markerOverlay_ea.Markers.Add(marker_1);
                     }
 
-                    rulerRoute.Clear();
-                    DrawRuler();
-                    CalculateDistance(gMapControl_EA, mesafe_metre_ea, rulerPoints);
-                    rulerPoints.Clear();
+                    rulerRoute_ea.Dispose();
+                    DrawRuler_ea(rulerOverlay_ea, rulerPoints_ea);
+                    CalculateDistance(gMapControl_EA, mesafe_metre_ea, rulerPoints_ea);
+                    rulerPoints_ea.Clear();
                     isRulerActive = false;
                 }
             }
         }
 
-        private void DrawRuler()
+        private void DrawRuler_stokastik(GMapOverlay rulerOverlay, List<PointLatLng> rulerPoints)
         {
-            if (rulerRoute != null)
+            if (rulerRoute_stokastik != null)
             {
-                rulerOverlay.Routes.Remove(rulerRoute);
+                rulerOverlay.Routes.Remove(rulerRoute_stokastik);
             }
-            rulerRoute = new GMapRoute(rulerPoints, "rulerRoute");
-            rulerRoute.Stroke = new Pen(Color.Red, 3);
-            rulerOverlay.Routes.Add(rulerRoute);
+            rulerRoute_stokastik = new GMapRoute(rulerPoints, "rulerRoute");
+            rulerRoute_stokastik.Stroke = new Pen(Color.Red, 3);
+            rulerOverlay.Routes.Add(rulerRoute_stokastik);
+            gMapControl_EA.Refresh();
+        }
+
+        private void DrawRuler_ea(GMapOverlay rulerOverlay, List<PointLatLng> rulerPoints)
+        {
+            if (rulerRoute_ea != null)
+            {
+                rulerOverlay.Routes.Remove(rulerRoute_ea);
+            }
+            rulerRoute_ea = new GMapRoute(rulerPoints, "rulerRoute");
+            rulerRoute_ea.Stroke = new Pen(Color.Red, 3);
+            rulerOverlay.Routes.Add(rulerRoute_ea);
             gMapControl_EA.Refresh();
         }
 
@@ -804,16 +820,16 @@ namespace SLF
         {
             // eğer sadece 1 adet nokta seçilmişse, ve ikinci nokta dinamik olarak farklı yerlere
             // tıklanarak seçiliyorsa, mesafeyi de buna göre güncelle.
-            if (isRulerActive && rulerPoints.Count == 1 && isRulerEnabled == true)
+            if (isRulerActive && rulerPoints_ea.Count == 1 && isRulerEnabled == true)
             {             
                 var point = gMapControl_EA.FromLocalToLatLng(e.X, e.Y);
-                if (rulerRoute != null)
+                if (rulerRoute_ea != null)
                 {
-                    rulerOverlay.Routes.Remove(rulerRoute);
+                    rulerOverlay_ea.Routes.Remove(rulerRoute_ea);
                 }
-                rulerRoute = new GMapRoute(new List<PointLatLng> { rulerPoints[0], point }, "rulerRoute");
-                rulerRoute.Stroke = new Pen(Color.Red, 3);
-                rulerOverlay.Routes.Add(rulerRoute);
+                rulerRoute_ea = new GMapRoute(new List<PointLatLng> { rulerPoints_ea[0], point }, "rulerRoute_ea");
+                rulerRoute_ea.Stroke = new Pen(Color.Red, 3);
+                rulerOverlay_ea.Routes.Add(rulerRoute_ea);
                 gMapControl_EA.Refresh();
             }
         }
@@ -832,27 +848,27 @@ namespace SLF
 
                 // bir marker objesi oluştur ve seçilen noktalara marker ata
                 GMapMarker marker_stokastik = new GMarkerGoogle(point, GMarkerGoogleType.orange_dot);
-                markerOverlay.Markers.Add(marker_stokastik);
+                markerOverlay_stokastik.Markers.Add(marker_stokastik);
 
                 // seçilen noktaları bir listeye koy
-                rulerPoints.Add(point);
+                rulerPoints_stokastik.Add(point);
                 
                 // 2 adet nokta seçildiği anda aralarındaki mesafeyi hesapla ve noktaların
                 // tutulduğu listeyi temizle
-                if (rulerPoints.Count == 2)
+                if (rulerPoints_stokastik.Count == 2)
                 {
-                    markerOverlay.Markers.Clear();
+                    markerOverlay_stokastik.Markers.Clear();
 
-                    foreach (var rulerPoint in rulerPoints)
+                    foreach (var rulerPoint in rulerPoints_stokastik)
                     {
                         GMapMarker marker_1 = new GMarkerGoogle(rulerPoint, GMarkerGoogleType.orange_dot);
-                        markerOverlay.Markers.Add(marker_1);
+                        markerOverlay_stokastik.Markers.Add(marker_1);
                     }
 
-                    DrawRuler();
-                    CalculateDistance(gMapControl_stokastik, mesafe_metre_stokastik, rulerPoints);
-                    rulerPoints.Clear();
-                    rulerRoute.Dispose();
+                    DrawRuler_stokastik(rulerOverlay_stokastik, rulerPoints_stokastik);
+                    CalculateDistance(gMapControl_stokastik, mesafe_metre_stokastik, rulerPoints_stokastik);
+                    rulerPoints_stokastik.Clear();
+                    rulerRoute_stokastik.Dispose();
                     isRulerActive = false;
                 }
             }
@@ -863,17 +879,17 @@ namespace SLF
             
             // eğer sadece 1 adet nokta seçilmişse, ve ikinci nokta dinamik olarak farklı yerlere
             // tıklanarak seçiliyorsa, mesafeyi de buna göre güncelle.
-            if (isRulerActive && rulerPoints.Count == 1 && isRulerEnabled == true)
+            if (isRulerActive && rulerPoints_stokastik.Count == 1 && isRulerEnabled == true)
             {
                 
                 var point = gMapControl_stokastik.FromLocalToLatLng(e.X, e.Y);
-                if (rulerRoute != null)
+                if (rulerRoute_stokastik != null)
                 {
-                    rulerOverlay.Routes.Remove(rulerRoute);
+                    rulerOverlay_stokastik.Routes.Remove(rulerRoute_stokastik);
                 }
-                rulerRoute = new GMapRoute(new List<PointLatLng> { rulerPoints[0], point }, "rulerRoute");
-                rulerRoute.Stroke = new Pen(Color.Red, 3);
-                rulerOverlay.Routes.Add(rulerRoute);
+                rulerRoute_stokastik = new GMapRoute(new List<PointLatLng> { rulerPoints_stokastik[0], point }, "rulerRoute_stokastik");
+                rulerRoute_stokastik.Stroke = new Pen(Color.Red, 3);
+                rulerOverlay_stokastik.Routes.Add(rulerRoute_stokastik);
                 gMapControl_stokastik.Refresh();
             }
         }
@@ -1204,10 +1220,10 @@ namespace SLF
                         // Poligonun işaretçilerini sil
                         foreach (var nokta in poligonlar[poligonIndex].Noktalar)
                         {
-                            var markerToRemove = markerOverlay.Markers.FirstOrDefault(marker => marker.Position.Lat == nokta.Enlem && marker.Position.Lng == nokta.Boylam);
+                            var markerToRemove = markerOverlay_stokastik.Markers.FirstOrDefault(marker => marker.Position.Lat == nokta.Enlem && marker.Position.Lng == nokta.Boylam);
                             if (markerToRemove != null)
                             {
-                                markerOverlay.Markers.Remove(markerToRemove);
+                                markerOverlay_stokastik.Markers.Remove(markerToRemove);
                             }
                         }
 
