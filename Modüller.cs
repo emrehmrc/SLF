@@ -17,14 +17,13 @@ namespace SLF
     public partial class ModülFormu : Form
     {
         public GirişFormu gir1;
-        List<string> veri_listesi_requires_xlsx = new List<string> { 
-            "Ekonometrik Yük Tahmini Verileri" 
-        };
+        private GirdiModülü girdiModülü;
 
         public ModülFormu()
         {
             
             InitializeComponent();
+            girdiModülü = new GirdiModülü();
 
         }
 
@@ -49,37 +48,30 @@ namespace SLF
 
         private void button1_Click(object sender, EventArgs e)
         {
-            OpenFileDialog fileDialog1 = new OpenFileDialog();
+            // Girdi modülündeki dosya yükleme butonuna tıklandığında çalışacak kodlar
 
-            // Modül seçimine göre dosya uzantısını belirle
-            string selectedItem = veri_listesi_seçimi.SelectedItem.ToString();
-            if (veri_listesi_requires_xlsx.Contains(selectedItem))
+            // Veri listesinde seçilen veri tipine göre dosya seçme işlemi yapılacak
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+
+            try
             {
-                // Constructor'daki veri_listesi_requires_xlsx listesindeki verilerin uzantısını xlsx olarak belirle
-                fileDialog1.Filter = "Excel files (*.xlsx)|*.xlsx|All files (*.*)|*.*";
-                if (fileDialog1.ShowDialog() == DialogResult.OK)
+                // ProcessFileSelection metodu ile dosya seçme işlemi yapılır ve seçilen dosya veri tablosuna yüklenir
+                girdiModülü.ProcessFileSelection(seçilenVeriTipi);
+                DataTable dataTable = girdiModülü.CurrentDataTable;
+                if (dataTable != null && dataTable.Rows.Count > 0)
                 {
-                    // Bu if bloğu dosya seçildiğinde çalışır
-                    // Selected file path
-                    string selectedFileName = fileDialog1.FileName;
-                    ExcelImporter importer = new ExcelImporter();
-                    DataTable dataTable = importer.ImportExcelFile(selectedFileName);
                     dataGridView1.DataSource = dataTable;
-
-                    // Process the selected file (e.g., upload it)
+                }
+                else
+                {
+                    MessageBox.Show("Dosya seçimi gerçekleştirilemedi.");
                 }
             }
-            else
+            catch (InvalidColumnHeadersException ex)
             {
-                // Değilse şimdilik tüm dosya uzantılarını kabul et
-                fileDialog1.Filter = "All files (*.*)|*.*";
-                if (fileDialog1.ShowDialog() == DialogResult.OK) { 
-                    // TODO
-                }
+                MessageBox.Show("Geçersiz sütun biçimi: " + ex.Message, "Hata!");
             }
-
-            fileDialog1.Title = "Select a file";
-
+            
         }
 
         private void button3_Click_1(object sender, EventArgs e)

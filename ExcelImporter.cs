@@ -1,18 +1,42 @@
 ﻿//using Excel = Microsoft.Office.Interop.Excel; // Alias for the Excel namespace
 using OfficeOpenXml; // Import the EPPlus library
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
-using DT = System.Data;
+using System.Text;
 
 namespace SLF
 {
+    public class InvalidColumnHeadersException : Exception
+    {
+        public InvalidColumnHeadersException(string message) : base(message)
+        {
+        }
+    }
+
     internal class ExcelImporter
     {
-        public DT.DataTable ImportExcelFile(string filePath)
+        Dictionary<string, List<string>> expectedHeadersMap = new Dictionary<string, List<string>>
         {
-            DT.DataTable dataTable = new DT.DataTable();
+            { 
+                "Abone Verileri", 
+                    new List<string> {
+                    "Bağlı Olduğu Kofre ID",
+                    "Bagli Oldugu Kofre Koordinat - X",
+                    "Bagli Oldugu Kofre Koordinat - Y",
+                    "Long",
+                    "Lat"
+                } 
+            },
+            { "Ekonometrik Yük Tahmini Verileri", new List<string> { "Header4", "Header5", "Header6" } },
+            // Add more data types and their expected headers as needed
+        };
+
+        public DataTable ImportExcelFile(string filePath, string seçilenVeriTipi)
+        {
+            DataTable dataTable = new DataTable();
 
             // Example of measuring import time
             Stopwatch stopwatch = new Stopwatch();
@@ -21,22 +45,23 @@ namespace SLF
             {
                 ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // Assuming data is in the first worksheet
 
+                // Validate column headers. In case it fails, it throws an exception.
+                ValidateColumnHeaders(worksheet, seçilenVeriTipi);
+
                 int rowCount = worksheet.Dimension.Rows;
                 int colCount = worksheet.Dimension.Columns;
-                int previewCount = rowCount; // 100;  // Preview first 100 rows
-                int minCount = Math.Min(previewCount, rowCount);
 
                 // Create columns in DataTable
                 for (int col = 1; col <= colCount; col++)
                 {
-                    string columnHeader = worksheet.Cells[1, col].Value?.ToString() ?? $"Column{col}";
                     DataColumn column = new DataColumn();
-                    column.ColumnName = columnHeader;
+                    column.ColumnName = worksheet.Cells[1, col].Text;
                     dataTable.Columns.Add(column);
                 }
 
                 // Populate DataTable with Excel data
-                for (int row = 2; row <= minCount; row++)
+                // Row starts from 2 because 1st row is column headers
+                for (int row = 2; row <= rowCount; row++)
                 {
                     DataRow dataRow = dataTable.NewRow();
                     for (int col = 1; col <= colCount; col++)
@@ -51,6 +76,36 @@ namespace SLF
             Console.WriteLine($"Excel file import took: {stopwatch.ElapsedMilliseconds} ms");
             return dataTable;
         }
+        private void ValidateColumnHeaders(ExcelWorksheet worksheet, string seçilenVeriTipi)
+        {
+            int colCount = worksheet.Dimension.Columns;
+            List<string> expectedHeaders = expectedHeadersMap[seçilenVeriTipi];
+            int expectedCount = expectedHeaders.Count;
+            if (colCount != expectedCount)
+            {
+                throw new InvalidColumnHeadersException(
+                    $"Sütun sayıları uyuşmuyor.\nBeklenen: {expectedCount}\nMevcut: {colCount}"
+                );
+            }
+
+            bool headerMismatch = false;
+            var invalidColumnMessage = new StringBuilder("Sütun adları uyuşmuyor.\n");
+            for (int col = 1; col <= colCount; col++)
+            {
+                string columnHeader = worksheet.Cells[1, col].Text;
+                if (string.IsNullOrEmpty(columnHeader) || !expectedHeaders.Contains(columnHeader))
+                {
+                    headerMismatch = true;
+                    string expectedHeader = expectedHeaders[col - 1];
+                    invalidColumnMessage.AppendLine($"{col}. sütun:\tBeklenen: {expectedHeader}\tMevcut: {columnHeader}");
+                }
+            }
+            if (headerMismatch)
+            {
+                throw new InvalidColumnHeadersException(invalidColumnMessage.ToString());
+            }
+        }
+
         private void ReleaseObject(object obj)
         {
             try
