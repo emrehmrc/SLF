@@ -17,26 +17,16 @@ namespace SLF
 {
     public partial class ModülFormu : Form
     {
-        public bool is_panning = false;
         private double startX = 0, startY = 0;
 
         // form objeleri
         public GirişFormu gir1;
-
-        // axMap objesine ait int return objesi
-        public int layer_1;
          
         // halihazırda import edilmiş olan katman sayısı
         public int eklenmiş_katman_sayısı = 0;
 
-        // stokastik haritasına eklenecek olan shapefile'lar ile alakalı arrayler
-        //public Shapefile[] shapefile_array = new Shapefile[10]; // shapefile array to hold .shp files/data
-        public string[] shapefile_names = new string[10]; // names of the .shp files
-        public int[] layerHandles = new int[10]; // array to hold int values to control the layers
-
-        // declare an instance of the Tablo_Formu
+        // declare an instance of the Tablo_Formu to be used to see the Attribute Table of the vector layers
         public Tablo_Formu tablo_formu;
-
 
         // variables to be used to create "ruler" in Stochastic/EA modules
         private List<PointLatLng> rulerPoints_stokastik = new List<PointLatLng>();
@@ -45,30 +35,36 @@ namespace SLF
         private GMapOverlay rulerOverlay_ea = new GMapOverlay("rulerOverlay_ea");
         private GMapRoute rulerRoute_stokastik;
         private GMapRoute rulerRoute_ea;
-        private bool isRulerActive = false;
-        private bool isRulerEnabled = false;    
+        private bool isRulerEnabled = false; // enable the drawing of a ruler while pushing mouse down   
+        private bool isRulerActive = false; // enable the drawing of a ruler
         private GMapOverlay markerOverlay_stokastik = new GMapOverlay("markerOverlay_stokastik");
         private GMapOverlay markerOverlay_ea = new GMapOverlay("markerOverlay_ea");
-        private GMapOverlay polygonOverlay = new GMapOverlay("polygonOverlay");
-        private List<PointLatLng> polygonPoints = new List<PointLatLng>();
-        private List<YüklenenDosya> loadedFiles = new List<YüklenenDosya>();
-        private List<PoligonVeri> poligonlar = new List<PoligonVeri>();
+        
+        // variables to be used to create polygons
+        private GMapOverlay polygonOverlay_ea = new GMapOverlay("polygonOverlay_ea");
+        private GMapOverlay polygonOverlay_stokastik = new GMapOverlay("polygonOverlay_stokastik");
+        private List<PointLatLng> polygonPoints_ea = new List<PointLatLng>();
+        private List<PoligonVeri> poligonlar_ea = new List<PoligonVeri>();
+        private List<PointLatLng> polygonPoints_stokastik = new List<PointLatLng>();
+        private List<PoligonVeri> poligonlar_stokastik = new List<PoligonVeri>();
 
-        private PointLatLng selectionStart;
-        private PointLatLng selectionEnd;
-        private bool isSelecting = false;
-        private GMapPolygon selectionPolygon;
+        // boolean variable to control the polygon selection by mouse down event
+        private bool isSelecting_polygon = false;
+
+
+        private List<YüklenenDosya> loadedFiles = new List<YüklenenDosya>();
+
 
         // Nokta veri yapısı
         public class NoktaVeri
         {
             public double Enlem { get; set; }
             public double Boylam { get; set; }
-            public double BinaDem { get; set; }
-            public int AboneSayisi { get; set; }
+            public double Bina_Demandi { get; set; }
+            public int Abone_Sayısı { get; set; }
         }
 
-        public enum DosyaTuru
+        public enum FileType
         {
             CSV,
             Poligon
@@ -76,13 +72,13 @@ namespace SLF
 
         public struct YüklenenDosya
         {
-            public string DosyaAdi { get; set; }
-            public DosyaTuru DosyaTuru { get; set; }
+            public string file_name { get; set; }
+            public FileType file_type { get; set; }
         }
 
         public class PoligonVeri
         {
-            public string Isim { get; set; }
+            public string polygon_name { get; set; }
             public List<NoktaVeri> Noktalar { get; set; }
         }
 
@@ -110,39 +106,22 @@ namespace SLF
             // stokastik haritası cetvel, nokta, poligon üst katmanları
             gMapControl_stokastik.Overlays.Add(rulerOverlay_stokastik);
             gMapControl_stokastik.Overlays.Add(markerOverlay_stokastik);
-            gMapControl_stokastik.Overlays.Add(polygonOverlay);
+            gMapControl_stokastik.Overlays.Add(polygonOverlay_stokastik);
 
             // EA haritası cetvel, nokta, poligon üst katmanları
             gMapControl_EA.Overlays.Add(rulerOverlay_ea);
             gMapControl_EA.Overlays.Add(markerOverlay_ea);
-            gMapControl_EA.Overlays.Add(polygonOverlay);
+            gMapControl_EA.Overlays.Add(polygonOverlay_ea);
 
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
 
             // Girdi Modülü'nde default olarak "Abone Verileri" seçeneğini göster
             veri_listesi_seçimi.SelectedIndex = 0;    
 
-            InitializeContextMenu_Nokta();
-
             // initialize the previously declared tablo_formu instance.
             tablo_formu = new Tablo_Formu();
 
         }
-
-        /* private void button7_Click(object sender, EventArgs e)
- {
-     OpenFileDialog openFileDialog = new OpenFileDialog();
-     openFileDialog.Filter = "CSV Dosyaları (*.csv)|*.csv|Tüm Dosyalar (*.*)|*.*";
-     openFileDialog.Title = "CSV Dosyasını Seç";
-
-     if (openFileDialog.ShowDialog() == DialogResult.OK)
-     {
-         string dosyaYolu = openFileDialog.FileName;
-         CSVYukle(dosyaYolu);
-         loadedFiles.Add(new YüklenenDosya { DosyaAdi = Path.GetFileName(dosyaYolu), DosyaTuru = DosyaTuru.CSV });
-         UpdateListBox();
-     }
- }*/
 
         private void CSVYukle(string dosyaYolu)
         {
@@ -169,8 +148,8 @@ namespace SLF
                     {
                         Enlem = enlem,
                         Boylam = boylam,
-                        BinaDem = binaDem,
-                        AboneSayisi = aboneSayisi
+                        Bina_Demandi = binaDem,
+                        Abone_Sayısı = aboneSayisi
                     };
 
                     PointLatLng nokta = new PointLatLng(enlem, boylam);
@@ -501,17 +480,56 @@ namespace SLF
             checkBox18.MouseDown += stokastik_checkBox_MouseDown;
         }
 
-        private void InitializeContextMenu_Nokta()
+        private void Poligon_Çiz_Click(object sender, EventArgs e)
         {
-            // Initialize the ContextMenuStrip
-            nokta_menüsü = new ContextMenuStrip();
+            isSelecting_polygon = true;
 
-            // Add items to the ContextMenuStrip
-            /*nokta_menüsü.Items.Add("Nokta Oluştur", null, nokta_ekle_click);
-            nokta_menüsü.Items.Add("Nokta Sil", null, nokta_sil_click);
-            nokta_menüsü.Items.Add("Tümünü Temizle", null, noktaları_sil_click);
-            nokta_menüsü.Items.Add("Kaydet", null, noktaları_kaydet_click);*/
+            if (Modül_Tabları.SelectedTab == tab_ea)
+            {
+                polygonPoints_ea.Clear();
+            } 
+            else if (Modül_Tabları.SelectedTab == tab_stokastik)
+            {
+                polygonPoints_stokastik.Clear();
+            }
         }
+
+        private void EA_toolStrip_Poligon_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                // Show the ContextMenuStrip at the mouse position
+                ContextMenuStrip_Poligon.Show(Cursor.Position);
+            }
+        }
+
+        private void Stokastik_toolStrip_Poligon_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                // Show the ContextMenuStrip at the mouse position
+                ContextMenuStrip_Poligon.Show(Cursor.Position);
+            }
+        }
+
+        private void EA_toolStrip_Nokta_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                // Show the ContextMenuStrip at the mouse position
+                ContextMenuStrip_Nokta.Show(Cursor.Position);
+            }
+        }
+
+        private void Stokastik_toolStrip_Nokta_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                // Show the ContextMenuStrip at the mouse position
+                ContextMenuStrip_Nokta.Show(Cursor.Position);
+            }
+        }
+
 
         private void button3_Click_1(object sender, EventArgs e)
         {
@@ -560,7 +578,7 @@ namespace SLF
         private void button10_Click(object sender, EventArgs e)
         {
 
-            tabControl1.SelectTab(tab_girdi);
+            Modül_Tabları.SelectTab(tab_girdi);
             veri_listesi_seçimi.Text = "Ekonometrik Yük Tahmini Verileri";
             veri_listesi_seçimi.Enabled = false;
 
@@ -568,21 +586,21 @@ namespace SLF
 
         private void button7_Click(object sender, EventArgs e)
         {
-            tabControl1.SelectTab(tab_girdi);
+            Modül_Tabları.SelectTab(tab_girdi);
             veri_listesi_seçimi.Text = "EA Şarj Verileri";
             veri_listesi_seçimi.Enabled = false;
         }
 
         private void button8_Click(object sender, EventArgs e)
         {
-            tabControl1.SelectTab(tab_girdi);
+            Modül_Tabları.SelectTab(tab_girdi);
             veri_listesi_seçimi.Text = "DEK Verileri";
             veri_listesi_seçimi.Enabled = false;
         }
 
         private void button6_Click(object sender, EventArgs e)
         {
-            tabControl1.SelectTab(tab_girdi);
+            Modül_Tabları.SelectTab(tab_girdi);
             veri_listesi_seçimi.Text = "İmar Verileri";
             veri_listesi_seçimi.Enabled = false;
         }
@@ -865,10 +883,10 @@ namespace SLF
                         markerOverlay_stokastik.Markers.Add(marker_1);
                     }
 
+                    rulerRoute_stokastik.Dispose();
                     DrawRuler_stokastik(rulerOverlay_stokastik, rulerPoints_stokastik);
                     CalculateDistance(gMapControl_stokastik, mesafe_metre_stokastik, rulerPoints_stokastik);
                     rulerPoints_stokastik.Clear();
-                    rulerRoute_stokastik.Dispose();
                     isRulerActive = false;
                 }
             }
@@ -929,55 +947,14 @@ namespace SLF
             tablo_formu.Show();
         }
 
-        private void UpdateListBox()
+        /*private void UpdateListBox()
         {
-            listBox1.Items.Clear();
+            EA_list_box.Items.Clear();
             foreach (var file in loadedFiles)
             {
-                listBox1.Items.Add(file.DosyaAdi);
+                EA_list_box.Items.Add(file.file_name);
             }
-        }
-
-        private void btnplgn_Click_1(object sender, EventArgs e)
-        {
-            isSelecting = true;
-        }
-
-        private void btnTamamla_Click_1(object sender, EventArgs e)
-        {
-            if (polygonPoints.Count > 2)
-            {
-                string poligonIsim = $"poligon_{poligonlar.Count + 1}";
-                GMapPolygon polygon = new GMapPolygon(polygonPoints, poligonIsim);
-                //polygon.Stroke = new Pen(Color.Red, 2);
-                polygonOverlay.Polygons.Add(polygon);
-
-                PoligonVeri poligonVeri = new PoligonVeri
-                {
-                    Isim = poligonIsim,
-                    Noktalar = polygonPoints.Select(p => new NoktaVeri
-                    {
-                        Enlem = p.Lat,
-                        Boylam = p.Lng,
-                        BinaDem = 0,
-                        AboneSayisi = 0
-                    }).ToList()
-                };
-                poligonlar.Add(poligonVeri);
-                listBox1.Items.Add(poligonVeri.Isim);
-
-                loadedFiles.Add(new YüklenenDosya { DosyaAdi = poligonIsim, DosyaTuru = DosyaTuru.Poligon });
-                UpdateListBox();
-
-                gMapControl_EA.Refresh();
-                isSelecting = false;
-                polygonPoints.Clear();
-            }
-            else
-            {
-                MessageBox.Show("Poligon oluşturmak için en az 3 nokta seçmelisiniz.");
-            }
-        }
+        }*/
 
         private void ButtonKml_Click(object sender, EventArgs e)
         {
@@ -1080,11 +1057,11 @@ namespace SLF
             }
         }
 
-        private void oznitelikAc_Click(object sender, EventArgs e)
+       /* private void oznitelikAc_Click(object sender, EventArgs e)
         {
-            if (listBox1.SelectedIndex != -1)
+            if (EA_list_box.SelectedIndex != -1)
             {
-                int selectedIndex = listBox1.SelectedIndex;
+                int selectedIndex = EA_list_box.SelectedIndex;
                 if (selectedIndex >= loadedFiles.Count)
                 {
                     int poligonIndex = selectedIndex - loadedFiles.Count;
@@ -1097,7 +1074,7 @@ namespace SLF
                     }
                 }
             }
-        }
+        }*/
 
 
         /*private void button6_Click(object sender, EventArgs e)
@@ -1110,15 +1087,6 @@ namespace SLF
                 UpdateListBox();
             }
         }*/
-
-        private void toolStripButton8_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                // Show the ContextMenuStrip at the mouse position
-                nokta_menüsü.Show(Cursor.Position);
-            }
-        }
 
 
 
@@ -1184,19 +1152,97 @@ namespace SLF
 
         private void NoktaBilgileriniGoster(NoktaVeri nokta)
         {
-            MessageBox.Show($"Enlem: {nokta.Enlem}\nBoylam: {nokta.Boylam}\nBina Dem: {nokta.BinaDem}\nAbone Sayısı: {nokta.AboneSayisi}");
+            MessageBox.Show($"Enlem: {nokta.Enlem}\nBoylam: {nokta.Boylam}\nBina Dem: " +
+                $"{nokta.Bina_Demandi}\nAbone Sayısı: {nokta.Abone_Sayısı}");
         }
 
-
-        private void Temizle()
+        private void gMapControl_EA_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
-            if (listBox1.SelectedIndex != -1)
+
+            if (isSelecting_polygon == true)
             {
-                int selectedIndex = listBox1.SelectedIndex;
+                polygonPoints_ea.Add(pointClick);
+                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
+                markerOverlay_ea.Markers.Add(marker);
+                gMapControl_EA.Refresh();
+            }
+
+            // eğer gmapControl_OnMapClick event'i ile 2 den fazla nokta seçilirse,
+            // bu noktalar arasında bir poligon çiz
+            if (polygonPoints_ea.Count >= 3)
+            {
+                Draw_Polygon(polygonPoints_ea, polygonOverlay_ea,
+                    poligonlar_ea, gMapControl_EA);
+            } 
+        }
+
+        private void gMapControl_stokastik_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        {
+
+            if (isSelecting_polygon == true)
+            {
+                polygonPoints_stokastik.Add(pointClick);
+                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
+                markerOverlay_stokastik.Markers.Add(marker);
+                gMapControl_stokastik.Refresh();
+            }
+
+            // eğer gmapControl_OnMapClick event'i ile 2 den fazla nokta seçilirse,
+            // bu noktalar arasında bir poligon çiz
+            if (polygonPoints_stokastik.Count >= 3)
+            {
+                Draw_Polygon(polygonPoints_stokastik,polygonOverlay_stokastik,
+                    poligonlar_stokastik,gMapControl_stokastik);
+            }
+        }
+
+        private void Draw_Polygon(List<PointLatLng> polygonPoints,GMapOverlay polygonOverlay,
+                                  List<PoligonVeri> poligonlar, GMapControl gmap)
+        {
+            // bu noktalar arasında poligon çiz, kırmızı ile işaretle, ve de 
+            // polygonOverlay katmanına ekle.
+            string poligonIsim = $"Poligon_{poligonlar.Count + 1}";
+            GMapPolygon polygon = new GMapPolygon(polygonPoints, poligonIsim);
+            polygon.Stroke = new Pen(Color.DarkBlue, 3);
+            polygonOverlay.Polygons.Add(polygon);
+
+            // polygon_data isminde, PoligonVeri sınıfına ait yeni bir obje oluştur, bu sınıfın propertyleri
+            // olan "polygon_name" ve "Noktalar" özelliklerini, ilgili objelerle doldur.
+            PoligonVeri polygon_data = new PoligonVeri
+            {
+                polygon_name = poligonIsim,
+
+                // LINQ sorgusu ve lambda expressionu (=>) kullanarak polygonPoints listesinin içindeki
+                // her bir point için Enlem, Boylam, Bina_Demandi ve Abone_Sayısı property'lerini set et.
+                Noktalar = polygonPoints.Select(p => new NoktaVeri
+                {
+                    Enlem = p.Lat,
+                    Boylam = p.Lng,
+                    Bina_Demandi = 0,
+                    Abone_Sayısı = 0
+                }).ToList()
+            };
+
+            // List<PoligonVeri> olan "poligonlar" instance'ını, ilgili "polygon_data" objesi ile doldur. 
+            poligonlar.Add(polygon_data);
+
+            EA_list_box.Items.Add(polygon_data.polygon_name);
+            gmap.Refresh();
+             
+            //loadedFiles.Add(new YüklenenDosya { DosyaAdi = poligonIsim, DosyaTuru = DosyaTuru.Poligon });
+            //UpdateListBox();
+
+        }
+
+        /*private void Temizle()
+        {
+            if (EA_list_box.SelectedIndex != -1)
+            {
+                int selectedIndex = EA_list_box.SelectedIndex;
                 if (selectedIndex < loadedFiles.Count)
                 {
                     // Seçilen öğe bir CSV dosyası ise
-                    string selectedFile = loadedFiles[selectedIndex].DosyaAdi;
+                    string selectedFile = loadedFiles[selectedIndex].file_name;
 
                     // Haritadaki işaretçileri de kaldır
                     foreach (var overlay in gMapControl_EA.Overlays)
@@ -1228,7 +1274,7 @@ namespace SLF
                         }
 
                         // Poligonu sil
-                        var poligonOverlayToRemove = polygonOverlay.Polygons.FirstOrDefault(polygon => polygon.Name == poligonlar[poligonIndex].Isim);
+                        var poligonOverlayToRemove = polygonOverlay.Polygons.FirstOrDefault(polygon => polygon.Name == poligonlar[poligonIndex].polygon_name);
                         if (poligonOverlayToRemove != null)
                         {
                             polygonOverlay.Polygons.Remove(poligonOverlayToRemove);
@@ -1237,12 +1283,12 @@ namespace SLF
                         poligonlar.RemoveAt(poligonIndex);
                     }
                 }
-                listBox1.Items.RemoveAt(selectedIndex); // ListBox'tan ilgili öğeyi sil
+                EA_list_box.Items.RemoveAt(selectedIndex); // ListBox'tan ilgili öğeyi sil
             }
 
             // Haritayı yeniden çiz
             gMapControl_EA.Refresh();
-        }
+        }*/
     }
 }
 
