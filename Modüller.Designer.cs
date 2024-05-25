@@ -80,7 +80,6 @@ namespace SLF
             this.Uydu = new System.Windows.Forms.ToolStripMenuItem();
             this.ButtonKml = new System.Windows.Forms.Button();
             this.oznitelikAc = new System.Windows.Forms.Button();
-            this.btnTamamla = new System.Windows.Forms.Button();
             this.EA_list_box = new System.Windows.Forms.ListBox();
             this.gMapControl_EA = new GMap.NET.WindowsForms.GMapControl();
             this.button7 = new System.Windows.Forms.Button();
@@ -136,7 +135,7 @@ namespace SLF
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.Stokastik_toolStrip_Nokta = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripButton7 = new System.Windows.Forms.ToolStripButton();
+            this.Stokastik_toolStrip_Grid = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripButton6 = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
@@ -418,7 +417,6 @@ namespace SLF
             this.tab_ea.Controls.Add(this.buton_ea_harita_katmanlar);
             this.tab_ea.Controls.Add(this.ButtonKml);
             this.tab_ea.Controls.Add(this.oznitelikAc);
-            this.tab_ea.Controls.Add(this.btnTamamla);
             this.tab_ea.Controls.Add(this.EA_list_box);
             this.tab_ea.Controls.Add(this.gMapControl_EA);
             this.tab_ea.Controls.Add(this.button7);
@@ -788,15 +786,6 @@ namespace SLF
             this.oznitelikAc.Text = "Öznitelikleri Göster";
             this.oznitelikAc.UseVisualStyleBackColor = true;
             // 
-            // btnTamamla
-            // 
-            this.btnTamamla.Location = new System.Drawing.Point(272, 153);
-            this.btnTamamla.Name = "btnTamamla";
-            this.btnTamamla.Size = new System.Drawing.Size(95, 75);
-            this.btnTamamla.TabIndex = 28;
-            this.btnTamamla.Text = "Poligon Tamamla";
-            this.btnTamamla.UseVisualStyleBackColor = true;
-            // 
             // EA_list_box
             // 
             this.EA_list_box.FormattingEnabled = true;
@@ -835,7 +824,7 @@ namespace SLF
             this.gMapControl_EA.TabIndex = 18;
             this.gMapControl_EA.Zoom = 0D;
             this.gMapControl_EA.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_EA_OnMapClick);
-            this.gMapControl_EA.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(this.mapControl_OnMarkerClick_edited);
+            this.gMapControl_EA.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(this.gMapControl_EA_OnMarkerClick);
             this.gMapControl_EA.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_EA_MouseDown);
             this.gMapControl_EA.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_EA_MouseMove);
             // 
@@ -1070,7 +1059,7 @@ namespace SLF
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gMapControl_stokastik.Bearing = 0F;
-            this.gMapControl_stokastik.CanDragMap = false;
+            this.gMapControl_stokastik.CanDragMap = true;
             this.gMapControl_stokastik.Cursor = System.Windows.Forms.Cursors.Default;
             this.gMapControl_stokastik.EmptyTileColor = System.Drawing.Color.Navy;
             this.gMapControl_stokastik.GrayScaleMode = false;
@@ -1094,6 +1083,7 @@ namespace SLF
             this.gMapControl_stokastik.TabIndex = 30;
             this.gMapControl_stokastik.Zoom = 0D;
             this.gMapControl_stokastik.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_stokastik_OnMapClick);
+            this.gMapControl_stokastik.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(this.gMapControl_stokastik_OnMarkerClick);
             this.gMapControl_stokastik.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_stokastik_MouseDown);
             this.gMapControl_stokastik.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_stokastik_MouseMove);
             // 
@@ -1312,7 +1302,7 @@ namespace SLF
             this.toolStripSeparator7,
             this.Stokastik_toolStrip_Nokta,
             this.toolStripSeparator5,
-            this.toolStripButton7,
+            this.Stokastik_toolStrip_Grid,
             this.toolStripSeparator6,
             this.toolStripButton6,
             this.toolStripSeparator8});
@@ -1490,25 +1480,26 @@ namespace SLF
             this.toolStripSeparator5.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
             this.toolStripSeparator5.Size = new System.Drawing.Size(6, 32);
             // 
-            // toolStripButton7
+            // Stokastik_toolStrip_Grid
             // 
-            this.toolStripButton7.AccessibleDescription = "";
-            this.toolStripButton7.AccessibleName = "";
-            this.toolStripButton7.BackColor = System.Drawing.Color.Beige;
-            this.toolStripButton7.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.toolStripButton7.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.toolStripButton7.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton7.Image")));
-            this.toolStripButton7.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.toolStripButton7.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton7.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
-            this.toolStripButton7.Name = "toolStripButton7";
-            this.toolStripButton7.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.toolStripButton7.Size = new System.Drawing.Size(142, 29);
-            this.toolStripButton7.Tag = "";
-            this.toolStripButton7.Text = "Grid Oluştur";
-            this.toolStripButton7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.toolStripButton7.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.toolStripButton7.ToolTipText = "Belirli bir alan seçilip bu alanda mxn şeklinde bir grid (ızgara) tanımlar.";
+            this.Stokastik_toolStrip_Grid.AccessibleDescription = "";
+            this.Stokastik_toolStrip_Grid.AccessibleName = "";
+            this.Stokastik_toolStrip_Grid.BackColor = System.Drawing.Color.Beige;
+            this.Stokastik_toolStrip_Grid.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.Stokastik_toolStrip_Grid.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.Stokastik_toolStrip_Grid.Image = ((System.Drawing.Image)(resources.GetObject("Stokastik_toolStrip_Grid.Image")));
+            this.Stokastik_toolStrip_Grid.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.Stokastik_toolStrip_Grid.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.Stokastik_toolStrip_Grid.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.Stokastik_toolStrip_Grid.Name = "Stokastik_toolStrip_Grid";
+            this.Stokastik_toolStrip_Grid.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.Stokastik_toolStrip_Grid.Size = new System.Drawing.Size(142, 29);
+            this.Stokastik_toolStrip_Grid.Tag = "";
+            this.Stokastik_toolStrip_Grid.Text = "Grid Oluştur";
+            this.Stokastik_toolStrip_Grid.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.Stokastik_toolStrip_Grid.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.Stokastik_toolStrip_Grid.ToolTipText = "Belirli bir alan seçilip bu alanda mxn şeklinde bir grid (ızgara) tanımlar.";
+            this.Stokastik_toolStrip_Grid.Click += new System.EventHandler(this.Stokastik_toolStrip_Grid_Click);
             // 
             // toolStripSeparator6
             // 
@@ -1536,6 +1527,7 @@ namespace SLF
             this.toolStripButton6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.toolStripButton6.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
             this.toolStripButton6.ToolTipText = "Çeşitli vektörel veya tabular algoritmaları içerir.";
+            this.toolStripButton6.Click += new System.EventHandler(this.toolStripButton6_Click);
             // 
             // toolStripSeparator8
             // 
@@ -1824,6 +1816,7 @@ namespace SLF
             this.Nokta_Ekle.Name = "Nokta_Ekle";
             this.Nokta_Ekle.Size = new System.Drawing.Size(153, 26);
             this.Nokta_Ekle.Text = "Nokta Ekle";
+            this.Nokta_Ekle.Click += new System.EventHandler(this.Nokta_Ekle_Click);
             // 
             // Nokta_Sil
             // 
@@ -2023,7 +2016,7 @@ namespace SLF
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripButton toolStripButton6;
         private System.Windows.Forms.ToolStripButton Stokastik_toolStrip_Poligon;
-        private System.Windows.Forms.ToolStripButton toolStripButton7;
+        private System.Windows.Forms.ToolStripButton Stokastik_toolStrip_Grid;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
         private System.Windows.Forms.ToolStripButton Stokastik_toolStrip_Nokta;
@@ -2042,7 +2035,6 @@ namespace SLF
         //private System.Windows.Forms.Button button6;
         private GMap.NET.WindowsForms.GMapControl gMapControl_EA;
         private System.Windows.Forms.Button button7;
-        private System.Windows.Forms.Button btnTamamla;
         private System.Windows.Forms.Button oznitelikAc;
         private System.Windows.Forms.Button ButtonKml;
         private GMap.NET.WindowsForms.GMapControl gMapControl_stokastik;

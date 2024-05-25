@@ -12,6 +12,10 @@ using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
 using System.Xml;
+using NetTopologySuite.Operation.Overlay;
+using System.Reflection;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.Triangulate;
 
 namespace SLF
 {
@@ -48,8 +52,19 @@ namespace SLF
         private List<PointLatLng> polygonPoints_stokastik = new List<PointLatLng>();
         private List<PoligonVeri> poligonlar_stokastik = new List<PoligonVeri>();
 
+        // variables to be used to create a grid
+        private GMapOverlay gridOverlay = new GMapOverlay("grid");
+        public int grid_size = 100;
+
+
+        // boolean variable to control the grid selection by mouse down event
+        private bool isSelecting_grid = false;
+
         // boolean variable to control the polygon selection by mouse down event
         private bool isSelecting_polygon = false;
+
+        // boolean variable to control the marker/point selection by mouse down event
+        private bool isSelecting_marker = false;
 
 
         private List<YüklenenDosya> loadedFiles = new List<YüklenenDosya>();
@@ -93,6 +108,25 @@ namespace SLF
             gmap.DragButton = MouseButtons.Left;
         }
 
+        private void AddPolygonToOverlay(Polygon polygon, GMapOverlay overlay)
+        {
+            List<PointLatLng> points = new List<PointLatLng>();
+            foreach (var coord in polygon.Coordinates)
+            {
+                points.Add(new PointLatLng(coord.Y, coord.X));
+            }
+
+            GMapPolygon gMapPolygon = new GMapPolygon(points, "gridPolygon")
+            {
+                Stroke = new Pen(Color.Green, 3),
+                Fill = new SolidBrush(Color.FromArgb(50, Color.Blue))
+            };
+
+            overlay.Polygons.Add(gMapPolygon);
+        }
+
+
+
         public ModülFormu() {
             
             InitializeComponent();
@@ -107,6 +141,7 @@ namespace SLF
             gMapControl_stokastik.Overlays.Add(rulerOverlay_stokastik);
             gMapControl_stokastik.Overlays.Add(markerOverlay_stokastik);
             gMapControl_stokastik.Overlays.Add(polygonOverlay_stokastik);
+            gMapControl_stokastik.Overlays.Add(gridOverlay);
 
             // EA haritası cetvel, nokta, poligon üst katmanları
             gMapControl_EA.Overlays.Add(rulerOverlay_ea);
@@ -512,6 +547,79 @@ namespace SLF
             }
         }
 
+        private void gMapControl_EA_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        {
+            // boolean control for marker selection when clicking on the map
+            if(isSelecting_marker)
+            {
+                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
+                markerOverlay_ea.Markers.Add(marker);
+
+                NoktaVeri noktaVeri_marker = new NoktaVeri
+                {
+                    Enlem =  Math.Round(pointClick.Lat, 4),
+                    Boylam = Math.Round(pointClick.Lng, 4)
+                };
+
+                marker.Tag = noktaVeri_marker;
+
+            }
+
+            // boolean control for polygon selection when clicking on the map
+            if (isSelecting_polygon)
+            {
+                polygonPoints_ea.Add(pointClick);
+                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
+                markerOverlay_ea.Markers.Add(marker);
+                gMapControl_EA.Refresh();
+            }
+
+            // eğer gmapControl_OnMapClick event'i ile 2 den fazla nokta seçilirse,
+            // bu noktalar arasında bir poligon çiz
+            if (polygonPoints_ea.Count >= 3)
+            {
+                Draw_Polygon(polygonPoints_ea, polygonOverlay_ea,
+                    poligonlar_ea, gMapControl_EA);
+            }
+        }
+
+        private void gMapControl_stokastik_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        {
+
+            // boolean control for marker selection when clicking on the map
+            if (isSelecting_marker)
+            {
+                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
+                markerOverlay_stokastik.Markers.Add(marker);
+
+                NoktaVeri noktaVeri_marker = new NoktaVeri
+                {
+                    Enlem = Math.Round(pointClick.Lat, 4),
+                    Boylam = Math.Round(pointClick.Lng, 4)
+                };
+
+                marker.Tag = noktaVeri_marker;
+
+            }
+
+            // boolean control for polygon selection when clicking on the map
+            if (isSelecting_polygon == true)
+            {
+                polygonPoints_stokastik.Add(pointClick);
+                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
+                markerOverlay_stokastik.Markers.Add(marker);
+                gMapControl_stokastik.Refresh();
+            }
+
+            // eğer gmapControl_OnMapClick event'i ile 2 den fazla nokta seçilirse,
+            // bu noktalar arasında bir poligon çiz
+            if (polygonPoints_stokastik.Count >= 3)
+            {
+                Draw_Polygon(polygonPoints_stokastik, polygonOverlay_stokastik,
+                    poligonlar_stokastik, gMapControl_stokastik);
+            }
+        }
+
         private void EA_toolStrip_Nokta_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -674,6 +782,7 @@ namespace SLF
 
         private void toolStripButton9_Click(object sender, EventArgs e)
         {
+
             // cetveli ve cetvele ait noktaları/markerları sil
             if (markerOverlay_ea != null)
             {
@@ -686,6 +795,8 @@ namespace SLF
             }
 
             this.gMapControl_EA.CanDragMap = false;
+            isSelecting_marker = false;
+            isSelecting_polygon = false;
             isRulerEnabled = false;
             gMapControl_EA.Cursor = Cursors.Arrow;
             mesafe_metre_ea.Visible = false;
@@ -1048,14 +1159,6 @@ namespace SLF
             }
         }
 
-        private void mapControl_OnMarkerClick_edited(GMapMarker item, MouseEventArgs e)
-        {
-            if (item.Tag != null && item.Tag is NoktaVeri)
-            {
-                NoktaVeri nokta = (NoktaVeri)item.Tag;
-                NoktaBilgileriniGoster(nokta);
-            }
-        }
 
        /* private void oznitelikAc_Click(object sender, EventArgs e)
         {
@@ -1156,44 +1259,70 @@ namespace SLF
                 $"{nokta.Bina_Demandi}\nAbone Sayısı: {nokta.Abone_Sayısı}");
         }
 
-        private void gMapControl_EA_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        private void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
         {
-
-            if (isSelecting_polygon == true)
+            if (item.Tag != null && item.Tag is NoktaVeri && Modül_Tabları.SelectedTab == tab_ea)
             {
-                polygonPoints_ea.Add(pointClick);
-                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
-                markerOverlay_ea.Markers.Add(marker);
-                gMapControl_EA.Refresh();
+                NoktaVeri seçili_nokta = item.Tag as NoktaVeri;
+                NoktaBilgileriniGoster(seçili_nokta);
             }
-
-            // eğer gmapControl_OnMapClick event'i ile 2 den fazla nokta seçilirse,
-            // bu noktalar arasında bir poligon çiz
-            if (polygonPoints_ea.Count >= 3)
-            {
-                Draw_Polygon(polygonPoints_ea, polygonOverlay_ea,
-                    poligonlar_ea, gMapControl_EA);
-            } 
         }
 
-        private void gMapControl_stokastik_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        private void Nokta_Ekle_Click(object sender, EventArgs e)
         {
+            isSelecting_marker = true;
+        }
 
-            if (isSelecting_polygon == true)
+        private void gMapControl_stokastik_OnMarkerClick(GMapMarker item, MouseEventArgs e)
+        {
+            if (item.Tag != null && item.Tag is NoktaVeri && Modül_Tabları.SelectedTab == tab_stokastik)
             {
-                polygonPoints_stokastik.Add(pointClick);
-                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
-                markerOverlay_stokastik.Markers.Add(marker);
-                gMapControl_stokastik.Refresh();
+                NoktaVeri seçili_nokta = item.Tag as NoktaVeri;
+                NoktaBilgileriniGoster(seçili_nokta);
             }
+        }
 
-            // eğer gmapControl_OnMapClick event'i ile 2 den fazla nokta seçilirse,
-            // bu noktalar arasında bir poligon çiz
-            if (polygonPoints_stokastik.Count >= 3)
+        public class GridGenerator
+        {
+            public static List<Polygon> CreateGrid(double xMin, double yMin, double xMax, double yMax, double cellSize)
             {
-                Draw_Polygon(polygonPoints_stokastik,polygonOverlay_stokastik,
-                    poligonlar_stokastik,gMapControl_stokastik);
+                var polygons = new List<Polygon>();
+                var geomFactory = new GeometryFactory();
+
+                for (double x = xMin; x < xMax; x += cellSize)
+                {
+                    for (double y = yMin; y < yMax; y += cellSize)
+                    {
+                        var coordinates = new Coordinate[]
+                        {
+                    new Coordinate(x, y),
+                    new Coordinate(x + cellSize, y),
+                    new Coordinate(x + cellSize, y + cellSize),
+                    new Coordinate(x, y + cellSize),
+                    new Coordinate(x, y)
+                        };
+
+                        var polygon = geomFactory.CreatePolygon(coordinates);
+                        polygons.Add(polygon);
+                    }
+                }
+
+                return polygons;
             }
+        }
+
+        private void Stokastik_toolStrip_Grid_Click(object sender, EventArgs e)
+        {
+            isSelecting_grid = true;
+
+            Grid_Seçenekler grid_formu = new Grid_Seçenekler();
+            grid_formu.Tag = this;
+            grid_formu.Owner = this;
+            grid_formu.Show();
+            grid_formu.BringToFront();
+            grid_formu.Focus();
+            grid_formu.StartPosition = FormStartPosition.CenterScreen;
+
         }
 
         private void Draw_Polygon(List<PointLatLng> polygonPoints,GMapOverlay polygonOverlay,
@@ -1289,6 +1418,54 @@ namespace SLF
             // Haritayı yeniden çiz
             gMapControl_EA.Refresh();
         }*/
+
+        public void CreateAndAddGridToMap()
+        {
+            // Define the bounding box and cell size
+            double xMin = 27.04;
+            double yMin = 38.4;
+            double xMax = 27.15;
+            double yMax = 38.5;
+            double cellSizeMeters = grid_size; // Degree size of grid cells
+
+            double centralLatitude = (yMin + yMax) / 2.0;
+            double cellSizeDegrees = MetersToDegrees(cellSizeMeters, centralLatitude);
+
+            // Create grid
+            var grid = GridGenerator.CreateGrid(xMin, yMin, xMax, yMax, cellSizeDegrees);
+
+            // Add grid polygons to the overlay
+            foreach (var polygon in grid)
+            {
+                AddPolygonToOverlay(polygon, gridOverlay);
+            }
+
+            gMapControl_stokastik.Refresh();
+        }
+
+        private void toolStripButton6_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private double MetersToDegrees(double meters, double latitude)
+        {
+            double degreesToRadians = Math.PI / 180.0;
+
+            // Convert latitude from degrees to radians
+            double latRad = latitude * degreesToRadians;
+
+            // One degree of latitude in meters
+            double metersPerDegreeLat = 111132.954 - 559.822 * Math.Cos(2 * latRad) + 1.175 * Math.Cos(4 * latRad);
+
+            // One degree of longitude in meters, varies with latitude
+            double metersPerDegreeLon = Math.Abs(111132.954 * Math.Cos(latRad));
+
+            double degreesLat = meters / metersPerDegreeLat;
+            double degreesLon = meters / metersPerDegreeLon;
+
+            return (degreesLat + degreesLon) / 2.0; // Average for simplicity
+        }
     }
 }
 
