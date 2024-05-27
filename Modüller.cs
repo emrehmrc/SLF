@@ -25,6 +25,7 @@ using SharpKml.Dom;
 using SharpKml.Engine;
 using NetTopologySuite.IO.ShapeFile.Extended;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
+using System.Threading.Tasks;
 
 namespace SLF
 {
@@ -34,9 +35,6 @@ namespace SLF
 
         // form objeleri
         public GirişFormu gir1;
-         
-        // halihazırda import edilmiş olan katman sayısı
-        public int eklenmiş_katman_sayısı = 0;
 
         // declare an instance of the Tablo_Formu to be used to see the Attribute Table of the vector layers
         public Tablo_Formu tablo_formu;
@@ -76,7 +74,7 @@ namespace SLF
 
         // boolean variable to control the marker/point selection by mouse down event
         private bool isSelecting_marker = false;
-
+        
         // create a list of gMapOverlay's that will hold the imported vector files
         private GMapOverlay[] tüm_katmanlar_array = new GMapOverlay[10];
         private DataTable[] tüm_katmanlar_datatable = new DataTable[10];    
@@ -124,14 +122,15 @@ namespace SLF
         }
 
         public ModülFormu() {
-            
-            InitializeComponent();
 
+            InitializeComponent();
+            
             // about Stokastik_Yuk_Haritası module
             InitializeGMap(gMapControl_stokastik);
             InitializeGMap(gMapControl_EA);
             buton_stokastik_harita_katmanlar.BringToFront();
             buton_ea_harita_katmanlar.BringToFront();
+
 
             // stokastik haritası cetvel, nokta, poligon üst katmanları
             gMapControl_stokastik.Overlays.Add(rulerOverlay_stokastik);
@@ -175,9 +174,11 @@ namespace SLF
             return (data_table);
         }
 
-        private void LoadShapefile(string filepath, GMapOverlay shapeFileOverlay, 
+        
+        private async Task LoadShapefile(string filepath, GMapOverlay shapeFileOverlay, 
                                     DataTable shapefile_datatable)
         {
+            
             // eğer dosya bulunamadıysa uyarı ver
             if (!File.Exists(filepath))
             {
@@ -235,8 +236,9 @@ namespace SLF
             }
         }
 
-        public void LoadKmlFile(string filepath, GMapOverlay kmlOverlay)
+        public async Task LoadKmlFile(string filepath, GMapOverlay kmlOverlay, DataTable data_table)
         {
+
             // eğer dosya bulunamadıysa uyarı ver
             if (!File.Exists(filepath))
             {
@@ -244,8 +246,11 @@ namespace SLF
                 return;
             }
 
+            int row_cnt = 1;
+
             using (var stream = File.OpenRead(filepath))
             {
+                // create a KML parser object and start parsing the KML stream
                 var parser = new Parser();
                 parser.Parse(stream);
 
@@ -258,8 +263,77 @@ namespace SLF
                     return;
                 }
 
+                bool columnsAdded = false;
+                data_table.Columns.Add("Row_No");
+
+                // for each row of the flattened document of KML file, fill the row of the datatable
                 foreach (var placemark in document.Flatten().OfType<SharpKml.Dom.Placemark>())
-                {
+                {                 
+                    var row = data_table.NewRow();
+
+                    if (!columnsAdded)
+                    {
+                        // Add columns based on the Schema if available
+                        foreach (var schema in document.Schemas)
+                        {
+                            // extract the schema.Fields info and add the field names as the column names of 
+                            // the data_table
+                            foreach (var field in schema.Fields)
+                            {
+                                // halihazırda sütun ismi eklenmişse pas geç, eklenmediyse ekle
+                                if (!data_table.Columns.Contains(field.Name))
+                                {
+                                    data_table.Columns.Add(field.Name);
+                                }
+                            }
+                        }
+
+                        columnsAdded = true;
+                    }
+
+                    // Handle ExtendedData
+                    if (placemark.ExtendedData != null)
+                    {
+                        foreach (var schemaData in placemark.ExtendedData.SchemaData)
+                        {
+                            foreach (var simpleData in schemaData.SimpleData)
+                            {
+                                if (!data_table.Columns.Contains(simpleData.Name))
+                                {
+                                    data_table.Columns.Add(simpleData.Name);
+                                }
+                                row["Row_No"] = row_cnt;
+                                row[simpleData.Name] = simpleData.Text;
+                            }
+                        }
+
+                        foreach (var data in placemark.ExtendedData.Data)
+                        {
+                            if (!data_table.Columns.Contains(data.Name))
+                            {
+                                data_table.Columns.Add(data.Name);
+                            }
+                            row["Row_No"] = row_cnt;
+                            row[data.Name] = data.Value;
+                        }
+                    }
+
+                    // Handle direct attributes
+                    var attributes = placemark.GetType().GetProperties();
+                    foreach (var attribute in attributes)
+                    {
+                        if (!data_table.Columns.Contains(attribute.Name))
+                        {
+                            data_table.Columns.Add(attribute.Name);
+                        }
+                        row["Row_No"] = row_cnt;
+                        row[attribute.Name] = attribute.GetValue(placemark)?.ToString();
+                    }
+
+                    data_table.Rows.Add(row);
+                    row_cnt++;
+
+                    // geometry bilgisini polygon olarak ya da multiline string olarak ekle
                     var geometry = placemark.Geometry;
                     if (geometry is SharpKml.Dom.Polygon kmlPolygon)
                     {
@@ -267,11 +341,11 @@ namespace SLF
                     }
                     else if (geometry is SharpKml.Dom.LineString kmlLineString)
                     {
-                        AddLineStringToOverlay(kmlLineString, kmlOverlay);
+                        AddLineStringToOverlay_kml(kmlLineString, kmlOverlay);
                     }
                 }
             }
-
+            
             gMapControl_stokastik.Refresh();
         }
 
@@ -288,7 +362,7 @@ namespace SLF
             overlay.Polygons.Add(polygon);
         }
 
-        private void AddLineStringToOverlay(SharpKml.Dom.LineString kmlLineString, GMapOverlay overlay)
+        private void AddLineStringToOverlay_kml(SharpKml.Dom.LineString kmlLineString, GMapOverlay overlay)
         {
             var points = kmlLineString.Coordinates.Select(coord => new PointLatLng(coord.Latitude, coord.Longitude)).ToList();
 
@@ -298,7 +372,6 @@ namespace SLF
             };
             overlay.Routes.Add(route);
         }
-
 
         // oluşturulan poligonları ilgili overlay katmanlarına ekleme kodu
         private void AddPolygonToOverlay(NetTopologySuite.Geometries.Polygon polygon, 
@@ -324,7 +397,7 @@ namespace SLF
 
 
         // stokastik dosya seçimi butonu
-        private void stokastik_dosya_seçimi_Click(object sender, EventArgs e)
+        private async void stokastik_dosya_seçimi_Click(object sender, EventArgs e)
         {
 
             // Find the first available slot in the array that holds shapefile overlay layers
@@ -345,7 +418,7 @@ namespace SLF
 
             if (result == DialogResult.OK)
             {
-                string filepath = vektorel_veri_seçimi.FileName;
+                string filepath = vektorel_veri_seçimi.FileName; C:///
                 string filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
                 string extension = filename.Substring(filename.Length - 3);
 
@@ -354,8 +427,10 @@ namespace SLF
                     GMapOverlay shapeFileOverlay = new GMapOverlay($"shapeFileOverlay_{index + 1}");
                     gMapControl_stokastik.Overlays.Add(shapeFileOverlay);
                     
-                    DataTable shapefile_datatable = new DataTable();  
-                    LoadShapefile(filepath, shapeFileOverlay, shapefile_datatable);
+                    DataTable shapefile_datatable = new DataTable();
+                    this.Cursor = Cursors.WaitCursor;
+                    await LoadShapefile(filepath, shapeFileOverlay, shapefile_datatable);
+                    this.Cursor = Cursors.Default;
                     tüm_katmanlar_array[index] = shapeFileOverlay;
                     tüm_katmanlar_array_names[index] = filename;
                     tüm_katmanlar_datatable[index] = shapefile_datatable;
@@ -373,10 +448,14 @@ namespace SLF
                 {
                     GMapOverlay kmlOverlay = new GMapOverlay($"kmlOverlay_{index + 1}");
                     gMapControl_stokastik.Overlays.Add(kmlOverlay);
-                    LoadKmlFile(filepath, kmlOverlay);
+
+                    DataTable kml_datatable = new DataTable();
+                    this.Cursor = Cursors.WaitCursor;
+                    await LoadKmlFile(filepath, kmlOverlay, kml_datatable);
+                    this.Cursor = Cursors.Default;
                     tüm_katmanlar_array[index] = kmlOverlay;
                     tüm_katmanlar_array_names[index] = filename;
-
+                    tüm_katmanlar_datatable[index] = kml_datatable;
 
                     System.Windows.Forms.CheckBox associatedCheckBox = GetCheckBoxByIndex(index);
                     if (associatedCheckBox != null)
@@ -1056,7 +1135,7 @@ namespace SLF
                 var point = gMapControl_stokastik.FromLocalToLatLng(e.X, e.Y);
 
                 // bir marker objesi oluştur ve seçilen noktalara marker ata
-                GMapMarker marker_stokastik = new GMarkerGoogle(point, GMarkerGoogleType.orange_dot);
+                GMapMarker marker_stokastik = new GMarkerGoogle(point, GMarkerGoogleType.blue_dot);
                 markerOverlay_stokastik.Markers.Add(marker_stokastik);
 
                 // seçilen noktaları bir listeye koy
