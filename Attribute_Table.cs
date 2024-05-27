@@ -13,17 +13,22 @@ namespace SLF
 {
     public partial class Tablo_Formu : Form
     {
-        public DataGridView dataGridView_objesi;
+        public DataGridView attribute_table;
         public Tablo_Formu()
         {
             InitializeComponent();
-            dataGridView_objesi = this.dataGridView1;
+            attribute_table = this.vektörel_attribute_table;
         }
 
         private void Tablo_Formu_FormClosing(object sender, FormClosingEventArgs e)
         {
             e.Cancel = true;
             this.Hide();
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }

@@ -61,6 +61,7 @@ namespace SLF
             this.Controls.Add(this.oznitelik);
             this.Name = "formOznitelik";
             this.Text = "Form2";
+            this.Load += new System.EventHandler(this.formOznitelik_Load);
             ((System.ComponentModel.ISupportInitialize)(this.oznitelik)).EndInit();
             this.ResumeLayout(false);
 

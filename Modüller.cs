@@ -23,6 +23,8 @@ using System.Reflection.Metadata;
 using SharpKml.Base;
 using SharpKml.Dom;
 using SharpKml.Engine;
+using NetTopologySuite.IO.ShapeFile.Extended;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 
 namespace SLF
 {
@@ -75,22 +77,14 @@ namespace SLF
         // boolean variable to control the marker/point selection by mouse down event
         private bool isSelecting_marker = false;
 
-        // create a list of shapeFileOverlay's that will hold the imported shapefiles
-        private GMapOverlay[] shapeFileOverlay_array = new GMapOverlay[10];
-        public string[] shapefile_names_array = new string[10]; // names of the .shp files
-
-        // create a list of mapInfoOverlayArray's that will hold the imported mapInfo files
-        private GMapOverlay[] mapInfoOverlay_array = new GMapOverlay[10];
-        private string[] mapinfo_names_array = new string[10];
-
-        // create a list of mapInfoOverlayArray's that will hold the imported mapInfo files
-        private GMapOverlay[] kmlOverlay_array = new GMapOverlay[10];
-        private string[] kml_names_array = new string[10];
-
+        // create a list of gMapOverlay's that will hold the imported vector files
+        private GMapOverlay[] tüm_katmanlar_array = new GMapOverlay[10];
+        private DataTable[] tüm_katmanlar_datatable = new DataTable[10];    
+        public string[] tüm_katmanlar_array_names = new string[10]; 
 
         private List<YüklenenDosya> loadedFiles = new List<YüklenenDosya>();
 
-
+        
         // Nokta veri yapısı
         public class NoktaVeri
         {
@@ -122,10 +116,10 @@ namespace SLF
         {
             gmap.MapProvider = GMapProviders.GoogleSatelliteMap;
             gmap.ShowCenter = false;
-            gmap.Position = new PointLatLng(38.4237, 27.1428);
+            gmap.Position = new PointLatLng(38.472, 27.10);
             gmap.MinZoom = 8;
             gmap.MaxZoom = 20;
-            gmap.Zoom = 12;
+            gmap.Zoom = 13;
             gmap.DragButton = MouseButtons.Left;
         }
 
@@ -161,7 +155,28 @@ namespace SLF
 
         }
 
-        private void LoadShapefile(string filepath, GMapOverlay shapeFileOverlay)
+        private DataTable LoadAttributeTable(DataRow row, DataGridView dataGridView, 
+                ShapefileDataReader shapefile_reader, DataTable data_table, int row_cnt)
+        {
+
+            // populate the new row by using the .GetValue method 
+            for (int i = 0; i < shapefile_reader.DbaseHeader.NumFields; i++)
+            {
+                row["Row_No"] = row_cnt;
+                row[i+1] = shapefile_reader.GetValue(i); // get the value of all columns for the i-th row
+            }
+
+            // add the resulting row to the datatable
+            data_table.Rows.Add(row);
+
+            // Bind the DataTable to the DataGridView
+            dataGridView.DataSource = data_table;
+
+            return (data_table);
+        }
+
+        private void LoadShapefile(string filepath, GMapOverlay shapeFileOverlay, 
+                                    DataTable shapefile_datatable)
         {
             // eğer dosya bulunamadıysa uyarı ver
             if (!File.Exists(filepath))
@@ -170,11 +185,33 @@ namespace SLF
                 return;
             }
             
+            // datatable that will hold the atttribute table of the .shp file
+            shapefile_datatable.Columns.Add("Row_No");
+
+            // shpReader object to read from the shp file  that is being imported
             var shpReader = new ShapefileDataReader(filepath, new GeometryFactory());
 
+            // Initialize the DataTable columns based on the shapefile's attribute fields
+            for (int i = 0; i < shpReader.DbaseHeader.NumFields; i++)
+            {
+                var sütunlar = shpReader.DbaseHeader.Fields[i];
+                shapefile_datatable.Columns.Add(sütunlar.Name, typeof(string)); // Simplified to string for all fields
+            }
+
+            int row_cnt = 1;
+
+            // read the lines of the .shp file one by one until no more line/row is left
             while (shpReader.Read())
             {
+                // extract the geometry information of each line in the .shp file
                 var geometry = shpReader.Geometry;
+
+                // create a new row for the datatable and then populate it by
+                // using the LoadAttributeTable() method
+                DataRow row = shapefile_datatable.NewRow();
+                shapefile_datatable = LoadAttributeTable(row, tablo_formu.attribute_table ,
+                            shpReader, shapefile_datatable, row_cnt);
+                row_cnt++;
 
                 // check if the geometry of the shapefile includes one polygon or is a multipolygon,
                 // add each of the polygons to the shapeFileOverlay by a for loop if multipolygon.
@@ -200,6 +237,7 @@ namespace SLF
 
         public void LoadKmlFile(string filepath, GMapOverlay kmlOverlay)
         {
+            // eğer dosya bulunamadıysa uyarı ver
             if (!File.Exists(filepath))
             {
                 MessageBox.Show("KML dosyası bulunamadı.!");
@@ -284,12 +322,13 @@ namespace SLF
             overlay.Polygons.Add(gMapPolygon);
         }
 
+
         // stokastik dosya seçimi butonu
         private void stokastik_dosya_seçimi_Click(object sender, EventArgs e)
         {
 
             // Find the first available slot in the array that holds shapefile overlay layers
-            int index = Array.FindIndex(shapeFileOverlay_array, s => s == null);
+            int index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
 
             if (index == -1)
             {
@@ -314,16 +353,20 @@ namespace SLF
                 {
                     GMapOverlay shapeFileOverlay = new GMapOverlay($"shapeFileOverlay_{index + 1}");
                     gMapControl_stokastik.Overlays.Add(shapeFileOverlay);
-                    LoadShapefile(filepath, shapeFileOverlay);
-                    shapeFileOverlay_array[index] = shapeFileOverlay;
-                    shapefile_names_array[index] = filename; 
+                    
+                    DataTable shapefile_datatable = new DataTable();  
+                    LoadShapefile(filepath, shapeFileOverlay, shapefile_datatable);
+                    tüm_katmanlar_array[index] = shapeFileOverlay;
+                    tüm_katmanlar_array_names[index] = filename;
+                    tüm_katmanlar_datatable[index] = shapefile_datatable;
+
 
                     System.Windows.Forms.CheckBox associatedCheckBox = GetCheckBoxByIndex(index);
                     if (associatedCheckBox != null)
                     {
                         associatedCheckBox.Checked = true;
                         associatedCheckBox.Visible = true;
-                        associatedCheckBox.Text = shapefile_names_array[index];
+                        associatedCheckBox.Text = tüm_katmanlar_array_names[index];
                     }
                 }
                 else if (extension == "kml")
@@ -331,15 +374,16 @@ namespace SLF
                     GMapOverlay kmlOverlay = new GMapOverlay($"kmlOverlay_{index + 1}");
                     gMapControl_stokastik.Overlays.Add(kmlOverlay);
                     LoadKmlFile(filepath, kmlOverlay);
-                    kmlOverlay_array[index] = kmlOverlay;
-                    kml_names_array[index] = filename;
+                    tüm_katmanlar_array[index] = kmlOverlay;
+                    tüm_katmanlar_array_names[index] = filename;
+
 
                     System.Windows.Forms.CheckBox associatedCheckBox = GetCheckBoxByIndex(index);
                     if (associatedCheckBox != null)
                     {
                         associatedCheckBox.Checked = true;
                         associatedCheckBox.Visible = true;
-                        associatedCheckBox.Text = shapefile_names_array[index];
+                        associatedCheckBox.Text = tüm_katmanlar_array_names[index];
                     }
                 }
             }       
@@ -401,6 +445,11 @@ namespace SLF
             checkBox18.MouseDown += stokastik_checkBox_MouseDown;
         }
 
+        private void ShowAttributeTable(DataTable datatable)
+        {
+            tablo_formu.attribute_table.DataSource = datatable;
+        }
+
 
         // mouse down event of the checkboxes which displays the related data table with the corresponding
         // checkbox/layer
@@ -412,11 +461,13 @@ namespace SLF
             rengiDeğiştirToolStripMenuItem.Tag = sender_checkbox;
             kaydetToolStripMenuItem.Tag = sender_checkbox;
 
-            /*if (shapefile_array[checkbox_index] != null)
+            if (tüm_katmanlar_array[checkbox_index] != null)
              {
-                 tablo_formu.Text = "Veri Tablosu - " + shapefile_names[checkbox_index];
-                 LoadAttributeTable(shapefile_array[checkbox_index], tablo_formu.dataGridView_objesi);
-             }*/
+                 tablo_formu.Text = "Veri Tablosu -- " + tüm_katmanlar_array_names[checkbox_index] +
+                    " -- " + tüm_katmanlar_datatable[checkbox_index].Rows.Count + " satır -- " +
+                    tüm_katmanlar_datatable[checkbox_index].Columns.Count + " sütun";
+                 ShowAttributeTable(tüm_katmanlar_datatable[checkbox_index]);
+             }
         }
 
         // display or hide the layers by checkboxes of the stokastik_yuk_tahmini form
@@ -425,9 +476,9 @@ namespace SLF
             System.Windows.Forms.CheckBox checkBox = (System.Windows.Forms.CheckBox)sender;
             int index = int.Parse(checkBox.Tag.ToString()) - 1;
             
-            if (shapeFileOverlay_array[index] != null)
+            if (tüm_katmanlar_array[index] != null)
             {
-                shapeFileOverlay_array[index].IsVisibile = checkBox.Checked;
+                tüm_katmanlar_array[index].IsVisibile = checkBox.Checked;
                 gMapControl_stokastik.Refresh();
             }
         }
@@ -715,6 +766,8 @@ namespace SLF
         private void tabloyuGörToolStripMenuItem_Click(object sender, EventArgs e)
         {
             tablo_formu.Show();
+            tablo_formu.Focus();
+            tablo_formu.BringToFront();
         }
 
         private void EA_Mesafe_Ölç_Click(object sender, EventArgs e)
@@ -1539,43 +1592,6 @@ namespace SLF
             gMapControl_EA.Refresh();
         }
 
-
-
-        /*private void LoadAttributeTable(Shapefile shapefile, DataGridView dataGridView)
-        {
-            DataTable dataTable = new DataTable();
-
-            dataTable.Columns.Add("Row_No");
-
-            // Add columns to the DataTable
-            for (int j = 0; j < shapefile.NumFields; j++)
-            {
-                Field field = shapefile.get_Field(j);
-                dataTable.Columns.Add(field.Name);
-            }
-
-            int row_cnt = 1;
-
-            // Add rows to the DataTable
-            for (int i = 0; i < shapefile.NumShapes; i++)
-            {
-                DataRow row = dataTable.NewRow();
-                row["Row_No"] = row_cnt;
-
-                for (int j = 0; j < shapefile.NumFields; j++)
-                {
-
-                    row[j + 1] = shapefile.get_CellValue(j, i);
-                }
-                dataTable.Rows.Add(row);
-                row_cnt++;
-            }
-
-            // Bind the DataTable to the DataGridView
-            dataGridView.DataSource = dataTable;
-        }*/
-
-
         /*private void Temizle()
         {
             if (EA_list_box.SelectedIndex != -1)
@@ -1631,6 +1647,7 @@ namespace SLF
             // Haritayı yeniden çiz
             gMapControl_EA.Refresh();
         }*/
+
 
     }
 }

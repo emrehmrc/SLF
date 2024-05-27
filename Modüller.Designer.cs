@@ -1037,7 +1037,7 @@ namespace SLF
             // mesafe_metre_stokastik
             // 
             this.mesafe_metre_stokastik.AutoSize = true;
-            this.mesafe_metre_stokastik.Location = new System.Drawing.Point(363, 57);
+            this.mesafe_metre_stokastik.Location = new System.Drawing.Point(408, 57);
             this.mesafe_metre_stokastik.Name = "mesafe_metre_stokastik";
             this.mesafe_metre_stokastik.Size = new System.Drawing.Size(0, 24);
             this.mesafe_metre_stokastik.TabIndex = 32;
@@ -1046,7 +1046,7 @@ namespace SLF
             // Mesafe_stokastik
             // 
             this.Mesafe_stokastik.AutoSize = true;
-            this.Mesafe_stokastik.Location = new System.Drawing.Point(279, 57);
+            this.Mesafe_stokastik.Location = new System.Drawing.Point(315, 57);
             this.Mesafe_stokastik.Name = "Mesafe_stokastik";
             this.Mesafe_stokastik.Size = new System.Drawing.Size(78, 24);
             this.Mesafe_stokastik.TabIndex = 31;
@@ -1066,7 +1066,7 @@ namespace SLF
             this.gMapControl_stokastik.GrayScaleMode = false;
             this.gMapControl_stokastik.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
             this.gMapControl_stokastik.LevelsKeepInMemory = 5;
-            this.gMapControl_stokastik.Location = new System.Drawing.Point(273, 47);
+            this.gMapControl_stokastik.Location = new System.Drawing.Point(307, 47);
             this.gMapControl_stokastik.MarkersEnabled = true;
             this.gMapControl_stokastik.MaxZoom = 2;
             this.gMapControl_stokastik.MinZoom = 2;
@@ -1080,7 +1080,7 @@ namespace SLF
             this.gMapControl_stokastik.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_stokastik.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_stokastik.ShowTileGridLines = false;
-            this.gMapControl_stokastik.Size = new System.Drawing.Size(1193, 584);
+            this.gMapControl_stokastik.Size = new System.Drawing.Size(1159, 584);
             this.gMapControl_stokastik.TabIndex = 30;
             this.gMapControl_stokastik.Zoom = 0D;
             this.gMapControl_stokastik.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_stokastik_OnMapClick);
@@ -1096,7 +1096,7 @@ namespace SLF
             this.buton_stokastik_harita_katmanlar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.buton_stokastik_harita_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
             this.buton_stokastik_harita_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_stokastik_harita_katmanlar.Location = new System.Drawing.Point(273, 579);
+            this.buton_stokastik_harita_katmanlar.Location = new System.Drawing.Point(307, 579);
             this.buton_stokastik_harita_katmanlar.Name = "buton_stokastik_harita_katmanlar";
             this.buton_stokastik_harita_katmanlar.Size = new System.Drawing.Size(62, 52);
             this.buton_stokastik_harita_katmanlar.TabIndex = 29;
@@ -1324,7 +1324,7 @@ namespace SLF
             this.Stokastik_Seç.Image = ((System.Drawing.Image)(resources.GetObject("Stokastik_Seç.Image")));
             this.Stokastik_Seç.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.Stokastik_Seç.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.Stokastik_Seç.Margin = new System.Windows.Forms.Padding(204, 1, 0, 2);
+            this.Stokastik_Seç.Margin = new System.Windows.Forms.Padding(296, 1, 0, 2);
             this.Stokastik_Seç.Name = "Stokastik_Seç";
             this.Stokastik_Seç.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
             this.Stokastik_Seç.Size = new System.Drawing.Size(73, 29);

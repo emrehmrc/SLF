@@ -22,5 +22,10 @@ namespace SLF
         {
 
         }
+
+        private void formOznitelik_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

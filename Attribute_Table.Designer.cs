@@ -29,22 +29,23 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Tablo_Formu));
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.vektörel_attribute_table = new System.Windows.Forms.DataGridView();
+            ((System.ComponentModel.ISupportInitialize)(this.vektörel_attribute_table)).BeginInit();
             this.SuspendLayout();
             // 
-            // dataGridView1
+            // vektörel_attribute_table
             // 
-            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.vektörel_attribute_table.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(12, 33);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.RowHeadersWidth = 51;
-            this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(1108, 528);
-            this.dataGridView1.TabIndex = 0;
+            this.vektörel_attribute_table.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.vektörel_attribute_table.Location = new System.Drawing.Point(12, 33);
+            this.vektörel_attribute_table.Name = "vektörel_attribute_table";
+            this.vektörel_attribute_table.RowHeadersWidth = 51;
+            this.vektörel_attribute_table.RowTemplate.Height = 24;
+            this.vektörel_attribute_table.Size = new System.Drawing.Size(1108, 528);
+            this.vektörel_attribute_table.TabIndex = 0;
+            this.vektörel_attribute_table.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // Tablo_Formu
             // 
@@ -52,19 +53,19 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.ClientSize = new System.Drawing.Size(1132, 573);
-            this.Controls.Add(this.dataGridView1);
+            this.Controls.Add(this.vektörel_attribute_table);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(1150, 620);
             this.Name = "Tablo_Formu";
             this.Text = "Tablo";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Tablo_Formu_FormClosing);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.vektörel_attribute_table)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridView vektörel_attribute_table;
     }
 }
