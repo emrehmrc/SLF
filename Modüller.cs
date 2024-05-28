@@ -12,20 +12,13 @@ using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
 using System.Xml;
-using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
-using NetTopologySuite.IO.KML;
-using NetTopologySuite.Features;
-using NetTopologySuite.Noding;
-using OSGeo.OGR;
-using OSGeo.OSR;
-using System.Reflection.Metadata;
 using SharpKml.Base;
 using SharpKml.Dom;
 using SharpKml.Engine;
-using NetTopologySuite.IO.ShapeFile.Extended;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Threading.Tasks;
+using NetTopologySuite.Geometries;
 
 namespace SLF
 {
@@ -124,7 +117,7 @@ namespace SLF
         public ModülFormu() {
 
             InitializeComponent();
-            
+
             // about Stokastik_Yuk_Haritası module
             InitializeGMap(gMapControl_stokastik);
             InitializeGMap(gMapControl_EA);
@@ -154,6 +147,7 @@ namespace SLF
 
         }
 
+
         private DataTable LoadAttributeTable(DataRow row, DataGridView dataGridView, 
                 ShapefileDataReader shapefile_reader, DataTable data_table, int row_cnt)
         {
@@ -174,7 +168,7 @@ namespace SLF
             return (data_table);
         }
 
-        
+
         private async Task LoadShapefile(string filepath, GMapOverlay shapeFileOverlay, 
                                     DataTable shapefile_datatable)
         {
@@ -190,7 +184,7 @@ namespace SLF
             shapefile_datatable.Columns.Add("Row_No");
 
             // shpReader object to read from the shp file  that is being imported
-            var shpReader = new ShapefileDataReader(filepath, new GeometryFactory());
+            var shpReader = new ShapefileDataReader(filepath, new NetTopologySuite.Geometries.GeometryFactory());
 
             // Initialize the DataTable columns based on the shapefile's attribute fields
             for (int i = 0; i < shpReader.DbaseHeader.NumFields; i++)
@@ -220,7 +214,7 @@ namespace SLF
                 {
                     AddPolygonToOverlay(polygon, shapeFileOverlay, "shapeFilePolygon");
                 }
-                else if (geometry is MultiPolygon multiPolygon)
+                else if (geometry is NetTopologySuite.Geometries.MultiPolygon multiPolygon)
                 {
                     foreach (NetTopologySuite.Geometries.Polygon poly in multiPolygon.Geometries)
                     {
@@ -246,111 +240,290 @@ namespace SLF
                 return;
             }
 
+            // oluşturulacak data table'a eklenecek olan row_cnt variable'ının initialization'u
             int row_cnt = 1;
 
+            // bir stream yarat ve import edilen kml dosyasını okumaya başla.
             using (var stream = File.OpenRead(filepath))
             {
                 // create a KML parser object and start parsing the KML stream
                 var parser = new Parser();
                 parser.Parse(stream);
 
+                // root node olan <kml> node'una eriş
                 var kml = parser.Root as Kml;
-                var document = kml?.Feature as SharpKml.Dom.Document;
-
-                if (document == null)
+                var folder = kml?.Feature as SharpKml.Dom.Folder;
+                
+                // <kml> node'unun child node'unun <folder> veya <Document> olup olmadığının kontrolü
+                if(folder != null)
                 {
-                    MessageBox.Show("KML dosyasının içinde herhangi bir doküman bulunamadı.");
-                    return;
-                }
-
-                bool columnsAdded = false;
-                data_table.Columns.Add("Row_No");
-
-                // for each row of the flattened document of KML file, fill the row of the datatable
-                foreach (var placemark in document.Flatten().OfType<SharpKml.Dom.Placemark>())
-                {                 
-                    var row = data_table.NewRow();
-
-                    if (!columnsAdded)
+                    // <folder> node'unun içindeki <Document> node'larını okumaya başla
+                    foreach (var documents in folder.Features)
                     {
-                        // Add columns based on the Schema if available
-                        foreach (var schema in document.Schemas)
+                        // eğer halihazrıda "Row_No" isminde bir sütun yoksa ekle
+                        if (!data_table.Columns.Contains("Row_No"))
                         {
-                            // extract the schema.Fields info and add the field names as the column names of 
-                            // the data_table
-                            foreach (var field in schema.Fields)
-                            {
-                                // halihazırda sütun ismi eklenmişse pas geç, eklenmediyse ekle
-                                if (!data_table.Columns.Contains(field.Name))
-                                {
-                                    data_table.Columns.Add(field.Name);
-                                }
-                            }
+                            data_table.Columns.Add("Row_No");
                         }
 
-                        columnsAdded = true;
-                    }
-
-                    // Handle ExtendedData
-                    if (placemark.ExtendedData != null)
-                    {
-                        foreach (var schemaData in placemark.ExtendedData.SchemaData)
+                        // eğer halihazrıda "coordinates" isminde bir sütun yoksa ekle
+                        if (!data_table.Columns.Contains("coordinates"))
                         {
-                            foreach (var simpleData in schemaData.SimpleData)
+                            data_table.Columns.Add("coordinates");
+                        }
+
+                        // <document> node'unu flatten ile düzelt, sonrasında içindeki <placemark> node'unu iterate et 
+                        foreach (var placemark in documents.Flatten().OfType<SharpKml.Dom.Placemark>())
+                        {
+                            var row = data_table.NewRow();
+
+                            // Handle ExtendedData
+                            if (placemark.ExtendedData != null)
                             {
-                                if (!data_table.Columns.Contains(simpleData.Name))
+                                foreach (var schemaData in placemark.ExtendedData.SchemaData)
                                 {
-                                    data_table.Columns.Add(simpleData.Name);
+                                    foreach (var simpleData in schemaData.SimpleData)
+                                    {
+                                        if (!data_table.Columns.Contains(simpleData.Name))
+                                        {
+                                            data_table.Columns.Add(simpleData.Name);
+                                        }
+                                        row["Row_No"] = row_cnt;
+                                        row[simpleData.Name] = simpleData.Text;
+                                    }
+                                }  
+
+                                // <ExtendedData> içindeki dataları Attribute Table'da ilgili sütunlara yaz
+                                foreach (var data in placemark.ExtendedData.Data)
+                                {
+                                    if (!data_table.Columns.Contains(data.Name))
+                                    {
+                                        data_table.Columns.Add(data.Name);
+                                    }
+                                    row["Row_No"] = row_cnt;
+                                    row[data.Name] = data.Value;
+                                }
+                            }
+
+                            // add polygon coordinates to "coordinates" column if any polygon exists
+                            foreach (SharpKml.Dom.Polygon polygon in placemark.Flatten().OfType<SharpKml.Dom.Polygon>())
+                            {
+                                foreach (SharpKml.Dom.OuterBoundary outerBoundary in polygon.Flatten().OfType<SharpKml.Dom.OuterBoundary>())
+                                {
+                                    foreach (SharpKml.Dom.LinearRing linearRing in outerBoundary.Flatten().OfType<SharpKml.Dom.LinearRing>())
+                                    {
+                                        // Convert the coordinates to a string
+                                        string coordinatesString = string.Join(" ; ",
+                                            linearRing.Coordinates.Select(coord => $"{Math.Round(coord.Longitude, 6)},{Math.Round(coord.Latitude, 6)}"));
+                                        row["Row_No"] = row_cnt;
+                                        row["coordinates"] = coordinatesString;
+                                    }
+                                }
+                            }
+
+                            // add point coordinates to "coordinate" column if any point exists
+                            foreach (SharpKml.Dom.Point points in placemark.Flatten().OfType<SharpKml.Dom.Point>())
+                            {
+                                // Convert the coordinates to a string
+                                string point_coordinates = Math.Round(points.Coordinate.Longitude,6).ToString() + 
+                                    " ; " + Math.Round(points.Coordinate.Latitude,6).ToString();
+                                row["Row_No"] = row_cnt;
+                                row["coordinates"] = point_coordinates;
+                                    
+                            }
+
+                            // add linestring coordinates to "coordinates" column if any linestring exists
+                            foreach (SharpKml.Dom.LineString lineString in placemark.Flatten().OfType<SharpKml.Dom.LineString>())
+                            {
+                                // Convert the coordinates to a string
+                                string coordinatesString = string.Join(" ; ",
+                                    lineString.Coordinates.Select(coord => $"{Math.Round(coord.Longitude, 6)},{Math.Round(coord.Latitude, 6)}"));
+                                row["Row_No"] = row_cnt;
+                                row["coordinates"] = coordinatesString;
+                            }
+
+                            // Handle direct attributes
+                            var attributes = placemark.GetType().GetProperties();
+                            foreach (var attribute in attributes)
+                            {
+                                if (!data_table.Columns.Contains(attribute.Name))
+                                {
+                                    data_table.Columns.Add(attribute.Name);
                                 }
                                 row["Row_No"] = row_cnt;
-                                row[simpleData.Name] = simpleData.Text;
+                                row[attribute.Name] = attribute.GetValue(placemark)?.ToString();
+                            }
+
+                            // oluşturulan satırı tablouya ekle
+                            data_table.Rows.Add(row);
+                            row_cnt++;
+
+                            // geometry bilgisini polygon olarak ya da multiline string olarak ekle
+                            var geometry = placemark.Geometry;
+
+                            if (geometry is SharpKml.Dom.Polygon kmlPolygon)
+                            {
+                                AddPolygonToOverlay_kml(kmlPolygon, kmlOverlay);
+                            }
+                            else if (geometry is SharpKml.Dom.LineString kmlLineString)
+                            {
+                                AddLineStringToOverlay_kml(kmlLineString, kmlOverlay);
+                            }
+                        }
+                    }
+
+                }
+                else
+                {
+                    // eğer <kml> root node'unun child/feature'larından biri document ise
+                    var document = kml?.Feature as SharpKml.Dom.Document;
+                    bool columnsAdded = false;
+
+                    // eğer halihazrıda "Row_No" isminde bir sütun yoksa ekle
+                    if (!data_table.Columns.Contains("Row_No"))
+                    {
+                        data_table.Columns.Add("Row_No");
+                    }
+
+                    // eğer halihazrıda "coordinates" isminde bir sütun yoksa ekle
+                    if (!data_table.Columns.Contains("coordinates"))
+                    {
+                        data_table.Columns.Add("coordinates");
+                    }
+
+                    // for each row of the flattened document of KML file, fill the row of the datatable
+                    foreach (var placemark in document.Flatten().OfType<SharpKml.Dom.Placemark>())
+                    {
+                        // her satırı table'a eklemek için her satır için yeni bir "row" objesi oluştur.
+                        var row = data_table.NewRow();
+
+                        if (!columnsAdded)
+                        {
+                            // Add columns based on the Schema if available
+                            foreach (var schema in document.Schemas)
+                            {
+                                // extract the schema.Fields info and add the field names as the column names of 
+                                // the data_table
+                                foreach (var field in schema.Fields)
+                                {
+                                    // halihazırda sütun ismi eklenmişse pas geç, eklenmediyse ekle
+                                    if (!data_table.Columns.Contains(field.Name))
+                                    {
+                                        data_table.Columns.Add(field.Name);
+                                    }
+                                }
+                            }
+                            columnsAdded = true;
+                        }
+
+                        // <ExtendedData> isimli node varsa içerindeki data'yı Attribute Table'a ekle
+                        if (placemark.ExtendedData != null)
+                        {
+                            foreach (var schemaData in placemark.ExtendedData.SchemaData)
+                            {
+                                foreach (var simpleData in schemaData.SimpleData)
+                                {
+                                    if (!data_table.Columns.Contains(simpleData.Name))
+                                    {
+                                        data_table.Columns.Add(simpleData.Name);
+                                    }
+                                    row["Row_No"] = row_cnt;
+                                    row[simpleData.Name] = simpleData.Text;
+                                }
+                            }   
+
+                            foreach (var data in placemark.ExtendedData.Data)
+                            {
+                                if (!data_table.Columns.Contains(data.Name))
+                                {
+                                    data_table.Columns.Add(data.Name);
+                                }
+                                row["Row_No"] = row_cnt;
+                                row[data.Name] = data.Value;
                             }
                         }
 
-                        foreach (var data in placemark.ExtendedData.Data)
+                        // add polygon coordinates to "coordinates" column if any polygon exists
+                        foreach (SharpKml.Dom.Polygon polygon in placemark.Flatten().OfType<SharpKml.Dom.Polygon>())
                         {
-                            if (!data_table.Columns.Contains(data.Name))
+                            foreach (SharpKml.Dom.OuterBoundary outerBoundary in polygon.Flatten().OfType<SharpKml.Dom.OuterBoundary>())
                             {
-                                data_table.Columns.Add(data.Name);
+                                foreach (SharpKml.Dom.LinearRing linearRing in outerBoundary.Flatten().OfType<SharpKml.Dom.LinearRing>())
+                                {
+                                    // Convert the coordinates to a string
+                                    string coordinatesString = string.Join(" ; ", 
+                                        linearRing.Coordinates.Select(coord => $"{Math.Round(coord.Longitude,6)},{Math.Round(coord.Latitude,6)}"));
+                                    row["Row_No"] = row_cnt;
+                                    row["coordinates"] = coordinatesString;
+                                }
+                            }
+                        }
+
+                        // add point coordinates to "coordinate" column if any point exists
+                        foreach (SharpKml.Dom.Point points in placemark.Flatten().OfType<SharpKml.Dom.Point>())
+                        {
+                            // Convert the coordinates to a string
+                            string point_coordinates = Math.Round(points.Coordinate.Longitude, 6).ToString() +
+                                " ; " + Math.Round(points.Coordinate.Latitude, 6).ToString();
+                            row["Row_No"] = row_cnt;
+                            row["coordinates"] = point_coordinates;
+
+                        }
+
+                        // add linestring coordinates to "coordinates" column if any linestring exists
+                        foreach (SharpKml.Dom.LineString lineString in placemark.Flatten().OfType<SharpKml.Dom.LineString>())
+                        {
+                            // Convert the coordinates to a string
+                            string coordinatesString = string.Join(" ; ",
+                                lineString.Coordinates.Select(coord => $"{Math.Round(coord.Longitude, 6)},{Math.Round(coord.Latitude, 6)}"));
+                            row["Row_No"] = row_cnt;
+                            row["coordinates"] = coordinatesString;
+                        }
+
+                        // Handle direct attributes
+                        var attributes = placemark.GetType().GetProperties();
+                        foreach (var attribute in attributes)
+                        {
+                            if (!data_table.Columns.Contains(attribute.Name))
+                            {
+                                data_table.Columns.Add(attribute.Name);
                             }
                             row["Row_No"] = row_cnt;
-                            row[data.Name] = data.Value;
+                            row[attribute.Name] = attribute.GetValue(placemark)?.ToString();
                         }
-                    }
 
-                    // Handle direct attributes
-                    var attributes = placemark.GetType().GetProperties();
-                    foreach (var attribute in attributes)
-                    {
-                        if (!data_table.Columns.Contains(attribute.Name))
+                        data_table.Rows.Add(row);
+                        row_cnt++;
+
+                        // geometry bilgisini polygon olarak ya da multiline string olarak ekle
+                        var geometry = placemark.Geometry;
+
+                        if (geometry is SharpKml.Dom.Polygon kmlPolygon)
                         {
-                            data_table.Columns.Add(attribute.Name);
+                            AddPolygonToOverlay_kml(kmlPolygon, kmlOverlay);
                         }
-                        row["Row_No"] = row_cnt;
-                        row[attribute.Name] = attribute.GetValue(placemark)?.ToString();
-                    }
-
-                    data_table.Rows.Add(row);
-                    row_cnt++;
-
-                    // geometry bilgisini polygon olarak ya da multiline string olarak ekle
-                    var geometry = placemark.Geometry;
-                    if (geometry is SharpKml.Dom.Polygon kmlPolygon)
-                    {
-                        AddPolygonToOverlay_kml(kmlPolygon, kmlOverlay);
-                    }
-                    else if (geometry is SharpKml.Dom.LineString kmlLineString)
-                    {
-                        AddLineStringToOverlay_kml(kmlLineString, kmlOverlay);
+                        else if (geometry is SharpKml.Dom.LineString kmlLineString)
+                        {
+                            AddLineStringToOverlay_kml(kmlLineString, kmlOverlay);
+                        }
                     }
                 }
             }
             
-            gMapControl_stokastik.Refresh();
+            if(Modül_Tabları.SelectedTab == tab_stokastik)
+            {
+                gMapControl_stokastik.Refresh();
+            }
+
+            if (Modül_Tabları.SelectedTab == tab_ea)
+            {
+                gMapControl_EA.Refresh();
+            }
         }
 
         private void AddPolygonToOverlay_kml(SharpKml.Dom.Polygon kmlPolygon, GMapOverlay overlay)
         {
+            // coordinates node, which has parental noods as Polygon.OuterBoundary.LinearRing.Coordinates
             var coordinates = kmlPolygon.OuterBoundary.LinearRing.Coordinates;
             List<PointLatLng> points = coordinates.Select(coord => new PointLatLng(coord.Latitude, coord.Longitude)).ToList();
 
@@ -364,11 +537,13 @@ namespace SLF
 
         private void AddLineStringToOverlay_kml(SharpKml.Dom.LineString kmlLineString, GMapOverlay overlay)
         {
-            var points = kmlLineString.Coordinates.Select(coord => new PointLatLng(coord.Latitude, coord.Longitude)).ToList();
+            // points node list, which has parental nodes as LineString.Coordinates
+            List<PointLatLng> points = kmlLineString.Coordinates.Select(coord => new PointLatLng(coord.Latitude, coord.Longitude)).ToList();
 
+            // create a new route including the points inside the points list.
             var route = new GMapRoute(points, "KmlLineString")
             {
-                Stroke = new Pen(Color.Red, 3)
+                Stroke = new Pen(Color.Blue, 3)
             };
             overlay.Routes.Add(route);
         }
@@ -395,6 +570,376 @@ namespace SLF
             overlay.Polygons.Add(gMapPolygon);
         }
 
+        private async Task LoadMifFile(string path,GMapOverlay mapInfoOverlay, DataTable attributeTable)
+        {
+            if (!File.Exists(path))
+            {
+                MessageBox.Show("MIF dosyası bulunamadı. Lütfen tekrar kontrol ediniz.");
+                return;
+            }
+
+            try
+            {
+                attributeTable = new DataTable();
+                var geometries = ParseMifFile(path, attributeTable);
+
+                foreach (var geometry in geometries)
+                {
+                    if (geometry is NetTopologySuite.Geometries.Point point)
+                    {
+                        AddPointToOverlay_mif(point, mapInfoOverlay);
+                    }
+                    else if (geometry is NetTopologySuite.Geometries.Polygon polygon)
+                    {
+                        AddPolygonToOverlay_mif(polygon, mapInfoOverlay);
+                    }
+                    else if (geometry is MultiPolygon multiPolygon)
+                    {
+                        foreach (NetTopologySuite.Geometries.Polygon poly in multiPolygon.Geometries)
+                        {
+                            AddPolygonToOverlay_mif(poly, mapInfoOverlay);
+                        }
+                    }
+                    else if (geometry is NetTopologySuite.Geometries.LineString lineString)
+                    {
+                        AddLineToOverlay_mif(lineString, mapInfoOverlay);
+                    }
+                }
+
+                if (Modül_Tabları.SelectedTab == tab_stokastik)
+                {
+                    gMapControl_stokastik.Refresh();
+                }
+
+                if (Modül_Tabları.SelectedTab == tab_ea)
+                {
+                    gMapControl_EA.Refresh();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to load MIF file: {ex.Message}");
+            }
+        }
+
+
+        /*private List<NetTopologySuite.Geometries.Geometry> ParseMifFile(string path, DataTable attributeTable)
+        {
+            var geometries = new List<NetTopologySuite.Geometries.Geometry>();
+            var geometryFactory = new GeometryFactory();
+
+            using (var reader = new StreamReader(path))
+            {
+                string line;
+                bool inDataSection = false;
+                bool inColumnSection = false;
+
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (line.Trim().Equals("COLUMNS", StringComparison.OrdinalIgnoreCase))
+                    {
+                        inColumnSection = true;
+                        continue;
+                    }
+
+                    if (inColumnSection)
+                    {
+                        if (line.Trim().Equals("DATA", StringComparison.OrdinalIgnoreCase))
+                        {
+                            inDataSection = true;
+                            inColumnSection = false;
+                            continue;
+                        }
+
+                        // Parse column definitions
+                        var columnParts = line.Trim().Split(' ');
+                        if (columnParts.Length >= 2)
+                        {
+                            string columnName = columnParts[0];
+                            string columnType = columnParts[1];
+                            attributeTable.Columns.Add(new DataColumn(columnName, GetColumnType(columnType)));
+                        }
+                    }
+
+                    if (!inDataSection) continue;
+
+                    // Parse geometries
+                    if (line.StartsWith("Point", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        if (parts.Length >= 3 &&
+                            double.TryParse(parts[1], out double x) &&
+                            double.TryParse(parts[2], out double y))
+                        {
+                            var point = geometryFactory.CreatePoint(new Coordinate(x, y));
+                            geometries.Add(point);
+                        }
+                    }
+                    else if (line.StartsWith("Line", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var coordinates = new List<Coordinate>();
+                        var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        for (int i = 1; i < parts.Length; i += 2)
+                        {
+                            if (double.TryParse(parts[i], out double x) && double.TryParse(parts[i + 1], out double y))
+                            {
+                                coordinates.Add(new Coordinate(x, y));
+                            }
+                        }
+                        var lineString = geometryFactory.CreateLineString(coordinates.ToArray());
+                        geometries.Add(lineString);
+                    }
+                    else if (line.StartsWith("Region", StringComparison.OrdinalIgnoreCase) || line.StartsWith("Polygon", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Handling regions and polygons similarly
+                        var coordinates = new List<Coordinate>();
+                        while ((line = reader.ReadLine()) != null && !line.Equals("END", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var parts = line.Trim().Split(' ');
+                            if (parts.Length == 2 && double.TryParse(parts[0], out double x) && double.TryParse(parts[1], out double y))
+                            {
+                                coordinates.Add(new Coordinate(x, y));
+                            }
+                        }
+                        if (coordinates.Count > 0)
+                        {
+                            coordinates.Add(coordinates[0]); // Close the polygon
+                            var polygon = geometryFactory.CreatePolygon(coordinates.ToArray());
+                            geometries.Add(polygon);
+                        }
+                    }
+
+                    // Read attribute data for each geometry
+                    var attributeValues = reader.ReadLine()?.Split(',');
+                    if (attributeValues != null)
+                    {
+                        var row = attributeTable.NewRow();
+                        for (int i = 0; i < attributeTable.Columns.Count; i++)
+                        {
+                            row[i] = attributeValues[i].Trim();
+                        }
+                        attributeTable.Rows.Add(row);
+                    }
+                }
+            }
+
+            return geometries;
+        }*/
+
+
+
+        private List<NetTopologySuite.Geometries.Geometry> ParseMifFile(string path, DataTable attributeTable)
+        {
+            var geometries = new List<NetTopologySuite.Geometries.Geometry>();
+            var geometryFactory = new GeometryFactory();
+
+            using (var reader = new StreamReader(path))
+            {
+                string line;
+                bool inDataSection = false;
+                bool inColumnSection = false;
+                bool isRegion = false;
+                bool isPolygon = false;
+                var coordinates = new List<Coordinate>();
+
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (line.Trim().Equals("COLUMNS", StringComparison.OrdinalIgnoreCase))
+                    {
+                        inColumnSection = true;
+                        continue;
+                    }
+
+                    if (inColumnSection)
+                    {
+                        if (line.Trim().Equals("DATA", StringComparison.OrdinalIgnoreCase))
+                        {
+                            inDataSection = true;
+                            inColumnSection = false;
+                            continue;
+                        }
+
+                        // Parse column definitions
+                        var columnParts = line.Trim().Split(' ');
+                        if (columnParts.Length >= 2)
+                        {
+                            string columnName = columnParts[0];
+                            string columnType = columnParts[1];
+                            attributeTable.Columns.Add(new DataColumn(columnName, GetColumnType(columnType)));
+                        }
+                    }
+
+                    if (!inDataSection) continue;
+
+                    // Parse geometries
+                    if (line.StartsWith("Point", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (coordinates.Count > 0)
+                        {
+                            // If we were reading a region or polygon, add it to the list
+                            var geometry = CreateGeometry(coordinates, geometryFactory, isRegion, isPolygon);
+                            if (geometry != null)
+                            {
+                                geometries.Add(geometry);
+                            }
+                            coordinates.Clear();
+                        }
+
+                        var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        if (parts.Length >= 3 &&
+                            double.TryParse(parts[1], out double x) &&
+                            double.TryParse(parts[2], out double y))
+                        {
+                            var point = geometryFactory.CreatePoint(new Coordinate(x, y));
+                            geometries.Add(point);
+                        }
+                    }
+                    else if (line.StartsWith("Pline", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // If we were reading a region or polygon, add it to the list
+                        if (coordinates.Count > 0)
+                        {
+                            var geometry = CreateGeometry(coordinates, geometryFactory, isRegion, isPolygon);
+                            if (geometry != null)
+                            {
+                                geometries.Add(geometry);
+                            }
+                            coordinates.Clear();
+                        }
+
+                        isRegion = false;
+                        isPolygon = false;
+
+                        // Parse polyline
+                        var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        for (int i = 1; i < parts.Length; i += 2)
+                        {
+                            if (double.TryParse(parts[i], out double x) && double.TryParse(parts[i + 1], out double y))
+                            {
+                                coordinates.Add(new Coordinate(x, y));
+                            }
+                        }
+                    }
+                    else if (line.StartsWith("Region", StringComparison.OrdinalIgnoreCase) || line.StartsWith("Polygon", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (coordinates.Count > 0)
+                        {
+                            // If we were reading a region or polygon, add it to the list
+                            var geometry = CreateGeometry(coordinates, geometryFactory, isRegion, isPolygon);
+                            if (geometry != null)
+                            {
+                                geometries.Add(geometry);
+                            }
+                            coordinates.Clear();
+                        }
+
+                        // Set flags for reading regions or polygons
+                        isRegion = line.StartsWith("Region", StringComparison.OrdinalIgnoreCase);
+                        isPolygon = line.StartsWith("Polygon", StringComparison.OrdinalIgnoreCase);
+                    }
+
+                    // Read attribute data for each geometry
+                    var attributeValues = reader.ReadLine()?.Split(',');
+                    if (attributeValues != null)
+                    {
+                        var row = attributeTable.NewRow();
+                        for (int i = 0; i < attributeTable.Columns.Count; i++)
+                        {
+                            row[i] = attributeValues[i].Trim();
+                        }
+                        attributeTable.Rows.Add(row);
+                    }
+                }
+
+                // Add the last geometry to the list
+                if (coordinates.Count > 0)
+                {
+                    var geometry = CreateGeometry(coordinates, geometryFactory, isRegion, isPolygon);
+                    if (geometry != null)
+                    {
+                        geometries.Add(geometry);
+                    }
+                }
+            }
+
+            return geometries;
+        }
+
+        private NetTopologySuite.Geometries.Geometry CreateGeometry(List<Coordinate> coordinates, GeometryFactory geometryFactory, bool isRegion, bool isPolygon)
+        {
+            if (coordinates.Count == 0)
+            {
+                return null;
+            }
+
+            if (isPolygon || isRegion)
+            {
+                // Close the polygon or region
+                coordinates.Add(coordinates[0]);
+                if (isRegion)
+                {
+                    // Regions should have multiple rings
+                    return geometryFactory.CreateMultiPolygon(new[] { geometryFactory.CreatePolygon(coordinates.ToArray()) });
+                }
+                else
+                {
+                    return geometryFactory.CreatePolygon(coordinates.ToArray());
+                }
+            }
+            else
+            {
+                return geometryFactory.CreateLineString(coordinates.ToArray());
+            }
+        }
+
+
+
+        private Type GetColumnType(string mifType)
+        {
+            switch (mifType.ToUpper())
+            {
+                case "CHAR":
+                    return typeof(string);
+                case "FLOAT":
+                    return typeof(double);
+                case "INTEGER":
+                    return typeof(int);
+                case "DATE":
+                    return typeof(DateTime);
+                default:
+                    return typeof(string);
+            }
+        }
+
+
+        private void AddPointToOverlay_mif(NetTopologySuite.Geometries.Point point, GMapOverlay overlay)
+        {
+            var marker = new GMarkerGoogle(new PointLatLng(point.Y, point.X), GMarkerGoogleType.red_dot);
+            overlay.Markers.Add(marker);
+        }
+
+        private void AddPolygonToOverlay_mif(NetTopologySuite.Geometries.Polygon polygon, GMapOverlay overlay)
+        {
+            var points = polygon.Coordinates.Select(c => new PointLatLng(c.Y, c.X)).ToList();
+            var gMapPolygon = new GMapPolygon(points, "Polygon")
+            {
+                Stroke = new Pen(Color.Blue, 2),
+                Fill = new SolidBrush(Color.FromArgb(50, Color.Blue))
+            };
+
+            overlay.Polygons.Add(gMapPolygon);
+        }
+
+        private void AddLineToOverlay_mif(NetTopologySuite.Geometries.LineString lineString, GMapOverlay overlay)
+        {
+            var points = lineString.Coordinates.Select(c => new PointLatLng(c.Y, c.X)).ToList();
+            var gMapRoute = new GMapRoute(points, "Line")
+            {
+                Stroke = new Pen(Color.Red, 2)
+            };
+
+            overlay.Routes.Add(gMapRoute);
+        }
 
         // stokastik dosya seçimi butonu
         private async void stokastik_dosya_seçimi_Click(object sender, EventArgs e)
@@ -411,7 +956,7 @@ namespace SLF
 
             OpenFileDialog vektorel_veri_seçimi = new OpenFileDialog();
 
-            vektorel_veri_seçimi.Filter = "Shapefile|*.shp|MapInfo File|*.tab|Google Earth File|*.kml|CSV File|*.csv";
+            vektorel_veri_seçimi.Filter = "Shapefile|*.shp|MapInfo File|*.MIF|Google Earth File|*.kml|CSV File|*.csv";
             vektorel_veri_seçimi.InitialDirectory = "C:\\Users\\Zekiye\\Desktop\\CBS";
 
             DialogResult result = vektorel_veri_seçimi.ShowDialog();
@@ -456,6 +1001,27 @@ namespace SLF
                     tüm_katmanlar_array[index] = kmlOverlay;
                     tüm_katmanlar_array_names[index] = filename;
                     tüm_katmanlar_datatable[index] = kml_datatable;
+
+                    System.Windows.Forms.CheckBox associatedCheckBox = GetCheckBoxByIndex(index);
+                    if (associatedCheckBox != null)
+                    {
+                        associatedCheckBox.Checked = true;
+                        associatedCheckBox.Visible = true;
+                        associatedCheckBox.Text = tüm_katmanlar_array_names[index];
+                    }
+                }
+                else if (extension == "MIF")
+                {
+                    GMapOverlay mapInfoOverlay = new GMapOverlay($"mapInfoOverlay_{index + 1}");
+                    gMapControl_stokastik.Overlays.Add(mapInfoOverlay);
+
+                    DataTable mapinfo_datatable = new DataTable();
+                    this.Cursor = Cursors.WaitCursor;
+                    await LoadMifFile(filepath, mapInfoOverlay, mapinfo_datatable);
+                    this.Cursor = Cursors.Default;
+                    tüm_katmanlar_array[index] = mapInfoOverlay;
+                    tüm_katmanlar_array_names[index] = filename;
+                    tüm_katmanlar_datatable[index] = mapinfo_datatable;
 
                     System.Windows.Forms.CheckBox associatedCheckBox = GetCheckBoxByIndex(index);
                     if (associatedCheckBox != null)
@@ -1450,20 +2016,20 @@ namespace SLF
             {
                 // NTS libraries to create polygons
                 var polygons = new List<NetTopologySuite.Geometries.Polygon>();
-                var geomFactory = new GeometryFactory(); // class that has CreatePolygon() method
+                var geomFactory = new NetTopologySuite.Geometries.GeometryFactory(); // class that has CreatePolygon() method
 
                 // create squares of sizes defined by cellSizeLon and cellSizeLat parameters - 100x100 meters etc.
                 for (double x = xMin; x < xMax; x += cellSizeLon)
                 {
                     for (double y = yMin; y < yMax; y += cellSizeLat)
                     {
-                        var coordinates = new Coordinate[]
+                        var coordinates = new NetTopologySuite.Geometries.Coordinate[]
                         {
-                    new Coordinate(x, y), // bottom-left corner of the cell
-                    new Coordinate(x + cellSizeLon, y), // bottom-right corner of the cell
-                    new Coordinate(x + cellSizeLon, y + cellSizeLat), // top-right corner of the cell
-                    new Coordinate(x, y + cellSizeLat), // top-left corner of the cell
-                    new Coordinate(x, y) // closing the loop with the starting point of the cell
+                    new NetTopologySuite.Geometries.Coordinate(x, y), // bottom-left corner of the cell
+                    new NetTopologySuite.Geometries.Coordinate(x + cellSizeLon, y), // bottom-right corner of the cell
+                    new NetTopologySuite.Geometries.Coordinate(x + cellSizeLon, y + cellSizeLat), // top-right corner of the cell
+                    new NetTopologySuite.Geometries.Coordinate(x, y + cellSizeLat), // top-left corner of the cell
+                    new NetTopologySuite.Geometries.Coordinate(x, y) // closing the loop with the starting point of the cell
                         };
 
                         // seçilen 5 adet closed loop noktalarından CreatePolygon() metodu ile cell ler oluştur.
@@ -1630,7 +2196,7 @@ namespace SLF
         }
 
         // cetvel ile seçilen2 nokta arasındaki mesafeyi metre cinsinden göster
-        private void CalculateDistance(GMapControl gmap, Label mesafe_metre, List<PointLatLng> rulerPoints)
+        private void CalculateDistance(GMapControl gmap, System.Windows.Forms.Label mesafe_metre, List<PointLatLng> rulerPoints)
         {
             if (rulerPoints.Count == 2)
             {
