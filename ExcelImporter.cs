@@ -23,12 +23,30 @@ namespace SLF
             { 
                 "Abone Verileri", 
                     new List<string> {
-                    "Bağlı Olduğu Kofre ID",
-                    "Bagli Oldugu Kofre Koordinat - X",
-                    "Bagli Oldugu Kofre Koordinat - Y",
-                    "Long",
-                    "Lat"
-                } 
+                        "TESISAT_NO",
+                        "X_KOORDINAT",
+                        "Y_KOORDINAT",
+                        "ADR_BINA_ID",
+                        "bina_turu",
+                        "ADR_ILCE_ID",
+                        "ENERJI_TABLO_KAYIT_KODU",
+                        "BAGLANTI_GUCU",
+                        "SOZ_DURUM",
+                        "ABONE_GRUBU",
+                        "GERILIM_SEVIYESI",
+                        "SOZ_BAS_TARIH",
+                        "SOZ_BIT_TARIH",
+                        "2019_Tuketim",
+                        "2020_Tuketim",
+                        "2021_Tuketim",
+                        "2022_Tuketim",
+                        "2023_Tuketim",
+                        "2019_Demant",
+                        "2020_Demant",
+                        "2021_Demant",
+                        "2022_Demant",
+                        "2023_Demant",
+                    } 
             },
             { "Ekonometrik Yük Tahmini Verileri", new List<string> { "Header4", "Header5", "Header6" } },
             // Add more data types and their expected headers as needed
@@ -58,7 +76,7 @@ namespace SLF
                     column.ColumnName = worksheet.Cells[1, col].Text;
                     dataTable.Columns.Add(column);
                 }
-
+               
                 // Populate DataTable with Excel data
                 // Row starts from 2 because 1st row is column headers
                 for (int row = 2; row <= rowCount; row++)
@@ -70,7 +88,7 @@ namespace SLF
                     }
                     dataTable.Rows.Add(dataRow);
                 }
-            }
+                 }
             stopwatch.Stop();
 
             Console.WriteLine($"Excel file import took: {stopwatch.ElapsedMilliseconds} ms");
