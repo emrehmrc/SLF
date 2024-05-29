@@ -13,6 +13,14 @@ namespace SLF
         private List<string> veri_listesi_requires_csv;
         private List<string> veri_listesi_requires_tabular;
 
+        private readonly List<string> nullLikeStrings = new List<string>
+        {
+            "null",
+            "N/A",
+            "#N/A"
+        };
+
+        private const string FileDialogTitle = "Bir veri dosyası seçiniz.";
         private const string FilterExcelFiles = "Excel dosyaları (*.xlsx)|*.xlsx";
         private const string FilterCsvFiles = "CSV dosyaları (*.csv)|*.csv";
         private const string FilterTabularFiles = "KML dosyaları (*.kml)|*.kml";
@@ -47,7 +55,7 @@ namespace SLF
         public void ProcessFileSelection(string seçilenVeriTipi)
         {
             OpenFileDialog fileDialog1 = new OpenFileDialog();
-            fileDialog1.Title = "Bir veri dosyası seçiniz.";
+            fileDialog1.Title = FileDialogTitle;
 
             if (veri_listesi_requires_xlsx.Contains(seçilenVeriTipi))
             {
@@ -106,10 +114,13 @@ namespace SLF
 
             foreach (DataColumn column in dataTable.Columns)
             {
-                // Count the number of null or DBNull values in the current column
-                
-                // TODO: COUNT NULL STRINGS OR N/A VALUES AS NULLS AS WELL
-                int nullCount = dataTable.AsEnumerable().Count(row => row.IsNull(column));
+                // Count the number of null, DBNull, "null", and "N/A" values in the current column
+
+                int nullCount = dataTable.AsEnumerable().Count(row =>
+                    row.IsNull(column) ||
+                    row[column] == DBNull.Value ||
+                    nullLikeStrings.Contains(row[column]?.ToString(), StringComparer.OrdinalIgnoreCase)
+                );
 
                 // Append the column name and null count to the report message
                 reportMessage.AppendLine($"{column.ColumnName}: {nullCount} null(s)");
