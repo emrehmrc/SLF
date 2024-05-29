@@ -68,6 +68,10 @@ namespace SLF
                     MessageBox.Show("Dosya seçimi gerçekleştirilemedi.");
                 }
             }
+            catch (NoFileSelectedException ex)
+            {
+                MessageBox.Show(ex.Message, "Uyarı!");
+            }
             catch (InvalidColumnHeadersException ex)
             {
                 MessageBox.Show("Geçersiz sütun biçimi: " + ex.Message, "Hata!");

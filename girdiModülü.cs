@@ -7,6 +7,13 @@ using System.Windows.Forms;
 
 namespace SLF
 {
+    public class NoFileSelectedException : Exception
+    {
+        public NoFileSelectedException(string message) : base(message)
+        {
+        }
+    }
+
     public class GirdiModülü
     {
         private List<string> veri_listesi_requires_xlsx;
@@ -65,6 +72,7 @@ namespace SLF
                     string selectedFileName = fileDialog1.FileName;
                     currentDataTable = ProcessExcelFile(selectedFileName, seçilenVeriTipi);
                 }
+                else throw new NoFileSelectedException("Dosya seçimi gerçekleştirilemedi.");
             }
             else if (veri_listesi_requires_csv.Contains(seçilenVeriTipi))
             {
@@ -74,6 +82,7 @@ namespace SLF
                     string selectedFileName = fileDialog1.FileName;
                     currentDataTable = ProcessCsvFile(selectedFileName);
                 }
+                else throw new NoFileSelectedException("Dosya seçimi gerçekleştirilemedi.");
             }
             else if (veri_listesi_requires_tabular.Contains(seçilenVeriTipi))
             {
@@ -83,7 +92,9 @@ namespace SLF
                     string selectedFileName = fileDialog1.FileName;
                     currentDataTable = ProcessTabularFile(selectedFileName);
                 }
+                else throw new NoFileSelectedException("Dosya seçimi gerçekleştirilemedi.");
             }
+            else throw new NoFileSelectedException("Bu veri tipi için atanmış bir dosya seçimi prosedürü henüz yok.");
         }
 
         private DataTable ProcessExcelFile(string fileName, string seçilenVeriTipi)
