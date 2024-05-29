@@ -140,6 +140,69 @@ namespace SLF
             // Display the report message in a MessageBox
             MessageBox.Show(reportMessage.ToString(), "Null Counts Per Column", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+        public void ReportUniqueRowCounts(DataTable dataTable)
+        {
+            // StringBuilder to build the report message
+            StringBuilder reportMessage = new StringBuilder();
+
+            // HashSet to store unique rows
+            HashSet<string> uniqueRows = new HashSet<string>();
+
+            // Iterate through each row in the DataTable
+            foreach (DataRow row in dataTable.Rows)
+            {
+                // Serialize the row into a string representation
+                string rowString = string.Join("|", row.ItemArray.Select(item => item?.ToString() ?? string.Empty));
+
+                // Add the string representation to the HashSet
+                uniqueRows.Add(rowString);
+            }
+
+            // Calculate the number of duplicate rows
+            int totalRows = dataTable.Rows.Count;
+            int uniqueRowCount = uniqueRows.Count;
+            int duplicateRowCount = totalRows - uniqueRowCount;
+
+            // Append the unique and duplicate row counts to the report message
+            reportMessage.AppendLine($"Total Rows: {totalRows}");
+            reportMessage.AppendLine($"Unique Rows: {uniqueRowCount}");
+            reportMessage.AppendLine($"Duplicate Rows: {duplicateRowCount}");
+
+            // Display the report message in a MessageBox
+            MessageBox.Show(reportMessage.ToString(), "Unique Row Counts", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        public void ReportUniqueCounts(DataTable dataTable)
+        {
+            // StringBuilder to build the report message
+            StringBuilder reportMessage = new StringBuilder();
+
+            foreach (DataColumn column in dataTable.Columns)
+            {
+                // HashSet to store unique values in the current column
+                HashSet<string> uniqueValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    // Get the value in the current column and row
+                    var value = row[column]?.ToString();
+
+                    // Add the value to the HashSet
+                    uniqueValues.Add(value ?? string.Empty);
+                }
+
+                // Calculate the number of unique values and duplicates
+                int totalCount = dataTable.Rows.Count;
+                int uniqueCount = uniqueValues.Count;
+                int duplicateCount = totalCount - uniqueCount;
+
+                // Append the column name and unique count to the report message
+                reportMessage.AppendLine($"{column.ColumnName}: {uniqueCount} unique value(s), {duplicateCount} duplicate(s)");
+            }
+
+            // Display the report message in a MessageBox
+            MessageBox.Show(reportMessage.ToString(), "Unique Counts Per Column", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
     }
 }
 

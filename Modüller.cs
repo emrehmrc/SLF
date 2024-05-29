@@ -62,6 +62,8 @@ namespace SLF
                 {
                     dataGridView1.DataSource = dataTable;
                     girdiModülü.ReportNullCounts(dataTable);
+                    girdiModülü.ReportUniqueRowCounts(dataTable);
+                    girdiModülü.ReportUniqueCounts(dataTable);
                 }
                 else
                 {
