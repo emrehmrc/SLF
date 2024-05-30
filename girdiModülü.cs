@@ -16,9 +16,12 @@ namespace SLF
 
     public class GirdiModülü
     {
-        private List<string> veri_listesi_requires_xlsx;
-        private List<string> veri_listesi_requires_csv;
-        private List<string> veri_listesi_requires_tabular;
+        private readonly List<string> veri_listesi_requires_xlsx = new List<string> {
+            "Ekonometrik Yük Tahmini Verileri",
+            "Abone Verileri"
+        };
+        private readonly List<string> veri_listesi_requires_csv = new List<string> { };
+        private readonly List<string> veri_listesi_requires_tabular = new List<string> { };
 
         private readonly List<string> nullLikeStrings = new List<string>
         {
@@ -26,6 +29,8 @@ namespace SLF
             "N/A",
             "#N/A"
         };
+
+        private string seçilenVeriTipi;
 
         private const string FileDialogTitle = "Bir veri dosyası seçiniz.";
         private const string FilterExcelFiles = "Excel dosyaları (*.xlsx)|*.xlsx";
@@ -59,13 +64,6 @@ namespace SLF
 
         public GirdiModülü()
         {
-            veri_listesi_requires_xlsx = new List<string> {
-                "Ekonometrik Yük Tahmini Verileri",
-                "Abone Verileri"
-            };
-            veri_listesi_requires_csv = new List<string> {};
-            veri_listesi_requires_tabular = new List<string> {};
-
             combinedExcelFilter = $"{FilterExcelFiles}|{FilterAllFiles}";
             combinedCsvFilter = $"{FilterCsvFiles}|{FilterAllFiles}";
             combinedTabularFilter = $"{FilterTabularFiles}|{FilterAllFiles}";
@@ -73,7 +71,8 @@ namespace SLF
 
         public void ProcessFileSelection(string seçilenVeriTipi)
         {
-            OpenFileDialog fileDialog1 = new OpenFileDialog();
+            this.seçilenVeriTipi = seçilenVeriTipi;
+            var fileDialog1 = new OpenFileDialog();
             fileDialog1.Title = FileDialogTitle;
 
             if (veri_listesi_requires_xlsx.Contains(seçilenVeriTipi))
@@ -130,16 +129,24 @@ namespace SLF
             // TODO: Implement tabular file processing
             return new DataTable();
         }
-        public void ReportNullCounts(DataTable dataTable)
+
+        public void Validate()
+        {
+            ReportNullCounts();
+            ReportUniqueRowCounts();
+            ReportUniqueCounts();
+            ReportCoordinatesOutOfLimits();
+        }
+        private void ReportNullCounts()
         {
             // StringBuilder to build the report message
             StringBuilder reportMessage = new StringBuilder();
 
-            foreach (DataColumn column in dataTable.Columns)
+            foreach (DataColumn column in currentDataTable.Columns)
             {
                 // Count the number of null, DBNull, "null", and "N/A" values in the current column
 
-                int nullCount = dataTable.AsEnumerable().Count(row =>
+                int nullCount = currentDataTable.AsEnumerable().Count(row =>
                     row.IsNull(column) ||
                     row[column] == DBNull.Value ||
                     nullLikeStrings.Contains(row[column]?.ToString(), StringComparer.OrdinalIgnoreCase)
@@ -152,7 +159,7 @@ namespace SLF
             // Display the report message in a MessageBox
             MessageBox.Show(reportMessage.ToString(), "Null Counts Per Column", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-        public void ReportUniqueRowCounts(DataTable dataTable)
+        private void ReportUniqueRowCounts()
         {
             // StringBuilder to build the report message
             StringBuilder reportMessage = new StringBuilder();
@@ -161,7 +168,7 @@ namespace SLF
             HashSet<string> uniqueRows = new HashSet<string>();
 
             // Iterate through each row in the DataTable
-            foreach (DataRow row in dataTable.Rows)
+            foreach (DataRow row in currentDataTable.Rows)
             {
                 // Serialize the row into a string representation
                 string rowString = string.Join("|", row.ItemArray.Select(item => item?.ToString() ?? string.Empty));
@@ -171,7 +178,7 @@ namespace SLF
             }
 
             // Calculate the number of duplicate rows
-            int totalRows = dataTable.Rows.Count;
+            int totalRows = currentDataTable.Rows.Count;
             int uniqueRowCount = uniqueRows.Count;
             int duplicateRowCount = totalRows - uniqueRowCount;
 
@@ -183,17 +190,17 @@ namespace SLF
             // Display the report message in a MessageBox
             MessageBox.Show(reportMessage.ToString(), "Unique Row Counts", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-        public void ReportUniqueCounts(DataTable dataTable)
+        private void ReportUniqueCounts()
         {
             // StringBuilder to build the report message
             StringBuilder reportMessage = new StringBuilder();
 
-            foreach (DataColumn column in dataTable.Columns)
+            foreach (DataColumn column in currentDataTable.Columns)
             {
                 // HashSet to store unique values in the current column
                 HashSet<string> uniqueValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                foreach (DataRow row in dataTable.Rows)
+                foreach (DataRow row in currentDataTable.Rows)
                 {
                     // Get the value in the current column and row
                     var value = row[column]?.ToString();
@@ -203,7 +210,7 @@ namespace SLF
                 }
 
                 // Calculate the number of unique values and duplicates
-                int totalCount = dataTable.Rows.Count;
+                int totalCount = currentDataTable.Rows.Count;
                 int uniqueCount = uniqueValues.Count;
                 int duplicateCount = totalCount - uniqueCount;
 
@@ -214,20 +221,19 @@ namespace SLF
             // Display the report message in a MessageBox
             MessageBox.Show(reportMessage.ToString(), "Unique Counts Per Column", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-        public void ReportCoordinatesOutOfLimits(DataTable dataTable, string seçilenVeriTipi)
+        private void ReportCoordinatesOutOfLimits()
         {
             var (minXValue, maxXValue) = minMaxCheckMap[seçilenVeriTipi]["X_KOORDINAT"];
             var (minYValue, maxYValue) = minMaxCheckMap[seçilenVeriTipi]["Y_KOORDINAT"];
 
             int countOutOfThresholdCoordinates = 0;
 
-            foreach (DataRow row in dataTable.Rows)
+            foreach (DataRow row in currentDataTable.Rows)
             {
                 if (float.TryParse(row["X_KOORDINAT"]?.ToString(), out float valueX) && float.TryParse(row["Y_KOORDINAT"]?.ToString(), out float valueY))
                 {
                     if (valueX < minXValue || valueX > maxXValue || valueY < minYValue || valueY > maxYValue)
                     {
-                        Console.WriteLine($"X: {valueX}, Y: {valueY}, MinX: {minXValue}, MaxX: {maxXValue}, MinY: {minYValue}, MaxY: {maxYValue}");
                         countOutOfThresholdCoordinates++;
                     }
                 }

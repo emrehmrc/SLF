@@ -61,10 +61,7 @@ namespace SLF
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
                     dataGridView1.DataSource = dataTable;
-                    girdiModülü.ReportNullCounts(dataTable);
-                    girdiModülü.ReportUniqueRowCounts(dataTable);
-                    girdiModülü.ReportUniqueCounts(dataTable);
-                    girdiModülü.ReportCoordinatesOutOfLimits(dataTable, seçilenVeriTipi);
+                    girdiModülü.Validate();
                 }
                 else
                 {
