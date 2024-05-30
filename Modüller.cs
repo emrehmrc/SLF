@@ -20,6 +20,9 @@ using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Threading.Tasks;
 using Avalonia;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Features;
+using NetTopologySuite.Operation;
+using MapWinGIS;
 
 namespace SLF
 {
@@ -75,6 +78,7 @@ namespace SLF
         
         // create a list of gMapOverlay's that will hold the imported vector files
         public GMapOverlay[] tüm_katmanlar_array = new GMapOverlay[10];
+        public MapWinGIS.Shapefile[] shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[10];
         public DataTable[] tüm_katmanlar_datatable = new DataTable[10];    
         public string[] tüm_katmanlar_array_names = new string[10];
 
@@ -91,7 +95,6 @@ namespace SLF
 
         // Find the first available slot in the array that holds shapefile overlay layers
         public int layer_index;
-
 
         // Nokta veri yapısı
         public class NoktaVeri
@@ -204,9 +207,12 @@ namespace SLF
                 MessageBox.Show("Herhangi bir dosya bulunamadı. Lütfen tekrardan kontrol ediniz.");
                 return;
             }
-            
-            // datatable that will hold the atttribute table of the .shp file
-            shapefile_datatable.Columns.Add("Row_No");
+
+            if (!shapefile_datatable.Columns.Contains("Row_No"))
+            {
+                // datatable that will hold the atttribute table of the .shp file
+                shapefile_datatable.Columns.Add("Row_No");
+            }
 
             // shpReader object to read from the shp file  that is being imported
             var shpReader = new ShapefileDataReader(filepath, new NetTopologySuite.Geometries.GeometryFactory());
@@ -215,7 +221,11 @@ namespace SLF
             for (int i = 0; i < shpReader.DbaseHeader.NumFields; i++)
             {
                 var sütunlar = shpReader.DbaseHeader.Fields[i];
-                shapefile_datatable.Columns.Add(sütunlar.Name, typeof(string)); // Simplified to string for all fields
+
+                if (!shapefile_datatable.Columns.Contains(sütunlar.Name))
+                {
+                    shapefile_datatable.Columns.Add(sütunlar.Name, typeof(string)); // Simplified to string for all fields
+                }
             }
 
             int row_cnt = 1;
@@ -231,6 +241,7 @@ namespace SLF
                 DataRow row = shapefile_datatable.NewRow();
                 shapefile_datatable = LoadAttributeTable(row, tablo_formu.attribute_table ,
                             shpReader, shapefile_datatable, row_cnt);
+
                 row_cnt++;
 
                 // check if the geometry of the shapefile includes one polygon or is a multipolygon,
@@ -249,7 +260,20 @@ namespace SLF
                 }
             }
 
-            if(Modül_Tabları.SelectedTab == tab_stokastik)
+            // Find the first available slot in the array that holds shapefile overlay layers
+            layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
+
+            if (layer_index == -1)
+            {
+                MessageBox.Show("En fazla 10 adet katman seçilebilmektedir.");
+                return;
+            }
+
+            // Convert GMapOverlay to MapWinGIS.Shapefile
+            MapWinGIS.Shapefile myShapefile = ConvertOverlayToShapefile(shapeFileOverlay);
+            shapeFileArray_MapWinGIS[layer_index] = myShapefile;
+
+            if (Modül_Tabları.SelectedTab == tab_stokastik)
             {
                 gMapControl_stokastik.Refresh();
             }
@@ -257,6 +281,52 @@ namespace SLF
             {
                 gMapControl_EA.Refresh();
             }
+        }
+
+        public MapWinGIS.Shapefile ConvertOverlayToShapefile(GMapOverlay overlay)
+        {
+            var shapefile = new MapWinGIS.Shapefile();
+            shapefile.CreateNewWithShapeID("", ShpfileType.SHP_POLYGON);
+
+            // Ensure attributes are added as fields
+            if (polygonAttributes.Count > 0)
+            {
+                var firstPolygon = polygonAttributes.Keys.First();
+                var firstRow = polygonAttributes[firstPolygon];
+                foreach (DataColumn column in firstRow.Table.Columns)
+                {
+                    shapefile.EditAddField(column.ColumnName, MapWinGIS.FieldType.STRING_FIELD, 10, 10);
+                }
+            }
+
+            foreach (var gMapPolygon in overlay.Polygons)
+            {
+                var shape = new MapWinGIS.Shape();
+                shape.Create(ShpfileType.SHP_POLYGON);
+
+                for (int i = 0; i < gMapPolygon.Points.Count; i++)
+                {
+                    var point = new MapWinGIS.Point
+                    {
+                        x = gMapPolygon.Points[i].Lng,
+                        y = gMapPolygon.Points[i].Lat
+                    };
+                    shape.InsertPoint(point, ref i);
+                }
+
+                int shapeIndex = shapefile.NumShapes;
+                shapefile.EditInsertShape(shape, ref shapeIndex);
+
+                // Add attributes to the shape
+                if (polygonAttributes.TryGetValue(gMapPolygon, out DataRow row))
+                {
+                    for (int i = 0; i < row.Table.Columns.Count; i++)
+                    {
+                        shapefile.EditCellValue(i, shapeIndex, row[i].ToString());
+                    }
+                }
+            }
+            return shapefile;
         }
 
         public async Task LoadKmlFile(string filepath, GMapOverlay kmlOverlay, DataTable data_table)
@@ -766,37 +836,57 @@ namespace SLF
 
 
         private void rengiDeğiştirToolStripMenuItem_Click(object sender, EventArgs e)
-        {/*
-
+        {
             ToolStripMenuItem rengini_degistir_menu_item = sender as ToolStripMenuItem;
-            
+
             if (rengini_degistir_menu_item != null)
             {
                 System.Windows.Forms.CheckBox checkBox = rengini_degistir_menu_item.Tag as System.Windows.Forms.CheckBox;
                 int checkbox_index = int.Parse(checkBox.Tag.ToString()) - 1;
 
-                ColorDialog stokastik_color = new ColorDialog();
-                stokastik_color.AnyColor = true;
-                stokastik_color.AllowFullOpen = true;
-                stokastik_color.FullOpen = true;
-                stokastik_color.Color = stokastik_haritası.get_ShapeLayerFillColor(checkbox_index);
-
-                if (stokastik_color.ShowDialog() == DialogResult.OK)
+                if (checkbox_index < 0 || checkbox_index >= tüm_katmanlar_array.Length)
                 {
-                    // Get the color components
-                    byte a = stokastik_color.Color.A;
-                    byte r = stokastik_color.Color.R;
-                    byte g = stokastik_color.Color.G;
-                    byte b = stokastik_color.Color.B;
+                    MessageBox.Show("Yanlış katman endeksi!","",
+                        MessageBoxButtons.OK,MessageBoxIcon.Error);
+                    return;
+                }
+
+                GMapOverlay overlay = tüm_katmanlar_array[checkbox_index];
+                if (overlay == null)
+                {
+                    MessageBox.Show("Katmanda herhangi bir data bulunamadı.", 
+                        "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                ColorDialog colorDialog = new ColorDialog
+                {
+                    AnyColor = true,
+                    AllowFullOpen = true,
+                    FullOpen = true
+                };
+
+                if (colorDialog.ShowDialog() == DialogResult.OK)
+                {
+                    Color selectedColor = colorDialog.Color;
+                    byte a = selectedColor.A;
+                    byte r = selectedColor.R;
+                    byte g = selectedColor.G;
+                    byte b = selectedColor.B;
 
                     // Combine them into a single uint in the order expected by MapWinGIS (ABGR)
                     uint abgr = (uint)(a << 24 | b << 16 | g << 8 | r);
 
+                    // Update the polygons in the overlay
+                    foreach (var polygon in overlay.Polygons)
+                    {
+                        polygon.Stroke = new Pen(Color.FromArgb(a, r, g, b), 3); // Set border color
+                        polygon.Fill = new SolidBrush(Color.FromArgb(50, selectedColor)); // Set fill color with transparency
+                    }
 
-                    gMapControl_stokastik.set_ShapeLayerFillColor(checkbox_index, abgr);
-                    stokastik_haritası.Redraw(); // Redraw the map to reflect the changes
+                    gMapControl_stokastik.Refresh(); // Redraw the map to reflect the changes
                 }
-            }*/
+            }
         }
 
         private void kaydetToolStripMenuItem_Click(object sender, EventArgs e)
@@ -819,13 +909,15 @@ namespace SLF
                 if (kaydet_result == DialogResult.OK)
                 {
                     string filepath = kaydet_file_dialog.FileName;
-                    //shapefile_array[checkbox_index].SaveAsEx(filepath, true, false);
+                    MapWinGIS.Shapefile shapefile = shapeFileArray_MapWinGIS[checkbox_index];
+                    shapefile.EditDeleteField(0);
+                    shapefile.EditDeleteField(0);
+                    shapefile.SaveAsEx(filepath, false, false);
+                    shapefile.Close();
+                    shapeFileArray_MapWinGIS[checkbox_index] = null;
                     MessageBox.Show("Dosya başarıyla kaydedildi.");
-
                 }
-
             }
-
         }
 
         private void temizleToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1772,7 +1864,11 @@ namespace SLF
 
             overlay.Polygons.Add(gMapPolygon);
             polygonAttributes[gMapPolygon] = attributes;
-            entire_grid.Add(polygon);
+
+            if(overlay == gridOverlay)
+            {
+                entire_grid.Add(polygon);
+            }
         }
 
         private double MetersToDegreesLatitude(double meters)
@@ -2058,8 +2154,8 @@ namespace SLF
 
                 // Highlight new selected polygon with a different border and fill color
                 selectedPolygon = polygon;
-                selectedPolygon.Stroke = new Pen(Color.Red, 3);
-                selectedPolygon.Fill = new SolidBrush(Color.FromArgb(50, Color.Red));
+                selectedPolygon.Stroke = new Pen(Color.LawnGreen, 3);
+                selectedPolygon.Fill = new SolidBrush(Color.FromArgb(50, Color.LawnGreen));
 
                 gMapControl_stokastik.Refresh();
             }
