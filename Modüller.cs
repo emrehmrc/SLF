@@ -65,16 +65,16 @@ namespace SLF
                 }
                 else
                 {
-                    MessageBox.Show("Dosya seçimi gerçekleştirilemedi.");
+                    MessageBox.Show("Dosya seçimi gerçekleştirilemedi.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
             catch (NoFileSelectedException ex)
             {
-                MessageBox.Show(ex.Message, "Uyarı!");
+                MessageBox.Show(ex.Message, "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (InvalidColumnHeadersException ex)
             {
-                MessageBox.Show("Geçersiz sütun biçimi: " + ex.Message, "Hata!");
+                MessageBox.Show("Geçersiz sütun biçimi: " + ex.Message, "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             
         }

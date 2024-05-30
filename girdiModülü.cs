@@ -50,12 +50,51 @@ namespace SLF
                 "Abone Verileri",
                 new Dictionary<string, (float Min, float Max)>
                 {
-                    { "X_KOORDINAT", (27.0f, 27.15f) },
-                    { "Y_KOORDINAT", (38.46f, 38.53f) } 
+                    { "X_KOORDINAT", (27.0f, 27.15f) }, // TODO: Update these values from the other data
+                    { "Y_KOORDINAT", (38.46f, 38.53f) } // TODO: Update these values from the other data
                 }
             }
         };
 
+        private readonly Dictionary<string, List<string>> nullFieldsGivingWarning = new Dictionary<string, List<string>> 
+        {
+            {
+                "Abone Verileri",
+                    new List<string> {
+                        "TESISAT_NO",
+                        "X_KOORDINAT",
+                        "Y_KOORDINAT",
+                        "ADR_BINA_ID",
+                        "bina_turu",
+                        "BAGLANTI_GUCU",
+                        "SOZ_DURUM",
+                        "ABONE_GRUBU",
+                        "GERILIM_SEVIYESI",
+                        "SOZ_BAS_TARIH",
+                        "SOZ_BIT_TARIH",
+                    }
+            }
+        };
+        private readonly Dictionary<string, List<string>> nullFieldsGivingError = new Dictionary<string, List<string>> 
+        {
+            {
+                "Abone Verileri",
+                    new List<string> {
+                        "ENERJI_TABLO_KAYIT_KODU",
+                        "ABONE_GRUBU",
+                        "2019_Tuketim",
+                        "2020_Tuketim",
+                        "2021_Tuketim",
+                        "2022_Tuketim",
+                        "2023_Tuketim",
+                        "2019_Demant",
+                        "2020_Demant",
+                        "2021_Demant",
+                        "2022_Demant",
+                        "2023_Demant",
+                    }
+            }
+        };
         // Public read-only property
         public DataTable CurrentDataTable
         {
@@ -72,8 +111,10 @@ namespace SLF
         public void ProcessFileSelection(string seçilenVeriTipi)
         {
             this.seçilenVeriTipi = seçilenVeriTipi;
-            var fileDialog1 = new OpenFileDialog();
-            fileDialog1.Title = FileDialogTitle;
+            var fileDialog1 = new OpenFileDialog
+            {
+                Title = FileDialogTitle
+            };
 
             if (veri_listesi_requires_xlsx.Contains(seçilenVeriTipi))
             {
@@ -140,7 +181,8 @@ namespace SLF
         private void ReportNullCounts()
         {
             // StringBuilder to build the report message
-            StringBuilder reportMessage = new StringBuilder();
+            StringBuilder warningReportMessage = new StringBuilder();
+            StringBuilder errorReportMessage = new StringBuilder();
 
             foreach (DataColumn column in currentDataTable.Columns)
             {
@@ -152,12 +194,21 @@ namespace SLF
                     nullLikeStrings.Contains(row[column]?.ToString(), StringComparer.OrdinalIgnoreCase)
                 );
 
-                // Append the column name and null count to the report message
-                reportMessage.AppendLine($"{column.ColumnName}: {nullCount} null(s)");
+                if (nullCount > 0 && nullFieldsGivingWarning[seçilenVeriTipi].Contains(column.ColumnName))
+                {
+                    // Append the column name and null count to the report message
+                    warningReportMessage.AppendLine($"{column.ColumnName}: {nullCount} null(s)");
+                }
+                if (nullCount > 0 && nullFieldsGivingError[seçilenVeriTipi].Contains(column.ColumnName))
+                {
+                    // Append the column name and null count to the report message
+                    errorReportMessage.AppendLine($"{column.ColumnName}: {nullCount} null(s)");
+                }
             }
 
             // Display the report message in a MessageBox
-            MessageBox.Show(reportMessage.ToString(), "Null Counts Per Column", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(warningReportMessage.ToString(), "Null Counts Per Column", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show(errorReportMessage.ToString(), "Null Counts Per Column", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
         private void ReportUniqueRowCounts()
         {
@@ -187,8 +238,9 @@ namespace SLF
             reportMessage.AppendLine($"Unique Rows: {uniqueRowCount}");
             reportMessage.AppendLine($"Duplicate Rows: {duplicateRowCount}");
 
-            // Display the report message in a MessageBox
-            MessageBox.Show(reportMessage.ToString(), "Unique Row Counts", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (duplicateRowCount > 0)
+                // Display the report message in a MessageBox
+                MessageBox.Show(reportMessage.ToString(), "Unique Row Counts", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
         private void ReportUniqueCounts()
         {
@@ -214,12 +266,13 @@ namespace SLF
                 int uniqueCount = uniqueValues.Count;
                 int duplicateCount = totalCount - uniqueCount;
 
-                // Append the column name and unique count to the report message
-                reportMessage.AppendLine($"{column.ColumnName}: {uniqueCount} unique value(s), {duplicateCount} duplicate(s)");
+                if (duplicateCount > 0)
+                    // Append the column name and unique count to the report message
+                    reportMessage.AppendLine($"{column.ColumnName}: {uniqueCount} unique value(s), {duplicateCount} duplicate(s)");
             }
 
             // Display the report message in a MessageBox
-            MessageBox.Show(reportMessage.ToString(), "Unique Counts Per Column", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(reportMessage.ToString(), "Unique Counts Per Column", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
         private void ReportCoordinatesOutOfLimits()
         {
@@ -240,8 +293,9 @@ namespace SLF
             }
             string reportMessage = $"KOORDINAT sütunlarında {countOutOfThresholdCoordinates} değer belirlenen koordinatların dışarısında.";
 
-            // Display the report message in a MessageBox
-            MessageBox.Show(reportMessage, "Koordinat Sınırları", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            if (countOutOfThresholdCoordinates > 0)
+                // Display the report message in a MessageBox
+                MessageBox.Show(reportMessage, "Koordinat Sınırları", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 }
