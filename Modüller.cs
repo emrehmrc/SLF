@@ -64,6 +64,7 @@ namespace SLF
                     girdiModülü.ReportNullCounts(dataTable);
                     girdiModülü.ReportUniqueRowCounts(dataTable);
                     girdiModülü.ReportUniqueCounts(dataTable);
+                    girdiModülü.ReportCoordinatesOutOfLimits(dataTable, seçilenVeriTipi);
                 }
                 else
                 {

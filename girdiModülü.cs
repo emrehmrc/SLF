@@ -39,6 +39,18 @@ namespace SLF
 
         private DataTable currentDataTable = new DataTable();
 
+        private readonly Dictionary<string, Dictionary<string, (float Min, float Max)>> minMaxCheckMap = new Dictionary<string, Dictionary<string, (float Min, float Max)>>
+        {
+            {
+                "Abone Verileri",
+                new Dictionary<string, (float Min, float Max)>
+                {
+                    { "X_KOORDINAT", (27.0f, 27.15f) },
+                    { "Y_KOORDINAT", (38.46f, 38.53f) } 
+                }
+            }
+        };
+
         // Public read-only property
         public DataTable CurrentDataTable
         {
@@ -202,7 +214,29 @@ namespace SLF
             // Display the report message in a MessageBox
             MessageBox.Show(reportMessage.ToString(), "Unique Counts Per Column", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+        public void ReportCoordinatesOutOfLimits(DataTable dataTable, string seçilenVeriTipi)
+        {
+            var (minXValue, maxXValue) = minMaxCheckMap[seçilenVeriTipi]["X_KOORDINAT"];
+            var (minYValue, maxYValue) = minMaxCheckMap[seçilenVeriTipi]["Y_KOORDINAT"];
 
+            int countOutOfThresholdCoordinates = 0;
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                if (float.TryParse(row["X_KOORDINAT"]?.ToString(), out float valueX) && float.TryParse(row["Y_KOORDINAT"]?.ToString(), out float valueY))
+                {
+                    if (valueX < minXValue || valueX > maxXValue || valueY < minYValue || valueY > maxYValue)
+                    {
+                        Console.WriteLine($"X: {valueX}, Y: {valueY}, MinX: {minXValue}, MaxX: {maxXValue}, MinY: {minYValue}, MaxY: {maxYValue}");
+                        countOutOfThresholdCoordinates++;
+                    }
+                }
+            }
+            string reportMessage = $"KOORDINAT sütunlarında {countOutOfThresholdCoordinates} değer belirlenen koordinatların dışarısında.";
+
+            // Display the report message in a MessageBox
+            MessageBox.Show(reportMessage, "Koordinat Sınırları", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
     }
 }
 
