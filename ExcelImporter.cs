@@ -59,6 +59,10 @@ namespace SLF
             // Example of measuring import time
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
+
+            // Ensure EPPlus is licensed properly
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
             using (var package = new ExcelPackage(new FileInfo(filePath)))
             {
                 ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // Assuming data is in the first worksheet
