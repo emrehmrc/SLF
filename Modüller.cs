@@ -7,6 +7,10 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using Microsoft.Web.WebView2.WinForms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Header;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using SLF;
 using GMap.NET;
 using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
@@ -27,6 +31,7 @@ namespace SLF
 
         // form objeleri
         public GirişFormu gir1;
+        private GirdiModülü girdiModülü;
 
         // declare an instance of the Tablo_Formu to be used to see the Attribute Table of the vector layers
         public Tablo_Formu tablo_formu;
@@ -128,6 +133,7 @@ namespace SLF
         public ModülFormu() {
 
             InitializeComponent();
+            girdiModülü = new GirdiModülü();
             InitializeGMap(gMapControl_stokastik);
             InitializeGMap(gMapControl_EA);
 
@@ -1897,15 +1903,35 @@ namespace SLF
 
         private void button1_Click(object sender, EventArgs e)
         {
-            OpenFileDialog dialog1 = new OpenFileDialog();
-            
-            DialogResult result1 = dialog1.ShowDialog();
+            // Girdi modülündeki dosya yükleme butonuna tıklandığında çalışacak kodlar
 
-            if(result1 == DialogResult.OK)
+            // Veri listesinde seçilen veri tipine göre dosya seçme işlemi yapılacak
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+
+            try
             {
-                Önizleme onizleme1 = new Önizleme();    
-                onizleme1.ShowDialog();
+                // ProcessFileSelection metodu ile dosya seçme işlemi yapılır ve seçilen dosya veri tablosuna yüklenir
+                girdiModülü.ProcessFileSelection(seçilenVeriTipi);
+                DataTable dataTable = girdiModülü.CurrentDataTable;
+                if (dataTable != null && dataTable.Rows.Count > 0)
+                {
+                    dataGridView1.DataSource = dataTable;
+                    girdiModülü.Validate();
+                }
+                else
+                {
+                    MessageBox.Show("Dosya seçimi gerçekleştirilemedi.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
+            catch (NoFileSelectedException ex)
+            {
+                MessageBox.Show(ex.Message, "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (InvalidColumnHeadersException ex)
+            {
+                MessageBox.Show("Geçersiz sütun biçimi: " + ex.Message, "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
         }
 
         private void DrawRuler_ea(GMapOverlay rulerOverlay, List<PointLatLng> rulerPoints)

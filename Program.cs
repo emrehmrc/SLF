@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using OfficeOpenXml;
 
 namespace SLF
 {
@@ -14,6 +15,9 @@ namespace SLF
         [STAThread]
         static void Main()
         {
+            // Set EPPlus license context
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // or LicenseContext.Commercial
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new GirişFormu());
