@@ -1,6 +1,8 @@
-﻿using System;
+﻿using RTools_NTS.Util;
+using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -174,8 +176,8 @@ namespace SLF
         public void Validate()
         {
             ReportNullCounts();
-            ReportUniqueRowCounts();
-            ReportUniqueCounts();
+            ReportDuplicateRowCounts();
+            ReportDuplicateCounts();
             ReportCoordinatesOutOfLimits();
         }
         private void ReportNullCounts()
@@ -183,6 +185,9 @@ namespace SLF
             // StringBuilder to build the report message
             StringBuilder warningReportMessage = new StringBuilder();
             StringBuilder errorReportMessage = new StringBuilder();
+
+            var warningNullList = new List<(string ColumnName, int NullCount)>();
+            var errorNullList = new List<(string ColumnName, int NullCount)>();
 
             foreach (DataColumn column in currentDataTable.Columns)
             {
@@ -198,11 +203,13 @@ namespace SLF
                 {
                     // Append the column name and null count to the report message
                     warningReportMessage.AppendLine($"{column.ColumnName}: {nullCount} null(s)");
+                    warningNullList.Add((column.ColumnName, nullCount));
                 }
                 if (nullCount > 0 && nullFieldsGivingError[seçilenVeriTipi].Contains(column.ColumnName))
                 {
                     // Append the column name and null count to the report message
                     errorReportMessage.AppendLine($"{column.ColumnName}: {nullCount} null(s)");
+                    errorNullList.Add((column.ColumnName, nullCount));
                 }
             }
 
@@ -210,7 +217,7 @@ namespace SLF
             MessageBox.Show(warningReportMessage.ToString(), "Null Counts Per Column", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             MessageBox.Show(errorReportMessage.ToString(), "Null Counts Per Column", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
-        private void ReportUniqueRowCounts()
+        private void ReportDuplicateRowCounts()
         {
             // StringBuilder to build the report message
             StringBuilder reportMessage = new StringBuilder();
@@ -241,11 +248,14 @@ namespace SLF
             if (duplicateRowCount > 0)
                 // Display the report message in a MessageBox
                 MessageBox.Show(reportMessage.ToString(), "Unique Row Counts", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                var duplicateCountTuple = (Identifier: "Unique Row Counts", RowCount: duplicateRowCount);
         }
-        private void ReportUniqueCounts()
+        private void ReportDuplicateCounts()
         {
             // StringBuilder to build the report message
             StringBuilder reportMessage = new StringBuilder();
+
+            var duplicateRowList = new List<(string ColumnName, int DuplicateCount)>();
 
             foreach (DataColumn column in currentDataTable.Columns)
             {
@@ -269,6 +279,7 @@ namespace SLF
                 if (duplicateCount > 0)
                     // Append the column name and unique count to the report message
                     reportMessage.AppendLine($"{column.ColumnName}: {uniqueCount} unique value(s), {duplicateCount} duplicate(s)");
+                    duplicateRowList.Add((column.ColumnName, duplicateCount));
             }
 
             // Display the report message in a MessageBox
