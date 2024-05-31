@@ -173,6 +173,9 @@ namespace SLF
             this.Poligon_Çiz = new System.Windows.Forms.ToolStripMenuItem();
             this.Poligon_Sil = new System.Windows.Forms.ToolStripMenuItem();
             this.Poligon_Kaydet = new System.Windows.Forms.ToolStripMenuItem();
+            this.ContextMenuStrip_Fonksiyon = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.katman_birleştir = new System.Windows.Forms.ToolStripMenuItem();
+            this.overlap_analizi = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
@@ -195,6 +198,7 @@ namespace SLF
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).BeginInit();
             this.ContextMenuStrip_Nokta.SuspendLayout();
             this.ContextMenuStrip_Poligon.SuspendLayout();
+            this.ContextMenuStrip_Fonksiyon.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -1532,7 +1536,7 @@ namespace SLF
             this.Stokastik_Fonksiyonlar.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.Stokastik_Fonksiyonlar.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
             this.Stokastik_Fonksiyonlar.ToolTipText = "Çeşitli vektörel veya tabular algoritmaları içerir.";
-            this.Stokastik_Fonksiyonlar.Click += new System.EventHandler(this.Stokastik_Fonksiyonlar_Click);
+            this.Stokastik_Fonksiyonlar.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Stokastik_Fonksiyonlar_MouseDown);
             // 
             // tab_yükHaritası
             // 
@@ -1862,6 +1866,30 @@ namespace SLF
             this.Poligon_Kaydet.Size = new System.Drawing.Size(182, 26);
             this.Poligon_Kaydet.Text = "Poligon Kaydet";
             // 
+            // ContextMenuStrip_Fonksiyon
+            // 
+            this.ContextMenuStrip_Fonksiyon.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.ContextMenuStrip_Fonksiyon.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.katman_birleştir,
+            this.overlap_analizi});
+            this.ContextMenuStrip_Fonksiyon.Name = "ContextMenuStrip_Fonksiyon";
+            this.ContextMenuStrip_Fonksiyon.Size = new System.Drawing.Size(188, 56);
+            // 
+            // katman_birleştir
+            // 
+            this.katman_birleştir.Image = ((System.Drawing.Image)(resources.GetObject("katman_birleştir.Image")));
+            this.katman_birleştir.Name = "katman_birleştir";
+            this.katman_birleştir.Size = new System.Drawing.Size(187, 26);
+            this.katman_birleştir.Text = "Katman Birleştir";
+            this.katman_birleştir.Click += new System.EventHandler(this.katman_birleştir_Click);
+            // 
+            // overlap_analizi
+            // 
+            this.overlap_analizi.Image = ((System.Drawing.Image)(resources.GetObject("overlap_analizi.Image")));
+            this.overlap_analizi.Name = "overlap_analizi";
+            this.overlap_analizi.Size = new System.Drawing.Size(187, 26);
+            this.overlap_analizi.Text = "Overlap Analizi";
+            // 
             // ModülFormu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -1913,6 +1941,7 @@ namespace SLF
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).EndInit();
             this.ContextMenuStrip_Nokta.ResumeLayout(false);
             this.ContextMenuStrip_Poligon.ResumeLayout(false);
+            this.ContextMenuStrip_Fonksiyon.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -2072,5 +2101,8 @@ namespace SLF
         private System.Windows.Forms.ToolStripMenuItem Poligon_Sil;
         private System.Windows.Forms.ToolStripMenuItem Poligon_Kaydet;
         private System.Windows.Forms.Label label14;
+        private ContextMenuStrip ContextMenuStrip_Fonksiyon;
+        private ToolStripMenuItem katman_birleştir;
+        private ToolStripMenuItem overlap_analizi;
     }
 }

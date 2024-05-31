@@ -18,10 +18,6 @@ using SharpKml.Dom;
 using SharpKml.Engine;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Threading.Tasks;
-using Avalonia;
-using NetTopologySuite.Geometries;
-using NetTopologySuite.Features;
-using NetTopologySuite.Operation;
 using MapWinGIS;
 
 namespace SLF
@@ -33,7 +29,6 @@ namespace SLF
         // form objeleri
         public GirişFormu gir1;
         private GirdiModülü girdiModülü;
-        public Fonksiyon_Oluştur fonksiyonFormu;
 
         // declare an instance of the Tablo_Formu to be used to see the Attribute Table of the vector layers
         public Tablo_Formu tablo_formu;
@@ -1538,6 +1533,38 @@ namespace SLF
             }
         }
 
+        private void katman_birleştir_Click(object sender, EventArgs e)
+        {
+            if (tüm_katmanlar_array_names[0] != null && tüm_katmanlar_array_names[1] != null)
+            {
+                Fonksiyon_Oluştur fonksiyonFormu = new Fonksiyon_Oluştur();
+
+                fonksiyonFormu.Tag = this;
+                fonksiyonFormu.Owner = this;
+
+                foreach (var layers in tüm_katmanlar_array_names)
+                {
+                    if (layers != null)
+                    {
+                        fonksiyonFormu.comboBox_fonksiyonlar_1.Items.Add(layers);
+                        fonksiyonFormu.comboBox_fonksiyonlar_2.Items.Add(layers);
+                    }
+                }
+                fonksiyonFormu.comboBox_fonksiyonlar_1.Text = tüm_katmanlar_array_names[0];
+                fonksiyonFormu.comboBox_fonksiyonlar_2.Text = tüm_katmanlar_array_names[1];
+
+                fonksiyonFormu.Show();
+                fonksiyonFormu.BringToFront();
+                fonksiyonFormu.Focus();
+                fonksiyonFormu.StartPosition = FormStartPosition.CenterScreen;
+            }
+            else
+            {
+                MessageBox.Show("Bu işlemi yapabilmek için en az 2 adet katman seçmelisiniz.",
+                    "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
         private void gMapControl_stokastik_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
 
@@ -2291,8 +2318,10 @@ namespace SLF
         {
             // Convert GMapPolygon to NTS Polygon
             var geometryFactory = new NetTopologySuite.Geometries.GeometryFactory();
+
             var coordinates1 = polygon1.Points.Select(p => new NetTopologySuite.Geometries.Coordinate(p.Lng, p.Lat)).ToArray();
             var coordinates2 = polygon2.Points.Select(p => new NetTopologySuite.Geometries.Coordinate(p.Lng, p.Lat)).ToArray();
+
             var ntsPolygon1 = geometryFactory.CreatePolygon(coordinates1);
             var ntsPolygon2 = geometryFactory.CreatePolygon(coordinates2);
 
@@ -2370,25 +2399,24 @@ namespace SLF
             {
                 resultingOverlay.Polygons.Add(resultingPolygon);
                 polygonAttributes[resultingPolygon] = resultingAttributes;
-            }
 
+                resultingPolygon.Stroke = new Pen(Color.LightSeaGreen, 3);
+                resultingPolygon.Fill = new SolidBrush(Color.FromArgb(50, Color.Transparent));
+            }
+            
             return resultingOverlay;
         }
 
-        private void Stokastik_Fonksiyonlar_Click(object sender, EventArgs e)
+        private void Stokastik_Fonksiyonlar_MouseDown(object sender, MouseEventArgs e)
         {
-            fonksiyonFormu = new Fonksiyon_Oluştur();
-            fonksiyonFormu.Show();
-            fonksiyonFormu.Tag = this;
-            fonksiyonFormu.Owner = this;
-            fonksiyonFormu.Show();
-            fonksiyonFormu.BringToFront();
-            fonksiyonFormu.Focus();
-            fonksiyonFormu.StartPosition = FormStartPosition.CenterScreen;
+            if (e.Button == MouseButtons.Left)
+            {
+                ContextMenuStrip_Fonksiyon.Show(Cursor.Position);
+            }
         }
 
         // join the two layers by their indexes within the tüm_katmanlar_array GMapOverlay array
-        public void JoinAttributesByLocation()
+        public async Task JoinAttributesByLocation()
         {
             firstLayerToJoin = Array.FindIndex(tüm_katmanlar_array_names, 
                 name => name == firstLayerName);
@@ -2398,13 +2426,13 @@ namespace SLF
             GMapOverlay firstOverlay = tüm_katmanlar_array[firstLayerToJoin]; 
             GMapOverlay secondOverlay = tüm_katmanlar_array[secondLayerToJoin]; 
 
-            List<(GMapPolygon Polygon, DataRow Attributes)> gridData = 
+            List<(GMapPolygon Polygon, DataRow Attributes)> firstLayerData = 
                 ExtractPolygonsAndAttributes(firstOverlay, tüm_katmanlar_datatable[firstLayerToJoin]);
 
-            List<(GMapPolygon Polygon, DataRow Attributes)> shapefileData = 
+            List<(GMapPolygon Polygon, DataRow Attributes)> secondLayerData = 
                 ExtractPolygonsAndAttributes(secondOverlay, tüm_katmanlar_datatable[secondLayerToJoin]);
 
-            List<(GMapPolygon ResultingPolygon, DataRow ResultingAttributes)> joinedData = PerformSpatialJoin(gridData, shapefileData);
+            List<(GMapPolygon ResultingPolygon, DataRow ResultingAttributes)> joinedData = PerformSpatialJoin(firstLayerData, secondLayerData);
 
             GMapOverlay resultingOverlay = CreateResultingOverlay(joinedData);
 
@@ -2440,12 +2468,26 @@ namespace SLF
                 // Add each DataRow to the DataTable
                 foreach (var (_, dataRow) in joinedData)
                 {
-                    joined_data_table.ImportRow(dataRow);
+                    DataRow newRow = joined_data_table.NewRow();
+                    foreach (DataColumn column in joined_data_table.Columns)
+                    {
+                        newRow[column.ColumnName] = dataRow[column.ColumnName];
+                    }
+                    joined_data_table.Rows.Add(newRow);
                 }
+
             }
 
             // add the datatable to the array so that it can be summoned later
             tüm_katmanlar_datatable[layer_index] = joined_data_table;
+
+            System.Windows.Forms.CheckBox associatedCheckBox = GetCheckBoxByIndex(layer_index);
+            if (associatedCheckBox != null)
+            {
+                associatedCheckBox.Checked = true;
+                associatedCheckBox.Visible = true;
+                associatedCheckBox.Text = tüm_katmanlar_array_names[layer_index];
+            }
 
             // add the layer to the specified map
             if (Modül_Tabları.SelectedTab == tab_stokastik)
