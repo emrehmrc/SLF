@@ -18,6 +18,7 @@ namespace SLF
 
     public class GirdiModülü
     {
+        private Önizleme onizleme1 = new Önizleme();
         private readonly List<string> veri_listesi_requires_xlsx = new List<string> {
             "Ekonometrik Yük Tahmini Verileri",
             "Abone Verileri"
@@ -45,6 +46,9 @@ namespace SLF
         private readonly string combinedTabularFilter;
 
         private DataTable currentDataTable = new DataTable();
+        private DataTable errorDataTable = new DataTable();
+        private DataTable warningDataTable = new DataTable();
+        private DataTable infoDataTable = new DataTable();
 
         private readonly Dictionary<string, Dictionary<string, (float Min, float Max)>> minMaxCheckMap = new Dictionary<string, Dictionary<string, (float Min, float Max)>>
         {
@@ -98,16 +102,30 @@ namespace SLF
             }
         };
         // Public read-only property
-        public DataTable CurrentDataTable
-        {
-            get { return currentDataTable; }
-        }
+        public DataTable CurrentDataTable { get { return currentDataTable; }}
+        public DataTable ErrorDataTable { get { return errorDataTable; }}
+        public DataTable WarningDataTable { get { return warningDataTable; }}
+        public DataTable InfoDataTable { get { return infoDataTable; }}
+        public Önizleme Onizleme1 { get { return onizleme1; }}
 
         public GirdiModülü()
         {
             combinedExcelFilter = $"{FilterExcelFiles}|{FilterAllFiles}";
             combinedCsvFilter = $"{FilterCsvFiles}|{FilterAllFiles}";
             combinedTabularFilter = $"{FilterTabularFiles}|{FilterAllFiles}";
+            AddColumnsToDataTable(errorDataTable);
+            AddColumnsToDataTable(warningDataTable);
+            AddColumnsToDataTable(infoDataTable);
+            onizleme1.Onizleme_DataGrid2.DataSource = errorDataTable;
+            onizleme1.Onizleme_DataGrid3.DataSource = warningDataTable;
+            onizleme1.Onizleme_DataGrid4.DataSource = infoDataTable;
+        }
+
+        private void AddColumnsToDataTable(DataTable table)
+        {
+            table.Columns.Add("Column Name", typeof(string));
+            table.Columns.Add("Error type", typeof(string));
+            table.Columns.Add("Açıklama", typeof(string));
         }
 
         public void ProcessFileSelection(string seçilenVeriTipi)
@@ -175,6 +193,9 @@ namespace SLF
 
         public void Validate()
         {
+            errorDataTable.Rows.Clear();
+            warningDataTable.Rows.Clear();
+            infoDataTable.Rows.Clear();
             ReportNullCounts();
             ReportDuplicateRowCounts();
             ReportDuplicateCounts();
@@ -182,17 +203,9 @@ namespace SLF
         }
         private void ReportNullCounts()
         {
-            // StringBuilder to build the report message
-            StringBuilder warningReportMessage = new StringBuilder();
-            StringBuilder errorReportMessage = new StringBuilder();
-
-            var warningNullList = new List<(string ColumnName, int NullCount)>();
-            var errorNullList = new List<(string ColumnName, int NullCount)>();
-
             foreach (DataColumn column in currentDataTable.Columns)
             {
                 // Count the number of null, DBNull, "null", and "N/A" values in the current column
-
                 int nullCount = currentDataTable.AsEnumerable().Count(row =>
                     row.IsNull(column) ||
                     row[column] == DBNull.Value ||
@@ -202,26 +215,21 @@ namespace SLF
                 if (nullCount > 0 && nullFieldsGivingWarning[seçilenVeriTipi].Contains(column.ColumnName))
                 {
                     // Append the column name and null count to the report message
-                    warningReportMessage.AppendLine($"{column.ColumnName}: {nullCount} null(s)");
-                    warningNullList.Add((column.ColumnName, nullCount));
+                    warningDataTable.Rows.Add(new object[] {
+                        column.ColumnName, "Null value", $"{nullCount} null(s)"
+                    });
                 }
                 if (nullCount > 0 && nullFieldsGivingError[seçilenVeriTipi].Contains(column.ColumnName))
                 {
                     // Append the column name and null count to the report message
-                    errorReportMessage.AppendLine($"{column.ColumnName}: {nullCount} null(s)");
-                    errorNullList.Add((column.ColumnName, nullCount));
+                    errorDataTable.Rows.Add(new object[] { 
+                        column.ColumnName, "Null value", $"{nullCount} null(s)" 
+                    });
                 }
             }
-
-            // Display the report message in a MessageBox
-            MessageBox.Show(warningReportMessage.ToString(), "Null Counts Per Column", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            MessageBox.Show(errorReportMessage.ToString(), "Null Counts Per Column", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
         private void ReportDuplicateRowCounts()
         {
-            // StringBuilder to build the report message
-            StringBuilder reportMessage = new StringBuilder();
-
             // HashSet to store unique rows
             HashSet<string> uniqueRows = new HashSet<string>();
 
@@ -240,23 +248,15 @@ namespace SLF
             int uniqueRowCount = uniqueRows.Count;
             int duplicateRowCount = totalRows - uniqueRowCount;
 
-            // Append the unique and duplicate row counts to the report message
-            reportMessage.AppendLine($"Total Rows: {totalRows}");
-            reportMessage.AppendLine($"Unique Rows: {uniqueRowCount}");
-            reportMessage.AppendLine($"Duplicate Rows: {duplicateRowCount}");
-
             if (duplicateRowCount > 0)
-                // Display the report message in a MessageBox
-                MessageBox.Show(reportMessage.ToString(), "Unique Row Counts", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                var duplicateCountTuple = (Identifier: "Unique Row Counts", RowCount: duplicateRowCount);
+            {
+                errorDataTable.Rows.Add(new object[] {
+                    "", "Duplicate records", $"{duplicateRowCount}"
+                });
+            }
         }
         private void ReportDuplicateCounts()
         {
-            // StringBuilder to build the report message
-            StringBuilder reportMessage = new StringBuilder();
-
-            var duplicateRowList = new List<(string ColumnName, int DuplicateCount)>();
-
             foreach (DataColumn column in currentDataTable.Columns)
             {
                 // HashSet to store unique values in the current column
@@ -277,14 +277,15 @@ namespace SLF
                 int duplicateCount = totalCount - uniqueCount;
 
                 if (duplicateCount > 0)
+                {
                     // Append the column name and unique count to the report message
-                    reportMessage.AppendLine($"{column.ColumnName}: {uniqueCount} unique value(s), {duplicateCount} duplicate(s)");
-                    duplicateRowList.Add((column.ColumnName, duplicateCount));
+                    warningDataTable.Rows.Add(new object[] {
+                        column.ColumnName, "Duplicate values", $"{duplicateCount}"
+                    });
+                }
             }
-
-            // Display the report message in a MessageBox
-            MessageBox.Show(reportMessage.ToString(), "Unique Counts Per Column", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
+
         private void ReportCoordinatesOutOfLimits()
         {
             var (minXValue, maxXValue) = minMaxCheckMap[seçilenVeriTipi]["X_KOORDINAT"];
@@ -305,8 +306,10 @@ namespace SLF
             string reportMessage = $"KOORDINAT sütunlarında {countOutOfThresholdCoordinates} değer belirlenen koordinatların dışarısında.";
 
             if (countOutOfThresholdCoordinates > 0)
-                // Display the report message in a MessageBox
-                MessageBox.Show(reportMessage, "Koordinat Sınırları", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // Add the warning to the DataTable
+                warningDataTable.Rows.Add(new object[] {
+                    "X_KOORDINAT & Y_KOORDINAT", "Koordinat Sınırları", $"{countOutOfThresholdCoordinates}"
+                });
         }
     }
 }

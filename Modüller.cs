@@ -2038,8 +2038,9 @@ namespace SLF
                 DataTable dataTable = girdiModülü.CurrentDataTable;
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
-                    dataGridView1.DataSource = dataTable;
+                    girdiModülü.Onizleme1.Onizleme_DataGrid1.DataSource = dataTable;
                     girdiModülü.Validate();
+                    girdiModülü.Onizleme1.ShowDialog();
                 }
                 else
                 {
