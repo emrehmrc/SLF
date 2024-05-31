@@ -33,6 +33,7 @@ namespace SLF
         // form objeleri
         public GirişFormu gir1;
         private GirdiModülü girdiModülü;
+        public Fonksiyon_Oluştur fonksiyonFormu;
 
         // declare an instance of the Tablo_Formu to be used to see the Attribute Table of the vector layers
         public Tablo_Formu tablo_formu;
@@ -75,12 +76,12 @@ namespace SLF
 
         // boolean variable to control the marker/point selection by mouse down event
         private bool isSelecting_marker = false;
-        
+
         // create a list of gMapOverlay's that will hold the imported vector files
-        public GMapOverlay[] tüm_katmanlar_array = new GMapOverlay[10];
-        public MapWinGIS.Shapefile[] shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[10];
-        public DataTable[] tüm_katmanlar_datatable = new DataTable[10];    
-        public string[] tüm_katmanlar_array_names = new string[10];
+        public GMapOverlay[] tüm_katmanlar_array;
+        public MapWinGIS.Shapefile[] shapeFileArray_MapWinGIS;
+        public DataTable[] tüm_katmanlar_datatable;
+        public string[] tüm_katmanlar_array_names;
 
         private GMapPolygon selectedPolygon;
 
@@ -95,6 +96,10 @@ namespace SLF
 
         // Find the first available slot in the array that holds shapefile overlay layers
         public int layer_index;
+        public int firstLayerToJoin;
+        public int secondLayerToJoin;
+        public string firstLayerName;
+        public string secondLayerName;
 
         // Nokta veri yapısı
         public class NoktaVeri
@@ -139,11 +144,17 @@ namespace SLF
 
             InitializeComponent();
             girdiModülü = new GirdiModülü();
+            
             InitializeGMap(gMapControl_stokastik);
             InitializeGMap(gMapControl_EA);
 
-            // define the initial directory to be shown when the user opens up the import file dialog
-            targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
+            tüm_katmanlar_array_names = new string[10];
+            tüm_katmanlar_array = new GMapOverlay[10];
+            shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[10];
+            tüm_katmanlar_datatable = new DataTable[10];
+
+        // define the initial directory to be shown when the user opens up the import file dialog
+        targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
 
             // bring the layers buttons that are positioned on the bottom left of the maps to front
             buton_stokastik_harita_katmanlar.BringToFront();
@@ -889,6 +900,20 @@ namespace SLF
             }
         }
 
+        // check whether the shapefile being exported is a grid shapefile or another shapefile
+        public bool HasField(MapWinGIS.Shapefile shapefile, string fieldName)
+        {
+            for (int i = 0; i < shapefile.NumFields; i++)
+            {
+                var field = shapefile.get_Field(i);
+                if (field.Name.Equals(fieldName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         private void kaydetToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
@@ -910,7 +935,12 @@ namespace SLF
                 {
                     string filepath = kaydet_file_dialog.FileName;
                     MapWinGIS.Shapefile shapefile = shapeFileArray_MapWinGIS[checkbox_index];
-                    shapefile.EditDeleteField(0);
+
+                    if(!HasField(shapefile, "xMin") && !HasField(shapefile, "yMax"))
+                    {
+                        shapefile.EditDeleteField(0);
+                    }
+
                     shapefile.EditDeleteField(0);
                     shapefile.SaveAsEx(filepath, false, false);
                     shapefile.Close();
@@ -1830,8 +1860,13 @@ namespace SLF
             // Find the first available slot in the array that holds shapefile overlay layers
             layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
             tüm_katmanlar_array[layer_index] = gridOverlay;
-            tüm_katmanlar_array_names[layer_index] = layer_index.ToString();
+            tüm_katmanlar_array_names[layer_index] = "Grid_" + grid_size + "_" + (layer_index + 1).ToString();
             tüm_katmanlar_datatable[layer_index] = gridTable;
+
+            // Convert gridOverlay to MapWinGIS.Shapefile so that it could be exported by the MapWinGIS
+            // built-in function SaveAsEx
+            MapWinGIS.Shapefile myShapefile = ConvertOverlayToShapefile(gridOverlay);
+            shapeFileArray_MapWinGIS[layer_index] = myShapefile;
 
             System.Windows.Forms.CheckBox associatedCheckBox = GetCheckBoxByIndex(layer_index);
             if (associatedCheckBox != null)
@@ -1840,7 +1875,6 @@ namespace SLF
                 associatedCheckBox.Visible = true;
                 associatedCheckBox.Text = tüm_katmanlar_array_names[layer_index];
             }
-
         }
 
         // oluşturulan poligonları ilgili overlay katmanlarına ekleme kodu
@@ -2234,6 +2268,199 @@ namespace SLF
 
             return oddNodes;
         }
+
+
+        // ------------------------------------------- FONKSİYONLAR --------------------------------------- //
+        private List<(GMapPolygon Polygon, DataRow Attributes)> ExtractPolygonsAndAttributes(GMapOverlay overlay, DataTable dataTable)
+        {
+            List<(GMapPolygon Polygon, DataRow Attributes)> polygonData = new List<(GMapPolygon, DataRow)>();
+
+            foreach (GMapPolygon polygon in overlay.Polygons)
+            {
+                if (polygonAttributes.TryGetValue(polygon, out DataRow attributes))
+                {
+                    polygonData.Add((polygon, attributes));
+                }
+            }
+
+            return polygonData;
+        }
+
+        // check whether two polygons intersect
+        private bool PolygonsIntersect(GMapPolygon polygon1, GMapPolygon polygon2)
+        {
+            // Convert GMapPolygon to NTS Polygon
+            var geometryFactory = new NetTopologySuite.Geometries.GeometryFactory();
+            var coordinates1 = polygon1.Points.Select(p => new NetTopologySuite.Geometries.Coordinate(p.Lng, p.Lat)).ToArray();
+            var coordinates2 = polygon2.Points.Select(p => new NetTopologySuite.Geometries.Coordinate(p.Lng, p.Lat)).ToArray();
+            var ntsPolygon1 = geometryFactory.CreatePolygon(coordinates1);
+            var ntsPolygon2 = geometryFactory.CreatePolygon(coordinates2);
+
+            return ntsPolygon1.Intersects(ntsPolygon2);
+        }
+
+        // combine the attributes of the polygons which intersect one another
+        private DataRow CombineAttributes(DataRow leftRow, DataRow rightRow)
+        {
+            DataTable combinedTable = new DataTable();
+
+            // Add columns from leftRow
+            foreach (DataColumn column in leftRow.Table.Columns)
+            {
+                combinedTable.Columns.Add(column.ColumnName, column.DataType);
+            }
+
+            // Add columns from rightRow, avoiding duplicates
+            foreach (DataColumn column in rightRow.Table.Columns)
+            {
+                if (!combinedTable.Columns.Contains(column.ColumnName))
+                {
+                    combinedTable.Columns.Add(column.ColumnName, column.DataType);
+                }
+            }
+
+            DataRow combinedRow = combinedTable.NewRow();
+
+            // Fill combinedRow with values from leftRow
+            foreach (DataColumn column in leftRow.Table.Columns)
+            {
+                combinedRow[column.ColumnName] = leftRow[column];
+            }
+
+            // Fill combinedRow with values from rightRow
+            foreach (DataColumn column in rightRow.Table.Columns)
+            {
+                combinedRow[column.ColumnName] = rightRow[column];
+            }
+
+            return combinedRow;
+        }
+
+        // take two polygons with <GMapPolygon, DataRow> dictionary structure and combine them into
+        // a new combined polygon with the same structure
+        private List<(GMapPolygon ResultingPolygon, DataRow ResultingAttributes)> PerformSpatialJoin(
+            List<(GMapPolygon Polygon, DataRow Attributes)> shapefile_1,
+            List<(GMapPolygon Polygon, DataRow Attributes)> shapefile_2)
+        {
+            List<(GMapPolygon ResultingPolygon, DataRow ResultingAttributes)> joinedData = new List<(GMapPolygon, DataRow)>();
+
+            // polygon-wise spatial join of the two polygons
+            foreach (var (gridPolygon, gridAttributes) in shapefile_1)
+            {
+                foreach (var (shapePolygon, shapeAttributes) in shapefile_2)
+                {
+                    if (PolygonsIntersect(gridPolygon, shapePolygon))
+                    {
+                        DataRow combinedAttributes = CombineAttributes(gridAttributes, shapeAttributes);
+                        joinedData.Add((gridPolygon, combinedAttributes));
+                    }
+                }
+            }
+
+            return joinedData;
+        }
+
+        // after performing spatial join, create the resulting GMapOverlay object
+        private GMapOverlay CreateResultingOverlay(
+        List<(GMapPolygon ResultingPolygon, DataRow ResultingAttributes)> joinedData)
+        {
+            GMapOverlay resultingOverlay = new GMapOverlay("ResultingOverlay");
+
+            foreach (var (resultingPolygon, resultingAttributes) in joinedData)
+            {
+                resultingOverlay.Polygons.Add(resultingPolygon);
+                polygonAttributes[resultingPolygon] = resultingAttributes;
+            }
+
+            return resultingOverlay;
+        }
+
+        private void Stokastik_Fonksiyonlar_Click(object sender, EventArgs e)
+        {
+            fonksiyonFormu = new Fonksiyon_Oluştur();
+            fonksiyonFormu.Show();
+            fonksiyonFormu.Tag = this;
+            fonksiyonFormu.Owner = this;
+            fonksiyonFormu.Show();
+            fonksiyonFormu.BringToFront();
+            fonksiyonFormu.Focus();
+            fonksiyonFormu.StartPosition = FormStartPosition.CenterScreen;
+        }
+
+        // join the two layers by their indexes within the tüm_katmanlar_array GMapOverlay array
+        public void JoinAttributesByLocation()
+        {
+            firstLayerToJoin = Array.FindIndex(tüm_katmanlar_array_names, 
+                name => name == firstLayerName);
+            secondLayerToJoin = Array.FindIndex(tüm_katmanlar_array_names, 
+                name => name == secondLayerName);
+
+            GMapOverlay firstOverlay = tüm_katmanlar_array[firstLayerToJoin]; 
+            GMapOverlay secondOverlay = tüm_katmanlar_array[secondLayerToJoin]; 
+
+            List<(GMapPolygon Polygon, DataRow Attributes)> gridData = 
+                ExtractPolygonsAndAttributes(firstOverlay, tüm_katmanlar_datatable[firstLayerToJoin]);
+
+            List<(GMapPolygon Polygon, DataRow Attributes)> shapefileData = 
+                ExtractPolygonsAndAttributes(secondOverlay, tüm_katmanlar_datatable[secondLayerToJoin]);
+
+            List<(GMapPolygon ResultingPolygon, DataRow ResultingAttributes)> joinedData = PerformSpatialJoin(gridData, shapefileData);
+
+            GMapOverlay resultingOverlay = CreateResultingOverlay(joinedData);
+
+            // Add the resulting overlay to your map control
+            gMapControl_stokastik.Overlays.Add(resultingOverlay);
+
+            // Find the first available slot in the array that holds shapefile overlay layers
+            layer_index = Array.FindIndex(tüm_katmanlar_array, i => i == null);
+
+            if (layer_index == -1)
+            {
+                MessageBox.Show("En fazla 10 adet katman seçilebilmektedir.");
+                return;
+            }
+
+            // add the layer and its name to the specified arrays
+            tüm_katmanlar_array[layer_index] = resultingOverlay;
+            tüm_katmanlar_array_names[layer_index] = "Birleşik_Katman_" + layer_index.ToString();
+
+            // create a data table object and fill it with the information from the joinedData object
+            DataTable joined_data_table = new DataTable();
+
+            if (joinedData.Count > 0)
+            {
+                // Use the first DataRow to define the columns of the DataTable
+                DataRow firstRow = joinedData[0].ResultingAttributes;
+
+                foreach (DataColumn column in firstRow.Table.Columns)
+                {
+                    joined_data_table.Columns.Add(column.ColumnName, column.DataType);
+                }
+
+                // Add each DataRow to the DataTable
+                foreach (var (_, dataRow) in joinedData)
+                {
+                    joined_data_table.ImportRow(dataRow);
+                }
+            }
+
+            // add the datatable to the array so that it can be summoned later
+            tüm_katmanlar_datatable[layer_index] = joined_data_table;
+
+            // add the layer to the specified map
+            if (Modül_Tabları.SelectedTab == tab_stokastik)
+            {
+                gMapControl_stokastik.Overlays.Add(resultingOverlay);
+                gMapControl_stokastik.Refresh();
+            }
+            else if (Modül_Tabları.SelectedTab == tab_ea)
+            {
+                gMapControl_EA.Overlays.Add(resultingOverlay);
+                gMapControl_EA.Refresh();
+            }
+        }
+
+        // -------------------------------------------------------------------------------------------------- //
 
     }
 }

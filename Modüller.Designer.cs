@@ -139,7 +139,6 @@ namespace SLF
             this.Stokastik_Grid_Oluştur = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.Stokastik_Fonksiyonlar = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.tab_yükHaritası = new System.Windows.Forms.TabPage();
             this.checkBox7 = new System.Windows.Forms.CheckBox();
             this.checkBox6 = new System.Windows.Forms.CheckBox();
@@ -1294,6 +1293,7 @@ namespace SLF
             // 
             // Seç_Stokastik
             // 
+            this.Seç_Stokastik.Dock = System.Windows.Forms.DockStyle.None;
             this.Seç_Stokastik.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.Seç_Stokastik.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.Stokastik_Seç,
@@ -1310,11 +1310,10 @@ namespace SLF
             this.toolStripSeparator5,
             this.Stokastik_Grid_Oluştur,
             this.toolStripSeparator6,
-            this.Stokastik_Fonksiyonlar,
-            this.toolStripSeparator8});
+            this.Stokastik_Fonksiyonlar});
             this.Seç_Stokastik.Location = new System.Drawing.Point(0, 0);
             this.Seç_Stokastik.Name = "Seç_Stokastik";
-            this.Seç_Stokastik.Size = new System.Drawing.Size(1472, 32);
+            this.Seç_Stokastik.Size = new System.Drawing.Size(1432, 32);
             this.Seç_Stokastik.TabIndex = 1;
             this.Seç_Stokastik.Text = "toolStrip1";
             // 
@@ -1533,13 +1532,7 @@ namespace SLF
             this.Stokastik_Fonksiyonlar.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.Stokastik_Fonksiyonlar.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
             this.Stokastik_Fonksiyonlar.ToolTipText = "Çeşitli vektörel veya tabular algoritmaları içerir.";
-            // 
-            // toolStripSeparator8
-            // 
-            this.toolStripSeparator8.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.toolStripSeparator8.Name = "toolStripSeparator8";
-            this.toolStripSeparator8.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator8.Size = new System.Drawing.Size(6, 32);
+            this.Stokastik_Fonksiyonlar.Click += new System.EventHandler(this.Stokastik_Fonksiyonlar_Click);
             // 
             // tab_yükHaritası
             // 
@@ -2026,7 +2019,6 @@ namespace SLF
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
         private System.Windows.Forms.ToolStripButton Stokastik_Nokta;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.ContextMenuStrip katmanlar_right_click;
         private System.Windows.Forms.ToolStripMenuItem tabloyuGörToolStripMenuItem;
