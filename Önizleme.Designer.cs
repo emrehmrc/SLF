@@ -28,164 +28,182 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.dataGridView2 = new System.Windows.Forms.DataGridView();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.dataGridView3 = new System.Windows.Forms.DataGridView();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.dataGridView4 = new System.Windows.Forms.DataGridView();
+            this.Onizleme_Tablar = new System.Windows.Forms.TabControl();
+            this.Onizleme_Onizleme = new System.Windows.Forms.TabPage();
+            this.Onizleme_dataGrid1 = new System.Windows.Forms.DataGridView();
+            this.Onizleme_Hata = new System.Windows.Forms.TabPage();
+            this.Onizleme_dataGrid2 = new System.Windows.Forms.DataGridView();
+            this.Onizleme_Warning = new System.Windows.Forms.TabPage();
+            this.Onizleme_dataGrid3 = new System.Windows.Forms.DataGridView();
+            this.Onizleme_Information = new System.Windows.Forms.TabPage();
+            this.Onizleme_dataGrid4 = new System.Windows.Forms.DataGridView();
             this.YÜKLE = new System.Windows.Forms.Button();
-            this.tabControl1.SuspendLayout();
-            this.tabPage1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
-            this.tabPage2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
-            this.tabPage3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView3)).BeginInit();
-            this.tabPage4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView4)).BeginInit();
+            this.button1 = new System.Windows.Forms.Button();
+            this.Onizleme_Tablar.SuspendLayout();
+            this.Onizleme_Onizleme.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid1)).BeginInit();
+            this.Onizleme_Hata.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid2)).BeginInit();
+            this.Onizleme_Warning.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid3)).BeginInit();
+            this.Onizleme_Information.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid4)).BeginInit();
             this.SuspendLayout();
             // 
-            // tabControl1
+            // Onizleme_Tablar
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.tabPage3);
-            this.tabControl1.Controls.Add(this.tabPage4);
-            this.tabControl1.Location = new System.Drawing.Point(12, 12);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1182, 569);
-            this.tabControl1.TabIndex = 0;
+            this.Onizleme_Tablar.Controls.Add(this.Onizleme_Onizleme);
+            this.Onizleme_Tablar.Controls.Add(this.Onizleme_Hata);
+            this.Onizleme_Tablar.Controls.Add(this.Onizleme_Warning);
+            this.Onizleme_Tablar.Controls.Add(this.Onizleme_Information);
+            this.Onizleme_Tablar.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Onizleme_Tablar.Location = new System.Drawing.Point(12, 12);
+            this.Onizleme_Tablar.Name = "Onizleme_Tablar";
+            this.Onizleme_Tablar.SelectedIndex = 0;
+            this.Onizleme_Tablar.Size = new System.Drawing.Size(1182, 569);
+            this.Onizleme_Tablar.TabIndex = 0;
             // 
-            // tabPage1
+            // Onizleme_Onizleme
             // 
-            this.tabPage1.Controls.Add(this.dataGridView1);
-            this.tabPage1.Location = new System.Drawing.Point(4, 25);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1174, 540);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Önizleme";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.Onizleme_Onizleme.Controls.Add(this.Onizleme_dataGrid1);
+            this.Onizleme_Onizleme.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Onizleme_Onizleme.Location = new System.Drawing.Point(4, 33);
+            this.Onizleme_Onizleme.Name = "Onizleme_Onizleme";
+            this.Onizleme_Onizleme.Padding = new System.Windows.Forms.Padding(3);
+            this.Onizleme_Onizleme.Size = new System.Drawing.Size(1174, 532);
+            this.Onizleme_Onizleme.TabIndex = 0;
+            this.Onizleme_Onizleme.Text = "Önizleme";
+            this.Onizleme_Onizleme.UseVisualStyleBackColor = true;
             // 
-            // dataGridView1
+            // Onizleme_dataGrid1
             // 
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(6, 17);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.RowHeadersWidth = 51;
-            this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(1162, 517);
-            this.dataGridView1.TabIndex = 0;
+            this.Onizleme_dataGrid1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.Onizleme_dataGrid1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.Onizleme_dataGrid1.Location = new System.Drawing.Point(0, 3);
+            this.Onizleme_dataGrid1.Name = "Onizleme_dataGrid1";
+            this.Onizleme_dataGrid1.RowHeadersWidth = 51;
+            this.Onizleme_dataGrid1.RowTemplate.Height = 24;
+            this.Onizleme_dataGrid1.Size = new System.Drawing.Size(1168, 531);
+            this.Onizleme_dataGrid1.TabIndex = 0;
             // 
-            // tabPage2
+            // Onizleme_Hata
             // 
-            this.tabPage2.Controls.Add(this.dataGridView2);
-            this.tabPage2.Location = new System.Drawing.Point(4, 25);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1174, 540);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Errors";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.Onizleme_Hata.Controls.Add(this.Onizleme_dataGrid2);
+            this.Onizleme_Hata.Location = new System.Drawing.Point(4, 33);
+            this.Onizleme_Hata.Name = "Onizleme_Hata";
+            this.Onizleme_Hata.Padding = new System.Windows.Forms.Padding(3);
+            this.Onizleme_Hata.Size = new System.Drawing.Size(1174, 532);
+            this.Onizleme_Hata.TabIndex = 1;
+            this.Onizleme_Hata.Text = "Hata";
+            this.Onizleme_Hata.UseVisualStyleBackColor = true;
             // 
-            // dataGridView2
+            // Onizleme_dataGrid2
             // 
-            this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView2.Location = new System.Drawing.Point(25, 18);
-            this.dataGridView2.Name = "dataGridView2";
-            this.dataGridView2.RowHeadersWidth = 51;
-            this.dataGridView2.RowTemplate.Height = 24;
-            this.dataGridView2.Size = new System.Drawing.Size(1092, 482);
-            this.dataGridView2.TabIndex = 0;
+            this.Onizleme_dataGrid2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.Onizleme_dataGrid2.Location = new System.Drawing.Point(3, 3);
+            this.Onizleme_dataGrid2.Name = "Onizleme_dataGrid2";
+            this.Onizleme_dataGrid2.RowHeadersWidth = 51;
+            this.Onizleme_dataGrid2.RowTemplate.Height = 24;
+            this.Onizleme_dataGrid2.Size = new System.Drawing.Size(1165, 523);
+            this.Onizleme_dataGrid2.TabIndex = 0;
             // 
-            // tabPage3
+            // Onizleme_Warning
             // 
-            this.tabPage3.Controls.Add(this.dataGridView3);
-            this.tabPage3.Location = new System.Drawing.Point(4, 25);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(1174, 540);
-            this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "Warrnings";
-            this.tabPage3.UseVisualStyleBackColor = true;
+            this.Onizleme_Warning.Controls.Add(this.Onizleme_dataGrid3);
+            this.Onizleme_Warning.Location = new System.Drawing.Point(4, 33);
+            this.Onizleme_Warning.Name = "Onizleme_Warning";
+            this.Onizleme_Warning.Size = new System.Drawing.Size(1174, 532);
+            this.Onizleme_Warning.TabIndex = 2;
+            this.Onizleme_Warning.Text = "Uyarı";
+            this.Onizleme_Warning.UseVisualStyleBackColor = true;
             // 
-            // dataGridView3
+            // Onizleme_dataGrid3
             // 
-            this.dataGridView3.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView3.Location = new System.Drawing.Point(16, 16);
-            this.dataGridView3.Name = "dataGridView3";
-            this.dataGridView3.RowHeadersWidth = 51;
-            this.dataGridView3.RowTemplate.Height = 24;
-            this.dataGridView3.Size = new System.Drawing.Size(1075, 484);
-            this.dataGridView3.TabIndex = 0;
+            this.Onizleme_dataGrid3.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.Onizleme_dataGrid3.Location = new System.Drawing.Point(3, 3);
+            this.Onizleme_dataGrid3.Name = "Onizleme_dataGrid3";
+            this.Onizleme_dataGrid3.RowHeadersWidth = 51;
+            this.Onizleme_dataGrid3.RowTemplate.Height = 24;
+            this.Onizleme_dataGrid3.Size = new System.Drawing.Size(1168, 526);
+            this.Onizleme_dataGrid3.TabIndex = 0;
             // 
-            // tabPage4
+            // Onizleme_Information
             // 
-            this.tabPage4.Controls.Add(this.dataGridView4);
-            this.tabPage4.Location = new System.Drawing.Point(4, 25);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Size = new System.Drawing.Size(1174, 540);
-            this.tabPage4.TabIndex = 3;
-            this.tabPage4.Text = "Information";
-            this.tabPage4.UseVisualStyleBackColor = true;
+            this.Onizleme_Information.Controls.Add(this.Onizleme_dataGrid4);
+            this.Onizleme_Information.Location = new System.Drawing.Point(4, 33);
+            this.Onizleme_Information.Name = "Onizleme_Information";
+            this.Onizleme_Information.Size = new System.Drawing.Size(1174, 532);
+            this.Onizleme_Information.TabIndex = 3;
+            this.Onizleme_Information.Text = "İstatistik";
+            this.Onizleme_Information.UseVisualStyleBackColor = true;
             // 
-            // dataGridView4
+            // Onizleme_dataGrid4
             // 
-            this.dataGridView4.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView4.Location = new System.Drawing.Point(21, 19);
-            this.dataGridView4.Name = "dataGridView4";
-            this.dataGridView4.RowHeadersWidth = 51;
-            this.dataGridView4.RowTemplate.Height = 24;
-            this.dataGridView4.Size = new System.Drawing.Size(1116, 485);
-            this.dataGridView4.TabIndex = 0;
+            this.Onizleme_dataGrid4.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.Onizleme_dataGrid4.Location = new System.Drawing.Point(3, 3);
+            this.Onizleme_dataGrid4.Name = "Onizleme_dataGrid4";
+            this.Onizleme_dataGrid4.RowHeadersWidth = 51;
+            this.Onizleme_dataGrid4.RowTemplate.Height = 24;
+            this.Onizleme_dataGrid4.Size = new System.Drawing.Size(1168, 526);
+            this.Onizleme_dataGrid4.TabIndex = 0;
             // 
             // YÜKLE
             // 
             this.YÜKLE.Font = new System.Drawing.Font("Maiandra GD", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.YÜKLE.Location = new System.Drawing.Point(910, 587);
+            this.YÜKLE.Location = new System.Drawing.Point(838, 583);
             this.YÜKLE.Name = "YÜKLE";
             this.YÜKLE.Size = new System.Drawing.Size(165, 38);
             this.YÜKLE.TabIndex = 1;
-            this.YÜKLE.Text = "YÜKLE";
+            this.YÜKLE.Text = "Yükle";
             this.YÜKLE.UseVisualStyleBackColor = true;
+            // 
+            // button1
+            // 
+            this.button1.Font = new System.Drawing.Font("Maiandra GD", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button1.Location = new System.Drawing.Point(1025, 583);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(165, 38);
+            this.button1.TabIndex = 2;
+            this.button1.Text = "Çık";
+            this.button1.UseVisualStyleBackColor = true;
             // 
             // Önizleme
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1206, 635);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.YÜKLE);
-            this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.Onizleme_Tablar);
             this.Name = "Önizleme";
             this.Text = "Önizleme";
-            this.tabControl1.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
-            this.tabPage2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
-            this.tabPage3.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView3)).EndInit();
-            this.tabPage4.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView4)).EndInit();
+            this.Onizleme_Tablar.ResumeLayout(false);
+            this.Onizleme_Onizleme.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid1)).EndInit();
+            this.Onizleme_Hata.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid2)).EndInit();
+            this.Onizleme_Warning.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid3)).EndInit();
+            this.Onizleme_Information.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid4)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.TabPage tabPage3;
-        private System.Windows.Forms.TabPage tabPage4;
-        private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.DataGridView dataGridView2;
-        private System.Windows.Forms.DataGridView dataGridView3;
-        private System.Windows.Forms.DataGridView dataGridView4;
+        private System.Windows.Forms.TabControl Onizleme_Tablar;
+        private System.Windows.Forms.TabPage Onizleme_Onizleme;
+        private System.Windows.Forms.TabPage Onizleme_Hata;
+        private System.Windows.Forms.TabPage Onizleme_Warning;
+        private System.Windows.Forms.TabPage Onizleme_Information;
+        private System.Windows.Forms.DataGridView Onizleme_dataGrid1;
+        private System.Windows.Forms.DataGridView Onizleme_dataGrid2;
+        private System.Windows.Forms.DataGridView Onizleme_dataGrid3;
+        private System.Windows.Forms.DataGridView Onizleme_dataGrid4;
         private System.Windows.Forms.Button YÜKLE;
+        private System.Windows.Forms.Button button1;
     }
 }
