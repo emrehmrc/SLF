@@ -72,5 +72,9 @@ namespace SLF
             }
         }
 
+        private void Grid_Seçenekler_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
