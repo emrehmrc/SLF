@@ -631,6 +631,39 @@ namespace SLF
             }
         }
 
+        private void AddPolygonToOverlay(NetTopologySuite.Geometries.Polygon polygon,
+            GMapOverlay overlay, string gMapPolygonId, DataRow attributes)
+        {
+            // oluşturulmuş poligona ait noktaların ekleneceği bir liste oluştur
+            List<PointLatLng> points_list = new List<PointLatLng>();
+
+            // poligona ait koordinatları nokta olarak "points" listesine ekle
+            foreach (var coord in polygon.Coordinates)
+            {
+                points_list.Add(new PointLatLng(coord.Y, coord.X));
+            }
+
+            /*GMapPolygon gMapPolygon = new GMapPolygon(points_list, gMapPolygonId)
+            {
+                Stroke = new Pen(Color.DarkBlue, 3),
+                Fill = new SolidBrush(Color.FromArgb(50, Color.DarkBlue))
+            };*/
+
+            GMapPolygon gMapPolygon = new GMapPolygon(points_list, gMapPolygonId)
+            {
+                Stroke = new Pen(overlayColors[layer_index].BorderColor, 3),
+                Fill = new SolidBrush(overlayColors[layer_index].FillColor)
+            };
+
+            overlay.Polygons.Add(gMapPolygon);
+            polygonAttributes[gMapPolygon] = attributes;
+
+            if (overlay == gridOverlay)
+            {
+                entire_grid.Add(polygon);
+            }
+        }
+
         private void AddPolygonToOverlay_kml(SharpKml.Dom.Polygon kmlPolygon, 
                                             GMapOverlay overlay,
                                             DataRow attributes)
@@ -641,8 +674,8 @@ namespace SLF
 
             GMapPolygon polygon = new GMapPolygon(points, "KmlPolygon")
             {
-                Stroke = new Pen(Color.DarkBlue, 3),
-                Fill = new SolidBrush(Color.FromArgb(50, Color.DarkBlue))
+                Stroke = new Pen(overlayColors[layer_index].BorderColor, 3),
+                Fill = new SolidBrush(overlayColors[layer_index].FillColor)
             };
             overlay.Polygons.Add(polygon);
             polygonAttributes[polygon] = attributes;
@@ -656,7 +689,7 @@ namespace SLF
             // create a new route including the points inside the points list.
             var route = new GMapRoute(points, "KmlLineString")
             {
-                Stroke = new Pen(Color.DarkRed, 3)
+                Stroke = new Pen(overlayColors[layer_index].BorderColor, 3)
             };
             overlay.Routes.Add(route);
         }
@@ -1018,6 +1051,21 @@ namespace SLF
             }
         }
 
+        // define default colors for each overlay object
+        private (Color BorderColor, Color FillColor)[] overlayColors = new (Color, Color)[]
+        {
+            (Color.Red, Color.FromArgb(50, Color.Red)),
+            (Color.Blue, Color.FromArgb(50, Color.Blue)),
+            (Color.Green, Color.FromArgb(50, Color.Green)),
+            (Color.Yellow, Color.FromArgb(50, Color.Yellow)),
+            (Color.Purple, Color.FromArgb(50, Color.Purple)),
+            (Color.Orange, Color.FromArgb(50, Color.Orange)),
+            (Color.Pink, Color.FromArgb(50, Color.Pink)),
+            (Color.Brown, Color.FromArgb(50, Color.Brown)),
+            (Color.Gray, Color.FromArgb(50, Color.Gray)),
+            (Color.Cyan, Color.FromArgb(50, Color.Cyan))
+        };
+
 
         private void rengiDeğiştirToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1142,32 +1190,41 @@ namespace SLF
         {
 
             ToolStripMenuItem delete_menu_item = sender as ToolStripMenuItem;
-            /*
+
             if (delete_menu_item != null)
             {
                 System.Windows.Forms.CheckBox checkBox = delete_menu_item.Tag as System.Windows.Forms.CheckBox;
                 int checkbox_index = int.Parse(checkBox.Tag.ToString()) - 1;
 
-                if (shapefile_array[checkbox_index] != null)
+                if (tüm_katmanlar_array[checkbox_index] != null)
                 {
-                    int layerHandle = layerHandles[checkbox_index];
-                    string katman_ismi = shapefile_names[checkbox_index];
+                    string katman_ismi = tüm_katmanlar_array_names[checkbox_index];
 
                     DialogResult temizle_result = MessageBox.Show(katman_ismi + " isimli katman " +
                         "silinecektir. Emin misiniz?", "", MessageBoxButtons.YesNo);
 
-                    if (layerHandle != -1 & temizle_result == DialogResult.Yes)
+                    if (temizle_result == DialogResult.Yes)
                     {
-                        shapefile_array[checkbox_index].RemoveSpatialIndex();
-                        shapefile_array[checkbox_index].Close();
-                        shapefile_array[checkbox_index] = null;
+
+                        if (Modül_Tabları.SelectedTab == tab_ea)
+                        {
+                            gMapControl_EA.Overlays.Remove(tüm_katmanlar_array[checkbox_index]);
+                            gMapControl_EA.Refresh();
+                        }
+
+                        if (Modül_Tabları.SelectedTab == tab_stokastik)
+                        {
+                            gMapControl_stokastik.Overlays.Remove(tüm_katmanlar_array[checkbox_index]);
+                            gMapControl_stokastik.Refresh();
+                        }
+
+                        tüm_katmanlar_array[checkbox_index] = null;
                         checkBox.Checked = false;
                         checkBox.Visible = false;
-                        stokastik_haritası.Redraw();
 
                     }
                 }
-            }*/
+            }
         }
 
 
@@ -2097,32 +2154,6 @@ namespace SLF
         }
 
         // oluşturulan poligonları ilgili overlay katmanlarına ekleme kodu
-        private void AddPolygonToOverlay(NetTopologySuite.Geometries.Polygon polygon,
-            GMapOverlay overlay, string gMapPolygonId, DataRow attributes)
-        {
-            // oluşturulmuş poligona ait noktaların ekleneceği bir liste oluştur
-            List<PointLatLng> points_list = new List<PointLatLng>();
-
-            // poligona ait koordinatları nokta olarak "points" listesine ekle
-            foreach (var coord in polygon.Coordinates)
-            {
-                points_list.Add(new PointLatLng(coord.Y, coord.X));
-            }
-
-            GMapPolygon gMapPolygon = new GMapPolygon(points_list, gMapPolygonId)
-            {
-                Stroke = new Pen(Color.DarkBlue, 3),
-                Fill = new SolidBrush(Color.FromArgb(50, Color.DarkBlue))
-            };
-
-            overlay.Polygons.Add(gMapPolygon);
-            polygonAttributes[gMapPolygon] = attributes;
-
-            if(overlay == gridOverlay)
-            {
-                entire_grid.Add(polygon);
-            }
-        }
 
         private double MetersToDegreesLatitude(double meters)
         {
