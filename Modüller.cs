@@ -19,6 +19,7 @@ using SharpKml.Engine;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Threading.Tasks;
 using MapWinGIS;
+using SharpMap.Data.Providers;
 
 namespace SLF
 {
@@ -96,6 +97,10 @@ namespace SLF
         public string firstLayerName;
         public string secondLayerName;
 
+        // variables that are to be used to export .kml files
+        public Dictionary<GMapPolygon, DataRow> polygonAttributes_kml;
+        public Dictionary<GMapRoute, DataRow> routeAttributes_kml;
+
         // Nokta veri yapısı
         public class NoktaVeri
         {
@@ -148,8 +153,8 @@ namespace SLF
             shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[10];
             tüm_katmanlar_datatable = new DataTable[10];
 
-        // define the initial directory to be shown when the user opens up the import file dialog
-        targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
+            // define the initial directory to be shown when the user opens up the import file dialog
+            targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
 
             // bring the layers buttons that are positioned on the bottom left of the maps to front
             buton_stokastik_harita_katmanlar.BringToFront();
@@ -656,6 +661,173 @@ namespace SLF
             overlay.Routes.Add(route);
         }
 
+
+        public MapWinGIS.Shapefile ConvertKmlToShapefile(GMapOverlay overlay)
+        {
+            var shapefile = new MapWinGIS.Shapefile();
+            shapefile.CreateNewWithShapeID("", ShpfileType.SHP_POLYGON);
+
+            // Add fields from the first polygon's attributes (if any)
+            if (polygonAttributes.Count > 0)
+            {
+                var firstPolygon = polygonAttributes.Keys.First();
+                var firstRow = polygonAttributes[firstPolygon];
+                foreach (DataColumn column in firstRow.Table.Columns)
+                {
+                    shapefile.EditAddField(column.ColumnName, MapWinGIS.FieldType.STRING_FIELD, 10, 10);
+                }
+            }
+
+            // Add polygons to shapefile
+            foreach (var polygon in overlay.Polygons)
+            {
+                var shape = new MapWinGIS.Shape();
+                shape.Create(ShpfileType.SHP_POLYGON);
+
+                for (int i = 0; i < polygon.Points.Count; i++)
+                {
+                    var point = new MapWinGIS.Point
+                    {
+                        x = polygon.Points[i].Lng,
+                        y = polygon.Points[i].Lat
+                    };
+                    shape.InsertPoint(point, ref i);
+                }
+
+                int shapeIndex = shapefile.NumShapes;
+                shapefile.EditInsertShape(shape, ref shapeIndex);
+
+                if (polygonAttributes.TryGetValue(polygon, out DataRow row))
+                {
+                    for (int i = 0; i < row.Table.Columns.Count; i++)
+                    {
+                        shapefile.EditCellValue(i, shapeIndex, row[i].ToString());
+                    }
+                }
+            }
+
+            // Add fields from the first route's attributes (if any)
+            if (routeAttributes_kml.Count > 0 && shapefile.NumFields == 0)
+            {
+                var firstRoute = routeAttributes_kml.Keys.First();
+                var firstRow = routeAttributes_kml[firstRoute];
+                foreach (DataColumn column in firstRow.Table.Columns)
+                {
+                    shapefile.EditAddField(column.ColumnName, MapWinGIS.FieldType.STRING_FIELD, 10, 10);
+                }
+            }
+
+            // Add routes to shapefile
+            foreach (var route in overlay.Routes)
+            {
+                var shape = new MapWinGIS.Shape();
+                shape.Create(ShpfileType.SHP_POLYLINE);
+
+                for (int i = 0; i < route.Points.Count; i++)
+                {
+                    var point = new MapWinGIS.Point
+                    {
+                        x = route.Points[i].Lng,
+                        y = route.Points[i].Lat
+                    };
+                    shape.InsertPoint(point, ref i);
+                }
+
+                int shapeIndex = shapefile.NumShapes;
+                shapefile.EditInsertShape(shape, ref shapeIndex);
+
+                if (routeAttributes_kml.TryGetValue(route, out DataRow row))
+                {
+                    for (int i = 0; i < row.Table.Columns.Count; i++)
+                    {
+                        shapefile.EditCellValue(i, shapeIndex, row[i].ToString());
+                    }
+                }
+            }
+
+            return shapefile;
+        }
+
+        public void ExportOverlayToKml(GMapOverlay overlay, string filePath)
+        {
+            var kmlDocument = new Document();
+            var kml = new Kml { Feature = kmlDocument };
+
+            if(overlay.Polygons != null)
+            {
+                foreach (var polygon in overlay.Polygons)
+                {
+                    var kmlPolygon = CreateKmlPolygon(polygon);
+                    kmlDocument.AddFeature(kmlPolygon);
+                }
+            }
+
+            if(overlay.Routes != null)
+            {
+                foreach (var route in overlay.Routes)
+                {
+                    var kmlLineString = CreateKmlLineString(route);
+                    kmlDocument.AddFeature(kmlLineString);
+                }
+            }
+
+            using (var stream = File.OpenWrite(filePath))
+            {
+                var serializer = new Serializer();
+                serializer.Serialize(kml, stream);
+            }
+        }
+
+        private SharpKml.Dom.Placemark CreateKmlPolygon(GMapPolygon gMapPolygon)
+        {
+            var kmlPolygon = new SharpKml.Dom.Polygon();
+            var outerBoundary = new SharpKml.Dom.OuterBoundary();
+            var linearRing = new SharpKml.Dom.LinearRing();
+
+            if (linearRing.Coordinates == null)
+            {
+                linearRing.Coordinates = new CoordinateCollection();
+            }
+
+            if (gMapPolygon.Points != null && gMapPolygon.Points.Count > 0)
+            {
+                foreach (var point in gMapPolygon.Points)
+                {
+                    linearRing.Coordinates.Add(new SharpKml.Base.Vector(point.Lat, point.Lng));
+                }
+            }
+
+            outerBoundary.LinearRing = linearRing;
+            kmlPolygon.OuterBoundary = outerBoundary;
+
+            var placemark = new SharpKml.Dom.Placemark
+            {
+                Geometry = kmlPolygon,
+                Name = gMapPolygon.Name
+            };
+
+            return placemark;
+        }
+
+        private SharpKml.Dom.Placemark CreateKmlLineString(GMapRoute gMapRoute)
+        {
+            var kmlLineString = new LineString();
+
+            foreach (var point in gMapRoute.Points)
+            {
+                kmlLineString.Coordinates.Add(new SharpKml.Base.Vector(point.Lat, point.Lng));
+            }
+
+            var placemark = new SharpKml.Dom.Placemark
+            {
+                Geometry = kmlLineString,
+                Name = gMapRoute.Name
+            };
+
+            return placemark;
+        }
+
+
         // stokastik dosya seçimi butonu
         private async void stokastik_dosya_seçimi_Click(object sender, EventArgs e)
         {
@@ -734,6 +906,12 @@ namespace SLF
                     tüm_katmanlar_array[layer_index] = kmlOverlay;
                     tüm_katmanlar_array_names[layer_index] = filename;
                     tüm_katmanlar_datatable[layer_index] = kml_datatable;
+
+                    // convert .kml overlay into a MapWinGIS.Shapefile object
+                    polygonAttributes_kml = new Dictionary<GMapPolygon, DataRow>();
+                    routeAttributes_kml = new Dictionary<GMapRoute, DataRow>();
+                    MapWinGIS.Shapefile shapefile = ConvertKmlToShapefile(kmlOverlay);
+                    shapeFileArray_MapWinGIS[layer_index] = shapefile;
 
                     System.Windows.Forms.CheckBox associatedCheckBox = GetCheckBoxByIndex(layer_index);
                     if (associatedCheckBox != null)
@@ -929,18 +1107,33 @@ namespace SLF
                 if (kaydet_result == DialogResult.OK)
                 {
                     string filepath = kaydet_file_dialog.FileName;
-                    MapWinGIS.Shapefile shapefile = shapeFileArray_MapWinGIS[checkbox_index];
+                    string filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
+                    string extension = filename.Substring(filename.Length - 3);
 
-                    if(!HasField(shapefile, "xMin") && !HasField(shapefile, "yMax"))
+                    if(extension == "shp")
                     {
+                        MapWinGIS.Shapefile shapefile = shapeFileArray_MapWinGIS[checkbox_index];
+
+                        if (!HasField(shapefile, "xMin") && !HasField(shapefile, "yMax"))
+                        {
+                            shapefile.EditDeleteField(0);
+                        }
+
                         shapefile.EditDeleteField(0);
+                        shapefile.SaveAsEx(filepath, false, false);
+                        shapefile.Close();
+                        //shapeFileArray_MapWinGIS[checkbox_index] = null;
+                        MessageBox.Show("Dosya başarıyla kaydedildi.");
+                    }
+                    else if (extension == "kml")
+                    {
+                        GMapOverlay kmlOverlay = new GMapOverlay();
+                        kmlOverlay = tüm_katmanlar_array[checkbox_index];
+
+                        ExportOverlayToKml(kmlOverlay, filepath);
+                        MessageBox.Show("Dosya başarıyla kaydedildi.");
                     }
 
-                    shapefile.EditDeleteField(0);
-                    shapefile.SaveAsEx(filepath, false, false);
-                    shapefile.Close();
-                    shapeFileArray_MapWinGIS[checkbox_index] = null;
-                    MessageBox.Show("Dosya başarıyla kaydedildi.");
                 }
             }
         }
@@ -1165,8 +1358,7 @@ namespace SLF
         private void tabloyuGörToolStripMenuItem_Click(object sender, EventArgs e)
         {
             tablo_formu.Show();
-            tablo_formu.Focus();
-            tablo_formu.BringToFront();
+            tablo_formu.Activate();
         }
 
         private void EA_Mesafe_Ölç_Click(object sender, EventArgs e)
