@@ -1,5 +1,4 @@
-﻿using RTools_NTS.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -203,6 +202,9 @@ namespace SLF
         }
         private void ReportNullCounts()
         {
+            float nullPercentage = 0.0f;
+            int totalRows = currentDataTable.Rows.Count;
+
             foreach (DataColumn column in currentDataTable.Columns)
             {
                 // Count the number of null, DBNull, "null", and "N/A" values in the current column
@@ -212,18 +214,20 @@ namespace SLF
                     nullLikeStrings.Contains(row[column]?.ToString(), StringComparer.OrdinalIgnoreCase)
                 );
 
+                nullPercentage = (float)nullCount / totalRows;
+
                 if (nullCount > 0 && nullFieldsGivingWarning[seçilenVeriTipi].Contains(column.ColumnName))
                 {
                     // Append the column name and null count to the report message
                     warningDataTable.Rows.Add(new object[] {
-                        column.ColumnName, "Null value", $"{nullCount} null(s)"
+                        column.ColumnName, "Null value", $"{nullPercentage:P1} null(s)"
                     });
                 }
                 if (nullCount > 0 && nullFieldsGivingError[seçilenVeriTipi].Contains(column.ColumnName))
                 {
                     // Append the column name and null count to the report message
                     errorDataTable.Rows.Add(new object[] { 
-                        column.ColumnName, "Null value", $"{nullCount} null(s)" 
+                        column.ColumnName, "Null value", $"{nullPercentage:P1} null(s)" 
                     });
                 }
             }
@@ -232,6 +236,8 @@ namespace SLF
         {
             // HashSet to store unique rows
             HashSet<string> uniqueRows = new HashSet<string>();
+
+            float duplicatePercentage = 0.0f;
 
             // Iterate through each row in the DataTable
             foreach (DataRow row in currentDataTable.Rows)
@@ -250,13 +256,15 @@ namespace SLF
 
             if (duplicateRowCount > 0)
             {
+                duplicatePercentage = (float)duplicateRowCount / totalRows;
                 errorDataTable.Rows.Add(new object[] {
-                    "", "Duplicate records", $"{duplicateRowCount}"
+                    "", "Duplicate records", $"{duplicatePercentage:P1}"
                 });
             }
         }
         private void ReportDuplicateCounts()
         {
+            float duplicatePercentage;
             foreach (DataColumn column in currentDataTable.Columns)
             {
                 // HashSet to store unique values in the current column
@@ -275,12 +283,13 @@ namespace SLF
                 int totalCount = currentDataTable.Rows.Count;
                 int uniqueCount = uniqueValues.Count;
                 int duplicateCount = totalCount - uniqueCount;
+                duplicatePercentage = (float)duplicateCount / totalCount;
 
                 if (duplicateCount > 0)
                 {
                     // Append the column name and unique count to the report message
                     warningDataTable.Rows.Add(new object[] {
-                        column.ColumnName, "Duplicate values", $"{duplicateCount}"
+                        column.ColumnName, "Duplicate values", $"{duplicatePercentage:P1}"
                     });
                 }
             }
@@ -292,6 +301,7 @@ namespace SLF
             var (minYValue, maxYValue) = minMaxCheckMap[seçilenVeriTipi]["Y_KOORDINAT"];
 
             int countOutOfThresholdCoordinates = 0;
+            float outOfThresholdPercentage = 0.0f;
 
             foreach (DataRow row in currentDataTable.Rows)
             {
@@ -303,12 +313,12 @@ namespace SLF
                     }
                 }
             }
-            string reportMessage = $"KOORDINAT sütunlarında {countOutOfThresholdCoordinates} değer belirlenen koordinatların dışarısında.";
 
             if (countOutOfThresholdCoordinates > 0)
                 // Add the warning to the DataTable
+                outOfThresholdPercentage = (float)countOutOfThresholdCoordinates / currentDataTable.Rows.Count;
                 warningDataTable.Rows.Add(new object[] {
-                    "X_KOORDINAT & Y_KOORDINAT", "Koordinat Sınırları", $"{countOutOfThresholdCoordinates}"
+                    "X_KOORDINAT & Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}"
                 });
         }
     }
