@@ -27,6 +27,7 @@ namespace SLF
 
         private readonly List<string> nullLikeStrings = new List<string>
         {
+            "",
             "null",
             "N/A",
             "#N/A"
@@ -87,16 +88,16 @@ namespace SLF
                     new List<string> {
                         "ENERJI_TABLO_KAYIT_KODU",
                         "ABONE_GRUBU",
-                        "2019_Tuketim",
-                        "2020_Tuketim",
-                        "2021_Tuketim",
-                        "2022_Tuketim",
-                        "2023_Tuketim",
-                        "2019_Demant",
-                        "2020_Demant",
-                        "2021_Demant",
-                        "2022_Demant",
-                        "2023_Demant",
+                    }
+            }
+        };
+        private readonly Dictionary<string, List<string>> duplicateFieldsGivingError = new Dictionary<string, List<string>>
+        {
+            {
+                "Abone Verileri",
+                    new List<string> {
+                        "TESISAT_NO",
+                        //"ENERJI_TABLO_KAYIT_KODU",
                     }
             }
         };
@@ -122,9 +123,10 @@ namespace SLF
 
         private void AddColumnsToDataTable(DataTable table)
         {
-            table.Columns.Add("Column Name", typeof(string));
-            table.Columns.Add("Error type", typeof(string));
-            table.Columns.Add("Açıklama", typeof(string));
+            table.Columns.Add("Sütun Adı", typeof(string));
+            table.Columns.Add("Validasyon Türü", typeof(string));
+            table.Columns.Add("Validasyon Bilgisi", typeof(string));
+            table.Columns.Add("Ek Açıklamalar", typeof(string));
         }
 
         public void ProcessFileSelection(string seçilenVeriTipi)
@@ -199,6 +201,7 @@ namespace SLF
             ReportDuplicateRowCounts();
             ReportDuplicateCounts();
             ReportCoordinatesOutOfLimits();
+            ReportErrorLessThanOrEqualToZero();
         }
         private void ReportNullCounts()
         {
@@ -220,14 +223,14 @@ namespace SLF
                 {
                     // Append the column name and null count to the report message
                     warningDataTable.Rows.Add(new object[] {
-                        column.ColumnName, "Null value", $"{nullPercentage:P1} null(s)"
+                        column.ColumnName, "Null değer", $"{nullPercentage:P1}"
                     });
                 }
                 if (nullCount > 0 && nullFieldsGivingError[seçilenVeriTipi].Contains(column.ColumnName))
                 {
                     // Append the column name and null count to the report message
                     errorDataTable.Rows.Add(new object[] { 
-                        column.ColumnName, "Null value", $"{nullPercentage:P1} null(s)" 
+                        column.ColumnName, "Null değer", $"{nullPercentage:P1}" 
                     });
                 }
             }
@@ -258,7 +261,7 @@ namespace SLF
             {
                 duplicatePercentage = (float)duplicateRowCount / totalRows;
                 errorDataTable.Rows.Add(new object[] {
-                    "", "Duplicate records", $"{duplicatePercentage:P1}"
+                    "", "Mükerrer veri", $"{duplicatePercentage:P1}"
                 });
             }
         }
@@ -267,6 +270,9 @@ namespace SLF
             float duplicatePercentage;
             foreach (DataColumn column in currentDataTable.Columns)
             {
+                if (!duplicateFieldsGivingError[seçilenVeriTipi].Contains(column.ColumnName)) {
+                    continue;
+                }
                 // HashSet to store unique values in the current column
                 HashSet<string> uniqueValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -289,7 +295,7 @@ namespace SLF
                 {
                     // Append the column name and unique count to the report message
                     warningDataTable.Rows.Add(new object[] {
-                        column.ColumnName, "Duplicate values", $"{duplicatePercentage:P1}"
+                        column.ColumnName, "Mükerrer hücre değerleri", $"{duplicatePercentage:P1}"
                     });
                 }
             }
@@ -321,6 +327,47 @@ namespace SLF
                     "X_KOORDINAT & Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}"
                 });
         }
-    }
+        private void ReportErrorLessThanOrEqualToZero()
+        {
+            int currentYear = DateTime.Now.Year;
+            float nonPositivePercentage;
+            int totalRows = currentDataTable.Rows.Count;
+            var column = currentDataTable.Columns[$"{currentYear - 1}_Tuketim"];
+            var fallbackColumn = currentDataTable.Columns[$"{currentYear - 2}_Tuketim"];
+
+            int nonPositiveCount = 0;
+
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                if (
+                    row.IsNull(column) ||
+                    row[column] == DBNull.Value ||
+                    nullLikeStrings.Contains(row[column]?.ToString(), StringComparer.OrdinalIgnoreCase) ||
+                    float.TryParse(row[column]?.ToString(), out float value) && value <= 0)
+                {
+                    // If the last year's consumption data is missing or less than or equal to zero, check the previous year's data
+                    if (row.IsNull(fallbackColumn) ||
+                        row[fallbackColumn] == DBNull.Value ||
+                        nullLikeStrings.Contains(row[fallbackColumn]?.ToString(), StringComparer.OrdinalIgnoreCase) ||
+                        float.TryParse(row[fallbackColumn]?.ToString(), out float fallbackValue) && fallbackValue <= 0
+                    )
+                    { 
+                        nonPositiveCount++;
+                    }
+                }
+            }
+
+            nonPositivePercentage = (float)nonPositiveCount / totalRows;
+
+            if (nonPositiveCount > 0)
+            {
+                // Append the column name and null count to the report message
+                errorDataTable.Rows.Add(new object[] {
+                    column.ColumnName, "Son yıl tüketim verisi", $"{nonPositivePercentage:P1} abonenin tüketim verisi yok",
+                    "Bu abonelerin tüketim verileri silinecek."
+                });
+            }
+        }
+     }
 }
 
