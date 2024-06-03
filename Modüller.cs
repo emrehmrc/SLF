@@ -148,10 +148,10 @@ namespace SLF
             InitializeGMap(gMapControl_stokastik);
             InitializeGMap(gMapControl_EA);
 
-            tüm_katmanlar_array_names = new string[10];
-            tüm_katmanlar_array = new GMapOverlay[10];
-            shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[10];
-            tüm_katmanlar_datatable = new DataTable[10];
+            tüm_katmanlar_array_names = new string[13];
+            tüm_katmanlar_array = new GMapOverlay[13];
+            shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[13];
+            tüm_katmanlar_datatable = new DataTable[13];
 
             // define the initial directory to be shown when the user opens up the import file dialog
             targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
@@ -276,7 +276,7 @@ namespace SLF
 
             if (layer_index == -1)
             {
-                MessageBox.Show("En fazla 10 adet katman seçilebilmektedir.");
+                MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
                 return;
             }
 
@@ -870,7 +870,7 @@ namespace SLF
 
             if (layer_index == -1)
             {
-                MessageBox.Show("En fazla 10 adet katman seçilebilmektedir.");
+                MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
                 return;
             }
 
@@ -971,10 +971,14 @@ namespace SLF
                 case 7: return checkBox16;
                 case 8: return checkBox17;
                 case 9: return checkBox18;
+                case 10: return checkBox19;
+                case 11: return checkBox20;
+                case 12: return checkBox21;
                 default: return null;
             }
         }
 
+        // stokastik haritasına ait checkboxların initializationları
         private void stokastik_haritası_checkboxes_init()
         {
             // shapefile_array de kullanılmak üzere oluşturulan checkbox etiketleri
@@ -988,6 +992,9 @@ namespace SLF
             checkBox16.Tag = 8;
             checkBox17.Tag = 9;
             checkBox18.Tag = 10;
+            checkBox19.Tag = 11;
+            checkBox20.Tag = 12;
+            checkBox21.Tag = 13;
 
             // stokastik haritası checkboxlarına event atama
             checkBox9.CheckedChanged += stokastik_checkBox_CheckedChanged;
@@ -1000,6 +1007,9 @@ namespace SLF
             checkBox16.CheckedChanged += stokastik_checkBox_CheckedChanged;
             checkBox17.CheckedChanged += stokastik_checkBox_CheckedChanged;
             checkBox18.CheckedChanged += stokastik_checkBox_CheckedChanged;
+            checkBox19.CheckedChanged += stokastik_checkBox_CheckedChanged;
+            checkBox20.CheckedChanged += stokastik_checkBox_CheckedChanged;
+            checkBox21.CheckedChanged += stokastik_checkBox_CheckedChanged;
 
             checkBox9.MouseDown += stokastik_checkBox_MouseDown;
             checkBox10.MouseDown += stokastik_checkBox_MouseDown;
@@ -1011,6 +1021,24 @@ namespace SLF
             checkBox16.MouseDown += stokastik_checkBox_MouseDown;
             checkBox17.MouseDown += stokastik_checkBox_MouseDown;
             checkBox18.MouseDown += stokastik_checkBox_MouseDown;
+            checkBox19.MouseDown += stokastik_checkBox_MouseDown;
+            checkBox20.MouseDown += stokastik_checkBox_MouseDown;
+            checkBox21.MouseDown += stokastik_checkBox_MouseDown;
+
+            checkBox9.ForeColor = overlayColors[0].BorderColor;
+            checkBox10.ForeColor = overlayColors[1].BorderColor;
+            checkBox11.ForeColor = overlayColors[2].BorderColor;
+            checkBox12.ForeColor = overlayColors[3].BorderColor;
+            checkBox13.ForeColor = overlayColors[4].BorderColor;
+            checkBox14.ForeColor = overlayColors[5].BorderColor;
+            checkBox15.ForeColor = overlayColors[6].BorderColor;
+            checkBox16.ForeColor = overlayColors[7].BorderColor;
+            checkBox17.ForeColor = overlayColors[8].BorderColor;
+            checkBox18.ForeColor = overlayColors[9].BorderColor;
+            checkBox19.ForeColor = overlayColors[10].BorderColor;
+            checkBox20.ForeColor = overlayColors[11].BorderColor;
+            checkBox21.ForeColor = overlayColors[12].BorderColor;
+
         }
 
         private void ShowAttributeTable(DataTable datatable)
@@ -1057,13 +1085,16 @@ namespace SLF
             (Color.Red, Color.FromArgb(50, Color.Red)),
             (Color.Blue, Color.FromArgb(50, Color.Blue)),
             (Color.Green, Color.FromArgb(50, Color.Green)),
-            (Color.Yellow, Color.FromArgb(50, Color.Yellow)),
+            (Color.DarkGoldenrod, Color.FromArgb(50, Color.DarkGoldenrod)),
             (Color.Purple, Color.FromArgb(50, Color.Purple)),
             (Color.Orange, Color.FromArgb(50, Color.Orange)),
             (Color.Pink, Color.FromArgb(50, Color.Pink)),
             (Color.Brown, Color.FromArgb(50, Color.Brown)),
             (Color.Gray, Color.FromArgb(50, Color.Gray)),
-            (Color.Cyan, Color.FromArgb(50, Color.Cyan))
+            (Color.Cyan, Color.FromArgb(50, Color.Cyan)),
+            (Color.DarkTurquoise, Color.FromArgb(50, Color.DarkTurquoise)),
+            (Color.Black, Color.FromArgb(50, Color.Black)),
+            (Color.Violet, Color.FromArgb(50, Color.Violet))
         };
 
 
@@ -1533,6 +1564,15 @@ namespace SLF
         {
             isSelecting_grid = true;
             gMapControl_stokastik.Cursor = Cursors.Arrow;
+
+            /*Grid_Seçenekler grid_formu = new Grid_Seçenekler();
+            grid_formu.Tag = this;
+            grid_formu.Owner = this;
+            grid_formu.Show();
+            grid_formu.BringToFront();
+            grid_formu.Focus();
+            grid_formu.StartPosition = FormStartPosition.CenterScreen;*/
+
         }
 
 
@@ -2411,15 +2451,15 @@ namespace SLF
         }*/
 
         //highlight the polygon which is double clicked on
-        private void HighlightPolygon(GMapPolygon polygon)
+        private void HighlightPolygon(GMapPolygon polygon, int index)
         {
             if (gridOverlay.Polygons.Contains(polygon))
             {
                 // Reset previous selected polygon
                 foreach (var poly in gridOverlay.Polygons)
                 {
-                    poly.Stroke = new Pen(Color.DarkBlue, 3);
-                    poly.Fill = new SolidBrush(Color.FromArgb(50, Color.DarkBlue));
+                    poly.Stroke = new Pen(overlayColors[index].BorderColor, 3);
+                    poly.Fill = new SolidBrush(overlayColors[index].FillColor);
                 }
 
                 // Highlight new selected polygon
@@ -2433,8 +2473,8 @@ namespace SLF
                 // Reset previous selected polygon to the previously defined default map colors
                 if (selectedPolygon != null)
                 {
-                    selectedPolygon.Stroke = new Pen(Color.DarkBlue, 3);
-                    selectedPolygon.Fill = new SolidBrush(Color.FromArgb(50, Color.DarkBlue));
+                    selectedPolygon.Stroke = new Pen(overlayColors[index].BorderColor, 3);
+                    selectedPolygon.Fill = new SolidBrush(overlayColors[index].FillColor);
                 }
 
                 // Highlight new selected polygon with a different border and fill color
@@ -2456,7 +2496,7 @@ namespace SLF
                 {
                     if (IsPointInPolygon(pointClick, polygon))
                     {
-                        HighlightPolygon(polygon);
+                        HighlightPolygon(polygon, layer_index);
 
                         if(polygonAttributes.TryGetValue(polygon, out DataRow row))
                         {
@@ -2485,7 +2525,7 @@ namespace SLF
                 {
                     if (IsPointInPolygon(pointClick, polygon))
                     {
-                        HighlightPolygon(polygon);
+                        HighlightPolygon(polygon, layer_index);
 
                         if (polygonAttributes.TryGetValue(polygon, out DataRow row))
                         {
@@ -2667,7 +2707,7 @@ namespace SLF
 
             if (layer_index == -1)
             {
-                MessageBox.Show("En fazla 10 adet katman seçilebilmektedir.");
+                MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
                 return;
             }
 

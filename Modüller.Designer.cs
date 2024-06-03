@@ -176,6 +176,9 @@ namespace SLF
             this.ContextMenuStrip_Fonksiyon = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.katman_birleştir = new System.Windows.Forms.ToolStripMenuItem();
             this.overlap_analizi = new System.Windows.Forms.ToolStripMenuItem();
+            this.checkBox19 = new System.Windows.Forms.CheckBox();
+            this.checkBox20 = new System.Windows.Forms.CheckBox();
+            this.checkBox21 = new System.Windows.Forms.CheckBox();
             this.menuStrip1.SuspendLayout();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
@@ -1016,6 +1019,9 @@ namespace SLF
             // 
             // tab_stokastik
             // 
+            this.tab_stokastik.Controls.Add(this.checkBox21);
+            this.tab_stokastik.Controls.Add(this.checkBox20);
+            this.tab_stokastik.Controls.Add(this.checkBox19);
             this.tab_stokastik.Controls.Add(this.mesafe_metre_stokastik);
             this.tab_stokastik.Controls.Add(this.Mesafe_stokastik);
             this.tab_stokastik.Controls.Add(this.gMapControl_stokastik);
@@ -1266,13 +1272,14 @@ namespace SLF
             // checkBox9
             // 
             this.checkBox9.AutoSize = true;
+            this.checkBox9.BackColor = System.Drawing.Color.Transparent;
             this.checkBox9.ContextMenuStrip = this.katmanlar_right_click;
             this.checkBox9.Location = new System.Drawing.Point(8, 170);
             this.checkBox9.Name = "checkBox9";
             this.checkBox9.Size = new System.Drawing.Size(124, 28);
             this.checkBox9.TabIndex = 19;
             this.checkBox9.Text = "checkBox9";
-            this.checkBox9.UseVisualStyleBackColor = true;
+            this.checkBox9.UseVisualStyleBackColor = false;
             this.checkBox9.Visible = false;
             // 
             // label13
@@ -1317,7 +1324,7 @@ namespace SLF
             this.Stokastik_Fonksiyonlar});
             this.Seç_Stokastik.Location = new System.Drawing.Point(0, 0);
             this.Seç_Stokastik.Name = "Seç_Stokastik";
-            this.Seç_Stokastik.Size = new System.Drawing.Size(1432, 32);
+            this.Seç_Stokastik.Size = new System.Drawing.Size(1393, 32);
             this.Seç_Stokastik.TabIndex = 1;
             this.Seç_Stokastik.Text = "toolStrip1";
             // 
@@ -1890,6 +1897,42 @@ namespace SLF
             this.overlap_analizi.Size = new System.Drawing.Size(187, 26);
             this.overlap_analizi.Text = "Overlap Analizi";
             // 
+            // checkBox19
+            // 
+            this.checkBox19.AutoSize = true;
+            this.checkBox19.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox19.Location = new System.Drawing.Point(9, 510);
+            this.checkBox19.Name = "checkBox19";
+            this.checkBox19.Size = new System.Drawing.Size(132, 28);
+            this.checkBox19.TabIndex = 33;
+            this.checkBox19.Text = "checkBox19";
+            this.checkBox19.UseVisualStyleBackColor = true;
+            this.checkBox19.Visible = false;
+            // 
+            // checkBox20
+            // 
+            this.checkBox20.AutoSize = true;
+            this.checkBox20.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox20.Location = new System.Drawing.Point(8, 544);
+            this.checkBox20.Name = "checkBox20";
+            this.checkBox20.Size = new System.Drawing.Size(136, 28);
+            this.checkBox20.TabIndex = 34;
+            this.checkBox20.Text = "checkBox20";
+            this.checkBox20.UseVisualStyleBackColor = true;
+            this.checkBox20.Visible = false;
+            // 
+            // checkBox21
+            // 
+            this.checkBox21.AutoSize = true;
+            this.checkBox21.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox21.Location = new System.Drawing.Point(8, 578);
+            this.checkBox21.Name = "checkBox21";
+            this.checkBox21.Size = new System.Drawing.Size(132, 28);
+            this.checkBox21.TabIndex = 35;
+            this.checkBox21.Text = "checkBox21";
+            this.checkBox21.UseVisualStyleBackColor = true;
+            this.checkBox21.Visible = false;
+            // 
             // ModülFormu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -2104,5 +2147,8 @@ namespace SLF
         private ContextMenuStrip ContextMenuStrip_Fonksiyon;
         private ToolStripMenuItem katman_birleştir;
         private ToolStripMenuItem overlap_analizi;
+        private CheckBox checkBox21;
+        private CheckBox checkBox20;
+        private CheckBox checkBox19;
     }
 }
