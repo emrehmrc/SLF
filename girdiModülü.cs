@@ -88,9 +88,9 @@ namespace SLF
                         { "ADR_BINA_ID", WarningErrorBoundary(0.2f) },
                         { "bina_turu", WarningErrorBoundary(0.2f) },
                         { "BAGLANTI_GUCU", WarningErrorBoundary(0.4f) },
-                        { "SOZ_DURUM", WarningErrorBoundary(0.2f) },
+                        { "SOZ_DURUM", INFO_ONLY },
                         { "ABONE_GRUBU",WarningErrorBoundary(0.2f) },
-                        { "GERILIM_SEVIYESI", WarningErrorBoundary(0.2f) },
+                        { "GERILIM_SEVIYESI", INFO_ONLY },
                         { "SOZ_BAS_TARIH", WARNING_ONLY },
                         { "SOZ_BIT_TARIH", WARNING_ONLY },
                         { "ENERJI_TABLO_KAYIT_KODU", WarningErrorBoundary(0.1f) }
