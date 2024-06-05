@@ -66,6 +66,7 @@ namespace SLF
         private const float MIN_THRESHOLD = 0.0f;
         private const float TUKETIM_ERROR_THRESHOLD = 0.2f;
         private const float COORDINATE_ERROR_THRESHOLD = 0.1f;
+        private const float ABONE_KAPASITE_LIMIT = 0.6f;
         private static (float Min, float Max) WARNING_ONLY = (MIN_THRESHOLD, MAX_THRESHOLD);
         private static (float Min, float Max) INFO_ONLY = (MAX_THRESHOLD, MAX_THRESHOLD);
 
@@ -389,6 +390,36 @@ namespace SLF
         private void AboneKapasiteCheck()
         {
             // yillik tuketim / 8760 / baglanti gucu
+            const int HoursInYear = 8760;
+            int overCapacityCount = 0;
+            int totalRows = currentDataTable.Rows.Count;
+            int lastYear = DateTime.Now.Year - 1;
+            var lastYearTuketim = currentDataTable.Columns[$"{lastYear}_Tuketim"];
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                if (float.TryParse(row[lastYearTuketim]?.ToString(), out float tuketim) && tuketim > 0)
+                {
+                    var baglantiGucu = row["BAGLANTI_GUCU"];
+                    if (float.TryParse(baglantiGucu?.ToString(), out float guc) && guc > 0)
+                    {
+                        float kapasite = (tuketim / HoursInYear) / guc;
+                        if (kapasite > ABONE_KAPASITE_LIMIT)
+                        {
+                            overCapacityCount++;
+                           
+                        }
+                    }
+                }
+            }
+
+            float overCapacityPercentage = (float)overCapacityCount / totalRows;
+
+            warningDataTable.Rows.Add(new object[]
+            {
+                 "", "Abone kapasitesi", $"{overCapacityPercentage:P1}",
+                 $"Abone kapasitesi {ABONE_KAPASITE_LIMIT:P1}'den büyük olan abonelerin tüketim verileri silinecek."
+            });
+
         }
      }
 }
