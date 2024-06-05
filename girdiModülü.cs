@@ -17,15 +17,15 @@ namespace SLF
 
     public class GirdiModülü
     {
-        private Önizleme onizleme1 = new Önizleme();
-        private readonly List<string> veri_listesi_requires_xlsx = new List<string> {
+        protected Önizleme onizleme1 = new Önizleme();
+        protected readonly List<string> veri_listesi_requires_xlsx = new List<string> {
             "Ekonometrik Yük Tahmini Verileri",
             "Abone Verileri"
         };
-        private readonly List<string> veri_listesi_requires_csv = new List<string> { };
-        private readonly List<string> veri_listesi_requires_tabular = new List<string> { };
+        protected readonly List<string> veri_listesi_requires_csv = new List<string> { };
+        protected readonly List<string> veri_listesi_requires_tabular = new List<string> { };
 
-        private readonly List<string> nullLikeStrings = new List<string>
+        protected readonly List<string> nullLikeStrings = new List<string>
         {
             "",
             "null",
@@ -33,24 +33,24 @@ namespace SLF
             "#N/A"
         };
 
-        private string seçilenVeriTipi;
+        protected string seçilenVeriTipi;
 
-        private const string FileDialogTitle = "Bir veri dosyası seçiniz.";
-        private const string FilterExcelFiles = "Excel dosyaları (*.xlsx)|*.xlsx";
-        private const string FilterCsvFiles = "CSV dosyaları (*.csv)|*.csv";
-        private const string FilterTabularFiles = "KML dosyaları (*.kml)|*.kml";
-        private const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
+        protected const string FileDialogTitle = "Bir veri dosyası seçiniz.";
+        protected const string FilterExcelFiles = "Excel dosyaları (*.xlsx)|*.xlsx";
+        protected const string FilterCsvFiles = "CSV dosyaları (*.csv)|*.csv";
+        protected const string FilterTabularFiles = "KML dosyaları (*.kml)|*.kml";
+        protected const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
 
-        private readonly string combinedExcelFilter;
-        private readonly string combinedCsvFilter;
-        private readonly string combinedTabularFilter;
+        protected readonly string combinedExcelFilter;
+        protected readonly string combinedCsvFilter;
+        protected readonly string combinedTabularFilter;
 
-        private DataTable currentDataTable = new DataTable();
-        private DataTable errorDataTable = new DataTable();
-        private DataTable warningDataTable = new DataTable();
-        private DataTable infoDataTable = new DataTable();
+        protected DataTable currentDataTable = new DataTable();
+        protected DataTable errorDataTable = new DataTable();
+        protected DataTable warningDataTable = new DataTable();
+        protected DataTable infoDataTable = new DataTable();
 
-        private readonly Dictionary<string, Dictionary<string, (float Min, float Max)>> minMaxCheckMap = new Dictionary<string, Dictionary<string, (float Min, float Max)>>
+        protected readonly Dictionary<string, Dictionary<string, (float Min, float Max)>> minMaxCheckMap = new Dictionary<string, Dictionary<string, (float Min, float Max)>>
         {
             {
                 "Abone Verileri",
@@ -62,21 +62,21 @@ namespace SLF
             }
         };
 
-        private const float MAX_THRESHOLD = float.MaxValue;
-        private const float MIN_THRESHOLD = 0.0f;
-        private const float TUKETIM_ERROR_THRESHOLD = 0.2f;
-        private const float COORDINATE_ERROR_THRESHOLD = 0.1f;
-        private const float ABONE_KAPASITE_LIMIT = 0.6f;
-        private static (float Min, float Max) WARNING_ONLY = (MIN_THRESHOLD, MAX_THRESHOLD);
-        private static (float Min, float Max) INFO_ONLY = (MAX_THRESHOLD, MAX_THRESHOLD);
+        protected const float MAX_THRESHOLD = float.MaxValue;
+        protected const float MIN_THRESHOLD = 0.0f;
+        protected const float TUKETIM_ERROR_THRESHOLD = 0.2f;
+        protected const float COORDINATE_ERROR_THRESHOLD = 0.1f;
+        protected const float ABONE_KAPASITE_LIMIT = 0.6f;
+        protected static (float Min, float Max) WARNING_ONLY = (MIN_THRESHOLD, MAX_THRESHOLD);
+        protected static (float Min, float Max) INFO_ONLY = (MAX_THRESHOLD, MAX_THRESHOLD);
 
-        private static (float Min, float Max) WarningErrorBoundary(float boundary)
+        protected static (float Min, float Max) WarningErrorBoundary(float boundary)
         {
             // Bi verinin "boundary"ye kadar olan kısmı warning, "boundary"den sonrası error
             return (MIN_THRESHOLD, boundary);
         }
 
-        private readonly Dictionary<string, Dictionary<string, (float warningThreshold, float errorThreshold)>> nullFieldsCheckWithLevel = new Dictionary<string, Dictionary<string, (float warningThreshold, float errorThreshold)>>
+        protected readonly Dictionary<string, Dictionary<string, (float warningThreshold, float errorThreshold)>> nullFieldsCheckWithLevel = new Dictionary<string, Dictionary<string, (float warningThreshold, float errorThreshold)>>
         {
             {
                 "Abone Verileri",
@@ -97,7 +97,7 @@ namespace SLF
                     }
             }
         };
-        private readonly Dictionary<string, List<string>> duplicateFieldsGivingError = new Dictionary<string, List<string>>
+        protected readonly Dictionary<string, List<string>> duplicateFieldsGivingError = new Dictionary<string, List<string>>
         {
             {
                 "Abone Verileri",
@@ -123,7 +123,7 @@ namespace SLF
             onizleme1.Onizleme_DataGrid4.DataSource = infoDataTable;
         }
 
-        private void AddColumnsToDataTable(DataTable table)
+        protected void AddColumnsToDataTable(DataTable table)
         {
             table.Columns.Add("Sütun Adı", typeof(string));
             table.Columns.Add("Validasyon Türü", typeof(string));
@@ -172,7 +172,7 @@ namespace SLF
             else throw new NoFileSelectedException("Bu veri tipi için atanmış bir dosya seçimi prosedürü henüz yok.");
         }
 
-        private DataTable ProcessExcelFile(string fileName, string seçilenVeriTipi)
+        protected DataTable ProcessExcelFile(string fileName, string seçilenVeriTipi)
         {
             ExcelImporter importer = new ExcelImporter();
             DataTable dataTable = importer.ImportExcelFile(fileName, seçilenVeriTipi);
@@ -182,13 +182,13 @@ namespace SLF
             return dataTable;
         }
 
-        private DataTable ProcessCsvFile(string fileName)
+        protected DataTable ProcessCsvFile(string fileName)
         {
             // TODO: Implement CSV file processing
             return new DataTable();
         }
 
-        private DataTable ProcessTabularFile(string fileName)
+        protected DataTable ProcessTabularFile(string fileName)
         {
             // TODO: Implement tabular file processing
             return new DataTable();
@@ -206,7 +206,7 @@ namespace SLF
             ReportCoordinatesOutOfLimits();
             AboneKapasiteCheck();
         }
-        private void ReportNullCounts()
+        protected void ReportNullCounts()
         {
             float nullPercentage = 0.0f;
             int totalRows = currentDataTable.Rows.Count;
@@ -241,7 +241,7 @@ namespace SLF
                 }
             }
         }
-        private void ReportDuplicateRowCounts()
+        protected void ReportDuplicateRowCounts()
         {
             // HashSet to store unique rows
             HashSet<string> uniqueRows = new HashSet<string>();
@@ -271,7 +271,7 @@ namespace SLF
                 });
             }
         }
-        private void ReportDuplicateCounts()
+        protected void ReportDuplicateCounts()
         {
             float duplicatePercentage;
             foreach (DataColumn column in currentDataTable.Columns)
@@ -307,7 +307,7 @@ namespace SLF
             }
         }
 
-        private void ReportCoordinatesOutOfLimits()
+        protected void ReportCoordinatesOutOfLimits()
         {
             var (minXValue, maxXValue) = minMaxCheckMap[seçilenVeriTipi]["X_KOORDINAT"];
             var (minYValue, maxYValue) = minMaxCheckMap[seçilenVeriTipi]["Y_KOORDINAT"];
@@ -340,7 +340,7 @@ namespace SLF
                 });
             }
         }
-        private void ReportErrorLessThanOrEqualToZero()
+        protected void ReportErrorLessThanOrEqualToZero()
         {
             int currentYear = DateTime.Now.Year;
             float nonPositivePercentage;
@@ -387,7 +387,7 @@ namespace SLF
                 });
             }
         }
-        private void AboneKapasiteCheck()
+        protected void AboneKapasiteCheck()
         {
             // yillik tuketim / 8760 / baglanti gucu
             const int HoursInYear = 8760;
