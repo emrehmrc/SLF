@@ -62,32 +62,37 @@ namespace SLF
             }
         };
 
-        private readonly Dictionary<string, List<string>> nullFieldsGivingWarning = new Dictionary<string, List<string>> 
+        private const float MAX_THRESHOLD = float.MaxValue;
+        private const float MIN_THRESHOLD = 0.0f;
+        private const float TUKETIM_ERROR_THRESHOLD = 0.2f;
+        private const float COORDINATE_ERROR_THRESHOLD = 0.1f;
+        private static (float Min, float Max) WARNING_ONLY = (MIN_THRESHOLD, MAX_THRESHOLD);
+        private static (float Min, float Max) INFO_ONLY = (MAX_THRESHOLD, MAX_THRESHOLD);
+
+        private static (float Min, float Max) WarningErrorBoundary(float boundary)
+        {
+            // Bi verinin "boundary"ye kadar olan kısmı warning, "boundary"den sonrası error
+            return (MIN_THRESHOLD, boundary);
+        }
+
+        private readonly Dictionary<string, Dictionary<string, (float warningThreshold, float errorThreshold)>> nullFieldsCheckWithLevel = new Dictionary<string, Dictionary<string, (float warningThreshold, float errorThreshold)>>
         {
             {
                 "Abone Verileri",
-                    new List<string> {
-                        "TESISAT_NO",
-                        "X_KOORDINAT",
-                        "Y_KOORDINAT",
-                        "ADR_BINA_ID",
-                        "bina_turu",
-                        "BAGLANTI_GUCU",
-                        "SOZ_DURUM",
-                        "ABONE_GRUBU",
-                        "GERILIM_SEVIYESI",
-                        "SOZ_BAS_TARIH",
-                        "SOZ_BIT_TARIH",
-                    }
-            }
-        };
-        private readonly Dictionary<string, List<string>> nullFieldsGivingError = new Dictionary<string, List<string>> 
-        {
-            {
-                "Abone Verileri",
-                    new List<string> {
-                        "ENERJI_TABLO_KAYIT_KODU",
-                        "ABONE_GRUBU",
+                    new Dictionary<string, (float warningThreshold, float errorThreshold)> 
+                    {
+                        { "TESISAT_NO", WarningErrorBoundary(0.2f) },
+                        { "X_KOORDINAT", WarningErrorBoundary(0.2f)  }, 
+                        { "Y_KOORDINAT", WarningErrorBoundary(0.2f)  },
+                        { "ADR_BINA_ID", WarningErrorBoundary(0.2f) },
+                        { "bina_turu", WarningErrorBoundary(0.2f) },
+                        { "BAGLANTI_GUCU", WarningErrorBoundary(0.4f) },
+                        { "SOZ_DURUM", WarningErrorBoundary(0.2f) },
+                        { "ABONE_GRUBU",WarningErrorBoundary(0.2f) },
+                        { "GERILIM_SEVIYESI", WarningErrorBoundary(0.2f) },
+                        { "SOZ_BAS_TARIH", WARNING_ONLY },
+                        { "SOZ_BIT_TARIH", WARNING_ONLY },
+                        { "ENERJI_TABLO_KAYIT_KODU", WarningErrorBoundary(0.1f) }
                     }
             }
         };
@@ -97,15 +102,11 @@ namespace SLF
                 "Abone Verileri",
                     new List<string> {
                         "TESISAT_NO",
-                        //"ENERJI_TABLO_KAYIT_KODU",
                     }
             }
         };
         // Public read-only property
         public DataTable CurrentDataTable { get { return currentDataTable; }}
-        public DataTable ErrorDataTable { get { return errorDataTable; }}
-        public DataTable WarningDataTable { get { return warningDataTable; }}
-        public DataTable InfoDataTable { get { return infoDataTable; }}
         public Önizleme Onizleme1 { get { return onizleme1; }}
 
         public GirdiModülü()
@@ -197,11 +198,12 @@ namespace SLF
             errorDataTable.Rows.Clear();
             warningDataTable.Rows.Clear();
             infoDataTable.Rows.Clear();
+            ReportErrorLessThanOrEqualToZero();
             ReportNullCounts();
             ReportDuplicateRowCounts();
             ReportDuplicateCounts();
             ReportCoordinatesOutOfLimits();
-            ReportErrorLessThanOrEqualToZero();
+            AboneKapasiteCheck();
         }
         private void ReportNullCounts()
         {
@@ -219,18 +221,21 @@ namespace SLF
 
                 nullPercentage = (float)nullCount / totalRows;
 
-                if (nullCount > 0 && nullFieldsGivingWarning[seçilenVeriTipi].Contains(column.ColumnName))
+                if (nullPercentage > 0 && nullFieldsCheckWithLevel[seçilenVeriTipi].ContainsKey(column.ColumnName))
                 {
+                    var datatableLevel = infoDataTable;
+
+                    if (nullPercentage >= nullFieldsCheckWithLevel[seçilenVeriTipi][column.ColumnName].errorThreshold)
+                    {
+                        datatableLevel = errorDataTable;
+                    }
+                    else if (nullPercentage >= nullFieldsCheckWithLevel[seçilenVeriTipi][column.ColumnName].warningThreshold)
+                    {
+                        datatableLevel = warningDataTable;
+                    }
                     // Append the column name and null count to the report message
-                    warningDataTable.Rows.Add(new object[] {
+                    datatableLevel.Rows.Add(new object[] {
                         column.ColumnName, "Null değer", $"{nullPercentage:P1}"
-                    });
-                }
-                if (nullCount > 0 && nullFieldsGivingError[seçilenVeriTipi].Contains(column.ColumnName))
-                {
-                    // Append the column name and null count to the report message
-                    errorDataTable.Rows.Add(new object[] { 
-                        column.ColumnName, "Null değer", $"{nullPercentage:P1}" 
                     });
                 }
             }
@@ -307,7 +312,6 @@ namespace SLF
             var (minYValue, maxYValue) = minMaxCheckMap[seçilenVeriTipi]["Y_KOORDINAT"];
 
             int countOutOfThresholdCoordinates = 0;
-            float outOfThresholdPercentage = 0.0f;
 
             foreach (DataRow row in currentDataTable.Rows)
             {
@@ -320,12 +324,20 @@ namespace SLF
                 }
             }
 
-            if (countOutOfThresholdCoordinates > 0)
+            float outOfThresholdPercentage = (float)countOutOfThresholdCoordinates / currentDataTable.Rows.Count;
+
+            if (outOfThresholdPercentage > 0)
+            {
+                var datatableLevel = warningDataTable;
+                if (outOfThresholdPercentage >= COORDINATE_ERROR_THRESHOLD)
+                {
+                    datatableLevel = errorDataTable;
+                }
                 // Add the warning to the DataTable
-                outOfThresholdPercentage = (float)countOutOfThresholdCoordinates / currentDataTable.Rows.Count;
-                warningDataTable.Rows.Add(new object[] {
+                datatableLevel.Rows.Add(new object[] {
                     "X_KOORDINAT & Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}"
                 });
+            }
         }
         private void ReportErrorLessThanOrEqualToZero()
         {
@@ -359,14 +371,24 @@ namespace SLF
 
             nonPositivePercentage = (float)nonPositiveCount / totalRows;
 
-            if (nonPositiveCount > 0)
+            if (nonPositivePercentage > 0)
             {
+                var datatableLevel = warningDataTable;
+                if (nonPositivePercentage >= TUKETIM_ERROR_THRESHOLD)
+                {
+                    datatableLevel = errorDataTable;
+                }
+
                 // Append the column name and null count to the report message
-                errorDataTable.Rows.Add(new object[] {
+                datatableLevel.Rows.Add(new object[] {
                     column.ColumnName, "Son yıl tüketim verisi", $"{nonPositivePercentage:P1} abonenin tüketim verisi yok",
                     "Bu abonelerin tüketim verileri silinecek."
                 });
             }
+        }
+        private void AboneKapasiteCheck()
+        {
+            // yillik tuketim / 8760 / baglanti gucu
         }
      }
 }
