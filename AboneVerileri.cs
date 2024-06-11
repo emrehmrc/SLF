@@ -17,8 +17,8 @@ namespace SLF
             { "Y_KOORDINAT", (38.46f, 38.53f) } // TODO: Update these values from the other data
         };
 
-        private const float TUKETIM_ERROR_THRESHOLD = 0.2f;
-        private const float COORDINATE_ERROR_THRESHOLD = 0.1f;
+        private readonly (float warningThreshold, float errorThreshold) TUKETIM_ERROR_THRESHOLD = WarningErrorBoundary(0.2f);
+        private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = WarningErrorBoundary(0.1f);
         private const float ABONE_KAPASITE_LIMIT = 0.6f;
 
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
@@ -69,17 +69,8 @@ namespace SLF
 
                 if (nullPercentage > 0 && nullFieldsCheckWithLevel.ContainsKey(column.ColumnName))
                 {
-                    var datatableLevel = infoDataTable;
-
-                    if (nullPercentage >= nullFieldsCheckWithLevel[column.ColumnName].errorThreshold)
-                    {
-                        datatableLevel = errorDataTable;
-                    }
-                    else if (nullPercentage >= nullFieldsCheckWithLevel[column.ColumnName].warningThreshold)
-                    {
-                        datatableLevel = warningDataTable;
-                    }
-                    // Append the column name and null count to the report message
+                    var thresholds = nullFieldsCheckWithLevel[column.ColumnName];
+                    var datatableLevel = GetDataTableBasedOnThreshold(nullPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
                     datatableLevel.Rows.Add(new object[] {
                         column.ColumnName, "Null değer", $"{nullPercentage:P1}"
                     });
@@ -175,11 +166,9 @@ namespace SLF
 
             if (outOfThresholdPercentage > 0)
             {
-                var datatableLevel = warningDataTable;
-                if (outOfThresholdPercentage >= COORDINATE_ERROR_THRESHOLD)
-                {
-                    datatableLevel = errorDataTable;
-                }
+                var thresholds = COORDINATE_ERROR_THRESHOLD;
+                var datatableLevel = GetDataTableBasedOnThreshold(outOfThresholdPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+
                 // Add the warning to the DataTable
                 datatableLevel.Rows.Add(new object[] {
                     "X_KOORDINAT & Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}"
@@ -220,11 +209,8 @@ namespace SLF
 
             if (nonPositivePercentage > 0)
             {
-                var datatableLevel = warningDataTable;
-                if (nonPositivePercentage >= TUKETIM_ERROR_THRESHOLD)
-                {
-                    datatableLevel = errorDataTable;
-                }
+                var thresholds = TUKETIM_ERROR_THRESHOLD;
+                var datatableLevel = GetDataTableBasedOnThreshold(nonPositivePercentage, thresholds.warningThreshold, thresholds.errorThreshold);
 
                 // Append the column name and null count to the report message
                 datatableLevel.Rows.Add(new object[] {

@@ -160,6 +160,25 @@ namespace SLF
             warningDataTable.Rows.Clear();
             infoDataTable.Rows.Clear();
         }
+        protected DataTable GetDataTableBasedOnThreshold(
+            float currentPercentage,
+            float warningThreshold,
+            float errorThreshold
+        )
+        {
+            if (currentPercentage >= errorThreshold)
+            {
+                return errorDataTable;
+            }
+            else if (currentPercentage >= warningThreshold)
+            {
+                return warningDataTable;
+            }
+            else
+            {
+                return infoDataTable;
+            }
+        }
     }
 }
 
