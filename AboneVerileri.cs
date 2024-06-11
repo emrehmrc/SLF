@@ -59,6 +59,17 @@ namespace SLF
             AboneKapasiteCheck();
             ReportDateFormatErrors();
         }
+
+        public void RemoveNullRows(string column)
+        {
+            List<int> rowsToRemoveList = columnNullRowsMap[column];
+            rowsToRemoveList.Sort((a, b) => b.CompareTo(a));
+            foreach (int rowIndex in rowsToRemoveList)
+            {
+                currentDataTable.Rows.RemoveAt(rowIndex);
+            }
+        }
+
         private void ReportNullCounts()
         {
             float nullPercentage = 0.0f;
@@ -66,16 +77,33 @@ namespace SLF
 
             foreach (DataColumn column in currentDataTable.Columns)
             {
-                // Count the number of null, DBNull, "null", and "N/A" values in the current column
-                int nullCount = currentDataTable.AsEnumerable().Count(row =>
-                    row.IsNull(column) ||
-                    row[column] == DBNull.Value ||
-                    nullLikeStrings.Contains(row[column]?.ToString(), StringComparer.OrdinalIgnoreCase)
-                );
+                if (!nullFieldsCheckWithLevel.ContainsKey(column.ColumnName))
+                {
+                    continue;
+                }
+
+                List<int> nullRows = new List<int>();
+
+                int nullCount = 0;
+
+                for (int i = 0; i < totalRows; i++)
+                {
+                    var row = currentDataTable.Rows[i];
+                    if (row.IsNull(column) ||
+                        row[column] == DBNull.Value ||
+                        nullLikeStrings.Contains(row[column]?.ToString(), StringComparer.OrdinalIgnoreCase))
+                    {
+                        nullCount++;
+                        // Add the row number and the null-like value to the nullRows
+                        nullRows.Add(i);
+                    }
+                }
+
+                columnNullRowsMap[column.ColumnName] = nullRows;
 
                 nullPercentage = (float)nullCount / totalRows;
 
-                if (nullPercentage > 0 && nullFieldsCheckWithLevel.ContainsKey(column.ColumnName))
+                if (nullPercentage > 0)
                 {
                     var thresholds = nullFieldsCheckWithLevel[column.ColumnName];
                     var datatableLevel = GetDataTableBasedOnThreshold(nullPercentage, thresholds.warningThreshold, thresholds.errorThreshold);

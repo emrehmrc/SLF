@@ -50,6 +50,8 @@ namespace SLF
         protected DataTable warningDataTable = new DataTable();
         protected DataTable infoDataTable = new DataTable();
 
+        protected Dictionary<string, List<int>> columnNullRowsMap = new Dictionary<string, List<int>>();
+
         protected const float MAX_THRESHOLD = float.MaxValue;
         protected const float MIN_THRESHOLD = float.MinValue;
         protected static (float Min, float Max) WARNING_ONLY = (MIN_THRESHOLD, MAX_THRESHOLD);
