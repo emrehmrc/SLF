@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -10,7 +11,6 @@ namespace SLF
 {
     public class AboneVerileri:GirdiModülü
     {
-        //private DataTable currentDataTable = new DataTable();
         private readonly Dictionary<string, (float Min, float Max)> minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
         {
             { "X_KOORDINAT", (27.0f, 27.15f) }, // TODO: Update these values from the other data
@@ -20,6 +20,8 @@ namespace SLF
         private readonly (float warningThreshold, float errorThreshold) TUKETIM_ERROR_THRESHOLD = WarningErrorBoundary(0.2f);
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = WarningErrorBoundary(0.1f);
         private const float ABONE_KAPASITE_LIMIT = 0.6f;
+
+        private string DATE_FORMAT = "yyyyMMdd";
 
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
@@ -32,9 +34,14 @@ namespace SLF
             { "SOZ_DURUM", INFO_ONLY },
             { "ABONE_GRUBU",WarningErrorBoundary(0.2f) },
             { "GERILIM_SEVIYESI", INFO_ONLY },
-            { "SOZ_BAS_TARIH", WARNING_ONLY },
-            { "SOZ_BIT_TARIH", WARNING_ONLY },
+            //{ "SOZ_BAS_TARIH", INFO_ONLY },
+            //{ "SOZ_BIT_TARIH", INFO_ONLY },
             { "ENERJI_TABLO_KAYIT_KODU", WarningErrorBoundary(0.1f) }
+        };
+        private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> dateFormatCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
+        {
+            //{ "SOZ_BAS_TARIH", INFO_ONLY },
+            //{ "SOZ_BIT_TARIH", INFO_ONLY },
         };
         private readonly List<string> duplicateFieldsGivingError = new List<string>
         {
@@ -50,6 +57,7 @@ namespace SLF
             ReportDuplicateCounts();
             ReportCoordinatesOutOfLimits();
             AboneKapasiteCheck();
+            ReportDateFormatErrors();
         }
         private void ReportNullCounts()
         {
@@ -75,6 +83,35 @@ namespace SLF
                         column.ColumnName, "Null değer", $"{nullPercentage:P1}"
                     });
                 }
+            }
+        }
+        private void ReportDateFormatErrors()
+        {
+            float invalidPercentage = 0.0f;
+            int totalRows = currentDataTable.Rows.Count;
+
+            foreach (DataColumn column in currentDataTable.Columns)
+            {
+                if (dateFormatCheckWithLevel.ContainsKey(column.ColumnName))
+                {
+                    var thresholds = dateFormatCheckWithLevel[column.ColumnName];
+                    int invalidCount = currentDataTable.AsEnumerable().Count(row =>
+                    {
+                        var value = row[column]?.ToString();
+                        return !DateTime.TryParseExact(value, DATE_FORMAT, null, DateTimeStyles.None, out _);
+                    });
+
+                    invalidPercentage = (float)invalidCount / totalRows;
+
+                    if (invalidPercentage > 0)
+                    {
+                        var datatableLevel = GetDataTableBasedOnThreshold(invalidPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+                        datatableLevel.Rows.Add(new object[]
+                        {
+                            column.ColumnName, "Geçersiz tarih formatı", $"{invalidPercentage:P1}", $"Tarihler { DATE_FORMAT } biçiminde olmalıdır. Lütfen düzeltiniz."
+                        });
+                    }
+                }   
             }
         }
         private void ReportDuplicateRowCounts()

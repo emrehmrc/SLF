@@ -51,9 +51,10 @@ namespace SLF
         protected DataTable infoDataTable = new DataTable();
 
         protected const float MAX_THRESHOLD = float.MaxValue;
-        protected const float MIN_THRESHOLD = 0.0f;
+        protected const float MIN_THRESHOLD = float.MinValue;
         protected static (float Min, float Max) WARNING_ONLY = (MIN_THRESHOLD, MAX_THRESHOLD);
         protected static (float Min, float Max) INFO_ONLY = (MAX_THRESHOLD, MAX_THRESHOLD);
+        protected static (float Min, float Max) ERROR_ONLY = (MIN_THRESHOLD, MIN_THRESHOLD);
 
         protected static (float Min, float Max) WarningErrorBoundary(float boundary)
         {
