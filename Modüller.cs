@@ -33,6 +33,16 @@ namespace SLF
         // form objeleri
         public GirişFormu gir1;
         private GirdiModülü girdiModülü;
+        private Dictionary<string, GirdiModülü> girdiModülleri = new Dictionary<string, GirdiModülü> {
+            {"Abone Verileri", new AboneVerileri()},
+            {"DEK Verileri", new GirdiModülü()},
+            {"DTR Verileri", new GirdiModülü()},
+            {"EA Şarj Verileri", new GirdiModülü()},
+            {"Ekonometrik Yük Tahmini Verileri", new GirdiModülü()},
+            {"Fider Verileri", new GirdiModülü()},
+            {"İmar Verileri", new GirdiModülü()},
+            {"TM Verileri", new GirdiModülü()},
+        };
 
         // declare an instance of the Tablo_Formu to be used to see the Attribute Table of the vector layers
         public Tablo_Formu tablo_formu;
@@ -138,7 +148,6 @@ namespace SLF
         public ModülFormu() {
 
             InitializeComponent();
-            girdiModülü = new GirdiModülü();
             InitializeGMap(gMapControl_stokastik);
             InitializeGMap(gMapControl_EA);
 
@@ -2030,6 +2039,7 @@ namespace SLF
 
             // Veri listesinde seçilen veri tipine göre dosya seçme işlemi yapılacak
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+            girdiModülü = girdiModülleri[seçilenVeriTipi];
 
             try
             {
