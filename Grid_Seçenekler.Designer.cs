@@ -123,7 +123,6 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Grid_Seçenekler";
             this.Text = "Grid Oluştur";
-            this.Load += new System.EventHandler(this.Grid_Seçenekler_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.ResumeLayout(false);

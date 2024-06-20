@@ -40,8 +40,8 @@ namespace SLF
                 modül.grid_size = 100;
                 modül.Show();
                 this.Close();
-                modül.gMapControl_stokastik.Overlays.Remove(modül.bounding_box_overlay);
-                modül.CreateAndAddGridToMap();
+                modül.isSelecting_grid = true;
+                modül.gMapControl_stokastik.Cursor = Cursors.Arrow;
             }
             else if (combobox_grid_sizes.SelectedIndex == 1)
             {
@@ -49,8 +49,8 @@ namespace SLF
                 modül.grid_size = 250;
                 modül.Show();
                 this.Close();
-                modül.gMapControl_stokastik.Overlays.Remove(modül.bounding_box_overlay);
-                modül.CreateAndAddGridToMap();
+                modül.isSelecting_grid = true;
+                modül.gMapControl_stokastik.Cursor = Cursors.Arrow;
             }
             else if (combobox_grid_sizes.SelectedIndex == 2)
             {
@@ -58,8 +58,8 @@ namespace SLF
                 modül.grid_size = 400;
                 modül.Show();
                 this.Close();
-                modül.gMapControl_stokastik.Overlays.Remove(modül.bounding_box_overlay);
-                modül.CreateAndAddGridToMap();
+                modül.isSelecting_grid = true;
+                modül.gMapControl_stokastik.Cursor = Cursors.Arrow;
             }
             else
             {
@@ -67,14 +67,10 @@ namespace SLF
                 modül.grid_size = 1000;
                 modül.Show();
                 this.Close();
-                modül.gMapControl_stokastik.Overlays.Remove(modül.bounding_box_overlay);
-                modül.CreateAndAddGridToMap();
+                modül.isSelecting_grid = true;
+                modül.gMapControl_stokastik.Cursor = Cursors.Arrow;
             }
         }
 
-        private void Grid_Seçenekler_Load(object sender, EventArgs e)
-        {
-
-        }
     }
 }
