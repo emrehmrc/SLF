@@ -19,7 +19,7 @@ using SharpKml.Engine;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Threading.Tasks;
 using MapWinGIS;
-using OSGeo.OGR;
+using SharpMap.Data.Providers;
 
 namespace SLF
 {
@@ -199,10 +199,10 @@ namespace SLF
         {
 
             // populate the new row by using the .GetValue method 
-            for (int i = 0; i < shapefile_reader.DbaseHeader.NumFields; i++)
+            for (int i = 1; i < shapefile_reader.DbaseHeader.NumFields; i++)
             {
                 row["Row_No"] = row_cnt;
-                row[i+1] = shapefile_reader.GetValue(i); // get the value of all columns for the i-th row
+                row[i] = shapefile_reader.GetValue(i); // get the value of all columns for the i-th row
             }
 
             // add the resulting row to the datatable
@@ -1202,15 +1202,32 @@ namespace SLF
                     {
                         MapWinGIS.Shapefile shapefile = shapeFileArray_MapWinGIS[checkbox_index];
 
-                        if (!HasField(shapefile, "xMin") && !HasField(shapefile, "yMax"))
+                        /*if (!HasField(shapefile, "xMin") && !HasField(shapefile, "yMax"))
                         {
                             shapefile.EditDeleteField(0);
+                        }*/
+
+                        int fieldIndex;
+                        
+                        /*fieldIndex = shapefile.get_FieldIndexByName("Cell_No");
+
+                        if(fieldIndex  != -1)
+                        {
+                            MessageBox.Show("a");
+                            shapefile.EditDeleteField(fieldIndex);
+                        }      */      
+
+                        fieldIndex = shapefile.get_FieldIndexByName("MWShapeID");
+
+                        if (fieldIndex != -1)
+                        {
+                            MessageBox.Show("b");
+                            shapefile.EditDeleteField(fieldIndex);
                         }
 
-                        shapefile.EditDeleteField(0);
                         shapefile.SaveAsEx(filepath, false, false);
                         shapefile.Close();
-                        //shapeFileArray_MapWinGIS[checkbox_index] = null;
+                        shapeFileArray_MapWinGIS[checkbox_index] = null;
                         MessageBox.Show("Dosya başarıyla kaydedildi.");
                     }
                     else if (extension == "kml")
@@ -2812,12 +2829,18 @@ namespace SLF
                 // initialize the aggregate arrays as dictionaries
                 var counts = selectedColumns.ToDictionary(column => column, column => 0.0);
                 var sums = selectedColumns.ToDictionary(column => column, column => 0.0);
-                var mins = selectedColumns.ToDictionary(column => column, column => double.MaxValue);
-                var maxs = selectedColumns.ToDictionary(column => column, column => double.MinValue);
+                var mins = selectedColumns.ToDictionary(column => column, column => double.MinValue);
+                var maxs = selectedColumns.ToDictionary(column => column, column => double.MaxValue);
                 
                 // add all of the columns from the first layer, and only the aggregate columns
                 // from the second layer
                 DataRow combinedAttributes = gridAttributes.Table.NewRow();
+
+                foreach(DataColumn columns_original in gridAttributes.Table.Columns)
+                {
+                    combinedAttributes[columns_original] = gridAttributes[columns_original];  
+                }
+
                 foreach (string column in selectedColumns)
                 {
                     if (!combinedAttributes.Table.Columns.Contains($"{column}_Count"))
@@ -2885,20 +2908,18 @@ namespace SLF
                         resultingAttributes[$"{column}_Count"] = counts[column];
                         resultingAttributes[$"{column}_Sum"] = sums[column];
 
-                        if (maxs[column] >= 1e10)
+                        if (maxs[column] == double.MaxValue)
                         {
-                            MessageBox.Show("max");
-                            resultingAttributes[$"{column}_Max"] = 9999999999;
+                            resultingAttributes[$"{column}_Max"] = double.PositiveInfinity;
                         }
                         else
                         {
                             resultingAttributes[$"{column}_Max"] = maxs[column];
                         }
 
-                        if (mins[column] <= -1e10)
+                        if (mins[column] == double.MinValue)
                         {
-                            MessageBox.Show("min");
-                            resultingAttributes[$"{column}_Min"] = -9999999999;
+                            resultingAttributes[$"{column}_Min"] = double.NegativeInfinity;
                         }
                         else
                         {
@@ -2960,7 +2981,7 @@ namespace SLF
 
             // add the resulting layer and its name to the specified arrays
             tüm_katmanlar_array[layer_index] = resultingOverlay;
-            tüm_katmanlar_array_names[layer_index] = "Birleşik_Katman_" + layer_index.ToString();
+            tüm_katmanlar_array_names[layer_index] = "Birleştirilmiş_Katman_" + layer_index.ToString();
 
             // create a data table object and fill it with the information from the joinedData object
             DataTable joined_data_table = new DataTable();
