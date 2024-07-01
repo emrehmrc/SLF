@@ -19,7 +19,7 @@ namespace SLF
     {
         protected Önizleme onizleme1 = new Önizleme();
         protected readonly List<string> veri_listesi_requires_xlsx = new List<string> {
-            "Ekonometrik Yük Tahmini Verileri",
+            "EA Şarj Verileri",
             "Abone Verileri"
         };
         protected readonly List<string> veri_listesi_requires_csv = new List<string> { };

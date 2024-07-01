@@ -48,7 +48,9 @@ namespace SLF
                         "2023_Demant",
                     } 
             },
-            { "Ekonometrik Yük Tahmini Verileri", new List<string> { "Header4", "Header5", "Header6" } },
+            { "EA Şarj Verileri", new List<string> { 
+                "ADI", "Kurulu_Gücü", "ENERJI_TABLO_KAYIT_KODU","X_KOORDINAT","Y_KOORDINAT"
+            } },
             // Add more data types and their expected headers as needed
         };
 
