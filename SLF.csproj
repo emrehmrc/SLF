@@ -394,6 +394,7 @@
     <Compile Include="Ana_Menü.Designer.cs">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
     </Compile>
+    <Compile Include="EASarjModulu.cs" />
     <Compile Include="Form2.cs">
       <SubType>Form</SubType>
     </Compile>
