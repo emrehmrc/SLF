@@ -10,16 +10,57 @@ namespace SLF
 {
     public class EASarjModulu : GirdiModülü
     {
+        private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = WarningErrorBoundary(0.1f);
+
+        private readonly Dictionary<string, (float Min, float Max)> minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
+        {
+            { "X_KOORDINAT", (float.MinValue, float.MaxValue) }, // TODO: Update these values from the other data
+            { "Y_KOORDINAT", (float.MinValue, float.MaxValue) } // TODO: Update these values from the other data
+        };
+
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
             { "X_KOORDINAT", WarningErrorBoundary(0.2f) },
             { "Y_KOORDINAT", WarningErrorBoundary(0.2f) },
         };
+        private void ReportCoordinatesOutOfLimits()
+        {
+            var (minXValue, maxXValue) = minMaxCheckMap["X_KOORDINAT"];
+            var (minYValue, maxYValue) = minMaxCheckMap["Y_KOORDINAT"];
+
+            int countOutOfThresholdCoordinates = 0;
+
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                if (float.TryParse(row["X_KOORDINAT"]?.ToString(), out float valueX) && float.TryParse(row["Y_KOORDINAT"]?.ToString(), out float valueY))
+                {
+                    if (valueX < minXValue || valueX > maxXValue || valueY < minYValue || valueY > maxYValue)
+                    {
+                        countOutOfThresholdCoordinates++;
+                    }
+                }
+            }
+
+            float outOfThresholdPercentage = (float)countOutOfThresholdCoordinates / currentDataTable.Rows.Count;
+
+            if (outOfThresholdPercentage > 0)
+            {
+                var thresholds = COORDINATE_ERROR_THRESHOLD;
+                var datatableLevel = GetDataTableBasedOnThreshold(outOfThresholdPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+
+                // Add the warning to the DataTable
+                datatableLevel.Rows.Add(new object[] {
+                    "X_KOORDINAT & Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}", "%10'dan fazla abonede konum bilgisi doğru değildir."
+                });
+            }
+        }
         public override void Validate()
         {
             base.Validate();
 
             ReportNullCounts();
+
+            ReportCoordinatesOutOfLimits();
 
 
         }
