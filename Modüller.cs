@@ -2051,6 +2051,18 @@ namespace SLF
                     girdiModülü.Onizleme1.Onizleme_DataGrid1.DataSource = dataTable;
                     girdiModülü.Validate();
                     girdiModülü.Onizleme1.ShowDialog();
+                    if (girdiModülü.IsError()) {
+                        MessageBox.Show("Hataları gidermeden devam edemezsiniz!", "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    girdiModülü.Remove();
+                    girdiModülü.Validate();
+                    girdiModülü.Impute();
+                    if (!girdiModülü.IsInfo() && !girdiModülü.IsWarning()) {
+                        //return;
+                    }
+                    girdiModülü.Validate();
+                    girdiModülü.Onizleme1.ShowDialog();
                 }
                 else
                 {

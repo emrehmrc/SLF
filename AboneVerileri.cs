@@ -13,30 +13,32 @@ namespace SLF
     {
         private readonly Dictionary<string, (float Min, float Max)> minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
         {
-            { "X_KOORDINAT", (27.0f, 27.15f) }, // TODO: Update these values from the other data
-            { "Y_KOORDINAT", (38.46f, 38.53f) } // TODO: Update these values from the other data
+            { "X_KOORDINAT", (float.MinValue, float.MaxValue) }, // TODO: Update these values from the other data
+            { "Y_KOORDINAT", (float.MinValue, float.MaxValue) } // TODO: Update these values from the other data
         };
 
-        private readonly (float warningThreshold, float errorThreshold) TUKETIM_ERROR_THRESHOLD = WarningErrorBoundary(0.2f);
+        private readonly (float warningThreshold, float errorThreshold) TUKETIM_ERROR_THRESHOLD = InfoErrorBoundary(0.2f);
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = WarningErrorBoundary(0.1f);
         private const float ABONE_KAPASITE_LIMIT = 0.6f;
 
-        private string DATE_FORMAT = "yyyyMMdd";
+        private readonly string DATE_FORMAT = "yyyyMMdd";
+        private readonly string SOZ_DVM = "SÃ¶z.Dvm";
+        private readonly string SOZ_IPT = "SÃ¶z.Ipt";
 
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
-            { "TESISAT_NO", WarningErrorBoundary(0.2f) },
+            { "TESISAT_NO", InfoErrorBoundary(0.2f) },
+            { "ENERJI_TABLO_KAYIT_KODU", InfoErrorBoundary(0.1f) },
+            { "BAGLANTI_GUCU", WarningErrorBoundary(0.4f) },
+            { "ABONE_GRUBU",WarningErrorBoundary(0.2f) },
             { "X_KOORDINAT", WarningErrorBoundary(0.2f) },
             { "Y_KOORDINAT", WarningErrorBoundary(0.2f) },
             { "ADR_BINA_ID", WarningErrorBoundary(0.2f) },
-            { "bina_turu", WarningErrorBoundary(0.2f) },
-            { "BAGLANTI_GUCU", WarningErrorBoundary(0.4f) },
-            { "SOZ_DURUM", INFO_ONLY },
-            { "ABONE_GRUBU",WarningErrorBoundary(0.2f) },
-            { "GERILIM_SEVIYESI", INFO_ONLY },
+            //{ "bina_turu", WarningErrorBoundary(0.2f) },
+            //{ "SOZ_DURUM", INFO_ONLY },
+            //{ "GERILIM_SEVIYESI", INFO_ONLY },
             //{ "SOZ_BAS_TARIH", INFO_ONLY },
             //{ "SOZ_BIT_TARIH", INFO_ONLY },
-            { "ENERJI_TABLO_KAYIT_KODU", WarningErrorBoundary(0.1f) }
         };
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> dateFormatCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
@@ -51,22 +53,63 @@ namespace SLF
         {
             base.Validate();
 
-            ReportErrorLessThanOrEqualToZero();
+            ReportErrorLessThanZero();
+            BinaKoordinatMatchCheck();
             ReportNullCounts();
             ReportDuplicateRowCounts();
             ReportDuplicateCounts();
             ReportCoordinatesOutOfLimits();
             AboneKapasiteCheck();
             ReportDateFormatErrors();
+            ReportSanalCounts();
         }
 
-        public void RemoveNullRows(string column)
+        public override void Remove()
         {
-            List<int> rowsToRemoveList = columnNullRowsMap[column];
-            rowsToRemoveList.Sort((a, b) => b.CompareTo(a));
-            foreach (int rowIndex in rowsToRemoveList)
+            List<int> combinedRowsToRemoveList = new List<int>();
+
+            // Add row indices from different columns to the combined list
+            combinedRowsToRemoveList.AddRange(columnNullRowsMap["TESISAT_NO"]);
+            combinedRowsToRemoveList.AddRange(columnNullRowsMap["TESISAT_DUPLICATE"]);
+            combinedRowsToRemoveList.AddRange(columnNullRowsMap["ENERJI_TABLO_KAYIT_KODU"]);
+            combinedRowsToRemoveList.AddRange(columnNullRowsMap["bina_turu"]);
+            combinedRowsToRemoveList.AddRange(columnNullRowsMap["KAPASITE"]);
+            combinedRowsToRemoveList.AddRange(columnNullRowsMap[$"{lastYear}_Tuketim"]);
+
+            RemoveCombinedRows(combinedRowsToRemoveList);
+        }
+
+        private void RemoveCombinedRows(List<int> rowsToRemoveList)
+        {
+            // Remove duplicates and sort in descending order
+            var rowIndicesToRemove = rowsToRemoveList.Distinct().OrderByDescending(i => i).ToList();
+
+            foreach (int rowIndex in rowIndicesToRemove)
             {
-                currentDataTable.Rows.RemoveAt(rowIndex);
+                if (rowIndex < currentDataTable.Rows.Count)
+                {
+                    currentDataTable.Rows.RemoveAt(rowIndex);
+                }
+            }
+        }
+
+        public override void Impute()
+        {
+            ImputeCoordinates();
+            AboneGrubuImpute();
+        }
+
+        private void ImputeCoordinates()
+        {
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                string adrBinaId = row["ADR_BINA_ID"].ToString();
+                if (binaIdToMostFrequentCoordinates.ContainsKey(adrBinaId))
+                {
+                    var coordinates = binaIdToMostFrequentCoordinates[adrBinaId];
+                    row["X_KOORDINAT"] = coordinates.X;
+                    row["Y_KOORDINAT"] = coordinates.Y;
+                }
             }
         }
 
@@ -89,9 +132,7 @@ namespace SLF
                 for (int i = 0; i < totalRows; i++)
                 {
                     var row = currentDataTable.Rows[i];
-                    if (row.IsNull(column) ||
-                        row[column] == DBNull.Value ||
-                        nullLikeStrings.Contains(row[column]?.ToString(), StringComparer.OrdinalIgnoreCase))
+                    if (IsNullLike(row[column]))
                     {
                         nullCount++;
                         // Add the row number and the null-like value to the nullRows
@@ -111,6 +152,38 @@ namespace SLF
                         column.ColumnName, "Null değer", $"{nullPercentage:P1}"
                     });
                 }
+            }
+        }
+        private void ReportSanalCounts()
+        {
+            float nullPercentage = 0.0f;
+            int totalRows = currentDataTable.Rows.Count;
+            string column = "bina_turu";
+
+            var nullRows = new List<int>();
+
+            int nullCount = 0;
+
+            for (int i = 0; i < totalRows; i++)
+            {
+                var row = currentDataTable.Rows[i];
+                if (row[column].ToString() == "SANAL")
+                {
+                    nullCount++;
+                    // Add the row number and the null-like value to the nullRows
+                    nullRows.Add(i);
+                }
+            }
+
+            columnNullRowsMap[column] = nullRows;
+
+            nullPercentage = (float)nullCount / totalRows;
+
+            if (nullPercentage > 0)
+            {
+                infoDataTable.Rows.Add(new object[] {
+                    column, "Sanal bina", $"{nullPercentage:P1}"
+                });
             }
         }
         private void ReportDateFormatErrors()
@@ -182,16 +255,23 @@ namespace SLF
                     continue;
                 }
                 // HashSet to store unique values in the current column
-                HashSet<string> uniqueValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                var uniqueValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                var duplicateRowIndices = new List<int>();
 
-                foreach (DataRow row in currentDataTable.Rows)
+                for (int i = 0; i < currentDataTable.Rows.Count; i++)
                 {
-                    // Get the value in the current column and row
-                    var value = row[column]?.ToString();
+                    var row = currentDataTable.Rows[i];
+                    var value = row[column]?.ToString() ?? string.Empty;
 
-                    // Add the value to the HashSet
-                    uniqueValues.Add(value ?? string.Empty);
+                    if (uniqueValues.Contains(value))
+                    {
+                        duplicateRowIndices.Add(i);
+                    }
+
+                    uniqueValues.Add(value);
                 }
+
+                columnNullRowsMap["TESISAT_DUPLICATE"] = duplicateRowIndices;
 
                 // Calculate the number of unique values and duplicates
                 int totalCount = currentDataTable.Rows.Count;
@@ -236,19 +316,21 @@ namespace SLF
 
                 // Add the warning to the DataTable
                 datatableLevel.Rows.Add(new object[] {
-                    "X_KOORDINAT & Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}"
+                    "X_KOORDINAT & Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}", "%10'dan fazla abonede konum bilgisi doğru değildir."
                 });
             }
         }
-        private void ReportErrorLessThanOrEqualToZero()
+        private void ReportErrorLessThanZero()
         {
-            int currentYear = DateTime.Now.Year;
-            float nonPositivePercentage;
+            float nonPositivePercentage, nonLastYearPercentage;
             int totalRows = currentDataTable.Rows.Count;
-            var column = currentDataTable.Columns[$"{currentYear - 1}_Tuketim"];
-            var fallbackColumn = currentDataTable.Columns[$"{currentYear - 2}_Tuketim"];
+            var column = currentDataTable.Columns[$"{lastYear}_Tuketim"];
+            var fallbackColumn = currentDataTable.Columns[$"{penultimateYear}_Tuketim"];
+            var nullRows = new List<int>();
+            var imputableRows = new List<int>();
 
             int nonPositiveCount = 0;
+            int nonLastYearCount = 0;
 
             foreach (DataRow row in currentDataTable.Rows)
             {
@@ -256,21 +338,29 @@ namespace SLF
                     row.IsNull(column) ||
                     row[column] == DBNull.Value ||
                     nullLikeStrings.Contains(row[column]?.ToString(), StringComparer.OrdinalIgnoreCase) ||
-                    float.TryParse(row[column]?.ToString(), out float value) && value <= 0)
+                    float.TryParse(row[column]?.ToString(), out float value) && value < 0)
                 {
                     // If the last year's consumption data is missing or less than or equal to zero, check the previous year's data
                     if (row.IsNull(fallbackColumn) ||
                         row[fallbackColumn] == DBNull.Value ||
                         nullLikeStrings.Contains(row[fallbackColumn]?.ToString(), StringComparer.OrdinalIgnoreCase) ||
-                        float.TryParse(row[fallbackColumn]?.ToString(), out float fallbackValue) && fallbackValue <= 0
+                        float.TryParse(row[fallbackColumn]?.ToString(), out float fallbackValue) && fallbackValue < 0
                     )
                     {
                         nonPositiveCount++;
+                        nullRows.Add(currentDataTable.Rows.IndexOf(row));
+                    }
+                    else {
+                        nonLastYearCount++;
+                        imputableRows.Add(currentDataTable.Rows.IndexOf(row));
                     }
                 }
             }
 
+            columnNullRowsMap[column.ColumnName] = nullRows;
+            imputableRowsMap[column.ColumnName] = imputableRows;
             nonPositivePercentage = (float)nonPositiveCount / totalRows;
+            nonLastYearPercentage = (float)nonLastYearCount / totalRows;
 
             if (nonPositivePercentage > 0)
             {
@@ -283,15 +373,21 @@ namespace SLF
                     "Bu abonelerin tüketim verileri silinecek."
                 });
             }
+            if (nonLastYearPercentage > 0)
+            {
+                // Append the column name and null count to the report message
+                warningDataTable.Rows.Add(new object[] {
+                    column.ColumnName, "Son yıl tüketim verisi", $"{nonLastYearPercentage:P1}", "Bu abonelerin son yıl tüketim verisi yok. Tüketim verileri geçmiş veriler ile doldurulacak."
+                });
+            }
         }
         private void AboneKapasiteCheck()
         {
             // yillik tuketim / 8760 / baglanti gucu
-            const int HoursInYear = 8760;
             int overCapacityCount = 0;
             int totalRows = currentDataTable.Rows.Count;
-            int lastYear = DateTime.Now.Year - 1;
             var lastYearTuketim = currentDataTable.Columns[$"{lastYear}_Tuketim"];
+            var nullRows = new List<int>();
             foreach (DataRow row in currentDataTable.Rows)
             {
                 if (float.TryParse(row[lastYearTuketim]?.ToString(), out float tuketim) && tuketim > 0)
@@ -303,20 +399,113 @@ namespace SLF
                         if (kapasite > ABONE_KAPASITE_LIMIT)
                         {
                             overCapacityCount++;
-
+                            nullRows.Add(currentDataTable.Rows.IndexOf(row));
                         }
                     }
                 }
             }
 
+            columnNullRowsMap["KAPASITE"] = nullRows;
             float overCapacityPercentage = (float)overCapacityCount / totalRows;
 
-            warningDataTable.Rows.Add(new object[]
+            if (overCapacityPercentage > 0)
             {
+                infoDataTable.Rows.Add(new object[]
+                {
                  "", "Abone kapasitesi", $"{overCapacityPercentage:P1}",
                  $"Abone kapasitesi {ABONE_KAPASITE_LIMIT:P1}'den büyük olan abonelerin tüketim verileri silinecek."
-            });
+                });
+            }
 
+        }
+        private void BinaKoordinatMatchCheck()
+        {
+            var grouped = currentDataTable.AsEnumerable().GroupBy(row => row["ADR_BINA_ID"]);
+
+            int nonUniqueCount = 0;
+
+            binaIdToMostFrequentCoordinates.Clear();
+
+            foreach (var group in grouped)
+            {
+                // Group by original coordinates to determine the most frequent coordinate
+                var coordinateGroups = group
+                    .Select(row => new
+                    {
+                        X = double.TryParse(row["X_KOORDINAT"].ToString(), out double x) ? (double?)x : null,
+                        Y = double.TryParse(row["Y_KOORDINAT"].ToString(), out double y) ? (double?)y : null
+                    })
+                    .Where(coord => coord.X.HasValue && coord.Y.HasValue)
+                    .GroupBy(coord => new { coord.X, coord.Y })
+                    .OrderByDescending(g => g.Count())
+                    .ToList();
+
+                if (coordinateGroups.Count == 0)
+                {
+                    continue;
+                }
+
+                var mostFrequentGroup = coordinateGroups.First();
+                var mostFrequentPair = mostFrequentGroup.Key;
+
+                // Check for distinct coordinates based on precision
+                var distinctCoordinates = coordinateGroups
+                    .Select(g => new
+                    {
+                        X = Math.Round(g.Key.X.Value, COORDINATE_ROUNDING_PRECISION),
+                        Y = Math.Round(g.Key.Y.Value, COORDINATE_ROUNDING_PRECISION)
+                    })
+                    .Distinct()
+                    .ToList();
+
+                if (distinctCoordinates.Count > 1)
+                {
+                    nonUniqueCount++;
+                    binaIdToMostFrequentCoordinates[(string)group.Key] = (mostFrequentPair.X.Value, mostFrequentPair.Y.Value);
+                }
+            }
+
+
+            float nonUniquePercentage = (float)nonUniqueCount / grouped.Count();
+            if (nonUniquePercentage > 0)
+            {
+                warningDataTable.Rows.Add(new object[]
+                {
+                 "X & Y KOORDINAT", "Bina koordinatları", $"{nonUniquePercentage:P1}",
+                 "Bazı bina koordinatları farklıdır. Bu durumda o bina için en çok tekrar eden koordinatlar kullanılacaktır."
+                });
+            }
+        }
+        private void AboneGrubuImpute()
+        {
+            var grouped = currentDataTable.AsEnumerable().GroupBy(row => row["ADR_BINA_ID"]);
+
+            aboneGrubuMostFrequent.Clear();
+
+            foreach (var group in grouped)
+            {
+                // Group by original coordinates to determine the most frequent coordinate
+                var mostFrequentAboneGrubu = group
+                    .GroupBy(row => row["ABONE_GRUBU"].ToString())
+                    .OrderByDescending(g => g.Count())
+                    .FirstOrDefault();
+
+                if (mostFrequentAboneGrubu != null)
+                {
+                    aboneGrubuMostFrequent[(string)group.Key] = mostFrequentAboneGrubu.Key;
+                }
+            }
+
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                string aboneGrubu = row["ABONE_GRUBU"].ToString();
+                string binaId = row["ADR_BINA_ID"].ToString();
+                if (IsNullLike(aboneGrubu))
+                {
+                    var imputedGrup = aboneGrubuMostFrequent[binaId];
+                    row["ABONE_GRUBU"] = imputedGrup;
+                }
+            }
         }
     }
 }
