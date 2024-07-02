@@ -489,6 +489,7 @@
     <EmbeddedResource Include="Önizleme.resx">
       <DependentUpon>Önizleme.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="docs\VEER.md" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
