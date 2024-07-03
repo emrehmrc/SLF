@@ -9,7 +9,36 @@ using System.Windows.Forms;
 namespace SLF
 {
     public class EASarjModulu : GirdiModülü
+
     {
+        // burada şarj istasyonu ad bilgisi yok ise bunu otomatik olarak doldurma yapmasının bir fonksiyonunu yazdım.
+        // eğer bunu yaparsa null count yapacak mı bilmiyorum yapmasına gerek var mı onu da bilmiyorum.
+        // data table'ın hangisini okuduğunu falan nasıl seçecek onu da bilmiyorum.
+        
+        //private void UpdateAdi(DataTable table)
+        //{
+        //    int counter = 1;
+
+        //    foreach (DataRow row in table.Rows)
+        //    {
+        //        if (row["ADI"] == DBNull.Value || row["ADI"].ToString() == "#NA" || string.IsNullOrWhiteSpace(row["ADI"].ToString()))
+        //        {
+        //            row["ADI"] = $"EA_Şarj_{counter}";
+        //            counter++;
+        //        }
+        //    }
+        //}
+
+        public override void Validate()
+        {
+            base.Validate();
+
+            ReportNullCounts();
+
+            ReportCoordinatesOutOfLimits();
+
+        }
+
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = WarningErrorBoundary(0.1f);
 
         private readonly Dictionary<string, (float Min, float Max)> minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
@@ -54,16 +83,7 @@ namespace SLF
                 });
             }
         }
-        public override void Validate()
-        {
-            base.Validate();
 
-            ReportNullCounts();
-
-            ReportCoordinatesOutOfLimits();
-
-
-        }
         private void ReportNullCounts()
         {
             float nullPercentage = 0.0f;
