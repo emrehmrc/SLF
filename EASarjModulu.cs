@@ -28,7 +28,7 @@ namespace SLF
         //        }
         //    }
         //}
-    
+
 
         //burada şarj istasyonunun tipi olmaması durumunda istasyon gücüne bakıp tipi belirleyecek olan kodun fonksiyonunu yazdım.
         // data table'ın hangisini okuduğunu falan nasıl seçecek onu da bilmiyorum.
@@ -51,6 +51,34 @@ namespace SLF
         //        }
         //    }
         //}
+
+
+        //EA Şarj istasyonları verisindeki trafo kodları ile trafo verilerindeki trafo kodlarını karşılaştıracak fonksiyon.
+        //Burada bu tablolar ismi ile ilgili nasıl doğru kodu bulacak falan hiç bilmiyorum sor.
+
+        //private void CheckTrafoKodlari(DataTable eaSektorTable, DataTable trafoTable)
+        //{
+        //    foreach (DataRow eaRow in eaSektorTable.Rows)
+        //    {
+        //        string eaTrafoKodu = eaRow["EA_TRAFO_KODU"].ToString();
+        //        bool matchFound = false;
+
+        //        foreach (DataRow trafoRow in trafoTable.Rows)
+        //        {
+        //            if (trafoRow["TRAFO_KODU"].ToString() == eaTrafoKodu)
+        //            {
+        //                matchFound = true;
+        //                break;
+        //            }
+        //        }
+
+        //        if (!matchFound)
+        //        {
+        //            Console.WriteLine($"Şarj istasyonu ile trafo eşlemesi yapılamamıştır: {eaTrafoKodu}");
+        //        }
+        //    }
+        //}
+
 
 
         public override void Validate()
