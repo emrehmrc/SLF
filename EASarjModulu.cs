@@ -14,7 +14,7 @@ namespace SLF
         // burada şarj istasyonu ad bilgisi yok ise bunu otomatik olarak doldurma yapmasının bir fonksiyonunu yazdım.
         // eğer bunu yaparsa null count yapacak mı bilmiyorum yapmasına gerek var mı onu da bilmiyorum.
         // data table'ın hangisini okuduğunu falan nasıl seçecek onu da bilmiyorum.
-        
+
         //private void UpdateAdi(DataTable table)
         //{
         //    int counter = 1;
@@ -28,6 +28,30 @@ namespace SLF
         //        }
         //    }
         //}
+    
+
+        //burada şarj istasyonunun tipi olmaması durumunda istasyon gücüne bakıp tipi belirleyecek olan kodun fonksiyonunu yazdım.
+        // data table'ın hangisini okuduğunu falan nasıl seçecek onu da bilmiyorum.
+
+        //private void UpdateIstasyonTipi(DataTable table)
+        //{
+        //    foreach (DataRow row in table.Rows)
+        //    {
+        //        if (row["ISTASYON_TIPI"] == DBNull.Value)
+        //        {
+        //            int istasyonGucu = Convert.ToInt32(row["ISTASYON_GUCU"]);
+        //            if (istasyonGucu <= 22)
+        //            {
+        //                row["ISTASYON_TIPI"] = 0;
+        //            }
+        //            else
+        //            {
+        //                row["ISTASYON_TIPI"] = 1;
+        //            }
+        //        }
+        //    }
+        //}
+
 
         public override void Validate()
         {
