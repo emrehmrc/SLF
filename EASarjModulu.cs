@@ -35,8 +35,6 @@ namespace SLF
 
 
         // burada şarj istasyonu ad bilgisi yok ise bunu otomatik olarak doldurma yapmasının bir fonksiyonunu yazdım.
-        // eğer bunu yaparsa null count yapacak mı bilmiyorum yapmasına gerek var mı onu da bilmiyorum.
-        // data table'ın hangisini okuduğunu falan nasıl seçecek onu da bilmiyorum.
 
         private void ImputeIstasyonAdı()
         {
@@ -54,7 +52,6 @@ namespace SLF
 
 
         //burada şarj istasyonunun tipi olmaması durumunda istasyon gücüne bakıp tipi belirleyecek olan kodun fonksiyonunu yazdım.
-        // data table'ın hangisini okuduğunu falan nasıl seçecek onu da bilmiyorum.
 
         private void ImputeIstasyonTipi()
         {
@@ -162,7 +159,7 @@ namespace SLF
             { "ISTASYON_ADI", WarningErrorBoundary(0.2f) },
             { "ISTASYON_GUCU", InfoErrorBoundary(0.2f) },
             { "EA_TRAFO_KODU", InfoErrorBoundary(0.2f) },
-            { "ISTASYON_TIPI", WarningErrorBoundary(0.2f) },
+            { "ISTASYON_TIPI", InfoWarningBoundary(0.2f) },
         };
         private void ReportCoordinatesOutOfLimits()
         {
