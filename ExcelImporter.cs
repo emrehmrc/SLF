@@ -20,8 +20,8 @@ namespace SLF
     {
         Dictionary<string, List<string>> expectedHeadersMap = new Dictionary<string, List<string>>
         {
-            { 
-                "Abone Verileri", 
+            {
+                "Abone Verileri",
                     new List<string> {
                         "TESISAT_NO",
                         "X_KOORDINAT",
@@ -46,11 +46,18 @@ namespace SLF
                         "2021_Demant",
                         "2022_Demant",
                         "2023_Demant",
-                    } 
+                    }
             },
-            { "EA Şarj Verileri", new List<string> { 
-                "ADI", "Kurulu_Gücü", "ENERJI_TABLO_KAYIT_KODU","X_KOORDINAT","Y_KOORDINAT"
-            } },
+            {
+                "EA Şarj Verileri", new List<string> {
+                    "ADI", "Kurulu_Gücü", "ENERJI_TABLO_KAYIT_KODU","X_KOORDINAT","Y_KOORDINAT"
+                }
+            },
+            {
+                "DTR Verileri", new List<string> {
+                    "ADI", "Kurulu_Gücü", "ENERJI_TABLO_KAYIT_KODU","X_KOORDINAT","Y_KOORDINAT"
+            }
+            },
             // Add more data types and their expected headers as needed
         };
 
