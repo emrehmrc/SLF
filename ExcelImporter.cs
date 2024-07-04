@@ -133,6 +133,15 @@ namespace SLF
                     "FIDER_DEMANT",
             }
             },
+            {
+                "TM Verileri", new List<string> {
+                    "EDW_TM_ID",
+                    "EDW_TRAFO_ID",
+                    "EDW_AY",
+                    "EDW_TM_DEMAND",
+            }
+            },
+
                         
             // Add more data types and their expected headers as needed
         };

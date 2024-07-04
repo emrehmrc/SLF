@@ -22,6 +22,7 @@ namespace SLF
             "EA Şarj Verileri",
             "Ekonometrik Yük Tahmini Verileri",
             "Fider Verileri",
+            "TM Verileri",
             "DTR Verileri",
             "DEK Verileri",
             "Abone Verileri"

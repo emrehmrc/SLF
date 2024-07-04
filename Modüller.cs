@@ -41,7 +41,7 @@ namespace SLF
             {"Ekonometrik Yük Tahmini Verileri", new EkonometrikYukTahminiModulu()},
             {"Fider Verileri", new FiderVerileri()},
             {"İmar Verileri", new GirdiModülü()},
-            {"TM Verileri", new GirdiModülü()},
+            {"TM Verileri", new TMVerileri()},
         };
 
         // declare an instance of the Tablo_Formu to be used to see the Attribute Table of the vector layers
