@@ -21,6 +21,7 @@ namespace SLF
         protected readonly List<string> veri_listesi_requires_xlsx = new List<string> {
             "EA Şarj Verileri",
             "Ekonometrik Yük Tahmini Verileri",
+            "Fider Verileri",
             "DTR Verileri",
             "DEK Verileri",
             "Abone Verileri"

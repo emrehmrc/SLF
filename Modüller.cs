@@ -39,7 +39,7 @@ namespace SLF
             {"DTR Verileri", new DTRModulu()},
             {"EA Şarj Verileri", new EASarjModulu()},
             {"Ekonometrik Yük Tahmini Verileri", new EkonometrikYukTahminiModulu()},
-            {"Fider Verileri", new GirdiModülü()},
+            {"Fider Verileri", new FiderVerileri()},
             {"İmar Verileri", new GirdiModülü()},
             {"TM Verileri", new GirdiModülü()},
         };

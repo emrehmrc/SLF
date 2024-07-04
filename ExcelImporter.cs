@@ -89,7 +89,7 @@ namespace SLF
             }
             },
                         {
-                "\"Ekonometrik Yük Tahmini Verileri\"", new List<string> {
+                "Ekonometrik Yük Tahmini Verileri", new List<string> {
                     "NUFUS",
                     "GRP",
                     "GRP_TARIMSAL_URETIM",
@@ -123,7 +123,17 @@ namespace SLF
                     "AYDINLATMA_ABONE_SAYISI",
                     "TOPLAM_ABONE_SAYISI",
             }
-            },         
+            },
+            {
+                "Fider Verileri", new List<string> {
+                    "FIDER_TM_ADI",
+                    "FIDER_ADI",
+                    "FIDER_TARIH",
+                    "FIDER_SAAT",
+                    "FIDER_DEMANT",
+            }
+            },
+                        
             // Add more data types and their expected headers as needed
         };
 
