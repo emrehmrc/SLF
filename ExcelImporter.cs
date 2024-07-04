@@ -53,7 +53,23 @@ namespace SLF
             } },
             {
                 "DTR Verileri", new List<string> {
-                    "ADI", "Kurulu_Gücü", "ENERJI_TABLO_KAYIT_KODU","X_KOORDINAT","Y_KOORDINAT"
+                    "TRAFO_ID",
+                    "TRAFO_KODU",
+                    "TRAFO_ILCE_ADI",
+                    "TRAFO_MAHALLE_ADI",
+                    "TRAFO_MULKIYET",
+                    "FIDER_ADI",
+                    "TRAFO_KAPASITESI",
+                    "TM_ID",
+                    "TM_FIDER_ID",
+                    "TRAFO_X_KOORDINAT",
+                    "TRAFO_Y_KOORDINAT",
+                    "TRAFO_ADI",
+                    "TRAFO_KURULUM_TARIHI",
+                    "PRIMER_GERILIM",
+                    "SEKONDER_GERILIM",
+                    "YIL_DEMANT",
+                    "YIL_TUKETIM"
             }
             },
             // Add more data types and their expected headers as needed
