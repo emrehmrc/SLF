@@ -68,8 +68,12 @@ namespace SLF
                     "TRAFO_KURULUM_TARIHI",
                     "PRIMER_GERILIM",
                     "SEKONDER_GERILIM",
-                    "YIL_DEMANT",
-                    "YIL_TUKETIM"
+                    "YIL_DEMANT_2021",
+                    "YIL_TUKETIM_2021",
+                    "YIL_DEMANT_2022",
+                    "YIL_TUKETIM_2022",
+                    "YIL_DEMANT_2023",
+                    "YIL_TUKETIM_2023"
             }
             },
             // Add more data types and their expected headers as needed
