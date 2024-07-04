@@ -11,23 +11,46 @@ namespace SLF
     public class EASarjModulu : GirdiModülü
 
     {
+        // burada EA Şarj koordinatı bulunmuyorsa trafo koordinatını alıyor.
+
+        //private void UpdateKoordinatlar(DataTable eaSektorTable, DataTable trafoTable)
+        //{
+        //    foreach (DataRow eaRow in eaSektorTable.Rows)
+        //    {
+        //        if (eaRow["X_KOORDINAT"] == DBNull.Value || eaRow["Y_KOORDINAT"] == DBNull.Value)
+        //        {
+        //            string eaTrafoKodu = eaRow["EA_TRAFO_KODU"].ToString();
+        //            foreach (DataRow trafoRow in trafoTable.Rows)
+        //            {
+        //                if (trafoRow["TRAFO_KODU"].ToString() == eaTrafoKodu)
+        //                {
+        //                    eaRow["X_KOORDINAT"] = trafoRow["X_KOORDINAT"];
+        //                    eaRow["Y_KOORDINAT"] = trafoRow["Y_KOORDINAT"];
+        //                    break;
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+
+
         // burada şarj istasyonu ad bilgisi yok ise bunu otomatik olarak doldurma yapmasının bir fonksiyonunu yazdım.
         // eğer bunu yaparsa null count yapacak mı bilmiyorum yapmasına gerek var mı onu da bilmiyorum.
         // data table'ın hangisini okuduğunu falan nasıl seçecek onu da bilmiyorum.
 
-        //private void UpdateAdi(DataTable table)
-        //{
-        //    int counter = 1;
+        private void ImputeIstasyonAdı()
+        {
+            int counter = 1;
 
-        //    foreach (DataRow row in table.Rows)
-        //    {
-        //        if (row["ADI"] == DBNull.Value || row["ADI"].ToString() == "#NA" || string.IsNullOrWhiteSpace(row["ADI"].ToString()))
-        //        {
-        //            row["ADI"] = $"EA_Şarj_{counter}";
-        //            counter++;
-        //        }
-        //    }
-        //}
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                if (IsNullLike(row["ISTASYON_ADI"]))
+                {
+                    row["ISTASYON_ADI"] = $"EA_Şarj_{counter}";
+                    counter++;
+                }
+            }
+        }
 
 
         //burada şarj istasyonunun tipi olmaması durumunda istasyon gücüne bakıp tipi belirleyecek olan kodun fonksiyonunu yazdım.
@@ -91,29 +114,64 @@ namespace SLF
 
         }
 
+        public override void Impute()
+        {
+            ImputeIstasyonAdı();
+        }
+        public override void Remove()
+        {
+            List<int> combinedRowsToRemoveList = new List<int>();
+
+            // Add row indices from different columns to the combined list
+            combinedRowsToRemoveList.AddRange(columnNullRowsMap["ISTASYON_GUCU"]);
+            combinedRowsToRemoveList.AddRange(columnNullRowsMap["EA_TRAFO_KODU"]);
+
+
+            RemoveCombinedRows(combinedRowsToRemoveList);
+        }
+
+        private void RemoveCombinedRows(List<int> rowsToRemoveList)
+        {
+            // Remove duplicates and sort in descending order
+            var rowIndicesToRemove = rowsToRemoveList.Distinct().OrderByDescending(i => i).ToList();
+
+            foreach (int rowIndex in rowIndicesToRemove)
+            {
+                if (rowIndex < currentDataTable.Rows.Count)
+                {
+                    currentDataTable.Rows.RemoveAt(rowIndex);
+                }
+            }
+        }
+
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = WarningErrorBoundary(0.1f);
 
         private readonly Dictionary<string, (float Min, float Max)> minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
         {
-            { "X_KOORDINAT", (float.MinValue, float.MaxValue) }, // TODO: Update these values from the other data
-            { "Y_KOORDINAT", (float.MinValue, float.MaxValue) } // TODO: Update these values from the other data
+            { "EA_X_KOORDINAT", (float.MinValue, float.MaxValue) }, // TODO: Update these values from the other data
+            { "EA_Y_KOORDINAT", (float.MinValue, float.MaxValue) } // TODO: Update these values from the other data
+            
         };
 
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
-            { "X_KOORDINAT", WarningErrorBoundary(0.2f) },
-            { "Y_KOORDINAT", WarningErrorBoundary(0.2f) },
+            { "EA_X_KOORDINAT", WarningErrorBoundary(0.2f) },
+            { "EA_Y_KOORDINAT", WarningErrorBoundary(0.2f) },
+            { "ISTASYON_ADI", WarningErrorBoundary(0.2f) },
+            { "ISTASYON_GUCU", InfoErrorBoundary(0.2f) },
+            { "EA_TRAFO_KODU", InfoErrorBoundary(0.2f) },
+            { "ISTASYON_TIPI", WarningErrorBoundary(0.2f) },
         };
         private void ReportCoordinatesOutOfLimits()
         {
-            var (minXValue, maxXValue) = minMaxCheckMap["X_KOORDINAT"];
-            var (minYValue, maxYValue) = minMaxCheckMap["Y_KOORDINAT"];
+            var (minXValue, maxXValue) = minMaxCheckMap["EA_X_KOORDINAT"];
+            var (minYValue, maxYValue) = minMaxCheckMap["EA_Y_KOORDINAT"];
 
             int countOutOfThresholdCoordinates = 0;
 
             foreach (DataRow row in currentDataTable.Rows)
             {
-                if (float.TryParse(row["X_KOORDINAT"]?.ToString(), out float valueX) && float.TryParse(row["Y_KOORDINAT"]?.ToString(), out float valueY))
+                if (float.TryParse(row["EA_X_KOORDINAT"]?.ToString(), out float valueX) && float.TryParse(row["EA_Y_KOORDINAT"]?.ToString(), out float valueY))
                 {
                     if (valueX < minXValue || valueX > maxXValue || valueY < minYValue || valueY > maxYValue)
                     {
@@ -131,7 +189,7 @@ namespace SLF
 
                 // Add the warning to the DataTable
                 datatableLevel.Rows.Add(new object[] {
-                    "X_KOORDINAT & Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}", "%10'dan fazla abonede konum bilgisi doğru değildir."
+                    "EA_X_KOORDINAT & EA_Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}", "%10'dan fazla abonede konum bilgisi doğru değildir."
                 });
             }
         }

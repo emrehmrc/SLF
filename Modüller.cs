@@ -2052,8 +2052,8 @@ namespace SLF
                     girdiModülü.Validate();
                     girdiModülü.Onizleme1.ShowDialog();
                     if (girdiModülü.IsError()) {
-                        MessageBox.Show("Hataları gidermeden devam edemezsiniz!", "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
+                        //MessageBox.Show("Hataları gidermeden devam edemezsiniz!", "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        //return;
                     }
                     girdiModülü.Remove();
                     girdiModülü.Validate();

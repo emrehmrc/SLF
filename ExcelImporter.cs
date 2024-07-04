@@ -48,11 +48,9 @@ namespace SLF
                         "2023_Demant",
                     }
             },
-            {
-                "EA Şarj Verileri", new List<string> {
-                    "ADI", "Kurulu_Gücü", "ENERJI_TABLO_KAYIT_KODU","X_KOORDINAT","Y_KOORDINAT"
-                }
-            },
+            { "EA Şarj Verileri", new List<string> { 
+                "ISTASYON_ADI", "ISTASYON_TIPI", "ISTASYON_GUCU", "EA_TRAFO_KODU","EA_X_KOORDINAT","EA_Y_KOORDINAT"
+            } },
             {
                 "DTR Verileri", new List<string> {
                     "ADI", "Kurulu_Gücü", "ENERJI_TABLO_KAYIT_KODU","X_KOORDINAT","Y_KOORDINAT"
