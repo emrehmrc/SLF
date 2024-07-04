@@ -76,6 +76,19 @@ namespace SLF
                     "YIL_TUKETIM_2023"
             }
             },
+
+            {
+                "DEK Verileri", new List<string> {
+                    "ILCE_ADI",
+                    "KAYNAK_TIPI",
+                    "DEK_KURULU_GUCU",
+                    "DEK_X_KOORDINAT",
+                    "DEK_Y_KOORDINAT",
+                    "DEK_TM_ADI",
+                    "DEK_KURULUM_YERI",
+                    "DEK_BAGLANDIGI_TRAFO_KODU",
+            }
+            },
             // Add more data types and their expected headers as needed
         };
 
