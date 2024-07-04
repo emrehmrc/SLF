@@ -97,6 +97,7 @@ namespace SLF
         {
             ImputeCoordinates();
             AboneGrubuImpute();
+            BaglantiGucuImpute();
         }
 
         private void ImputeCoordinates()
@@ -504,6 +505,48 @@ namespace SLF
                 {
                     var imputedGrup = aboneGrubuMostFrequent[binaId];
                     row["ABONE_GRUBU"] = imputedGrup;
+                }
+            }
+        }
+        private void BaglantiGucuImpute()
+        {
+            // Dictionary to hold the most frequent BAGLANTI_GUCU for each combination of ADR_BINA_ID and ABONE_GRUBU
+            var baglantiGucuMostFrequent = new Dictionary<string, string>();
+
+            // Group by ADR_BINA_ID and ABONE_GRUBU
+            var grouped = currentDataTable.AsEnumerable()
+                .GroupBy(row => new
+                {
+                    AdrBinaId = row["ADR_BINA_ID"].ToString(),
+                    AboneGrubu = row["ABONE_GRUBU"].ToString()
+                });
+
+            // Find the most frequent BAGLANTI_GUCU for each combination of ADR_BINA_ID and ABONE_GRUBU
+            foreach (var group in grouped)
+            {
+                var mostFrequentBaglantiGucu = group
+                    .GroupBy(row => row["BAGLANTI_GUCU"].ToString())
+                    .OrderByDescending(g => g.Count())
+                    .FirstOrDefault();
+
+                if (mostFrequentBaglantiGucu != null)
+                {
+                    var key = $"{group.Key.AdrBinaId}_{group.Key.AboneGrubu}";
+                    baglantiGucuMostFrequent[key] = mostFrequentBaglantiGucu.Key;
+                }
+            }
+
+            // Impute the missing BAGLANTI_GUCU values in the DataTable
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                string aboneGrubu = row["ABONE_GRUBU"].ToString();
+                string binaId = row["ADR_BINA_ID"].ToString();
+                string baglantiGucu = row["BAGLANTI_GUCU"].ToString();
+                var key = $"{binaId}_{aboneGrubu}";
+
+                if (IsNullLike(baglantiGucu) && baglantiGucuMostFrequent.ContainsKey(key))
+                {
+                    row["BAGLANTI_GUCU"] = baglantiGucuMostFrequent[key];
                 }
             }
         }
