@@ -20,6 +20,7 @@ namespace SLF
         protected Önizleme onizleme1 = new Önizleme();
         protected readonly List<string> veri_listesi_requires_xlsx = new List<string> {
             "EA Şarj Verileri",
+            "Ekonometrik Yük Tahmini Verileri",
             "DTR Verileri",
             "DEK Verileri",
             "Abone Verileri"

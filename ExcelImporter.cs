@@ -76,7 +76,6 @@ namespace SLF
                     "YIL_TUKETIM_2023"
             }
             },
-
             {
                 "DEK Verileri", new List<string> {
                     "ILCE_ADI",
@@ -89,6 +88,42 @@ namespace SLF
                     "DEK_BAGLANDIGI_TRAFO_KODU",
             }
             },
+                        {
+                "\"Ekonometrik Yük Tahmini Verileri\"", new List<string> {
+                    "NUFUS",
+                    "GRP",
+                    "GRP_TARIMSAL_URETIM",
+                    "GRP_SANAYI_URETIM",
+                    "GRP_HIZMET_URETIM",
+                    "GRP_TARIMSAL_URETIM_lag1",
+                    "GRP_SANAYI_URETIM_lag1",
+                    "GRP_HIZMET_URETIM_lag1",
+                    "CDD",
+                    "HDD",
+                    "MESKEN_DAGITILAN",
+                    "SANAYI_DAGITILAN",
+                    "TICARETHANE_DAGITILAN",
+                    "TARIMSAL_SULAMA_DAGITILAN",
+                    "AYDINLATMA_DAGITILAN",
+                    "TOPLAM_DAGITILAN",
+                    "KKO",
+                    "KKO",
+                    "MESKEN_FATURALANAN",
+                    "SANAYI_FATURALANAN",
+                    "TICARETHANE_FATURALANAN",
+                    "TARIMSAL_SULAMA_FATURALANAN",
+                    "AYDINLATMA_FATURALANAN",
+                    "TOPLAM_FATURALANAN",
+                    "PUANT_YAZ",
+                    "PUANT_KIŞ",
+                    "MESKEN_ABONE_SAYISI",
+                    "SANAYI_ABONE_SAYISI",
+                    "TICARETHANE_ABONE_SAYISI",
+                    "TARIMSAL_SULAMA_ABONE_SAYISI",
+                    "AYDINLATMA_ABONE_SAYISI",
+                    "TOPLAM_ABONE_SAYISI",
+            }
+            },         
             // Add more data types and their expected headers as needed
         };
 

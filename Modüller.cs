@@ -38,7 +38,7 @@ namespace SLF
             {"DEK Verileri", new DEKModulu()},
             {"DTR Verileri", new DTRModulu()},
             {"EA Şarj Verileri", new EASarjModulu()},
-            {"Ekonometrik Yük Tahmini Verileri", new GirdiModülü()},
+            {"Ekonometrik Yük Tahmini Verileri", new EkonometrikYukTahminiModulu()},
             {"Fider Verileri", new GirdiModülü()},
             {"İmar Verileri", new GirdiModülü()},
             {"TM Verileri", new GirdiModülü()},
