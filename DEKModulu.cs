@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace SLF
 {
-    public class DTRModulu : GirdiModülü
+    public class DEKModulu : GirdiModülü
 
     {
 

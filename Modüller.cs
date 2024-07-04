@@ -35,7 +35,7 @@ namespace SLF
         private GirdiModülü girdiModülü;
         private Dictionary<string, GirdiModülü> girdiModülleri = new Dictionary<string, GirdiModülü> {
             {"Abone Verileri", new AboneVerileri()},
-            {"DEK Verileri", new GirdiModülü()},
+            {"DEK Verileri", new DEKModulu()},
             {"DTR Verileri", new DTRModulu()},
             {"EA Şarj Verileri", new EASarjModulu()},
             {"Ekonometrik Yük Tahmini Verileri", new GirdiModülü()},
