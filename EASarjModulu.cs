@@ -56,24 +56,24 @@ namespace SLF
         //burada şarj istasyonunun tipi olmaması durumunda istasyon gücüne bakıp tipi belirleyecek olan kodun fonksiyonunu yazdım.
         // data table'ın hangisini okuduğunu falan nasıl seçecek onu da bilmiyorum.
 
-        //private void UpdateIstasyonTipi(DataTable table)
-        //{
-        //    foreach (DataRow row in table.Rows)
-        //    {
-        //        if (row["ISTASYON_TIPI"] == DBNull.Value)
-        //        {
-        //            int istasyonGucu = Convert.ToInt32(row["ISTASYON_GUCU"]);
-        //            if (istasyonGucu <= 22)
-        //            {
-        //                row["ISTASYON_TIPI"] = 0;
-        //            }
-        //            else
-        //            {
-        //                row["ISTASYON_TIPI"] = 1;
-        //            }
-        //        }
-        //    }
-        //}
+        private void ImputeIstasyonTipi()
+        {
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                if (IsNullLike(row["ISTASYON_TIPI"]))
+                {
+                    int istasyonGucu = Convert.ToInt32(row["ISTASYON_GUCU"]);
+                    if (istasyonGucu <= 22)
+                    {
+                        row["ISTASYON_TIPI"] = 0;
+                    }
+                    else
+                    {
+                        row["ISTASYON_TIPI"] = 1;
+                    }
+                }
+            }
+        }
 
 
         //EA Şarj istasyonları verisindeki trafo kodları ile trafo verilerindeki trafo kodlarını karşılaştıracak fonksiyon.
@@ -117,6 +117,8 @@ namespace SLF
         public override void Impute()
         {
             ImputeIstasyonAdı();
+
+            ImputeIstasyonTipi();
         }
         public override void Remove()
         {
