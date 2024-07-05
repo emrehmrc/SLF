@@ -33,7 +33,9 @@ namespace SLF
         //    }
         //}
 
-
+        private const int AC_DC_THRESHOLD = 22;
+        private const int AC_CONSTANT = 0;
+        private const int DC_CONSTANT = 1;
         // burada şarj istasyonu ad bilgisi yok ise bunu otomatik olarak doldurma yapmasının bir fonksiyonunu yazdım.
 
         private void ImputeIstasyonAdı()
@@ -60,13 +62,13 @@ namespace SLF
                 if (IsNullLike(row["ISTASYON_TIPI"]))
                 {
                     int istasyonGucu = Convert.ToInt32(row["ISTASYON_GUCU"]);
-                    if (istasyonGucu <= 22)
+                    if (istasyonGucu <= AC_DC_THRESHOLD)
                     {
-                        row["ISTASYON_TIPI"] = 0;
+                        row["ISTASYON_TIPI"] = AC_CONSTANT;
                     }
                     else
                     {
-                        row["ISTASYON_TIPI"] = 1;
+                        row["ISTASYON_TIPI"] = DC_CONSTANT;
                     }
                 }
             }
@@ -156,10 +158,10 @@ namespace SLF
         {
             { "EA_X_KOORDINAT", WarningErrorBoundary(0.2f) },
             { "EA_Y_KOORDINAT", WarningErrorBoundary(0.2f) },
-            { "ISTASYON_ADI", WarningErrorBoundary(0.2f) },
+            { "ISTASYON_ADI", WARNING_ONLY},
             { "ISTASYON_GUCU", InfoErrorBoundary(0.2f) },
             { "EA_TRAFO_KODU", InfoErrorBoundary(0.2f) },
-            { "ISTASYON_TIPI", InfoWarningBoundary(0.2f) },
+            { "ISTASYON_TIPI", WARNING_ONLY},
         };
         private void ReportCoordinatesOutOfLimits()
         {
