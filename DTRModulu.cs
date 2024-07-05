@@ -129,18 +129,21 @@ namespace SLF
 
                 // Add the warning to the DataTable
                 datatableLevel.Rows.Add(new object[] {
-                    "X_KOORDINAT & Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}", "%10'dan fazla abonede konum bilgisi doğru değildir."
+                    "TRAFO_X_KOORDINAT & TRAFO_Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}", "%10'dan fazla abonede konum bilgisi doğru değildir."
                 });
             }
         }
 
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
-            { "TRAFO_X_KOORDINAT", InfoErrorBoundary(0.2f) },
-            { "TRAFO_Y_KOORDINAT", InfoErrorBoundary(0.2f) },
-            { "TRAFO_KODU", InfoErrorBoundary(0.2f) },
-            { "TM_FIDER_ID", InfoErrorBoundary(0.2f) },
+            { "TRAFO_X_KOORDINAT", ERROR_ONLY},
+            { "TRAFO_Y_KOORDINAT", ERROR_ONLY},
+            { "TM_FIDER_ID", ERROR_ONLY},
             { "TRAFO_KURULUM_TARIHI", WarningErrorBoundary(0.2f) },
+            { "TRAFO_KAPASITESI", WarningErrorBoundary(0.2f) },
+            { "TRAFO_MULKIYET", WarningErrorBoundary(0.2f) },
+            { "YIL_TUKETIM_2023", WarningErrorBoundary(0.2f) },
+            { "YIL_DEMANT_2023", WarningErrorBoundary(0.2f) },
         };
         private void ReportNullCounts()
         {
@@ -195,7 +198,34 @@ namespace SLF
 
             ReportDuplicateCounts();
 
-            ReportDateFormatErrors();
+            //ReportDateFormatErrors();
+        }
+
+        public override void Remove()
+        {
+            List<int> combinedRowsToRemoveList = new List<int>();
+
+            // Add row indices from different columns to the combined list
+            combinedRowsToRemoveList.AddRange(columnNullRowsMap["TRAFO_KURULUM_TARIHI"]);
+            combinedRowsToRemoveList.AddRange(columnNullRowsMap["TRAFO_KAPASITESI"]);
+
+
+
+            RemoveCombinedRows(combinedRowsToRemoveList);
+        }
+
+        private void RemoveCombinedRows(List<int> rowsToRemoveList)
+        {
+            // Remove duplicates and sort in descending order
+            var rowIndicesToRemove = rowsToRemoveList.Distinct().OrderByDescending(i => i).ToList();
+
+            foreach (int rowIndex in rowIndicesToRemove)
+            {
+                if (rowIndex < currentDataTable.Rows.Count)
+                {
+                    currentDataTable.Rows.RemoveAt(rowIndex);
+                }
+            }
         }
 
     }
