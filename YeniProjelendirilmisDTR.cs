@@ -12,53 +12,10 @@ namespace SLF
     public class YeniProjelendirilmisDTR : GirdiModülü
 
     {
-        private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = WarningErrorBoundary(0.1f);
-        
-        private readonly Dictionary<string, (float Min, float Max)> minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
-        {
-            { "DEK_X_KOORDINAT", (float.MinValue, float.MaxValue) }, // TODO: Update these values from the other data
-            { "DEK_Y_KOORDINAT", (float.MinValue, float.MaxValue) } // TODO: Update these values from the other data
-            
-        };
-        private void ReportCoordinatesOutOfLimits()
-        {
-            var (minXValue, maxXValue) = minMaxCheckMap["DEK_X_KOORDINAT"];
-            var (minYValue, maxYValue) = minMaxCheckMap["DEK_Y_KOORDINAT"];
-
-            int countOutOfThresholdCoordinates = 0;
-
-            foreach (DataRow row in currentDataTable.Rows)
-            {
-                if (float.TryParse(row["TRAFO_X_KOORDINAT"]?.ToString(), out float valueX) && float.TryParse(row["TRAFO_Y_KOORDINAT"]?.ToString(), out float valueY))
-                {
-                    if (valueX < minXValue || valueX > maxXValue || valueY < minYValue || valueY > maxYValue)
-                    {
-                        countOutOfThresholdCoordinates++;
-                    }
-                }
-            }
-            float outOfThresholdPercentage = (float)countOutOfThresholdCoordinates / currentDataTable.Rows.Count;
-
-            if (outOfThresholdPercentage > 0)
-            {
-                var thresholds = COORDINATE_ERROR_THRESHOLD;
-                var datatableLevel = GetDataTableBasedOnThreshold(outOfThresholdPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
-
-                // Add the warning to the DataTable
-                datatableLevel.Rows.Add(new object[] {
-                    "TRAFO_X_KOORDINAT & TRAFO_Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}", "%10'dan fazla abonede konum bilgisi doğru değildir."
-                });
-            }
-        }
-
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
-            { "ILCE_ADI", INFO_ONLY},
-            { "KAYNAK_TIPI", INFO_ONLY},
-            { "DEK_KURULU_GUCU", ERROR_ONLY},
-            { "DEK_BAGLANDIGI_TRAFO_KODU", ERROR_ONLY},
-            { "DEK_X_KOORDINAT", INFO_ONLY},
-            { "DEK_Y_KOORDINAT", INFO_ONLY},
+            { "PROJELENDIRILMIS_TRAFO_ID", ERROR_ONLY},
+            { "PROJELENDIRILMIS_TRAFO_YATIRIM_SINIFI", ERROR_ONLY},
         };
         private void ReportNullCounts()
         {
@@ -106,8 +63,6 @@ namespace SLF
             base.Validate();
 
             ReportNullCounts();
-
-            ReportCoordinatesOutOfLimits();
         }
     }
 }
