@@ -12,7 +12,97 @@ namespace SLF
     public class TMVerileri : GirdiModülü
 
     {
+        private readonly string DATE_FORMAT = "yyyyMMdd";
 
+        private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> dateFormatCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
+        {
+            { "EDW_SAAT", INFO_ONLY },
+        };
+        private void ReportDateFormatErrors()
+        {
+            float invalidPercentage = 0.0f;
+            int totalRows = currentDataTable.Rows.Count;
+
+            foreach (DataColumn column in currentDataTable.Columns)
+            {
+                if (dateFormatCheckWithLevel.ContainsKey(column.ColumnName))
+                {
+                    var thresholds = dateFormatCheckWithLevel[column.ColumnName];
+                    int invalidCount = currentDataTable.AsEnumerable().Count(row =>
+                    {
+                        var value = row[column]?.ToString();
+                        return !DateTime.TryParseExact(value, DATE_FORMAT, null, DateTimeStyles.None, out _);
+                    });
+
+                    invalidPercentage = (float)invalidCount / totalRows;
+
+                    if (invalidPercentage > 0)
+                    {
+                        var datatableLevel = GetDataTableBasedOnThreshold(invalidPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+                        datatableLevel.Rows.Add(new object[]
+                        {
+                            column.ColumnName, "Geçersiz tarih formatı", $"{invalidPercentage:P1}", $"Tarihler { DATE_FORMAT } biçiminde olmalıdır. Lütfen düzeltiniz."
+                        });
+                    }
+                }
+            }
+        }
+
+        private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
+        {
+            { "EDW_TM_ID", ERROR_ONLY},
+            { "EDW_TRAFO_ID", ERROR_ONLY},
+        };
+        private void ReportNullCounts()
+        {
+            float nullPercentage = 0.0f;
+            int totalRows = currentDataTable.Rows.Count;
+
+            foreach (DataColumn column in currentDataTable.Columns)
+            {
+                if (!nullFieldsCheckWithLevel.ContainsKey(column.ColumnName))
+                {
+                    continue;
+                }
+
+                List<int> nullRows = new List<int>();
+
+                int nullCount = 0;
+
+                for (int i = 0; i < totalRows; i++)
+                {
+                    var row = currentDataTable.Rows[i];
+                    if (IsNullLike(row[column]))
+                    {
+                        nullCount++;
+                        // Add the row number and the null-like value to the nullRows
+                        nullRows.Add(i);
+                    }
+                }
+
+                columnNullRowsMap[column.ColumnName] = nullRows;
+
+                nullPercentage = (float)nullCount / totalRows;
+
+                if (nullPercentage > 0)
+                {
+                    var thresholds = nullFieldsCheckWithLevel[column.ColumnName];
+                    var datatableLevel = GetDataTableBasedOnThreshold(nullPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+                    datatableLevel.Rows.Add(new object[] {
+                        column.ColumnName, "Null değer", $"{nullPercentage:P1}"
+                    });
+                }
+            }
+        }
+        public override void Validate()
+        {
+            base.Validate();
+
+            ReportNullCounts();
+
+            //ReportDateFormatErrors();
+        }
     }
 }
+
 
