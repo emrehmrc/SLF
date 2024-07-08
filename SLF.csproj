@@ -394,6 +394,8 @@
     <Compile Include="Ana_Menü.Designer.cs">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
     </Compile>
+    <Compile Include="YeniProjelendirilmisDTR.cs" />
+    <Compile Include="EnerjiMusaadeleri.cs" />
     <Compile Include="TMVerileri.cs" />
     <Compile Include="Fider Verileri.cs" />
     <Compile Include="EkonometrikYukTahminiModulu.cs" />

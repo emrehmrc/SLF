@@ -25,7 +25,9 @@ namespace SLF
             "TM Verileri",
             "DTR Verileri",
             "DEK Verileri",
-            "Abone Verileri"
+            "Abone Verileri",
+            "Enerji Müsaadeleri Verileri",
+            "Yeni Projelendirilmiş DTR Verileri"
         };
         protected readonly List<string> veri_listesi_requires_csv = new List<string> { };
         protected readonly List<string> veri_listesi_requires_tabular = new List<string> { };

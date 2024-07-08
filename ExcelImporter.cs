@@ -141,6 +141,37 @@ namespace SLF
                     "EDW_TM_DEMAND",
             }
             },
+                        {
+                "Enerji Müsaadeleri Verileri", new List<string> {
+                    "ENERJI_MUSAADE_NO",
+                    "ENERJI_MUSAADE_ABONE_GRUBU",
+                    "ENERJI_MUSAADE_ABONE_FAALIYET_KATEGORI",
+                    "ENERJI_MUSAADE_TALEP_DURUMU",
+                    "ENERJI_MUSAADE_GERILIM_SEVIYESI",
+                    "ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL",
+                    "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID",
+                    "ENERJI_MUSAADE_BAGLANTI_GUCU",
+                    "ENERJI_MUSAADE_IL",
+                    "ENERJI_MUSAADE_ILCE",
+                    "ENERJI_MUSAADE_MAHALLE",
+                    "ENERJI_MUSAADE_ENERJILENDIRME_YILI",
+                    "ENERJI_MUSAADE_BASVURU_TARIHI",
+            }
+            },
+                                    {
+                "Yeni Projelendirilmiş DTR Verileri", new List<string> {
+                    "PROJELENDIRILMIS_TRAFO_ID",
+                    "PROJELENDIRILMIS_TRAFO_PROJE_KODU",
+                    "PROJELENDIRILMIS_TRAFO_PROJE_ADI",
+                    "PROJELENDIRILMIS_TRAFO_YATIRIM_SINIFI",
+                    "PROJELENDIRILMIS_TRAFO_KAPASITE",
+                    "PROJELENDIRILMIS_TRAFO_YENI_KAPASITE",
+                    "PROJELENDIRILMIS_TRAFO_YATIRIM_YILI",
+                    "PROJELENDIRILMIS_TRAFO_X_KOORDINAT",
+                    "PROJELENDIRILMIS_TRAFO_Y_KOORDINAT",
+            }
+            },
+
 
                         
             // Add more data types and their expected headers as needed

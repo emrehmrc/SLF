@@ -42,6 +42,8 @@ namespace SLF
             {"Fider Verileri", new FiderVerileri()},
             {"İmar Verileri", new GirdiModülü()},
             {"TM Verileri", new TMVerileri()},
+            {"Enerji Müsaadeleri Verileri", new EnerjiMusaadeleri()},
+            {"Yeni Projelendirilmiş DTR Verileri", new YeniProjelendirilmisDTR()},
         };
 
         // declare an instance of the Tablo_Formu to be used to see the Attribute Table of the vector layers
