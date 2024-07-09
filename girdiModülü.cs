@@ -57,6 +57,7 @@ namespace SLF
         protected readonly string combinedTabularFilter;
 
         protected DataTable currentDataTable = new DataTable();
+        protected static Dictionary<string, DataTable> dataTablesByType = new Dictionary<string, DataTable>();  // Static so that it can be accessed as the same instance from other subclasses
         protected DataTable errorDataTable = new DataTable();
         protected DataTable warningDataTable = new DataTable();
         protected DataTable infoDataTable = new DataTable();
@@ -165,6 +166,7 @@ namespace SLF
                 {
                     string selectedFileName = fileDialog1.FileName;
                     currentDataTable = ProcessExcelFile(selectedFileName, seçilenVeriTipi);
+                    dataTablesByType[seçilenVeriTipi] = currentDataTable;
                 }
                 else throw new NoFileSelectedException("Dosya seçimi gerçekleştirilemedi.");
             }
