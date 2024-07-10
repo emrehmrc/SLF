@@ -53,7 +53,7 @@ namespace SLF
         {
             "TRAFO_KODU",
         };
-        private void ReportDuplicateCounts()
+        private void ReportCompositeDuplicateCounts()
         {
             float duplicatePercentage;
             foreach (DataColumn column in currentDataTable.Columns)
@@ -62,24 +62,27 @@ namespace SLF
                 {
                     continue;
                 }
-                // HashSet to store unique values in the current column
+                // HashSet to store unique composite keys
                 var uniqueValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 var duplicateRowIndices = new List<int>();
 
                 for (int i = 0; i < currentDataTable.Rows.Count; i++)
                 {
                     var row = currentDataTable.Rows[i];
-                    var value = row[column]?.ToString() ?? string.Empty;
+                    var value1 = row["TRAFO_ID"]?.ToString() ?? string.Empty;
+                    var value2 = row["TRAFO_X_KOORDINAT"]?.ToString() ?? string.Empty;
+                    var value3 = row["TRAFO_Y_KOORDINAT"]?.ToString() ?? string.Empty;
+                    var compositeKey = $"{value1}|{value2}|{value3}";
 
-                    if (uniqueValues.Contains(value))
+                    if (uniqueValues.Contains(compositeKey))
                     {
                         duplicateRowIndices.Add(i);
                     }
 
-                    uniqueValues.Add(value);
+                    uniqueValues.Add(compositeKey);
                 }
 
-                columnNullRowsMap["TESISAT_DUPLICATE"] = duplicateRowIndices;
+                columnNullRowsMap["NONUNIQUE_TRAFO_X_Y"] = duplicateRowIndices;
 
                 // Calculate the number of unique values and duplicates
                 int totalCount = currentDataTable.Rows.Count;
@@ -90,9 +93,9 @@ namespace SLF
                 if (duplicateCount > 0)
                 {
                     // Append the column name and unique count to the report message
-                    warningDataTable.Rows.Add(new object[] {
-                        column.ColumnName, "Mükerrer hücre değerleri", $"{duplicatePercentage:P1}"
-                    });
+                    infoDataTable.Rows.Add(new object[] {
+                    column.ColumnName, "Mükerrer hücre değerleri", $"{duplicatePercentage:P1}"
+                });
                 }
             }
         }
@@ -196,7 +199,7 @@ namespace SLF
 
             ReportCoordinatesOutOfLimits();
 
-            ReportDuplicateCounts();
+            ReportCompositeDuplicateCounts();
 
             ReportDateFormatErrors();
         }
@@ -206,8 +209,7 @@ namespace SLF
             List<int> combinedRowsToRemoveList = new List<int>();
 
             // Add row indices from different columns to the combined list
-            combinedRowsToRemoveList.AddRange(columnNullRowsMap["TRAFO_KURULUM_TARIHI"]);
-            combinedRowsToRemoveList.AddRange(columnNullRowsMap["TRAFO_KAPASITESI"]);
+            combinedRowsToRemoveList.AddRange(columnNullRowsMap["NONUNIQUE_TRAFO_X_Y"]);
 
 
 
