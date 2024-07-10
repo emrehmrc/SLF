@@ -15,7 +15,7 @@ namespace SLF
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
             { "PROJELENDIRILMIS_TRAFO_ID", ERROR_ONLY},
-            { "PROJELENDIRILMIS_TRAFO_YATIRIM_SINIFI", ERROR_ONLY},
+            { "PROJELENDIRILMIS_TRAFO_YATIRIM_SINIFI", INFO_ONLY},
         };
         private void ReportNullCounts()
         {

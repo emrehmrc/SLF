@@ -52,6 +52,7 @@ namespace SLF
         {
             { "EDW_TM_ID", ERROR_ONLY},
             { "EDW_TRAFO_ID", ERROR_ONLY},
+            { "EDW_TM_DEMAND", ERROR_ONLY},
         };
         private void ReportNullCounts()
         {

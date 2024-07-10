@@ -52,7 +52,7 @@ namespace SLF
         {
             { "FIDER_TM_ADI", ERROR_ONLY},
             { "FIDER_ADI", ERROR_ONLY},
-            { "FIDER_DEMAND", INFO_ONLY},
+            { "FIDER_DEMAND", WARNING_ONLY},
         };
         private void ReportNullCounts()
         {

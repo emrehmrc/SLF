@@ -14,10 +14,10 @@ namespace SLF
     {
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
-            { "ENERJI_MUSAADE_TALEP_DURUMU", INFO_ONLY},
-            { "ENERJI_MUSAADE_GERILIM_SEVIYESI", INFO_ONLY},
-            { "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID", ERROR_ONLY},
-            { "ENERJI_MUSAADE_BAGLANTI_GUCU", ERROR_ONLY},
+            { "ENERJI_MUSAADE_TALEP_DURUMU", WARNING_ONLY},
+            { "ENERJI_MUSAADE_GERILIM_SEVIYESI", WARNING_ONLY},
+            { "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID", INFO_ONLY},
+            { "ENERJI_MUSAADE_BAGLANTI_GUCU", INFO_ONLY},
             { "ENERJI_MUSAADE_ENERJILENDIRME_YILI", WARNING_ONLY},
         };
         private void ReportNullCounts()

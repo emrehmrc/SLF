@@ -57,8 +57,8 @@ namespace SLF
             { "KAYNAK_TIPI", INFO_ONLY},
             { "DEK_KURULU_GUCU", ERROR_ONLY},
             { "DEK_BAGLANDIGI_TRAFO_KODU", ERROR_ONLY},
-            { "DEK_X_KOORDINAT", INFO_ONLY},
-            { "DEK_Y_KOORDINAT", INFO_ONLY},
+            { "DEK_X_KOORDINAT", WARNING_ONLY},
+            { "DEK_Y_KOORDINAT", WARNING_ONLY},
         };
         private void ReportNullCounts()
         {
