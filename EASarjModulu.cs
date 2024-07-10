@@ -156,8 +156,8 @@ namespace SLF
 
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
-            { "EA_X_KOORDINAT", WarningErrorBoundary(0.2f) },
-            { "EA_Y_KOORDINAT", WarningErrorBoundary(0.2f) },
+            { "EA_X_KOORDINAT", WARNING_ONLY },
+            { "EA_Y_KOORDINAT", WARNING_ONLY },
             { "ISTASYON_ADI", WARNING_ONLY},
             { "ISTASYON_GUCU", InfoErrorBoundary(0.2f) },
             { "EA_TRAFO_KODU", InfoErrorBoundary(0.2f) },
