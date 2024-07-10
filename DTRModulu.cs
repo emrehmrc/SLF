@@ -141,12 +141,12 @@ namespace SLF
         {
             { "TRAFO_X_KOORDINAT", ERROR_ONLY},
             { "TRAFO_Y_KOORDINAT", ERROR_ONLY},
-            { "TM_FIDER_ID", WarningErrorBoundary(0.05f)},
+            { "TM_FIDER_ID", WarningErrorBoundary(0.1f)},
             { "TRAFO_KURULUM_TARIHI", WarningErrorBoundary(0.2f) },
             { "TRAFO_KAPASITESI", WarningErrorBoundary(0.2f) },
             { "TRAFO_MULKIYET", WarningErrorBoundary(0.2f) },
-            { "YIL_TUKETIM_2023", WarningErrorBoundary(0.2f) },
-            { "YIL_DEMANT_2023", WarningErrorBoundary(0.2f) },
+            //{ "YIL_TUKETIM_2023", WarningErrorBoundary(0.2f) },
+            //{ "YIL_DEMANT_2023", WarningErrorBoundary(0.2f) },
         };
         private void ReportNullCounts()
         {
@@ -167,7 +167,7 @@ namespace SLF
                 for (int i = 0; i < totalRows; i++)
                 {
                     var row = currentDataTable.Rows[i];
-                    if (IsNullLike(row[column]))
+                    if (IsNullLike(row[column], true))
                     {
                         nullCount++;
                         // Add the row number and the null-like value to the nullRows
@@ -204,6 +204,10 @@ namespace SLF
             ReportDateFormatErrors();
         }
 
+        public override void Impute() { 
+            ImputeTMFiderID();
+        }
+
         public override void Remove()
         {
             List<int> combinedRowsToRemoveList = new List<int>();
@@ -226,6 +230,48 @@ namespace SLF
                 if (rowIndex < currentDataTable.Rows.Count)
                 {
                     currentDataTable.Rows.RemoveAt(rowIndex);
+                }
+            }
+        }
+        private void ImputeTMFiderID()
+        {
+            const double maxDistance = 0.01;
+
+            foreach (int missingIndex in columnNullRowsMap["TM_FIDER_ID"])
+            {
+                var missingRow = currentDataTable.Rows[missingIndex];
+                double missingX = Convert.ToDouble(missingRow["TRAFO_X_KOORDINAT"]);
+                double missingY = Convert.ToDouble(missingRow["TRAFO_Y_KOORDINAT"]);
+
+                double closestDistance = double.MaxValue;
+                DataRow closestRow = null;
+
+                foreach (DataRow row in currentDataTable.Rows)
+                {
+                    if (row == missingRow || IsNullLike(row["TM_FIDER_ID"], true))
+                    {
+                        continue;
+                    }
+
+                    double x = Convert.ToDouble(row["TRAFO_X_KOORDINAT"]);
+                    double y = Convert.ToDouble(row["TRAFO_Y_KOORDINAT"]);
+                    double distance = Math.Sqrt(Math.Pow(missingX - x, 2) + Math.Pow(missingY - y, 2));
+
+                    if (distance < closestDistance && distance < maxDistance)
+                    {
+                        closestDistance = distance;
+                        closestRow = row;
+                    }
+                }
+
+                if (closestRow != null)
+                {
+                    missingRow["TM_FIDER_ID"] = closestRow["TM_FIDER_ID"];
+                    missingRow["FIDER_ADI"] = closestRow["FIDER_ADI"];
+                }
+                else
+                {
+                    missingRow["TM_FIDER_ID"] = "Fider Bulunamadı";
                 }
             }
         }

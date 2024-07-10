@@ -75,9 +75,13 @@ namespace SLF
         protected static (float Min, float Max) INFO_ONLY = (MAX_THRESHOLD, MAX_THRESHOLD);
         protected static (float Min, float Max) ERROR_ONLY = (MIN_THRESHOLD, MIN_THRESHOLD);
 
-        protected bool IsNullLike(object value)
+        protected bool IsNullLike(object value, bool isZero=false)
         {
             if (value == null || value == DBNull.Value)
+            {
+                return true;
+            }
+            if (isZero && value.ToString()=="0")
             {
                 return true;
             }
