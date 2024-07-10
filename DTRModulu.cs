@@ -12,6 +12,7 @@ namespace SLF
     public class DTRModulu : GirdiModülü
 
     {
+        private readonly (float warningThreshold, float errorThreshold) TUKETIM_ERROR_THRESHOLD = WarningErrorBoundary(0.2f);
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = ERROR_ONLY;
         private readonly string DATE_FORMAT = "dd.MM.yyyy";
 
@@ -202,6 +203,7 @@ namespace SLF
             ReportCompositeDuplicateCounts();
 
             ReportDateFormatErrors();
+            ReportErrorLessThanZero();
         }
 
         public override void Impute() { 
@@ -214,6 +216,7 @@ namespace SLF
 
             // Add row indices from different columns to the combined list
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["NONUNIQUE_TRAFO_X_Y"]);
+            combinedRowsToRemoveList.AddRange(columnNullRowsMap[$"YIL_TUKETIM_{lastYear}"]);
 
 
 
@@ -273,6 +276,60 @@ namespace SLF
                 {
                     missingRow["TM_FIDER_ID"] = "Fider Bulunamadı";
                 }
+            }
+        }
+        private void ReportErrorLessThanZero()
+        {
+            float negativePercentage, zeroPercentage;
+            int totalRows = currentDataTable.Rows.Count;
+            var column = currentDataTable.Columns[$"YIL_TUKETIM_{lastYear}"];
+            var nullRows = new List<int>();
+            var imputableRows = new List<int>();
+
+            int negativeCount = 0;
+            int zeroCount = 0;
+
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                if (
+                    row.IsNull(column) ||
+                    row[column] == DBNull.Value ||
+                    nullLikeStrings.Contains(row[column]?.ToString(), StringComparer.OrdinalIgnoreCase) ||
+                    float.TryParse(row[column]?.ToString(), out float value) && value < 0)
+                {
+                    // Son yıl tüketimi 0'dan az ise
+                    negativeCount++;
+                    imputableRows.Add(currentDataTable.Rows.IndexOf(row));
+                }
+                else if (float.TryParse(row[column]?.ToString(), out float value2) && value2 == 0) 
+                { 
+                    zeroCount++;
+                    nullRows.Add(currentDataTable.Rows.IndexOf(row));
+                }
+            }
+
+            columnNullRowsMap[column.ColumnName] = nullRows;
+            imputableRowsMap[column.ColumnName] = imputableRows;
+            negativePercentage = (float)negativeCount / totalRows;
+            zeroPercentage = (float)zeroCount / totalRows;
+
+            if (negativePercentage > 0)
+            {
+                var thresholds = TUKETIM_ERROR_THRESHOLD;
+                var datatableLevel = GetDataTableBasedOnThreshold(negativePercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+
+                // Append the column name and null count to the report message
+                datatableLevel.Rows.Add(new object[] {
+                    column.ColumnName, "Son yıl tüketim verisi", $"{negativePercentage:P1} abonenin tüketim verisi yok",
+                    "Bu abonelerin tüketim verileri silinecek."
+                });
+            }
+            if (zeroPercentage > 0)
+            {
+                // Append the column name and null count to the report message
+                infoDataTable.Rows.Add(new object[] {
+                    column.ColumnName, "Son yıl tüketim verisi", $"{zeroPercentage:P1}", "Bu trafolarda son yıl tüketim verisi yok. Tüketim verileri silinecek."
+                });
             }
         }
 
