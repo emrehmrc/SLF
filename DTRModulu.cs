@@ -12,8 +12,8 @@ namespace SLF
     public class DTRModulu : GirdiModülü
 
     {
-        private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = WarningErrorBoundary(0.1f);
-        private readonly string DATE_FORMAT = "yyyyMMdd";
+        private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = ERROR_ONLY;
+        private readonly string DATE_FORMAT = "dd.MM.yyyy";
 
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> dateFormatCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
@@ -138,7 +138,7 @@ namespace SLF
         {
             { "TRAFO_X_KOORDINAT", ERROR_ONLY},
             { "TRAFO_Y_KOORDINAT", ERROR_ONLY},
-            { "TM_FIDER_ID", ERROR_ONLY},
+            { "TM_FIDER_ID", WarningErrorBoundary(0.05f)},
             { "TRAFO_KURULUM_TARIHI", WarningErrorBoundary(0.2f) },
             { "TRAFO_KAPASITESI", WarningErrorBoundary(0.2f) },
             { "TRAFO_MULKIYET", WarningErrorBoundary(0.2f) },
@@ -198,7 +198,7 @@ namespace SLF
 
             ReportDuplicateCounts();
 
-            //ReportDateFormatErrors();
+            ReportDateFormatErrors();
         }
 
         public override void Remove()

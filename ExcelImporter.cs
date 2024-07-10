@@ -107,7 +107,7 @@ namespace SLF
                     "AYDINLATMA_DAGITILAN",
                     "TOPLAM_DAGITILAN",
                     "KKO",
-                    "KKO",
+                    "KKM",
                     "MESKEN_FATURALANAN",
                     "SANAYI_FATURALANAN",
                     "TICARETHANE_FATURALANAN",
