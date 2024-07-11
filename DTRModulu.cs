@@ -198,6 +198,8 @@ namespace SLF
             { "TRAFO_MULKIYET", WarningErrorBoundary(0.2f) },
             //{ "YIL_TUKETIM_2023", WarningErrorBoundary(0.2f) },
             //{ "YIL_DEMANT_2023", WarningErrorBoundary(0.2f) },
+            { "PRIMER_GERILIM", WARNING_ONLY },
+            { "SEKONDER_GERILIM", WARNING_ONLY },
         };
         private void ReportNullCounts()
         {
