@@ -30,16 +30,28 @@ namespace SLF
                 if (dateFormatCheckWithLevel.ContainsKey(column.ColumnName))
                 {
                     var thresholds = dateFormatCheckWithLevel[column.ColumnName];
-                    int invalidCount = currentDataTable.AsEnumerable().Count(row =>
+                    int invalidCount = 0;
+                    List<int> invalidRows = new List<int>();
+
+                    for (int i = 0; i < totalRows; i++)
                     {
+                        var row = currentDataTable.Rows[i];
                         var value = row[column]?.ToString();
-                        return !DateTime.TryParseExact(value, DATE_FORMAT, null, DateTimeStyles.None, out _);
-                    });
+                        if (!DateTime.TryParseExact(value, DATE_FORMAT, null, DateTimeStyles.None, out _))
+                        {
+                            invalidCount++;
+                            // Add the row index to the invalidRows list
+                            invalidRows.Add(i);
+                        }
+                    }
 
                     invalidPercentage = (float)invalidCount / totalRows;
 
                     if (invalidPercentage > 0)
                     {
+                        // Add the column and its invalid rows to the dictionary
+                        columnNullRowsMap[column.ColumnName] = invalidRows;
+
                         var datatableLevel = GetDataTableBasedOnThreshold(invalidPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
                         datatableLevel.Rows.Add(new object[]
                         {
@@ -168,7 +180,7 @@ namespace SLF
                 for (int i = 0; i < totalRows; i++)
                 {
                     var row = currentDataTable.Rows[i];
-                    if (IsNullLike(row[column], true))
+                    if (IsNullLike(row[column], isZero: true))
                     {
                         nullCount++;
                         // Add the row number and the null-like value to the nullRows
@@ -238,6 +250,7 @@ namespace SLF
         }
         private void ImputeTMFiderID()
         {
+            // 0.01 is the 2d distance of the delta of x and y coordinates. Roughly equal to 1 km.
             const double maxDistance = 0.01;
 
             foreach (int missingIndex in columnNullRowsMap["TM_FIDER_ID"])
