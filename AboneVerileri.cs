@@ -13,8 +13,8 @@ namespace SLF
     {
         private readonly Dictionary<string, (float Min, float Max)> minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
         {
-            { "X_KOORDINAT", (float.MinValue, float.MaxValue) }, // TODO: Update these values from the other data
-            { "Y_KOORDINAT", (float.MinValue, float.MaxValue) } // TODO: Update these values from the other data
+            { "ABONE_X_KOORDINAT", (float.MinValue, float.MaxValue) }, // TODO: Update these values from the other data
+            { "ABONE_Y_KOORDINAT", (float.MinValue, float.MaxValue) } // TODO: Update these values from the other data
         };
 
         private readonly (float warningThreshold, float errorThreshold) TUKETIM_ERROR_THRESHOLD = InfoErrorBoundary(0.2f);
@@ -28,22 +28,22 @@ namespace SLF
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
             { "TESISAT_NO", InfoErrorBoundary(0.2f) },
-            { "ENERJI_TABLO_KAYIT_KODU", InfoErrorBoundary(0.1f) },
+            { "BAGLANDIGI_TRAFO_KODU", InfoErrorBoundary(0.1f) },
             { "BAGLANTI_GUCU", WarningErrorBoundary(0.4f) },
             { "ABONE_GRUBU",WarningErrorBoundary(0.2f) },
-            { "X_KOORDINAT", WarningErrorBoundary(0.2f) },
-            { "Y_KOORDINAT", WarningErrorBoundary(0.2f) },
-            { "ADR_BINA_ID", WarningErrorBoundary(0.2f) },
-            //{ "bina_turu", WarningErrorBoundary(0.2f) },
-            //{ "SOZ_DURUM", INFO_ONLY },
+            { "ABONE_X_KOORDINAT", WarningErrorBoundary(0.2f) },
+            { "ABONE_Y_KOORDINAT", WarningErrorBoundary(0.2f) },
+            { "BINA_ID", WarningErrorBoundary(0.2f) },
+            //{ "BINA_TURU", WarningErrorBoundary(0.2f) },
+            //{ "SOZLESME_DURUMU", INFO_ONLY },
             //{ "GERILIM_SEVIYESI", INFO_ONLY },
-            //{ "SOZ_BAS_TARIH", INFO_ONLY },
-            //{ "SOZ_BIT_TARIH", INFO_ONLY },
+            //{ "ABONE_BASLANGIC_TARIHI", INFO_ONLY },
+            //{ "ABONE_BITIS_TARIHI", INFO_ONLY },
         };
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> dateFormatCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
-            //{ "SOZ_BAS_TARIH", INFO_ONLY },
-            //{ "SOZ_BIT_TARIH", INFO_ONLY },
+            //{ "ABONE_BASLANGIC_TARIHI", INFO_ONLY },
+            //{ "ABONE_BITIS_TARIHI", INFO_ONLY },
         };
         private readonly List<string> duplicateFieldsGivingError = new List<string>
         {
@@ -71,8 +71,8 @@ namespace SLF
             // Add row indices from different columns to the combined list
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["TESISAT_NO"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["TESISAT_DUPLICATE"]);
-            combinedRowsToRemoveList.AddRange(columnNullRowsMap["ENERJI_TABLO_KAYIT_KODU"]);
-            combinedRowsToRemoveList.AddRange(columnNullRowsMap["bina_turu"]);
+            combinedRowsToRemoveList.AddRange(columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"]);
+            combinedRowsToRemoveList.AddRange(columnNullRowsMap["BINA_TURU"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["KAPASITE"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap[$"{lastYear}_Tuketim"]);
 
@@ -104,12 +104,12 @@ namespace SLF
         {
             foreach (DataRow row in currentDataTable.Rows)
             {
-                string adrBinaId = row["ADR_BINA_ID"].ToString();
+                string adrBinaId = row["BINA_ID"].ToString();
                 if (binaIdToMostFrequentCoordinates.ContainsKey(adrBinaId))
                 {
                     var coordinates = binaIdToMostFrequentCoordinates[adrBinaId];
-                    row["X_KOORDINAT"] = coordinates.X;
-                    row["Y_KOORDINAT"] = coordinates.Y;
+                    row["ABONE_X_KOORDINAT"] = coordinates.X;
+                    row["ABONE_Y_KOORDINAT"] = coordinates.Y;
                 }
             }
         }
@@ -159,7 +159,7 @@ namespace SLF
         {
             float nullPercentage = 0.0f;
             int totalRows = currentDataTable.Rows.Count;
-            string column = "bina_turu";
+            string column = "BINA_TURU";
 
             var nullRows = new List<int>();
 
@@ -292,14 +292,14 @@ namespace SLF
 
         private void ReportCoordinatesOutOfLimits()
         {
-            var (minXValue, maxXValue) = minMaxCheckMap["X_KOORDINAT"];
-            var (minYValue, maxYValue) = minMaxCheckMap["Y_KOORDINAT"];
+            var (minXValue, maxXValue) = minMaxCheckMap["ABONE_X_KOORDINAT"];
+            var (minYValue, maxYValue) = minMaxCheckMap["ABONE_Y_KOORDINAT"];
 
             int countOutOfThresholdCoordinates = 0;
 
             foreach (DataRow row in currentDataTable.Rows)
             {
-                if (float.TryParse(row["X_KOORDINAT"]?.ToString(), out float valueX) && float.TryParse(row["Y_KOORDINAT"]?.ToString(), out float valueY))
+                if (float.TryParse(row["ABONE_X_KOORDINAT"]?.ToString(), out float valueX) && float.TryParse(row["ABONE_Y_KOORDINAT"]?.ToString(), out float valueY))
                 {
                     if (valueX < minXValue || valueX > maxXValue || valueY < minYValue || valueY > maxYValue)
                     {
@@ -317,7 +317,7 @@ namespace SLF
 
                 // Add the warning to the DataTable
                 datatableLevel.Rows.Add(new object[] {
-                    "X_KOORDINAT & Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}", "%10'dan fazla abonede konum bilgisi doğru değildir."
+                    "ABONE_X_KOORDINAT & ABONE_Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}", "%10'dan fazla abonede konum bilgisi doğru değildir."
                 });
             }
         }
@@ -421,7 +421,7 @@ namespace SLF
         }
         private void BinaKoordinatMatchCheck()
         {
-            var grouped = currentDataTable.AsEnumerable().GroupBy(row => row["ADR_BINA_ID"]);
+            var grouped = currentDataTable.AsEnumerable().GroupBy(row => row["BINA_ID"]);
 
             int nonUniqueCount = 0;
 
@@ -433,8 +433,8 @@ namespace SLF
                 var coordinateGroups = group
                     .Select(row => new
                     {
-                        X = double.TryParse(row["X_KOORDINAT"].ToString(), out double x) ? (double?)x : null,
-                        Y = double.TryParse(row["Y_KOORDINAT"].ToString(), out double y) ? (double?)y : null
+                        X = double.TryParse(row["ABONE_X_KOORDINAT"].ToString(), out double x) ? (double?)x : null,
+                        Y = double.TryParse(row["ABONE_Y_KOORDINAT"].ToString(), out double y) ? (double?)y : null
                     })
                     .Where(coord => coord.X.HasValue && coord.Y.HasValue)
                     .GroupBy(coord => new { coord.X, coord.Y })
@@ -479,7 +479,7 @@ namespace SLF
         }
         private void AboneGrubuImpute()
         {
-            var grouped = currentDataTable.AsEnumerable().GroupBy(row => row["ADR_BINA_ID"]);
+            var grouped = currentDataTable.AsEnumerable().GroupBy(row => row["BINA_ID"]);
 
             aboneGrubuMostFrequent.Clear();
 
@@ -500,7 +500,7 @@ namespace SLF
             foreach (DataRow row in currentDataTable.Rows)
             {
                 string aboneGrubu = row["ABONE_GRUBU"].ToString();
-                string binaId = row["ADR_BINA_ID"].ToString();
+                string binaId = row["BINA_ID"].ToString();
                 if (IsNullLike(aboneGrubu))
                 {
                     var imputedGrup = aboneGrubuMostFrequent[binaId];
@@ -517,7 +517,7 @@ namespace SLF
             var grouped = currentDataTable.AsEnumerable()
                 .GroupBy(row => new
                 {
-                    AdrBinaId = row["ADR_BINA_ID"].ToString(),
+                    AdrBinaId = row["BINA_ID"].ToString(),
                     AboneGrubu = row["ABONE_GRUBU"].ToString()
                 });
 
@@ -540,7 +540,7 @@ namespace SLF
             foreach (DataRow row in currentDataTable.Rows)
             {
                 string aboneGrubu = row["ABONE_GRUBU"].ToString();
-                string binaId = row["ADR_BINA_ID"].ToString();
+                string binaId = row["BINA_ID"].ToString();
                 string baglantiGucu = row["BAGLANTI_GUCU"].ToString();
                 var key = $"{binaId}_{aboneGrubu}";
 
