@@ -215,11 +215,14 @@ namespace SLF
             ReportCompositeDuplicateCounts();
 
             ReportDateFormatErrors();
-            ReportErrorLessThanZero();
+            ReportErrorLessThanZero($"YIL_TUKETIM_{lastYear}");
+            ReportErrorLessThanZero($"YIL_DEMANT_{lastYear}");
         }
 
         public override void Impute() { 
             ImputeTMFiderID();
+            ImputeTuketim();
+            ImputeDemand();
         }
 
         public override void Remove()
@@ -248,6 +251,41 @@ namespace SLF
                 }
             }
         }
+
+        private void ImputeTuketim()
+        {
+            // TODO: DEEP LEARNING METODU ILE DEGISTIRILECEK
+            var tuketimColumn = $"YIL_TUKETIM_{lastYear}";
+            foreach (int missingIndex in imputableRowsMap[tuketimColumn])
+            {
+                var missingRow = currentDataTable.Rows[missingIndex];
+                double imputedValue = 99999;
+                missingRow[tuketimColumn] = imputedValue;
+
+            }
+        }
+
+        private void ImputeDemand()
+        {
+            var demandColumn = $"YIL_DEMANT_{lastYear}";
+            var tuketimColumn = $"YIL_TUKETIM_{lastYear}";
+            foreach (int missingIndex in imputableRowsMap[demandColumn])
+            {
+                var missingRow = currentDataTable.Rows[missingIndex];
+                var tuketim_value = missingRow[tuketimColumn];
+                double imputedValue;
+                if (double.TryParse(tuketim_value.ToString(), out double tuketimDouble))
+                {
+                    imputedValue = 2 * tuketimDouble / 8760;
+                    missingRow[demandColumn] = imputedValue;
+                }
+                else
+                {
+                    throw new ArgumentException($"Tüketim verisi geçersiz: {tuketim_value}");
+                }
+            }
+        }
+
         private void ImputeTMFiderID()
         {
             // 0.01 is the 2d distance of the delta of x and y coordinates. Roughly equal to 1 km.
@@ -291,11 +329,11 @@ namespace SLF
                 }
             }
         }
-        private void ReportErrorLessThanZero()
+        private void ReportErrorLessThanZero(string columnName)
         {
             float negativePercentage, zeroPercentage;
             int totalRows = currentDataTable.Rows.Count;
-            var column = currentDataTable.Columns[$"YIL_TUKETIM_{lastYear}"];
+            var column = currentDataTable.Columns[columnName];
             var nullRows = new List<int>();
             var imputableRows = new List<int>();
 
@@ -333,7 +371,7 @@ namespace SLF
 
                 // Append the column name and null count to the report message
                 datatableLevel.Rows.Add(new object[] {
-                    column.ColumnName, "Son yıl tüketim verisi", $"{negativePercentage:P1} abonenin tüketim verisi yok",
+                    column.ColumnName, "Son yıl verisi", $"{negativePercentage:P1} abonenin tüketim verisi yok",
                     "Bu abonelerin tüketim verileri silinecek."
                 });
             }
@@ -341,7 +379,7 @@ namespace SLF
             {
                 // Append the column name and null count to the report message
                 infoDataTable.Rows.Add(new object[] {
-                    column.ColumnName, "Son yıl tüketim verisi", $"{zeroPercentage:P1}", "Bu trafolarda son yıl tüketim verisi yok. Tüketim verileri silinecek."
+                    column.ColumnName, "Son yıl verisi", $"{zeroPercentage:P1}", "Bu trafolarda son yıl verisi yok. Tüketim verileri silinecek."
                 });
             }
         }
