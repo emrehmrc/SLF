@@ -62,6 +62,44 @@ namespace SLF
             }
         }
 
+        private void ReportTrafoLoad()
+        {
+            double loadThreshold = 1.0;
+            int overLoadCount = 0;
+            int totalRows = currentDataTable.Rows.Count;
+            var lastYearDemand = currentDataTable.Columns[$"YIL_DEMANT_{lastYear}"];
+            var nullRows = new List<int>();
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                if (float.TryParse(row[lastYearDemand]?.ToString(), out float demand) && demand > 0)
+                {
+                    var trafoKapasitesi = row["TRAFO_KAPASITESI"];
+                    if (float.TryParse(trafoKapasitesi?.ToString(), out float kapasite) && kapasite > 0)
+                    {
+                        float load = demand / kapasite;
+                        if (load > loadThreshold )
+                        {
+                            overLoadCount++;
+                            nullRows.Add(currentDataTable.Rows.IndexOf(row));
+                        }
+                    }
+                }
+            }
+
+            columnNullRowsMap["TRAFO_LOAD"] = nullRows;
+            float overCapacityPercentage = (float)overLoadCount / totalRows;
+
+            if (overCapacityPercentage > 0)
+            {
+                infoDataTable.Rows.Add(new object[]
+                {
+                 "", "Abone kapasitesi", $"{overCapacityPercentage:P1}",
+                 $"Abone kapasitesi {loadThreshold:P1}'den büyük olan abonelerin tüketim verileri silinecek."
+                });
+            }
+
+        }
+
         private readonly List<string> duplicateFieldsGivingError = new List<string>
         {
             "TRAFO_KODU",
@@ -217,6 +255,7 @@ namespace SLF
             ReportDateFormatErrors();
             ReportErrorLessThanZero($"YIL_TUKETIM_{lastYear}");
             ReportErrorLessThanZero($"YIL_DEMANT_{lastYear}");
+            ReportTrafoLoad();
         }
 
         public override void Impute() { 
