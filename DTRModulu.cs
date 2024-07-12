@@ -305,6 +305,7 @@ namespace SLF
             ImputeTuketim();
             ImputeDemand();
             ImputeAverageDate();
+            ImputeTrafoMulkiyet();
         }
 
         public override void Remove()
@@ -331,6 +332,17 @@ namespace SLF
                 {
                     currentDataTable.Rows.RemoveAt(rowIndex);
                 }
+            }
+        }
+
+        private void ImputeTrafoMulkiyet()
+        {
+            var column = "TRAFO_MULKIYET";
+            foreach (int missingIndex in columnNullRowsMap[column])
+            {
+                var missingRow = currentDataTable.Rows[missingIndex];
+                missingRow[column] = 0;
+
             }
         }
 
