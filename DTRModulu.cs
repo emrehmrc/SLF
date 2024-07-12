@@ -20,10 +20,18 @@ namespace SLF
         {
             15, 25, 40, 50, 63, 100, 160, 200, 250, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500
         };
+        private static readonly List<int> PRIMER_GERILIM_LISTESI = new List<int>
+        {
+            6300, 10500, 15800, 31500, 33000, 34500
+        };
+        private static readonly List<int> SEKONDER_GERILIM_LISTESI = new List<int>
+        {
+            400
+        };
 
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> dateFormatCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
-            { "TRAFO_KURULUM_TARIHI", INFO_ONLY },
+            { "TRAFO_KURULUM_TARIHI", WarningErrorBoundary(0.2f) },
         };
         private void ReportDateFormatErrors()
         {
@@ -257,6 +265,7 @@ namespace SLF
                     continue;
                 }
 
+                var isZero = !column.ColumnName.Contains("MULKIYET");
                 List<int> nullRows = new List<int>();
 
                 int nullCount = 0;
@@ -264,7 +273,7 @@ namespace SLF
                 for (int i = 0; i < totalRows; i++)
                 {
                     var row = currentDataTable.Rows[i];
-                    if (IsNullLike(row[column], isZero: true))
+                    if (IsNullLike(row[column], isZero))
                     {
                         nullCount++;
                         // Add the row number and the null-like value to the nullRows
@@ -287,6 +296,102 @@ namespace SLF
             }
         }
 
+        private void ReportPrimerGerilim()
+        {
+            float invalidPercentage = 0.0f;
+            int totalRows = currentDataTable.Rows.Count;
+            string column = "PRIMER_GERILIM";
+
+                List<int> invalidRows = new List<int>();
+
+                int invalidCount = 0;
+
+                for (int i = 0; i < totalRows; i++)
+                {
+                    var row = currentDataTable.Rows[i];
+                    var cellValue = row[column]?.ToString();
+                    if (!IsNullLike(cellValue))
+                    {
+                        if (int.TryParse(cellValue, out int value))
+                        {
+                            if (!PRIMER_GERILIM_LISTESI.Contains(value))
+                            {
+                                invalidCount++;
+                                // Add the row number to the invalidRows
+                                invalidRows.Add(i);
+                            }
+                        }
+                        else
+                        {
+                            invalidCount++;
+                            // Add the row number to the invalidRows if the value cannot be parsed
+                            invalidRows.Add(i);
+                        }
+                    }
+                }
+
+                //columnInvalidRowsMap[column.ColumnName] = invalidRows;
+
+                invalidPercentage = (float)invalidCount / totalRows;
+
+                if (invalidPercentage > 0)
+                {
+                    //var thresholds = invalidFieldsCheckWithLevel[column.ColumnName];
+                    //var datatableLevel = GetDataTableBasedOnThreshold(invalidPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+                    infoDataTable.Rows.Add(new object[] {
+                    "PRIMER_GERILIM", "Geçersiz değer", $"{invalidPercentage:P1}"
+                });
+                }
+        }
+
+        private void ReportSekonderGerilim()
+        {
+            float invalidPercentage = 0.0f;
+            int totalRows = currentDataTable.Rows.Count;
+            string column = "SEKONDER_GERILIM";
+
+            List<int> invalidRows = new List<int>();
+
+            int invalidCount = 0;
+
+            for (int i = 0; i < totalRows; i++)
+            {
+                var row = currentDataTable.Rows[i];
+                var cellValue = row[column]?.ToString();
+                if (!IsNullLike(cellValue))
+                {
+                    if (int.TryParse(cellValue, out int value))
+                    {
+                        if (!SEKONDER_GERILIM_LISTESI.Contains(value))
+                        {
+                            invalidCount++;
+                            // Add the row number to the invalidRows
+                            invalidRows.Add(i);
+                        }
+                    }
+                    else
+                    {
+                        invalidCount++;
+                        // Add the row number to the invalidRows if the value cannot be parsed
+                        invalidRows.Add(i);
+                    }
+                }
+            }
+
+            //columnInvalidRowsMap[column.ColumnName] = invalidRows;
+
+            invalidPercentage = (float)invalidCount / totalRows;
+
+            if (invalidPercentage > 0)
+            {
+                //var thresholds = invalidFieldsCheckWithLevel[column.ColumnName];
+                //var datatableLevel = GetDataTableBasedOnThreshold(invalidPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+                infoDataTable.Rows.Add(new object[] {
+                    "SEKONDER_GERILIM", "Geçersiz değer", $"{invalidPercentage:P1}"
+                });
+            }
+        }
+
 
         public override void Validate()
         {
@@ -302,6 +407,9 @@ namespace SLF
             ReportErrorLessThanZero($"YIL_TUKETIM_{lastYear}");
             ReportErrorLessThanZero($"YIL_DEMANT_{lastYear}");
             ReportTrafoLoad();
+
+            ReportPrimerGerilim();
+            ReportSekonderGerilim();
         }
 
         public override void Impute() { 
