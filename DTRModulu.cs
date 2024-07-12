@@ -16,6 +16,10 @@ namespace SLF
         private readonly (float warningThreshold, float errorThreshold) TUKETIM_ERROR_THRESHOLD = WarningErrorBoundary(0.2f);
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = ERROR_ONLY;
         private readonly string DATE_FORMAT = "dd.MM.yyyy";
+        private static readonly List<int> TRAFO_KAPASITE_LISTESI = new List<int>
+        {
+            15, 25, 40, 50, 63, 100, 160, 200, 250, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500
+        };
 
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> dateFormatCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
@@ -306,6 +310,7 @@ namespace SLF
             ImputeDemand();
             ImputeAverageDate();
             ImputeTrafoMulkiyet();
+            ImputeTrafoKapasitesi();
         }
 
         public override void Remove()
@@ -343,6 +348,37 @@ namespace SLF
                 var missingRow = currentDataTable.Rows[missingIndex];
                 missingRow[column] = 0;
 
+            }
+        }
+        private void ImputeTrafoKapasitesi()
+        {
+            var column = "TRAFO_KAPASITESI";
+            var refColumn = $"YIL_DEMANT_{lastYear}";
+            double demandFactor = 2.5;
+            double tentativeKapasite;
+            foreach (int missingIndex in columnNullRowsMap[column])
+            {
+                var missingRow = currentDataTable.Rows[missingIndex];
+
+                var refValue = missingRow[refColumn];
+
+                if (!IsNullLike(refValue))
+                {
+                    if (double.TryParse(refValue?.ToString(), out double demand))
+                    {
+                        // Calculate the tentative kapasite
+                        tentativeKapasite = demand * demandFactor;
+
+                        // Find the closest kapasite value in the list
+                        double kapasite = TRAFO_KAPASITE_LISTESI.OrderBy(x => Math.Abs(x - tentativeKapasite)).First();
+                        // Assign the calculated kapasite to the missing row
+                        missingRow[column] = kapasite;
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"'{refColumn}' column has invalid data format at row index {missingIndex}.");
+                    }
+                }
             }
         }
 
