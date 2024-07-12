@@ -108,6 +108,8 @@ namespace SLF
         private void ReportCompositeDuplicateCounts()
         {
             float duplicatePercentage;
+            float partialDuplicatePercentage;
+
             foreach (DataColumn column in currentDataTable.Columns)
             {
                 if (!duplicateFieldsGivingError.Contains(column.ColumnName))
@@ -118,10 +120,14 @@ namespace SLF
                 var uniqueValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 var duplicateRowIndices = new List<int>();
 
+                // Dictionary to track partial duplicates by TRAFO_KODU
+                var trafoIdToCoordinatesMap = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+                var partialDuplicateRowIndices = new List<int>();
+
                 for (int i = 0; i < currentDataTable.Rows.Count; i++)
                 {
                     var row = currentDataTable.Rows[i];
-                    var value1 = row["TRAFO_ID"]?.ToString() ?? string.Empty;
+                    var value1 = row["TRAFO_KODU"]?.ToString() ?? string.Empty;
                     var value2 = row["TRAFO_X_KOORDINAT"]?.ToString() ?? string.Empty;
                     var value3 = row["TRAFO_Y_KOORDINAT"]?.ToString() ?? string.Empty;
                     var compositeKey = $"{value1}|{value2}|{value3}";
@@ -132,9 +138,29 @@ namespace SLF
                     }
 
                     uniqueValues.Add(compositeKey);
+                    // Check for partial duplicates
+                    if (trafoIdToCoordinatesMap.ContainsKey(value1))
+                    {
+                        var coordinatesSet = trafoIdToCoordinatesMap[value1];
+                        var coordinatePair = $"{value2}|{value3}";
+
+                        if (!coordinatesSet.Contains(coordinatePair))
+                        {
+                            partialDuplicateRowIndices.Add(i);
+                        }
+
+                        // Add the coordinate pair to the set for this TRAFO_KODU
+                        coordinatesSet.Add(coordinatePair);
+                    }
+                    else
+                    {
+                        // Initialize the set for this TRAFO_KODU
+                        trafoIdToCoordinatesMap[value1] = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { $"{value2}|{value3}" };
+                    }
                 }
 
                 columnNullRowsMap["NONUNIQUE_TRAFO_X_Y"] = duplicateRowIndices;
+                columnNullRowsMap["PARTIAL_DUPLICATE_TRAFO_KODU"] = partialDuplicateRowIndices;
 
                 // Calculate the number of unique values and duplicates
                 int totalCount = currentDataTable.Rows.Count;
@@ -147,6 +173,18 @@ namespace SLF
                     // Append the column name and unique count to the report message
                     infoDataTable.Rows.Add(new object[] {
                     column.ColumnName, "Mükerrer hücre değerleri", $"{duplicatePercentage:P1}"
+                });
+                }
+
+                // Calculate and store the duplicate percentage for partial duplicates
+                int partialDuplicateCount = partialDuplicateRowIndices.Count;
+                partialDuplicatePercentage = (float)partialDuplicateCount / totalCount;
+
+                if (partialDuplicateCount > 0)
+                {
+                    // Append the column name and duplicate percentage to the report message
+                    errorDataTable.Rows.Add(new object[] {
+                    column.ColumnName, "Kısmi mükerrer hücre değerleri", $"{partialDuplicatePercentage:P1}"
                 });
                 }
             }
@@ -191,6 +229,7 @@ namespace SLF
 
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
+            { "TRAFO_KODU", ERROR_ONLY},
             { "TRAFO_X_KOORDINAT", ERROR_ONLY},
             { "TRAFO_Y_KOORDINAT", ERROR_ONLY},
             { "TM_FIDER_ID", WarningErrorBoundary(0.1f)},
@@ -447,8 +486,6 @@ namespace SLF
             DateTime averageDate = new DateTime(averageTicks);
 
             string averageDateString = averageDate.ToString(DATE_FORMAT, CultureInfo.InvariantCulture);
-
-            MessageBox.Show($"Ortalama tarih: {averageDateString}");
 
             foreach (int index in columnNullRowsMap[dateColumn])
             {
