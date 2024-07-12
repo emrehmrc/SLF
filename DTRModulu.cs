@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -264,6 +265,7 @@ namespace SLF
             ImputeTMFiderID();
             ImputeTuketim();
             ImputeDemand();
+            ImputeAverageDate();
         }
 
         public override void Remove()
@@ -424,7 +426,42 @@ namespace SLF
                 });
             }
         }
+        void ImputeAverageDate()
+        {
+            string dateColumn = "TRAFO_KURULUM_TARIHI";
+            var dateStrings = currentDataTable.AsEnumerable()
+                                       .Where(row => !string.IsNullOrEmpty(row[dateColumn]?.ToString()))
+                                       .Select(row => row[dateColumn].ToString())
+                                       .ToList();
 
+            var dateTimes = dateStrings.Select(date => DateTime.ParseExact(date, DATE_FORMAT, CultureInfo.InvariantCulture))
+                                       .ToList();
+
+            if (dateTimes.Count == 0)
+            {
+                throw new ArgumentException("No valid dates found in the column.");
+            }
+
+            BigInteger totalTicks = dateTimes.Aggregate(BigInteger.Zero, (sum, date) => sum + date.Ticks);
+            long averageTicks = (long)(totalTicks / dateTimes.Count);
+            DateTime averageDate = new DateTime(averageTicks);
+
+            string averageDateString = averageDate.ToString(DATE_FORMAT, CultureInfo.InvariantCulture);
+
+            MessageBox.Show($"Ortalama tarih: {averageDateString}");
+
+            foreach (int index in columnNullRowsMap[dateColumn])
+            {
+                if (index >= 0 && index < currentDataTable.Rows.Count)
+                {
+                    currentDataTable.Rows[index][dateColumn] = averageDateString;
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException($"Index {index} is out of the valid range.");
+                }
+            }
+        }
     }
 }
 
