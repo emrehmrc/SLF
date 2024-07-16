@@ -12,6 +12,19 @@ namespace SLF
     public class DEKModulu : GirdiModülü
 
     {
+        private void ImputeKaynakTipi()
+        {
+            // "KAYNAK_TIPI" kolonundaki null değerleri "GES" ile doldurma
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                // Eğer KAYNAK_TIPI kolonu null ise
+                if (IsNullLike(row["KAYNAK_TIPI"]))
+                {
+                    // "GES" ile doldur
+                    row["KAYNAK_TIPI"] = "GES";
+                }
+            }
+        }
         private void ImputeIlceAdi()
         {
             // "ILCE_ADI" kolonundaki null değerleri sayma ve en çok tekrarlanan değeri bulma
@@ -84,8 +97,8 @@ namespace SLF
 
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
-            { "ILCE_ADI", INFO_ONLY},
-            { "KAYNAK_TIPI", INFO_ONLY},
+            { "ILCE_ADI", WARNING_ONLY},
+            { "KAYNAK_TIPI", WARNING_ONLY},
             { "DEK_KURULU_GUCU", ERROR_ONLY},
             { "DEK_BAGLANDIGI_TRAFO_KODU", ERROR_ONLY},
             { "DEK_X_KOORDINAT", WARNING_ONLY},
@@ -143,6 +156,8 @@ namespace SLF
         public override void Impute()
         {
             ImputeIlceAdi();
+
+            ImputeKaynakTipi();
         }
     }
 }
