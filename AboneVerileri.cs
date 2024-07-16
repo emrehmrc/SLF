@@ -74,7 +74,7 @@ namespace SLF
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["BINA_TURU"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["KAPASITE"]);
-            combinedRowsToRemoveList.AddRange(columnNullRowsMap[$"{lastYear}_Tuketim"]);
+            combinedRowsToRemoveList.AddRange(columnNullRowsMap[$"YIL_TUKETIM_{lastYear}"]);
 
             RemoveCombinedRows(combinedRowsToRemoveList);
         }
@@ -98,6 +98,19 @@ namespace SLF
             ImputeCoordinates();
             AboneGrubuImpute();
             BaglantiGucuImpute();
+            ImputeLastYearTuketim();
+        }
+
+        private void ImputeLastYearTuketim() {
+            var column = $"YIL_TUKETIM_{lastYear}";
+            var fallbackColumn = $"YIL_TUKETIM_{penultimateYear}";
+
+            foreach (int missingIndex in imputableRowsMap[column])
+            {
+                var missingRow = currentDataTable.Rows[missingIndex];
+                var imputedValue = missingRow[fallbackColumn];
+                missingRow[column] = imputedValue;
+            }
         }
 
         private void ImputeCoordinates()
@@ -325,8 +338,8 @@ namespace SLF
         {
             float nonPositivePercentage, nonLastYearPercentage;
             int totalRows = currentDataTable.Rows.Count;
-            var column = currentDataTable.Columns[$"{lastYear}_Tuketim"];
-            var fallbackColumn = currentDataTable.Columns[$"{penultimateYear}_Tuketim"];
+            var column = currentDataTable.Columns[$"YIL_TUKETIM_{lastYear}"];
+            var fallbackColumn = currentDataTable.Columns[$"YIL_TUKETIM_{penultimateYear}"];
             var nullRows = new List<int>();
             var imputableRows = new List<int>();
 
@@ -351,7 +364,7 @@ namespace SLF
                         nonPositiveCount++;
                         nullRows.Add(currentDataTable.Rows.IndexOf(row));
                     }
-                    else {
+                    else if (row["SOZLESME_DURUMU"].ToString() == SOZ_DVM) {
                         nonLastYearCount++;
                         imputableRows.Add(currentDataTable.Rows.IndexOf(row));
                     }
@@ -387,7 +400,7 @@ namespace SLF
             // yillik tuketim / 8760 / baglanti gucu
             int overCapacityCount = 0;
             int totalRows = currentDataTable.Rows.Count;
-            var lastYearTuketim = currentDataTable.Columns[$"{lastYear}_Tuketim"];
+            var lastYearTuketim = currentDataTable.Columns[$"YIL_TUKETIM_{lastYear}"];
             var nullRows = new List<int>();
             foreach (DataRow row in currentDataTable.Rows)
             {
