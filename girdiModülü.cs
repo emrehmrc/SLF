@@ -61,6 +61,7 @@ namespace SLF
         protected DataTable errorDataTable = new DataTable();
         protected DataTable warningDataTable = new DataTable();
         protected DataTable infoDataTable = new DataTable();
+        protected DataTable statDataTable = new DataTable();
 
         protected Dictionary<string, List<int>> columnNullRowsMap = new Dictionary<string, List<int>>();
         protected Dictionary<string, List<int>> imputableRowsMap = new Dictionary<string, List<int>>();
@@ -123,14 +124,17 @@ namespace SLF
             AddColumnsToDataTable(errorDataTable);
             AddColumnsToDataTable(warningDataTable);
             AddColumnsToDataTable(infoDataTable);
+            AddColumnsToDataTable(statDataTable);
             warningDataTable.Columns.Add("İmpütasyon", typeof(bool));
             onizleme1.Onizleme_DataGrid2.DataSource = errorDataTable;
             onizleme1.Onizleme_DataGrid3.DataSource = warningDataTable;
             onizleme1.Onizleme_DataGrid4.DataSource = infoDataTable;
+            //onizleme1.Onizleme_DataGrid5.DataSource = statDataTable;
             onizleme1.Onizleme_DataGrid1.AllowUserToAddRows = false;
             onizleme1.Onizleme_DataGrid2.AllowUserToAddRows = false;
             onizleme1.Onizleme_DataGrid3.AllowUserToAddRows = false;
             onizleme1.Onizleme_DataGrid4.AllowUserToAddRows = false;
+            //onizleme1.Onizleme_DataGrid5.AllowUserToAddRows = false;
         }
 
         public bool IsError()
