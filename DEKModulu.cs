@@ -12,6 +12,37 @@ namespace SLF
     public class DEKModulu : GirdiModülü
 
     {
+        private void ImputeIlceAdi()
+        {
+            // "ILCE_ADI" kolonundaki null değerleri sayma ve en çok tekrarlanan değeri bulma
+            var mostFrequentValue = currentDataTable.AsEnumerable()
+                                                    // ILCE_ADI kolonundaki null olmayan değerleri seç
+                                                    .Where(row => !IsNullLike(row["ILCE_ADI"]))
+                                                    // Bu değerleri grupla
+                                                    .GroupBy(row => row["ILCE_ADI"])
+                                                    // Grupları tekrar sayısına göre sırala (azalan)
+                                                    .OrderByDescending(g => g.Count())
+                                                    // İlk grubu (en çok tekrarlanan değeri) seç
+                                                    .FirstOrDefault()?.Key;
+
+            // Eğer en çok tekrarlanan değer null ise fonksiyondan çık
+            if (mostFrequentValue == null)
+            {
+                return;
+            }
+
+            // "ILCE_ADI" kolonundaki null değerleri en çok kullanılan değer ile doldurma
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                // Eğer ILCE_ADI kolonu null ise
+                if (IsNullLike(row["ILCE_ADI"]))
+                {
+                    // En çok kullanılan değer ile doldur
+                    row["ILCE_ADI"] = mostFrequentValue;
+                }
+            }
+        }
+
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = WarningErrorBoundary(0.1f);
         
         private readonly Dictionary<string, (float Min, float Max)> minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
@@ -109,7 +140,12 @@ namespace SLF
 
             ReportCoordinatesOutOfLimits();
         }
+        public override void Impute()
+        {
+            ImputeIlceAdi();
+        }
     }
 }
+
 
 
