@@ -12,11 +12,39 @@ namespace SLF
     public class EnerjiMusaadeleri : GirdiModülü
 
     {
+        private void ImputeOnay()
+        {
+            // currentDataTable'ın tüm satırlarını dolaş
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                // Eğer ENERJI_MUSAADE_TALEP_DURUMU kolonu IsNullLike metoduna göre null ise
+                if (IsNullLike(row["ENERJI_MUSAADE_TALEP_DURUMU"]))
+                {
+                    // ENERJI_MUSAADE_TALEP_DURUMU kolonunu 1 olarak güncelle
+                    row["ENERJI_MUSAADE_TALEP_DURUMU"] = 0;
+                }
+            }
+        }
+
+        private void ImputeEnerjilendirmeYılı()
+        {
+            // currentDataTable'ın tüm satırlarını dolaş
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                // Eğer ENERJI_MUSAADE_ENERJILENDIRME_YILI kolonu IsNullLike metoduna göre null ise
+                if (IsNullLike(row["ENERJI_MUSAADE_ENERJILENDIRME_YILI"]))
+                {
+                    // ENERJI_MUSAADE_ENERJILENDIRME_YILI değerini horizon ilk yıl olarak güncelle
+                    row["ENERJI_MUSAADE_ENERJILENDIRME_YILI"] = lastYear;
+                }
+            }
+        }
+
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
             { "ENERJI_MUSAADE_TALEP_DURUMU", WARNING_ONLY},
-            { "ENERJI_MUSAADE_GERILIM_SEVIYESI", WARNING_ONLY},
-            { "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID", INFO_ONLY},
+            { "ENERJI_MUSAADE_GERILIM_SEVIYESI", INFO_ONLY},
+            { "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID", WARNING_ONLY},
             { "ENERJI_MUSAADE_BAGLANTI_GUCU", INFO_ONLY},
             { "ENERJI_MUSAADE_ENERJILENDIRME_YILI", WARNING_ONLY},
         };
@@ -66,6 +94,12 @@ namespace SLF
             base.Validate();
 
             ReportNullCounts();
+        }
+        public override void Impute()
+        {
+            ImputeOnay();
+
+            ImputeEnerjilendirmeYılı();
         }
     }
 }
