@@ -239,6 +239,16 @@ namespace SLF
         
         }
 
+        public virtual void Preprocess()
+        {
+        
+        }
+
+        public virtual void Postprocess()
+        {
+        
+        }
+
         protected void ClearRows()
         {
             errorDataTable.Rows.Clear();

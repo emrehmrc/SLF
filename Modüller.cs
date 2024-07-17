@@ -2051,6 +2051,7 @@ namespace SLF
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
                     girdiModülü.Onizleme1.Onizleme_DataGrid1.DataSource = dataTable;
+                    girdiModülü.Preprocess();
                     while (true)
                     {
                         girdiModülü.Validate();
@@ -2072,6 +2073,7 @@ namespace SLF
                         girdiModülü.Validate();
                         girdiModülü.Impute();
                     }
+                    girdiModülü.Postprocess();
                 }
                 else
                 {
