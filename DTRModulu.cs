@@ -104,7 +104,7 @@ namespace SLF
 
             if (overCapacityPercentage > 0)
             {
-                infoDataTable.Rows.Add(new object[]
+                statDataTable.Rows.Add(new object[]
                 {
                  "", "Abone kapasitesi", $"{overCapacityPercentage:P1}",
                  $"Abone kapasitesi {loadThreshold:P1}'den büyük olan abonelerin tüketim verileri silinecek."
@@ -338,7 +338,7 @@ namespace SLF
                 {
                     //var thresholds = invalidFieldsCheckWithLevel[column.ColumnName];
                     //var datatableLevel = GetDataTableBasedOnThreshold(invalidPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
-                    infoDataTable.Rows.Add(new object[] {
+                    statDataTable.Rows.Add(new object[] {
                     "PRIMER_GERILIM", "Geçersiz değer", $"{invalidPercentage:P1}"
                 });
                 }
@@ -386,7 +386,7 @@ namespace SLF
             {
                 //var thresholds = invalidFieldsCheckWithLevel[column.ColumnName];
                 //var datatableLevel = GetDataTableBasedOnThreshold(invalidPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
-                infoDataTable.Rows.Add(new object[] {
+                statDataTable.Rows.Add(new object[] {
                     "SEKONDER_GERILIM", "Geçersiz değer", $"{invalidPercentage:P1}"
                 });
             }

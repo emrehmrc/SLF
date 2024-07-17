@@ -2051,20 +2051,27 @@ namespace SLF
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
                     girdiModülü.Onizleme1.Onizleme_DataGrid1.DataSource = dataTable;
-                    girdiModülü.Validate();
-                    girdiModülü.Onizleme1.ShowDialog();
-                    if (girdiModülü.IsError()) {
-                        //MessageBox.Show("Hataları gidermeden devam edemezsiniz!", "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        //return;
+                    while (true)
+                    {
+                        girdiModülü.Validate();
+                        girdiModülü.Onizleme1.ShowDialog();
+
+                        if (girdiModülü.IsError())
+                        {
+                            //MessageBox.Show("Hataları gidermeden devam edemezsiniz!", "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            //return;
+                        }
+
+                        // Exit the loop if there are no info or warning messages
+                        if (!girdiModülü.IsInfo() && !girdiModülü.IsWarning())
+                        {
+                            break;
+                        }
+
+                        girdiModülü.Remove();
+                        girdiModülü.Validate();
+                        girdiModülü.Impute();
                     }
-                    girdiModülü.Remove();
-                    girdiModülü.Validate();
-                    girdiModülü.Impute();
-                    if (!girdiModülü.IsInfo() && !girdiModülü.IsWarning()) {
-                        //return;
-                    }
-                    girdiModülü.Validate();
-                    girdiModülü.Onizleme1.ShowDialog();
                 }
                 else
                 {
