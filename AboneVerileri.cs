@@ -28,7 +28,7 @@ namespace SLF
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
             { "TESISAT_NO", InfoErrorBoundary(0.2f) },
-            { "BAGLANDIGI_TRAFO_KODU", InfoErrorBoundary(0.1f) },
+            { "BAGLANDIGI_TRAFO_KODU", WarningErrorBoundary(0.1f) },
             { "BAGLANTI_GUCU", WarningErrorBoundary(0.4f) },
             { "ABONE_GRUBU",WarningErrorBoundary(0.2f) },
             { "ABONE_X_KOORDINAT", WarningErrorBoundary(0.2f) },
@@ -49,6 +49,10 @@ namespace SLF
         {
             "TESISAT_NO",
         };
+        public override void Preprocess()
+        {
+            PreprocessMismatchedTrafoKodu();
+        }
         public override void Validate()
         {
             base.Validate();
@@ -89,6 +93,28 @@ namespace SLF
                 if (rowIndex < currentDataTable.Rows.Count)
                 {
                     currentDataTable.Rows.RemoveAt(rowIndex);
+                }
+            }
+        }
+
+        private void PreprocessMismatchedTrafoKodu()
+        {
+            DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+            var validTrafos = new HashSet<string>(trafoDataTable.AsEnumerable()
+                                      .Select(row => row["TRAFO_KODU"].ToString())
+                                      .Distinct()
+            );
+
+            // Loop through currentDataTable to find invalid trafos and their indexes
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                string connectedTrafo = row["BAGLANDIGI_TRAFO_KODU"].ToString();
+                if (IsNullLike(connectedTrafo))
+                {
+                }
+                else if (!validTrafos.Contains(connectedTrafo))
+                {
+                    row["BAGLANDIGI_TRAFO_KODU"] = "#N/A";
                 }
             }
         }
