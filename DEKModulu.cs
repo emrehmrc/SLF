@@ -73,7 +73,7 @@ namespace SLF
 
             foreach (DataRow row in currentDataTable.Rows)
             {
-                if (float.TryParse(row["TRAFO_X_KOORDINAT"]?.ToString(), out float valueX) && float.TryParse(row["TRAFO_Y_KOORDINAT"]?.ToString(), out float valueY))
+                if (float.TryParse(row["DEK_X_KOORDINAT"]?.ToString(), out float valueX) && float.TryParse(row["DEK_Y_KOORDINAT"]?.ToString(), out float valueY))
                 {
                     if (valueX < minXValue || valueX > maxXValue || valueY < minYValue || valueY > maxYValue)
                     {
@@ -90,7 +90,7 @@ namespace SLF
 
                 // Add the warning to the DataTable
                 datatableLevel.Rows.Add(new object[] {
-                    "TRAFO_X_KOORDINAT & TRAFO_Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}", "%10'dan fazla abonede konum bilgisi doğru değildir."
+                    "DEK_X_KOORDINAT & DEK_Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}", "%10'dan fazla abonede konum bilgisi doğru değildir."
                 });
             }
         }
