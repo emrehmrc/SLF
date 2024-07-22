@@ -20,6 +20,9 @@ namespace SLF
         private readonly (float warningThreshold, float errorThreshold) TUKETIM_ERROR_THRESHOLD = InfoErrorBoundary(0.2f);
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = WarningErrorBoundary(0.1f);
         private const float ABONE_KAPASITE_LIMIT = 0.6f;
+        private const double BAGLANTI_GUCU_THRESHOLD = 30.0;
+
+        private const double MAX_DISTANCE_IN_DEGREES = 0.001;
 
         private readonly string DATE_FORMAT = "yyyyMMdd";
         private readonly string SOZ_DVM = "SÃ¶z.Dvm";
@@ -75,7 +78,7 @@ namespace SLF
             // Add row indices from different columns to the combined list
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["TESISAT_NO"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["TESISAT_DUPLICATE"]);
-            combinedRowsToRemoveList.AddRange(columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"]);
+            //combinedRowsToRemoveList.AddRange(columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["BINA_TURU"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["KAPASITE"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap[$"YIL_TUKETIM_{lastYear}"]);
@@ -121,6 +124,7 @@ namespace SLF
 
         public override void Impute()
         {
+            //TrafoKoduImpute();
             ImputeCoordinates();
             AboneGrubuImpute();
             BaglantiGucuImpute();
@@ -586,6 +590,52 @@ namespace SLF
                 if (IsNullLike(baglantiGucu) && baglantiGucuMostFrequent.ContainsKey(key))
                 {
                     row["BAGLANTI_GUCU"] = baglantiGucuMostFrequent[key];
+                }
+            }
+        }
+        private void TrafoKoduImpute()
+        {
+            nullFieldsCheckWithLevel["BAGLANDIGI_TRAFO_KODU"] = InfoErrorBoundary(0.01f);  // Stricter threshold for TrafoKodu
+            // 0.001 is the 2d distance of the delta of x and y coordinates. Roughly equal to 100m.
+
+            foreach (int missingIndex in columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"])
+            {
+                var missingRow = currentDataTable.Rows[missingIndex];
+                double missingX = Convert.ToDouble(missingRow["ABONE_X_KOORDINAT"]);
+                double missingY = Convert.ToDouble(missingRow["ABONE_Y_KOORDINAT"]);
+
+                double closestDistance = double.MaxValue;
+                DataRow closestRow = null;
+
+                foreach (DataRow row in currentDataTable.Rows)
+                {
+                    if (row == missingRow || IsNullLike(row["BAGLANDIGI_TRAFO_KODU"], true))
+                    {
+                        continue;
+                    }
+
+                    double x = Convert.ToDouble(row["ABONE_X_KOORDINAT"]);
+                    double y = Convert.ToDouble(row["ABONE_Y_KOORDINAT"]);
+                    double distance = Math.Sqrt(Math.Pow(missingX - x, 2) + Math.Pow(missingY - y, 2));
+
+                    if (distance < closestDistance && distance < MAX_DISTANCE_IN_DEGREES)
+                    {
+                        closestDistance = distance;
+                        closestRow = row;
+                    }
+                }
+
+                if (closestRow != null)
+                {
+                    double baglantiGucu = Convert.ToDouble(missingRow["BAGLANTI_GUCU"]);
+                    if (baglantiGucu < BAGLANTI_GUCU_THRESHOLD)
+                    {
+                        missingRow["BAGLANDIGI_TRAFO_KODU"] = closestRow["BAGLANDIGI_TRAFO_KODU"];
+                    }
+                }
+                else
+                {
+                    //missingRow["BAGLANDIGI_TRAFO_KODU"] = "Fider Bulunamadı";
                 }
             }
         }
