@@ -11,27 +11,55 @@ namespace SLF
     public class EASarjModulu : GirdiModülü
 
     {
-        // burada EA Şarj koordinatı bulunmuyorsa trafo koordinatını alıyor.
+        private void PreprocessMismatchedTrafoKodu()
+        {
+            DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+            var validTrafos = new HashSet<string>(trafoDataTable.AsEnumerable()
+                                      .Select(row => row["TRAFO_KODU"].ToString())
+                                      .Distinct()
+            );
 
-        //private void UpdateKoordinatlar(DataTable eaSektorTable, DataTable trafoTable)
-        //{
-        //    foreach (DataRow eaRow in eaSektorTable.Rows)
-        //    {
-        //        if (eaRow["X_KOORDINAT"] == DBNull.Value || eaRow["Y_KOORDINAT"] == DBNull.Value)
-        //        {
-        //            string eaTrafoKodu = eaRow["EA_TRAFO_KODU"].ToString();
-        //            foreach (DataRow trafoRow in trafoTable.Rows)
-        //            {
-        //                if (trafoRow["TRAFO_KODU"].ToString() == eaTrafoKodu)
-        //                {
-        //                    eaRow["X_KOORDINAT"] = trafoRow["X_KOORDINAT"];
-        //                    eaRow["Y_KOORDINAT"] = trafoRow["Y_KOORDINAT"];
-        //                    break;
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
+            // Loop through currentDataTable to find invalid trafos and their indexes
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                string connectedTrafo = row["EA_TRAFO_KODU"].ToString();
+                if (IsNullLike(connectedTrafo))
+                {
+                }
+                else if (!validTrafos.Contains(connectedTrafo))
+                {
+                    row["EA_TRAFO_KODU"] = "#N/A";
+                }
+            }
+        }
+        private void ImputeCoordinate()
+        {
+            // "DTR Verileri" tablosunu al
+            DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+
+            // Her satırı dolaş
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                // "EA_X_Koordinat" değeri null ise
+                if (IsNullLike(row["EA_X_KOORDINAT"]) || IsNullLike(row["EA_Y_KOORDINAT"]))
+                {
+                    string eaTrafoKodu = row["EA_TRAFO_KODU"].ToString();
+
+                    // "DTR Verileri" tablosunda TRAFO_KODU'nu eşle
+                    foreach (DataRow dtrRow in trafoDataTable.Rows)
+                    {
+                        if (dtrRow["TRAFO_KODU"].ToString() == eaTrafoKodu)
+                        {
+                            // "TRAFO_X_KOORDINAT" değerini al ve güncelle
+                            row["EA_X_KOORDINAT"] = dtrRow["TRAFO_X_KOORDINAT"];
+                            row["EA_Y_KOORDINAT"] = dtrRow["TRAFO_Y_KOORDINAT"];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
 
         private const int AC_DC_THRESHOLD = 22;
         private const int AC_CONSTANT = 0;
@@ -74,35 +102,10 @@ namespace SLF
             }
         }
 
-
-        //EA Şarj istasyonları verisindeki trafo kodları ile trafo verilerindeki trafo kodlarını karşılaştıracak fonksiyon.
-        //Burada bu tablolar ismi ile ilgili nasıl doğru kodu bulacak falan hiç bilmiyorum sor.
-
-        //private void CheckTrafoKodlari(DataTable eaSektorTable, DataTable trafoTable)
-        //{
-        //    foreach (DataRow eaRow in eaSektorTable.Rows)
-        //    {
-        //        string eaTrafoKodu = eaRow["EA_TRAFO_KODU"].ToString();
-        //        bool matchFound = false;
-
-        //        foreach (DataRow trafoRow in trafoTable.Rows)
-        //        {
-        //            if (trafoRow["TRAFO_KODU"].ToString() == eaTrafoKodu)
-        //            {
-        //                matchFound = true;
-        //                break;
-        //            }
-        //        }
-
-        //        if (!matchFound)
-        //        {
-        //            Console.WriteLine($"Şarj istasyonu ile trafo eşlemesi yapılamamıştır: {eaTrafoKodu}");
-        //        }
-        //    }
-        //}
-
-
-
+        public override void Preprocess()
+        {
+            PreprocessMismatchedTrafoKodu();
+        }
         public override void Validate()
         {
             base.Validate();
@@ -118,6 +121,8 @@ namespace SLF
             ImputeIstasyonAdı();
 
             ImputeIstasyonTipi();
+
+            ImputeCoordinate();
         }
         public override void Remove()
         {
