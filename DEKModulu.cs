@@ -12,6 +12,111 @@ namespace SLF
     public class DEKModulu : GirdiModülü
 
     {
+        private void ReportKuruluGuc()
+        {
+            // 1000'den büyük değerlerin yüzdesi için bir değişken tanımla ve başlangıç değeri olarak 0.0f ata
+            float invalidPercentage = 0.0f;
+
+            // currentDataTable'daki toplam satır sayısını al
+            int totalRows = currentDataTable.Rows.Count;
+
+            // Hangi kolonun kontrol edileceğini belirle
+            string column = "DEK_KURULU_GUCU";
+
+            // Geçersiz satırları tutmak için bir liste tanımla
+            List<int> invalidRows = new List<int>();
+
+            // Geçersiz değerlerin sayısını tutmak için bir değişken tanımla ve başlangıç değeri olarak 0 ata
+            int invalidCount = 0;
+
+            // Tüm satırlar üzerinden döngü başlat
+            for (int i = 0; i < totalRows; i++)
+            {
+                // Mevcut satırı al
+                var row = currentDataTable.Rows[i];
+
+                // Satırın belirtilen kolonundaki değeri al
+                var cellValue = row[column]?.ToString();
+
+                // Değer null veya boş değilse
+                if (!IsNullLike(cellValue))
+                {
+                    // Değerin sayıya çevrilebilir olup olmadığını kontrol et
+                    if (int.TryParse(cellValue, out int value))
+                    {
+                        // Eğer değer 1000'den büyükse
+                        if (value > 1000)
+                        {
+                            // Geçersiz değer sayısını artır
+                            invalidCount++;
+                            // Geçersiz satırların listesine satır numarasını ekle
+                            invalidRows.Add(i);
+                        }
+                    }
+                }
+            }
+
+            // Geçersiz değer yüzdesini hesapla
+            invalidPercentage = (float)invalidCount / totalRows;
+
+            // Eğer geçersiz değer yüzdesi 0'dan büyükse
+            if (invalidPercentage > 0)
+            {
+                // statDataTable'a yeni bir satır ekle. Burada "DEK_KURULU_GUCU", "Kurulu gücü 1000kVA'dan büyük olan {invalidCount} kadar DEK'ler mevcuttur. Eğer düzeltilmezse bu durum doğru kabul edilecektir." bilgisi eklenir
+                statDataTable.Rows.Add(new object[] {
+            "DEK_KURULU_GUCU", $"Kurulu gücü 1000kVA'dan büyük olan {invalidCount} kadar DEK'ler mevcuttur. Eğer düzeltilmezse bu durum doğru kabul edilecektir.", $"{invalidPercentage:P1}"
+        });
+            }
+        }
+
+        private void ImputeCoordinate()
+        {
+            // "DTR Verileri" tablosunu al
+            DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+
+            // Her satırı dolaş
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                // "EA_X_Koordinat" değeri null ise
+                if (IsNullLike(row["DEK_X_KOORDINAT"]) || IsNullLike(row["DEK_Y_KOORDINAT"]))
+                {
+                    string eaTrafoKodu = row["DEK_BAGLANDIGI_TRAFO_KODU"].ToString();
+
+                    // "DTR Verileri" tablosunda TRAFO_KODU'nu eşle
+                    foreach (DataRow dtrRow in trafoDataTable.Rows)
+                    {
+                        if (dtrRow["TRAFO_KODU"].ToString() == eaTrafoKodu)
+                        {
+                            // "TRAFO_X_KOORDINAT" değerini al ve güncelle
+                            row["DEK_X_KOORDINAT"] = dtrRow["TRAFO_X_KOORDINAT"];
+                            row["DEK_Y_KOORDINAT"] = dtrRow["TRAFO_Y_KOORDINAT"];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        private void PreprocessMismatchedTrafoKodu()
+        {
+            DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+            var validTrafos = new HashSet<string>(trafoDataTable.AsEnumerable()
+                                      .Select(row => row["TRAFO_KODU"].ToString())
+                                      .Distinct()
+            );
+
+            // Loop through currentDataTable to find invalid trafos and their indexes
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                string connectedTrafo = row["DEK_BAGLANDIGI_TRAFO_KODU"].ToString();
+                if (IsNullLike(connectedTrafo))
+                {
+                }
+                else if (!validTrafos.Contains(connectedTrafo))
+                {
+                    row["DEK_BAGLANDIGI_TRAFO_KODU"] = "#N/A";
+                }
+            }
+        }
         private void ImputeKaynakTipi()
         {
             // "KAYNAK_TIPI" kolonundaki null değerleri "GES" ile doldurma
@@ -145,6 +250,11 @@ namespace SLF
                 }
             }
         }
+
+        public override void Preprocess()
+        {
+            PreprocessMismatchedTrafoKodu();
+        }
         public override void Validate()
         {
             base.Validate();
@@ -152,12 +262,16 @@ namespace SLF
             ReportNullCounts();
 
             ReportCoordinatesOutOfLimits();
+
+            ReportKuruluGuc();
         }
         public override void Impute()
         {
             ImputeIlceAdi();
 
             ImputeKaynakTipi();
+
+            ImputeCoordinate();
         }
     }
 }
