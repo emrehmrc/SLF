@@ -16,6 +16,7 @@ namespace SLF
         private readonly (float warningThreshold, float errorThreshold) TUKETIM_ERROR_THRESHOLD = WarningErrorBoundary(0.2f);
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = ERROR_ONLY;
         private readonly string DATE_FORMAT = "dd.MM.yyyy";
+        private double K_FACTOR = 1.75;
         private static readonly List<int> TRAFO_KAPASITE_LISTESI = new List<int>
         {
             15, 25, 40, 50, 63, 100, 160, 200, 250, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500
@@ -514,12 +515,33 @@ namespace SLF
                 double imputedValue;
                 if (double.TryParse(tuketim_value.ToString(), out double tuketimDouble))
                 {
-                    imputedValue = 2 * tuketimDouble / 8760;
+                    imputedValue = K_FACTOR * tuketimDouble / HoursInYear;
                     missingRow[demandColumn] = imputedValue;
                 }
                 else
                 {
                     throw new ArgumentException($"Tüketim verisi geçersiz: {tuketim_value}");
+                }
+            }
+        }
+
+        private void ImputeTuketimIfDemand()
+        {
+            var demandColumn = $"YIL_DEMANT_{lastYear}";
+            var tuketimColumn = $"YIL_TUKETIM_{lastYear}";
+            foreach (int missingIndex in imputableRowsMap[demandColumn])
+            {
+                var missingRow = currentDataTable.Rows[missingIndex];
+                var demand_value = missingRow[demandColumn];
+                double imputedValue;
+                if (double.TryParse(demand_value.ToString(), out double demandDouble))
+                {
+                    imputedValue = demandDouble * HoursInYear / K_FACTOR;
+                    missingRow[tuketimColumn] = imputedValue;
+                }
+                else
+                {
+                    throw new ArgumentException($"Demand verisi geçersiz: {demand_value}");
                 }
             }
         }
