@@ -55,6 +55,7 @@ namespace SLF
         public override void Preprocess()
         {
             PreprocessMismatchedTrafoKodu();
+            CheckConnectivity();
         }
         public override void Validate()
         {
@@ -638,6 +639,86 @@ namespace SLF
                     //missingRow["BAGLANDIGI_TRAFO_KODU"] = "Fider Bulunamadı";
                 }
             }
+        }
+        private void CheckConnectivity()
+        {
+            var trafoDataTable = dataTablesByType["DTR Verileri"];
+            // Construct the column name for the last year consumption
+            string consumptionColumn = $"YIL_TUKETIM_{lastYear}";
+
+            // Create a dictionary to hold the grouped and summed results
+            Dictionary<string, double> trafoDictionary = new Dictionary<string, double>();
+            Dictionary<string, double> aboneDictionary = new Dictionary<string, double>();
+
+            foreach(DataRow row in trafoDataTable.Rows)
+            {
+                // Get the key value (TRAFO_KODU)
+                string key = row["TRAFO_KODU"].ToString();
+
+                // Get the consumption value, ensuring proper type conversion and handling of DBNull
+                double consumption = row[consumptionColumn] != DBNull.Value ? Convert.ToDouble(row[consumptionColumn]) : 0;
+
+                // Add the consumption value to the corresponding key in the dictionary
+                if (trafoDictionary.ContainsKey(key))
+                {
+                    trafoDictionary[key] += consumption;
+                }
+                else
+                {
+                    trafoDictionary[key] = consumption;
+                }
+            }
+
+            // Iterate through each row in the DataTable
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                // Get the key value (BAGLANDIGI_TRAFO_KODU)
+                string key = row["BAGLANDIGI_TRAFO_KODU"].ToString();
+
+                // Get the consumption value, ensuring proper type conversion and handling of DBNull
+                double consumption = row[consumptionColumn] != DBNull.Value ? Convert.ToDouble(row[consumptionColumn]) : 0;
+
+                // Add the consumption value to the corresponding key in the dictionary
+                if (aboneDictionary.ContainsKey(key))
+                {
+                    aboneDictionary[key] += consumption;
+                }
+                else
+                {
+                    aboneDictionary[key] = consumption;
+                }
+            }
+
+            // Group by BAGLANDIGI_TRAFO_KODU and sum the YIL_TUKETIM_{lastYear} column
+            //var groupedData = from row in currentDataTable.AsEnumerable()
+            //                  group row by row.Field<string>("BAGLANDIGI_TRAFO_KODU") into grp
+            //                  select new
+            //                  {
+            //                      BAGLANDIGI_TRAFO_KODU = grp.Key,
+            //                      SumConsumption = grp.Sum(r => (double)r[consumptionColumn])
+            //                  };
+
+            //// Convert the grouped data to a dictionary
+            //Dictionary<string, double> resultDictionary = groupedData.ToDictionary(
+            //    item => item.BAGLANDIGI_TRAFO_KODU,
+            //    item => item.SumConsumption
+            //);
+                // Display each key-value pair in a message box
+            int connectivityPassCount = 0;
+            foreach (var kvp in trafoDictionary)
+            {
+                var totalKeyCount = trafoDictionary.Count;
+                var trafoToplam = kvp.Value;
+                var aboneToplam = aboneDictionary.ContainsKey(kvp.Key) ? aboneDictionary[kvp.Key] : 0;
+                if (trafoToplam * 0.9 <= aboneToplam && aboneToplam <= trafoToplam)
+                {
+                    connectivityPassCount++;
+                }
+                //MessageBox.Show($"BAGLANDIGI_TRAFO_KODU: {kvp.Key}\nSum Consumption: {kvp.Value} Trafo toplam: {trafoDictionary[kvp.Key]}", "Group By Result");
+            }
+            var connectivityPassPercentage = (float)connectivityPassCount / trafoDictionary.Count;
+            MessageBox.Show($"Connectivity Pass Percentage: {connectivityPassPercentage:P1}", "Connectivity Check");
+            bool connectivityPass = connectivityPassPercentage > 0.95;
         }
     }
 }
