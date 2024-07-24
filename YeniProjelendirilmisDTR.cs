@@ -12,8 +12,43 @@ namespace SLF
     public class YeniProjelendirilmisDTR : GirdiModülü
 
     {
-        int horizonYear = 2035;
+        private void MevcutDTRKapasiteCheck()
+        {
+            int invalidNewCapacityCount = 0;
+            int totalRows = currentDataTable.Rows.Count;
+            var oldTrafoCapacity = currentDataTable.Columns["PROJELENDIRILMIS_TRAFO_KAPASITE"];
+            var newTrafoCapacity = currentDataTable.Columns["PROJELENDIRILMIS_TRAFO_YENI_KAPASITE"];
+            var nullRows = new List<int>();
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                if (float.TryParse(row[oldTrafoCapacity]?.ToString(), out float oldCapacity) && oldCapacity > 0)
+                {
+                    if (float.TryParse(row[newTrafoCapacity]?.ToString(), out float newCapacity) && newCapacity > 0)
+                    {
+                        if (newCapacity < oldCapacity)    
+                        {
+                            invalidNewCapacityCount++;
+                            nullRows.Add(currentDataTable.Rows.IndexOf(row));
+                        }
+                    }
+                }
+            }
 
+            columnNullRowsMap["KAPASITE"] = nullRows;
+            float invalidNewCapacityPercentage = (float)invalidNewCapacityCount / totalRows;
+
+            if (invalidNewCapacityPercentage > 0)
+            {
+                infoDataTable.Rows.Add(new object[]
+                {
+                 "", "Projelendirilmiş yeni DTR kapasitesi", $"{invalidNewCapacityPercentage:P1}",
+                 "Projelendirilmiş yeni DTR kapasitesi mevcut DTR kapasitesinden küçük olamaz. Bu şart sağlamayan DTR'lar silinecektir."
+                });
+            }
+
+        }
+
+        int horizonYear = 2035;
         private void ImputeFlagInvestmentYear()  // BU FONKSIYON ŞU AN HORIZON YEAR'I STATIK ALIYOR VE BUNU OPTIMIZE OLARAK FLAG EDIYOR.
         {
             foreach (DataRow row in currentDataTable.Rows)
@@ -57,7 +92,7 @@ namespace SLF
             }
         }
 
-        private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = InfoErrorBoundary(1f);  // BUNDAN EMİN DEĞİLİM KONTROL ETMEK LAZIM!!!
+        private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = INFO_ONLY;
 
         private readonly Dictionary<string, (float Min, float Max)> minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
         {
@@ -174,7 +209,8 @@ namespace SLF
             // Add row indices from different columns to the combined list
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["PROJELENDIRILMIS_TRAFO_ID"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["PROJELENDIRILMIS_TRAFO_YATIRIM_SINIFI"]);
-            combinedRowsToRemoveList.AddRange(columnNullRowsMap["PROJELENDIRILMIS_TRAFO_KAPASITE"]);
+            combinedRowsToRemoveList.AddRange(columnNullRowsMap["PROJELENDIRILMIS_TRAFO_YENI_KAPASITE"]);
+            combinedRowsToRemoveList.AddRange(columnNullRowsMap["KAPASITE"]);
 
 
             RemoveCombinedRows(combinedRowsToRemoveList);
