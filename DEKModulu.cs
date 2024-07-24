@@ -80,12 +80,12 @@ namespace SLF
                 // "EA_X_Koordinat" değeri null ise
                 if (IsNullLike(row["DEK_X_KOORDINAT"]) || IsNullLike(row["DEK_Y_KOORDINAT"]))
                 {
-                    string eaTrafoKodu = row["DEK_BAGLANDIGI_TRAFO_KODU"].ToString();
+                    string DEKTrafoKodu = row["DEK_BAGLANDIGI_TRAFO_KODU"].ToString();
 
                     // "DTR Verileri" tablosunda TRAFO_KODU'nu eşle
                     foreach (DataRow dtrRow in trafoDataTable.Rows)
                     {
-                        if (dtrRow["TRAFO_KODU"].ToString() == eaTrafoKodu)
+                        if (dtrRow["TRAFO_KODU"].ToString() == DEKTrafoKodu)
                         {
                             // "TRAFO_X_KOORDINAT" değerini al ve güncelle
                             row["DEK_X_KOORDINAT"] = dtrRow["TRAFO_X_KOORDINAT"];
