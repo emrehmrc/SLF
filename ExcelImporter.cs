@@ -137,8 +137,9 @@ namespace SLF
                 "TM Verileri", new List<string> {
                     "EDW_TM_ID",
                     "EDW_TRAFO_ID",
-                    "EDW_AY",
-                    "EDW_TM_DEMAND",
+                    "EDW_TARIH",
+                    "EDW_TM_TUKETIM",
+                    "EDW_TM_URETIM",
             }
             },
                         {
@@ -156,6 +157,8 @@ namespace SLF
                     "ENERJI_MUSAADE_MAHALLE",
                     "ENERJI_MUSAADE_ENERJILENDIRME_YILI",
                     "ENERJI_MUSAADE_BASVURU_TARIHI",
+                    "ENERJI_MUSAADE_X_KOORDINAT",
+                    "ENERJI_MUSAADE_Y_KOORDINAT",
             }
             },
                                     {

@@ -12,6 +12,125 @@ namespace SLF
     public class FiderVerileri : GirdiModülü
 
     {
+        private readonly (float warningThreshold, float errorThreshold) DEMAND_MAX_THRESHOLD = ERROR_ONLY;
+
+        // doğru hesaplamıyor gibi bakmak lazım bir de error veriyor imputasyona geçtiğinde
+        private void ReportInvalidPeakDemand()
+        {
+            // Sabit değerler
+            float threshold = 50;
+
+            int countInvalidPeakDemand = 0;
+
+            // DataTable'daki her bir satırı kontrol et
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                // FIDER_DEMANT sütunundaki değeri float'a dönüştürmeye çalış
+                if (float.TryParse(row["FIDER_DEMANT"]?.ToString(), out float demandValue))
+                {
+                    // Eğer değer 50 veya daha büyükse ya da -50 veya daha küçükse, sayacı artır
+                    if (demandValue >= threshold || demandValue <= -threshold)
+                    {
+                        countInvalidPeakDemand++;
+                    }
+                }
+            }
+
+            // Geçersiz peak demand değerlerinin yüzdesini hesapla
+            float invalidPeakDemandPercentage = (float)countInvalidPeakDemand / currentDataTable.Rows.Count;
+
+            // Eğer yüzdelik değer sıfırdan büyükse, tabloya ekleme yap
+            if (invalidPeakDemandPercentage > 0)
+            {
+
+                var thresholds = DEMAND_MAX_THRESHOLD;
+                var datatableLevel = GetDataTableBasedOnThreshold(invalidPeakDemandPercentage, thresholds.warningThreshold, thresholds.errorThreshold); 
+                // Geçersiz peak demand bilgilerini tabloya ekle
+                datatableLevel.Rows.Add(new object[] {
+            "FIDER_DEMANT", // Hangi parametreyle ilgili olduğu
+            "Puant Değer Sınırları", // Sorunun açıklaması
+            $"{invalidPeakDemandPercentage:P1}", // Yüzdelik değer
+            $"Saatlik maksimum puant değerlerinde 50MW değerinden büyük ya da -50MW değerinden küçük {countInvalidPeakDemand} kadar değer vardır." // Ayrıntılı açıklama
+        });
+            }
+        }
+
+        // BU FONKSIYON KOMPLEKS VE KONTROL EDILMESI GEREKIYOR. AYRICA BU FONKSIYON SU ANKI HALIYLE CAGRILDIGINDA UZUN SURDU GIBI BIR HATA VERIYOR.
+        private void CalculateAnnualPeakDemand()
+        {
+            // Yeni kolon ekle
+            if (!currentDataTable.Columns.Contains("FIDER_ANNUAL_PEAK_DEMAND"))
+            {
+                currentDataTable.Columns.Add("FIDER_ANNUAL_PEAK_DEMAND", typeof(double));
+            }
+
+            // Fider adları ve yılları elde et
+            var fiderNames = currentDataTable.AsEnumerable().Select(row => row.Field<string>("FIDER_ADI")).Distinct();
+            var years = currentDataTable.AsEnumerable()
+                                        .Select(row =>
+                                        {
+                                            int year;
+                                            string dateString = row.Field<string>("FIDER_TARIH");
+                                            return int.TryParse(dateString.Substring(0, 4), out year) ? year : (int?)null;
+                                        })
+                                        .Where(year => year.HasValue)
+                                        .Select(year => year.Value)
+                                        .Distinct();
+
+            // Fider adları ve yıllar için yıllık peak demand değerlerini saklamak için dictionary
+            var peakDemandDictionary = new Dictionary<(string fiderName, int year), double>();
+
+            // Her fider ve yıl için yıllık peak demand hesapla
+            foreach (var fiderName in fiderNames)
+            {
+                foreach (var year in years)
+                {
+                    var filteredData = currentDataTable.AsEnumerable()
+                        .Where(row => row.Field<string>("FIDER_ADI") == fiderName &&
+                                      int.TryParse(row.Field<string>("FIDER_TARIH").Substring(0, 4), out int rowYear) && rowYear == year)
+                        .Select(row =>
+                        {
+                            double value;
+                            return double.TryParse(row["FIDER_DEMANT"].ToString(), out value) ? value : (double?)null;
+                        })
+                        .Where(value => value.HasValue)
+                        .Select(value => value.Value);
+
+                    if (filteredData.Any())
+                    {
+                        var top3Percent = filteredData.OrderByDescending(value => value).Take((int)Math.Max(1, filteredData.Count() * 0.03));
+                        if (top3Percent.Any())
+                        {
+                            double annualPeakDemand = top3Percent.Average();
+                            peakDemandDictionary[(fiderName, year)] = annualPeakDemand;
+                        }
+                    }
+                }
+            }
+        }
+
+            private void PreprocessMismatchedTMAdi()
+        {
+            DataTable TMDataTable = dataTablesByType["TM Verileri"];
+            var validTrafos = new HashSet<string>(TMDataTable.AsEnumerable()
+                                      .Select(row => row["EDW_TM_ID"].ToString())
+                                      .Distinct()
+            );
+
+            // Loop through currentDataTable to find invalid trafos and their indexes
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                string connectedTM = row["FIDER_TM_ADI"].ToString();
+                if (IsNullLike(connectedTM))
+                {
+                }
+                else if (!validTrafos.Contains(connectedTM))
+                {
+                    row["FIDER_TM_ADI"] = "#N/A";
+                }
+            }
+        }
+        
         private readonly string DATE_FORMAT = "yyyyMMdd";
         
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> dateFormatCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
@@ -95,13 +214,44 @@ namespace SLF
                 }
             }
         }
+        public override void Preprocess()
+        {
+            //PreprocessMismatchedTMAdi();
+
+            //CalculateAnnualPeakDemand();
+        }
         public override void Validate()
         {
             base.Validate();
 
             ReportNullCounts();
 
-            //ReportDateFormatErrors();
+            ReportDateFormatErrors();
+
+            ReportInvalidPeakDemand();
+        }
+        public override void Remove()
+        {
+            List<int> combinedRowsToRemoveList = new List<int>();
+
+            // Add row indices from different columns to the combined list
+            combinedRowsToRemoveList.AddRange(columnNullRowsMap["FIDER_TARIH"]);
+
+            RemoveCombinedRows(combinedRowsToRemoveList);
+        }
+
+        private void RemoveCombinedRows(List<int> rowsToRemoveList)
+        {
+            // Remove duplicates and sort in descending order
+            var rowIndicesToRemove = rowsToRemoveList.Distinct().OrderByDescending(i => i).ToList();
+
+            foreach (int rowIndex in rowIndicesToRemove)
+            {
+                if (rowIndex < currentDataTable.Rows.Count)
+                {
+                    currentDataTable.Rows.RemoveAt(rowIndex);
+                }
+            }
         }
     }
 }

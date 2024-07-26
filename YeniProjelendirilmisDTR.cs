@@ -197,6 +197,8 @@ namespace SLF
             ReportNullCounts();
 
             ReportCoordinatesOutOfLimitsByCondition();
+
+            MevcutDTRKapasiteCheck();
         }
         public override void Impute()
         {
