@@ -689,21 +689,6 @@ namespace SLF
                 }
             }
 
-            // Group by BAGLANDIGI_TRAFO_KODU and sum the YIL_TUKETIM_{lastYear} column
-            //var groupedData = from row in currentDataTable.AsEnumerable()
-            //                  group row by row.Field<string>("BAGLANDIGI_TRAFO_KODU") into grp
-            //                  select new
-            //                  {
-            //                      BAGLANDIGI_TRAFO_KODU = grp.Key,
-            //                      SumConsumption = grp.Sum(r => (double)r[consumptionColumn])
-            //                  };
-
-            //// Convert the grouped data to a dictionary
-            //Dictionary<string, double> resultDictionary = groupedData.ToDictionary(
-            //    item => item.BAGLANDIGI_TRAFO_KODU,
-            //    item => item.SumConsumption
-            //);
-                // Display each key-value pair in a message box
             int connectivityPassCount = 0;
             foreach (var kvp in trafoDictionary)
             {
@@ -714,11 +699,9 @@ namespace SLF
                 {
                     connectivityPassCount++;
                 }
-                //MessageBox.Show($"BAGLANDIGI_TRAFO_KODU: {kvp.Key}\nSum Consumption: {kvp.Value} Trafo toplam: {trafoDictionary[kvp.Key]}", "Group By Result");
             }
             var connectivityPassPercentage = (float)connectivityPassCount / trafoDictionary.Count;
-            MessageBox.Show($"Connectivity Pass Percentage: {connectivityPassPercentage:P1}", "Connectivity Check");
-            bool connectivityPass = connectivityPassPercentage > 0.95;
+            aboneTrafoConnectivityPass = connectivityPassPercentage > 0.95;
         }
     }
 }

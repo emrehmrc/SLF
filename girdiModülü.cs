@@ -76,6 +76,8 @@ namespace SLF
         protected static (float Min, float Max) INFO_ONLY = (MAX_THRESHOLD, MAX_THRESHOLD);
         protected static (float Min, float Max) ERROR_ONLY = (MIN_THRESHOLD, MIN_THRESHOLD);
 
+        protected static bool aboneTrafoConnectivityPass = true;
+
         protected bool IsNullLike(object value, bool isZero=false)
         {
             if (value == null || value == DBNull.Value)
