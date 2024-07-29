@@ -16,7 +16,6 @@ namespace SLF
         private readonly (float warningThreshold, float errorThreshold) TUKETIM_ERROR_THRESHOLD = WarningErrorBoundary(0.2f);
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = ERROR_ONLY;
         private readonly string DATE_FORMAT = "dd.MM.yyyy";
-        private double K_FACTOR = 1.75;
         private static readonly List<int> TRAFO_KAPASITE_LISTESI = new List<int>
         {
             15, 25, 40, 50, 63, 100, 160, 200, 250, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500
@@ -247,7 +246,7 @@ namespace SLF
             { "TRAFO_Y_KOORDINAT", ERROR_ONLY},
             { "TM_FIDER_ID", WarningErrorBoundary(0.1f)},
             { "TRAFO_KURULUM_TARIHI", WarningErrorBoundary(0.2f) },
-            { "TRAFO_KAPASITESI", WarningErrorBoundary(0.2f) },
+            { "TRAFO_KAPASITESI", ERROR_ONLY }, // WarningErrorBoundary(0.2f) },
             { "TRAFO_MULKIYET", WarningErrorBoundary(0.2f) },
             //{ "YIL_TUKETIM_2023", WarningErrorBoundary(0.2f) },
             //{ "YIL_DEMANT_2023", WarningErrorBoundary(0.2f) },
@@ -415,11 +414,11 @@ namespace SLF
 
         public override void Impute() { 
             ImputeTMFiderID();
-            ImputeTuketim();
-            ImputeDemand();
             ImputeAverageDate();
             ImputeTrafoMulkiyet();
-            ImputeTrafoKapasitesi();
+            //ImputeTrafoKapasitesi();
+            ImputeTuketim();
+            ImputeDemand();
         }
 
         public override void Remove()
@@ -491,19 +490,6 @@ namespace SLF
             }
         }
 
-        private void ImputeTuketim()
-        {
-            // TODO: DEEP LEARNING METODU ILE DEGISTIRILECEK
-            var tuketimColumn = $"YIL_TUKETIM_{lastYear}";
-            foreach (int missingIndex in imputableRowsMap[tuketimColumn])
-            {
-                var missingRow = currentDataTable.Rows[missingIndex];
-                double imputedValue = 99999;
-                missingRow[tuketimColumn] = imputedValue;
-
-            }
-        }
-
         private void ImputeDemand()
         {
             var demandColumn = $"YIL_DEMANT_{lastYear}";
@@ -518,18 +504,16 @@ namespace SLF
                     imputedValue = K_FACTOR * tuketimDouble / HoursInYear;
                     missingRow[demandColumn] = imputedValue;
                 }
-                else
-                {
-                    throw new ArgumentException($"Tüketim verisi geçersiz: {tuketim_value}");
-                }
             }
         }
 
-        private void ImputeTuketimIfDemand()
+        private void ImputeTuketim()
         {
+            const double maxDistance = 0.005;
             var demandColumn = $"YIL_DEMANT_{lastYear}";
+            var kapasiteColumn = "TRAFO_KAPASITESI";
             var tuketimColumn = $"YIL_TUKETIM_{lastYear}";
-            foreach (int missingIndex in imputableRowsMap[demandColumn])
+            foreach (int missingIndex in imputableRowsMap[tuketimColumn])
             {
                 var missingRow = currentDataTable.Rows[missingIndex];
                 var demand_value = missingRow[demandColumn];
@@ -541,7 +525,10 @@ namespace SLF
                 }
                 else
                 {
-                    throw new ArgumentException($"Demand verisi geçersiz: {demand_value}");
+                    var toBeImputedValue = TO_BE_IMPUTED_STRING;
+                    var imputedDemandValue = TO_BE_IMPUTED_STRING;
+                    missingRow[tuketimColumn] = toBeImputedValue;
+                    missingRow[demandColumn] = imputedDemandValue;
                 }
             }
         }

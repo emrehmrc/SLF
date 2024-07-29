@@ -77,6 +77,19 @@ namespace SLF
         protected static (float Min, float Max) ERROR_ONLY = (MIN_THRESHOLD, MIN_THRESHOLD);
 
         protected static bool aboneTrafoConnectivityPass = true;
+        protected const string TO_BE_IMPUTED_STRING = "TO_BE_IMPUTED";
+
+        protected readonly Dictionary<string, double> kFactorByAboneGrubu = new Dictionary<string, double>
+        {
+            { "AYDINLATMA", 2.5 },
+            { "GENEL_AYDINLATMA", 2.5 },
+            { "MESKEN", 2.5 },
+            { "SANAYI", 2.5 },
+            { "TARIMSAL SULAMA", 2.5 },
+            { "TICARETHANE", 2.5 },
+            { "URETICI", 2.5 },
+        };
+        protected double K_FACTOR = 2.5;
 
         protected bool IsNullLike(object value, bool isZero=false)
         {
