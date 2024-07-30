@@ -15,6 +15,13 @@ namespace SLF
         }
     }
 
+    public class PrerequisiteException : Exception
+    {
+        public PrerequisiteException(string message) : base(message)
+        {
+        }
+    }
+
     public class GirdiModülü
     {
         protected Önizleme onizleme1 = new Önizleme();
@@ -172,6 +179,11 @@ namespace SLF
             table.Columns.Add("Validasyon Türü", typeof(string));
             table.Columns.Add("Validasyon Bilgisi", typeof(string));
             table.Columns.Add("Ek Açıklamalar", typeof(string));
+        }
+
+        public virtual void CheckPrerequisites()
+        {
+        
         }
 
         public void ProcessFileSelection(string seçilenVeriTipi)

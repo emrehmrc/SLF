@@ -2045,6 +2045,7 @@ namespace SLF
 
             try
             {
+                girdiModülü.CheckPrerequisites(); // Check the required datatables for the given module
                 // ProcessFileSelection metodu ile dosya seçme işlemi yapılır ve seçilen dosya veri tablosuna yüklenir
                 girdiModülü.ProcessFileSelection(seçilenVeriTipi);
                 DataTable dataTable = girdiModülü.CurrentDataTable;
@@ -2088,7 +2089,10 @@ namespace SLF
             {
                 MessageBox.Show("Geçersiz sütun biçimi: " + ex.Message, "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
+            catch (PrerequisiteException ex)
+            {
+                MessageBox.Show(ex.Message, "Önkoşul hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void DrawRuler_ea(GMapOverlay rulerOverlay, List<PointLatLng> rulerPoints)

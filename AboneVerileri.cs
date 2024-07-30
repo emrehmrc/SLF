@@ -54,6 +54,14 @@ namespace SLF
         {
             "TESISAT_NO",
         };
+        public override void CheckPrerequisites()
+        {
+            // Check if "DTR Verileri" exists in the dictionary
+            if (!dataTablesByType.ContainsKey("DTR Verileri"))
+            {
+                throw new PrerequisiteException("Abone verilerinin yüklenmesi için öncelikle 'DTR Verileri'nin yüklenmesi gerekmektedir.");
+            }
+        }
         public override void Preprocess()
         {
             PreprocessMismatchedTrafoKodu();
