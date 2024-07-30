@@ -71,6 +71,7 @@ namespace SLF
         {
             DeferredImputeTrafoTuketimDemand();
             MessageBox.Show("DTR verilerinde eksik kalan tüketimler, abone verilerinin yüklenmesiyle birlikte dolduruldu.");
+            nullFieldsCheckWithLevel["BAGLANDIGI_TRAFO_KODU"] = WarningErrorBoundary(0.1f);  // Return to the original value as you could reupload the data all over again
         }
         public override void Validate()
         {
@@ -621,6 +622,20 @@ namespace SLF
             trafoKoduRemoveFlag = true;
             // 0.001 is the 2d distance of the delta of x and y coordinates. Roughly equal to 100m.
 
+            // Create a list of non-null rows with their coordinates
+            var nonNullRows = currentDataTable.AsEnumerable()
+                                              .Where(row => !IsNullLike(row["BAGLANDIGI_TRAFO_KODU"], true))
+                                              .Select(row => new
+                                              {
+                                                  Row = row,
+                                                  X = Convert.ToDouble(row["ABONE_X_KOORDINAT"]),
+                                                  Y = Convert.ToDouble(row["ABONE_Y_KOORDINAT"])
+                                              })
+                                              .ToList();
+
+            // Sort non-null rows by X coordinate
+            nonNullRows.Sort((a, b) => a.X.CompareTo(b.X));
+
             foreach (int missingIndex in columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"])
             {
                 var missingRow = currentDataTable.Rows[missingIndex];
@@ -628,23 +643,29 @@ namespace SLF
                 double missingY = Convert.ToDouble(missingRow["ABONE_Y_KOORDINAT"]);
 
                 double closestDistance = double.MaxValue;
-                DataRow closestRow = null;
+                var closestRow = default(dynamic);
 
-                foreach (DataRow row in currentDataTable.Rows)
+                // Use binary search to find the position of the missing row by X coordinate
+                int position = nonNullRows.BinarySearch(new { Row = (DataRow)null, X = missingX, Y = 0.0 },
+                                                        Comparer<dynamic>.Create((a, b) => a.X.CompareTo(b.X)));
+
+                if (position < 0) position = ~position;
+
+                // Search in the neighborhood of the found position
+                int left = Math.Max(0, position - 100);  // Adjust the range as necessary
+                int right = Math.Min(nonNullRows.Count - 1, position + 100);
+
+                for (int i = left; i <= right; i++)
                 {
-                    if (row == missingRow || IsNullLike(row["BAGLANDIGI_TRAFO_KODU"], true))
-                    {
-                        continue;
-                    }
-
-                    double x = Convert.ToDouble(row["ABONE_X_KOORDINAT"]);
-                    double y = Convert.ToDouble(row["ABONE_Y_KOORDINAT"]);
+                    var row = nonNullRows[i];
+                    double x = row.X;
+                    double y = row.Y;
                     double distance = Math.Sqrt(Math.Pow(missingX - x, 2) + Math.Pow(missingY - y, 2));
 
                     if (distance < closestDistance && distance < MAX_DISTANCE_IN_DEGREES)
                     {
                         closestDistance = distance;
-                        closestRow = row;
+                        closestRow = row.Row;
                     }
                 }
 
