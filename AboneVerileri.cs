@@ -149,6 +149,9 @@ namespace SLF
                 TrafoKoduImpute();
             }
             ImputeCoordinates();
+            ImputeOutOfLimitCoordinates("COORDINATE_LIMITS");
+            ImputeOutOfLimitCoordinates("ABONE_X_KOORDINAT");
+            ImputeOutOfLimitCoordinates("ABONE_Y_KOORDINAT");
             AboneGrubuImpute();
             BaglantiGucuImpute();
             ImputeLastYearTuketim();
@@ -163,6 +166,37 @@ namespace SLF
                 var missingRow = currentDataTable.Rows[missingIndex];
                 var imputedValue = missingRow[fallbackColumn];
                 missingRow[column] = imputedValue;
+            }
+        }
+        private void ImputeOutOfLimitCoordinates(string column)
+        {
+            //var column = "COORDINATE_LIMITS";
+
+            foreach (int missingIndex in columnNullRowsMap[column])
+            {
+                var missingRow = currentDataTable.Rows[missingIndex];
+                if(aboneTrafoConnectivityPass)
+                {
+                    var trafoKodu = missingRow["BAGLANDIGI_TRAFO_KODU"].ToString();
+                    if (!IsNullLike(trafoKodu) && trafoKodu != "TO_BE_IMPUTED")
+                    {
+                        var trafoRow = dataTablesByType["DTR Verileri"].AsEnumerable().FirstOrDefault(r => r["TRAFO_KODU"].ToString() == trafoKodu);
+                        if (trafoRow != null)
+                        {
+                            missingRow["ABONE_X_KOORDINAT"] = trafoRow["TRAFO_X_KOORDINAT"];
+                            missingRow["ABONE_Y_KOORDINAT"] = trafoRow["TRAFO_Y_KOORDINAT"];
+                        }
+                        else
+                        {
+                            throw new ArgumentException($"Abone verileri için koordinatlar impute edilirken hata oluştu. Trafo kodu: {trafoKodu}");
+                        }
+                    }
+                }
+                else
+                {
+                    missingRow["ABONE_X_KOORDINAT"] = "KOORDINATI_YOK";
+                    missingRow["ABONE_Y_KOORDINAT"] = "KOORDINATI_YOK";
+                }
             }
         }
 
@@ -361,6 +395,8 @@ namespace SLF
             var (minXValue, maxXValue) = minMaxCheckMap["ABONE_X_KOORDINAT"];
             var (minYValue, maxYValue) = minMaxCheckMap["ABONE_Y_KOORDINAT"];
 
+            var nullRows = new List<int>();
+
             int countOutOfThresholdCoordinates = 0;
 
             foreach (DataRow row in currentDataTable.Rows)
@@ -370,9 +406,12 @@ namespace SLF
                     if (valueX < minXValue || valueX > maxXValue || valueY < minYValue || valueY > maxYValue)
                     {
                         countOutOfThresholdCoordinates++;
+                        nullRows.Add(currentDataTable.Rows.IndexOf(row));
                     }
                 }
             }
+
+            columnNullRowsMap["COORDINATE_LIMITS"] = nullRows;
 
             float outOfThresholdPercentage = (float)countOutOfThresholdCoordinates / currentDataTable.Rows.Count;
 
