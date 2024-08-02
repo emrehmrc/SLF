@@ -147,11 +147,23 @@ namespace SLF
                 if (dateFormatCheckWithLevel.ContainsKey(column.ColumnName))
                 {
                     var thresholds = dateFormatCheckWithLevel[column.ColumnName];
-                    int invalidCount = currentDataTable.AsEnumerable().Count(row =>
-                    {
+                    int invalidCount = 0;
+                    var invalidRows = new List<int>();
+
+                    foreach (DataRow row in currentDataTable.Rows) {
                         var value = row[column]?.ToString();
-                        return !DateTime.TryParseExact(value, DATE_FORMAT, null, DateTimeStyles.None, out _);
-                    });
+                        if (!DateTime.TryParseExact(value, DATE_FORMAT, null, DateTimeStyles.None, out _))
+                        {
+                            invalidCount++;
+                            invalidRows.Add(row.Table.Rows.IndexOf(row));
+                        }
+                    }
+                    //int invalidCount = currentDataTable.AsEnumerable().Count(row =>
+                    //{
+                    //    var value = row[column]?.ToString();
+                    //    return !DateTime.TryParseExact(value, DATE_FORMAT, null, DateTimeStyles.None, out _);
+                    //});
+                    columnNullRowsMap[column.ColumnName] = invalidRows;
 
                     invalidPercentage = (float)invalidCount / totalRows;
 
@@ -192,7 +204,7 @@ namespace SLF
                 for (int i = 0; i < totalRows; i++)
                 {
                     var row = currentDataTable.Rows[i];
-                    if (IsNullLike(row[column]))
+                    if (IsNullLike(row[column], true))
                     {
                         nullCount++;
                         // Add the row number and the null-like value to the nullRows
