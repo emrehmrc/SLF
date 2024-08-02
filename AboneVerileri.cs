@@ -28,6 +28,8 @@ namespace SLF
         private readonly string SOZ_DVM = "SÃ¶z.Dvm";
         private readonly string SOZ_IPT = "SÃ¶z.Ipt";
 
+        private bool trafoKoduRemoveFlag = false;
+
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
             { "TESISAT_NO", InfoErrorBoundary(0.2f) },
@@ -52,10 +54,24 @@ namespace SLF
         {
             "TESISAT_NO",
         };
+        public override void CheckPrerequisites()
+        {
+            // Check if "DTR Verileri" exists in the dictionary
+            if (!dataTablesByType.ContainsKey("DTR Verileri"))
+            {
+                throw new PrerequisiteException("Abone verilerinin yüklenmesi için öncelikle 'DTR Verileri'nin yüklenmesi gerekmektedir.");
+            }
+        }
         public override void Preprocess()
         {
             PreprocessMismatchedTrafoKodu();
             CheckConnectivity();
+        }
+        public override void Postprocess()
+        {
+            DeferredImputeTrafoTuketimDemand();
+            MessageBox.Show("DTR verilerinde eksik kalan tüketimler, abone verilerinin yüklenmesiyle birlikte dolduruldu.");
+            nullFieldsCheckWithLevel["BAGLANDIGI_TRAFO_KODU"] = WarningErrorBoundary(0.1f);  // Return to the original value as you could reupload the data all over again
         }
         public override void Validate()
         {
@@ -79,7 +95,10 @@ namespace SLF
             // Add row indices from different columns to the combined list
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["TESISAT_NO"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["TESISAT_DUPLICATE"]);
-            //combinedRowsToRemoveList.AddRange(columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"]);
+            if(trafoKoduRemoveFlag)
+            {
+                combinedRowsToRemoveList.AddRange(columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"]);
+            }
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["BINA_TURU"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["KAPASITE"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap[$"YIL_TUKETIM_{lastYear}"]);
@@ -125,8 +144,14 @@ namespace SLF
 
         public override void Impute()
         {
-            //TrafoKoduImpute();
+            if(!trafoKoduRemoveFlag)
+            {
+                TrafoKoduImpute();
+            }
             ImputeCoordinates();
+            ImputeOutOfLimitCoordinates("COORDINATE_LIMITS");
+            ImputeOutOfLimitCoordinates("ABONE_X_KOORDINAT");
+            ImputeOutOfLimitCoordinates("ABONE_Y_KOORDINAT");
             AboneGrubuImpute();
             BaglantiGucuImpute();
             ImputeLastYearTuketim();
@@ -141,6 +166,37 @@ namespace SLF
                 var missingRow = currentDataTable.Rows[missingIndex];
                 var imputedValue = missingRow[fallbackColumn];
                 missingRow[column] = imputedValue;
+            }
+        }
+        private void ImputeOutOfLimitCoordinates(string column)
+        {
+            //var column = "COORDINATE_LIMITS";
+
+            foreach (int missingIndex in columnNullRowsMap[column])
+            {
+                var missingRow = currentDataTable.Rows[missingIndex];
+                if(aboneTrafoConnectivityPass)
+                {
+                    var trafoKodu = missingRow["BAGLANDIGI_TRAFO_KODU"].ToString();
+                    if (!IsNullLike(trafoKodu) && trafoKodu != "TO_BE_IMPUTED")
+                    {
+                        var trafoRow = dataTablesByType["DTR Verileri"].AsEnumerable().FirstOrDefault(r => r["TRAFO_KODU"].ToString() == trafoKodu);
+                        if (trafoRow != null)
+                        {
+                            missingRow["ABONE_X_KOORDINAT"] = trafoRow["TRAFO_X_KOORDINAT"];
+                            missingRow["ABONE_Y_KOORDINAT"] = trafoRow["TRAFO_Y_KOORDINAT"];
+                        }
+                        else
+                        {
+                            throw new ArgumentException($"Abone verileri için koordinatlar impute edilirken hata oluştu. Trafo kodu: {trafoKodu}");
+                        }
+                    }
+                }
+                else
+                {
+                    missingRow["ABONE_X_KOORDINAT"] = "KOORDINATI_YOK";
+                    missingRow["ABONE_Y_KOORDINAT"] = "KOORDINATI_YOK";
+                }
             }
         }
 
@@ -339,6 +395,8 @@ namespace SLF
             var (minXValue, maxXValue) = minMaxCheckMap["ABONE_X_KOORDINAT"];
             var (minYValue, maxYValue) = minMaxCheckMap["ABONE_Y_KOORDINAT"];
 
+            var nullRows = new List<int>();
+
             int countOutOfThresholdCoordinates = 0;
 
             foreach (DataRow row in currentDataTable.Rows)
@@ -348,9 +406,12 @@ namespace SLF
                     if (valueX < minXValue || valueX > maxXValue || valueY < minYValue || valueY > maxYValue)
                     {
                         countOutOfThresholdCoordinates++;
+                        nullRows.Add(currentDataTable.Rows.IndexOf(row));
                     }
                 }
             }
+
+            columnNullRowsMap["COORDINATE_LIMITS"] = nullRows;
 
             float outOfThresholdPercentage = (float)countOutOfThresholdCoordinates / currentDataTable.Rows.Count;
 
@@ -597,7 +658,22 @@ namespace SLF
         private void TrafoKoduImpute()
         {
             nullFieldsCheckWithLevel["BAGLANDIGI_TRAFO_KODU"] = InfoErrorBoundary(0.01f);  // Stricter threshold for TrafoKodu
+            trafoKoduRemoveFlag = true;
             // 0.001 is the 2d distance of the delta of x and y coordinates. Roughly equal to 100m.
+
+            // Create a list of non-null rows with their coordinates
+            var nonNullRows = currentDataTable.AsEnumerable()
+                                              .Where(row => !IsNullLike(row["BAGLANDIGI_TRAFO_KODU"], true))
+                                              .Select(row => new
+                                              {
+                                                  Row = row,
+                                                  X = Convert.ToDouble(row["ABONE_X_KOORDINAT"]),
+                                                  Y = Convert.ToDouble(row["ABONE_Y_KOORDINAT"])
+                                              })
+                                              .ToList();
+
+            // Sort non-null rows by X coordinate
+            nonNullRows.Sort((a, b) => a.X.CompareTo(b.X));
 
             foreach (int missingIndex in columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"])
             {
@@ -606,23 +682,29 @@ namespace SLF
                 double missingY = Convert.ToDouble(missingRow["ABONE_Y_KOORDINAT"]);
 
                 double closestDistance = double.MaxValue;
-                DataRow closestRow = null;
+                var closestRow = default(dynamic);
 
-                foreach (DataRow row in currentDataTable.Rows)
+                // Use binary search to find the position of the missing row by X coordinate
+                int position = nonNullRows.BinarySearch(new { Row = (DataRow)null, X = missingX, Y = 0.0 },
+                                                        Comparer<dynamic>.Create((a, b) => a.X.CompareTo(b.X)));
+
+                if (position < 0) position = ~position;
+
+                // Search in the neighborhood of the found position
+                int left = Math.Max(0, position - 100);  // Adjust the range as necessary
+                int right = Math.Min(nonNullRows.Count - 1, position + 100);
+
+                for (int i = left; i <= right; i++)
                 {
-                    if (row == missingRow || IsNullLike(row["BAGLANDIGI_TRAFO_KODU"], true))
-                    {
-                        continue;
-                    }
-
-                    double x = Convert.ToDouble(row["ABONE_X_KOORDINAT"]);
-                    double y = Convert.ToDouble(row["ABONE_Y_KOORDINAT"]);
+                    var row = nonNullRows[i];
+                    double x = row.X;
+                    double y = row.Y;
                     double distance = Math.Sqrt(Math.Pow(missingX - x, 2) + Math.Pow(missingY - y, 2));
 
                     if (distance < closestDistance && distance < MAX_DISTANCE_IN_DEGREES)
                     {
                         closestDistance = distance;
-                        closestRow = row;
+                        closestRow = row.Row;
                     }
                 }
 
@@ -656,7 +738,7 @@ namespace SLF
                 string key = row["TRAFO_KODU"].ToString();
 
                 // Get the consumption value, ensuring proper type conversion and handling of DBNull
-                double consumption = row[consumptionColumn] != DBNull.Value ? Convert.ToDouble(row[consumptionColumn]) : 0;
+                double consumption = (row[consumptionColumn] != DBNull.Value && row[consumptionColumn].ToString() != TO_BE_IMPUTED_STRING) ? Convert.ToDouble(row[consumptionColumn]) : 0;
 
                 // Add the consumption value to the corresponding key in the dictionary
                 if (trafoDictionary.ContainsKey(key))
@@ -689,21 +771,6 @@ namespace SLF
                 }
             }
 
-            // Group by BAGLANDIGI_TRAFO_KODU and sum the YIL_TUKETIM_{lastYear} column
-            //var groupedData = from row in currentDataTable.AsEnumerable()
-            //                  group row by row.Field<string>("BAGLANDIGI_TRAFO_KODU") into grp
-            //                  select new
-            //                  {
-            //                      BAGLANDIGI_TRAFO_KODU = grp.Key,
-            //                      SumConsumption = grp.Sum(r => (double)r[consumptionColumn])
-            //                  };
-
-            //// Convert the grouped data to a dictionary
-            //Dictionary<string, double> resultDictionary = groupedData.ToDictionary(
-            //    item => item.BAGLANDIGI_TRAFO_KODU,
-            //    item => item.SumConsumption
-            //);
-                // Display each key-value pair in a message box
             int connectivityPassCount = 0;
             foreach (var kvp in trafoDictionary)
             {
@@ -714,11 +781,109 @@ namespace SLF
                 {
                     connectivityPassCount++;
                 }
-                //MessageBox.Show($"BAGLANDIGI_TRAFO_KODU: {kvp.Key}\nSum Consumption: {kvp.Value} Trafo toplam: {trafoDictionary[kvp.Key]}", "Group By Result");
             }
             var connectivityPassPercentage = (float)connectivityPassCount / trafoDictionary.Count;
-            MessageBox.Show($"Connectivity Pass Percentage: {connectivityPassPercentage:P1}", "Connectivity Check");
-            bool connectivityPass = connectivityPassPercentage > 0.95;
+            aboneTrafoConnectivityPass = connectivityPassPercentage > 0.95;
+        }
+
+        public void DeferredImputeTrafoTuketimDemand()
+        {
+            var trafoDataTable = dataTablesByType["DTR Verileri"];
+            const double maxDistance = double.MaxValue;  // 0.005;
+            var demandColumn = $"YIL_DEMANT_{lastYear}";
+            var kapasiteColumn = "TRAFO_KAPASITESI";
+            var tuketimColumn = $"YIL_TUKETIM_{lastYear}";
+
+            var deferredImputableRows = new List<int>();
+
+            foreach (DataRow row in trafoDataTable.Rows)
+            {
+                if (row[tuketimColumn].ToString() == TO_BE_IMPUTED_STRING && row[demandColumn].ToString() == TO_BE_IMPUTED_STRING)
+                {
+                    deferredImputableRows.Add(trafoDataTable.Rows.IndexOf(row));
+                }
+            }
+
+            foreach (int missingIndex in deferredImputableRows)
+            {
+                var missingRow = trafoDataTable.Rows[missingIndex];
+                var trafoKodu = missingRow["TRAFO_KODU"];
+                double imputedValue;
+                double imputedDemandValue;
+                if (aboneTrafoConnectivityPass)
+                {
+                    double sumOfTrafo = 0;
+                    foreach (DataRow row in currentDataTable.Rows)
+                    {
+                        if (row["BAGLANDIGI_TRAFO_KODU"].ToString() == trafoKodu.ToString())
+                        {
+                            sumOfTrafo += Convert.ToDouble(row[$"YIL_TUKETIM_{lastYear}"]);
+                        }
+                    }
+                    var aboneGrubu = missingRow["ABONE_GRUBU"].ToString();
+                    var kFactorForTheGrup = K_FACTOR; // kFactorByAboneGrubu[aboneGrubu];
+                    imputedValue = 1.03 * sumOfTrafo;
+                    imputedDemandValue = kFactorForTheGrup * imputedValue / HoursInYear;
+                }
+                else // if (!aboneTrafoConnectivityPass)
+                {
+                    double missingX = Convert.ToDouble(missingRow["TRAFO_X_KOORDINAT"]);
+                    double missingY = Convert.ToDouble(missingRow["TRAFO_Y_KOORDINAT"]);
+                    List<(DataRow row, double distance)> closestRows = new List<(DataRow, double)>();
+                    foreach (DataRow row in trafoDataTable.Rows)
+                    {
+                        if (row == missingRow || IsNullLike(row[demandColumn], true) || IsNullLike(row[kapasiteColumn], true) || row[demandColumn].ToString() == TO_BE_IMPUTED_STRING)
+                        {
+                            continue;
+                        }
+                        double x = Convert.ToDouble(row["TRAFO_X_KOORDINAT"]);
+                        double y = Convert.ToDouble(row["TRAFO_Y_KOORDINAT"]);
+                        double distance = Math.Sqrt(Math.Pow(missingX - x, 2) + Math.Pow(missingY - y, 2));
+                        if (distance < maxDistance)
+                        {
+                            closestRows.Add((row, distance));
+                        }
+                    }
+                    // Sort the list by distance
+                    closestRows.Sort((a, b) => a.distance.CompareTo(b.distance));
+
+                    // Take the three closest rows
+                    var top3ClosestRows = closestRows.Take(3).ToList();
+
+                    if (top3ClosestRows.Count > 0)
+                    {
+                        // Here, you can decide how to use these three closest rows to impute the value
+                        double totalLoad = 0;
+
+                        foreach (var (row, _) in top3ClosestRows)
+                        {
+                            double rowDemand = Convert.ToDouble(row[demandColumn]);
+                            double rowKapasite = Convert.ToDouble(row[kapasiteColumn]);
+                            //double rowTuketim = Convert.ToDouble(row[tuketimColumn]);
+
+                            double load = rowDemand / rowKapasite;
+
+                            totalLoad += load;
+                        }
+
+                        double averageLoad = totalLoad / top3ClosestRows.Count;
+
+                        double missingKapasite = Convert.ToDouble(missingRow[kapasiteColumn]);
+
+                        imputedDemandValue = averageLoad * missingKapasite;
+                        imputedValue = imputedDemandValue * HoursInYear / K_FACTOR;
+                        missingRow[demandColumn] = imputedValue;
+                    }
+                    else
+                    {
+                        imputedValue = 99999; // No close enough rows found
+                        imputedDemandValue = 99999; // No close enough rows found
+                        MessageBox.Show("No close enough rows found");
+                    }
+                }
+                missingRow[tuketimColumn] = imputedValue;
+                missingRow[demandColumn] = imputedDemandValue;
+            }
         }
     }
 }
