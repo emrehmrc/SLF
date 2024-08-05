@@ -178,7 +178,7 @@
             this.Controls.Add(this.YÜKLE);
             this.Controls.Add(this.Onizleme_Tablar);
             this.Name = "Önizleme";
-            this.Text = "Önizleme";
+            this.Text = " ";
             this.Onizleme_Tablar.ResumeLayout(false);
             this.Onizleme_Onizleme.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid1)).EndInit();

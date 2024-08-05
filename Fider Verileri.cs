@@ -13,6 +13,7 @@ namespace SLF
 
     {
         private readonly (float warningThreshold, float errorThreshold) DEMAND_MAX_THRESHOLD = ERROR_ONLY;
+        protected override List<string> Prerequisites => new List<string> { "DTR Verileri" };
 
         // doğru hesaplamıyor gibi bakmak lazım bir de error veriyor imputasyona geçtiğinde
         private void ReportInvalidPeakDemand()
@@ -55,58 +56,26 @@ namespace SLF
             }
         }
 
-        // BU FONKSIYON KOMPLEKS VE KONTROL EDILMESI GEREKIYOR. AYRICA BU FONKSIYON SU ANKI HALIYLE CAGRILDIGINDA UZUN SURDU GIBI BIR HATA VERIYOR.
         private void CalculateAnnualPeakDemand()
         {
-            // Yeni kolon ekle
-            if (!currentDataTable.Columns.Contains("FIDER_ANNUAL_PEAK_DEMAND"))
-            {
-                currentDataTable.Columns.Add("FIDER_ANNUAL_PEAK_DEMAND", typeof(double));
-            }
-
-            // Fider adları ve yılları elde et
-            var fiderNames = currentDataTable.AsEnumerable().Select(row => row.Field<string>("FIDER_ADI")).Distinct();
-            var years = currentDataTable.AsEnumerable()
-                                        .Select(row =>
-                                        {
-                                            int year;
-                                            string dateString = row.Field<string>("FIDER_TARIH");
-                                            return int.TryParse(dateString.Substring(0, 4), out year) ? year : (int?)null;
-                                        })
-                                        .Where(year => year.HasValue)
-                                        .Select(year => year.Value)
-                                        .Distinct();
-
-            // Fider adları ve yıllar için yıllık peak demand değerlerini saklamak için dictionary
-            var peakDemandDictionary = new Dictionary<(string fiderName, int year), double>();
-
-            // Her fider ve yıl için yıllık peak demand hesapla
-            foreach (var fiderName in fiderNames)
-            {
-                foreach (var year in years)
+            annualPeakDemand = currentDataTable.AsEnumerable()
+                .GroupBy(row => new
                 {
-                    var filteredData = currentDataTable.AsEnumerable()
-                        .Where(row => row.Field<string>("FIDER_ADI") == fiderName &&
-                                      int.TryParse(row.Field<string>("FIDER_TARIH").Substring(0, 4), out int rowYear) && rowYear == year)
-                        .Select(row =>
-                        {
-                            double value;
-                            return double.TryParse(row["FIDER_DEMANT"].ToString(), out value) ? value : (double?)null;
-                        })
-                        .Where(value => value.HasValue)
-                        .Select(value => value.Value);
-
-                    if (filteredData.Any())
-                    {
-                        var top3Percent = filteredData.OrderByDescending(value => value).Take((int)Math.Max(1, filteredData.Count() * 0.03));
-                        if (top3Percent.Any())
-                        {
-                            double annualPeakDemand = top3Percent.Average();
-                            peakDemandDictionary[(fiderName, year)] = annualPeakDemand;
-                        }
-                    }
-                }
-            }
+                    FiderName = row.Field<string>("FIDER_ID"),
+                    Year = row.Field<string>("FIDER_TARIH").Substring(0, 4)
+                })
+                .Where(g => g.Key.Year != null && g.All(row => int.TryParse(g.Key.Year, out _)))
+                .Select(g => new
+                {
+                    g.Key.FiderName,
+                    Year = int.Parse(g.Key.Year),
+                    Top3PercentAverage = g.Select(row => double.TryParse(row["FIDER_DEMANT"].ToString(), out double value) ? value : (double?)null)
+                                          .Where(value => value.HasValue)
+                                          .OrderByDescending(value => value.Value)
+                                          .Take((int)Math.Max(1, g.Count() * 0.03))
+                                          .Average(value => value.Value)
+                })
+                .ToDictionary(x => (x.FiderName, x.Year), x => x.Top3PercentAverage);
         }
 
             private void PreprocessMismatchedTMAdi()
@@ -131,7 +100,7 @@ namespace SLF
             }
         }
         
-        private readonly string DATE_FORMAT = "yyyyMMdd";
+        private readonly string DATE_FORMAT = "yyyy-MM-dd";
         
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> dateFormatCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
@@ -147,11 +116,18 @@ namespace SLF
                 if (dateFormatCheckWithLevel.ContainsKey(column.ColumnName))
                 {
                     var thresholds = dateFormatCheckWithLevel[column.ColumnName];
-                    int invalidCount = currentDataTable.AsEnumerable().Count(row =>
-                    {
+                    int invalidCount = 0;
+                    var invalidRows = new List<int>();
+
+                    foreach (DataRow row in currentDataTable.Rows) {
                         var value = row[column]?.ToString();
-                        return !DateTime.TryParseExact(value, DATE_FORMAT, null, DateTimeStyles.None, out _);
-                    });
+                        if (!DateTime.TryParseExact(value, DATE_FORMAT, null, DateTimeStyles.None, out _))
+                        {
+                            invalidCount++;
+                            invalidRows.Add(row.Table.Rows.IndexOf(row));
+                        }
+                    }
+                    columnNullRowsMap[column.ColumnName] = invalidRows;
 
                     invalidPercentage = (float)invalidCount / totalRows;
 
@@ -192,7 +168,7 @@ namespace SLF
                 for (int i = 0; i < totalRows; i++)
                 {
                     var row = currentDataTable.Rows[i];
-                    if (IsNullLike(row[column]))
+                    if (IsNullLike(row[column], true))
                     {
                         nullCount++;
                         // Add the row number and the null-like value to the nullRows
@@ -217,8 +193,7 @@ namespace SLF
         public override void Preprocess()
         {
             //PreprocessMismatchedTMAdi();
-
-            //CalculateAnnualPeakDemand();
+            CalculateAnnualPeakDemand();
         }
         public override void Validate()
         {
