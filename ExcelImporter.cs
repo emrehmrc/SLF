@@ -128,6 +128,7 @@ namespace SLF
                 "Fider Verileri", new List<string> {
                     "FIDER_TM_ADI",
                     "FIDER_ADI",
+                    "FIDER_ID",
                     "FIDER_TARIH",
                     "FIDER_SAAT",
                     "FIDER_DEMANT",

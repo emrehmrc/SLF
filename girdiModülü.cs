@@ -75,6 +75,7 @@ namespace SLF
         protected Dictionary<string, List<int>> imputableRowsMap = new Dictionary<string, List<int>>();
         protected Dictionary<string, (double X, double Y)> binaIdToMostFrequentCoordinates = new Dictionary<string, (double X, double Y)>();
         protected Dictionary<string, string> aboneGrubuMostFrequent = new Dictionary<string, string>();
+        protected Dictionary<(string FiderName, int Year), double> annualPeakDemand = new Dictionary<(string FiderName, int Year), double>();
         //protected Dictionary<string, (double X, double Y)> binaIdToAverageCoordinates = new Dictionary<string, (double X, double Y)>();
 
         protected const int COORDINATE_ROUNDING_PRECISION = 3;
