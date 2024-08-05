@@ -1895,7 +1895,7 @@ namespace SLF
             this.Poligon_Sil,
             this.Poligon_Kaydet});
             this.ContextMenuStrip_Poligon.Name = "ContextMenuStrip_Poligon";
-            this.ContextMenuStrip_Poligon.Size = new System.Drawing.Size(183, 82);
+            this.ContextMenuStrip_Poligon.Size = new System.Drawing.Size(215, 110);
             // 
             // Poligon_Çiz
             // 
@@ -1909,15 +1909,17 @@ namespace SLF
             // 
             this.Poligon_Sil.Image = ((System.Drawing.Image)(resources.GetObject("Poligon_Sil.Image")));
             this.Poligon_Sil.Name = "Poligon_Sil";
-            this.Poligon_Sil.Size = new System.Drawing.Size(182, 26);
+            this.Poligon_Sil.Size = new System.Drawing.Size(214, 26);
             this.Poligon_Sil.Text = "Poligon Sil";
+            this.Poligon_Sil.Click += new System.EventHandler(this.Poligon_Sil_Click);
             // 
             // Poligon_Kaydet
             // 
             this.Poligon_Kaydet.Image = ((System.Drawing.Image)(resources.GetObject("Poligon_Kaydet.Image")));
             this.Poligon_Kaydet.Name = "Poligon_Kaydet";
-            this.Poligon_Kaydet.Size = new System.Drawing.Size(182, 26);
+            this.Poligon_Kaydet.Size = new System.Drawing.Size(214, 26);
             this.Poligon_Kaydet.Text = "Poligon Kaydet";
+            this.Poligon_Kaydet.Click += new System.EventHandler(this.Poligon_Kaydet_Click);
             // 
             // ContextMenuStrip_Fonksiyon
             // 

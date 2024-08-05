@@ -189,6 +189,7 @@ namespace SLF
             gMapControl_stokastik.Overlays.Add(rulerOverlay_stokastik);
             gMapControl_stokastik.Overlays.Add(markerOverlay_stokastik);
             gMapControl_stokastik.Overlays.Add(polygonOverlay_stokastik);
+            //
             gMapControl_stokastik.Overlays.Add(gridOverlay);
             stokastik_haritası_checkboxes_init();
 
@@ -661,12 +662,6 @@ namespace SLF
             {
                 points_list.Add(new PointLatLng(coord.Y, coord.X));
             }
-
-            /*GMapPolygon gMapPolygon = new GMapPolygon(points_list, gMapPolygonId)
-            {
-                Stroke = new Pen(Color.DarkBlue, 3),
-                Fill = new SolidBrush(Color.FromArgb(50, Color.DarkBlue))
-            };*/
 
             GMapPolygon gMapPolygon = new GMapPolygon(points_list, gMapPolygonId)
             {
@@ -1862,6 +1857,17 @@ namespace SLF
                     isRulerActive = false;
                 }
             }
+
+            if (e.Button == MouseButtons.Right && isSelecting_polygon)
+            {
+                markerOverlay_stokastik.Markers.Clear();
+                polygonPoints_stokastik.Clear(); 
+                polygonOverlay_stokastik.Clear();
+                Mesafe_stokastik.Visible = false;
+                mesafe_metre_stokastik.Visible = false;
+
+                gMapControl_stokastik.Refresh();
+            }
         }
         
 
@@ -1960,39 +1966,133 @@ namespace SLF
         private void gMapControl_stokastik_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
 
-            // boolean control for marker selection when clicking on the map
-            if (isSelecting_marker)
+            if(e.Button == MouseButtons.Left)
             {
-                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
-                markerOverlay_stokastik.Markers.Add(marker);
-
-                NoktaVeri noktaVeri_marker = new NoktaVeri
+                // boolean control for marker selection when clicking on the map
+                if (isSelecting_marker)
                 {
-                    Enlem = Math.Round(pointClick.Lat, 4),
-                    Boylam = Math.Round(pointClick.Lng, 4)
-                };
+                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
+                    markerOverlay_stokastik.Markers.Add(marker);
 
-                marker.Tag = noktaVeri_marker;
+                    NoktaVeri noktaVeri_marker = new NoktaVeri
+                    {
+                        Enlem = Math.Round(pointClick.Lat, 4),
+                        Boylam = Math.Round(pointClick.Lng, 4)
+                    };
 
+                    marker.Tag = noktaVeri_marker;
+                }
+
+                // boolean control for polygon selection when clicking on the map
+                if (isSelecting_polygon)
+                {
+
+                    polygonPoints_stokastik.Add(pointClick);
+                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
+                    markerOverlay_stokastik.Markers.Add(marker);
+                    gMapControl_stokastik.Refresh();
+
+                    // eğer gmapControl_OnMapClick event'i ile 2 den fazla nokta seçilirse,
+                    // bu noktalar arasında bir poligon çiz
+                    if (polygonPoints_stokastik.Count >= 3)
+                    {
+
+                        Draw_Polygon(polygonPoints_stokastik, polygonOverlay_stokastik,
+                            poligonlar_stokastik, gMapControl_stokastik);
+
+                        double area = CalculatePolygonArea(polygonPoints_stokastik);
+
+                        mesafe_metre_stokastik.Visible = true;
+                        Mesafe_stokastik.Visible = true;
+                        Mesafe_stokastik.Text = "Seçili Alan: " + Math.Round(area, 0).ToString() + " m²";
+
+                    }
+                }
             }
+        }
 
-            // boolean control for polygon selection when clicking on the map
-            if (isSelecting_polygon)
+        private void Poligon_Kaydet_Click(object sender, EventArgs e)
+        {
+            if (polygonOverlay_stokastik != null && polygonOverlay_stokastik.Polygons.Count != 0)
             {
-                polygonPoints_stokastik.Add(pointClick);
-                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
-                markerOverlay_stokastik.Markers.Add(marker);
-                gMapControl_stokastik.Refresh();
+                markerOverlay_stokastik.Markers.Clear();
 
+                // Find the first available slot in the array that holds shapefile overlay layers
+                layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
+                tüm_katmanlar_array[layer_index] = polygonOverlay_stokastik; 
+                tüm_katmanlar_array_names[layer_index] = "Polygon_" + "_" + (layer_index + 1).ToString();
+
+                // Convert gridOverlay to MapWinGIS.Shapefile so that it could be exported by the MapWinGIS
+                // built-in function SaveAsEx
+                MapWinGIS.Shapefile myShapefile = ConvertOverlayToShapefile(polygonOverlay_stokastik);
+                shapeFileArray_MapWinGIS[layer_index] = myShapefile;
+
+                // Create DataTable and store it
+                DataTable polygonDataTable = CreatePolygonDataTable(polygonPoints_stokastik, layer_index);
+                tüm_katmanlar_datatable[layer_index] = polygonDataTable;
+
+                System.Windows.Forms.CheckBox associatedCheckBox = GetCheckBoxByIndex(layer_index);
+                if (associatedCheckBox != null)
+                {
+                    associatedCheckBox.Checked = true;
+                    associatedCheckBox.Visible = true;
+                    associatedCheckBox.Text = tüm_katmanlar_array_names[layer_index];
+                }
+
+                MessageBox.Show("Poligon kaydedildi.");
+                Mesafe_stokastik.Visible = false;
+                mesafe_metre_stokastik.Visible = false;
+                isSelecting_polygon = false;
+
+                // Instead of clearing, create a new overlay for further use
+                //polygonOverlay_stokastik = new GMapOverlay("polygonOverlay_stik");
+                //polygonOverlay_stokastik.Polygons.Clear();
             }
-
-            // eğer gmapControl_OnMapClick event'i ile 2 den fazla nokta seçilirse,
-            // bu noktalar arasında bir poligon çiz
-            if (polygonPoints_stokastik.Count >= 3)
+            else
             {
-                Draw_Polygon(polygonPoints_stokastik, polygonOverlay_stokastik,
-                    poligonlar_stokastik, gMapControl_stokastik);
+                MessageBox.Show("Herhangi bir poligon çizilmemiştir. Lütfen öncelikle bir poligon çiziniz.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
+        }
+
+        private DataTable CreatePolygonDataTable(List<PointLatLng> polygonPoints, int polygonId)
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("PolygonID", typeof(int));
+            dt.Columns.Add("Coordinates", typeof(string));
+
+            // Create a string representation of the coordinates
+            string coordinates = string.Join(", ", polygonPoints.Select(p => $"({p.Lat}, {p.Lng})"));
+
+            // Create a new row
+            DataRow row = dt.NewRow();
+            row["PolygonID"] = polygonId;
+            row["Coordinates"] = coordinates;
+            dt.Rows.Add(row);
+
+            return dt;
+        }
+
+        private double CalculatePolygonArea(List<PointLatLng> points)
+        {
+            double area = 0;
+
+            for (int i = 0; i < points.Count; i++)
+            {
+                var p1 = points[i];
+                var p2 = points[(i + 1) % points.Count];
+
+                area += Deg2Rad(p2.Lng - p1.Lng) *
+                        (2 + Math.Sin(Deg2Rad(p1.Lat)) + Math.Sin(Deg2Rad(p2.Lat)));
+            }
+
+            area = area * 6378137 * 6378137 / 2.0;
+
+            return Math.Abs(area); // In square meters
+        }
+
+        private double Deg2Rad(double degrees)
+        {
+            return degrees * Math.PI / 180.0;
         }
 
         /////////////////////////////// ---------------------- /////////////////////////////////
@@ -2301,11 +2401,15 @@ namespace SLF
         private void Draw_Polygon(List<PointLatLng> polygonPoints, GMapOverlay polygonOverlay,
                   List<PoligonVeri> poligonlar, GMapControl gmap)
         {
-            // bu noktalar arasında poligon çiz, kırmızı ile işaretle, ve de 
+            // bu noktalar arasında poligon çiz, mavi ile işaretle, ve de 
             // polygonOverlay katmanına ekle.
             string poligonIsim = $"Poligon_{poligonlar.Count + 1}";
-            GMapPolygon polygon = new GMapPolygon(polygonPoints, poligonIsim);
-            polygon.Stroke = new Pen(Color.DarkBlue, 3);
+            GMapPolygon polygon = new GMapPolygon(polygonPoints, poligonIsim)
+            {
+                Stroke = new Pen(Color.DarkBlue, 3)
+            };
+
+            //polygonOverlay.Polygons.Clear();
             polygonOverlay.Polygons.Add(polygon);
 
             // polygon_data isminde, PoligonVeri sınıfına ait yeni bir obje oluştur, bu sınıfın propertyleri
@@ -2328,7 +2432,7 @@ namespace SLF
             // List<PoligonVeri> olan "poligonlar" instance'ını, ilgili "polygon_data" objesi ile doldur. 
             poligonlar.Add(polygon_data);
 
-            EA_list_box.Items.Add(polygon_data.polygon_name);
+            //EA_list_box.Items.Add(polygon_data.polygon_name);
             gmap.Refresh();
 
             //loadedFiles.Add(new YüklenenDosya { DosyaAdi = poligonIsim, DosyaTuru = DosyaTuru.Poligon });
@@ -3072,6 +3176,14 @@ namespace SLF
             if (result == DialogResult.No)
             {
                 e.Cancel = true; // Cancel the closing event
+            }
+        }
+
+        private void Poligon_Sil_Click(object sender, EventArgs e)
+        {
+            if (polygonOverlay_stokastik == null || polygonOverlay_stokastik.Polygons.Count == 0)
+            {
+                MessageBox.Show("Herhangi bir poligon çizilmemiştir. Lütfen öncelikle bir poligon çiziniz.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
 
