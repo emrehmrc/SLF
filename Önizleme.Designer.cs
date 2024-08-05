@@ -52,6 +52,9 @@
             // 
             // Onizleme_Tablar
             // 
+            this.Onizleme_Tablar.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.Onizleme_Tablar.Controls.Add(this.Onizleme_Onizleme);
             this.Onizleme_Tablar.Controls.Add(this.Onizleme_Hata);
             this.Onizleme_Tablar.Controls.Add(this.Onizleme_Warning);
@@ -101,6 +104,9 @@
             // 
             // Onizleme_dataGrid2
             // 
+            this.Onizleme_dataGrid2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.Onizleme_dataGrid2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.Onizleme_dataGrid2.Location = new System.Drawing.Point(3, 3);
             this.Onizleme_dataGrid2.Name = "Onizleme_dataGrid2";
@@ -121,6 +127,9 @@
             // 
             // Onizleme_dataGrid3
             // 
+            this.Onizleme_dataGrid3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.Onizleme_dataGrid3.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.Onizleme_dataGrid3.Location = new System.Drawing.Point(3, 3);
             this.Onizleme_dataGrid3.Name = "Onizleme_dataGrid3";
@@ -141,6 +150,9 @@
             // 
             // Onizleme_dataGrid4
             // 
+            this.Onizleme_dataGrid4.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.Onizleme_dataGrid4.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.Onizleme_dataGrid4.Location = new System.Drawing.Point(3, 3);
             this.Onizleme_dataGrid4.Name = "Onizleme_dataGrid4";
@@ -151,6 +163,7 @@
             // 
             // YÜKLE
             // 
+            this.YÜKLE.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.YÜKLE.Font = new System.Drawing.Font("Maiandra GD", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.YÜKLE.Location = new System.Drawing.Point(838, 583);
             this.YÜKLE.Name = "YÜKLE";
@@ -161,6 +174,7 @@
             // 
             // button1
             // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.button1.Font = new System.Drawing.Font("Maiandra GD", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button1.Location = new System.Drawing.Point(1025, 583);
             this.button1.Name = "button1";
