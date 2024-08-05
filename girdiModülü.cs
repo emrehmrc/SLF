@@ -48,6 +48,7 @@ namespace SLF
         };
 
         protected string seçilenVeriTipi;
+        protected virtual List<string> Prerequisites { get; } = new List<string>();
 
         protected const int HoursInYear = 8760;
         protected readonly int lastYear = DateTime.Now.Year - 1;
@@ -113,6 +114,26 @@ namespace SLF
             return nullLikeStrings.Contains(stringValue, StringComparer.OrdinalIgnoreCase);
         }
 
+        public void CheckPrerequisites(string seçilenVeriTipi)
+        {
+            var missingPrerequisites = new List<string>();
+
+            // Check each prerequisite
+            foreach (var prerequisite in Prerequisites)
+            {
+                if (!dataTablesByType.ContainsKey(prerequisite))
+                {
+                    missingPrerequisites.Add(prerequisite);
+                }
+            }
+
+            // If there are missing prerequisites, throw an exception with the list
+            if (missingPrerequisites.Count > 0)
+            {
+                var missingMessage = string.Join(", ", missingPrerequisites);
+                throw new PrerequisiteException($"{seçilenVeriTipi}nin yüklenmesi için öncelikle şu verilerin yüklenmesi gerekir: {missingMessage}");
+            }
+        }
         protected static (float Min, float Max) WarningErrorBoundary(float boundary)
         {
             // Bi verinin "boundary"ye kadar olan kısmı warning, "boundary"den sonrası error
@@ -179,11 +200,6 @@ namespace SLF
             table.Columns.Add("Validasyon Türü", typeof(string));
             table.Columns.Add("Validasyon Bilgisi", typeof(string));
             table.Columns.Add("Ek Açıklamalar", typeof(string));
-        }
-
-        public virtual void CheckPrerequisites()
-        {
-        
         }
 
         public void ProcessFileSelection(string seçilenVeriTipi)

@@ -17,6 +17,7 @@ namespace SLF
             { "ABONE_Y_KOORDINAT", (float.MinValue, float.MaxValue) } // TODO: Update these values from the other data
         };
 
+        protected override List<string> Prerequisites => new List<string> { "DTR Verileri"};
         private readonly (float warningThreshold, float errorThreshold) TUKETIM_ERROR_THRESHOLD = InfoErrorBoundary(0.2f);
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = WarningErrorBoundary(0.1f);
         private const float ABONE_KAPASITE_LIMIT = 0.6f;
@@ -54,14 +55,6 @@ namespace SLF
         {
             "TESISAT_NO",
         };
-        public override void CheckPrerequisites()
-        {
-            // Check if "DTR Verileri" exists in the dictionary
-            if (!dataTablesByType.ContainsKey("DTR Verileri"))
-            {
-                throw new PrerequisiteException("Abone verilerinin yüklenmesi için öncelikle 'DTR Verileri'nin yüklenmesi gerekmektedir.");
-            }
-        }
         public override void Preprocess()
         {
             PreprocessMismatchedTrafoKodu();

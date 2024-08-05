@@ -2045,7 +2045,7 @@ namespace SLF
 
             try
             {
-                girdiModülü.CheckPrerequisites(); // Check the required datatables for the given module
+                girdiModülü.CheckPrerequisites(seçilenVeriTipi); // Check the required datatables for the given module
                 // ProcessFileSelection metodu ile dosya seçme işlemi yapılır ve seçilen dosya veri tablosuna yüklenir
                 girdiModülü.ProcessFileSelection(seçilenVeriTipi);
                 DataTable dataTable = girdiModülü.CurrentDataTable;
