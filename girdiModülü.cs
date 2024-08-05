@@ -173,12 +173,12 @@ namespace SLF
             onizleme1.Onizleme_DataGrid2.DataSource = errorDataTable;
             onizleme1.Onizleme_DataGrid3.DataSource = warningDataTable;
             onizleme1.Onizleme_DataGrid4.DataSource = infoDataTable;
-            //onizleme1.Onizleme_DataGrid5.DataSource = statDataTable;
+            onizleme1.Onizleme_DataGrid5.DataSource = statDataTable;
             onizleme1.Onizleme_DataGrid1.AllowUserToAddRows = false;
             onizleme1.Onizleme_DataGrid2.AllowUserToAddRows = false;
             onizleme1.Onizleme_DataGrid3.AllowUserToAddRows = false;
             onizleme1.Onizleme_DataGrid4.AllowUserToAddRows = false;
-            //onizleme1.Onizleme_DataGrid5.AllowUserToAddRows = false;
+            onizleme1.Onizleme_DataGrid5.AllowUserToAddRows = false;
         }
 
         public bool IsError()

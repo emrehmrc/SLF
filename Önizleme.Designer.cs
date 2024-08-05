@@ -39,6 +39,8 @@
             this.Onizleme_dataGrid4 = new System.Windows.Forms.DataGridView();
             this.YÜKLE = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.Onizleme_Statistics = new System.Windows.Forms.TabPage();
+            this.Onizleme_dataGrid5 = new System.Windows.Forms.DataGridView();
             this.Onizleme_Tablar.SuspendLayout();
             this.Onizleme_Onizleme.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid1)).BeginInit();
@@ -48,6 +50,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid3)).BeginInit();
             this.Onizleme_Information.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid4)).BeginInit();
+            this.Onizleme_Statistics.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid5)).BeginInit();
             this.SuspendLayout();
             // 
             // Onizleme_Tablar
@@ -59,6 +63,7 @@
             this.Onizleme_Tablar.Controls.Add(this.Onizleme_Hata);
             this.Onizleme_Tablar.Controls.Add(this.Onizleme_Warning);
             this.Onizleme_Tablar.Controls.Add(this.Onizleme_Information);
+            this.Onizleme_Tablar.Controls.Add(this.Onizleme_Statistics);
             this.Onizleme_Tablar.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Onizleme_Tablar.Location = new System.Drawing.Point(12, 12);
             this.Onizleme_Tablar.Name = "Onizleme_Tablar";
@@ -99,7 +104,7 @@
             this.Onizleme_Hata.Padding = new System.Windows.Forms.Padding(3);
             this.Onizleme_Hata.Size = new System.Drawing.Size(1174, 532);
             this.Onizleme_Hata.TabIndex = 1;
-            this.Onizleme_Hata.Text = "Hata";
+            this.Onizleme_Hata.Text = "Hatalar";
             this.Onizleme_Hata.UseVisualStyleBackColor = true;
             // 
             // Onizleme_dataGrid2
@@ -122,7 +127,7 @@
             this.Onizleme_Warning.Name = "Onizleme_Warning";
             this.Onizleme_Warning.Size = new System.Drawing.Size(1174, 532);
             this.Onizleme_Warning.TabIndex = 2;
-            this.Onizleme_Warning.Text = "Uyarı";
+            this.Onizleme_Warning.Text = "Düzeltilecekler";
             this.Onizleme_Warning.UseVisualStyleBackColor = true;
             // 
             // Onizleme_dataGrid3
@@ -145,7 +150,7 @@
             this.Onizleme_Information.Name = "Onizleme_Information";
             this.Onizleme_Information.Size = new System.Drawing.Size(1174, 532);
             this.Onizleme_Information.TabIndex = 3;
-            this.Onizleme_Information.Text = "İstatistik";
+            this.Onizleme_Information.Text = "Silinecekler";
             this.Onizleme_Information.UseVisualStyleBackColor = true;
             // 
             // Onizleme_dataGrid4
@@ -169,7 +174,7 @@
             this.YÜKLE.Name = "YÜKLE";
             this.YÜKLE.Size = new System.Drawing.Size(165, 38);
             this.YÜKLE.TabIndex = 1;
-            this.YÜKLE.Text = "Yükle";
+            this.YÜKLE.Text = "İçeri Aktar";
             this.YÜKLE.UseVisualStyleBackColor = true;
             // 
             // button1
@@ -182,6 +187,29 @@
             this.button1.TabIndex = 2;
             this.button1.Text = "Çık";
             this.button1.UseVisualStyleBackColor = true;
+            // 
+            // Onizleme_Statistics
+            // 
+            this.Onizleme_Statistics.Controls.Add(this.Onizleme_dataGrid5);
+            this.Onizleme_Statistics.Location = new System.Drawing.Point(4, 33);
+            this.Onizleme_Statistics.Name = "Onizleme_Statistics";
+            this.Onizleme_Statistics.Size = new System.Drawing.Size(1174, 532);
+            this.Onizleme_Statistics.TabIndex = 4;
+            this.Onizleme_Statistics.Text = "Bilgiler";
+            this.Onizleme_Statistics.UseVisualStyleBackColor = true;
+            // 
+            // Onizleme_dataGrid5
+            // 
+            this.Onizleme_dataGrid5.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.Onizleme_dataGrid5.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.Onizleme_dataGrid5.Location = new System.Drawing.Point(5, 3);
+            this.Onizleme_dataGrid5.Name = "Onizleme_dataGrid5";
+            this.Onizleme_dataGrid5.RowHeadersWidth = 51;
+            this.Onizleme_dataGrid5.RowTemplate.Height = 24;
+            this.Onizleme_dataGrid5.Size = new System.Drawing.Size(1166, 526);
+            this.Onizleme_dataGrid5.TabIndex = 0;
             // 
             // Önizleme
             // 
@@ -202,6 +230,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid3)).EndInit();
             this.Onizleme_Information.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid4)).EndInit();
+            this.Onizleme_Statistics.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid5)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -219,5 +249,7 @@
         private System.Windows.Forms.DataGridView Onizleme_dataGrid4;
         private System.Windows.Forms.Button YÜKLE;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TabPage Onizleme_Statistics;
+        private System.Windows.Forms.DataGridView Onizleme_dataGrid5;
     }
 }

@@ -367,7 +367,7 @@ namespace SLF
             "Ekonometrik Yük Tahmini Verileri",
             "Fider Verileri",
             "İmar Verileri",
-            "TM Verileri"});
+            "Enerji Müsaadeleri Verileri"});
             this.veri_listesi_seçimi.Location = new System.Drawing.Point(44, 75);
             this.veri_listesi_seçimi.Name = "veri_listesi_seçimi";
             this.veri_listesi_seçimi.Size = new System.Drawing.Size(361, 32);

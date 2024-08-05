@@ -20,5 +20,7 @@ namespace SLF
         public DataGridView Onizleme_DataGrid2 { get { return Onizleme_dataGrid2;} }
         public DataGridView Onizleme_DataGrid3 { get { return Onizleme_dataGrid3;} }
         public DataGridView Onizleme_DataGrid4 { get { return Onizleme_dataGrid4;} }
+
+        public DataGridView Onizleme_DataGrid5 { get { return Onizleme_dataGrid5;} }
     }
 }

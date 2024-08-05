@@ -12,6 +12,7 @@ namespace SLF
     public class DEKModulu : GirdiModülü
 
     {
+        protected override List<string> Prerequisites => new List<string> { "DTR Verileri" };
         private void ReportKuruluGuc()
         {
             // 1000'den büyük değerlerin yüzdesi için bir değişken tanımla ve başlangıç değeri olarak 0.0f ata
@@ -45,7 +46,7 @@ namespace SLF
                     if (int.TryParse(cellValue, out int value))
                     {
                         // Eğer değer 1000'den büyükse
-                        if (value > 1000)
+                        if (value > 0)
                         {
                             // Geçersiz değer sayısını artır
                             invalidCount++;
@@ -64,7 +65,7 @@ namespace SLF
             {
                 // statDataTable'a yeni bir satır ekle. Burada "DEK_KURULU_GUCU", "Kurulu gücü 1000kVA'dan büyük olan {invalidCount} kadar DEK'ler mevcuttur. Eğer düzeltilmezse bu durum doğru kabul edilecektir." bilgisi eklenir
                 statDataTable.Rows.Add(new object[] {
-            "DEK_KURULU_GUCU", $"Kurulu gücü 1000kVA'dan büyük olan {invalidCount} kadar DEK'ler mevcuttur. Eğer düzeltilmezse bu durum doğru kabul edilecektir.", $"{invalidPercentage:P1}"
+            "DEK_KURULU_GUCU", "Hatalı sayı", $"{invalidPercentage:P1}", $"Kurulu gücü 1000kVA'dan büyük olan {invalidCount} kadar DEK'ler mevcuttur. Eğer düzeltilmezse bu durum doğru kabul edilecektir."
         });
             }
         }

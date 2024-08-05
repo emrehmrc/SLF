@@ -42,7 +42,6 @@ namespace SLF
             {"Ekonometrik Yük Tahmini Verileri", new EkonometrikYukTahminiModulu()},
             {"Fider Verileri", new FiderVerileri()},
             {"İmar Verileri", new GirdiModülü()},
-            {"TM Verileri", new TMVerileri()},
             {"Enerji Müsaadeleri Verileri", new EnerjiMusaadeleri()},
             {"Yeni Projelendirilmiş DTR Verileri", new YeniProjelendirilmisDTR()},
         };
