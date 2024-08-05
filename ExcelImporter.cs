@@ -90,6 +90,7 @@ namespace SLF
             },
                         {
                 "Ekonometrik Yük Tahmini Verileri", new List<string> {
+                    "YIL",
                     "NUFUS",
                     "GRP",
                     "GRP_TARIMSAL_URETIM",
