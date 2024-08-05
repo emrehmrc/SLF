@@ -735,13 +735,13 @@ namespace SLF
             this.OSM,
             this.Uydu});
             this.harita_katmanları_right_click.Name = "harita_katmanları_right_click";
-            this.harita_katmanları_right_click.Size = new System.Drawing.Size(215, 188);
+            this.harita_katmanları_right_click.Size = new System.Drawing.Size(196, 160);
             // 
             // Arazi
             // 
             this.Arazi.Image = ((System.Drawing.Image)(resources.GetObject("Arazi.Image")));
             this.Arazi.Name = "Arazi";
-            this.Arazi.Size = new System.Drawing.Size(214, 26);
+            this.Arazi.Size = new System.Drawing.Size(195, 26);
             this.Arazi.Text = "Arazi";
             this.Arazi.Click += new System.EventHandler(this.Arazi_Click);
             // 
@@ -749,7 +749,7 @@ namespace SLF
             // 
             this.Google_Earth.Image = ((System.Drawing.Image)(resources.GetObject("Google_Earth.Image")));
             this.Google_Earth.Name = "Google_Earth";
-            this.Google_Earth.Size = new System.Drawing.Size(214, 26);
+            this.Google_Earth.Size = new System.Drawing.Size(195, 26);
             this.Google_Earth.Text = "GE Online";
             this.Google_Earth.Click += new System.EventHandler(this.Google_Earth_Click);
             // 
@@ -757,7 +757,7 @@ namespace SLF
             // 
             this.Google_Earth_Desktop.Image = ((System.Drawing.Image)(resources.GetObject("Google_Earth_Desktop.Image")));
             this.Google_Earth_Desktop.Name = "Google_Earth_Desktop";
-            this.Google_Earth_Desktop.Size = new System.Drawing.Size(214, 26);
+            this.Google_Earth_Desktop.Size = new System.Drawing.Size(195, 26);
             this.Google_Earth_Desktop.Text = "GE Pro Desktop";
             this.Google_Earth_Desktop.Click += new System.EventHandler(this.Google_Earth_Desktop_Click);
             // 
@@ -765,7 +765,7 @@ namespace SLF
             // 
             this.Harita.Image = ((System.Drawing.Image)(resources.GetObject("Harita.Image")));
             this.Harita.Name = "Harita";
-            this.Harita.Size = new System.Drawing.Size(214, 26);
+            this.Harita.Size = new System.Drawing.Size(195, 26);
             this.Harita.Text = "Harita";
             this.Harita.Click += new System.EventHandler(this.Harita_Click);
             // 
@@ -773,7 +773,7 @@ namespace SLF
             // 
             this.OSM.Image = ((System.Drawing.Image)(resources.GetObject("OSM.Image")));
             this.OSM.Name = "OSM";
-            this.OSM.Size = new System.Drawing.Size(214, 26);
+            this.OSM.Size = new System.Drawing.Size(195, 26);
             this.OSM.Text = "Open Street Map";
             this.OSM.Click += new System.EventHandler(this.OSM_Click);
             // 
@@ -781,7 +781,7 @@ namespace SLF
             // 
             this.Uydu.Image = ((System.Drawing.Image)(resources.GetObject("Uydu.Image")));
             this.Uydu.Name = "Uydu";
-            this.Uydu.Size = new System.Drawing.Size(214, 26);
+            this.Uydu.Size = new System.Drawing.Size(195, 26);
             this.Uydu.Text = "Uydu";
             this.Uydu.Click += new System.EventHandler(this.Uydu_Click);
             // 
@@ -1960,7 +1960,7 @@ namespace SLF
             this.Name = "ModülFormu";
             this.Text = "Modüller";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.at_closed);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ModülFormu_FormClosing);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.Modül_Tabları.ResumeLayout(false);

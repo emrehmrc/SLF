@@ -1312,22 +1312,6 @@ namespace SLF
                 panel1.Visible = false;
             }
         }
-
-        private void at_closed(object sender, FormClosedEventArgs e)
-        {
-            DialogResult result = MessageBox.Show(
-                "Programı kapatmak istediğinize emin misiniz? Kaydedilmeyen veriler kaybolacaktır!",
-                "Çıkış",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning
-            );
-
-            if (result == DialogResult.Yes)
-            {
-                System.Windows.Forms.Application.Exit();
-            }
-        }
-
         private void checkBox8_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBox8.Checked)
@@ -2015,12 +1999,13 @@ namespace SLF
             }
 
             // boolean control for polygon selection when clicking on the map
-            if (isSelecting_polygon == true)
+            if (isSelecting_polygon)
             {
                 polygonPoints_stokastik.Add(pointClick);
                 GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
                 markerOverlay_stokastik.Markers.Add(marker);
                 gMapControl_stokastik.Refresh();
+
             }
 
             // eğer gmapControl_OnMapClick event'i ile 2 den fazla nokta seçilirse,
@@ -2031,7 +2016,6 @@ namespace SLF
                     poligonlar_stokastik, gMapControl_stokastik);
             }
         }
-
 
         /////////////////////////////// ---------------------- /////////////////////////////////
 
@@ -3035,6 +3019,21 @@ namespace SLF
             {
                 gMapControl_EA.Overlays.Add(resultingOverlay);
                 gMapControl_EA.Refresh();
+            }
+        }
+
+        private void ModülFormu_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            DialogResult result = MessageBox.Show(
+                    "Programı kapatmak istediğinize emin misiniz? Kaydedilmeyen veriler kaybolacaktır!",
+                    "Çıkış",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning
+                );
+
+            if (result == DialogResult.No)
+            {
+                e.Cancel = true; // Cancel the closing event
             }
         }
 
