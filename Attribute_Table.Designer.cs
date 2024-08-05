@@ -45,7 +45,6 @@
             this.vektörel_attribute_table.RowTemplate.Height = 24;
             this.vektörel_attribute_table.Size = new System.Drawing.Size(1108, 528);
             this.vektörel_attribute_table.TabIndex = 0;
-            this.vektörel_attribute_table.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // Tablo_Formu
             // 
