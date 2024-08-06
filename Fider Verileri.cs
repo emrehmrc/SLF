@@ -59,23 +59,20 @@ namespace SLF
         private void CalculateAnnualPeakDemand()
         {
             annualPeakDemand = currentDataTable.AsEnumerable()
-                .GroupBy(row => new
-                {
-                    FiderName = row.Field<string>("FIDER_ID"),
-                    Year = row.Field<string>("FIDER_TARIH").Substring(0, 4)
-                })
-                .Where(g => g.Key.Year != null && g.All(row => int.TryParse(g.Key.Year, out _)))
+                .Where(row => row.Field<string>("FIDER_TARIH") != null
+                      && row.Field<string>("FIDER_ID") != null
+                      && row.Field<string>("FIDER_TARIH").Substring(0, 4) == lastYear.ToString())
+                .GroupBy(row => row.Field<string>("FIDER_ID"))
                 .Select(g => new
                 {
-                    g.Key.FiderName,
-                    Year = int.Parse(g.Key.Year),
+                    FiderName = g.Key,
                     Top3PercentAverage = g.Select(row => double.TryParse(row["FIDER_DEMANT"].ToString(), out double value) ? value : (double?)null)
                                           .Where(value => value.HasValue)
                                           .OrderByDescending(value => value.Value)
                                           .Take((int)Math.Max(1, g.Count() * 0.03))
                                           .Average(value => value.Value)
                 })
-                .ToDictionary(x => (x.FiderName, x.Year), x => x.Top3PercentAverage);
+                .ToDictionary(x => x.FiderName, x => x.Top3PercentAverage);
         }
 
             private void PreprocessMismatchedTMAdi()
