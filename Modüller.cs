@@ -66,9 +66,9 @@ namespace SLF
         private GMapOverlay polygonOverlay_ea = new GMapOverlay("polygonOverlay_ea");
         public GMapOverlay polygonOverlay_stokastik;
         private List<PointLatLng> polygonPoints_ea = new List<PointLatLng>();
-        private List<PoligonVeri> poligonlar_ea = new List<PoligonVeri>();
+        //private List<PoligonVeri> poligonlar_ea = new List<PoligonVeri>();
         private List<PointLatLng> polygonPoints_stokastik = new List<PointLatLng>();
-        private List<PoligonVeri> poligonlar_stokastik = new List<PoligonVeri>();
+        //private List<PoligonVeri> poligonlar_stokastik = new List<PoligonVeri>();
 
         // variables to be used to create a grid
         public GMapOverlay bounding_box_overlay;
@@ -85,7 +85,6 @@ namespace SLF
 
         // boolean variable to control the polygon selection by mouse down event
         private bool isSelecting_polygon = false;
-        private bool isSaving_polygon = false;
 
         // boolean variable to control the marker/point selection by mouse down event
         private bool isSelecting_marker = false;
@@ -1741,8 +1740,7 @@ namespace SLF
             // bu noktalar arasında bir poligon çiz
             if (polygonPoints_ea.Count >= 3)
             {
-                Draw_Polygon(polygonPoints_ea, polygonOverlay_ea,
-                    poligonlar_ea, gMapControl_EA);
+                Draw_Polygon(polygonPoints_ea, polygonOverlay_ea, gMapControl_EA);
             }
         }
 
@@ -1989,10 +1987,14 @@ namespace SLF
                 // boolean control for polygon selection when clicking on the map
                 if (isSelecting_polygon)
                 {
-                    
                     polygonPoints_stokastik.Add(pointClick);
                     GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
                     markerOverlay_stokastik.Markers.Add(marker);
+
+                    if(polygonOverlay_stokastik != null)
+                    {
+                        gMapControl_stokastik.Overlays.Remove(polygonOverlay_stokastik);
+                    }                  
                     
                     layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
                     polygonOverlay_stokastik = new GMapOverlay("polygonOverlay_" + layer_index.ToString());
@@ -2004,36 +2006,48 @@ namespace SLF
                     if (polygonPoints_stokastik.Count >= 3)
                     {
 
-                        Draw_Polygon(polygonPoints_stokastik, polygonOverlay_stokastik,
-                            poligonlar_stokastik, gMapControl_stokastik);
+                        Draw_Polygon(polygonPoints_stokastik, polygonOverlay_stokastik, gMapControl_stokastik);
 
                         double area = CalculatePolygonArea(polygonPoints_stokastik);
 
                         mesafe_metre_stokastik.Visible = true;
                         Mesafe_stokastik.Visible = true;
                         Mesafe_stokastik.Text = "Seçili Alan: " + Math.Round(area, 0).ToString() + " m²";
-
                     }
                 }
             }
         }
 
+        private void Draw_Polygon(List<PointLatLng> polygonPoints, GMapOverlay polygonOverlay,GMapControl gmap)
+        {
+            // bu noktalar arasında poligon çiz, mavi ile işaretle, ve de 
+            // polygonOverlay katmanına ekle.
+            string poligonIsim = $"Poligon_{polygonOverlay.Polygons.Count + 1}";
+            GMapPolygon polygon = new GMapPolygon(polygonPoints, poligonIsim)
+            {
+                Stroke = new Pen(Color.DarkBlue, 3)
+            };
+
+            polygonOverlay.Polygons.Clear();
+            polygonOverlay.Polygons.Add(polygon);
+            gmap.Refresh();
+        }
+
         private void Poligon_Kaydet_Click(object sender, EventArgs e)
         {
-            isSaving_polygon = true;
 
             if (polygonOverlay_stokastik != null && polygonOverlay_stokastik.Polygons.Count != 0)
             {
                 markerOverlay_stokastik.Markers.Clear();
 
-                // Find the first available slot in the array that holds shapefile overlay layers
                 layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
-                tüm_katmanlar_array[layer_index] = polygonOverlay_stokastik; 
+                GMapOverlay overlay_to_be_saved = polygonOverlay_stokastik;
+                tüm_katmanlar_array[layer_index] = overlay_to_be_saved; 
                 tüm_katmanlar_array_names[layer_index] = "Polygon_" + "_" + (layer_index + 1).ToString();
 
                 // Convert gridOverlay to MapWinGIS.Shapefile so that it could be exported by the MapWinGIS
                 // built-in function SaveAsEx
-                MapWinGIS.Shapefile myShapefile = ConvertOverlayToShapefile(polygonOverlay_stokastik);
+                MapWinGIS.Shapefile myShapefile = ConvertOverlayToShapefile(overlay_to_be_saved);
                 shapeFileArray_MapWinGIS[layer_index] = myShapefile;
 
                 // Create DataTable and store it
@@ -2053,10 +2067,9 @@ namespace SLF
                 mesafe_metre_stokastik.Visible = false;
                 isSelecting_polygon = false;
 
-                // Instead of clearing, create a new overlay for further use
-                //polygonOverlay_stokastik = new GMapOverlay("polygonOverlay_stik");
-                //polygonOverlay_stokastik.Polygons.Clear();
-                polygonOverlay_stokastik.Dispose();
+                // Prepare a new overlay for future use
+                polygonOverlay_stokastik = null;
+                polygonPoints_stokastik.Clear();
             }
             else
             {
@@ -2408,47 +2421,6 @@ namespace SLF
             return meters * degreesPerMeter;
         }
 
-        private void Draw_Polygon(List<PointLatLng> polygonPoints, GMapOverlay polygonOverlay,
-                  List<PoligonVeri> poligonlar, GMapControl gmap)
-        {
-            // bu noktalar arasında poligon çiz, mavi ile işaretle, ve de 
-            // polygonOverlay katmanına ekle.
-            string poligonIsim = $"Poligon_{poligonlar.Count + 1}";
-            GMapPolygon polygon = new GMapPolygon(polygonPoints, poligonIsim)
-            {
-                Stroke = new Pen(Color.DarkBlue, 3)
-            };
-
-            polygonOverlay.Polygons.Clear();
-            polygonOverlay.Polygons.Add(polygon);
-
-            // polygon_data isminde, PoligonVeri sınıfına ait yeni bir obje oluştur, bu sınıfın propertyleri
-            // olan "polygon_name" ve "Noktalar" özelliklerini, ilgili objelerle doldur.
-            PoligonVeri polygon_data = new PoligonVeri
-            {
-                polygon_name = poligonIsim,
-
-                // LINQ sorgusu ve lambda expressionu (=>) kullanarak polygonPoints listesinin içindeki
-                // her bir point için Enlem, Boylam, Bina_Demandi ve Abone_Sayısı property'lerini set et.
-                Noktalar = polygonPoints.Select(p => new NoktaVeri
-                {
-                    Enlem = p.Lat,
-                    Boylam = p.Lng,
-                    Bina_Demandi = 0,
-                    Abone_Sayısı = 0
-                }).ToList()
-            };
-
-            // List<PoligonVeri> olan "poligonlar" instance'ını, ilgili "polygon_data" objesi ile doldur. 
-            poligonlar.Add(polygon_data);
-
-            //EA_list_box.Items.Add(polygon_data.polygon_name);
-            gmap.Refresh();
-
-            //loadedFiles.Add(new YüklenenDosya { DosyaAdi = poligonIsim, DosyaTuru = DosyaTuru.Poligon });
-            //UpdateListBox();
-
-        }
         /*
         private void CSVYukle(string filepath)
         {
@@ -3148,14 +3120,6 @@ namespace SLF
             {
                 MessageBox.Show("Herhangi bir poligon çizilmemiştir. Lütfen öncelikle bir poligon çiziniz.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-        }
-
-        private void veri_listesi_seçimi_TextChanged(object sender, EventArgs e)
-        {
-        }
-
-        private void veri_listesi_seçimi_TextUpdate(object sender, EventArgs e)
-        {
         }
 
         private void veri_listesi_seçimi_SelectedIndexChanged(object sender, EventArgs e)

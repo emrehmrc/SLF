@@ -373,8 +373,6 @@ namespace SLF
             this.veri_listesi_seçimi.Size = new System.Drawing.Size(361, 32);
             this.veri_listesi_seçimi.TabIndex = 0;
             this.veri_listesi_seçimi.SelectedIndexChanged += new System.EventHandler(this.veri_listesi_seçimi_SelectedIndexChanged);
-            this.veri_listesi_seçimi.TextUpdate += new System.EventHandler(this.veri_listesi_seçimi_TextUpdate);
-            this.veri_listesi_seçimi.TextChanged += new System.EventHandler(this.veri_listesi_seçimi_TextChanged);
             // 
             // tab_dek
             // 
