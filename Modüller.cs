@@ -3142,6 +3142,14 @@ namespace SLF
 
         private void veri_listesi_seçimi_TextChanged(object sender, EventArgs e)
         {
+        }
+
+        private void veri_listesi_seçimi_TextUpdate(object sender, EventArgs e)
+        {
+        }
+
+        private void veri_listesi_seçimi_SelectedIndexChanged(object sender, EventArgs e)
+        {
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
             girdiModülü = girdiModülleri[seçilenVeriTipi];
             dataGridView1.DataSource = girdiModülü.importedDataTable;
