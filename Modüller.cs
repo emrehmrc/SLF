@@ -2453,57 +2453,7 @@ namespace SLF
             // Veri listesinde seçilen veri tipine göre dosya seçme işlemi yapılacak
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
             girdiModülü = girdiModülleri[seçilenVeriTipi];
-
-            try
-            {
-                girdiModülü.CheckPrerequisites(seçilenVeriTipi); // Check the required datatables for the given module
-                // ProcessFileSelection metodu ile dosya seçme işlemi yapılır ve seçilen dosya veri tablosuna yüklenir
-                girdiModülü.ProcessFileSelection(seçilenVeriTipi);
-                DataTable dataTable = girdiModülü.CurrentDataTable;
-                if (dataTable != null && dataTable.Rows.Count > 0)
-                {
-                    girdiModülü.Onizleme1.Onizleme_DataGrid1.DataSource = dataTable;
-                    girdiModülü.Preprocess();
-                    while (true)
-                    {
-                        girdiModülü.Validate();
-                        girdiModülü.Onizleme1.ShowDialog();
-
-                        if (girdiModülü.IsError())
-                        {
-                            //MessageBox.Show("Hataları gidermeden devam edemezsiniz!", "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            //return;
-                        }
-
-                        // Exit the loop if there are no info or warning messages
-                        if (!girdiModülü.IsInfo() && !girdiModülü.IsWarning())
-                        {
-                            break;
-                        }
-
-                        girdiModülü.Remove();
-                        girdiModülü.Validate();
-                        girdiModülü.Impute();
-                    }
-                    girdiModülü.Postprocess();
-                }
-                else
-                {
-                    MessageBox.Show("Dosya seçimi gerçekleştirilemedi.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-            }
-            catch (NoFileSelectedException ex)
-            {
-                MessageBox.Show(ex.Message, "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            catch (InvalidColumnHeadersException ex)
-            {
-                MessageBox.Show("Geçersiz sütun biçimi: " + ex.Message, "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            catch (PrerequisiteException ex)
-            {
-                MessageBox.Show(ex.Message, "Önkoşul hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            girdiModülü.VEERProcess(seçilenVeriTipi);
         }
 
         private void DrawRuler_ea(GMapOverlay rulerOverlay, List<PointLatLng> rulerPoints)

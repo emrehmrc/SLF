@@ -22,6 +22,13 @@ namespace SLF
         }
     }
 
+    public class StopVEERProcess : Exception
+    {
+        public StopVEERProcess(string message) : base(message)
+        {
+        }
+    }
+
     public class GirdiModülü
     {
         protected Önizleme onizleme1 = new Önizleme();
@@ -70,6 +77,10 @@ namespace SLF
         protected DataTable warningDataTable = new DataTable();
         protected DataTable infoDataTable = new DataTable();
         protected DataTable statDataTable = new DataTable();
+        protected DataTable errorDataTableReport = new DataTable();
+        protected DataTable warningDataTableReport = new DataTable();
+        protected DataTable infoDataTableReport = new DataTable();
+        protected DataTable statDataTableReport = new DataTable();
 
         protected Dictionary<string, List<int>> columnNullRowsMap = new Dictionary<string, List<int>>();
         protected Dictionary<string, List<int>> imputableRowsMap = new Dictionary<string, List<int>>();
@@ -113,6 +124,85 @@ namespace SLF
 
             string stringValue = value.ToString();
             return nullLikeStrings.Contains(stringValue, StringComparer.OrdinalIgnoreCase);
+        }
+
+        public void VEERProcess(string seçilenVeriTipi)
+        {
+            try
+            {
+                CheckPrerequisites(seçilenVeriTipi); // Check the required datatables for the given module
+                // ProcessFileSelection metodu ile dosya seçme işlemi yapılır ve seçilen dosya veri tablosuna yüklenir
+                ProcessFileSelection(seçilenVeriTipi);
+                DataTable dataTable = CurrentDataTable;
+                if (dataTable != null && dataTable.Rows.Count > 0)
+                {
+                    Onizleme1.Onizleme_DataGrid1.DataSource = dataTable;
+                    Preprocess();
+                    while (true)
+                    {
+                        ClearRows();
+                        Validate();
+                        if (IsError())
+                        {
+                            //onizleme1.buton_YUKLE.Enabled = false;
+                            //onizleme1.buton_Ilerle.Enabled = false;
+                        }
+
+                        // Exit the loop if there are no info or warning messages
+                        if (!IsInfo() && !IsWarning())
+                        {
+                            //onizleme1.buton_YUKLE.Enabled = true;
+                            //onizleme1.buton_Ilerle.Enabled = false;
+                        }
+                        var dialogResult = Onizleme1.ShowDialog();
+                        if (dialogResult == DialogResult.Cancel)
+                        {
+                            throw new StopVEERProcess("Kullanıcı işlemi iptal etti.");
+                        }
+
+
+                        if (IsError())
+                        {
+                            //MessageBox.Show("Hataları gidermeden devam edemezsiniz!", "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            //return;
+                        }
+
+                        // Exit the loop if there are no info or warning messages
+                        if (!IsInfo() && !IsWarning())
+                        {
+                            break;
+                        }
+
+                        Remove();
+                        Validate();
+                        Impute();
+
+                        AppendAllToReportDataTables();
+                    }
+                    Postprocess();
+                    ImportProcessedData();
+                }
+                else
+                {
+                    MessageBox.Show("Dosya seçimi gerçekleştirilemedi.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            catch (StopVEERProcess ex)
+            {
+                MessageBox.Show(ex.Message, "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (NoFileSelectedException ex)
+            {
+                MessageBox.Show(ex.Message, "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (InvalidColumnHeadersException ex)
+            {
+                MessageBox.Show("Geçersiz sütun biçimi: " + ex.Message, "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (PrerequisiteException ex)
+            {
+                MessageBox.Show(ex.Message, "Önkoşul hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         public void CheckPrerequisites(string seçilenVeriTipi)
@@ -169,7 +259,10 @@ namespace SLF
             AddColumnsToDataTable(warningDataTable);
             AddColumnsToDataTable(infoDataTable);
             AddColumnsToDataTable(statDataTable);
-            warningDataTable.Columns.Add("İmpütasyon", typeof(bool));
+            AddColumnsToDataTable(errorDataTableReport);
+            AddColumnsToDataTable(warningDataTableReport);
+            AddColumnsToDataTable(infoDataTableReport);
+            AddColumnsToDataTable(statDataTableReport);
             onizleme1.Onizleme_DataGrid2.DataSource = errorDataTable;
             onizleme1.Onizleme_DataGrid3.DataSource = warningDataTable;
             onizleme1.Onizleme_DataGrid4.DataSource = infoDataTable;
@@ -203,6 +296,27 @@ namespace SLF
             table.Columns.Add("Ek Açıklamalar", typeof(string));
         }
 
+        private void AppendAllToReportDataTables()
+        {
+            AppendToReportDataTables(errorDataTable, errorDataTableReport);
+            AppendToReportDataTables(warningDataTable, warningDataTableReport);
+            AppendToReportDataTables(infoDataTable, infoDataTableReport);
+            AppendToReportDataTables(statDataTable, statDataTableReport);
+        }
+
+        protected void AppendToReportDataTables(DataTable source, DataTable destination)
+        {
+            foreach (DataRow row in source.Rows)
+            {
+                destination.ImportRow(row);
+            }
+        }
+
+        protected void ImportProcessedData()
+        {
+            dataTablesByType[seçilenVeriTipi] = currentDataTable;
+        }
+
         public void ProcessFileSelection(string seçilenVeriTipi)
         {
             this.seçilenVeriTipi = seçilenVeriTipi;
@@ -218,7 +332,6 @@ namespace SLF
                 {
                     string selectedFileName = fileDialog1.FileName;
                     currentDataTable = ProcessExcelFile(selectedFileName, seçilenVeriTipi);
-                    dataTablesByType[seçilenVeriTipi] = currentDataTable;
                 }
                 else throw new NoFileSelectedException("Dosya seçimi gerçekleştirilemedi.");
             }
@@ -269,7 +382,6 @@ namespace SLF
 
         public virtual void Validate()
         {
-            ClearRows();
         }
 
 
@@ -298,6 +410,7 @@ namespace SLF
             errorDataTable.Rows.Clear();
             warningDataTable.Rows.Clear();
             infoDataTable.Rows.Clear();
+            statDataTable.Rows.Clear();
         }
         protected DataTable GetDataTableBasedOnThreshold(
             float currentPercentage,
