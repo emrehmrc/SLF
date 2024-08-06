@@ -214,7 +214,7 @@ namespace SLF
             this.yardımToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1482, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(1482, 30);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -225,7 +225,7 @@ namespace SLF
             this.exportToolStripMenuItem,
             this.saToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(64, 24);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(64, 26);
             this.fileToolStripMenuItem.Text = "Dosya";
             // 
             // importToolStripMenuItem
@@ -249,7 +249,7 @@ namespace SLF
             // yardımToolStripMenuItem
             // 
             this.yardımToolStripMenuItem.Name = "yardımToolStripMenuItem";
-            this.yardımToolStripMenuItem.Size = new System.Drawing.Size(69, 24);
+            this.yardımToolStripMenuItem.Size = new System.Drawing.Size(69, 26);
             this.yardımToolStripMenuItem.Text = "Yardım";
             // 
             // Modül_Tabları
@@ -301,9 +301,9 @@ namespace SLF
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(47, 145);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(110, 18);
+            this.label3.Size = new System.Drawing.Size(101, 18);
             this.label3.TabIndex = 5;
-            this.label3.Text = "Veri Ön İzleme:";
+            this.label3.Text = "Aktarılan Veri:";
             // 
             // dataGridView1
             // 
@@ -356,7 +356,6 @@ namespace SLF
             this.veri_listesi_seçimi.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.veri_listesi_seçimi.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.veri_listesi_seçimi.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.veri_listesi_seçimi.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.veri_listesi_seçimi.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.veri_listesi_seçimi.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.veri_listesi_seçimi.FormattingEnabled = true;
@@ -430,9 +429,9 @@ namespace SLF
             this.tab_ea.Controls.Add(this.EA_list_box);
             this.tab_ea.Controls.Add(this.gMapControl_EA);
             this.tab_ea.Controls.Add(this.button7);
-            this.tab_ea.Location = new System.Drawing.Point(4, 62);
+            this.tab_ea.Location = new System.Drawing.Point(4, 33);
             this.tab_ea.Name = "tab_ea";
-            this.tab_ea.Size = new System.Drawing.Size(1472, 634);
+            this.tab_ea.Size = new System.Drawing.Size(1472, 663);
             this.tab_ea.TabIndex = 5;
             this.tab_ea.Text = "EA Şarj Modülü";
             this.tab_ea.UseVisualStyleBackColor = true;
@@ -719,7 +718,7 @@ namespace SLF
             this.buton_ea_harita_katmanlar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.buton_ea_harita_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
             this.buton_ea_harita_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_ea_harita_katmanlar.Location = new System.Drawing.Point(373, 579);
+            this.buton_ea_harita_katmanlar.Location = new System.Drawing.Point(373, 608);
             this.buton_ea_harita_katmanlar.Name = "buton_ea_harita_katmanlar";
             this.buton_ea_harita_katmanlar.Size = new System.Drawing.Size(62, 52);
             this.buton_ea_harita_katmanlar.TabIndex = 31;
@@ -839,7 +838,7 @@ namespace SLF
             this.gMapControl_EA.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_EA.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_EA.ShowTileGridLines = false;
-            this.gMapControl_EA.Size = new System.Drawing.Size(1096, 590);
+            this.gMapControl_EA.Size = new System.Drawing.Size(1096, 619);
             this.gMapControl_EA.TabIndex = 18;
             this.gMapControl_EA.Zoom = 0D;
             this.gMapControl_EA.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_EA_OnMapClick);
@@ -993,9 +992,9 @@ namespace SLF
             // tab_imar
             // 
             this.tab_imar.Controls.Add(this.button6);
-            this.tab_imar.Location = new System.Drawing.Point(4, 62);
+            this.tab_imar.Location = new System.Drawing.Point(4, 33);
             this.tab_imar.Name = "tab_imar";
-            this.tab_imar.Size = new System.Drawing.Size(1472, 634);
+            this.tab_imar.Size = new System.Drawing.Size(1472, 663);
             this.tab_imar.TabIndex = 4;
             this.tab_imar.Text = "İmar Analizleri";
             this.tab_imar.UseVisualStyleBackColor = true;
@@ -1012,9 +1011,9 @@ namespace SLF
             // 
             // tab_optDTR
             // 
-            this.tab_optDTR.Location = new System.Drawing.Point(4, 62);
+            this.tab_optDTR.Location = new System.Drawing.Point(4, 33);
             this.tab_optDTR.Name = "tab_optDTR";
-            this.tab_optDTR.Size = new System.Drawing.Size(1472, 634);
+            this.tab_optDTR.Size = new System.Drawing.Size(1472, 663);
             this.tab_optDTR.TabIndex = 7;
             this.tab_optDTR.Text = "Optimal DTR Konumlandırma";
             this.tab_optDTR.UseVisualStyleBackColor = true;

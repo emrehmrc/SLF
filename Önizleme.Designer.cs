@@ -28,6 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Önizleme));
             this.Onizleme_Tablar = new System.Windows.Forms.TabControl();
             this.Onizleme_Onizleme = new System.Windows.Forms.TabPage();
             this.Onizleme_dataGrid1 = new System.Windows.Forms.DataGridView();
@@ -42,6 +44,7 @@
             this.buton_YUKLE = new System.Windows.Forms.Button();
             this.buton_ÇIK = new System.Windows.Forms.Button();
             this.buton_İlerle = new System.Windows.Forms.Button();
+            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.Onizleme_Tablar.SuspendLayout();
             this.Onizleme_Onizleme.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid1)).BeginInit();
@@ -66,6 +69,7 @@
             this.Onizleme_Tablar.Controls.Add(this.Onizleme_Information);
             this.Onizleme_Tablar.Controls.Add(this.Onizleme_Statistics);
             this.Onizleme_Tablar.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Onizleme_Tablar.ImageList = this.imageList1;
             this.Onizleme_Tablar.Location = new System.Drawing.Point(12, 12);
             this.Onizleme_Tablar.Name = "Onizleme_Tablar";
             this.Onizleme_Tablar.SelectedIndex = 0;
@@ -76,6 +80,7 @@
             // 
             this.Onizleme_Onizleme.Controls.Add(this.Onizleme_dataGrid1);
             this.Onizleme_Onizleme.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Onizleme_Onizleme.ImageIndex = 4;
             this.Onizleme_Onizleme.Location = new System.Drawing.Point(4, 33);
             this.Onizleme_Onizleme.Name = "Onizleme_Onizleme";
             this.Onizleme_Onizleme.Padding = new System.Windows.Forms.Padding(3);
@@ -99,7 +104,9 @@
             // 
             // Onizleme_Hata
             // 
+            this.Onizleme_Hata.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.Onizleme_Hata.Controls.Add(this.Onizleme_dataGrid2);
+            this.Onizleme_Hata.ImageIndex = 0;
             this.Onizleme_Hata.Location = new System.Drawing.Point(4, 33);
             this.Onizleme_Hata.Name = "Onizleme_Hata";
             this.Onizleme_Hata.Padding = new System.Windows.Forms.Padding(3);
@@ -124,6 +131,7 @@
             // Onizleme_Warning
             // 
             this.Onizleme_Warning.Controls.Add(this.Onizleme_dataGrid3);
+            this.Onizleme_Warning.ImageIndex = 1;
             this.Onizleme_Warning.Location = new System.Drawing.Point(4, 33);
             this.Onizleme_Warning.Name = "Onizleme_Warning";
             this.Onizleme_Warning.Size = new System.Drawing.Size(1174, 532);
@@ -147,6 +155,7 @@
             // Onizleme_Information
             // 
             this.Onizleme_Information.Controls.Add(this.Onizleme_dataGrid4);
+            this.Onizleme_Information.ImageIndex = 2;
             this.Onizleme_Information.Location = new System.Drawing.Point(4, 33);
             this.Onizleme_Information.Name = "Onizleme_Information";
             this.Onizleme_Information.Size = new System.Drawing.Size(1174, 532);
@@ -170,6 +179,7 @@
             // Onizleme_Statistics
             // 
             this.Onizleme_Statistics.Controls.Add(this.Onizleme_dataGrid5);
+            this.Onizleme_Statistics.ImageIndex = 3;
             this.Onizleme_Statistics.Location = new System.Drawing.Point(4, 33);
             this.Onizleme_Statistics.Name = "Onizleme_Statistics";
             this.Onizleme_Statistics.Size = new System.Drawing.Size(1174, 532);
@@ -224,6 +234,16 @@
             this.buton_İlerle.Text = "İlerle";
             this.buton_İlerle.UseVisualStyleBackColor = true;
             // 
+            // imageList1
+            // 
+            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
+            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList1.Images.SetKeyName(0, "error");
+            this.imageList1.Images.SetKeyName(1, "warning");
+            this.imageList1.Images.SetKeyName(2, "trash");
+            this.imageList1.Images.SetKeyName(3, "info");
+            this.imageList1.Images.SetKeyName(4, "applicationtable_103629.ico");
+            // 
             // Önizleme
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -233,8 +253,9 @@
             this.Controls.Add(this.buton_ÇIK);
             this.Controls.Add(this.buton_YUKLE);
             this.Controls.Add(this.Onizleme_Tablar);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Önizleme";
-            this.Text = " ";
+            this.Text = "Veri Önizleme ve Doğrulama";
             this.Onizleme_Tablar.ResumeLayout(false);
             this.Onizleme_Onizleme.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid1)).EndInit();
@@ -266,5 +287,6 @@
         private System.Windows.Forms.TabPage Onizleme_Statistics;
         private System.Windows.Forms.DataGridView Onizleme_dataGrid5;
         private System.Windows.Forms.Button buton_İlerle;
+        private System.Windows.Forms.ImageList imageList1;
     }
 }

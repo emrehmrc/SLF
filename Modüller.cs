@@ -169,6 +169,10 @@ namespace SLF
             InitializeGMap(gMapControl_stokastik);
             InitializeGMap(gMapControl_EA);
 
+            SortTabPagesAlphabetically(Modül_Tabları, true);
+
+            Modül_Tabları.SelectedTab = tab_girdi;
+
             tüm_katmanlar_array_names = new string[13];
             tüm_katmanlar_array = new GMapOverlay[13];
             shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[13];
@@ -3192,6 +3196,27 @@ namespace SLF
                 MessageBox.Show("Herhangi bir poligon çizilmemiştir. Lütfen öncelikle bir poligon çiziniz.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
+
+        private void SortTabPagesAlphabetically(TabControl tabControl, bool ascending = true)
+        {
+            // Get the list of TabPages
+            List<TabPage> tabPages = new List<TabPage>();
+            foreach (TabPage tabPage in tabControl.TabPages)
+            {
+                tabPages.Add(tabPage);
+            }
+
+            // Sort the list of TabPages based on the Text property
+            tabPages.Sort((x, y) =>
+            {
+                return ascending ? string.Compare(x.Text, y.Text) : -string.Compare(x.Text, y.Text);
+            });
+
+            // Clear the current TabPages and add the sorted TabPages
+            tabControl.TabPages.Clear();
+            tabControl.TabPages.AddRange(tabPages.ToArray());
+        }
+
 
 
         // join the two layers by their indexes within the tüm_katmanlar_array GMapOverlay array
