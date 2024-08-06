@@ -2557,7 +2557,10 @@ namespace SLF
             // Veri listesinde seçilen veri tipine göre dosya seçme işlemi yapılacak
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
             girdiModülü = girdiModülleri[seçilenVeriTipi];
-            girdiModülü.VEERProcess(seçilenVeriTipi);
+            var isImported = girdiModülü.VEERProcess(seçilenVeriTipi);
+            if (isImported) { 
+                dataGridView1.DataSource = girdiModülü.CurrentDataTable;
+            }
         }
 
         private void DrawRuler_ea(GMapOverlay rulerOverlay, List<PointLatLng> rulerPoints)
@@ -3135,6 +3138,13 @@ namespace SLF
             {
                 MessageBox.Show("Herhangi bir poligon çizilmemiştir. Lütfen öncelikle bir poligon çiziniz.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
+        }
+
+        private void veri_listesi_seçimi_TextChanged(object sender, EventArgs e)
+        {
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+            girdiModülü = girdiModülleri[seçilenVeriTipi];
+            dataGridView1.DataSource = girdiModülü.importedDataTable;
         }
 
 

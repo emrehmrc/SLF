@@ -72,7 +72,8 @@ namespace SLF
         protected readonly string combinedTabularFilter;
 
         protected DataTable currentDataTable = new DataTable();
-        protected static Dictionary<string, DataTable> dataTablesByType = new Dictionary<string, DataTable>();  // Static so that it can be accessed as the same instance from other subclasses
+        public DataTable importedDataTable = new DataTable();
+        public static Dictionary<string, DataTable> dataTablesByType = new Dictionary<string, DataTable>();  // Static so that it can be accessed as the same instance from other subclasses
         protected DataTable errorDataTable = new DataTable();
         protected DataTable warningDataTable = new DataTable();
         protected DataTable infoDataTable = new DataTable();
@@ -126,7 +127,7 @@ namespace SLF
             return nullLikeStrings.Contains(stringValue, StringComparer.OrdinalIgnoreCase);
         }
 
-        public void VEERProcess(string seçilenVeriTipi)
+        public bool VEERProcess(string seçilenVeriTipi)
         {
             try
             {
@@ -176,6 +177,7 @@ namespace SLF
                     Postprocess();
                     ImportProcessedData();
                     MessageBox.Show(seçilenVeriTipi + " başarıyla yüklendi.", "Başarılı!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return true;
                 }
                 else
                 {
@@ -198,6 +200,7 @@ namespace SLF
             {
                 MessageBox.Show(ex.Message, "Önkoşul hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            return false;
         }
 
         public void CheckPrerequisites(string seçilenVeriTipi)
@@ -309,7 +312,8 @@ namespace SLF
 
         protected void ImportProcessedData()
         {
-            dataTablesByType[seçilenVeriTipi] = currentDataTable;
+            importedDataTable = currentDataTable.Copy();
+            dataTablesByType[seçilenVeriTipi] = importedDataTable;
         }
 
         public void ProcessFileSelection(string seçilenVeriTipi)
