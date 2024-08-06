@@ -206,6 +206,7 @@
             this.buton_YUKLE.TabIndex = 1;
             this.buton_YUKLE.Text = "İçeri Aktar";
             this.buton_YUKLE.UseVisualStyleBackColor = true;
+            this.buton_YUKLE.Click += new System.EventHandler(this.buton_YUKLE_Click);
             // 
             // buton_ÇIK
             // 
@@ -217,6 +218,7 @@
             this.buton_ÇIK.TabIndex = 2;
             this.buton_ÇIK.Text = "Çık";
             this.buton_ÇIK.UseVisualStyleBackColor = true;
+            this.buton_ÇIK.Click += new System.EventHandler(this.buton_ÇIK_Click);
             // 
             // buton_İlerle
             // 
@@ -228,6 +230,7 @@
             this.buton_İlerle.TabIndex = 3;
             this.buton_İlerle.Text = "İlerle";
             this.buton_İlerle.UseVisualStyleBackColor = true;
+            this.buton_İlerle.Click += new System.EventHandler(this.buton_İlerle_Click);
             // 
             // Önizleme
             // 

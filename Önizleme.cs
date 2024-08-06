@@ -24,5 +24,20 @@ namespace SLF
         public Button Buton_YUKLE { get { return buton_YUKLE; } }
         public Button Buton_ÇIK { get { return buton_ÇIK; } }
         public Button Buton_İLERLE { get { return buton_İlerle; } }
+
+        private void buton_İlerle_Click(object sender, EventArgs e)
+        {
+            this.DialogResult = DialogResult.Retry;
+        }
+
+        private void buton_YUKLE_Click(object sender, EventArgs e)
+        {
+            this.DialogResult = DialogResult.OK;
+        }
+
+        private void buton_ÇIK_Click(object sender, EventArgs e)
+        {
+            this.DialogResult = DialogResult.Cancel;
+        }
     }
 }

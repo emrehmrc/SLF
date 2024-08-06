@@ -137,6 +137,9 @@ namespace SLF
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
                     Onizleme1.Onizleme_DataGrid1.DataSource = dataTable;
+                    onizleme1.Buton_YUKLE.Enabled = false;
+                    onizleme1.Buton_İLERLE.Enabled = true;
+
                     Preprocess();
                     while (true)
                     {
@@ -144,31 +147,22 @@ namespace SLF
                         Validate();
                         if (IsError())
                         {
-                            //onizleme1.buton_YUKLE.Enabled = false;
-                            //onizleme1.buton_Ilerle.Enabled = false;
+                            //onizleme1.Buton_YUKLE.Enabled = false;
+                            //onizleme1.Buton_İLERLE.Enabled = false;
                         }
 
                         // Exit the loop if there are no info or warning messages
                         if (!IsInfo() && !IsWarning())
                         {
-                            //onizleme1.buton_YUKLE.Enabled = true;
-                            //onizleme1.buton_Ilerle.Enabled = false;
+                            onizleme1.Buton_YUKLE.Enabled = true;
+                            onizleme1.Buton_İLERLE.Enabled = false;
                         }
                         var dialogResult = Onizleme1.ShowDialog();
                         if (dialogResult == DialogResult.Cancel)
                         {
                             throw new StopVEERProcess("Kullanıcı işlemi iptal etti.");
                         }
-
-
-                        if (IsError())
-                        {
-                            //MessageBox.Show("Hataları gidermeden devam edemezsiniz!", "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            //return;
-                        }
-
-                        // Exit the loop if there are no info or warning messages
-                        if (!IsInfo() && !IsWarning())
+                        else if (dialogResult == DialogResult.OK)
                         {
                             break;
                         }
@@ -181,6 +175,7 @@ namespace SLF
                     }
                     Postprocess();
                     ImportProcessedData();
+                    MessageBox.Show(seçilenVeriTipi + " başarıyla yüklendi.", "Başarılı!", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
