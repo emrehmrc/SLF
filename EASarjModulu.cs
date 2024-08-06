@@ -9,7 +9,7 @@ using System.Windows.Forms;
 namespace SLF
 {
     public class EASarjModulu : GirdiModülü
-
+        
     {
         private void PreprocessMismatchedTrafoKodu()
         {
