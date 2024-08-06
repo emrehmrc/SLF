@@ -64,7 +64,7 @@ namespace SLF
         
         // variables to be used to create polygons
         private GMapOverlay polygonOverlay_ea = new GMapOverlay("polygonOverlay_ea");
-        private GMapOverlay polygonOverlay_stokastik = new GMapOverlay("polygonOverlay_stokastik");
+        public GMapOverlay polygonOverlay_stokastik;
         private List<PointLatLng> polygonPoints_ea = new List<PointLatLng>();
         private List<PoligonVeri> poligonlar_ea = new List<PoligonVeri>();
         private List<PointLatLng> polygonPoints_stokastik = new List<PointLatLng>();
@@ -85,6 +85,7 @@ namespace SLF
 
         // boolean variable to control the polygon selection by mouse down event
         private bool isSelecting_polygon = false;
+        private bool isSaving_polygon = false;
 
         // boolean variable to control the marker/point selection by mouse down event
         private bool isSelecting_marker = false;
@@ -168,6 +169,10 @@ namespace SLF
             InitializeGMap(gMapControl_stokastik);
             InitializeGMap(gMapControl_EA);
 
+            SortTabPagesAlphabetically(Modül_Tabları, true);
+
+            Modül_Tabları.SelectedTab = tab_girdi;
+
             tüm_katmanlar_array_names = new string[13];
             tüm_katmanlar_array = new GMapOverlay[13];
             shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[13];
@@ -188,7 +193,7 @@ namespace SLF
             // stokastik haritası cetvel, nokta, poligon üst katmanları
             gMapControl_stokastik.Overlays.Add(rulerOverlay_stokastik);
             gMapControl_stokastik.Overlays.Add(markerOverlay_stokastik);
-            gMapControl_stokastik.Overlays.Add(polygonOverlay_stokastik);
+            
             //
             gMapControl_stokastik.Overlays.Add(gridOverlay);
             stokastik_haritası_checkboxes_init();
@@ -1868,8 +1873,7 @@ namespace SLF
 
                 gMapControl_stokastik.Refresh();
             }
-        }
-        
+        }      
 
         private void gMapControl_stokastik_MouseMove(object sender, MouseEventArgs e)
         {
@@ -1965,7 +1969,6 @@ namespace SLF
 
         private void gMapControl_stokastik_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
-
             if(e.Button == MouseButtons.Left)
             {
                 // boolean control for marker selection when clicking on the map
@@ -1986,10 +1989,14 @@ namespace SLF
                 // boolean control for polygon selection when clicking on the map
                 if (isSelecting_polygon)
                 {
-
+                    
                     polygonPoints_stokastik.Add(pointClick);
                     GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
                     markerOverlay_stokastik.Markers.Add(marker);
+                    
+                    layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
+                    polygonOverlay_stokastik = new GMapOverlay("polygonOverlay_" + layer_index.ToString());
+                    gMapControl_stokastik.Overlays.Add(polygonOverlay_stokastik);
                     gMapControl_stokastik.Refresh();
 
                     // eğer gmapControl_OnMapClick event'i ile 2 den fazla nokta seçilirse,
@@ -2013,6 +2020,8 @@ namespace SLF
 
         private void Poligon_Kaydet_Click(object sender, EventArgs e)
         {
+            isSaving_polygon = true;
+
             if (polygonOverlay_stokastik != null && polygonOverlay_stokastik.Polygons.Count != 0)
             {
                 markerOverlay_stokastik.Markers.Clear();
@@ -2047,6 +2056,7 @@ namespace SLF
                 // Instead of clearing, create a new overlay for further use
                 //polygonOverlay_stokastik = new GMapOverlay("polygonOverlay_stik");
                 //polygonOverlay_stokastik.Polygons.Clear();
+                polygonOverlay_stokastik.Dispose();
             }
             else
             {
@@ -2409,7 +2419,7 @@ namespace SLF
                 Stroke = new Pen(Color.DarkBlue, 3)
             };
 
-            //polygonOverlay.Polygons.Clear();
+            polygonOverlay.Polygons.Clear();
             polygonOverlay.Polygons.Add(polygon);
 
             // polygon_data isminde, PoligonVeri sınıfına ait yeni bir obje oluştur, bu sınıfın propertyleri
@@ -3155,6 +3165,27 @@ namespace SLF
             dataGridView1.DataSource = girdiModülü.importedDataTable;
         }
 
+        private void SortTabPagesAlphabetically(TabControl tabControl, bool ascending = true)
+        {
+            // Get the list of TabPages
+            List<TabPage> tabPages = new List<TabPage>();
+            foreach (TabPage tabPage in tabControl.TabPages)
+            {
+                tabPages.Add(tabPage);
+            }
+
+            // Sort the list of TabPages based on the Text property
+            tabPages.Sort((x, y) =>
+            {
+                return ascending ? string.Compare(x.Text, y.Text) : -string.Compare(x.Text, y.Text);
+            });
+
+            // Clear the current TabPages and add the sorted TabPages
+            tabControl.TabPages.Clear();
+            tabControl.TabPages.AddRange(tabPages.ToArray());
+        }
+
+
 
         // join the two layers by their indexes within the tüm_katmanlar_array GMapOverlay array
         public async Task JoinAttributesByLocation()
@@ -3165,7 +3196,7 @@ namespace SLF
                 name => name == firstLayerName);
             secondLayerToJoin = Array.FindIndex(tüm_katmanlar_array_names, 
                 name => name == secondLayerName);
-
+            
             // extract the first and second overlay layers according to their specified indices
             GMapOverlay firstOverlay = tüm_katmanlar_array[firstLayerToJoin]; 
             GMapOverlay secondOverlay = tüm_katmanlar_array[secondLayerToJoin]; 
