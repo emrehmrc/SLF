@@ -177,7 +177,7 @@ namespace SLF
                     }
                     Postprocess();
                     ImportProcessedData();
-                    MessageBox.Show(seçilenVeriTipi + " başarıyla yüklendi.", "Başarılı!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ShowImportedMessage();
                     return true;
                 }
                 else
@@ -204,6 +204,18 @@ namespace SLF
             return false;
         }
 
+        public void ShowImportedMessage()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine($"{seçilenVeriTipi} başarıyla yüklendi.");
+            sb.AppendLine($"Toplam satır sayısı: {importedDataTable.Rows.Count}");
+
+            // Convert to string
+            string result = sb.ToString();
+            MessageBox.Show(result, "Başarılı!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        }
         public void CheckPrerequisites(string seçilenVeriTipi)
         {
             var missingPrerequisites = new List<string>();
