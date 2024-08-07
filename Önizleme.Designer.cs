@@ -41,10 +41,10 @@
             this.Onizleme_dataGrid4 = new System.Windows.Forms.DataGridView();
             this.Onizleme_Statistics = new System.Windows.Forms.TabPage();
             this.Onizleme_dataGrid5 = new System.Windows.Forms.DataGridView();
+            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.buton_YUKLE = new System.Windows.Forms.Button();
             this.buton_ÇIK = new System.Windows.Forms.Button();
             this.buton_İlerle = new System.Windows.Forms.Button();
-            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.Onizleme_Tablar.SuspendLayout();
             this.Onizleme_Onizleme.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid1)).BeginInit();
@@ -98,6 +98,7 @@
             this.Onizleme_dataGrid1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.Onizleme_dataGrid1.Location = new System.Drawing.Point(0, 3);
             this.Onizleme_dataGrid1.Name = "Onizleme_dataGrid1";
+            this.Onizleme_dataGrid1.ReadOnly = true;
             this.Onizleme_dataGrid1.RowHeadersWidth = 51;
             this.Onizleme_dataGrid1.RowTemplate.Height = 24;
             this.Onizleme_dataGrid1.Size = new System.Drawing.Size(1168, 531);
@@ -125,6 +126,7 @@
             this.Onizleme_dataGrid2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.Onizleme_dataGrid2.Location = new System.Drawing.Point(3, 3);
             this.Onizleme_dataGrid2.Name = "Onizleme_dataGrid2";
+            this.Onizleme_dataGrid2.ReadOnly = true;
             this.Onizleme_dataGrid2.RowHeadersWidth = 51;
             this.Onizleme_dataGrid2.RowTemplate.Height = 24;
             this.Onizleme_dataGrid2.Size = new System.Drawing.Size(1165, 523);
@@ -150,6 +152,7 @@
             this.Onizleme_dataGrid3.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.Onizleme_dataGrid3.Location = new System.Drawing.Point(3, 3);
             this.Onizleme_dataGrid3.Name = "Onizleme_dataGrid3";
+            this.Onizleme_dataGrid3.ReadOnly = true;
             this.Onizleme_dataGrid3.RowHeadersWidth = 51;
             this.Onizleme_dataGrid3.RowTemplate.Height = 24;
             this.Onizleme_dataGrid3.Size = new System.Drawing.Size(1168, 526);
@@ -175,6 +178,7 @@
             this.Onizleme_dataGrid4.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.Onizleme_dataGrid4.Location = new System.Drawing.Point(3, 3);
             this.Onizleme_dataGrid4.Name = "Onizleme_dataGrid4";
+            this.Onizleme_dataGrid4.ReadOnly = true;
             this.Onizleme_dataGrid4.RowHeadersWidth = 51;
             this.Onizleme_dataGrid4.RowTemplate.Height = 24;
             this.Onizleme_dataGrid4.Size = new System.Drawing.Size(1168, 526);
@@ -200,10 +204,21 @@
             this.Onizleme_dataGrid5.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.Onizleme_dataGrid5.Location = new System.Drawing.Point(5, 3);
             this.Onizleme_dataGrid5.Name = "Onizleme_dataGrid5";
+            this.Onizleme_dataGrid5.ReadOnly = true;
             this.Onizleme_dataGrid5.RowHeadersWidth = 51;
             this.Onizleme_dataGrid5.RowTemplate.Height = 24;
             this.Onizleme_dataGrid5.Size = new System.Drawing.Size(1166, 526);
             this.Onizleme_dataGrid5.TabIndex = 0;
+            // 
+            // imageList1
+            // 
+            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
+            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList1.Images.SetKeyName(0, "error");
+            this.imageList1.Images.SetKeyName(1, "warning");
+            this.imageList1.Images.SetKeyName(2, "trash");
+            this.imageList1.Images.SetKeyName(3, "info");
+            this.imageList1.Images.SetKeyName(4, "applicationtable_103629.ico");
             // 
             // buton_YUKLE
             // 
@@ -241,16 +256,6 @@
             this.buton_İlerle.Text = "İlerle";
             this.buton_İlerle.UseVisualStyleBackColor = true;
             this.buton_İlerle.Click += new System.EventHandler(this.buton_İlerle_Click);
-            // 
-            // imageList1
-            // 
-            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
-            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
-            this.imageList1.Images.SetKeyName(0, "error");
-            this.imageList1.Images.SetKeyName(1, "warning");
-            this.imageList1.Images.SetKeyName(2, "trash");
-            this.imageList1.Images.SetKeyName(3, "info");
-            this.imageList1.Images.SetKeyName(4, "applicationtable_103629.ico");
             // 
             // Önizleme
             // 

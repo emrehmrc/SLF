@@ -214,7 +214,7 @@ namespace SLF
             this.yardımToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1482, 30);
+            this.menuStrip1.Size = new System.Drawing.Size(1482, 28);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -225,7 +225,7 @@ namespace SLF
             this.exportToolStripMenuItem,
             this.saToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(64, 26);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(64, 24);
             this.fileToolStripMenuItem.Text = "Dosya";
             // 
             // importToolStripMenuItem
@@ -249,7 +249,7 @@ namespace SLF
             // yardımToolStripMenuItem
             // 
             this.yardımToolStripMenuItem.Name = "yardımToolStripMenuItem";
-            this.yardımToolStripMenuItem.Size = new System.Drawing.Size(69, 26);
+            this.yardımToolStripMenuItem.Size = new System.Drawing.Size(69, 24);
             this.yardımToolStripMenuItem.Text = "Yardım";
             // 
             // Modül_Tabları
@@ -313,6 +313,7 @@ namespace SLF
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Location = new System.Drawing.Point(46, 166);
             this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.Size = new System.Drawing.Size(1420, 463);
@@ -432,9 +433,9 @@ namespace SLF
             this.tab_ea.Controls.Add(this.EA_list_box);
             this.tab_ea.Controls.Add(this.gMapControl_EA);
             this.tab_ea.Controls.Add(this.button7);
-            this.tab_ea.Location = new System.Drawing.Point(4, 33);
+            this.tab_ea.Location = new System.Drawing.Point(4, 62);
             this.tab_ea.Name = "tab_ea";
-            this.tab_ea.Size = new System.Drawing.Size(1472, 663);
+            this.tab_ea.Size = new System.Drawing.Size(1472, 634);
             this.tab_ea.TabIndex = 5;
             this.tab_ea.Text = "EA Şarj Modülü";
             this.tab_ea.UseVisualStyleBackColor = true;
@@ -995,9 +996,9 @@ namespace SLF
             // tab_imar
             // 
             this.tab_imar.Controls.Add(this.button6);
-            this.tab_imar.Location = new System.Drawing.Point(4, 33);
+            this.tab_imar.Location = new System.Drawing.Point(4, 62);
             this.tab_imar.Name = "tab_imar";
-            this.tab_imar.Size = new System.Drawing.Size(1472, 663);
+            this.tab_imar.Size = new System.Drawing.Size(1472, 634);
             this.tab_imar.TabIndex = 4;
             this.tab_imar.Text = "İmar Analizleri";
             this.tab_imar.UseVisualStyleBackColor = true;
@@ -1014,9 +1015,9 @@ namespace SLF
             // 
             // tab_optDTR
             // 
-            this.tab_optDTR.Location = new System.Drawing.Point(4, 33);
+            this.tab_optDTR.Location = new System.Drawing.Point(4, 62);
             this.tab_optDTR.Name = "tab_optDTR";
-            this.tab_optDTR.Size = new System.Drawing.Size(1472, 663);
+            this.tab_optDTR.Size = new System.Drawing.Size(1472, 634);
             this.tab_optDTR.TabIndex = 7;
             this.tab_optDTR.Text = "Optimal DTR Konumlandırma";
             this.tab_optDTR.UseVisualStyleBackColor = true;
