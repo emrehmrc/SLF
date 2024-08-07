@@ -146,6 +146,7 @@ namespace SLF
                     {
                         ClearRows();
                         Validate();
+                        RenameTabCounts();
                         if (IsError())
                         {
                             //onizleme1.Buton_YUKLE.Enabled = false;
@@ -377,6 +378,32 @@ namespace SLF
         {
             // TODO: Implement tabular file processing
             return new DataTable();
+        }
+
+        // Helper method to get the original tab text without the count
+        private string GetOriginalTabText(TabPage tabPage)
+        {
+            string text = tabPage.Text;
+            int index = text.LastIndexOf('(');
+            if (index > 0)
+            {
+                return text.Substring(0, index).Trim();
+            }
+            return text;
+        }
+
+        public void RenameTabCounts()
+        {
+            int errorCount = errorDataTable.Rows.Count;
+            int warningCount = warningDataTable.Rows.Count;
+            int infoCount = infoDataTable.Rows.Count;
+            int statCount = statDataTable.Rows.Count;
+
+            // Append counts to the current text of each tab
+            onizleme1.Onizleme_Hata_Sekmesi.Text = $"{GetOriginalTabText(onizleme1.Onizleme_Hata_Sekmesi)} ({errorCount})";
+            onizleme1.Onizleme_Warning_Sekmesi.Text = $"{GetOriginalTabText(onizleme1.Onizleme_Warning_Sekmesi)} ({warningCount})";
+            onizleme1.Onizleme_Information_Sekmesi.Text = $"{GetOriginalTabText(onizleme1.Onizleme_Information_Sekmesi)} ({infoCount})";
+            onizleme1.Onizleme_Statistics_Sekmesi.Text = $"{GetOriginalTabText(onizleme1.Onizleme_Statistics_Sekmesi)} ({statCount})";
         }
 
         public virtual void Validate()

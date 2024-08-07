@@ -24,6 +24,10 @@ namespace SLF
         public Button Buton_YUKLE { get { return buton_YUKLE; } }
         public Button Buton_ÇIK { get { return buton_ÇIK; } }
         public Button Buton_İLERLE { get { return buton_İlerle; } }
+        public TabPage Onizleme_Hata_Sekmesi { get { return Onizleme_Hata; } }
+        public TabPage Onizleme_Warning_Sekmesi { get { return Onizleme_Warning; } }
+        public TabPage Onizleme_Information_Sekmesi { get { return Onizleme_Information; } }
+        public TabPage Onizleme_Statistics_Sekmesi { get { return Onizleme_Statistics; } }
 
         private void buton_İlerle_Click(object sender, EventArgs e)
         {
