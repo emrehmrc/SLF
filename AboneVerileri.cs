@@ -29,7 +29,7 @@ namespace SLF
         private readonly string SOZ_DVM = "SÃ¶z.Dvm";
         private readonly string SOZ_IPT = "SÃ¶z.Ipt";
 
-        private bool trafoKoduRemoveFlag = false;
+        private bool trafoKoduRemoveFlag;
 
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
@@ -57,6 +57,7 @@ namespace SLF
         };
         public override void Preprocess()
         {
+            trafoKoduRemoveFlag = false;
             PreprocessMismatchedTrafoKodu();
             CheckConnectivity();
         }
