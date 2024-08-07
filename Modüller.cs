@@ -2568,7 +2568,8 @@ namespace SLF
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
             girdiModülü = girdiModülleri[seçilenVeriTipi];
             var isImported = girdiModülü.VEERProcess(seçilenVeriTipi);
-            if (isImported) { 
+            if (isImported) {
+                veri_listesi_seçimi.Refresh();
                 dataGridView1.DataSource = girdiModülü.CurrentDataTable;
             }
         }
@@ -3185,10 +3186,39 @@ namespace SLF
             tabControl.TabPages.AddRange(tabPages.ToArray());
         }
 
+        private void veri_listesi_seçimi_DrawItem(object sender, DrawItemEventArgs e)
+        {
+
+            // Check if the index is valid
+            if (e.Index < 0)
+                return;
+
+            // Get the current item to be drawn
+            string text = veri_listesi_seçimi.Items[e.Index].ToString();
+
+            // Determine the color based on some condition
+            Color textColor = Color.Black;
+            var girdiModülü = girdiModülleri[text];
+            if (girdiModülü.importedDataTable.Rows.Count > 0)
+            {
+                textColor = Color.Green;
+            }
+
+            e.DrawBackground();
+            // Draw the text with the determined color
+            using (Brush brush = new SolidBrush(textColor))
+            {
+                e.Graphics.DrawString(text, e.Font, brush, e.Bounds);
+            }
+
+            // Draw the focus rectangle if the item is selected
+            e.DrawFocusRectangle();
+        }
 
 
-        // join the two layers by their indexes within the tüm_katmanlar_array GMapOverlay array
-        public async Task JoinAttributesByLocation()
+
+    // join the two layers by their indexes within the tüm_katmanlar_array GMapOverlay array
+    public async Task JoinAttributesByLocation()
         {
             // find the indices of the layers that are selected in the "jabl" functionality/interface
             // in the "tüm_katmanlar_array_names"

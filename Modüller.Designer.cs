@@ -357,6 +357,7 @@ namespace SLF
             this.veri_listesi_seçimi.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.veri_listesi_seçimi.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.veri_listesi_seçimi.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.veri_listesi_seçimi.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.veri_listesi_seçimi.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.veri_listesi_seçimi.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.veri_listesi_seçimi.FormattingEnabled = true;
@@ -373,6 +374,7 @@ namespace SLF
             this.veri_listesi_seçimi.Name = "veri_listesi_seçimi";
             this.veri_listesi_seçimi.Size = new System.Drawing.Size(361, 32);
             this.veri_listesi_seçimi.TabIndex = 0;
+            this.veri_listesi_seçimi.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.veri_listesi_seçimi_DrawItem);
             this.veri_listesi_seçimi.SelectedIndexChanged += new System.EventHandler(this.veri_listesi_seçimi_SelectedIndexChanged);
             this.veri_listesi_seçimi.TextUpdate += new System.EventHandler(this.veri_listesi_seçimi_TextUpdate);
             this.veri_listesi_seçimi.TextChanged += new System.EventHandler(this.veri_listesi_seçimi_TextChanged);
