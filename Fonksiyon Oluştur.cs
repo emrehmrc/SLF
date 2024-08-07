@@ -16,12 +16,14 @@ namespace SLF
     {
         public ModülFormu mod1;
         public List<string> agrege_olacak_sutunlar = new List<string>();
+        public List<object> tum_sutunlar_listesi = new List<object>();
+        public List<object> secilen_sutunlar_listesi = new List<object>();
 
         public Fonksiyon_Oluştur()
         {
             InitializeComponent();
-            this.Height = 240;
-            this.MaximumSize = new System.Drawing.Size(height: 700, width: this.Width);
+            Height = 240;
+            MaximumSize = new Size(height: 700, width: this.Width);
         }
 
         private async void buton_jabl_Click(object sender, EventArgs e)
@@ -34,7 +36,7 @@ namespace SLF
             mod1 = (ModülFormu)Tag;
             mod1.firstLayerName = comboBox_fonksiyonlar_1.Text;
             mod1.secondLayerName = comboBox_fonksiyonlar_2.Text;
-            this.Cursor = Cursors.WaitCursor;
+            Cursor = Cursors.WaitCursor;
 
             // either do a "jabl" or "jabl-summary"
             if(checkBox_cell_statistics.Checked == false)
@@ -46,43 +48,84 @@ namespace SLF
                 await mod1.JoinAttributesByLocation_summary();
             }
 
-            this.Cursor = Cursors.Default;
+            Cursor = Cursors.Default;
         }
         
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBox_cell_statistics.Checked == true)
             {
-                this.Height = 700;
+                Height = 700;
             }
             else
             {
-                this.Height = 240;
+                Height = 240;
             }
         }
 
+        // tum sutunlar listesi
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-            if(tum_sutunlar.SelectedItems != null)
+            if (tum_sutunlar.SelectedItems != null && tum_sutunlar.Items.Count != 0)
             {
-                foreach (var selected_items in tum_sutunlar.SelectedItems)
+                foreach (var selectedItem in tum_sutunlar.SelectedItems)
                 {
-                    secilen_sutunlar.Items.Add(selected_items);
+                    if(!tum_sutunlar_listesi.Contains(selectedItem))
+                    {
+                        tum_sutunlar_listesi.Add(selectedItem);
+                    }   
                 }
-                tum_sutunlar.SelectedItems.Clear();
+
+                foreach (var item in tum_sutunlar_listesi)
+                {
+                    if (!secilen_sutunlar.Items.Contains(item))
+                    {
+                        secilen_sutunlar.Items.Add(item);
+                        tum_sutunlar.Items.Remove(item);
+                    }             
+                    
+                }
+                secilen_sutunlar.ClearSelected();
+                tum_sutunlar.ClearSelected();
+                tum_sutunlar_listesi.Clear();
+                secilen_sutunlar_listesi.Clear();
             }
         }
 
+        // secilen sutun listesi
         private void pictureBox3_Click(object sender, EventArgs e)
         {
-            if (secilen_sutunlar.SelectedItems != null)
+            if (secilen_sutunlar.SelectedItems != null && secilen_sutunlar.Items.Count != 0)
             {
-                foreach (var selected_items in secilen_sutunlar.SelectedItems)
+                foreach (var selectedItem in secilen_sutunlar.SelectedItems)
                 {
-                    secilen_sutunlar.Items.Remove(selected_items);
+                    if (!secilen_sutunlar_listesi.Contains(selectedItem))
+                    {
+                        secilen_sutunlar_listesi.Add(selectedItem);
+                    }
+   
                 }
-                secilen_sutunlar.SelectedItems.Clear();
+
+                foreach (var item in secilen_sutunlar_listesi)
+                {
+                    secilen_sutunlar.Items.Remove(item);
+
+                    if (!tum_sutunlar.Items.Contains(item))
+                    {
+                        tum_sutunlar.Items.Add(item);
+                    }
+                  
+                }
+                secilen_sutunlar.ClearSelected();
+                tum_sutunlar.ClearSelected();
+                tum_sutunlar_listesi.Clear();
+                secilen_sutunlar_listesi.Clear();
             }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }
