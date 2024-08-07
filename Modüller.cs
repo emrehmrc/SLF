@@ -3215,10 +3215,24 @@ namespace SLF
             e.DrawFocusRectangle();
         }
 
+        private void raporGoruntuleButonu_Click(object sender, EventArgs e)
+        {
+            // Girdi modülündeki dosya yükleme butonuna tıklandığında çalışacak kodlar
+
+            // Veri listesinde seçilen veri tipine göre dosya seçme işlemi yapılacak
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+            girdiModülü = girdiModülleri[seçilenVeriTipi];
+            girdiModülü.VEERReport(seçilenVeriTipi);
+            //if (isImported) {
+            //    veri_listesi_seçimi.Refresh();
+            //    dataGridView1.DataSource = girdiModülü.CurrentDataTable;
+            //}
+        }
 
 
-    // join the two layers by their indexes within the tüm_katmanlar_array GMapOverlay array
-    public async Task JoinAttributesByLocation()
+
+        // join the two layers by their indexes within the tüm_katmanlar_array GMapOverlay array
+        public async Task JoinAttributesByLocation()
         {
             // find the indices of the layers that are selected in the "jabl" functionality/interface
             // in the "tüm_katmanlar_array_names"

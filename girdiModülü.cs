@@ -25,6 +25,7 @@ namespace SLF
     public class GirdiModülü
     {
         protected Önizleme onizleme1 = new Önizleme();
+        protected Raporlama raporlama1 = new Raporlama();
         protected readonly List<string> veri_listesi_requires_xlsx = new List<string> {
             "EA Şarj Verileri",
             "Ekonometrik Yük Tahmini Verileri",
@@ -120,6 +121,28 @@ namespace SLF
             return nullLikeStrings.Contains(stringValue, StringComparer.OrdinalIgnoreCase);
         }
 
+        public void VEERReport(string seçilenVeriTipi) {
+            DataTable dataTable = importedDataTable;
+            if (dataTable != null && dataTable.Rows.Count > 0)
+            {
+                RenameTabCounts();
+                raporlama1.Onizleme_DataGrid2.DataSource = errorDataTableReport;
+                raporlama1.Onizleme_DataGrid3.DataSource = warningDataTableReport;
+                raporlama1.Onizleme_DataGrid4.DataSource = infoDataTableReport;
+                raporlama1.Onizleme_DataGrid5.DataSource = statDataTableReport;
+                var dialogResult = raporlama1.ShowDialog();
+                if (dialogResult == DialogResult.Cancel)
+                {
+                }
+                else if (dialogResult == DialogResult.OK)
+                {
+                }
+            }
+            else
+            {
+                MessageBox.Show("Veri tablosu boş.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
         public bool VEERProcess(string seçilenVeriTipi)
         {
             try
@@ -133,6 +156,7 @@ namespace SLF
                     Onizleme1.Onizleme_DataGrid1.DataSource = dataTable;
                     onizleme1.Buton_YUKLE.Enabled = false;
                     onizleme1.Buton_İLERLE.Enabled = true;
+                    ClearReportRows();
 
                     Preprocess();
                     while (true)
@@ -163,6 +187,7 @@ namespace SLF
                         }
 
                         Remove();
+                        ClearRows();
                         Validate();
                         Impute();
 
@@ -400,11 +425,21 @@ namespace SLF
             int infoCount = infoDataTable.Rows.Count;
             int statCount = statDataTable.Rows.Count;
 
+            int errorReportCount = errorDataTableReport.Rows.Count;
+            int warningReportCount = warningDataTableReport.Rows.Count;
+            int infoReportCount = infoDataTableReport.Rows.Count;
+            int statReportCount = statDataTableReport.Rows.Count;
+
             // Append counts to the current text of each tab
             onizleme1.Onizleme_Hata_Sekmesi.Text = $"{GetOriginalTabText(onizleme1.Onizleme_Hata_Sekmesi)} ({errorCount})";
             onizleme1.Onizleme_Warning_Sekmesi.Text = $"{GetOriginalTabText(onizleme1.Onizleme_Warning_Sekmesi)} ({warningCount})";
             onizleme1.Onizleme_Information_Sekmesi.Text = $"{GetOriginalTabText(onizleme1.Onizleme_Information_Sekmesi)} ({infoCount})";
             onizleme1.Onizleme_Statistics_Sekmesi.Text = $"{GetOriginalTabText(onizleme1.Onizleme_Statistics_Sekmesi)} ({statCount})";
+
+            raporlama1.Onizleme_Hata_Sekmesi.Text = $"{GetOriginalTabText(raporlama1.Onizleme_Hata_Sekmesi)} ({errorReportCount})";
+            raporlama1.Onizleme_Warning_Sekmesi.Text = $"{GetOriginalTabText(raporlama1.Onizleme_Warning_Sekmesi)} ({warningReportCount})";
+            raporlama1.Onizleme_Information_Sekmesi.Text = $"{GetOriginalTabText(raporlama1.Onizleme_Information_Sekmesi)} ({infoReportCount})";
+            raporlama1.Onizleme_Statistics_Sekmesi.Text = $"{GetOriginalTabText(raporlama1.Onizleme_Statistics_Sekmesi)} ({statReportCount})";
         }
 
         public virtual void Validate()
@@ -438,6 +473,13 @@ namespace SLF
             warningDataTable.Rows.Clear();
             infoDataTable.Rows.Clear();
             statDataTable.Rows.Clear();
+        }
+        protected void ClearReportRows()
+        {
+            errorDataTableReport.Rows.Clear();
+            warningDataTableReport.Rows.Clear();
+            infoDataTableReport.Rows.Clear();
+            statDataTableReport.Rows.Clear();
         }
         protected DataTable GetDataTableBasedOnThreshold(
             float currentPercentage,

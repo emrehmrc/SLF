@@ -180,6 +180,7 @@ namespace SLF
             this.ContextMenuStrip_Fonksiyon = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.katman_birleştir = new System.Windows.Forms.ToolStripMenuItem();
             this.overlap_analizi = new System.Windows.Forms.ToolStripMenuItem();
+            this.raporGoruntuleButonu = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
@@ -281,6 +282,7 @@ namespace SLF
             // 
             // tab_girdi
             // 
+            this.tab_girdi.Controls.Add(this.raporGoruntuleButonu);
             this.tab_girdi.Controls.Add(this.label3);
             this.tab_girdi.Controls.Add(this.dataGridView1);
             this.tab_girdi.Controls.Add(this.label2);
@@ -1951,6 +1953,19 @@ namespace SLF
             this.overlap_analizi.Size = new System.Drawing.Size(187, 26);
             this.overlap_analizi.Text = "Overlap Analizi";
             // 
+            // raporGoruntuleButonu
+            // 
+            this.raporGoruntuleButonu.BackColor = System.Drawing.Color.White;
+            this.raporGoruntuleButonu.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("raporGoruntuleButonu.BackgroundImage")));
+            this.raporGoruntuleButonu.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.raporGoruntuleButonu.ForeColor = System.Drawing.Color.Transparent;
+            this.raporGoruntuleButonu.Location = new System.Drawing.Point(828, 56);
+            this.raporGoruntuleButonu.Name = "raporGoruntuleButonu";
+            this.raporGoruntuleButonu.Size = new System.Drawing.Size(76, 67);
+            this.raporGoruntuleButonu.TabIndex = 6;
+            this.raporGoruntuleButonu.UseVisualStyleBackColor = false;
+            this.raporGoruntuleButonu.Click += new System.EventHandler(this.raporGoruntuleButonu_Click);
+            // 
             // ModülFormu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -2169,5 +2184,6 @@ namespace SLF
         private CheckBox checkBox20;
         private CheckBox checkBox19;
         private ToolStripMenuItem Google_Earth_Desktop;
+        private Button raporGoruntuleButonu;
     }
 }
