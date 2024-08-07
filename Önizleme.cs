@@ -41,7 +41,30 @@ namespace SLF
 
         private void buton_ÇIK_Click(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.Cancel;
+            DialogResult result = MessageBox.Show("İşlemi iptal etmek istiyor musunuz? Bu veri tipi için yapılan işlemler kaybolacaktır.", "İşlem İptali", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+                this.DialogResult = DialogResult.Cancel;
+        }
+
+        private void Önizleme_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Check if the close reason is the user clicking the close button
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                // Show a confirmation dialog
+                DialogResult result = MessageBox.Show("İşlemi iptal etmek istiyor musunuz? Bu veri tipi için yapılan işlemler kaybolacaktır.", "İşlem İptali", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
+                {
+                    // If user chooses Yes, allow the form to close
+                    e.Cancel = false;
+                }
+                else
+                {
+                    // If user chooses No, cancel the form closing
+                    e.Cancel = true;
+                }
+            }
         }
     }
 }

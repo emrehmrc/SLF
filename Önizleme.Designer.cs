@@ -269,6 +269,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Önizleme";
             this.Text = "Veri Önizleme ve Doğrulama";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Önizleme_FormClosing);
             this.Onizleme_Tablar.ResumeLayout(false);
             this.Onizleme_Onizleme.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid1)).EndInit();

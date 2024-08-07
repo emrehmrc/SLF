@@ -22,13 +22,6 @@ namespace SLF
         }
     }
 
-    public class StopVEERProcess : Exception
-    {
-        public StopVEERProcess(string message) : base(message)
-        {
-        }
-    }
-
     public class GirdiModülü
     {
         protected Önizleme onizleme1 = new Önizleme();
@@ -162,7 +155,7 @@ namespace SLF
                         var dialogResult = Onizleme1.ShowDialog();
                         if (dialogResult == DialogResult.Cancel)
                         {
-                            throw new StopVEERProcess("Kullanıcı işlemi iptal etti.");
+                            return false;
                         }
                         else if (dialogResult == DialogResult.OK)
                         {
@@ -184,10 +177,6 @@ namespace SLF
                 {
                     MessageBox.Show("Dosya seçimi gerçekleştirilemedi.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
-            }
-            catch (StopVEERProcess ex)
-            {
-                MessageBox.Show(ex.Message, "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (NoFileSelectedException ex)
             {

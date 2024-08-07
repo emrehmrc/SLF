@@ -3197,7 +3197,7 @@ namespace SLF
             string text = veri_listesi_seçimi.Items[e.Index].ToString();
 
             // Determine the color based on some condition
-            Color textColor = Color.Black;
+            Color textColor = Color.Red;
             var girdiModülü = girdiModülleri[text];
             if (girdiModülü.importedDataTable.Rows.Count > 0)
             {
