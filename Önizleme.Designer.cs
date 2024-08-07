@@ -241,7 +241,7 @@
             this.buton_ÇIK.Name = "buton_ÇIK";
             this.buton_ÇIK.Size = new System.Drawing.Size(165, 38);
             this.buton_ÇIK.TabIndex = 2;
-            this.buton_ÇIK.Text = "Çık";
+            this.buton_ÇIK.Text = "İptal";
             this.buton_ÇIK.UseVisualStyleBackColor = true;
             this.buton_ÇIK.Click += new System.EventHandler(this.buton_ÇIK_Click);
             // 
