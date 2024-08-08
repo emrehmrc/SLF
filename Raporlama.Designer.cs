@@ -39,10 +39,9 @@
             this.Onizleme_dataGrid4 = new System.Windows.Forms.DataGridView();
             this.Onizleme_Statistics = new System.Windows.Forms.TabPage();
             this.Onizleme_dataGrid5 = new System.Windows.Forms.DataGridView();
-            this.Onizleme_Reports = new System.Windows.Forms.TabPage();
-            this.Onizleme_dataGrid6 = new System.Windows.Forms.DataGridView();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.buton_ÇIK = new System.Windows.Forms.Button();
+            this.excelExportButton = new System.Windows.Forms.Button();
             this.Onizleme_Tablar.SuspendLayout();
             this.Onizleme_Hata.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid2)).BeginInit();
@@ -52,8 +51,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid4)).BeginInit();
             this.Onizleme_Statistics.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid5)).BeginInit();
-            this.Onizleme_Reports.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid6)).BeginInit();
             this.SuspendLayout();
             // 
             // Onizleme_Tablar
@@ -65,7 +62,6 @@
             this.Onizleme_Tablar.Controls.Add(this.Onizleme_Warning);
             this.Onizleme_Tablar.Controls.Add(this.Onizleme_Information);
             this.Onizleme_Tablar.Controls.Add(this.Onizleme_Statistics);
-            this.Onizleme_Tablar.Controls.Add(this.Onizleme_Reports);
             this.Onizleme_Tablar.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Onizleme_Tablar.ImageList = this.imageList1;
             this.Onizleme_Tablar.Location = new System.Drawing.Point(12, 12);
@@ -180,31 +176,6 @@
             this.Onizleme_dataGrid5.Size = new System.Drawing.Size(1166, 526);
             this.Onizleme_dataGrid5.TabIndex = 0;
             // 
-            // Onizleme_Reports
-            // 
-            this.Onizleme_Reports.Controls.Add(this.Onizleme_dataGrid6);
-            this.Onizleme_Reports.Location = new System.Drawing.Point(4, 33);
-            this.Onizleme_Reports.Name = "Onizleme_Reports";
-            this.Onizleme_Reports.Size = new System.Drawing.Size(1174, 532);
-            this.Onizleme_Reports.TabIndex = 5;
-            this.Onizleme_Reports.Text = "İstatistikler";
-            this.Onizleme_Reports.UseVisualStyleBackColor = true;
-            // 
-            // Onizleme_dataGrid6
-            // 
-            this.Onizleme_dataGrid6.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.Onizleme_dataGrid6.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-            this.Onizleme_dataGrid6.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.Onizleme_dataGrid6.Location = new System.Drawing.Point(4, 3);
-            this.Onizleme_dataGrid6.Name = "Onizleme_dataGrid6";
-            this.Onizleme_dataGrid6.ReadOnly = true;
-            this.Onizleme_dataGrid6.RowHeadersWidth = 51;
-            this.Onizleme_dataGrid6.RowTemplate.Height = 24;
-            this.Onizleme_dataGrid6.Size = new System.Drawing.Size(1166, 526);
-            this.Onizleme_dataGrid6.TabIndex = 1;
-            // 
             // imageList1
             // 
             this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
@@ -227,11 +198,24 @@
             this.buton_ÇIK.UseVisualStyleBackColor = true;
             this.buton_ÇIK.Click += new System.EventHandler(this.buton_ÇIK_Click);
             // 
+            // excelExportButton
+            // 
+            this.excelExportButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.excelExportButton.Font = new System.Drawing.Font("Maiandra GD", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.excelExportButton.Location = new System.Drawing.Point(833, 583);
+            this.excelExportButton.Name = "excelExportButton";
+            this.excelExportButton.Size = new System.Drawing.Size(165, 38);
+            this.excelExportButton.TabIndex = 3;
+            this.excelExportButton.Text = "Excel\'e Aktar";
+            this.excelExportButton.UseVisualStyleBackColor = true;
+            this.excelExportButton.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Raporlama
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1206, 635);
+            this.Controls.Add(this.excelExportButton);
             this.Controls.Add(this.buton_ÇIK);
             this.Controls.Add(this.Onizleme_Tablar);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -246,8 +230,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid4)).EndInit();
             this.Onizleme_Statistics.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid5)).EndInit();
-            this.Onizleme_Reports.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid6)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -264,8 +246,7 @@
         private System.Windows.Forms.TabPage Onizleme_Statistics;
         private System.Windows.Forms.DataGridView Onizleme_dataGrid5;
         private System.Windows.Forms.ImageList imageList1;
-        private System.Windows.Forms.TabPage Onizleme_Reports;
-        private System.Windows.Forms.DataGridView Onizleme_dataGrid6;
         private System.Windows.Forms.Button buton_ÇIK;
+        private System.Windows.Forms.Button excelExportButton;
     }
 }

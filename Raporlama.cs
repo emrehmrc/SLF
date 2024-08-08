@@ -12,6 +12,9 @@ namespace SLF
 {
     public partial class Raporlama : Form
     {
+        protected const string FileDialogTitle = "Kaydedeceğiniz dosyanın adını giriniz.";
+        protected const string FilterExcelFiles = "Excel dosyaları (*.xlsx)|*.xlsx";
+        protected const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
         public Raporlama()
         {
             InitializeComponent();
@@ -20,7 +23,7 @@ namespace SLF
         public DataGridView Onizleme_DataGrid3 { get { return Onizleme_dataGrid3;} }
         public DataGridView Onizleme_DataGrid4 { get { return Onizleme_dataGrid4;} }
         public DataGridView Onizleme_DataGrid5 { get { return Onizleme_dataGrid5;} }
-        public DataGridView Onizleme_DataGrid6 { get { return Onizleme_dataGrid6;} }
+        //public DataGridView Onizleme_DataGrid6 { get { return Onizleme_dataGrid6;} }
         //public Button Buton_YUKLE { get { return buton_YUKLE; } }
         public Button Buton_ÇIK { get { return buton_ÇIK; } }
         //public Button Buton_İLERLE { get { return buton_İlerle; } }
@@ -44,6 +47,42 @@ namespace SLF
             //DialogResult result = MessageBox.Show("İşlemi iptal etmek istiyor musunuz? Bu veri tipi için yapılan işlemler kaybolacaktır.", "İşlem İptali", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             //if (result == DialogResult.Yes)
                 this.DialogResult = DialogResult.Cancel;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var fileDialog = new SaveFileDialog();
+            fileDialog.Title = FileDialogTitle;
+            fileDialog.Filter = $"{FilterExcelFiles}|{FilterAllFiles}"; ;
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var filePath = fileDialog.FileName;
+                var dataTableList = new List<DataTable> {
+                    Onizleme_DataGrid2.DataSource as DataTable,
+                    Onizleme_DataGrid3.DataSource as DataTable,
+                    Onizleme_DataGrid4.DataSource as DataTable,
+                    Onizleme_DataGrid5.DataSource as DataTable,
+                    //Onizleme_DataGrid6.DataSource as DataTable
+                };
+                var sheetNames = new List<string> {
+                    "Hatalar",
+                    "Düzeltilecekler",
+                    "Silinecekler",
+                    "Bilgiler",
+                    //"İstatistikler"
+                };
+                var excelExporter = new ExcelExporter();
+                excelExporter.ExportExcelFile(
+                    filePath,
+                    dataTableList,
+                    sheetNames
+                );
+            }
+            else
+            {
+                MessageBox.Show("Dosya seçilmedi.");
+            }
+
         }
 
         //private void Önizleme_FormClosing(object sender, FormClosingEventArgs e)

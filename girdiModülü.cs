@@ -76,6 +76,7 @@ namespace SLF
         protected DataTable warningDataTableReport = new DataTable();
         protected DataTable infoDataTableReport = new DataTable();
         protected DataTable statDataTableReport = new DataTable();
+        protected DataTable reportDataTableReport = new DataTable();
 
         protected Dictionary<string, List<int>> columnNullRowsMap = new Dictionary<string, List<int>>();
         protected Dictionary<string, List<int>> imputableRowsMap = new Dictionary<string, List<int>>();
@@ -285,6 +286,7 @@ namespace SLF
             raporlama1.Onizleme_DataGrid3.DataSource = warningDataTableReport;
             raporlama1.Onizleme_DataGrid4.DataSource = infoDataTableReport;
             raporlama1.Onizleme_DataGrid5.DataSource = statDataTableReport;
+            //raporlama1.Onizleme_DataGrid6.DataSource = reportDataTableReport;
             onizleme1.Onizleme_DataGrid1.AllowUserToAddRows = false;
             onizleme1.Onizleme_DataGrid2.AllowUserToAddRows = false;
             onizleme1.Onizleme_DataGrid3.AllowUserToAddRows = false;
@@ -294,7 +296,7 @@ namespace SLF
             raporlama1.Onizleme_DataGrid3.AllowUserToAddRows = false;
             raporlama1.Onizleme_DataGrid4.AllowUserToAddRows = false;
             raporlama1.Onizleme_DataGrid5.AllowUserToAddRows = false;
-            raporlama1.Onizleme_DataGrid6.AllowUserToAddRows = false;
+            //raporlama1.Onizleme_DataGrid6.AllowUserToAddRows = false;
         }
 
         public bool IsError()
