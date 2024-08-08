@@ -459,6 +459,12 @@
     <Compile Include="Yardım.Designer.cs">
       <DependentUpon>Yardım.cs</DependentUpon>
     </Compile>
+    <Compile Include="Raporlama.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Raporlama.Designer.cs">
+      <DependentUpon>Raporlama.cs</DependentUpon>
+    </Compile>
     <Compile Include="Önizleme.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -501,6 +507,9 @@
     </Compile>
     <EmbeddedResource Include="Yardım.resx">
       <DependentUpon>Yardım.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Raporlama.resx">
+      <DependentUpon>Raporlama.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Önizleme.resx">
       <DependentUpon>Önizleme.cs</DependentUpon>

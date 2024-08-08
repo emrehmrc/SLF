@@ -177,6 +177,7 @@ namespace SLF
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.Stokastik_Fonksiyonlar = new System.Windows.Forms.ToolStripButton();
             this.Seç_Stokastik = new System.Windows.Forms.ToolStrip();
+            this.raporGoruntuleButonu = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
@@ -277,6 +278,7 @@ namespace SLF
             // 
             // tab_girdi
             // 
+            this.tab_girdi.Controls.Add(this.raporGoruntuleButonu);
             this.tab_girdi.Controls.Add(this.label3);
             this.tab_girdi.Controls.Add(this.dataGridView1);
             this.tab_girdi.Controls.Add(this.label2);
@@ -309,6 +311,7 @@ namespace SLF
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Location = new System.Drawing.Point(46, 166);
             this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.Size = new System.Drawing.Size(1420, 463);
@@ -352,6 +355,7 @@ namespace SLF
             this.veri_listesi_seçimi.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.veri_listesi_seçimi.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.veri_listesi_seçimi.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.veri_listesi_seçimi.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.veri_listesi_seçimi.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.veri_listesi_seçimi.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.veri_listesi_seçimi.FormattingEnabled = true;
@@ -368,6 +372,7 @@ namespace SLF
             this.veri_listesi_seçimi.Name = "veri_listesi_seçimi";
             this.veri_listesi_seçimi.Size = new System.Drawing.Size(361, 32);
             this.veri_listesi_seçimi.TabIndex = 0;
+            this.veri_listesi_seçimi.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.veri_listesi_seçimi_DrawItem);
             this.veri_listesi_seçimi.SelectedIndexChanged += new System.EventHandler(this.veri_listesi_seçimi_SelectedIndexChanged);
             // 
             // tab_dek
@@ -1694,6 +1699,19 @@ namespace SLF
             this.overlap_analizi.Size = new System.Drawing.Size(187, 26);
             this.overlap_analizi.Text = "Overlap Analizi";
             // 
+            // raporGoruntuleButonu
+            // 
+            this.raporGoruntuleButonu.BackColor = System.Drawing.Color.White;
+            this.raporGoruntuleButonu.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("raporGoruntuleButonu.BackgroundImage")));
+            this.raporGoruntuleButonu.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.raporGoruntuleButonu.ForeColor = System.Drawing.Color.Transparent;
+            this.raporGoruntuleButonu.Location = new System.Drawing.Point(828, 56);
+            this.raporGoruntuleButonu.Name = "raporGoruntuleButonu";
+            this.raporGoruntuleButonu.Size = new System.Drawing.Size(76, 67);
+            this.raporGoruntuleButonu.TabIndex = 6;
+            this.raporGoruntuleButonu.UseVisualStyleBackColor = false;
+            this.raporGoruntuleButonu.Click += new System.EventHandler(this.raporGoruntuleButonu_Click);
+            // 
             // Stokastik_Seç
             // 
             this.Stokastik_Seç.AccessibleDescription = "";
@@ -2123,5 +2141,6 @@ namespace SLF
         private ToolStripButton Stokastik_Grid_Oluştur;
         private ToolStripSeparator toolStripSeparator6;
         private ToolStripButton Stokastik_Fonksiyonlar;
+        private Button raporGoruntuleButonu;
     }
 }

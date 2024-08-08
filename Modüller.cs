@@ -2547,7 +2547,8 @@ namespace SLF
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
             girdiModülü = girdiModülleri[seçilenVeriTipi];
             var isImported = girdiModülü.VEERProcess(seçilenVeriTipi);
-            if (isImported) { 
+            if (isImported) {
+                veri_listesi_seçimi.Refresh();
                 dataGridView1.DataSource = girdiModülü.CurrentDataTable;
             }
         }
@@ -3058,6 +3059,49 @@ namespace SLF
             // Clear the current TabPages and add the sorted TabPages
             tabControl.TabPages.Clear();
             tabControl.TabPages.AddRange(tabPages.ToArray());
+        }
+
+        private void veri_listesi_seçimi_DrawItem(object sender, DrawItemEventArgs e)
+        {
+
+            // Check if the index is valid
+            if (e.Index < 0)
+                return;
+
+            // Get the current item to be drawn
+            string text = veri_listesi_seçimi.Items[e.Index].ToString();
+
+            // Determine the color based on some condition
+            Color textColor = Color.Red;
+            var girdiModülü = girdiModülleri[text];
+            if (girdiModülü.importedDataTable.Rows.Count > 0)
+            {
+                textColor = Color.Green;
+            }
+
+            e.DrawBackground();
+            // Draw the text with the determined color
+            using (Brush brush = new SolidBrush(textColor))
+            {
+                e.Graphics.DrawString(text, e.Font, brush, e.Bounds);
+            }
+
+            // Draw the focus rectangle if the item is selected
+            e.DrawFocusRectangle();
+        }
+
+        private void raporGoruntuleButonu_Click(object sender, EventArgs e)
+        {
+            // Girdi modülündeki dosya yükleme butonuna tıklandığında çalışacak kodlar
+
+            // Veri listesinde seçilen veri tipine göre dosya seçme işlemi yapılacak
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+            girdiModülü = girdiModülleri[seçilenVeriTipi];
+            girdiModülü.VEERReport(seçilenVeriTipi);
+            //if (isImported) {
+            //    veri_listesi_seçimi.Refresh();
+            //    dataGridView1.DataSource = girdiModülü.CurrentDataTable;
+            //}
         }
 
 
