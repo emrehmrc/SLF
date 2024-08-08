@@ -126,21 +126,11 @@ namespace SLF
             if (dataTable != null && dataTable.Rows.Count > 0)
             {
                 RenameTabCounts();
-                raporlama1.Onizleme_DataGrid2.DataSource = errorDataTableReport;
-                raporlama1.Onizleme_DataGrid3.DataSource = warningDataTableReport;
-                raporlama1.Onizleme_DataGrid4.DataSource = infoDataTableReport;
-                raporlama1.Onizleme_DataGrid5.DataSource = statDataTableReport;
-                var dialogResult = raporlama1.ShowDialog();
-                if (dialogResult == DialogResult.Cancel)
-                {
-                }
-                else if (dialogResult == DialogResult.OK)
-                {
-                }
+                raporlama1.ShowDialog();
             }
             else
             {
-                MessageBox.Show("Veri tablosu boş.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show($"{seçilenVeriTipi}'ni yüklemeden rapor tablosunu göremezsiniz.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
         public bool VEERProcess(string seçilenVeriTipi)
@@ -164,6 +154,7 @@ namespace SLF
                         ClearRows();
                         Validate();
                         RenameTabCounts();
+                        AppendAllToReportDataTables();
                         if (IsError())
                         {
                             //onizleme1.Buton_YUKLE.Enabled = false;
@@ -190,8 +181,6 @@ namespace SLF
                         ClearRows();
                         Validate();
                         Impute();
-
-                        AppendAllToReportDataTables();
                     }
                     Postprocess();
                     ImportProcessedData();
@@ -292,11 +281,20 @@ namespace SLF
             onizleme1.Onizleme_DataGrid3.DataSource = warningDataTable;
             onizleme1.Onizleme_DataGrid4.DataSource = infoDataTable;
             onizleme1.Onizleme_DataGrid5.DataSource = statDataTable;
+            raporlama1.Onizleme_DataGrid2.DataSource = errorDataTableReport;
+            raporlama1.Onizleme_DataGrid3.DataSource = warningDataTableReport;
+            raporlama1.Onizleme_DataGrid4.DataSource = infoDataTableReport;
+            raporlama1.Onizleme_DataGrid5.DataSource = statDataTableReport;
             onizleme1.Onizleme_DataGrid1.AllowUserToAddRows = false;
             onizleme1.Onizleme_DataGrid2.AllowUserToAddRows = false;
             onizleme1.Onizleme_DataGrid3.AllowUserToAddRows = false;
             onizleme1.Onizleme_DataGrid4.AllowUserToAddRows = false;
             onizleme1.Onizleme_DataGrid5.AllowUserToAddRows = false;
+            raporlama1.Onizleme_DataGrid2.AllowUserToAddRows = false;
+            raporlama1.Onizleme_DataGrid3.AllowUserToAddRows = false;
+            raporlama1.Onizleme_DataGrid4.AllowUserToAddRows = false;
+            raporlama1.Onizleme_DataGrid5.AllowUserToAddRows = false;
+            raporlama1.Onizleme_DataGrid6.AllowUserToAddRows = false;
         }
 
         public bool IsError()
@@ -333,7 +331,14 @@ namespace SLF
         {
             foreach (DataRow row in source.Rows)
             {
-                destination.ImportRow(row);
+                // Check if an identical row already exists in the destination
+                bool duplicateExists = destination.AsEnumerable().Any(r => r.ItemArray.SequenceEqual(row.ItemArray));
+
+                // If no duplicate exists, import the row
+                if (!duplicateExists)
+                {
+                    destination.ImportRow(row);
+                }
             }
         }
 
