@@ -67,6 +67,11 @@ namespace SLF
                     MessageBox.Show("Halihazırda böyle bir dosya açık ve kullanımda. Dosyayı kapatıp yeniden deneyin.", "Dosya Kaydetme Hatası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return; // Exit the method after showing the message
                 }
+                catch (OutOfMemoryException)
+                {
+                    MessageBox.Show("Bu işlemi gerçekleştirmek için bellek yetersiz. Kaydetmek istediğiniz dosya çok büyük olabilir.", "Dosya Kaydetme Hatası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return; // Exit the method after showing the message
+                }
             }
         }
 

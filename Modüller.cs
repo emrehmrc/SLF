@@ -3201,6 +3201,46 @@ namespace SLF
                 gMapControl_EA.Refresh();
             }
         }
+
+        private void ExcelDownloadButton_Click(object sender, EventArgs e)
+        {
+
+            const string FileDialogTitle = "Kaydedeceğiniz dosyanın adını giriniz.";
+            const string FilterExcelFiles = "Excel dosyaları (*.xlsx)|*.xlsx";
+            const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
+            if (dataTable.Rows.Count == 0)
+            {
+                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Excel dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            var fileDialog = new SaveFileDialog();
+            fileDialog.Title = FileDialogTitle;
+            fileDialog.Filter = $"{FilterExcelFiles}|{FilterAllFiles}"; ;
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var filePath = fileDialog.FileName;
+                var dataTableList = new List<DataTable> {
+                    dataTable,
+                };
+                var sheetNames = new List<string> {
+                    seçilenVeriTipi,
+                };
+                var excelExporter = new ExcelExporter();
+                excelExporter.ExportExcelFile(
+                    filePath,
+                    dataTableList,
+                    sheetNames
+                );
+            }
+            else
+            {
+                MessageBox.Show("Dosya seçilmedi.");
+            }
+
+        }
+
         public async Task JoinAttributesByLocation_summary()
         {
             // Assume selectedColumns is populated from the ComboBox selections

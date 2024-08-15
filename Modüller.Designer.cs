@@ -41,6 +41,7 @@ namespace SLF
             this.yardımToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Modül_Tabları = new System.Windows.Forms.TabControl();
             this.tab_girdi = new System.Windows.Forms.TabPage();
+            this.ExcelDownloadButton = new System.Windows.Forms.Button();
             this.raporGoruntuleButonu = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
@@ -278,6 +279,7 @@ namespace SLF
             // 
             // tab_girdi
             // 
+            this.tab_girdi.Controls.Add(this.ExcelDownloadButton);
             this.tab_girdi.Controls.Add(this.raporGoruntuleButonu);
             this.tab_girdi.Controls.Add(this.label3);
             this.tab_girdi.Controls.Add(this.dataGridView1);
@@ -294,8 +296,23 @@ namespace SLF
             this.tab_girdi.Text = "Girdi Modülü";
             this.tab_girdi.UseVisualStyleBackColor = true;
             // 
+            // ExcelDownloadButton
+            // 
+            this.ExcelDownloadButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ExcelDownloadButton.BackColor = System.Drawing.Color.White;
+            this.ExcelDownloadButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("ExcelDownloadButton.BackgroundImage")));
+            this.ExcelDownloadButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.ExcelDownloadButton.ForeColor = System.Drawing.Color.Transparent;
+            this.ExcelDownloadButton.Location = new System.Drawing.Point(1175, 59);
+            this.ExcelDownloadButton.Name = "ExcelDownloadButton";
+            this.ExcelDownloadButton.Size = new System.Drawing.Size(76, 67);
+            this.ExcelDownloadButton.TabIndex = 7;
+            this.ExcelDownloadButton.UseVisualStyleBackColor = false;
+            this.ExcelDownloadButton.Click += new System.EventHandler(this.ExcelDownloadButton_Click);
+            // 
             // raporGoruntuleButonu
             // 
+            this.raporGoruntuleButonu.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.raporGoruntuleButonu.BackColor = System.Drawing.Color.White;
             this.raporGoruntuleButonu.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("raporGoruntuleButonu.BackgroundImage")));
             this.raporGoruntuleButonu.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
@@ -394,9 +411,9 @@ namespace SLF
             this.tab_dek.Controls.Add(this.button8);
             this.tab_dek.Controls.Add(this.label16);
             this.tab_dek.Controls.Add(this.dataGridView4);
-            this.tab_dek.Location = new System.Drawing.Point(4, 62);
+            this.tab_dek.Location = new System.Drawing.Point(4, 33);
             this.tab_dek.Name = "tab_dek";
-            this.tab_dek.Size = new System.Drawing.Size(1472, 634);
+            this.tab_dek.Size = new System.Drawing.Size(1472, 663);
             this.tab_dek.TabIndex = 6;
             this.tab_dek.Text = "DEK Modülü";
             this.tab_dek.UseVisualStyleBackColor = true;
@@ -445,9 +462,9 @@ namespace SLF
             this.tab_ea.Controls.Add(this.EA_list_box);
             this.tab_ea.Controls.Add(this.gMapControl_EA);
             this.tab_ea.Controls.Add(this.button7);
-            this.tab_ea.Location = new System.Drawing.Point(4, 62);
+            this.tab_ea.Location = new System.Drawing.Point(4, 33);
             this.tab_ea.Name = "tab_ea";
-            this.tab_ea.Size = new System.Drawing.Size(1472, 634);
+            this.tab_ea.Size = new System.Drawing.Size(1472, 663);
             this.tab_ea.TabIndex = 5;
             this.tab_ea.Text = "EA Şarj Modülü";
             this.tab_ea.UseVisualStyleBackColor = true;
@@ -882,10 +899,10 @@ namespace SLF
             this.tab_ekonometrik.Controls.Add(this.button10);
             this.tab_ekonometrik.Controls.Add(this.label12);
             this.tab_ekonometrik.Controls.Add(this.dataGridView2);
-            this.tab_ekonometrik.Location = new System.Drawing.Point(4, 62);
+            this.tab_ekonometrik.Location = new System.Drawing.Point(4, 33);
             this.tab_ekonometrik.Name = "tab_ekonometrik";
             this.tab_ekonometrik.Padding = new System.Windows.Forms.Padding(3);
-            this.tab_ekonometrik.Size = new System.Drawing.Size(1472, 634);
+            this.tab_ekonometrik.Size = new System.Drawing.Size(1472, 663);
             this.tab_ekonometrik.TabIndex = 1;
             this.tab_ekonometrik.Text = "Ekonometrik Talep Tahmini Modülü";
             this.tab_ekonometrik.UseVisualStyleBackColor = true;
@@ -1008,9 +1025,9 @@ namespace SLF
             // tab_imar
             // 
             this.tab_imar.Controls.Add(this.button6);
-            this.tab_imar.Location = new System.Drawing.Point(4, 62);
+            this.tab_imar.Location = new System.Drawing.Point(4, 33);
             this.tab_imar.Name = "tab_imar";
-            this.tab_imar.Size = new System.Drawing.Size(1472, 634);
+            this.tab_imar.Size = new System.Drawing.Size(1472, 663);
             this.tab_imar.TabIndex = 4;
             this.tab_imar.Text = "İmar Analizleri";
             this.tab_imar.UseVisualStyleBackColor = true;
@@ -1027,9 +1044,9 @@ namespace SLF
             // 
             // tab_optDTR
             // 
-            this.tab_optDTR.Location = new System.Drawing.Point(4, 62);
+            this.tab_optDTR.Location = new System.Drawing.Point(4, 33);
             this.tab_optDTR.Name = "tab_optDTR";
-            this.tab_optDTR.Size = new System.Drawing.Size(1472, 634);
+            this.tab_optDTR.Size = new System.Drawing.Size(1472, 663);
             this.tab_optDTR.TabIndex = 7;
             this.tab_optDTR.Text = "Optimal DTR Konumlandırma";
             this.tab_optDTR.UseVisualStyleBackColor = true;
@@ -2143,5 +2160,6 @@ namespace SLF
         private ToolStripSeparator toolStripSeparator6;
         private ToolStripButton Stokastik_Fonksiyonlar;
         private Button raporGoruntuleButonu;
+        private Button ExcelDownloadButton;
     }
 }
