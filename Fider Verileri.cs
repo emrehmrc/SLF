@@ -75,6 +75,61 @@ namespace SLF
                 .ToDictionary(x => x.FiderName, x => x.Top3PercentAverage);
         }
 
+
+        private void FiderDTRCompare()
+        {
+            var trafoDataTable = dataTablesByType["DTR Verileri"];
+            // Get the number of unique TM_FIDER_ID values
+            int uniqueTMFiderIdCount = trafoDataTable.AsEnumerable()
+                .Select(row => row.Field<string>("TM_FIDER_ID"))
+                .Distinct()
+                .Count();
+
+            statDataTable.Rows.Add(new object[]
+            {
+                "", "Yegane DTR fider sayısı", $"{uniqueTMFiderIdCount}", "DTR'larda bu kadar yegane fider vardır."
+            });
+            statDataTable.Rows.Add(new object[]
+            {
+                "", "Yegane fider sayısı", $"{annualPeakDemand.Count}", "Fider verilerinde bu kadar yegane fider vardır."
+            });
+
+            // Counter for the number of FIDER_IDs that do not meet the criteria
+            int wrongCount = 0;
+
+            foreach (var fider in annualPeakDemand)
+            {
+                // Extract the FIDER_ID and the corresponding peak demand value
+                string fiderId = fider.Key;
+                double peakDemand = fider.Value;
+
+                // Calculate the 50% and 80% thresholds
+                double lowerLimit = peakDemand * 0.5;
+                double upperLimit = peakDemand * 0.8;
+
+                // Sum the trafo values for the current FIDER_ID
+                double trafoSum = trafoDataTable.AsEnumerable()
+                    .Where(row => row.Field<string>("TM_FIDER_ID") == fiderId)
+                    .Sum(row => double.TryParse(row[$"YIL_DEMANT_{lastYear}"].ToString(), out double value) ? value : 0);
+                double trafoHourly = trafoSum / HoursInYear;
+
+                Console.WriteLine($"Fider: {fiderId}, Peak Demand: {peakDemand}, Trafo Sum: {trafoHourly}");
+                // Check if the trafoSum is outside the 50%-80% range
+                if (trafoHourly < lowerLimit || trafoHourly > upperLimit)
+                {
+                    wrongCount++;
+                }
+            }
+            double wrongPercentage = wrongCount / (double)annualPeakDemand.Count;
+            if (wrongPercentage > 0)
+            {
+                statDataTable.Rows.Add(new object[]
+                {
+                    "Fider ve DTR demandı eşlemesi", "Eşlenmeyen değerler", $"{wrongPercentage:P1}", "Bu kadar veride DTR verileri Fider verilerinin %50-%80 aralığında değildir."
+                });
+            }
+        }
+
             private void PreprocessMismatchedTMAdi()
         {
             DataTable TMDataTable = dataTablesByType["TM Verileri"];
@@ -201,6 +256,7 @@ namespace SLF
             ReportDateFormatErrors();
 
             ReportInvalidPeakDemand();
+            FiderDTRCompare();
         }
         public override void Remove()
         {
