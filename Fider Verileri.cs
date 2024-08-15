@@ -13,7 +13,7 @@ namespace SLF
 
     {
         private readonly (float warningThreshold, float errorThreshold) DEMAND_MAX_THRESHOLD = ERROR_ONLY;
-        protected override List<string> Prerequisites => new List<string> { "DTR Verileri" };
+        protected override List<string> Prerequisites => new List<string> { "DTR Verileri", "Abone Verileri" };
 
         // doğru hesaplamıyor gibi bakmak lazım bir de error veriyor imputasyona geçtiğinde
         private void ReportInvalidPeakDemand()
