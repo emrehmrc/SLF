@@ -3204,8 +3204,6 @@ namespace SLF
 
         private void ExcelDownloadButton_Click(object sender, EventArgs e)
         {
-
-            const string FileDialogTitle = "Kaydedeceğiniz dosyanın adını giriniz.";
             const string FilterExcelFiles = "Excel dosyaları (*.xlsx)|*.xlsx";
             const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
@@ -3215,9 +3213,11 @@ namespace SLF
                 MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Excel dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            var fileDialog = new SaveFileDialog();
-            fileDialog.Title = FileDialogTitle;
-            fileDialog.Filter = $"{FilterExcelFiles}|{FilterAllFiles}"; ;
+            var fileDialog = new SaveFileDialog
+            {
+                Title =  "Kaydedeceğiniz dosyanın adını giriniz.",
+                Filter = $"{FilterExcelFiles}|{FilterAllFiles}"
+            };
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
                 var filePath = fileDialog.FileName;
