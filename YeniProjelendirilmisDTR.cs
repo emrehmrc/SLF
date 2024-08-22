@@ -12,6 +12,7 @@ namespace SLF
     public class YeniProjelendirilmisDTR : GirdiModülü
 
     {
+        protected override List<string> Prerequisites => new List<string> { "DTR Verileri"};
         private void MevcutDTRKapasiteCheck()
         {
             int invalidNewCapacityCount = 0;
