@@ -12,6 +12,7 @@ namespace SLF
     public class EnerjiMusaadeleri : GirdiModülü
 
     {
+        protected override List<string> Prerequisites => new List<string> { "DTR Verileri"};
         private void ImputeMustakilOlmayanTrafoID()
         {
             // "DTR Verileri" tablosundan trafo bilgilerini al
@@ -200,7 +201,7 @@ namespace SLF
 
             // Add row indices from different columns to the combined list
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["ENERJI_MUSAADE_GERILIM_SEVIYESI"]);
-            combinedRowsToRemoveList.AddRange(columnNullRowsMap["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"]);
+            //combinedRowsToRemoveList.AddRange(columnNullRowsMap["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
 
             RemoveCombinedRows(combinedRowsToRemoveList);
