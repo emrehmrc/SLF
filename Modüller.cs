@@ -3226,17 +3226,11 @@ namespace SLF
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
                 var filePath = fileDialog.FileName;
-                var dataTableList = new List<DataTable> {
-                    dataTable,
-                };
-                var sheetNames = new List<string> {
-                    seçilenVeriTipi,
-                };
                 var excelExporter = new ExcelExporter();
                 excelExporter.ExportExcelFile(
                     filePath,
-                    dataTableList,
-                    sheetNames
+                    dataTable,
+                    seçilenVeriTipi
                 );
             }
             else
@@ -3265,8 +3259,8 @@ namespace SLF
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
                 var filePath = fileDialog.FileName;
-                var excelExporter = new ExcelExporter();
-                excelExporter.ExportCsvFile(
+                var csvHandler = new CsvHandler();
+                csvHandler.ExportCsvFile(
                     filePath,
                     dataTable
                 );
