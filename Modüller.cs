@@ -3213,6 +3213,11 @@ namespace SLF
                 MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Excel dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+            else if (dataTable.Rows.Count > 50000)
+            {
+                MessageBox.Show($"{seçilenVeriTipi} için veri boyutu çok büyük. CSV olarak dışa aktarmayı deneyebilirsiniz.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             var fileDialog = new SaveFileDialog
             {
                 Title =  "Kaydedeceğiniz dosyanın adını giriniz.",
