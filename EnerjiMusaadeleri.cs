@@ -12,11 +12,13 @@ namespace SLF
     public class EnerjiMusaadeleri : GirdiModülü
 
     {
-        protected override List<string> Prerequisites => new List<string> { "DTR Verileri"};
+        protected override List<string> Prerequisites => new List<string> { "DTR Verileri", "Yeni Projelendirilmiş DTR Verileri" };
         private void ImputeMustakilOlmayanTrafoID()
         {
+            int veerUniqID = 1;
             // "DTR Verileri" tablosundan trafo bilgilerini al
             DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+            DataTable yeniProjelendirilmisTrafoDataTable = dataTablesByType["Yeni Projelendirilmiş DTR Verileri"];
             var trafoList = trafoDataTable.AsEnumerable()
                                           .Select(row => new
                                           {
@@ -25,6 +27,18 @@ namespace SLF
                                               TrafoYKoordinat = Convert.ToDouble(row["TRAFO_Y_KOORDINAT"])
                                           })
                                           .ToList();
+            var yeniTrafoList = yeniProjelendirilmisTrafoDataTable.AsEnumerable()
+                    .Where(row => row["PROJELENDIRILMIS_TRAFO_ID"] != DBNull.Value &&
+                    row["PROJELENDIRILMIS_TRAFO_X_KOORDINAT"] != DBNull.Value &&
+                    row["PROJELENDIRILMIS_TRAFO_Y_KOORDINAT"] != DBNull.Value)
+
+                  .Select(row => new
+                  {
+                      TrafoKodu = row["PROJELENDIRILMIS_TRAFO_ID"].ToString(),
+                      TrafoXKoordinat = Convert.ToDouble(row["PROJELENDIRILMIS_TRAFO_X_KOORDINAT"]),
+                      TrafoYKoordinat = Convert.ToDouble(row["PROJELENDIRILMIS_TRAFO_Y_KOORDINAT"])
+                  })
+                  .ToList();
 
             foreach (DataRow row in currentDataTable.Rows)
             {
@@ -39,11 +53,10 @@ namespace SLF
                         if (IsNullLike(row["ENERJI_MUSAADE_X_KOORDINAT"]) || IsNullLike(row["ENERJI_MUSAADE_Y_KOORDINAT"]))
                         {
                             row["ENERJI_MUSAADE_GERILIM_SEVIYESI"] = "#N/A";
-                            continue;
                         }
 
                         // "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID" değeri IsNullLike ise veya geçerli trafo kodları arasında değilse kontrol eder
-                        if (IsNullLike(connectedTrafo) || !trafoList.Any(t => t.TrafoKodu == connectedTrafo))
+                        else if (IsNullLike(connectedTrafo) || !trafoList.Any(t => t.TrafoKodu == connectedTrafo))
                         {
                             // En yakın trafoyu bul ve "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID" olarak ayarla
                             double enYakinMesafe = double.MaxValue;
@@ -70,6 +83,30 @@ namespace SLF
                             {
                                 row["ENERJI_MUSAADE_GERILIM_SEVIYESI"] = "#N/A";
                             }
+                        }
+                    }
+                    else if (!IsNullLike(row["ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL"]) && row["ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL"].ToString() == "1")
+                    {
+                        string connectedTrafo = row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"].ToString();
+                        // "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID" değeri IsNullLike ise veya geçerli trafo kodları arasında değilse kontrol eder
+                        if (IsNullLike(connectedTrafo) || !yeniTrafoList.Any(t => t.TrafoKodu == connectedTrafo)) // TODO
+                        {
+                            // Yeni Trafo listesine satır ekle Unique ID ile VEER-uniq-0001
+                            string uniqueId = $"VEER-uniq-{veerUniqID++}";
+                            // Yeni Trafo listesine ayni satida kapasiteyi doldur (enerji musaadesindeki baglanti gucunun 10 katini al)
+                            double yeniTrafoKapasitesi = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]) * 10;
+                            int roundedYeniTrafoKapasitesi = RoundUpTrafoKapasitesi(yeniTrafoKapasitesi);
+                            // TRAFO_KAPASITE_LISTESI listesinde bi ustundekine yuvarla bu degerin
+                            yeniProjelendirilmisTrafoDataTable.Rows.Add(
+                                uniqueId,
+                                "",
+                                "",
+                                "",
+                                roundedYeniTrafoKapasitesi,
+                                roundedYeniTrafoKapasitesi,
+                                lastYear
+                            );
+
                         }
                     }
                 }
