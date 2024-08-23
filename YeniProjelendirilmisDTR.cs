@@ -212,7 +212,7 @@ namespace SLF
             // Add row indices from different columns to the combined list
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["PROJELENDIRILMIS_TRAFO_ID"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["PROJELENDIRILMIS_TRAFO_YATIRIM_SINIFI"]);
-            combinedRowsToRemoveList.AddRange(columnNullRowsMap["PROJELENDIRILMIS_TRAFO_YENI_KAPASITE"]);
+            //combinedRowsToRemoveList.AddRange(columnNullRowsMap["PROJELENDIRILMIS_TRAFO_YENI_KAPASITE"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["KAPASITE"]);
 
 
