@@ -37,6 +37,10 @@ namespace SLF
             "Enerji Müsaadeleri Verileri",
             "Yeni Projelendirilmiş DTR Verileri"
         };
+        protected static readonly List<int> TRAFO_KAPASITE_LISTESI = new List<int>
+        {
+            15, 25, 40, 50, 63, 100, 160, 200, 250, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500
+        };
         protected readonly List<string> veri_listesi_requires_csv = new List<string> { };
         protected readonly List<string> veri_listesi_requires_tabular = new List<string> { };
 
@@ -106,6 +110,21 @@ namespace SLF
             { "URETICI", 2.5 },
         };
         protected double K_FACTOR = 2.5;
+
+        protected int RoundUpTrafoKapasitesi(double yeniTrafoKapasitesi)
+        {
+            // Find the smallest value in the list that is greater than or equal to yeniTrafoKapasitesi
+            int roundedKapasite = TRAFO_KAPASITE_LISTESI.FirstOrDefault(kapasite => kapasite >= yeniTrafoKapasitesi);
+
+            // If no such value is found (meaning yeniTrafoKapasitesi is larger than any value in the list), 
+            // return the maximum value in the list
+            if (roundedKapasite == 0)
+            {
+                roundedKapasite = TRAFO_KAPASITE_LISTESI.Max();
+            }
+
+            return roundedKapasite;
+        }
 
         protected bool IsNullLike(object value, bool isZero=false)
         {
