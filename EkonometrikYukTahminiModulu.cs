@@ -197,7 +197,7 @@ namespace SLF
             }
             return false;
         }
-        private void CheckConsecutiveYears()
+        private void CheckConsecutiveYears() // yılların ardısıklık kontrolu
         {
             List<int> years = new List<int>();
             int totalRows = currentDataTable.Rows.Count;
@@ -237,7 +237,7 @@ namespace SLF
                 yearColumnName, "Yıllar ardışık değil veya en az 5 yıl değil.","","doldurulmalı" });
             }
         }
-        private void CheckBetweenDagıtılanAndKayip()
+        private void CheckBetweenDagıtılanAndKayip() // 3 datanın check edilmesi
         {
             float nullPercentage = 0.0f;
             int totalRows = currentDataTable.Rows.Count;
@@ -262,16 +262,14 @@ namespace SLF
             }
 
         }
-        public void CheckPercentageIncreaseLoadSanayiTicarethaneFaturalanan()
+        public void CheckPercentageIncreaseLoadSanayiTicarethaneFaturalanan() //%10 üzerinde artısta veya azalısta uyarı kısmı
         {
             int totalRows = currentDataTable.Rows.Count;
-            string ticarethaneFaturalanan = "TICARETHANE_FATURALANAN";
-            string meskenFaturalanan = "MESKEN_FATURALANAN";
-            string sanayiFaturalanan = "SANAYI_FATURALANAN";
+            
             string yil = "YIL";
             foreach (DataColumn column in currentDataTable.Columns)
             {
-                if (!loadPercentageIncreaseDetect.ContainsKey(column.ColumnName))
+                if (!loadPercentageIncreaseDetect.ContainsKey(column.ColumnName)) // bakılacak datalar loadPercentageIncreaseDetect dictinaryde tanımlı
                 {
                     continue;
                 }
@@ -329,7 +327,7 @@ namespace SLF
                 }
             }
        }
-        public void ImputeKkmKkoDag()
+        public void ImputeKkmKkoDag() //bosluklların kosullu olarak doldurulması imputasyon
         {
             string toplamDagitilan = "TOPLAM_DAGITILAN";
             string kko = "KKO";
@@ -357,7 +355,7 @@ namespace SLF
             }
           
         } 
-        public void ImputeDagıtılan()
+        public void ImputeDagıtılan() // dagıtılan kısımlarının imputasyonları
         {  int totalRows = currentDataTable.Rows.Count;
             for (int i = 0; i < totalRows; i++)
             {
