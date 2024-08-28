@@ -41,6 +41,9 @@ namespace SLF
             this.yardımToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Modül_Tabları = new System.Windows.Forms.TabControl();
             this.tab_girdi = new System.Windows.Forms.TabPage();
+            this.yearApproveButton = new System.Windows.Forms.Button();
+            this.endYearComboBox = new System.Windows.Forms.ComboBox();
+            this.startYearComboBox = new System.Windows.Forms.ComboBox();
             this.csvExportButton = new System.Windows.Forms.Button();
             this.ExcelDownloadButton = new System.Windows.Forms.Button();
             this.raporGoruntuleButonu = new System.Windows.Forms.Button();
@@ -282,6 +285,9 @@ namespace SLF
             // 
             // tab_girdi
             // 
+            this.tab_girdi.Controls.Add(this.yearApproveButton);
+            this.tab_girdi.Controls.Add(this.endYearComboBox);
+            this.tab_girdi.Controls.Add(this.startYearComboBox);
             this.tab_girdi.Controls.Add(this.csvExportButton);
             this.tab_girdi.Controls.Add(this.ExcelDownloadButton);
             this.tab_girdi.Controls.Add(this.raporGoruntuleButonu);
@@ -300,6 +306,39 @@ namespace SLF
             this.tab_girdi.TabIndex = 0;
             this.tab_girdi.Text = "Girdi Modülü";
             this.tab_girdi.UseVisualStyleBackColor = true;
+            // 
+            // yearApproveButton
+            // 
+            this.yearApproveButton.Location = new System.Drawing.Point(1064, 58);
+            this.yearApproveButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.yearApproveButton.Name = "yearApproveButton";
+            this.yearApproveButton.Size = new System.Drawing.Size(100, 28);
+            this.yearApproveButton.TabIndex = 11;
+            this.yearApproveButton.Text = "Onayla";
+            this.yearApproveButton.UseVisualStyleBackColor = true;
+            this.yearApproveButton.Click += new System.EventHandler(this.yearApproveButton_Click);
+            // 
+            // endYearComboBox
+            // 
+            this.endYearComboBox.FormattingEnabled = true;
+            this.endYearComboBox.Location = new System.Drawing.Point(935, 59);
+            this.endYearComboBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.endYearComboBox.Name = "endYearComboBox";
+            this.endYearComboBox.Size = new System.Drawing.Size(121, 26);
+            this.endYearComboBox.TabIndex = 10;
+            this.endYearComboBox.Text = "Yıl seçiniz";
+            this.endYearComboBox.SelectedIndexChanged += new System.EventHandler(this.endYearComboBox_SelectedIndexChanged);
+            // 
+            // startYearComboBox
+            // 
+            this.startYearComboBox.FormattingEnabled = true;
+            this.startYearComboBox.Location = new System.Drawing.Point(799, 59);
+            this.startYearComboBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.startYearComboBox.Name = "startYearComboBox";
+            this.startYearComboBox.Size = new System.Drawing.Size(121, 26);
+            this.startYearComboBox.TabIndex = 9;
+            this.startYearComboBox.Text = "Yıl seçiniz";
+            this.startYearComboBox.SelectedIndexChanged += new System.EventHandler(this.startYearComboBox_SelectedIndexChanged);
             // 
             // csvExportButton
             // 
@@ -367,7 +406,7 @@ namespace SLF
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(1420, 461);
+            this.dataGridView1.Size = new System.Drawing.Size(1420, 455);
             this.dataGridView1.TabIndex = 4;
             // 
             // label2
@@ -430,6 +469,7 @@ namespace SLF
             this.veri_listesi_seçimi.TabIndex = 0;
             this.veri_listesi_seçimi.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.veri_listesi_seçimi_DrawItem);
             this.veri_listesi_seçimi.SelectedIndexChanged += new System.EventHandler(this.veri_listesi_seçimi_SelectedIndexChanged);
+            this.veri_listesi_seçimi.MouseDown += new System.Windows.Forms.MouseEventHandler(this.veri_listesi_seçimi_MouseDown);
             // 
             // tab_dek
             // 
@@ -876,7 +916,7 @@ namespace SLF
             this.EA_list_box.Location = new System.Drawing.Point(17, 271);
             this.EA_list_box.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.EA_list_box.Name = "EA_list_box";
-            this.EA_list_box.Size = new System.Drawing.Size(244, 172);
+            this.EA_list_box.Size = new System.Drawing.Size(244, 124);
             this.EA_list_box.TabIndex = 20;
             // 
             // gMapControl_EA
@@ -2048,6 +2088,7 @@ namespace SLF
             this.Text = "Modüller";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ModülFormu_FormClosing);
+            this.Load += new System.EventHandler(this.ModülFormu_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.Modül_Tabları.ResumeLayout(false);
@@ -2247,5 +2288,8 @@ namespace SLF
         private Button raporGoruntuleButonu;
         private Button ExcelDownloadButton;
         private Button csvExportButton;
+        private ComboBox endYearComboBox;
+        private ComboBox startYearComboBox;
+        private Button yearApproveButton;
     }
 }

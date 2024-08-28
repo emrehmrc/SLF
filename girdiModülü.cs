@@ -53,11 +53,32 @@ namespace SLF
         };
 
         protected string seçilenVeriTipi;
+        protected int slfStartYear;
+        protected int slfEndYear;
+        public int SlfStartYear
+        {
+            get { return slfStartYear; }
+            set { slfStartYear = value; }
+        }
+
+        public int SlfEndYear
+        {
+            get { return slfEndYear; }
+            set { slfEndYear = value; }
+        }
         protected virtual List<string> Prerequisites { get; } = new List<string>();
 
         protected const int HoursInYear = 8760;
-        protected readonly int lastYear = DateTime.Now.Year - 1;
-        protected readonly int penultimateYear = DateTime.Now.Year - 2;
+        protected int lastYear
+        {
+            get { return slfStartYear - 1; }
+        }
+        protected int penultimateYear
+        {
+            get { return slfStartYear - 2; }
+        }
+        //protected int lastYear; = DateTime.Now.Year - 1;
+        //protected readonly int penultimateYear = DateTime.Now.Year - 2;
 
         protected const string FileDialogTitle = "Bir veri dosyası seçiniz.";
         protected const string FilterExcelFiles = "Excel dosyaları (*.xlsx)|*.xlsx";
