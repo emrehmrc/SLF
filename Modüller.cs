@@ -3292,7 +3292,7 @@ namespace SLF
 
         private void ResetYearSelectionProcessGirdiModulu()
         {
-            slfStartYear = slfStartYear = 0;    
+            slfStartYear = slfEndYear = 0;    
             int currentYear = DateTime.Now.Year;
             int lastYear = currentYear - 1;
 
