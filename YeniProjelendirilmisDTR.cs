@@ -49,7 +49,6 @@ namespace SLF
 
         }
 
-        int horizonYear = 2035;
         private void ImputeFlagInvestmentYear()  // BU FONKSIYON ŞU AN HORIZON YEAR'I STATIK ALIYOR VE BUNU OPTIMIZE OLARAK FLAG EDIYOR.
         {
             foreach (DataRow row in currentDataTable.Rows)

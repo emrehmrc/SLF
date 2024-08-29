@@ -77,6 +77,10 @@ namespace SLF
         {
             get { return slfStartYear - 2; }
         }
+        protected int horizonYear
+        {
+            get { return slfStartYear; }
+        }
         //protected int lastYear; = DateTime.Now.Year - 1;
         //protected readonly int penultimateYear = DateTime.Now.Year - 2;
 
@@ -198,8 +202,8 @@ namespace SLF
                         AppendAllToReportDataTables();
                         if (IsError())
                         {
-                            //onizleme1.Buton_YUKLE.Enabled = false;
-                            //onizleme1.Buton_İLERLE.Enabled = false;
+                            onizleme1.Buton_YUKLE.Enabled = false;
+                            onizleme1.Buton_İLERLE.Enabled = false;
                         }
 
                         // Exit the loop if there are no info or warning messages
