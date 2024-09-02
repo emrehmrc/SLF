@@ -179,6 +179,7 @@ namespace SLF
             this.ContextMenuStrip_Fonksiyon = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.katman_birleştir = new System.Windows.Forms.ToolStripMenuItem();
             this.overlap_analizi = new System.Windows.Forms.ToolStripMenuItem();
+            this.yenidenAdlandırToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
@@ -411,9 +412,9 @@ namespace SLF
             this.tab_dek.Controls.Add(this.button8);
             this.tab_dek.Controls.Add(this.label16);
             this.tab_dek.Controls.Add(this.dataGridView4);
-            this.tab_dek.Location = new System.Drawing.Point(4, 33);
+            this.tab_dek.Location = new System.Drawing.Point(4, 62);
             this.tab_dek.Name = "tab_dek";
-            this.tab_dek.Size = new System.Drawing.Size(1472, 663);
+            this.tab_dek.Size = new System.Drawing.Size(1472, 634);
             this.tab_dek.TabIndex = 6;
             this.tab_dek.Text = "DEK Modülü";
             this.tab_dek.UseVisualStyleBackColor = true;
@@ -462,9 +463,9 @@ namespace SLF
             this.tab_ea.Controls.Add(this.EA_list_box);
             this.tab_ea.Controls.Add(this.gMapControl_EA);
             this.tab_ea.Controls.Add(this.button7);
-            this.tab_ea.Location = new System.Drawing.Point(4, 33);
+            this.tab_ea.Location = new System.Drawing.Point(4, 62);
             this.tab_ea.Name = "tab_ea";
-            this.tab_ea.Size = new System.Drawing.Size(1472, 663);
+            this.tab_ea.Size = new System.Drawing.Size(1472, 634);
             this.tab_ea.TabIndex = 5;
             this.tab_ea.Text = "EA Şarj Modülü";
             this.tab_ea.UseVisualStyleBackColor = true;
@@ -899,10 +900,10 @@ namespace SLF
             this.tab_ekonometrik.Controls.Add(this.button10);
             this.tab_ekonometrik.Controls.Add(this.label12);
             this.tab_ekonometrik.Controls.Add(this.dataGridView2);
-            this.tab_ekonometrik.Location = new System.Drawing.Point(4, 33);
+            this.tab_ekonometrik.Location = new System.Drawing.Point(4, 62);
             this.tab_ekonometrik.Name = "tab_ekonometrik";
             this.tab_ekonometrik.Padding = new System.Windows.Forms.Padding(3);
-            this.tab_ekonometrik.Size = new System.Drawing.Size(1472, 663);
+            this.tab_ekonometrik.Size = new System.Drawing.Size(1472, 634);
             this.tab_ekonometrik.TabIndex = 1;
             this.tab_ekonometrik.Text = "Ekonometrik Talep Tahmini Modülü";
             this.tab_ekonometrik.UseVisualStyleBackColor = true;
@@ -1025,9 +1026,9 @@ namespace SLF
             // tab_imar
             // 
             this.tab_imar.Controls.Add(this.button6);
-            this.tab_imar.Location = new System.Drawing.Point(4, 33);
+            this.tab_imar.Location = new System.Drawing.Point(4, 62);
             this.tab_imar.Name = "tab_imar";
-            this.tab_imar.Size = new System.Drawing.Size(1472, 663);
+            this.tab_imar.Size = new System.Drawing.Size(1472, 634);
             this.tab_imar.TabIndex = 4;
             this.tab_imar.Text = "İmar Analizleri";
             this.tab_imar.UseVisualStyleBackColor = true;
@@ -1044,9 +1045,9 @@ namespace SLF
             // 
             // tab_optDTR
             // 
-            this.tab_optDTR.Location = new System.Drawing.Point(4, 33);
+            this.tab_optDTR.Location = new System.Drawing.Point(4, 62);
             this.tab_optDTR.Name = "tab_optDTR";
-            this.tab_optDTR.Size = new System.Drawing.Size(1472, 663);
+            this.tab_optDTR.Size = new System.Drawing.Size(1472, 634);
             this.tab_optDTR.TabIndex = 7;
             this.tab_optDTR.Text = "Optimal DTR Konumlandırma";
             this.tab_optDTR.UseVisualStyleBackColor = true;
@@ -1108,9 +1109,10 @@ namespace SLF
             this.tabloyuGörToolStripMenuItem,
             this.rengiDeğiştirToolStripMenuItem,
             this.temizleToolStripMenuItem,
+            this.yenidenAdlandırToolStripMenuItem,
             this.kaydetToolStripMenuItem});
             this.katmanlar_right_click.Name = "katmanlar_right_click";
-            this.katmanlar_right_click.Size = new System.Drawing.Size(177, 108);
+            this.katmanlar_right_click.Size = new System.Drawing.Size(215, 162);
             this.katmanlar_right_click.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.katmanlar_right_click_Closing);
             this.katmanlar_right_click.Opening += new System.ComponentModel.CancelEventHandler(this.katmanlar_right_click_Opening);
             // 
@@ -1119,7 +1121,7 @@ namespace SLF
             this.tabloyuGörToolStripMenuItem.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.tabloyuGörToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("tabloyuGörToolStripMenuItem.Image")));
             this.tabloyuGörToolStripMenuItem.Name = "tabloyuGörToolStripMenuItem";
-            this.tabloyuGörToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
+            this.tabloyuGörToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
             this.tabloyuGörToolStripMenuItem.Text = "Tabloyu Gör";
             this.tabloyuGörToolStripMenuItem.Click += new System.EventHandler(this.tabloyuGörToolStripMenuItem_Click);
             // 
@@ -1127,7 +1129,7 @@ namespace SLF
             // 
             this.rengiDeğiştirToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("rengiDeğiştirToolStripMenuItem.Image")));
             this.rengiDeğiştirToolStripMenuItem.Name = "rengiDeğiştirToolStripMenuItem";
-            this.rengiDeğiştirToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
+            this.rengiDeğiştirToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
             this.rengiDeğiştirToolStripMenuItem.Text = "Rengi Değiştir";
             this.rengiDeğiştirToolStripMenuItem.Click += new System.EventHandler(this.rengiDeğiştirToolStripMenuItem_Click);
             // 
@@ -1135,7 +1137,7 @@ namespace SLF
             // 
             this.temizleToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("temizleToolStripMenuItem.Image")));
             this.temizleToolStripMenuItem.Name = "temizleToolStripMenuItem";
-            this.temizleToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
+            this.temizleToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
             this.temizleToolStripMenuItem.Text = "Temizle";
             this.temizleToolStripMenuItem.Click += new System.EventHandler(this.temizleToolStripMenuItem_Click);
             // 
@@ -1143,7 +1145,7 @@ namespace SLF
             // 
             this.kaydetToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("kaydetToolStripMenuItem.Image")));
             this.kaydetToolStripMenuItem.Name = "kaydetToolStripMenuItem";
-            this.kaydetToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
+            this.kaydetToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
             this.kaydetToolStripMenuItem.Text = "Kaydet";
             this.kaydetToolStripMenuItem.Click += new System.EventHandler(this.kaydetToolStripMenuItem_Click);
             // 
@@ -1945,6 +1947,14 @@ namespace SLF
             this.overlap_analizi.Size = new System.Drawing.Size(187, 26);
             this.overlap_analizi.Text = "Overlap Analizi";
             // 
+            // yenidenAdlandırToolStripMenuItem
+            // 
+            this.yenidenAdlandırToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("yenidenAdlandırToolStripMenuItem.Image")));
+            this.yenidenAdlandırToolStripMenuItem.Name = "yenidenAdlandırToolStripMenuItem";
+            this.yenidenAdlandırToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
+            this.yenidenAdlandırToolStripMenuItem.Text = "Yeniden Adlandır";
+            this.yenidenAdlandırToolStripMenuItem.Click += new System.EventHandler(this.yenidenAdlandırToolStripMenuItem_Click);
+            // 
             // ModülFormu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -2161,5 +2171,6 @@ namespace SLF
         private ToolStripButton Stokastik_Fonksiyonlar;
         private Button raporGoruntuleButonu;
         private Button ExcelDownloadButton;
+        private ToolStripMenuItem yenidenAdlandırToolStripMenuItem;
     }
 }
