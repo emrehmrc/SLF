@@ -2057,6 +2057,7 @@ namespace SLF
             temizleToolStripMenuItem.Tag = sender_checkbox;
             rengiDeğiştirToolStripMenuItem.Tag = sender_checkbox;
             kaydetToolStripMenuItem.Tag = sender_checkbox;
+            yenidenAdlandırToolStripMenuItem.Tag = sender_checkbox;
 
             if (tüm_katmanlar_array[checkbox_index] != null)
             {
@@ -2166,6 +2167,59 @@ namespace SLF
                 }
             }
             return false;
+        }
+
+        // A simple prompt dialog for renaming
+        public static class Prompt
+        {
+            public static string ShowDialog(string text, string caption)
+            {
+                Form prompt = new Form()
+                {
+                    Width = 320,
+                    Height = 160,
+                    FormBorderStyle = FormBorderStyle.FixedDialog,
+                    Text = caption,
+                    StartPosition = FormStartPosition.CenterScreen
+                };
+                System.Windows.Forms.Label textLabel = new System.Windows.Forms.Label() { Left = 50, Top = 20, Text = text };
+                TextBox textBox = new TextBox() { Left = 50, Top = 50, Width = 170 , Height = 70};
+                Button confirmation = new Button() { Text = "Tamam", Left = 170, Width = 100, Top = 85, DialogResult = DialogResult.OK };
+                confirmation.Click += (sender, e) => { prompt.Close(); };
+                prompt.Controls.Add(textBox);
+                prompt.Controls.Add(confirmation);
+                prompt.Controls.Add(textLabel);
+                prompt.AcceptButton = confirmation;
+
+                return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
+            }
+        }
+
+        private void yenidenAdlandırToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem yeniden_adlandir = sender as ToolStripMenuItem;
+
+            if (yeniden_adlandir != null)
+            {
+                System.Windows.Forms.CheckBox checkBox = yeniden_adlandir.Tag as System.Windows.Forms.CheckBox;
+                int checkbox_index = int.Parse(checkBox.Tag.ToString()) - 1;
+
+                if (tüm_katmanlar_array[checkbox_index] != null)
+                {
+                    // Prompt the user to input a new name
+                    string newName = Prompt.ShowDialog("Yeni isim:", "Katmanı Yeniden Adlandır");
+
+                    if (!string.IsNullOrEmpty(newName))
+                    {
+                        // Rename the layer in your underlying data structure
+                        checkBox.Text = newName; // Adjust this according to your layer data structure
+                        tüm_katmanlar_array_names[checkbox_index] = newName;
+
+                        // Refresh the list/tree view
+                        checkBox.Refresh();
+                    }
+                }
+            }
         }
 
         private void kaydetToolStripMenuItem_Click(object sender, EventArgs e)

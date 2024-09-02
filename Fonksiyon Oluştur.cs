@@ -127,5 +127,33 @@ namespace SLF
         {
             Close();
         }
+
+
+        private void comboBox_fonksiyonlar_2_TextChanged(object sender, EventArgs e)
+        {
+            mod1 = (ModülFormu)Tag;
+
+            // Find the first item that matches the search text
+            string selected_table_name = mod1.tüm_katmanlar_array_names
+                .FirstOrDefault(name => name.Contains(comboBox_fonksiyonlar_2.Text));
+
+            int index = Array.IndexOf(mod1.tüm_katmanlar_array_names, selected_table_name);
+
+            // create an example row so that the columns of the second table could be displayed
+            // in the list box
+            DataRow example_row = mod1.tüm_katmanlar_datatable[index].NewRow();
+
+            secilen_sutunlar.ClearSelected();
+            tum_sutunlar.ClearSelected();
+            tum_sutunlar_listesi.Clear();
+            secilen_sutunlar_listesi.Clear();
+            tum_sutunlar.Items.Clear();
+            secilen_sutunlar.Items.Clear();
+
+            foreach (var columns in example_row.Table.Columns)
+            {
+                tum_sutunlar.Items.Add(columns.ToString());
+            }
+        }
     }
 }
