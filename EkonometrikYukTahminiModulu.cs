@@ -7,7 +7,7 @@ namespace SLF
     public class EkonometrikYukTahminiModulu : GirdiModülü
 
     {
-        protected override List<string> Prerequisites => new List<string> { "DTR Verileri", "Abone Verileri" };
+        //protected override List<string> Prerequisites => new List<string> { "DTR Verileri", "Abone Verileri" };
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
             { "MESKEN_FATURALANAN", ERROR_ONLY},

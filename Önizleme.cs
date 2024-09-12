@@ -12,7 +12,7 @@ namespace SLF
 {
     public partial class Önizleme : Form
     {
-        public Önizleme()
+        public Önizleme()   // tum ekranların sekmeleri onizleme hata,bilgilendir vs..
         {
             InitializeComponent();
         }
@@ -31,7 +31,7 @@ namespace SLF
 
         private void buton_İlerle_Click(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.Retry;
+            this.DialogResult = DialogResult.Retry;       //dialog tum durumlar için tanımlı tekrar tanımlanabilir
         }
 
         private void buton_YUKLE_Click(object sender, EventArgs e)

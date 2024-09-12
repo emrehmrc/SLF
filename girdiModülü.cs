@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace SLF
 {
-    public class NoFileSelectedException : Exception
+    public class NoFileSelectedException : Exception // dosyanın yuklenme durumları mesajları
     {
         public NoFileSelectedException(string message) : base(message)
         {
@@ -25,8 +25,8 @@ namespace SLF
     public class GirdiModülü
     {
         protected Önizleme onizleme1 = new Önizleme();
-        protected Raporlama raporlama1 = new Raporlama();
-        protected readonly List<string> veri_listesi_requires_xlsx = new List<string> {
+        protected Raporlama raporlama1 = new Raporlama(); // excel sayfası için yapılmıs calısma excelexporter ve excel importer için bakılabilir ileri durumlarda 
+        protected readonly List<string> veri_listesi_requires_xlsx = new List<string> {  // 2. ekran list kosullar tanımlı birbirine baglı olan moduller ekle olup olmadıgı kontrolu yapılıyor
             "EA Şarj Verileri",
             "Ekonometrik Yük Tahmini Verileri",
             "Fider Verileri",
@@ -37,14 +37,14 @@ namespace SLF
             "Enerji Müsaadeleri Verileri",
             "Yeni Projelendirilmiş DTR Verileri"
         };
-        protected static readonly List<int> TRAFO_KAPASITE_LISTESI = new List<int>
+        protected static readonly List<int> TRAFO_KAPASITE_LISTESI = new List<int> // trafo yakınsama için kullanılan list
         {
             15, 25, 40, 50, 63, 100, 160, 200, 250, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500
         };
-        protected readonly List<string> veri_listesi_requires_csv = new List<string> { };
+        protected readonly List<string> veri_listesi_requires_csv = new List<string> { }; 
         protected readonly List<string> veri_listesi_requires_tabular = new List<string> { };
 
-        protected readonly List<string> nullLikeStrings = new List<string>
+        protected readonly List<string> nullLikeStrings = new List<string> // doluluk bosluk check kısımları kontrolu yapılıyor
         {
             "",
             "null",
@@ -66,7 +66,7 @@ namespace SLF
             get { return slfEndYear; }
             set { slfEndYear = value; }
         }
-        protected virtual List<string> Prerequisites { get; } = new List<string>();
+        protected virtual List<string> Prerequisites { get; } = new List<string>(); 
 
         protected const int HoursInYear = 8760;
         protected int lastYear
