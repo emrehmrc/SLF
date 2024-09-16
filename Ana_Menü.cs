@@ -22,14 +22,42 @@ namespace SLF
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+
+        private void StartButton_Click(object sender, EventArgs e)
         {
-            mod1 = new ModülFormu();
-            mod1.Tag = this;
-            mod1.Show();
-            this.Hide();
+            MethodForm optionForm = new MethodForm();
+            //this.Hide();
+            optionForm.ShowDialog();
+            this.Show();
+
         }
 
+
+        /*
+                private void button1_Click(object sender, EventArgs e)
+                {
+                    // Initialize the class-level mod1 variable
+                    mod1 = new ModülFormu();
+
+                    // Hide the current form (GirişFormu)
+                    this.Hide();
+
+                    // Show the new form
+                    mod1.ShowDialog();
+
+                    // Once the new form is closed, show the current form (GirişFormu) again
+                    this.Show();
+                }
+        */
+        /*
+                private void button1_Click(object sender, EventArgs e)
+                {
+                    mod1 = new ModülFormu();
+                    mod1.Tag = this;
+                    mod1.Show();
+                    this.Hide();
+                }
+        */
         private void roundButton2_Click(object sender, EventArgs e)
         {
             Yardım yardım_formu = new Yardım();

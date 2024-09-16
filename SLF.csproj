@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\Avalonia.11.0.10\build\Avalonia.props" Condition="Exists('packages\Avalonia.11.0.10\build\Avalonia.props')" />
   <Import Project="packages\SkiaSharp.NativeAssets.WebAssembly.2.88.8\build\netstandard1.0\SkiaSharp.NativeAssets.WebAssembly.props" Condition="Exists('packages\SkiaSharp.NativeAssets.WebAssembly.2.88.8\build\netstandard1.0\SkiaSharp.NativeAssets.WebAssembly.props')" />
   <Import Project="packages\HarfBuzzSharp.NativeAssets.WebAssembly.7.3.0.2\build\netstandard1.0\HarfBuzzSharp.NativeAssets.WebAssembly.props" Condition="Exists('packages\HarfBuzzSharp.NativeAssets.WebAssembly.7.3.0.2\build\netstandard1.0\HarfBuzzSharp.NativeAssets.WebAssembly.props')" />
   <Import Project="packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
-  <Import Project="packages\Avalonia.11.0.10\build\Avalonia.props" Condition="Exists('packages\Avalonia.11.0.10\build\Avalonia.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -41,12 +41,15 @@
   <ItemGroup>
     <Reference Include="Avalonia, Version=11.0.10.0, Culture=neutral, PublicKeyToken=c8d484a7012f9a8b, processorArchitecture=MSIL">
       <HintPath>packages\Avalonia.11.0.10\lib\net461\Avalonia.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Avalonia.Base, Version=11.0.10.0, Culture=neutral, PublicKeyToken=c8d484a7012f9a8b, processorArchitecture=MSIL">
       <HintPath>packages\Avalonia.11.0.10\lib\net461\Avalonia.Base.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Avalonia.Controls, Version=11.0.10.0, Culture=neutral, PublicKeyToken=c8d484a7012f9a8b, processorArchitecture=MSIL">
       <HintPath>packages\Avalonia.11.0.10\lib\net461\Avalonia.Controls.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Avalonia.Controls.ColorPicker, Version=11.0.10.0, Culture=neutral, PublicKeyToken=c8d484a7012f9a8b, processorArchitecture=MSIL">
       <HintPath>packages\Avalonia.Controls.ColorPicker.11.0.10\lib\netstandard2.0\Avalonia.Controls.ColorPicker.dll</HintPath>
@@ -56,6 +59,7 @@
     </Reference>
     <Reference Include="Avalonia.DesignerSupport, Version=0.7.0.0, Culture=neutral, PublicKeyToken=c8d484a7012f9a8b, processorArchitecture=MSIL">
       <HintPath>packages\Avalonia.11.0.10\lib\net461\Avalonia.DesignerSupport.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Avalonia.Desktop, Version=11.0.10.0, Culture=neutral, PublicKeyToken=c8d484a7012f9a8b, processorArchitecture=MSIL">
       <HintPath>packages\Avalonia.Desktop.11.0.10\lib\netstandard2.0\Avalonia.Desktop.dll</HintPath>
@@ -65,27 +69,33 @@
     </Reference>
     <Reference Include="Avalonia.Dialogs, Version=11.0.10.0, Culture=neutral, PublicKeyToken=c8d484a7012f9a8b, processorArchitecture=MSIL">
       <HintPath>packages\Avalonia.11.0.10\lib\net461\Avalonia.Dialogs.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Avalonia.FreeDesktop, Version=11.0.10.0, Culture=neutral, PublicKeyToken=c8d484a7012f9a8b, processorArchitecture=MSIL">
       <HintPath>packages\Avalonia.FreeDesktop.11.0.10\lib\netstandard2.0\Avalonia.FreeDesktop.dll</HintPath>
     </Reference>
     <Reference Include="Avalonia.Markup, Version=11.0.10.0, Culture=neutral, PublicKeyToken=c8d484a7012f9a8b, processorArchitecture=MSIL">
       <HintPath>packages\Avalonia.11.0.10\lib\net461\Avalonia.Markup.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Avalonia.Markup.Xaml, Version=11.0.10.0, Culture=neutral, PublicKeyToken=c8d484a7012f9a8b, processorArchitecture=MSIL">
       <HintPath>packages\Avalonia.11.0.10\lib\net461\Avalonia.Markup.Xaml.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Avalonia.Metal, Version=11.0.10.0, Culture=neutral, PublicKeyToken=c8d484a7012f9a8b, processorArchitecture=MSIL">
       <HintPath>packages\Avalonia.11.0.10\lib\net461\Avalonia.Metal.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Avalonia.MicroCom, Version=11.0.10.0, Culture=neutral, PublicKeyToken=c8d484a7012f9a8b, processorArchitecture=MSIL">
       <HintPath>packages\Avalonia.11.0.10\lib\net461\Avalonia.MicroCom.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Avalonia.Native, Version=11.0.10.0, Culture=neutral, PublicKeyToken=c8d484a7012f9a8b, processorArchitecture=MSIL">
       <HintPath>packages\Avalonia.Native.11.0.10\lib\netstandard2.0\Avalonia.Native.dll</HintPath>
     </Reference>
     <Reference Include="Avalonia.OpenGL, Version=11.0.10.0, Culture=neutral, PublicKeyToken=c8d484a7012f9a8b, processorArchitecture=MSIL">
       <HintPath>packages\Avalonia.11.0.10\lib\net461\Avalonia.OpenGL.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Avalonia.Remote.Protocol, Version=11.0.10.0, Culture=neutral, PublicKeyToken=7ecde292c616a9f3, processorArchitecture=MSIL">
       <HintPath>packages\Avalonia.Remote.Protocol.11.0.10\lib\netstandard2.0\Avalonia.Remote.Protocol.dll</HintPath>
@@ -353,8 +363,8 @@
     <Reference Include="System.Text.Encodings.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.Text.Encodings.Web.8.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
     </Reference>
-    <Reference Include="System.Text.Json, Version=8.0.0.3, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>packages\System.Text.Json.8.0.3\lib\net462\System.Text.Json.dll</HintPath>
+    <Reference Include="System.Text.Json, Version=8.0.0.4, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Text.Json.8.0.4\lib\net462\System.Text.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.Threading.Channels, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.Threading.Channels.8.0.0\lib\net462\System.Threading.Channels.dll</HintPath>
@@ -396,6 +406,12 @@
     </Compile>
     <Compile Include="CsvHandler.cs" />
     <Compile Include="ExcelExporter.cs" />
+    <Compile Include="MethodForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MethodForm.Designer.cs">
+      <DependentUpon>MethodForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="YeniProjelendirilmisDTR.cs" />
     <Compile Include="EnerjiMusaadeleri.cs" />
     <Compile Include="TMVerileri.cs" />
@@ -498,6 +514,9 @@
       <DependentUpon>Modüller.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="MethodForm.resx">
+      <DependentUpon>MethodForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -570,7 +589,6 @@
     </PropertyGroup>
     <Error Condition="!Exists('packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
     <Error Condition="!Exists('packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
-    <Error Condition="!Exists('packages\Avalonia.11.0.10\build\Avalonia.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Avalonia.11.0.10\build\Avalonia.props'))" />
     <Error Condition="!Exists('packages\Avalonia.11.0.10\build\Avalonia.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Avalonia.11.0.10\build\Avalonia.targets'))" />
     <Error Condition="!Exists('packages\Avalonia.BuildServices.0.0.31\build\Avalonia.BuildServices.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Avalonia.BuildServices.0.0.31\build\Avalonia.BuildServices.targets'))" />
     <Error Condition="!Exists('packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets'))" />
@@ -587,6 +605,7 @@
     <Error Condition="!Exists('packages\SkiaSharp.NativeAssets.WebAssembly.2.88.8\build\netstandard1.0\SkiaSharp.NativeAssets.WebAssembly.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\SkiaSharp.NativeAssets.WebAssembly.2.88.8\build\netstandard1.0\SkiaSharp.NativeAssets.WebAssembly.targets'))" />
     <Error Condition="!Exists('packages\GDAL.Native.3.8.5\build\netstandard2.0\GDAL.Native.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\GDAL.Native.3.8.5\build\netstandard2.0\GDAL.Native.targets'))" />
     <Error Condition="!Exists('packages\Microsoft.Web.WebView2.1.0.2535.41\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Web.WebView2.1.0.2535.41\build\Microsoft.Web.WebView2.targets'))" />
+    <Error Condition="!Exists('packages\Avalonia.11.0.10\build\Avalonia.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Avalonia.11.0.10\build\Avalonia.props'))" />
   </Target>
   <Import Project="packages\Avalonia.11.0.10\build\Avalonia.targets" Condition="Exists('packages\Avalonia.11.0.10\build\Avalonia.targets')" />
   <Import Project="packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />

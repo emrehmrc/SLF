@@ -207,7 +207,7 @@ namespace SLF
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
 
             // Girdi Modülü'nde default olarak "Abone Verileri" seçeneğini göster
-            veri_listesi_seçimi.SelectedIndex = 0;
+            //veri_listesi_seçimi.SelectedIndex = 0;
 
             // initialize the previously declared tablo_formu instance.
             tablo_formu = new Tablo_Formu();
@@ -2553,7 +2553,7 @@ namespace SLF
             // Veri listesinde seçilen veri tipine göre dosya seçme işlemi yapılacak
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
             girdiModülü = girdiModülleri[seçilenVeriTipi];
-            girdiModülü.SlfStartYear = slfStartYear;
+            girdiModülü.SlfStartYear = slfStartYear;    
             girdiModülü.SlfEndYear = slfEndYear;
             var isImported = girdiModülü.VEERProcess(seçilenVeriTipi);
             if (isImported) {
@@ -3295,7 +3295,7 @@ namespace SLF
             slfStartYear = slfEndYear = 0;    
             int currentYear = DateTime.Now.Year;
             int lastYear = currentYear - 1;
-
+            
             startYearComboBox.SelectedIndex = -1;
             startYearComboBox.Text = "Yıl seçiniz";
             endYearComboBox.SelectedIndex = -1;
@@ -3334,6 +3334,7 @@ namespace SLF
             }
             // Get the selected year
             int selectedYear = (int)startYearComboBox.SelectedItem;
+            
 
             // Enable the endYearComboBox
             endYearComboBox.Enabled = true;
@@ -3355,6 +3356,7 @@ namespace SLF
         {
             yearApproveButton.Enabled = true;
         }
+
 
         private void yearApproveButton_Click(object sender, EventArgs e)
         {
@@ -3398,6 +3400,51 @@ namespace SLF
                 //yearApproveButton.Enabled = false;
                 yearApproveButton.Text = "Sıfırla";
             }
+        }
+
+//METHOD FORMUNDAN ELF OPSİYONU SEÇİLDİĞİNDE DİĞER TABLARIN GİZLENMESİ
+        public List<TabPage> hiddenTabs = new List<TabPage>();
+
+        public ModülFormu(string tabToSelect = "")
+        {
+            InitializeComponent();
+
+            // If a specific tab should be shown and others hidden
+            if (tabToSelect == "tab_girdi")
+            {
+                // Select the specific tab (tab_girdi)
+                Modül_Tabları.SelectedTab = Modül_Tabları.TabPages["tab_girdi"];
+                veri_listesi_seçimi.Text = "Ekonometrik Yük Tahmini Verileri";
+                veri_listesi_seçimi.Enabled = false;
+
+                // Hide other tabs in a single loop by removing them from TabControl
+                for (int i = Modül_Tabları.TabPages.Count - 1; i >= 0; i--)
+                {
+                    TabPage tabPage = Modül_Tabları.TabPages[i];
+                    if (tabPage.Name != "tab_girdi")
+                    {
+                        hiddenTabs.Add(tabPage);  // Add to hiddenTabs list
+                        Modül_Tabları.TabPages.Remove(tabPage);  // Remove tab
+                    }
+                }
+            }
+        }
+
+        // Method to restore hidden tabs (optional if needed to re-add them)
+        public void RestoreHiddenTabs()
+        {
+            foreach (TabPage tabPage in hiddenTabs)
+            {
+                Modül_Tabları.TabPages.Add(tabPage);  // Add back the hidden tabs
+            }
+
+            hiddenTabs.Clear();  // Clear the list after restoring
+        }
+
+
+        private void ELFPredictionButton_Click(object sender, EventArgs e)
+        {
+
         }
 
         public async Task JoinAttributesByLocation_summary()

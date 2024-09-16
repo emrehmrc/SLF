@@ -263,52 +263,57 @@ namespace SLF
             }
 
         }
-        public void CheckPercentageIncreaseLoadSanayiTicarethaneFaturalanan() //%10 üzerinde artısta veya azalısta uyarı kısmı
+
+        public void CheckPercentageIncreaseLoadSanayiTicarethaneFaturalanan()
         {
             int totalRows = currentDataTable.Rows.Count;
-            
             string yil = "YIL";
+
             foreach (DataColumn column in currentDataTable.Columns)
             {
-                if (!loadPercentageIncreaseDetect.ContainsKey(column.ColumnName)) // bakılacak datalar loadPercentageIncreaseDetect dictinaryde tanımlı
+                if (!loadPercentageIncreaseDetect.ContainsKey(column.ColumnName))
                 {
                     continue;
                 }
+
                 List<int> increaseNullRows = new List<int>();
                 List<int> decreaseNullRows = new List<int>();
                 List<string> increaseYearRows = new List<string>();
                 List<string> decreaseYearRows = new List<string>();
-                float overIncreaseCount = 0.0f;
-                float overDecreaseCount = 0.0f;
 
                 for (int i = 1; i < totalRows; i++)
                 {
                     var previousRow = currentDataTable.Rows[i - 1];
                     var row = currentDataTable.Rows[i];
 
-                    if (!IsNullLike(row[column]))
+                    if (!IsNullLike(row[column]) && !IsNullLike(previousRow[column]))
                     {
-                        var percentageDiff = Convert.ToDouble(row[column]) / Convert.ToDouble(previousRow[column]);
-                        if (percentageDiff > 1.10)
-                        {       
-                            increaseNullRows.Add(i);
-                            increaseYearRows.Add(row[yil].ToString());
-                            overIncreaseCount++;
-                        }
-                        else if (percentageDiff < 0.90)
-                        {  
-                            decreaseNullRows.Add(i);
-                            decreaseYearRows.Add(row[yil].ToString());
-                            overDecreaseCount++;
+                        var currentValue = Convert.ToDouble(row[column]);
+                        var previousValue = Convert.ToDouble(previousRow[column]);
+
+                        if (previousValue != 0) // Prevent division by zero
+                        {
+                            var percentageDiff = currentValue / previousValue;
+
+                            if (percentageDiff > 1.10)
+                            {
+                                increaseNullRows.Add(i);
+                                increaseYearRows.Add(row[yil].ToString());
+                            }
+                            else if (percentageDiff < 0.90)
+                            {
+                                decreaseNullRows.Add(i);
+                                decreaseYearRows.Add(row[yil].ToString());
+                            }
                         }
                     }
                 }
 
-                if (overIncreaseCount > 0)
+                // Handle increase warnings
+                if (increaseNullRows.Count > 0)
                 {
                     columnNullRowsMap[column.ColumnName] = increaseNullRows;
-                   
-                    float nullDataPercentage = (float)increaseNullRows.Count / totalRows;
+
                     string increaseYilValues = string.Join(", ", increaseYearRows);
                     statDataTable.Rows.Add(new object[]
                     {
@@ -316,10 +321,11 @@ namespace SLF
                     });
                 }
 
-                if (overDecreaseCount > 0)
+                // Handle decrease warnings
+                if (decreaseNullRows.Count > 0)
                 {
-                    columnNullRowsMap[column.ColumnName] = decreaseNullRows;            
-                    float nullDataPercentage = (float)decreaseNullRows.Count / totalRows;
+                    columnNullRowsMap[column.ColumnName] = decreaseNullRows;
+
                     string decreaseYilValues = string.Join(", ", decreaseYearRows);
                     statDataTable.Rows.Add(new object[]
                     {
@@ -327,7 +333,74 @@ namespace SLF
                     });
                 }
             }
-       }
+        }
+
+        /*        public void CheckPercentageIncreaseLoadSanayiTicarethaneFaturalanan() //%10 üzerinde artısta veya azalısta uyarı kısmı
+                {
+                    int totalRows = currentDataTable.Rows.Count;
+
+                    string yil = "YIL";
+                    foreach (DataColumn column in currentDataTable.Columns)
+                    {
+                        if (!loadPercentageIncreaseDetect.ContainsKey(column.ColumnName)) // bakılacak datalar loadPercentageIncreaseDetect dictinaryde tanımlı
+                        {
+                            continue;
+                        }
+                        List<int> increaseNullRows = new List<int>();
+                        List<int> decreaseNullRows = new List<int>();
+                        List<string> increaseYearRows = new List<string>();
+                        List<string> decreaseYearRows = new List<string>();
+                        float overIncreaseCount = 0.0f;
+                        float overDecreaseCount = 0.0f;
+
+                        for (int i = 1; i < totalRows; i++)
+                        {
+                            var previousRow = currentDataTable.Rows[i - 1];
+                            var row = currentDataTable.Rows[i];
+
+                            if (!IsNullLike(row[column]))
+                            {
+                                var percentageDiff = Convert.ToDouble(row[column]) / Convert.ToDouble(previousRow[column]);
+                                if (percentageDiff > 1.10)
+                                {       
+                                    increaseNullRows.Add(i);
+                                    increaseYearRows.Add(row[yil].ToString());
+                                    overIncreaseCount++;
+                                }
+                                else if (percentageDiff < 0.90)
+                                {  
+                                    decreaseNullRows.Add(i);
+                                    decreaseYearRows.Add(row[yil].ToString());
+                                    overDecreaseCount++;
+                                }
+                            }
+                        }
+
+                        if (overIncreaseCount > 0)
+                        {
+                            columnNullRowsMap[column.ColumnName] = increaseNullRows;
+
+                            float nullDataPercentage = (float)increaseNullRows.Count / totalRows;
+                            string increaseYilValues = string.Join(", ", increaseYearRows);
+                            statDataTable.Rows.Add(new object[]
+                            {
+                        column.ColumnName, "%10 artış gözlemlendi UYARI", increaseYilValues, "VERİNİN DOĞRULUĞUNDAN EMİN OLUNMALI!!"
+                            });
+                        }
+
+                        if (overDecreaseCount > 0)
+                        {
+                            columnNullRowsMap[column.ColumnName] = decreaseNullRows;            
+                            float nullDataPercentage = (float)decreaseNullRows.Count / totalRows;
+                            string decreaseYilValues = string.Join(", ", decreaseYearRows);
+                            statDataTable.Rows.Add(new object[]
+                            {
+                        column.ColumnName, "%10 düşüş gözlemlendi UYARI", decreaseYilValues, "VERİNİN DOĞRULUĞUNDAN EMİN OLUNMALI!!"
+                            });
+                        }
+                    }
+               }
+        */
         public void ImputeKkmKkoDag() //bosluklların kosullu olarak doldurulması imputasyon
         {
             string toplamDagitilan = "TOPLAM_DAGITILAN";
