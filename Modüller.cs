@@ -3292,7 +3292,7 @@ namespace SLF
 
         private void ResetYearSelectionProcessGirdiModulu()
         {
-            slfStartYear = slfEndYear = 0;    
+            slfStartYear = slfEndYear = 0;
             int currentYear = DateTime.Now.Year;
             int lastYear = currentYear - 1;
 
@@ -3323,7 +3323,7 @@ namespace SLF
 
         private void veri_listesi_seçimi_MouseDown(object sender, MouseEventArgs e)
         {
-            
+
         }
 
         private void startYearComboBox_SelectedIndexChanged(object sender, EventArgs e)
