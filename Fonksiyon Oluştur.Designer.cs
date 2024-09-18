@@ -43,8 +43,11 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
+            this.checkBoxCount = new System.Windows.Forms.CheckBox();
+            this.checkBoxMaks = new System.Windows.Forms.CheckBox();
+            this.checkBoxMin = new System.Windows.Forms.CheckBox();
+            this.checkBoxSum = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
@@ -110,6 +113,7 @@
             this.button2.TabIndex = 5;
             this.button2.Text = "İptal";
             this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // checkBox_cell_statistics
             // 
@@ -129,10 +133,10 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(394, 247);
+            this.label3.Font = new System.Drawing.Font("Maiandra GD", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(393, 237);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(286, 24);
+            this.label3.Size = new System.Drawing.Size(331, 27);
             this.label3.TabIndex = 8;
             this.label3.Text = "Agregasyonu Yapılacak Sütünlar";
             // 
@@ -140,25 +144,29 @@
             // 
             this.tum_sutunlar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.tum_sutunlar.BackColor = System.Drawing.Color.FloralWhite;
             this.tum_sutunlar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.tum_sutunlar.Font = new System.Drawing.Font("Microsoft Tai Le", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tum_sutunlar.FormattingEnabled = true;
-            this.tum_sutunlar.ItemHeight = 16;
+            this.tum_sutunlar.ItemHeight = 23;
             this.tum_sutunlar.Location = new System.Drawing.Point(24, 274);
             this.tum_sutunlar.Name = "tum_sutunlar";
             this.tum_sutunlar.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.tum_sutunlar.Size = new System.Drawing.Size(282, 324);
+            this.tum_sutunlar.Size = new System.Drawing.Size(282, 303);
             this.tum_sutunlar.TabIndex = 9;
             // 
             // secilen_sutunlar
             // 
             this.secilen_sutunlar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.secilen_sutunlar.BackColor = System.Drawing.Color.FloralWhite;
+            this.secilen_sutunlar.Font = new System.Drawing.Font("Microsoft Tai Le", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.secilen_sutunlar.FormattingEnabled = true;
-            this.secilen_sutunlar.ItemHeight = 16;
+            this.secilen_sutunlar.ItemHeight = 23;
             this.secilen_sutunlar.Location = new System.Drawing.Point(398, 274);
             this.secilen_sutunlar.Name = "secilen_sutunlar";
             this.secilen_sutunlar.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.secilen_sutunlar.Size = new System.Drawing.Size(282, 324);
+            this.secilen_sutunlar.Size = new System.Drawing.Size(282, 303);
             this.secilen_sutunlar.TabIndex = 10;
             // 
             // label4
@@ -167,10 +175,10 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(20, 247);
+            this.label4.Font = new System.Drawing.Font("Maiandra GD", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(23, 237);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(115, 24);
+            this.label4.Size = new System.Drawing.Size(134, 27);
             this.label4.TabIndex = 11;
             this.label4.Text = "Sütun Listesi";
             // 
@@ -191,10 +199,11 @@
             // 
             // pictureBox2
             // 
+            this.pictureBox2.BackColor = System.Drawing.Color.PaleTurquoise;
             this.pictureBox2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.pictureBox2.Location = new System.Drawing.Point(750, 274);
             this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(10, 322);
+            this.pictureBox2.Size = new System.Drawing.Size(16, 322);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox2.TabIndex = 13;
             this.pictureBox2.TabStop = false;
@@ -205,31 +214,12 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(804, 247);
+            this.label5.Font = new System.Drawing.Font("Maiandra GD", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(804, 240);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(228, 24);
+            this.label5.Size = new System.Drawing.Size(267, 27);
             this.label5.TabIndex = 15;
             this.label5.Text = "Kullanılacak Fonksiyonlar";
-            // 
-            // checkedListBox1
-            // 
-            this.checkedListBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.checkedListBox1.BackColor = System.Drawing.Color.FloralWhite;
-            this.checkedListBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.checkedListBox1.CheckOnClick = true;
-            this.checkedListBox1.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkedListBox1.Items.AddRange(new object[] {
-            "Say",
-            "Topla",
-            "Min",
-            "Maks",
-            "Ortalama"});
-            this.checkedListBox1.Location = new System.Drawing.Point(808, 274);
-            this.checkedListBox1.Name = "checkedListBox1";
-            this.checkedListBox1.Size = new System.Drawing.Size(240, 182);
-            this.checkedListBox1.TabIndex = 16;
             // 
             // pictureBox3
             // 
@@ -245,15 +235,64 @@
             this.pictureBox3.TabStop = false;
             this.pictureBox3.Click += new System.EventHandler(this.pictureBox3_Click);
             // 
+            // checkBoxCount
+            // 
+            this.checkBoxCount.AutoSize = true;
+            this.checkBoxCount.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBoxCount.Location = new System.Drawing.Point(809, 285);
+            this.checkBoxCount.Name = "checkBoxCount";
+            this.checkBoxCount.Size = new System.Drawing.Size(65, 29);
+            this.checkBoxCount.TabIndex = 18;
+            this.checkBoxCount.Text = "Say";
+            this.checkBoxCount.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxMaks
+            // 
+            this.checkBoxMaks.AutoSize = true;
+            this.checkBoxMaks.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBoxMaks.Location = new System.Drawing.Point(809, 390);
+            this.checkBoxMaks.Name = "checkBoxMaks";
+            this.checkBoxMaks.Size = new System.Drawing.Size(80, 29);
+            this.checkBoxMaks.TabIndex = 19;
+            this.checkBoxMaks.Text = "Maks";
+            this.checkBoxMaks.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxMin
+            // 
+            this.checkBoxMin.AutoSize = true;
+            this.checkBoxMin.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBoxMin.Location = new System.Drawing.Point(809, 355);
+            this.checkBoxMin.Name = "checkBoxMin";
+            this.checkBoxMin.Size = new System.Drawing.Size(68, 29);
+            this.checkBoxMin.TabIndex = 20;
+            this.checkBoxMin.Text = "Min";
+            this.checkBoxMin.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxSum
+            // 
+            this.checkBoxSum.AutoSize = true;
+            this.checkBoxSum.Font = new System.Drawing.Font("Microsoft Tai Le", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBoxSum.Location = new System.Drawing.Point(809, 320);
+            this.checkBoxSum.Name = "checkBoxSum";
+            this.checkBoxSum.Size = new System.Drawing.Size(83, 29);
+            this.checkBoxSum.TabIndex = 21;
+            this.checkBoxSum.Text = "Topla";
+            this.checkBoxSum.UseVisualStyleBackColor = true;
+            // 
             // Fonksiyon_Oluştur
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FloralWhite;
+            this.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.ClientSize = new System.Drawing.Size(1122, 649);
+            this.Controls.Add(this.checkBoxSum);
+            this.Controls.Add(this.checkBoxMin);
+            this.Controls.Add(this.checkBoxMaks);
+            this.Controls.Add(this.checkBoxCount);
             this.Controls.Add(this.pictureBox3);
             this.Controls.Add(this.checkBox_cell_statistics);
-            this.Controls.Add(this.checkedListBox1);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.buton_jabl);
@@ -267,6 +306,7 @@
             this.Controls.Add(this.comboBox_fonksiyonlar_1);
             this.Controls.Add(this.tum_sutunlar);
             this.Controls.Add(this.label3);
+            this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Fonksiyon_Oluştur";
@@ -296,7 +336,10 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.CheckedListBox checkedListBox1;
         private System.Windows.Forms.PictureBox pictureBox3;
+        public System.Windows.Forms.CheckBox checkBoxCount;
+        public System.Windows.Forms.CheckBox checkBoxMaks;
+        public System.Windows.Forms.CheckBox checkBoxMin;
+        public System.Windows.Forms.CheckBox checkBoxSum;
     }
 }

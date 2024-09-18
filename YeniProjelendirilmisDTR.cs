@@ -12,6 +12,7 @@ namespace SLF
     public class YeniProjelendirilmisDTR : GirdiModülü
 
     {
+        protected override List<string> Prerequisites => new List<string> { "DTR Verileri"};
         private void MevcutDTRKapasiteCheck()
         {
             int invalidNewCapacityCount = 0;
@@ -48,7 +49,6 @@ namespace SLF
 
         }
 
-        int horizonYear = 2035;
         private void ImputeFlagInvestmentYear()  // BU FONKSIYON ŞU AN HORIZON YEAR'I STATIK ALIYOR VE BUNU OPTIMIZE OLARAK FLAG EDIYOR.
         {
             foreach (DataRow row in currentDataTable.Rows)
@@ -211,7 +211,7 @@ namespace SLF
             // Add row indices from different columns to the combined list
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["PROJELENDIRILMIS_TRAFO_ID"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["PROJELENDIRILMIS_TRAFO_YATIRIM_SINIFI"]);
-            combinedRowsToRemoveList.AddRange(columnNullRowsMap["PROJELENDIRILMIS_TRAFO_YENI_KAPASITE"]);
+            //combinedRowsToRemoveList.AddRange(columnNullRowsMap["PROJELENDIRILMIS_TRAFO_YENI_KAPASITE"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["KAPASITE"]);
 
 

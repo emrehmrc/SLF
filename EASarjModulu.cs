@@ -9,8 +9,9 @@ using System.Windows.Forms;
 namespace SLF
 {
     public class EASarjModulu : GirdiModülü
-
+        
     {
+        protected override List<string> Prerequisites => new List<string> { "DTR Verileri"};
         private void PreprocessMismatchedTrafoKodu()
         {
             DataTable trafoDataTable = dataTablesByType["DTR Verileri"];

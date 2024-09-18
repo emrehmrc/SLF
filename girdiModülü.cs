@@ -25,6 +25,7 @@ namespace SLF
     public class GirdiModülü
     {
         protected Önizleme onizleme1 = new Önizleme();
+        protected Raporlama raporlama1 = new Raporlama();
         protected readonly List<string> veri_listesi_requires_xlsx = new List<string> {
             "EA Şarj Verileri",
             "Ekonometrik Yük Tahmini Verileri",
@@ -35,6 +36,10 @@ namespace SLF
             "Abone Verileri",
             "Enerji Müsaadeleri Verileri",
             "Yeni Projelendirilmiş DTR Verileri"
+        };
+        protected static readonly List<int> TRAFO_KAPASITE_LISTESI = new List<int>
+        {
+            15, 25, 40, 50, 63, 100, 160, 200, 250, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500
         };
         protected readonly List<string> veri_listesi_requires_csv = new List<string> { };
         protected readonly List<string> veri_listesi_requires_tabular = new List<string> { };
@@ -48,11 +53,36 @@ namespace SLF
         };
 
         protected string seçilenVeriTipi;
+        protected int slfStartYear;
+        protected int slfEndYear;
+        public int SlfStartYear
+        {
+            get { return slfStartYear; }
+            set { slfStartYear = value; }
+        }
+
+        public int SlfEndYear
+        {
+            get { return slfEndYear; }
+            set { slfEndYear = value; }
+        }
         protected virtual List<string> Prerequisites { get; } = new List<string>();
 
         protected const int HoursInYear = 8760;
-        protected readonly int lastYear = DateTime.Now.Year - 1;
-        protected readonly int penultimateYear = DateTime.Now.Year - 2;
+        protected int lastYear
+        {
+            get { return slfStartYear - 1; }
+        }
+        protected int penultimateYear
+        {
+            get { return slfStartYear - 2; }
+        }
+        protected int horizonYear
+        {
+            get { return slfStartYear; }
+        }
+        //protected int lastYear; = DateTime.Now.Year - 1;
+        //protected readonly int penultimateYear = DateTime.Now.Year - 2;
 
         protected const string FileDialogTitle = "Bir veri dosyası seçiniz.";
         protected const string FilterExcelFiles = "Excel dosyaları (*.xlsx)|*.xlsx";
@@ -65,17 +95,23 @@ namespace SLF
         protected readonly string combinedTabularFilter;
 
         protected DataTable currentDataTable = new DataTable();
-        protected static Dictionary<string, DataTable> dataTablesByType = new Dictionary<string, DataTable>();  // Static so that it can be accessed as the same instance from other subclasses
+        public DataTable importedDataTable = new DataTable();
+        public static Dictionary<string, DataTable> dataTablesByType = new Dictionary<string, DataTable>();  // Static so that it can be accessed as the same instance from other subclasses
         protected DataTable errorDataTable = new DataTable();
         protected DataTable warningDataTable = new DataTable();
         protected DataTable infoDataTable = new DataTable();
         protected DataTable statDataTable = new DataTable();
+        protected DataTable errorDataTableReport = new DataTable();
+        protected DataTable warningDataTableReport = new DataTable();
+        protected DataTable infoDataTableReport = new DataTable();
+        protected DataTable statDataTableReport = new DataTable();
+        protected DataTable reportDataTableReport = new DataTable();
 
         protected Dictionary<string, List<int>> columnNullRowsMap = new Dictionary<string, List<int>>();
         protected Dictionary<string, List<int>> imputableRowsMap = new Dictionary<string, List<int>>();
         protected Dictionary<string, (double X, double Y)> binaIdToMostFrequentCoordinates = new Dictionary<string, (double X, double Y)>();
         protected Dictionary<string, string> aboneGrubuMostFrequent = new Dictionary<string, string>();
-        protected Dictionary<(string FiderName, int Year), double> annualPeakDemand = new Dictionary<(string FiderName, int Year), double>();
+        protected Dictionary<string, double> annualPeakDemand = new Dictionary<string, double>();
         //protected Dictionary<string, (double X, double Y)> binaIdToAverageCoordinates = new Dictionary<string, (double X, double Y)>();
 
         protected const int COORDINATE_ROUNDING_PRECISION = 3;
@@ -100,6 +136,21 @@ namespace SLF
         };
         protected double K_FACTOR = 2.5;
 
+        protected int RoundUpTrafoKapasitesi(double yeniTrafoKapasitesi)
+        {
+            // Find the smallest value in the list that is greater than or equal to yeniTrafoKapasitesi
+            int roundedKapasite = TRAFO_KAPASITE_LISTESI.FirstOrDefault(kapasite => kapasite >= yeniTrafoKapasitesi);
+
+            // If no such value is found (meaning yeniTrafoKapasitesi is larger than any value in the list), 
+            // return the maximum value in the list
+            if (roundedKapasite == 0)
+            {
+                roundedKapasite = TRAFO_KAPASITE_LISTESI.Max();
+            }
+
+            return roundedKapasite;
+        }
+
         protected bool IsNullLike(object value, bool isZero=false)
         {
             if (value == null || value == DBNull.Value)
@@ -115,6 +166,104 @@ namespace SLF
             return nullLikeStrings.Contains(stringValue, StringComparer.OrdinalIgnoreCase);
         }
 
+        public void VEERReport(string seçilenVeriTipi) {
+            DataTable dataTable = importedDataTable;
+            if (dataTable != null && dataTable.Rows.Count > 0)
+            {
+                RenameTabCounts();
+                raporlama1.ShowDialog();
+            }
+            else
+            {
+                MessageBox.Show($"{seçilenVeriTipi}'ni yüklemeden rapor tablosunu göremezsiniz.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+        public bool VEERProcess(string seçilenVeriTipi)
+        {
+            try
+            {
+                CheckPrerequisites(seçilenVeriTipi); // Check the required datatables for the given module
+                // ProcessFileSelection metodu ile dosya seçme işlemi yapılır ve seçilen dosya veri tablosuna yüklenir
+                ProcessFileSelection(seçilenVeriTipi);
+                DataTable dataTable = CurrentDataTable;
+                if (dataTable != null && dataTable.Rows.Count > 0)
+                {
+                    Onizleme1.Onizleme_DataGrid1.DataSource = dataTable;
+                    onizleme1.Buton_YUKLE.Enabled = false;
+                    onizleme1.Buton_İLERLE.Enabled = true;
+                    ClearReportRows();
+
+                    Preprocess();
+                    while (true)
+                    {
+                        ClearRows();
+                        Validate();
+                        RenameTabCounts();
+                        AppendAllToReportDataTables();
+                        if (IsError())
+                        {
+                            onizleme1.Buton_YUKLE.Enabled = false;
+                            onizleme1.Buton_İLERLE.Enabled = false;
+                        }
+
+                        // Exit the loop if there are no info or warning messages
+                        if (!IsInfo() && !IsWarning())
+                        {
+                            onizleme1.Buton_YUKLE.Enabled = true;
+                            onizleme1.Buton_İLERLE.Enabled = false;
+                        }
+                        var dialogResult = Onizleme1.ShowDialog();
+                        if (dialogResult == DialogResult.Cancel)
+                        {
+                            return false;
+                        }
+                        else if (dialogResult == DialogResult.OK)
+                        {
+                            break;
+                        }
+
+                        Remove();
+                        ClearRows();
+                        Validate();
+                        Impute();
+                    }
+                    Postprocess();
+                    ImportProcessedData();
+                    ShowImportedMessage();
+                    return true;
+                }
+                else
+                {
+                    MessageBox.Show("Dosya seçimi gerçekleştirilemedi.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            catch (NoFileSelectedException ex)
+            {
+                MessageBox.Show(ex.Message, "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (InvalidColumnHeadersException ex)
+            {
+                MessageBox.Show("Geçersiz sütun biçimi: " + ex.Message, "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (PrerequisiteException ex)
+            {
+                MessageBox.Show(ex.Message, "Önkoşul hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return false;
+        }
+
+        public void ShowImportedMessage()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine($"{seçilenVeriTipi} başarıyla yüklendi.");
+            sb.AppendLine($"Toplam satır sayısı: {importedDataTable.Rows.Count}");
+
+            // Convert to string
+            string result = sb.ToString();
+            MessageBox.Show(result, "Başarılı!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        }
         public void CheckPrerequisites(string seçilenVeriTipi)
         {
             var missingPrerequisites = new List<string>();
@@ -169,16 +318,29 @@ namespace SLF
             AddColumnsToDataTable(warningDataTable);
             AddColumnsToDataTable(infoDataTable);
             AddColumnsToDataTable(statDataTable);
-            warningDataTable.Columns.Add("İmpütasyon", typeof(bool));
+            AddColumnsToDataTable(errorDataTableReport);
+            AddColumnsToDataTable(warningDataTableReport);
+            AddColumnsToDataTable(infoDataTableReport);
+            AddColumnsToDataTable(statDataTableReport);
             onizleme1.Onizleme_DataGrid2.DataSource = errorDataTable;
             onizleme1.Onizleme_DataGrid3.DataSource = warningDataTable;
             onizleme1.Onizleme_DataGrid4.DataSource = infoDataTable;
-            //onizleme1.Onizleme_DataGrid5.DataSource = statDataTable;
+            onizleme1.Onizleme_DataGrid5.DataSource = statDataTable;
+            raporlama1.Onizleme_DataGrid2.DataSource = errorDataTableReport;
+            raporlama1.Onizleme_DataGrid3.DataSource = warningDataTableReport;
+            raporlama1.Onizleme_DataGrid4.DataSource = infoDataTableReport;
+            raporlama1.Onizleme_DataGrid5.DataSource = statDataTableReport;
+            //raporlama1.Onizleme_DataGrid6.DataSource = reportDataTableReport;
             onizleme1.Onizleme_DataGrid1.AllowUserToAddRows = false;
             onizleme1.Onizleme_DataGrid2.AllowUserToAddRows = false;
             onizleme1.Onizleme_DataGrid3.AllowUserToAddRows = false;
             onizleme1.Onizleme_DataGrid4.AllowUserToAddRows = false;
-            //onizleme1.Onizleme_DataGrid5.AllowUserToAddRows = false;
+            onizleme1.Onizleme_DataGrid5.AllowUserToAddRows = false;
+            raporlama1.Onizleme_DataGrid2.AllowUserToAddRows = false;
+            raporlama1.Onizleme_DataGrid3.AllowUserToAddRows = false;
+            raporlama1.Onizleme_DataGrid4.AllowUserToAddRows = false;
+            raporlama1.Onizleme_DataGrid5.AllowUserToAddRows = false;
+            //raporlama1.Onizleme_DataGrid6.AllowUserToAddRows = false;
         }
 
         public bool IsError()
@@ -203,6 +365,35 @@ namespace SLF
             table.Columns.Add("Ek Açıklamalar", typeof(string));
         }
 
+        private void AppendAllToReportDataTables()
+        {
+            AppendToReportDataTables(errorDataTable, errorDataTableReport);
+            AppendToReportDataTables(warningDataTable, warningDataTableReport);
+            AppendToReportDataTables(infoDataTable, infoDataTableReport);
+            AppendToReportDataTables(statDataTable, statDataTableReport);
+        }
+
+        protected void AppendToReportDataTables(DataTable source, DataTable destination)
+        {
+            foreach (DataRow row in source.Rows)
+            {
+                // Check if an identical row already exists in the destination
+                bool duplicateExists = destination.AsEnumerable().Any(r => r.ItemArray.SequenceEqual(row.ItemArray));
+
+                // If no duplicate exists, import the row
+                if (!duplicateExists)
+                {
+                    destination.ImportRow(row);
+                }
+            }
+        }
+
+        protected void ImportProcessedData()
+        {
+            importedDataTable = currentDataTable.Copy();
+            dataTablesByType[seçilenVeriTipi] = importedDataTable;
+        }
+
         public void ProcessFileSelection(string seçilenVeriTipi)
         {
             this.seçilenVeriTipi = seçilenVeriTipi;
@@ -218,7 +409,6 @@ namespace SLF
                 {
                     string selectedFileName = fileDialog1.FileName;
                     currentDataTable = ProcessExcelFile(selectedFileName, seçilenVeriTipi);
-                    dataTablesByType[seçilenVeriTipi] = currentDataTable;
                 }
                 else throw new NoFileSelectedException("Dosya seçimi gerçekleştirilemedi.");
             }
@@ -267,9 +457,44 @@ namespace SLF
             return new DataTable();
         }
 
+        // Helper method to get the original tab text without the count
+        private string GetOriginalTabText(TabPage tabPage)
+        {
+            string text = tabPage.Text;
+            int index = text.LastIndexOf('(');
+            if (index > 0)
+            {
+                return text.Substring(0, index).Trim();
+            }
+            return text;
+        }
+
+        public void RenameTabCounts()
+        {
+            int errorCount = errorDataTable.Rows.Count;
+            int warningCount = warningDataTable.Rows.Count;
+            int infoCount = infoDataTable.Rows.Count;
+            int statCount = statDataTable.Rows.Count;
+
+            int errorReportCount = errorDataTableReport.Rows.Count;
+            int warningReportCount = warningDataTableReport.Rows.Count;
+            int infoReportCount = infoDataTableReport.Rows.Count;
+            int statReportCount = statDataTableReport.Rows.Count;
+
+            // Append counts to the current text of each tab
+            onizleme1.Onizleme_Hata_Sekmesi.Text = $"{GetOriginalTabText(onizleme1.Onizleme_Hata_Sekmesi)} ({errorCount})";
+            onizleme1.Onizleme_Warning_Sekmesi.Text = $"{GetOriginalTabText(onizleme1.Onizleme_Warning_Sekmesi)} ({warningCount})";
+            onizleme1.Onizleme_Information_Sekmesi.Text = $"{GetOriginalTabText(onizleme1.Onizleme_Information_Sekmesi)} ({infoCount})";
+            onizleme1.Onizleme_Statistics_Sekmesi.Text = $"{GetOriginalTabText(onizleme1.Onizleme_Statistics_Sekmesi)} ({statCount})";
+
+            raporlama1.Onizleme_Hata_Sekmesi.Text = $"{GetOriginalTabText(raporlama1.Onizleme_Hata_Sekmesi)} ({errorReportCount})";
+            raporlama1.Onizleme_Warning_Sekmesi.Text = $"{GetOriginalTabText(raporlama1.Onizleme_Warning_Sekmesi)} ({warningReportCount})";
+            raporlama1.Onizleme_Information_Sekmesi.Text = $"{GetOriginalTabText(raporlama1.Onizleme_Information_Sekmesi)} ({infoReportCount})";
+            raporlama1.Onizleme_Statistics_Sekmesi.Text = $"{GetOriginalTabText(raporlama1.Onizleme_Statistics_Sekmesi)} ({statReportCount})";
+        }
+
         public virtual void Validate()
         {
-            ClearRows();
         }
 
 
@@ -298,6 +523,14 @@ namespace SLF
             errorDataTable.Rows.Clear();
             warningDataTable.Rows.Clear();
             infoDataTable.Rows.Clear();
+            statDataTable.Rows.Clear();
+        }
+        protected void ClearReportRows()
+        {
+            errorDataTableReport.Rows.Clear();
+            warningDataTableReport.Rows.Clear();
+            infoDataTableReport.Rows.Clear();
+            statDataTableReport.Rows.Clear();
         }
         protected DataTable GetDataTableBasedOnThreshold(
             float currentPercentage,
