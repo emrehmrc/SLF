@@ -32,7 +32,6 @@ namespace SLF
     {
         private double startX = 0, startY = 0;
         public int slfStartYear = 0, slfEndYear = 0;
-
         // form objeleri
         public GirişFormu gir1;
         private GirdiModülü girdiModülü;
@@ -163,59 +162,187 @@ namespace SLF
             gmap.Zoom = 13;
             gmap.DragButton = MouseButtons.Left;
         }
+        private string selectedMethod;  // Store the method
+        public List<TabPage> hiddenTabs = new List<TabPage>();  // To store hidden tabs
 
-        public ModülFormu()
+
+        public ModülFormu() : this("", "")
         {
+        }
 
+        // Main constructor with parameters for selectedMethod and tabToSelect
+        public ModülFormu(string selectedMethod = "", string tabToSelect = "")
+        {
             InitializeComponent();
+            this.selectedMethod = selectedMethod;  // Store the method
+
+            // Initialize the maps and other UI components
+            InitializeFormComponents();
+
+            if (!string.IsNullOrEmpty(tabToSelect))
+            {
+                InitializeTabs(tabToSelect);  // Select the specific tab and hide others
+            }
+            else
+            {
+                InitializeFormBasedOnMethod();  // Initialize based on the selected method
+            }
+        }
+
+        // Initialize all form components (called in the constructors)
+        private void InitializeFormComponents()
+        {
             InitializeGMap(gMapControl_stokastik);
             InitializeGMap(gMapControl_EA);
             SortTabPagesAlphabetically(Modül_Tabları, true);
-            ModuleTabPanel.Paint += new PaintEventHandler(ModuleTabPanel_Paint);
-            //HeaderPanel.Paint += new PaintEventHandler(HeaderPanel_Paint);
 
+            ModuleTabPanel.Paint += new PaintEventHandler(ModuleTabPanel_Paint);
+
+            // Default selected tab
             Modül_Tabları.SelectedTab = tab_girdi;
 
+            // Initialize the arrays and other components
             tüm_katmanlar_array_names = new string[13];
             tüm_katmanlar_array = new GMapOverlay[13];
             shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[13];
             tüm_katmanlar_datatable = new DataTable[13];
 
-            // define the initial directory to be shown when the user opens up the import file dialog
             targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
 
-            // bring the layers buttons that are positioned on the bottom left of the maps to front
             buton_stokastik_harita_katmanlar.BringToFront();
             buton_ea_harita_katmanlar.BringToFront();
 
-            // initialization of the polygonAttributes object that gets to be displayed when double clicking
-            // on the map
             polygonAttributes = new Dictionary<GMapPolygon, DataRow>();
             polygonAttributes_grid = new Dictionary<NetTopologySuite.Geometries.Polygon, DataRow>();
 
-            // stokastik haritası cetvel, nokta, poligon üst katmanları
+            // Add overlays to the maps
             gMapControl_stokastik.Overlays.Add(rulerOverlay_stokastik);
             gMapControl_stokastik.Overlays.Add(markerOverlay_stokastik);
-
-            //
             gMapControl_stokastik.Overlays.Add(gridOverlay);
             stokastik_haritası_checkboxes_init();
 
-            // EA haritası cetvel, nokta, poligon üst katmanları
             gMapControl_EA.Overlays.Add(rulerOverlay_ea);
             gMapControl_EA.Overlays.Add(markerOverlay_ea);
             gMapControl_EA.Overlays.Add(polygonOverlay_ea);
 
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
 
-            // Girdi Modülü'nde default olarak "Abone Verileri" seçeneğini göster
+            // Default selection for veri_listesi_seçimi
             veri_listesi_seçimi.SelectedIndex = 0;
 
-            // initialize the previously declared tablo_formu instance.
+            // Initialize the tablo_formu instance
             tablo_formu = new Tablo_Formu();
-
         }
 
+        // Initialize specific tabs and hide others
+        private void InitializeTabs(string tabToSelect)
+        {
+            if (Modül_Tabları.TabPages.ContainsKey(tabToSelect))
+            {
+                Modül_Tabları.SelectedTab = Modül_Tabları.TabPages[tabToSelect];
+                veri_listesi_seçimi.Text = "Ekonometrik Yük Tahmini Verileri";
+                veri_listesi_seçimi.Enabled = false;
+
+                HideOtherTabs(tabToSelect);
+            }
+            else
+            {
+                throw new ArgumentException($"Tab '{tabToSelect}' does not exist.");
+            }
+        }
+
+        // Hide all tabs except the specified one
+        private void HideOtherTabs(string tabToKeep)
+        {
+            foreach (TabPage tabPage in Modül_Tabları.TabPages.Cast<TabPage>().ToList())
+            {
+                if (tabPage.Name != tabToKeep && !hiddenTabs.Contains(tabPage))  // Ensure tab isn't already hidden
+                {
+                    hiddenTabs.Add(tabPage);
+                    Modül_Tabları.TabPages.Remove(tabPage);
+                }
+            }
+        }
+
+        // Initialize form based on the selected method
+        private void InitializeFormBasedOnMethod()
+        {
+            if (selectedMethod == "ELF (Ekonometrik)")
+            {
+                // Show only the tab_girdi tab and hide others
+                InitializeTabs("tab_girdi");
+            }
+            else if (selectedMethod == "SLF (Jeo-Uzamsal)")
+            {
+                // For SLF, do not hide any tabs. You can add other logic here if needed.
+            }
+        }
+
+        // Restore hidden tabs
+        public void RestoreHiddenTabs()
+        {
+            foreach (TabPage tabPage in hiddenTabs.ToList())  // Use a copy of the list to avoid modification issues
+            {
+                if (!Modül_Tabları.TabPages.Contains(tabPage))  // Ensure tab isn't already restored
+                {
+                    Modül_Tabları.TabPages.Add(tabPage);
+                }
+            }
+
+            hiddenTabs.Clear();  // Clear the list after restoring
+        }
+        /*        public ModülFormu()
+                {
+
+                    InitializeComponent();
+                    InitializeGMap(gMapControl_stokastik);
+                    InitializeGMap(gMapControl_EA);
+                    SortTabPagesAlphabetically(Modül_Tabları, true);
+                    ModuleTabPanel.Paint += new PaintEventHandler(ModuleTabPanel_Paint);
+                    //HeaderPanel.Paint += new PaintEventHandler(HeaderPanel_Paint);
+
+                    Modül_Tabları.SelectedTab = tab_girdi;
+
+                    tüm_katmanlar_array_names = new string[13];
+                    tüm_katmanlar_array = new GMapOverlay[13];
+                    shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[13];
+                    tüm_katmanlar_datatable = new DataTable[13];
+
+                    // define the initial directory to be shown when the user opens up the import file dialog
+                    targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
+
+                    // bring the layers buttons that are positioned on the bottom left of the maps to front
+                    buton_stokastik_harita_katmanlar.BringToFront();
+                    buton_ea_harita_katmanlar.BringToFront();
+
+                    // initialization of the polygonAttributes object that gets to be displayed when double clicking
+                    // on the map
+                    polygonAttributes = new Dictionary<GMapPolygon, DataRow>();
+                    polygonAttributes_grid = new Dictionary<NetTopologySuite.Geometries.Polygon, DataRow>();
+
+                    // stokastik haritası cetvel, nokta, poligon üst katmanları
+                    gMapControl_stokastik.Overlays.Add(rulerOverlay_stokastik);
+                    gMapControl_stokastik.Overlays.Add(markerOverlay_stokastik);
+
+                    //
+                    gMapControl_stokastik.Overlays.Add(gridOverlay);
+                    stokastik_haritası_checkboxes_init();
+
+                    // EA haritası cetvel, nokta, poligon üst katmanları
+                    gMapControl_EA.Overlays.Add(rulerOverlay_ea);
+                    gMapControl_EA.Overlays.Add(markerOverlay_ea);
+                    gMapControl_EA.Overlays.Add(polygonOverlay_ea);
+
+                    Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+
+                    // Girdi Modülü'nde default olarak "Abone Verileri" seçeneğini göster
+                    veri_listesi_seçimi.SelectedIndex = 0;
+
+                    // initialize the previously declared tablo_formu instance.
+                    tablo_formu = new Tablo_Formu();
+
+                }
+        */
         private DataTable LoadAttributeTable(DataRow row, DataGridView dataGridView,
                 ShapefileDataReader shapefile_reader, DataTable data_table, int row_cnt)
         {
@@ -2542,7 +2669,7 @@ namespace SLF
             rulerOverlay.Routes.Add(rulerRoute_stokastik);
             gMapControl_EA.Refresh();
         }
-
+/*
 //THESE METHODS ARE ADDED FOR ELF METHOD SELECTION FROM METHODS FORM
 
         private string selectedMethod;  // Store the method
@@ -2615,7 +2742,7 @@ namespace SLF
             }
 
             hiddenTabs.Clear();  // Clear the list after restoring
-        }
+        }*/
 
         private void SelectFolderButton_Click(object sender, EventArgs e)
         {
@@ -3581,7 +3708,7 @@ namespace SLF
 
 
         /// <summary>
-        /// ELF METHOD RELATED CHANGES&UPDATES
+        /// ELF METHOD RScript Run RELATED CHANGES & UPDATES
         /// </summary>
         // Assuming you have a class like this
         public class ScriptProcessor
