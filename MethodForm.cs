@@ -9,12 +9,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-
-/*namespace SLF
+namespace SLF
 {
     public partial class MethodForm : Form
     {
         public ModülFormu mod1;
+        public string selectedMethod { get; private set; }
 
         public MethodForm()
         {
@@ -25,35 +25,8 @@ using System.Windows.Forms;
         {
             if (MethodComboBox.SelectedItem != null)
             {
-                string selectedItem = MethodComboBox.SelectedItem.ToString();
-
-                switch (selectedItem)
-                {
-                    case "SLF":
-                        mod1 = new ModülFormu();
-                        this.Hide();
-                        mod1.ShowDialog();
-                        this.Show();
-                        break;
-
-                    case "ELF":
-                        mod1 = new ModülFormu("tab_girdi");
-                        //mod1.Modül_Tabları.SelectedTab = mod1.tab_girdi;
-
-                        // Use the public property to set ComboBox text
-                        mod1.VeriListesiText = "Ekonometrik Yük Tahmini Verileri";
-                        // Use the public method to disable the ComboBox
-                        mod1.SetVeriListesiEnabled(false);
-
-                        this.Hide();
-                        mod1.ShowDialog();
-                        this.Show();
-                        break;
-
-                    default:
-                        MessageBox.Show("Please select a valid option from the ComboBox.");
-                        break;
-                }
+                selectedMethod = MethodComboBox.SelectedItem.ToString();
+                OpenModülFormuBasedOnSelection(selectedMethod);
             }
             else
             {
@@ -61,20 +34,31 @@ using System.Windows.Forms;
             }
         }
 
+        private void OpenModülFormuBasedOnSelection(string method)
+        {
+            mod1 = new ModülFormu(method);  // Pass selectedMethod to ModülFormu
+            this.Hide();  // Hide current form
+            mod1.ShowDialog();  // Show the new form as a dialog
+            this.Show();  // Show current form again after new form is closed
+        }
+
+
         private void MethodPanel_Paint(object sender, PaintEventArgs e)
         {
             MethodPanel.BackColor = Color.FromArgb(100, 0, 0, 0);
         }
     }
-}*/
+}
 
 
-namespace SLF
+
+/*namespace SLF
 {
     public partial class MethodForm : Form
     {
         public ModülFormu mod1;
-        public string selectedItem;
+        //public string selectedItem;
+        public string selectedMethod { get; private set; }
 
 
         public MethodForm()
@@ -87,10 +71,10 @@ namespace SLF
             // Check if the ComboBox has a selected item
             if (MethodComboBox.SelectedItem != null)
             {
-               selectedItem = MethodComboBox.SelectedItem.ToString();
+                selectedMethod = MethodComboBox.SelectedItem.ToString();
 
                 // Handle different actions based on the selected ComboBox item
-                switch (selectedItem)
+                switch (selectedMethod)
                 {
                     case "SLF":
                         // Open the ModülFormu with no specific tab selected (open whole tabs)
@@ -126,7 +110,7 @@ namespace SLF
             MethodPanel.BackColor = Color.FromArgb(100, 0, 0, 0);
         }
     }
-}
+}*/
 
 /*
 Modül_Tabları.SelectTab(tab_girdi);
