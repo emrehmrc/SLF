@@ -24,6 +24,7 @@ using NetTopologySuite.Features;
 using NetTopologySuite.Operation;
 using MapWinGIS;
 using SharpMap.Data.Providers;
+using System.Threading;
 
 namespace SLF
 {
@@ -169,6 +170,7 @@ namespace SLF
             InitializeComponent();
             InitializeGMap(gMapControl_stokastik);
             InitializeGMap(gMapControl_EA);
+            
 
             SortTabPagesAlphabetically(Modül_Tabları, true);
 
@@ -3328,7 +3330,7 @@ namespace SLF
 
         private void startYearComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(startYearComboBox.SelectedIndex == -1)
+            if (startYearComboBox.SelectedIndex == -1)
             {
                 return;
             }
@@ -3355,6 +3357,172 @@ namespace SLF
         {
             yearApproveButton.Enabled = true;
         }
+        private void calculateChargeStation(int greenAc, int redDc)
+        {
+            // Önce mevcut label'ı bulup, varsa kaldırıyoruz
+            var existingLabel = this.Controls.Find("istasyonAdetLabel", true).FirstOrDefault();
+            if (existingLabel != null)
+            {
+                this.Controls.Remove(existingLabel);
+            }
+
+            // Yeni bir label oluşturuyoruz
+            System.Windows.Forms.Label istasyonAdetLabel = new System.Windows.Forms.Label();
+            istasyonAdetLabel.Text = $"AC istasyonlar: {greenAc-1}, DC istasyonlar: {redDc-1}";
+
+            // GMap kontrolünün sağ üst köşesine yerleştiriyoruz
+            istasyonAdetLabel.Location = new System.Drawing.Point(gMapControl_EA.Width - 400, 10);  // Sağ üst köşeye yerleştir
+            istasyonAdetLabel.AutoSize = true;  // Label boyutunu otomatik ayarla
+
+            // Kalın font ve büyük boyut
+            istasyonAdetLabel.Font = new System.Drawing.Font("Arial", 16, System.Drawing.FontStyle.Bold);
+            istasyonAdetLabel.BackColor = System.Drawing.Color.Transparent;
+            istasyonAdetLabel.ForeColor = System.Drawing.Color.White;  // Yazı rengi siyah
+            //istasyonAdetLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle; // Kenarlık ekleyelim
+            istasyonAdetLabel.BackColor = System.Drawing.Color.Transparent;
+            // Sağ üst köşeye sabitlenecek şekilde anchor ayarlıyoruz (gMapControl içinde)
+            istasyonAdetLabel.Anchor = (AnchorStyles.Top | AnchorStyles.Right);
+            istasyonAdetLabel.Name = "istasyonAdetLabel";  // Label'in adı, gelecekte bulmak için
+
+            // Label'i gMapControl_EA'nin bir alt kontrolü olarak ekliyoruz
+            gMapControl_EA.Controls.Add(istasyonAdetLabel);
+
+            // GMap kontrolünü yeniden çizdiriyoruz
+            gMapControl_EA.Refresh();
+        }
+
+
+        private async Task eaHaritayaVeriYukleAsync()
+        {  // backend işlemleri tamamlandıgında pointlerin haritada gösterilme işlemleri
+            int redDc = 0;
+            int greenAc = 0;
+
+            try
+            {
+                // EA haritası için bir katman (overlay) oluştur
+                GMapOverlay eaOverlay = new GMapOverlay("EA Layer");
+
+                // Eğer DataGridView1'de veri yoksa uyarı ver
+                if (dataGridView1.DataSource == null)
+                {
+                    MessageBox.Show("Veri kaynağı bulunamadı. Lütfen verileri kontrol edin.");
+                    return;
+                }
+
+                // Önce mevcut overlay'leri temizleyin
+                gMapControl_EA.Overlays.Clear();
+
+                // Verilerin işlenmesini asenkron şekilde başlatıyoruz (arka planda)
+                DataTable eaData = await Task.Run(() => DataGridViewToDataTable(dataGridView1));
+
+                // Veri işlemi başarılıysa devam edin
+                if (eaData != null && eaData.Rows.Count > 0)
+                {
+                    // UI işlemlerini ana thread'e aktarıyoruz
+                    Invoke(new Action(() =>
+                    {
+                        // EA verilerini harita üzerine işaretleyici (marker) olarak ekliyoruz
+                        foreach (DataRow row in eaData.Rows)
+                        {
+                            // Koordinatların null veya boş olup olmadığını kontrol edin
+                            if (!girdiModülü.IsNullLike(row["EA_X_KOORDINAT"]) && !girdiModülü.IsNullLike(row["EA_Y_KOORDINAT"]))
+                            {
+                                // Koordinatları al
+                                double x = Convert.ToDouble(row["EA_X_KOORDINAT"]);
+                                double y = Convert.ToDouble(row["EA_Y_KOORDINAT"]);
+
+                                // İstasyon gücünü kontrol edin ve işaretleyiciyi ekleyin
+                                if (int.TryParse(row["ISTASYON_GUCU"].ToString(), out int istasyonGucu))
+                                {
+                                    GMarkerGoogle marker;
+
+                                    // İstasyon gücüne göre yeşil veya kırmızı işaretleyici ekleyin
+                                    if (istasyonGucu <= 22)
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.green);
+                                        greenAc++;  // AC istasyonu için sayaç artır
+                                    }
+                                    else
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.red);
+                                        redDc++;  // DC istasyonu için sayaç artır
+                                    }
+
+                                    eaOverlay.Markers.Add(marker);  // Marker'ı overlay'e ekle
+                                }
+                            }
+                        }
+
+                        // Yeni overlay'i ekleyin ve haritayı güncelleyin
+                        gMapControl_EA.Overlays.Add(eaOverlay);
+                        gMapControl_EA.Refresh();
+
+                        calculateChargeStation(greenAc, redDc);
+                    }));
+                }
+                else
+                {
+                    MessageBox.Show("Lütfen Ea şarj noktalarını görebilmek için verilerinizi yükleyiniz.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Bir hata oluştu: {ex.Message}");
+            }
+        }
+        
+
+        public DataTable DataGridViewToDataTable(DataGridView dataGridView) // datagridview verilerinin datatable donusumu 
+        {
+            DataTable dataTable = new DataTable();
+
+            // Sütunları ekleyin
+            foreach (DataGridViewColumn column in dataGridView.Columns)
+            {
+                // DataTable'e sütunları ekleyin
+                dataTable.Columns.Add(column.Name, column.ValueType);
+            }
+
+            // Satırları ekleyin
+            foreach (DataGridViewRow row in dataGridView.Rows)
+            {
+                // Eğer satır doluysa veri ekleyin (son satır boş olabilir)
+                if (!row.IsNewRow)
+                {
+                    DataRow dataRow = dataTable.NewRow();
+
+                    foreach (DataGridViewCell cell in row.Cells)
+                    {
+                        dataRow[cell.ColumnIndex] = cell.Value ?? DBNull.Value; // Hücre dolu değilse DBNull olarak ayarlayın
+                    }
+
+                    dataTable.Rows.Add(dataRow);
+                }
+            }
+
+            return dataTable;
+        }
+
+        private async void Modül_Tabları_SelectedIndexChanged(object sender, EventArgs e) // ea sarj modulu butonu tıklandgında baslayan event fonksiyonu
+        {
+            // Sadece "EA Şarj Modülü" tabına tıklandığında işlem yapalım
+            if (Modül_Tabları.SelectedTab.Text == "EA Şarj Modülü")
+            {
+                if (dataGridView1.DataSource == null)
+                {
+                    MessageBox.Show("Lütfen önce verileri yükleyin.");
+                    return;
+                }
+
+                // Harita işlemini başlat
+                await eaHaritayaVeriYukleAsync();
+            }
+        }
+
+        //private void EA_list_box_SelectedIndexChanged(object sender, EventArgs e) // ea katman kısmı 
+        //{
+
+        //}
 
         private void yearApproveButton_Click(object sender, EventArgs e)
         {

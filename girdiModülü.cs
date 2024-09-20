@@ -151,7 +151,7 @@ namespace SLF
             return roundedKapasite;
         }
 
-        protected bool IsNullLike(object value, bool isZero=false)
+        public bool IsNullLike(object value, bool isZero=false)
         {
             if (value == null || value == DBNull.Value)
             {

@@ -257,8 +257,8 @@ namespace SLF
             // 
             // Modül_Tabları
             // 
-            this.Modül_Tabları.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.Modül_Tabları.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Modül_Tabları.Controls.Add(this.tab_girdi);
             this.Modül_Tabları.Controls.Add(this.tab_dek);
@@ -282,6 +282,7 @@ namespace SLF
             this.Modül_Tabları.SelectedIndex = 0;
             this.Modül_Tabları.Size = new System.Drawing.Size(1480, 700);
             this.Modül_Tabları.TabIndex = 2;
+            this.Modül_Tabları.SelectedIndexChanged += new System.EventHandler(this.Modül_Tabları_SelectedIndexChanged);
             // 
             // tab_girdi
             // 
@@ -310,7 +311,7 @@ namespace SLF
             // yearApproveButton
             // 
             this.yearApproveButton.Location = new System.Drawing.Point(1064, 58);
-            this.yearApproveButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.yearApproveButton.Margin = new System.Windows.Forms.Padding(4);
             this.yearApproveButton.Name = "yearApproveButton";
             this.yearApproveButton.Size = new System.Drawing.Size(100, 28);
             this.yearApproveButton.TabIndex = 11;
@@ -396,8 +397,8 @@ namespace SLF
             // 
             // dataGridView1
             // 
-            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Location = new System.Drawing.Point(45, 166);
@@ -476,10 +477,10 @@ namespace SLF
             this.tab_dek.Controls.Add(this.button8);
             this.tab_dek.Controls.Add(this.label16);
             this.tab_dek.Controls.Add(this.dataGridView4);
-            this.tab_dek.Location = new System.Drawing.Point(4, 91);
+            this.tab_dek.Location = new System.Drawing.Point(4, 62);
             this.tab_dek.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tab_dek.Name = "tab_dek";
-            this.tab_dek.Size = new System.Drawing.Size(1472, 605);
+            this.tab_dek.Size = new System.Drawing.Size(1472, 634);
             this.tab_dek.TabIndex = 6;
             this.tab_dek.Text = "DEK Modülü";
             this.tab_dek.UseVisualStyleBackColor = true;
@@ -506,8 +507,8 @@ namespace SLF
             // 
             // dataGridView4
             // 
-            this.dataGridView4.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.dataGridView4.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView4.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView4.Location = new System.Drawing.Point(368, 44);
@@ -530,10 +531,10 @@ namespace SLF
             this.tab_ea.Controls.Add(this.EA_list_box);
             this.tab_ea.Controls.Add(this.gMapControl_EA);
             this.tab_ea.Controls.Add(this.button7);
-            this.tab_ea.Location = new System.Drawing.Point(4, 91);
+            this.tab_ea.Location = new System.Drawing.Point(4, 62);
             this.tab_ea.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tab_ea.Name = "tab_ea";
-            this.tab_ea.Size = new System.Drawing.Size(1472, 605);
+            this.tab_ea.Size = new System.Drawing.Size(1472, 634);
             this.tab_ea.TabIndex = 5;
             this.tab_ea.Text = "EA Şarj Modülü";
             this.tab_ea.UseVisualStyleBackColor = true;
@@ -918,11 +919,12 @@ namespace SLF
             this.EA_list_box.Name = "EA_list_box";
             this.EA_list_box.Size = new System.Drawing.Size(244, 124);
             this.EA_list_box.TabIndex = 20;
+            //this.EA_list_box.SelectedIndexChanged += new System.EventHandler(this.EA_list_box_SelectedIndexChanged);
             // 
             // gMapControl_EA
             // 
-            this.gMapControl_EA.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.gMapControl_EA.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gMapControl_EA.Bearing = 0F;
             this.gMapControl_EA.CanDragMap = true;
@@ -974,11 +976,11 @@ namespace SLF
             this.tab_ekonometrik.Controls.Add(this.button10);
             this.tab_ekonometrik.Controls.Add(this.label12);
             this.tab_ekonometrik.Controls.Add(this.dataGridView2);
-            this.tab_ekonometrik.Location = new System.Drawing.Point(4, 91);
+            this.tab_ekonometrik.Location = new System.Drawing.Point(4, 62);
             this.tab_ekonometrik.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tab_ekonometrik.Name = "tab_ekonometrik";
             this.tab_ekonometrik.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tab_ekonometrik.Size = new System.Drawing.Size(1472, 605);
+            this.tab_ekonometrik.Size = new System.Drawing.Size(1472, 634);
             this.tab_ekonometrik.TabIndex = 1;
             this.tab_ekonometrik.Text = "Ekonometrik Talep Tahmini Modülü";
             this.tab_ekonometrik.UseVisualStyleBackColor = true;
@@ -1094,8 +1096,8 @@ namespace SLF
             // 
             // dataGridView2
             // 
-            this.dataGridView2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.dataGridView2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView2.Location = new System.Drawing.Point(451, 49);
@@ -1109,10 +1111,10 @@ namespace SLF
             // tab_imar
             // 
             this.tab_imar.Controls.Add(this.button6);
-            this.tab_imar.Location = new System.Drawing.Point(4, 91);
+            this.tab_imar.Location = new System.Drawing.Point(4, 62);
             this.tab_imar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tab_imar.Name = "tab_imar";
-            this.tab_imar.Size = new System.Drawing.Size(1472, 605);
+            this.tab_imar.Size = new System.Drawing.Size(1472, 634);
             this.tab_imar.TabIndex = 4;
             this.tab_imar.Text = "İmar Analizleri";
             this.tab_imar.UseVisualStyleBackColor = true;
@@ -1130,20 +1132,20 @@ namespace SLF
             // 
             // tab_optDTR
             // 
-            this.tab_optDTR.Location = new System.Drawing.Point(4, 91);
+            this.tab_optDTR.Location = new System.Drawing.Point(4, 62);
             this.tab_optDTR.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tab_optDTR.Name = "tab_optDTR";
-            this.tab_optDTR.Size = new System.Drawing.Size(1472, 605);
+            this.tab_optDTR.Size = new System.Drawing.Size(1472, 634);
             this.tab_optDTR.TabIndex = 7;
             this.tab_optDTR.Text = "Optimal DTR Konumlandırma";
             this.tab_optDTR.UseVisualStyleBackColor = true;
             // 
             // tab_senaryo
             // 
-            this.tab_senaryo.Location = new System.Drawing.Point(4, 91);
+            this.tab_senaryo.Location = new System.Drawing.Point(4, 62);
             this.tab_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tab_senaryo.Name = "tab_senaryo";
-            this.tab_senaryo.Size = new System.Drawing.Size(1472, 605);
+            this.tab_senaryo.Size = new System.Drawing.Size(1472, 634);
             this.tab_senaryo.TabIndex = 3;
             this.tab_senaryo.Text = "Senaryo Oluşturma Modülü";
             this.tab_senaryo.UseVisualStyleBackColor = true;
@@ -1170,10 +1172,10 @@ namespace SLF
             this.tab_stokastik.Controls.Add(this.label13);
             this.tab_stokastik.Controls.Add(this.stokastik_dosya_seçimi);
             this.tab_stokastik.Controls.Add(this.Seç_Stokastik);
-            this.tab_stokastik.Location = new System.Drawing.Point(4, 91);
+            this.tab_stokastik.Location = new System.Drawing.Point(4, 62);
             this.tab_stokastik.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tab_stokastik.Name = "tab_stokastik";
-            this.tab_stokastik.Size = new System.Drawing.Size(1472, 605);
+            this.tab_stokastik.Size = new System.Drawing.Size(1472, 634);
             this.tab_stokastik.TabIndex = 2;
             this.tab_stokastik.Text = "Stokastik Yük Tahmini Modülü";
             this.tab_stokastik.UseVisualStyleBackColor = true;
@@ -1285,8 +1287,8 @@ namespace SLF
             // gMapControl_stokastik
             // 
             this.gMapControl_stokastik.AllowDrop = true;
-            this.gMapControl_stokastik.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.gMapControl_stokastik.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gMapControl_stokastik.Bearing = 0F;
             this.gMapControl_stokastik.CanDragMap = true;
@@ -1488,7 +1490,7 @@ namespace SLF
             // 
             // Seç_Stokastik
             // 
-            this.Seç_Stokastik.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.Seç_Stokastik.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Seç_Stokastik.Dock = System.Windows.Forms.DockStyle.None;
             this.Seç_Stokastik.ImageScalingSize = new System.Drawing.Size(20, 20);
@@ -1715,10 +1717,10 @@ namespace SLF
             this.tab_yükHaritası.Controls.Add(this.button3);
             this.tab_yükHaritası.Controls.Add(this.webView21);
             this.tab_yükHaritası.Controls.Add(this.panel1);
-            this.tab_yükHaritası.Location = new System.Drawing.Point(4, 91);
+            this.tab_yükHaritası.Location = new System.Drawing.Point(4, 62);
             this.tab_yükHaritası.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tab_yükHaritası.Name = "tab_yükHaritası";
-            this.tab_yükHaritası.Size = new System.Drawing.Size(1472, 605);
+            this.tab_yükHaritası.Size = new System.Drawing.Size(1472, 634);
             this.tab_yükHaritası.TabIndex = 9;
             this.tab_yükHaritası.Text = "Yük Haritası Modülü";
             this.tab_yükHaritası.UseVisualStyleBackColor = true;
@@ -1838,8 +1840,8 @@ namespace SLF
             // webView21
             // 
             this.webView21.AllowExternalDrop = true;
-            this.webView21.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.webView21.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.webView21.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.webView21.CreationProperties = null;
@@ -1941,20 +1943,20 @@ namespace SLF
             // 
             // tab_rapor
             // 
-            this.tab_rapor.Location = new System.Drawing.Point(4, 91);
+            this.tab_rapor.Location = new System.Drawing.Point(4, 62);
             this.tab_rapor.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tab_rapor.Name = "tab_rapor";
-            this.tab_rapor.Size = new System.Drawing.Size(1472, 605);
+            this.tab_rapor.Size = new System.Drawing.Size(1472, 634);
             this.tab_rapor.TabIndex = 8;
             this.tab_rapor.Text = "Raporlama";
             this.tab_rapor.UseVisualStyleBackColor = true;
             // 
             // tab_validasyon
             // 
-            this.tab_validasyon.Location = new System.Drawing.Point(4, 91);
+            this.tab_validasyon.Location = new System.Drawing.Point(4, 62);
             this.tab_validasyon.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tab_validasyon.Name = "tab_validasyon";
-            this.tab_validasyon.Size = new System.Drawing.Size(1472, 605);
+            this.tab_validasyon.Size = new System.Drawing.Size(1472, 634);
             this.tab_validasyon.TabIndex = 10;
             this.tab_validasyon.Text = "Validasyon Modülü";
             this.tab_validasyon.UseVisualStyleBackColor = true;

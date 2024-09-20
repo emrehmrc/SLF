@@ -11,7 +11,7 @@ namespace SLF
     public class EASarjModulu : GirdiModülü
 
     {
-        protected override List<string> Prerequisites => new List<string> { "DTR Verileri"};
+        protected override List<string> Prerequisites => new List<string> { "DTR Verileri" };
         private void PreprocessMismatchedTrafoKodu()
         {
             DataTable trafoDataTable = dataTablesByType["DTR Verileri"];    // datatablebytype ile birbirne baglı olana modullerin check ve imputasyonlar buradan başlıyor 
