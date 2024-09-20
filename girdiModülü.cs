@@ -166,8 +166,7 @@ namespace SLF
             return nullLikeStrings.Contains(stringValue, StringComparer.OrdinalIgnoreCase);
         }
 
-        public void VEERReport(string seçilenVeriTipi)
-        {
+        public void VEERReport(string seçilenVeriTipi) {
             DataTable dataTable = importedDataTable;
             if (dataTable != null && dataTable.Rows.Count > 0)
             {
@@ -179,22 +178,14 @@ namespace SLF
                 MessageBox.Show($"{seçilenVeriTipi}'ni yüklemeden rapor tablosunu göremezsiniz.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
-        // bool skipPrerequisites is added for direct access to ELF Method
-
-        public bool VEERProcess(string seçilenVeriTipi, bool skipPrerequisites = false)
+        public bool VEERProcess(string seçilenVeriTipi)
         {
             try
             {
-                // Skip prerequisite check if the flag is true
-                if (!skipPrerequisites)
-                {
-                    CheckPrerequisites(seçilenVeriTipi); // Check the required datatables for the given module
-                }
-
+                CheckPrerequisites(seçilenVeriTipi); // Check the required datatables for the given module
                 // ProcessFileSelection metodu ile dosya seçme işlemi yapılır ve seçilen dosya veri tablosuna yüklenir
                 ProcessFileSelection(seçilenVeriTipi);
                 DataTable dataTable = CurrentDataTable;
-
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
                     Onizleme1.Onizleme_DataGrid1.DataSource = dataTable;
@@ -261,80 +252,6 @@ namespace SLF
             return false;
         }
 
-        /*        public bool VEERProcess(string seçilenVeriTipi)
-                {
-                    try
-                    {
-                        CheckPrerequisites(seçilenVeriTipi); // Check the required datatables for the given module
-                        // ProcessFileSelection metodu ile dosya seçme işlemi yapılır ve seçilen dosya veri tablosuna yüklenir
-                        ProcessFileSelection(seçilenVeriTipi);
-                        DataTable dataTable = CurrentDataTable;
-                        if (dataTable != null && dataTable.Rows.Count > 0)
-                        {
-                            Onizleme1.Onizleme_DataGrid1.DataSource = dataTable;
-                            onizleme1.Buton_YUKLE.Enabled = false;
-                            onizleme1.Buton_İLERLE.Enabled = true;
-                            ClearReportRows();
-
-                            Preprocess();
-                            while (true)
-                            {
-                                ClearRows();
-                                Validate();
-                                RenameTabCounts();
-                                AppendAllToReportDataTables();
-                                if (IsError())
-                                {
-                                    onizleme1.Buton_YUKLE.Enabled = false;
-                                    onizleme1.Buton_İLERLE.Enabled = false;
-                                }
-
-                                // Exit the loop if there are no info or warning messages
-                                if (!IsInfo() && !IsWarning())
-                                {
-                                    onizleme1.Buton_YUKLE.Enabled = true;
-                                    onizleme1.Buton_İLERLE.Enabled = false;
-                                }
-                                var dialogResult = Onizleme1.ShowDialog();
-                                if (dialogResult == DialogResult.Cancel)
-                                {
-                                    return false;
-                                }
-                                else if (dialogResult == DialogResult.OK)
-                                {
-                                    break;
-                                }
-
-                                Remove();
-                                ClearRows();
-                                Validate();
-                                Impute();
-                            }
-                            Postprocess();
-                            ImportProcessedData();
-                            ShowImportedMessage();
-                            return true;
-                        }
-                        else
-                        {
-                            MessageBox.Show("Dosya seçimi gerçekleştirilemedi.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        }
-                    }
-                    catch (NoFileSelectedException ex)
-                    {
-                        MessageBox.Show(ex.Message, "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
-                    catch (InvalidColumnHeadersException ex)
-                    {
-                        MessageBox.Show("Geçersiz sütun biçimi: " + ex.Message, "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    catch (PrerequisiteException ex)
-                    {
-                        MessageBox.Show(ex.Message, "Önkoşul hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    return false;
-                }
-        */
         public void ShowImportedMessage()
         {
             StringBuilder sb = new StringBuilder();
@@ -583,22 +500,22 @@ namespace SLF
 
         public virtual void Remove()
         {
-
+        
         }
 
         public virtual void Impute()
         {
-
+        
         }
 
         public virtual void Preprocess()
         {
-
+        
         }
 
         public virtual void Postprocess()
         {
-
+        
         }
 
         protected void ClearRows()
