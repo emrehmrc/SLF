@@ -1681,6 +1681,37 @@ namespace SLF
             this.button2.UseVisualStyleBackColor = true;
             this.button2.UseWaitCursor = true;
             // 
+            // ELFBaseSenaryoRadioButton
+            // 
+            this.ELFBaseSenaryoRadioButton.AutoSize = true;
+            this.ELFBaseSenaryoRadioButton.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.ELFBaseSenaryoRadioButton.CheckedState.BorderThickness = 0;
+            this.ELFBaseSenaryoRadioButton.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.ELFBaseSenaryoRadioButton.CheckedState.InnerColor = System.Drawing.Color.White;
+            this.ELFBaseSenaryoRadioButton.CheckedState.InnerOffset = -4;
+            this.ELFBaseSenaryoRadioButton.Location = new System.Drawing.Point(3, 67);
+            this.ELFBaseSenaryoRadioButton.Name = "ELFBaseSenaryoRadioButton";
+            this.ELFBaseSenaryoRadioButton.Size = new System.Drawing.Size(101, 21);
+            this.ELFBaseSenaryoRadioButton.TabIndex = 25;
+            this.ELFBaseSenaryoRadioButton.Text = "Baz Senaryo";
+            this.ELFBaseSenaryoRadioButton.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
+            this.ELFBaseSenaryoRadioButton.UncheckedState.BorderThickness = 2;
+            this.ELFBaseSenaryoRadioButton.UncheckedState.FillColor = System.Drawing.Color.Transparent;
+            this.ELFBaseSenaryoRadioButton.UncheckedState.InnerColor = System.Drawing.Color.Transparent;
+            this.ELFBaseSenaryoRadioButton.UseWaitCursor = true;
+            // 
+            // button2
+            // 
+            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.button2.Location = new System.Drawing.Point(204, 133);
+            this.button2.Margin = new System.Windows.Forms.Padding(2);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(132, 57);
+            this.button2.TabIndex = 19;
+            this.button2.Text = "Tüm Sonuçları Görüntüle";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.UseWaitCursor = true;
+            // 
             // ELFPredictionButton
             // 
             this.ELFPredictionButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
