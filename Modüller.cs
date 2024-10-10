@@ -25,15 +25,19 @@ using NetTopologySuite.Operation;
 using MapWinGIS;
 using SharpMap.Data.Providers;
 using System.Drawing.Drawing2D;
+using ClosedXML.Excel;
+using OfficeOpenXml;
+using DrawingImage = System.Drawing.Image;
 
 namespace SLF
 {
     public partial class ModülFormu : Form
     {
+
         private double startX = 0, startY = 0;
         public int slfStartYear = 0, slfEndYear = 0;
         // form objeleri
-        public GirişFormu gir1;
+        public HomePageForm gir1;
         private GirdiModülü girdiModülü;
         private Dictionary<string, GirdiModülü> girdiModülleri = new Dictionary<string, GirdiModülü> {
             {"Abone Verileri", new AboneVerileri()},
@@ -162,20 +166,18 @@ namespace SLF
             gmap.Zoom = 13;
             gmap.DragButton = MouseButtons.Left;
         }
+
         private string selectedMethod;  // Store the method
         public List<TabPage> hiddenTabs = new List<TabPage>();  // To store hidden tabs
-
-
         public ModülFormu() : this("", "")
         {
         }
-
         // Main constructor with parameters for selectedMethod and tabToSelect
         public ModülFormu(string selectedMethod = "", string tabToSelect = "")
         {
             InitializeComponent();
+            this.DoubleBuffered = true;
             this.selectedMethod = selectedMethod;  // Store the method
-
             // Initialize the maps and other UI components
             InitializeFormComponents();
 
@@ -195,6 +197,8 @@ namespace SLF
             InitializeGMap(gMapControl_stokastik);
             InitializeGMap(gMapControl_EA);
             SortTabPagesAlphabetically(Modül_Tabları, true);
+            // Enable double buffering for the form to reduce flickering
+            this.DoubleBuffered = true;
 
             ModuleTabPanel.Paint += new PaintEventHandler(ModuleTabPanel_Paint);
 
@@ -228,38 +232,101 @@ namespace SLF
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
 
             // Default selection for veri_listesi_seçimi
-            veri_listesi_seçimi.SelectedIndex = 0;
+            veri_listesi_seçimi.SelectedIndex = 2;
 
             // Initialize the tablo_formu instance
             tablo_formu = new Tablo_Formu();
         }
-
-        // Initialize specific tabs and hide others
-        private void InitializeTabs(string tabToSelect)
+        //VISUAL CHANGES
+        private void ModuleTabPanel_Paint(object sender, PaintEventArgs e)
         {
-            if (Modül_Tabları.TabPages.ContainsKey(tabToSelect))
-            {
-                Modül_Tabları.SelectedTab = Modül_Tabları.TabPages[tabToSelect];
-                veri_listesi_seçimi.Text = "Ekonometrik Yük Tahmini Verileri";
-                veri_listesi_seçimi.Enabled = false;
+            // Get the Graphics object from the PaintEventArgs
+/*            Graphics graphics = e.Graphics;
 
-                HideOtherTabs(tabToSelect);
-            }
-            else
-            {
-                throw new ArgumentException($"Tab '{tabToSelect}' does not exist.");
-            }
+
+            // Create a rectangle the same size as the panel
+            Rectangle gradient_rectangle = new Rectangle(0, 0, ModuleTabPanel.Width, ModuleTabPanel.Height);
+
+            // Define the gradient's properties
+            Brush brush = new LinearGradientBrush(gradient_rectangle, Color.FromArgb(100, 252, 179, 38), Color.FromArgb(100, 0, 253, 147), 85f);
+
+            // Apply the gradient by filling the rectangle with the brush
+            graphics.FillRectangle(brush, gradient_rectangle);
+
+            // Optionally, set the panel's background color to be fully transparent
+            ModuleTabPanel.BackColor = Color.Transparent;
+            this.DoubleBuffered = true;*/
         }
 
-        // Hide all tabs except the specified one
-        private void HideOtherTabs(string tabToKeep)
+        /*        private void HeaderPanel_Paint(object sender, PaintEventArgs e)
+                {
+                    // Get the Graphics object from the PaintEventArgs
+                    Graphics graphics = e.Graphics;
+
+                    // Create a rectangle the same size as the panel
+                    Rectangle gradient_rectangle = new Rectangle(0, 0, HeaderPanel.Width, HeaderPanel.Height);
+
+                    // Define the gradient's properties
+                    Brush brush = new LinearGradientBrush(gradient_rectangle, Color.FromArgb(100, 252, 179, 38), Color.FromArgb(100, 0, 253, 147), 65f);
+
+                    // Apply the gradient by filling the rectangle with the brush
+                    graphics.FillRectangle(brush, gradient_rectangle);
+
+                    // Optionally, set the panel's background color to be fully transparent
+                    HeaderPanel.BackColor = Color.Transparent;
+                }*/
+        // Initialize specific tabs and hide others
+        private void InitializeTabs(params string[] tabsToSelect)
         {
+            foreach (string tabToSelect in tabsToSelect)
+            {
+                if (Modül_Tabları.TabPages.ContainsKey(tabToSelect))
+                {
+                    // Make sure the tab is selected in Modül_Tabları
+                    Modül_Tabları.SelectedTab = Modül_Tabları.TabPages[tabToSelect];
+                    // Custom logic for specific tabs in Modül_Tabları
+                    if (tabToSelect == "tab_girdi")
+                    {
+                        veri_listesi_seçimi.Text = "Ekonometrik Yük Tahmini Verileri";
+                        veri_listesi_seçimi.Enabled = false;
+                    }
+                }
+                else if (SenaryoModuleTabControl.TabPages.ContainsKey(tabToSelect))
+                {
+                    // Make sure the tab is selected in SenaryoModuleTabControl
+                    SenaryoModuleTabControl.SelectedTab = SenaryoModuleTabControl.TabPages[tabToSelect];
+                    // Custom logic for specific tabs in SenaryoModuleTabControl
+                }
+                else
+                {
+                    throw new ArgumentException($"Tab '{tabToSelect}' does not exist in either TabControl.");
+                }
+            }
+
+            // Hide all other tabs except the specified ones
+            HideOtherTabs(tabsToSelect);
+        }
+
+        // Hide all tabs except the ones specified
+        private void HideOtherTabs(params string[] tabsToKeep)
+        {
+            // Handle Modül_Tabları
             foreach (TabPage tabPage in Modül_Tabları.TabPages.Cast<TabPage>().ToList())
             {
-                if (tabPage.Name != tabToKeep && !hiddenTabs.Contains(tabPage))  // Ensure tab isn't already hidden
+                if (!tabsToKeep.Contains(tabPage.Name) && !hiddenTabs.Contains(tabPage))  // Ensure tab isn't already hidden
                 {
                     hiddenTabs.Add(tabPage);
                     Modül_Tabları.TabPages.Remove(tabPage);
+                }
+            }
+
+            // Handle SenaryoModuleTabControl
+            foreach (TabPage tabPage in SenaryoModuleTabControl.TabPages.Cast<TabPage>().ToList())
+            {
+                if (!tabsToKeep.Contains(tabPage.Name) && !hiddenTabs.Contains(tabPage))  // Ensure tab isn't already hidden
+                {
+                    hiddenTabs.Add(tabPage);
+                    SenaryoModuleTabControl.TabPages.Remove(tabPage);
                 }
             }
         }
@@ -269,80 +336,578 @@ namespace SLF
         {
             if (selectedMethod == "ELF (Ekonometrik)")
             {
-                // Show only the tab_girdi tab and hide others
-                InitializeTabs("tab_girdi");
+                // Show both the "tab_girdi" and "tab_ekonometrik" tabs and hide others
+                InitializeTabs("tab_girdi", "tab_ekonometrik", "tab_senaryo", "EkonometrikSenaryoTabPage");
+                Modül_Tabları.SelectedTab = tab_girdi;
             }
             else if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
-                // For SLF, do not hide any tabs. You can add other logic here if needed.
+                // For SLF, do not hide any tabs. Add logic here if needed.
             }
         }
 
         // Restore hidden tabs
         public void RestoreHiddenTabs()
         {
-            foreach (TabPage tabPage in hiddenTabs.ToList())  // Use a copy of the list to avoid modification issues
+            // Restore tabs for Modül_Tabları
+            foreach (TabPage tabPage in hiddenTabs.ToList())
             {
-                if (!Modül_Tabları.TabPages.Contains(tabPage))  // Ensure tab isn't already restored
+                if (!Modül_Tabları.TabPages.Contains(tabPage))
                 {
                     Modül_Tabları.TabPages.Add(tabPage);
                 }
             }
 
+            // Restore tabs for SenaryoModuleTabControl
+            foreach (TabPage tabPage in hiddenTabs.ToList())
+            {
+                if (!SenaryoModuleTabControl.TabPages.Contains(tabPage))
+                {
+                    SenaryoModuleTabControl.TabPages.Add(tabPage);
+                }
+            }
+
             hiddenTabs.Clear();  // Clear the list after restoring
         }
-        /*        public ModülFormu()
+
+        private void OpenModuleButton_Click(object sender, EventArgs e)
+        {
+            string filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+
+            // Load the Excel package
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                // Clear previous data
+                ELFMinSenaryoTable.DataSource = null;
+                ELFLowSenaryoTable.DataSource = null;
+                ELFBaseSenaryoTable.DataSource = null;
+                ELFHighSenaryoTable.DataSource = null;
+                ELFMaxSenaryoTable.DataSource = null;
+
+                // Load only sheets 2 to 6 (indices 1 to 5)
+                for (int i = 0; i <= 5; i++) // i = 1 corresponds to sheet 2, i = 5 corresponds to sheet 6
                 {
+                    var worksheet = package.Workbook.Worksheets[i + 1]; // Worksheets are 1-indexed, so i + 1 is used here
+                    DataTable dt = new DataTable();
 
-                    InitializeComponent();
-                    InitializeGMap(gMapControl_stokastik);
-                    InitializeGMap(gMapControl_EA);
-                    SortTabPagesAlphabetically(Modül_Tabları, true);
-                    ModuleTabPanel.Paint += new PaintEventHandler(ModuleTabPanel_Paint);
-                    //HeaderPanel.Paint += new PaintEventHandler(HeaderPanel_Paint);
+                    // Load header
+                    for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+                    {
+                        dt.Columns.Add(worksheet.Cells[1, col].Text);
+                    }
 
-                    Modül_Tabları.SelectedTab = tab_girdi;
+                    // Load data
+                    for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+                    {
+                        var newRow = dt.NewRow();
+                        for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+                        {
+                            newRow[col - 1] = worksheet.Cells[row, col].Text;
+                        }
+                        dt.Rows.Add(newRow);
+                    }
 
-                    tüm_katmanlar_array_names = new string[13];
-                    tüm_katmanlar_array = new GMapOverlay[13];
-                    shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[13];
-                    tüm_katmanlar_datatable = new DataTable[13];
-
-                    // define the initial directory to be shown when the user opens up the import file dialog
-                    targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
-
-                    // bring the layers buttons that are positioned on the bottom left of the maps to front
-                    buton_stokastik_harita_katmanlar.BringToFront();
-                    buton_ea_harita_katmanlar.BringToFront();
-
-                    // initialization of the polygonAttributes object that gets to be displayed when double clicking
-                    // on the map
-                    polygonAttributes = new Dictionary<GMapPolygon, DataRow>();
-                    polygonAttributes_grid = new Dictionary<NetTopologySuite.Geometries.Polygon, DataRow>();
-
-                    // stokastik haritası cetvel, nokta, poligon üst katmanları
-                    gMapControl_stokastik.Overlays.Add(rulerOverlay_stokastik);
-                    gMapControl_stokastik.Overlays.Add(markerOverlay_stokastik);
-
-                    //
-                    gMapControl_stokastik.Overlays.Add(gridOverlay);
-                    stokastik_haritası_checkboxes_init();
-
-                    // EA haritası cetvel, nokta, poligon üst katmanları
-                    gMapControl_EA.Overlays.Add(rulerOverlay_ea);
-                    gMapControl_EA.Overlays.Add(markerOverlay_ea);
-                    gMapControl_EA.Overlays.Add(polygonOverlay_ea);
-
-                    Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
-
-                    // Girdi Modülü'nde default olarak "Abone Verileri" seçeneğini göster
-                    veri_listesi_seçimi.SelectedIndex = 0;
-
-                    // initialize the previously declared tablo_formu instance.
-                    tablo_formu = new Tablo_Formu();
-
+                    // Set the data source for the corresponding DataGridView
+                    if (i < 5) // Adjust to match the DataGridView indices
+                    {
+                        var dataGrids = new[] { ELFMinSenaryoTable, ELFLowSenaryoTable, ELFBaseSenaryoTable, ELFHighSenaryoTable, ELFMaxSenaryoTable };
+                        dataGrids[i].DataSource = dt;
+                    }
                 }
-        */
+            }
+
+            // Optionally set the selected tab to tab_senaryo
+            Modül_Tabları.SelectedTab = tab_senaryo;
+        }
+
+
+
+
+        /*        // Event handler for opening the Senaryo module
+                private void OpenModuleButton_Click(object sender, EventArgs e)
+                {
+                    Modül_Tabları.SelectedTab = tab_senaryo;
+
+
+                    if (veri_listesi_seçimi.Text == "EA Şarj Verileri")
+                    {
+                        // List of tab names to hide
+                        string[] tabsToHide = { "StokastikSenaryoTabPage", "DEKSenaryoTabPage", "EkonometrikSenaryoTabPage" };
+
+                        // Loop through each tab name and remove it if it exists
+                        foreach (string tabName in tabsToHide)
+                        {
+                            if (SenaryoModuleTabControl.TabPages.ContainsKey(tabName))
+                            {
+                                SenaryoModuleTabControl.TabPages.RemoveByKey(tabName);
+                            }
+                        }
+                    }
+                }*/
+
+        private void ELFScenerioSaveGunaButton_Click(object sender, EventArgs e)
+        {
+            string originalFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+            string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+
+            // Create a copy of the original Excel file
+            File.Copy(originalFilePath, modifiedFilePath, true);
+
+            // Load the copied Excel file and update it with user changes
+            using (var package = new ExcelPackage(new FileInfo(modifiedFilePath)))
+            {
+                // Update worksheets with changes from the DataGridViews
+                UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[1], ELFMinSenaryoTable);
+                UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[2], ELFLowSenaryoTable);
+                UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[3], ELFBaseSenaryoTable);
+                UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[4], ELFHighSenaryoTable);
+                UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[5], ELFMaxSenaryoTable);
+
+                // Save the changes to the copied Excel file
+                package.Save();
+            }
+
+            MessageBox.Show("User changes saved to the modified Excel file.");
+        }
+        // Helper method to update an Excel worksheet based on the DataGridView
+        private void UpdateWorksheetFromDataGridView(ExcelWorksheet worksheet, DataGridView dgv)
+        {
+            for (int row = 0; row < dgv.Rows.Count; row++)
+            {
+                for (int col = 0; col < dgv.Columns.Count; col++)
+                {
+                    worksheet.Cells[row + 2, col + 1].Value = dgv.Rows[row].Cells[col].Value;
+                }
+            }
+        }
+        private void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e)
+        {
+            string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+
+            // Check if the modified file exists
+            if (!File.Exists(modifiedFilePath))
+            {
+                MessageBox.Show("The modified Excel file does not exist. Please save the scenario first.");
+                return;
+            }
+
+            // Run the R script
+            RunModelRScript(modifiedFilePath);
+
+            // Load results into tab_ekonometrik
+            LoadResultsToTabEkonometrik();
+        }
+
+        // Method to run the R script
+        private void RunModelRScript(string modifiedFilePath)
+        {
+            string rScriptPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\model.R";
+
+            // Run the R script using ProcessStartInfo
+            var processInfo = new ProcessStartInfo()
+            {
+                FileName = "Rscript.exe", // Path to Rscript.exe
+                Arguments = $"\"{rScriptPath}\" \"{modifiedFilePath}\"", // Pass the modified Excel file as an argument
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (var process = Process.Start(processInfo))
+            {
+                process.OutputDataReceived += (sender, args) => Console.WriteLine(args.Data);
+                process.ErrorDataReceived += (sender, args) => Console.WriteLine("ERROR: " + args.Data);
+                process.BeginOutputReadLine();
+                process.WaitForExit();
+            }
+
+            MessageBox.Show("R script executed successfully.");
+        }
+
+        // Method to load results into tab_ekonometrik
+        private void LoadResultsToTabEkonometrik()
+        {
+            string resultsFilePath = @"C:\Path\To\Results.xlsx"; // Adjust with your actual results file path
+
+            using (var package = new ExcelPackage(new FileInfo(resultsFilePath)))
+            {
+                // Load the corresponding results into each DataGridView
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[1], ELFMinResultsTable);   // Sheet 1 -> ELFMinResultsTable
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[2], ELFLowResultsTable);   // Sheet 2 -> ELFLowResultsTable
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[3], ELFBaseResultsTable);  // Sheet 3 -> ELFBaseResultsTable
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[4], ELFHighResultsTable);  // Sheet 4 -> ELFHighResultsTable
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[5], ELFMaxResultsTable);   // Sheet 5 -> ELFMaxResultsTable
+            }
+
+            // Switch to the results tab after loading all the data
+            Modül_Tabları.SelectedTab = tab_ekonometrik;
+        }
+
+        // Helper method to load data from an Excel worksheet into a DataGridView
+        private void LoadWorksheetToDataGridView(ExcelWorksheet worksheet, DataGridView dataGridView)
+        {
+            DataTable dt = new DataTable();
+
+            // Load headers from the first row
+            for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+            {
+                dt.Columns.Add(worksheet.Cells[1, col].Text);
+            }
+
+            // Load data from the worksheet into the DataTable (starting from row 2)
+            for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+            {
+                var newRow = dt.NewRow();
+                for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+                {
+                    newRow[col - 1] = worksheet.Cells[row, col].Text;
+                }
+                dt.Rows.Add(newRow);
+            }
+
+            // Assign the DataTable as the DataSource of the DataGridView
+            dataGridView.DataSource = dt;
+        }
+
+
+
+        private void LoadImageIntoPictureBox(PictureBox pictureBox, string imagePath)
+        {
+            if (File.Exists(imagePath))
+            {
+                using (DrawingImage img = DrawingImage.FromFile(imagePath))
+                {
+                    pictureBox.Image = new Bitmap(img); // Create a new Bitmap to avoid file lock issues
+                }
+            }
+            else
+            {
+                MessageBox.Show($"Image not found: {imagePath}", "Image Load Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+        public DataTable ReadExcelToDataTable(string filePath)
+        {
+            // Check if file exists
+            if (!File.Exists(filePath))
+            {
+                MessageBox.Show($"Excel file not found: {filePath}");
+                return null;
+            }
+
+            DataTable dataTable = new DataTable();
+
+            try
+            {
+                // Load the Excel file
+                using (var workbook = new XLWorkbook(filePath))
+                {
+                    // Get the first worksheet in the Excel file
+                    var worksheet = workbook.Worksheet(1);
+
+                    // Read the header (assuming the first row contains column names)
+                    bool headerRow = true;
+                    foreach (var row in worksheet.RowsUsed())
+                    {
+                        if (headerRow)
+                        {
+                            foreach (var cell in row.Cells())
+                            {
+                                dataTable.Columns.Add(cell.Value.ToString()); // Create columns based on the first row
+                            }
+                            headerRow = false; // Only process the header row once
+                        }
+                        else
+                        {
+                            // Create a new DataRow for each subsequent row in the Excel file
+                            DataRow dataRow = dataTable.NewRow();
+                            int columnIndex = 0;
+
+                            foreach (var cell in row.Cells())
+                            {
+                                dataRow[columnIndex] = cell.Value.ToString(); // Assign cell values to the DataRow
+                                columnIndex++;
+                            }
+
+                            dataTable.Rows.Add(dataRow); // Add DataRow to DataTable
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error reading Excel file: {ex.Message}");
+                return null;
+            }
+
+            return dataTable;
+        }
+        /// <summary>
+        /// ELF METHOD RScript Run RELATED CHANGES & UPDATES
+        /// </summary>
+        // Assuming you have a class like this
+        /*        public class ScriptProcessor
+                {
+                    public void ReScript(string scriptName, string parameters)
+                    {
+                        // Your script processing logic here
+                        Console.WriteLine($"Processing script: {scriptName} with parameters: {parameters}");
+                    }
+                }
+
+                // Inside your form or class, you would create an instance of ScriptProcessor
+                private ScriptProcessor wdC = new ScriptProcessor();
+
+                private void ELFPredictionButton_Click(object sender, EventArgs e)
+                {
+                    // Check if the ComboBox has at least two items
+                    if (comboBox1.Items.Count >= 2)
+                    {
+                        // Get the first and second selected items from the ComboBox
+                        string parametre1 = comboBox1.Items[0].ToString();
+                        string parametre2 = comboBox1.Items[1].ToString();
+
+                        // Concatenate the parameters (adjust for your R script's needs)
+                        string combinedParameters = $"{parametre1} {parametre2}"; // Space-separated parameters
+
+                        // Assuming wdC is an instance of ScriptProcessor
+                        wdC.ReScript("vanilin kods.R", combinedParameters);
+
+                        // Full path to your R script
+                        string rScriptPath = @"C:\path\to\your\script.R";
+
+                        // Pass the combined parameters to ExecuteCommand to run the R script
+                        ExecuteCommand(rScriptPath, combinedParameters);
+                    }
+                    else
+                    {
+                        MessageBox.Show("ComboBox does not have enough items!");
+                    }
+                }
+
+                public void ExecuteCommand(string scriptPath, string arguments)
+                {
+                    // Path to the Rscript executable
+                    string rScriptExecutable = @"C:\Program Files\R\R-X.X.X\bin\Rscript.exe"; // Adjust for your R installation path
+
+                    // Prepare the full command with the script path and parameters
+                    string command = $"\"{scriptPath}\" {arguments}";
+
+                    ProcessStartInfo processInfo = new ProcessStartInfo(rScriptExecutable, command)
+                    {
+                        CreateNoWindow = true,
+                        UseShellExecute = false, // Allows output redirection
+                        RedirectStandardOutput = true, // To capture output from R script
+                        RedirectStandardError = true
+                    };
+
+                    using (Process process = Process.Start(processInfo))
+                    {
+                        // Capture and log the output if needed
+                        string output = process.StandardOutput.ReadToEnd();
+                        string error = process.StandardError.ReadToEnd();
+
+                        process.WaitForExit();
+
+                        // Log or handle the output
+                        Console.WriteLine("Output: " + output);
+                        if (!string.IsNullOrEmpty(error))
+                        {
+                            Console.WriteLine("Error: " + error);
+                        }
+                    }
+                }
+                // Assuming you have a class like this
+                public class ScriptProcessor
+                {
+                    public void ReScript(string scriptName, string parameters)
+                    {
+                        // Your script processing logic here
+                        Console.WriteLine($"Processing script: {scriptName} with parameters: {parameters}");
+                    }
+                }
+
+                // Inside your form or class, you would create an instance of ScriptProcessor
+                private ScriptProcessor wdC = new ScriptProcessor();
+
+                private void ELFPredictionButton_Click(object sender, EventArgs e)
+                {
+                    // Check if the ComboBox has at least one item
+                    if (comboBox1.Items.Count >= 1)
+                    {
+                        // Create a list to hold up to 5 parameters
+                        List<string> parameters = new List<string>();
+
+                        // Loop through the ComboBox items (up to 5 items)
+                        for (int i = 0; i < comboBox1.Items.Count && i < 5; i++)
+                        {
+                            parameters.Add(comboBox1.Items[i].ToString());
+                        }
+
+                        // Join the parameters with space separation
+                        string combinedParameters = string.Join(" ", parameters);
+
+                        // Assuming wdC is an instance of ScriptProcessor
+                        wdC.ReScript("vanilin kods.R", combinedParameters);
+
+                        // Full path to your R script
+                        string rScriptPath = @"C:\path\to\your\script.R";
+
+                        // Pass the combined parameters to ExecuteCommand to run the R script
+                        ExecuteCommand(rScriptPath, combinedParameters);
+                    }
+                    else
+                    {
+                        MessageBox.Show("ComboBox does not have enough items!");
+                    }
+                }
+
+                public void ExecuteCommand(string scriptPath, string arguments)
+                {
+                    // Path to the Rscript executable
+                    string rScriptExecutable = @"C:\Program Files\R\R-X.X.X\bin\Rscript.exe"; // Adjust for your R installation path
+
+                    // Prepare the full command with the script path and parameters
+                    string command = $"\"{scriptPath}\" {arguments}";
+
+                    ProcessStartInfo processInfo = new ProcessStartInfo(rScriptExecutable, command)
+                    {
+                        CreateNoWindow = true,
+                        UseShellExecute = false, // Allows output redirection
+                        RedirectStandardOutput = true, // To capture output from R script
+                        RedirectStandardError = true
+                    };
+
+                    try
+                    {
+                        using (Process process = Process.Start(processInfo))
+                        {
+                            string output = process.StandardOutput.ReadToEnd();
+                            string error = process.StandardError.ReadToEnd();
+
+                            process.WaitForExit();
+
+                            if (!string.IsNullOrEmpty(error))
+                            {
+                                MessageBox.Show("Error: " + error, "Execution Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                            else
+                            {
+                                // Load table data into DataGridView
+                                DataTable table = ReadExcelToDataTable(@"C:\path\to\output.csv");
+                                if (table != null)
+                                {
+                                    dataGridView2.DataSource = table;
+                                }
+
+                                // Load graphical output (PNG) into PictureBox controls
+                                LoadImagesIntoPictureBoxes();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("An error occurred: " + ex.Message, "Execution Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+
+                private void LoadImagesIntoPictureBoxes()
+                {
+                    // Path to the folder where the images are saved
+                    string imageFolderPath = @"C:\path\to\output\";
+
+                    // Load images into PictureBox controls with checks
+                    LoadImageIntoPictureBox(pictureBox1, Path.Combine(imageFolderPath, "plot1.png"));
+                    LoadImageIntoPictureBox(pictureBox2, Path.Combine(imageFolderPath, "plot2.png"));
+                    // Add more PictureBox assignments as needed
+                }
+
+                private void LoadImageIntoPictureBox(PictureBox pictureBox, string imagePath)
+                {
+                    if (File.Exists(imagePath))
+                    {
+                        using (DrawingImage img = DrawingImage.FromFile(imagePath))
+                        {
+                            pictureBox.Image = new Bitmap(img); // Create a new Bitmap to avoid file lock issues
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Image not found: {imagePath}", "Image Load Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }*/
+
+        /*        public DataTable ReadCsvToDataTable(string filePath)
+                {
+                    DataTable dataTable = new DataTable();
+                    using (StreamReader reader = new StreamReader(filePath))
+                    {
+                        string[] headers = reader.ReadLine().Split(','); // Adjust delimiter for TSV if needed
+                        foreach (string header in headers)
+                        {
+                            dataTable.Columns.Add(header); // Add columns
+                        }
+
+                        while (!reader.EndOfStream)
+                        {
+                            string[] rows = reader.ReadLine().Split(',');
+                            DataRow dataRow = dataTable.NewRow();
+                            for (int i = 0; i < headers.Length; i++)
+                            {
+                                dataRow[i] = rows[i];
+                            }
+                            dataTable.Rows.Add(dataRow);
+                        }
+                    }
+                    return dataTable;
+                }*/
+
+
+        /*        private void ELFPredictionButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Load table data into DataGridView from Excel
+                DataTable table = ReadExcelToDataTable(@"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı
+\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\SONUCLAR.xlsx");
+                if (table != null)
+                {
+                    dataGridView2.DataSource = table;
+                }
+                else
+                {
+                    MessageBox.Show("Failed to load data from Excel.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+                // Load graphical output (PNG) into PictureBox controls
+                LoadImagesIntoPictureBoxes();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("An error occurred: " + ex.Message, "Execution Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            // run thşs code:
+            // C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep
+            // Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\model.R
+
+
+        }
+
+        private void LoadImagesIntoPictureBoxes()
+        {
+            // Path to the folder where the images are saved
+            string imageFolderPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Grafik Outputs";
+
+            // Load images into PictureBox controls with checks
+            LoadImageIntoPictureBox(pictureBox1, Path.Combine(imageFolderPath, "afyon_aydınlatma_gdp.png"));
+            // Add more PictureBox assignments as needed
+        }*/
+
+        /// <summary>
+        /// ELF METHOD RScript Run RELATED CHANGES & UPDATES END
+        /// </summary>
+        /// 
         private DataTable LoadAttributeTable(DataRow row, DataGridView dataGridView,
                 ShapefileDataReader shapefile_reader, DataTable data_table, int row_cnt)
         {
@@ -1454,19 +2019,6 @@ namespace SLF
                 panel1.Visible = false;
             }
         }
-        private void PredictionCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (PredictionCheckBox.Checked)
-            {
-                ELFTablePanel.Visible = true;
-            }
-            else
-            {
-                ELFTablePanel.Visible = false;
-            }
-        }
-
-
 
 
         /* ------------------------------------------------------------------------------------*/
@@ -1486,16 +2038,6 @@ namespace SLF
             string url2 = "https://www.openstreetmap.org/#map=15/38.4600/27.1153";
             webView21.CoreWebView2.Navigate(url2);
         }
-
-        private void button10_Click(object sender, EventArgs e)
-        {
-
-            Modül_Tabları.SelectTab(tab_girdi);
-            veri_listesi_seçimi.Text = "Ekonometrik Yük Tahmini Verileri";
-            veri_listesi_seçimi.Enabled = false;
-
-        }
-
         private void button7_Click(object sender, EventArgs e)
         {
             Modül_Tabları.SelectTab(tab_girdi);
@@ -2669,80 +3211,6 @@ namespace SLF
             rulerOverlay.Routes.Add(rulerRoute_stokastik);
             gMapControl_EA.Refresh();
         }
-/*
-//THESE METHODS ARE ADDED FOR ELF METHOD SELECTION FROM METHODS FORM
-
-        private string selectedMethod;  // Store the method
-        public List<TabPage> hiddenTabs = new List<TabPage>();
-
-        public ModülFormu(string selectedMethod = "", string tabToSelect = "")
-        {
-            InitializeComponent();
-            this.selectedMethod = selectedMethod;  // Store the method
-            if (!string.IsNullOrEmpty(tabToSelect))
-            {
-                InitializeTabs(tabToSelect);
-            }
-            else
-            {
-                InitializeFormBasedOnMethod();
-            }
-        }
-
-        private void InitializeTabs(string tabToSelect)
-        {
-            // Select the specific tab and hide others
-            if (tabToSelect == "tab_girdi")
-            {
-                Modül_Tabları.SelectedTab = Modül_Tabları.TabPages["tab_girdi"];
-                veri_listesi_seçimi.Text = "Ekonometrik Yük Tahmini Verileri";
-                veri_listesi_seçimi.Enabled = false;
-
-                HideOtherTabs("tab_girdi");
-            }
-        }
-
-        private void HideOtherTabs(string tabToKeep)
-        {
-            // Hide all tabs except the specified one
-            foreach (TabPage tabPage in Modül_Tabları.TabPages.Cast<TabPage>().ToList())
-            {
-                if (tabPage.Name != tabToKeep)
-                {
-                    hiddenTabs.Add(tabPage);  // Add to hiddenTabs list
-                    Modül_Tabları.TabPages.Remove(tabPage);  // Remove tab
-                }
-            }
-        }
-
-        private void InitializeFormBasedOnMethod()
-        {
-            if (selectedMethod == "ELF (Ekonometrik)")
-            {
-                // Show only the tab_girdi tab and hide others
-                Modül_Tabları.SelectedTab = Modül_Tabları.TabPages["tab_girdi"];
-                veri_listesi_seçimi.Text = "Ekonometrik Yük Tahmini Verileri";
-                veri_listesi_seçimi.Enabled = false;
-
-                // Hide all other tabs
-                HideOtherTabs("tab_girdi");
-            }
-            else if (selectedMethod == "SLF (Jeo-Uzamsal)")
-            {
-                // For SLF, do not hide any tabs
-                // Optionally, add other logic if needed
-            }
-        }
-
-        public void RestoreHiddenTabs()
-        {
-            foreach (TabPage tabPage in hiddenTabs)
-            {
-                Modül_Tabları.TabPages.Add(tabPage);  // Add back the hidden tabs
-            }
-
-            hiddenTabs.Clear();  // Clear the list after restoring
-        }*/
 
         private void SelectFolderButton_Click(object sender, EventArgs e)
         {
@@ -2773,12 +3241,12 @@ namespace SLF
             if (selectedMethod == "ELF (Ekonometrik)")
             {
                 // Logic for ELF selection
-                MessageBox.Show("ELF method selected, skipping prerequisites.");
+               // MessageBox.Show("ELF method selected, skipping prerequisites.");
             }
             else if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
                 // Logic for SLF selection
-                MessageBox.Show("SLF method selected, prerequisites are required.");
+               // MessageBox.Show("SLF method selected, prerequisites are required.");
             }
             else
             {
@@ -2802,28 +3270,6 @@ namespace SLF
             }
         }
 
-
-        /*        private void button1_Click(object sender, EventArgs e)
-                {
-                    // Girdi modülündeki dosya yükleme butonuna tıklandığında çalışacak kodlar
-                    if (slfStartYear == 0 || slfEndYear == 0)
-                    {
-                        MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-
-                    // Veri listesinde seçilen veri tipine göre dosya seçme işlemi yapılacak
-                    string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
-                    girdiModülü = girdiModülleri[seçilenVeriTipi];
-                    girdiModülü.SlfStartYear = slfStartYear;
-                    girdiModülü.SlfEndYear = slfEndYear;
-                    var isImported = girdiModülü.VEERProcess(seçilenVeriTipi);
-                    if (isImported)
-                    {
-                        veri_listesi_seçimi.Refresh();
-                        dataGridView1.DataSource = girdiModülü.CurrentDataTable;
-                    }
-                }*/
 
         private void DrawRuler_ea(GMapOverlay rulerOverlay, List<PointLatLng> rulerPoints)
         {
@@ -3625,6 +4071,12 @@ namespace SLF
             yearApproveButton.Enabled = true;
         }
 
+        private void HomePageButton_Click(object sender, EventArgs e)
+        {
+            HomePageForm homePageForm = new HomePageForm();
+            homePageForm.Show();
+            this.Hide();
+        }
 
         private void yearApproveButton_Click(object sender, EventArgs e)
         {
@@ -3669,249 +4121,6 @@ namespace SLF
                 yearApproveButton.Text = "Sıfırla";
             }
         }
-        //VISUAL CHANGES
-        private void ModuleTabPanel_Paint(object sender, PaintEventArgs e)
-        {
-            // Get the Graphics object from the PaintEventArgs
-            Graphics graphics = e.Graphics;
-
-            // Create a rectangle the same size as the panel
-            Rectangle gradient_rectangle = new Rectangle(0, 0, ModuleTabPanel.Width, ModuleTabPanel.Height);
-
-            // Define the gradient's properties
-            Brush brush = new LinearGradientBrush(gradient_rectangle, Color.FromArgb(100, 252, 179, 38), Color.FromArgb(100, 0, 253, 147), 85f);
-
-            // Apply the gradient by filling the rectangle with the brush
-            graphics.FillRectangle(brush, gradient_rectangle);
-
-            // Optionally, set the panel's background color to be fully transparent
-            ModuleTabPanel.BackColor = Color.Transparent;
-        }
-
-        /*        private void HeaderPanel_Paint(object sender, PaintEventArgs e)
-                {
-                    // Get the Graphics object from the PaintEventArgs
-                    Graphics graphics = e.Graphics;
-
-                    // Create a rectangle the same size as the panel
-                    Rectangle gradient_rectangle = new Rectangle(0, 0, HeaderPanel.Width, HeaderPanel.Height);
-
-                    // Define the gradient's properties
-                    Brush brush = new LinearGradientBrush(gradient_rectangle, Color.FromArgb(100, 252, 179, 38), Color.FromArgb(100, 0, 253, 147), 65f);
-
-                    // Apply the gradient by filling the rectangle with the brush
-                    graphics.FillRectangle(brush, gradient_rectangle);
-
-                    // Optionally, set the panel's background color to be fully transparent
-                    HeaderPanel.BackColor = Color.Transparent;
-                }*/
-
-
-        /// <summary>
-        /// ELF METHOD RScript Run RELATED CHANGES & UPDATES
-        /// </summary>
-        // Assuming you have a class like this
-        public class ScriptProcessor
-        {
-            public void ReScript(string scriptName, string parameters)
-            {
-                // Your script processing logic here
-                Console.WriteLine($"Processing script: {scriptName} with parameters: {parameters}");
-            }
-        }
-
-        // Inside your form or class, you would create an instance of ScriptProcessor
-        private ScriptProcessor wdC = new ScriptProcessor();
-
-        private void ELFPredictionButton_Click(object sender, EventArgs e)
-        {
-            // Check if the ComboBox has at least two items
-            if (comboBox1.Items.Count >= 2)
-            {
-                // Get the first and second selected items from the ComboBox
-                string parametre1 = comboBox1.Items[0].ToString();
-                string parametre2 = comboBox1.Items[1].ToString();
-
-                // Concatenate the parameters (adjust for your R script's needs)
-                string combinedParameters = $"{parametre1} {parametre2}"; // Space-separated parameters
-
-                // Assuming wdC is an instance of ScriptProcessor
-                wdC.ReScript("vanilin kods.R", combinedParameters);
-
-                // Full path to your R script
-                string rScriptPath = @"C:\path\to\your\script.R";
-
-                // Pass the combined parameters to ExecuteCommand to run the R script
-                ExecuteCommand(rScriptPath, combinedParameters);
-            }
-            else
-            {
-                MessageBox.Show("ComboBox does not have enough items!");
-            }
-        }
-
-        public void ExecuteCommand(string scriptPath, string arguments)
-        {
-            // Path to the Rscript executable
-            string rScriptExecutable = @"C:\Program Files\R\R-X.X.X\bin\Rscript.exe"; // Adjust for your R installation path
-
-            // Prepare the full command with the script path and parameters
-            string command = $"\"{scriptPath}\" {arguments}";
-
-            ProcessStartInfo processInfo = new ProcessStartInfo(rScriptExecutable, command)
-            {
-                CreateNoWindow = true,
-                UseShellExecute = false, // Allows output redirection
-                RedirectStandardOutput = true, // To capture output from R script
-                RedirectStandardError = true
-            };
-
-            using (Process process = Process.Start(processInfo))
-            {
-                // Capture and log the output if needed
-                string output = process.StandardOutput.ReadToEnd();
-                string error = process.StandardError.ReadToEnd();
-
-                process.WaitForExit();
-
-                // Log or handle the output
-                Console.WriteLine("Output: " + output);
-                if (!string.IsNullOrEmpty(error))
-                {
-                    Console.WriteLine("Error: " + error);
-                }
-            }
-        }
-/*        // Assuming you have a class like this
-        public class ScriptProcessor
-        {
-            public void ReScript(string scriptName, string parameters)
-            {
-                // Your script processing logic here
-                Console.WriteLine($"Processing script: {scriptName} with parameters: {parameters}");
-            }
-        }
-
-        // Inside your form or class, you would create an instance of ScriptProcessor
-        private ScriptProcessor wdC = new ScriptProcessor();
-
-        private void ELFPredictionButton_Click(object sender, EventArgs e)
-        {
-            // Check if the ComboBox has at least one item
-            if (comboBox1.Items.Count >= 1)
-            {
-                // Create a list to hold up to 5 parameters
-                List<string> parameters = new List<string>();
-
-                // Loop through the ComboBox items (up to 5 items)
-                for (int i = 0; i < comboBox1.Items.Count && i < 5; i++)
-                {
-                    parameters.Add(comboBox1.Items[i].ToString());
-                }
-
-                // Join the parameters with space separation
-                string combinedParameters = string.Join(" ", parameters);
-
-                // Assuming wdC is an instance of ScriptProcessor
-                wdC.ReScript("vanilin kods.R", combinedParameters);
-
-                // Full path to your R script
-                string rScriptPath = @"C:\path\to\your\script.R";
-
-                // Pass the combined parameters to ExecuteCommand to run the R script
-                ExecuteCommand(rScriptPath, combinedParameters);
-            }
-            else
-            {
-                MessageBox.Show("ComboBox does not have enough items!");
-            }
-        }
-
-        public void ExecuteCommand(string scriptPath, string arguments)
-        {
-            // Path to the Rscript executable
-            string rScriptExecutable = @"C:\Program Files\R\R-X.X.X\bin\Rscript.exe"; // Adjust for your R installation path
-
-            // Prepare the full command with the script path and parameters
-            string command = $"\"{scriptPath}\" {arguments}";
-
-            ProcessStartInfo processInfo = new ProcessStartInfo(rScriptExecutable, command)
-            {
-                CreateNoWindow = true,
-                UseShellExecute = false, // Allows output redirection
-                RedirectStandardOutput = true, // To capture output from R script
-                RedirectStandardError = true
-            };
-
-            using (Process process = Process.Start(processInfo))
-            {
-                string output = process.StandardOutput.ReadToEnd();
-                string error = process.StandardError.ReadToEnd();
-
-                process.WaitForExit();
-
-                if (!string.IsNullOrEmpty(error))
-                {
-                    Console.WriteLine("Error: " + error);
-                }
-                else
-                {
-                    // Load table data into DataGridView as before
-                    DataTable table = ReadCsvToDataTable(@"C:\path\to\output.csv");
-                    dataGridView1.DataSource = table;
-
-                    // Load graphical output (PNG) into PictureBox controls
-                    LoadImagesIntoPictureBoxes();
-                }
-            }
-        }
-        private void LoadImagesIntoPictureBoxes()
-        {
-            // Path to the folder where the images are saved
-            string imageFolderPath = @"C:\path\to\output\";
-
-            // Load the first image into pictureBox1
-            string imagePath1 = Path.Combine(imageFolderPath, "plot1.png");
-            if (File.Exists(imagePath1))
-            {
-                pictureBox1.Image = Image.FromFile(imagePath1);
-            }
-
-            // Load the second image into pictureBox2
-            string imagePath2 = Path.Combine(imageFolderPath, "plot2.png");
-            if (File.Exists(imagePath2))
-            {
-                pictureBox2.Image = Image.FromFile(imagePath2);
-            }
-
-            // Add more PictureBox assignments as needed
-        }
-
-        public DataTable ReadCsvToDataTable(string filePath)
-        {
-            DataTable dataTable = new DataTable();
-            using (StreamReader reader = new StreamReader(filePath))
-            {
-                string[] headers = reader.ReadLine().Split(','); // Adjust delimiter for TSV if needed
-                foreach (string header in headers)
-                {
-                    dataTable.Columns.Add(header); // Add columns
-                }
-
-                while (!reader.EndOfStream)
-                {
-                    string[] rows = reader.ReadLine().Split(',');
-                    DataRow dataRow = dataTable.NewRow();
-                    for (int i = 0; i < headers.Length; i++)
-                    {
-                        dataRow[i] = rows[i];
-                    }
-                    dataTable.Rows.Add(dataRow);
-                }
-            }
-            return dataTable;
-        }*/
-
 
         public async Task JoinAttributesByLocation_summary()
         {

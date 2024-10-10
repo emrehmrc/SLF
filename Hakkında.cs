@@ -13,7 +13,7 @@ namespace SLF
     public partial class Hakkında : Form
     {
 
-        public GirişFormu gir2;
+        public HomePageForm gir2;
         public Hakkında()
         {
             InitializeComponent();
@@ -21,7 +21,7 @@ namespace SLF
 
         private void button2_Click(object sender, EventArgs e)
         {
-            gir2 = (GirişFormu)Tag;
+            gir2 = (HomePageForm)Tag;
             gir2.Show();
             this.Hide();
         }
@@ -29,7 +29,7 @@ namespace SLF
         private void Hakkında_FormClosed(object sender, FormClosedEventArgs e)
         {
             this.Close();
-            GirişFormu hakkında_to_giris = new GirişFormu();
+            HomePageForm hakkında_to_giris = new HomePageForm();
             hakkında_to_giris.Show();
         }
     }

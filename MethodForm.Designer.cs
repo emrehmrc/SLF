@@ -47,7 +47,7 @@
             this.MethodPanel.Controls.Add(this.MethodComboBox);
             this.MethodPanel.Location = new System.Drawing.Point(44, 53);
             this.MethodPanel.Name = "MethodPanel";
-            this.MethodPanel.Size = new System.Drawing.Size(266, 295);
+            this.MethodPanel.Size = new System.Drawing.Size(299, 352);
             this.MethodPanel.TabIndex = 0;
             this.MethodPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.MethodPanel_Paint);
             // 
@@ -57,7 +57,7 @@
             this.ForwardButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.LightGreen;
             this.ForwardButton.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.ForwardButton.ForeColor = System.Drawing.Color.Orange;
-            this.ForwardButton.Location = new System.Drawing.Point(78, 180);
+            this.ForwardButton.Location = new System.Drawing.Point(104, 238);
             this.ForwardButton.Name = "ForwardButton";
             this.ForwardButton.Size = new System.Drawing.Size(99, 28);
             this.ForwardButton.TabIndex = 1;
@@ -71,11 +71,11 @@
             this.label1.BackColor = System.Drawing.Color.Transparent;
             this.label1.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.label1.ForeColor = System.Drawing.Color.Coral;
-            this.label1.Location = new System.Drawing.Point(14, 71);
+            this.label1.Location = new System.Drawing.Point(13, 101);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(97, 19);
+            this.label1.Size = new System.Drawing.Size(101, 19);
             this.label1.TabIndex = 2;
-            this.label1.Text = "Metot Listesi:";
+            this.label1.Text = "Metot Seçimi:";
             // 
             // MethodComboBox
             // 
@@ -87,9 +87,9 @@
             this.MethodComboBox.Items.AddRange(new object[] {
             "SLF (Jeo-Uzamsal)",
             "ELF (Ekonometrik)"});
-            this.MethodComboBox.Location = new System.Drawing.Point(33, 121);
+            this.MethodComboBox.Location = new System.Drawing.Point(26, 155);
             this.MethodComboBox.Name = "MethodComboBox";
-            this.MethodComboBox.Size = new System.Drawing.Size(199, 25);
+            this.MethodComboBox.Size = new System.Drawing.Size(253, 25);
             this.MethodComboBox.TabIndex = 1;
             this.MethodComboBox.Text = "Başlangıç metodu seçiniz.";
             // 
@@ -98,13 +98,13 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
-            this.ClientSize = new System.Drawing.Size(351, 404);
+            this.ClientSize = new System.Drawing.Size(384, 461);
             this.Controls.Add(this.MethodPanel);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.MaximumSize = new System.Drawing.Size(367, 443);
-            this.MinimumSize = new System.Drawing.Size(367, 443);
+            this.MaximumSize = new System.Drawing.Size(400, 500);
+            this.MinimumSize = new System.Drawing.Size(400, 500);
             this.Name = "MethodForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Metot Seçimi";

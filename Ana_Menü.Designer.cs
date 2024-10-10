@@ -1,6 +1,6 @@
 ﻿namespace SLF
 {
-    partial class GirişFormu
+    partial class HomePageForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GirişFormu));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HomePageForm));
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -97,7 +97,7 @@
             this.StartButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.StartButton.Font = new System.Drawing.Font("Maiandra GD", 25.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.StartButton.ForeColor = System.Drawing.Color.Transparent;
-            this.StartButton.Location = new System.Drawing.Point(761, 3);
+            this.StartButton.Location = new System.Drawing.Point(942, 3);
             this.StartButton.Name = "StartButton";
             this.StartButton.Size = new System.Drawing.Size(222, 63);
             this.StartButton.TabIndex = 8;
@@ -143,7 +143,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1016, 110);
+            this.panel1.Size = new System.Drawing.Size(1197, 110);
             this.panel1.TabIndex = 11;
             // 
             // roundButton1
@@ -153,7 +153,7 @@
             this.roundButton1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.roundButton1.Font = new System.Drawing.Font("Verdana", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.roundButton1.ForeColor = System.Drawing.Color.DarkCyan;
-            this.roundButton1.Location = new System.Drawing.Point(726, 19);
+            this.roundButton1.Location = new System.Drawing.Point(907, 19);
             this.roundButton1.Name = "roundButton1";
             this.roundButton1.Size = new System.Drawing.Size(126, 73);
             this.roundButton1.TabIndex = 4;
@@ -168,7 +168,7 @@
             this.roundButton2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.roundButton2.Font = new System.Drawing.Font("Verdana", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.roundButton2.ForeColor = System.Drawing.Color.Tomato;
-            this.roundButton2.Location = new System.Drawing.Point(878, 19);
+            this.roundButton2.Location = new System.Drawing.Point(1059, 19);
             this.roundButton2.Name = "roundButton2";
             this.roundButton2.Size = new System.Drawing.Size(126, 73);
             this.roundButton2.TabIndex = 5;
@@ -184,19 +184,19 @@
             this.panel2.Controls.Add(this.StartButton);
             this.panel2.Controls.Add(this.pictureBox3);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel2.Location = new System.Drawing.Point(0, 485);
+            this.panel2.Location = new System.Drawing.Point(0, 547);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1016, 83);
+            this.panel2.Size = new System.Drawing.Size(1197, 83);
             this.panel2.TabIndex = 12;
             // 
-            // GirişFormu
+            // HomePageForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Snow;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.ClientSize = new System.Drawing.Size(1016, 568);
+            this.ClientSize = new System.Drawing.Size(1197, 630);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.Font = new System.Drawing.Font("Microsoft Tai Le", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -204,7 +204,8 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.Name = "GirişFormu";
+            this.MinimumSize = new System.Drawing.Size(1213, 669);
+            this.Name = "HomePageForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "JEO UZAMSAL YÜK TAHMİNİ YAZILIMI";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();

@@ -20,7 +20,7 @@ namespace SLF
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new GirişFormu());
+            Application.Run(new HomePageForm());
         }
     }
 }
