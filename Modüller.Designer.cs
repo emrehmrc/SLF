@@ -41,18 +41,26 @@ namespace SLF
             this.yardımToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Modül_Tabları = new System.Windows.Forms.TabControl();
             this.tab_girdi = new System.Windows.Forms.TabPage();
+            this.label3 = new System.Windows.Forms.Label();
+            this.OpenModuleButtonPanel = new System.Windows.Forms.Panel();
+            this.OpenModuleButton = new System.Windows.Forms.Button();
+            this.panel9 = new System.Windows.Forms.Panel();
+            this.label17 = new System.Windows.Forms.Label();
+            this.raporGoruntuleButonu = new System.Windows.Forms.Button();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.panel8 = new System.Windows.Forms.Panel();
+            this.label18 = new System.Windows.Forms.Label();
+            this.ExcelDownloadButton = new System.Windows.Forms.Button();
+            this.csvExportButton = new System.Windows.Forms.Button();
+            this.panel6 = new System.Windows.Forms.Panel();
+            this.startYearComboBox = new System.Windows.Forms.ComboBox();
             this.yearApproveButton = new System.Windows.Forms.Button();
             this.endYearComboBox = new System.Windows.Forms.ComboBox();
-            this.startYearComboBox = new System.Windows.Forms.ComboBox();
-            this.csvExportButton = new System.Windows.Forms.Button();
-            this.ExcelDownloadButton = new System.Windows.Forms.Button();
-            this.raporGoruntuleButonu = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.label2 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
+            this.panel7 = new System.Windows.Forms.Panel();
             this.veri_listesi_seçimi = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.SelectFolderButton = new System.Windows.Forms.Button();
             this.tab_dek = new System.Windows.Forms.TabPage();
             this.button8 = new System.Windows.Forms.Button();
             this.label16 = new System.Windows.Forms.Label();
@@ -92,18 +100,18 @@ namespace SLF
             this.gMapControl_EA = new GMap.NET.WindowsForms.GMapControl();
             this.button7 = new System.Windows.Forms.Button();
             this.tab_ekonometrik = new System.Windows.Forms.TabPage();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.button5 = new System.Windows.Forms.Button();
-            this.label11 = new System.Windows.Forms.Label();
-            this.comboBox4 = new System.Windows.Forms.ComboBox();
-            this.label10 = new System.Windows.Forms.Label();
-            this.comboBox3 = new System.Windows.Forms.ComboBox();
-            this.checkBox8 = new System.Windows.Forms.CheckBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label9 = new System.Windows.Forms.Label();
-            this.button10 = new System.Windows.Forms.Button();
-            this.label12 = new System.Windows.Forms.Label();
+            this.ELFGraphicsPanel = new System.Windows.Forms.Panel();
+            this.ELFTablePanel = new System.Windows.Forms.Panel();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
+            this.panel5 = new System.Windows.Forms.Panel();
+            this.label12 = new System.Windows.Forms.Label();
+            this.button10 = new System.Windows.Forms.Button();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.ELFPredictionButton = new System.Windows.Forms.Button();
+            this.comboBox4 = new System.Windows.Forms.ComboBox();
+            this.PredictionCheckBox = new System.Windows.Forms.CheckBox();
+            this.label11 = new System.Windows.Forms.Label();
             this.tab_imar = new System.Windows.Forms.TabPage();
             this.button6 = new System.Windows.Forms.Button();
             this.tab_optDTR = new System.Windows.Forms.TabPage();
@@ -171,7 +179,7 @@ namespace SLF
             this.tab_rapor = new System.Windows.Forms.TabPage();
             this.tab_validasyon = new System.Windows.Forms.TabPage();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.button2 = new System.Windows.Forms.Button();
+            this.HomePageButton = new System.Windows.Forms.Button();
             this.ContextMenuStrip_Nokta = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.Nokta_Ekle = new System.Windows.Forms.ToolStripMenuItem();
             this.Nokta_Sil = new System.Windows.Forms.ToolStripMenuItem();
@@ -183,18 +191,30 @@ namespace SLF
             this.ContextMenuStrip_Fonksiyon = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.katman_birleştir = new System.Windows.Forms.ToolStripMenuItem();
             this.overlap_analizi = new System.Windows.Forms.ToolStripMenuItem();
+            this.ModuleTabPanel = new System.Windows.Forms.Panel();
+            this.HeaderPanel = new System.Windows.Forms.Panel();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.label9 = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
+            this.OpenModuleButtonPanel.SuspendLayout();
+            this.panel9.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.panel8.SuspendLayout();
+            this.panel6.SuspendLayout();
+            this.panel7.SuspendLayout();
             this.tab_dek.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView4)).BeginInit();
             this.tab_ea.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.harita_katmanları_right_click.SuspendLayout();
             this.tab_ekonometrik.SuspendLayout();
-            this.panel2.SuspendLayout();
+            this.ELFGraphicsPanel.SuspendLayout();
+            this.ELFTablePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
+            this.panel5.SuspendLayout();
             this.tab_imar.SuspendLayout();
             this.tab_stokastik.SuspendLayout();
             this.katmanlar_right_click.SuspendLayout();
@@ -205,19 +225,23 @@ namespace SLF
             this.ContextMenuStrip_Nokta.SuspendLayout();
             this.ContextMenuStrip_Poligon.SuspendLayout();
             this.ContextMenuStrip_Fonksiyon.SuspendLayout();
+            this.ModuleTabPanel.SuspendLayout();
+            this.HeaderPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
             // 
-            this.menuStrip1.BackColor = System.Drawing.Color.White;
+            this.menuStrip1.BackColor = System.Drawing.Color.LightSalmon;
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.yardımToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Padding = new System.Windows.Forms.Padding(5, 2, 0, 2);
-            this.menuStrip1.Size = new System.Drawing.Size(1484, 28);
+            this.menuStrip1.Padding = new System.Windows.Forms.Padding(4, 2, 0, 2);
+            this.menuStrip1.Size = new System.Drawing.Size(1229, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -228,37 +252,37 @@ namespace SLF
             this.exportToolStripMenuItem,
             this.saToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(64, 24);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(51, 20);
             this.fileToolStripMenuItem.Text = "Dosya";
             // 
             // importToolStripMenuItem
             // 
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(169, 26);
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
             this.importToolStripMenuItem.Text = "İçeri Aktar";
             // 
             // exportToolStripMenuItem
             // 
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(169, 26);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
             this.exportToolStripMenuItem.Text = "Dışarı Aktar";
             // 
             // saToolStripMenuItem
             // 
             this.saToolStripMenuItem.Name = "saToolStripMenuItem";
-            this.saToolStripMenuItem.Size = new System.Drawing.Size(169, 26);
+            this.saToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
             this.saToolStripMenuItem.Text = "Kaydet";
             // 
             // yardımToolStripMenuItem
             // 
             this.yardımToolStripMenuItem.Name = "yardımToolStripMenuItem";
-            this.yardımToolStripMenuItem.Size = new System.Drawing.Size(69, 24);
+            this.yardımToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
             this.yardımToolStripMenuItem.Text = "Yardım";
             // 
             // Modül_Tabları
             // 
-            this.Modül_Tabları.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.Modül_Tabları.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Modül_Tabları.Controls.Add(this.tab_girdi);
             this.Modül_Tabları.Controls.Add(this.tab_dek);
@@ -271,48 +295,205 @@ namespace SLF
             this.Modül_Tabları.Controls.Add(this.tab_yükHaritası);
             this.Modül_Tabları.Controls.Add(this.tab_rapor);
             this.Modül_Tabları.Controls.Add(this.tab_validasyon);
-            this.Modül_Tabları.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Modül_Tabları.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.Modül_Tabları.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Modül_Tabları.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.Modül_Tabları.HotTrack = true;
-            this.Modül_Tabları.Location = new System.Drawing.Point(0, 86);
-            this.Modül_Tabları.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.Modül_Tabları.MinimumSize = new System.Drawing.Size(1480, 700);
+            this.Modül_Tabları.Location = new System.Drawing.Point(0, 0);
+            this.Modül_Tabları.Margin = new System.Windows.Forms.Padding(2);
             this.Modül_Tabları.Multiline = true;
             this.Modül_Tabları.Name = "Modül_Tabları";
             this.Modül_Tabları.Padding = new System.Drawing.Point(20, 3);
             this.Modül_Tabları.SelectedIndex = 0;
-            this.Modül_Tabları.Size = new System.Drawing.Size(1480, 700);
+            this.Modül_Tabları.Size = new System.Drawing.Size(1229, 559);
             this.Modül_Tabları.TabIndex = 2;
             // 
             // tab_girdi
             // 
-            this.tab_girdi.Controls.Add(this.yearApproveButton);
-            this.tab_girdi.Controls.Add(this.endYearComboBox);
-            this.tab_girdi.Controls.Add(this.startYearComboBox);
-            this.tab_girdi.Controls.Add(this.csvExportButton);
-            this.tab_girdi.Controls.Add(this.ExcelDownloadButton);
-            this.tab_girdi.Controls.Add(this.raporGoruntuleButonu);
+            this.tab_girdi.AutoScroll = true;
+            this.tab_girdi.BackColor = System.Drawing.Color.WhiteSmoke;
             this.tab_girdi.Controls.Add(this.label3);
+            this.tab_girdi.Controls.Add(this.OpenModuleButtonPanel);
+            this.tab_girdi.Controls.Add(this.panel9);
             this.tab_girdi.Controls.Add(this.dataGridView1);
-            this.tab_girdi.Controls.Add(this.label2);
-            this.tab_girdi.Controls.Add(this.button1);
-            this.tab_girdi.Controls.Add(this.label1);
-            this.tab_girdi.Controls.Add(this.veri_listesi_seçimi);
+            this.tab_girdi.Controls.Add(this.panel8);
+            this.tab_girdi.Controls.Add(this.panel6);
+            this.tab_girdi.Controls.Add(this.panel7);
             this.tab_girdi.Font = new System.Drawing.Font("Maiandra GD", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tab_girdi.Location = new System.Drawing.Point(4, 62);
-            this.tab_girdi.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tab_girdi.Location = new System.Drawing.Point(4, 48);
+            this.tab_girdi.Margin = new System.Windows.Forms.Padding(2);
             this.tab_girdi.Name = "tab_girdi";
-            this.tab_girdi.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tab_girdi.Size = new System.Drawing.Size(1472, 634);
+            this.tab_girdi.Padding = new System.Windows.Forms.Padding(2);
+            this.tab_girdi.Size = new System.Drawing.Size(1221, 507);
             this.tab_girdi.TabIndex = 0;
             this.tab_girdi.Text = "Girdi Modülü";
-            this.tab_girdi.UseVisualStyleBackColor = true;
+            // 
+            // label3
+            // 
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Maiandra GD", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(2, 78);
+            this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(105, 16);
+            this.label3.TabIndex = 5;
+            this.label3.Text = "Veri Önizleme:";
+            // 
+            // OpenModuleButtonPanel
+            // 
+            this.OpenModuleButtonPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.OpenModuleButtonPanel.Controls.Add(this.OpenModuleButton);
+            this.OpenModuleButtonPanel.Location = new System.Drawing.Point(1106, 462);
+            this.OpenModuleButtonPanel.Name = "OpenModuleButtonPanel";
+            this.OpenModuleButtonPanel.Size = new System.Drawing.Size(111, 36);
+            this.OpenModuleButtonPanel.TabIndex = 17;
+            // 
+            // OpenModuleButton
+            // 
+            this.OpenModuleButton.Dock = System.Windows.Forms.DockStyle.Right;
+            this.OpenModuleButton.Location = new System.Drawing.Point(3, 0);
+            this.OpenModuleButton.Name = "OpenModuleButton";
+            this.OpenModuleButton.Size = new System.Drawing.Size(108, 36);
+            this.OpenModuleButton.TabIndex = 16;
+            this.OpenModuleButton.Text = "Modüle Git";
+            this.OpenModuleButton.UseVisualStyleBackColor = true;
+            // 
+            // panel9
+            // 
+            this.panel9.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.panel9.Controls.Add(this.label17);
+            this.panel9.Controls.Add(this.raporGoruntuleButonu);
+            this.panel9.Location = new System.Drawing.Point(1012, 3);
+            this.panel9.Name = "panel9";
+            this.panel9.Size = new System.Drawing.Size(183, 48);
+            this.panel9.TabIndex = 15;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label17.Location = new System.Drawing.Point(2, 5);
+            this.label17.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(93, 17);
+            this.label17.TabIndex = 7;
+            this.label17.Text = "Rapor Oluştur:";
+            // 
+            // raporGoruntuleButonu
+            // 
+            this.raporGoruntuleButonu.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.raporGoruntuleButonu.BackColor = System.Drawing.Color.White;
+            this.raporGoruntuleButonu.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("raporGoruntuleButonu.BackgroundImage")));
+            this.raporGoruntuleButonu.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.raporGoruntuleButonu.ForeColor = System.Drawing.Color.Transparent;
+            this.raporGoruntuleButonu.Location = new System.Drawing.Point(116, 7);
+            this.raporGoruntuleButonu.Margin = new System.Windows.Forms.Padding(2);
+            this.raporGoruntuleButonu.Name = "raporGoruntuleButonu";
+            this.raporGoruntuleButonu.Size = new System.Drawing.Size(42, 36);
+            this.raporGoruntuleButonu.TabIndex = 6;
+            this.raporGoruntuleButonu.UseVisualStyleBackColor = false;
+            this.raporGoruntuleButonu.Click += new System.EventHandler(this.raporGoruntuleButonu_Click);
+            // 
+            // dataGridView1
+            // 
+            this.dataGridView1.AllowUserToAddRows = false;
+            this.dataGridView1.AllowUserToDeleteRows = false;
+            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridView1.BackgroundColor = System.Drawing.Color.WhiteSmoke;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Location = new System.Drawing.Point(7, 96);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(2);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.ReadOnly = true;
+            this.dataGridView1.RowHeadersWidth = 51;
+            this.dataGridView1.RowTemplate.Height = 24;
+            this.dataGridView1.Size = new System.Drawing.Size(1210, 350);
+            this.dataGridView1.TabIndex = 4;
+            // 
+            // panel8
+            // 
+            this.panel8.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.panel8.Controls.Add(this.label18);
+            this.panel8.Controls.Add(this.ExcelDownloadButton);
+            this.panel8.Controls.Add(this.csvExportButton);
+            this.panel8.Location = new System.Drawing.Point(799, 3);
+            this.panel8.Name = "panel8";
+            this.panel8.Size = new System.Drawing.Size(210, 48);
+            this.panel8.TabIndex = 14;
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label18.Location = new System.Drawing.Point(2, 3);
+            this.label18.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(70, 17);
+            this.label18.TabIndex = 16;
+            this.label18.Text = "Dışa Aktar:";
+            // 
+            // ExcelDownloadButton
+            // 
+            this.ExcelDownloadButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ExcelDownloadButton.BackColor = System.Drawing.Color.White;
+            this.ExcelDownloadButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("ExcelDownloadButton.BackgroundImage")));
+            this.ExcelDownloadButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.ExcelDownloadButton.ForeColor = System.Drawing.Color.Transparent;
+            this.ExcelDownloadButton.Location = new System.Drawing.Point(107, 0);
+            this.ExcelDownloadButton.Margin = new System.Windows.Forms.Padding(2);
+            this.ExcelDownloadButton.Name = "ExcelDownloadButton";
+            this.ExcelDownloadButton.Size = new System.Drawing.Size(42, 36);
+            this.ExcelDownloadButton.TabIndex = 7;
+            this.ExcelDownloadButton.UseVisualStyleBackColor = false;
+            this.ExcelDownloadButton.Click += new System.EventHandler(this.ExcelDownloadButton_Click);
+            // 
+            // csvExportButton
+            // 
+            this.csvExportButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.csvExportButton.BackColor = System.Drawing.Color.White;
+            this.csvExportButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("csvExportButton.BackgroundImage")));
+            this.csvExportButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.csvExportButton.ForeColor = System.Drawing.Color.Transparent;
+            this.csvExportButton.Location = new System.Drawing.Point(153, 2);
+            this.csvExportButton.Margin = new System.Windows.Forms.Padding(2);
+            this.csvExportButton.Name = "csvExportButton";
+            this.csvExportButton.Size = new System.Drawing.Size(42, 36);
+            this.csvExportButton.TabIndex = 8;
+            this.csvExportButton.UseVisualStyleBackColor = false;
+            this.csvExportButton.Click += new System.EventHandler(this.csvExportButton_Click);
+            // 
+            // panel6
+            // 
+            this.panel6.Controls.Add(this.startYearComboBox);
+            this.panel6.Controls.Add(this.yearApproveButton);
+            this.panel6.Controls.Add(this.endYearComboBox);
+            this.panel6.Location = new System.Drawing.Point(3, 3);
+            this.panel6.Name = "panel6";
+            this.panel6.Size = new System.Drawing.Size(227, 61);
+            this.panel6.TabIndex = 12;
+            // 
+            // startYearComboBox
+            // 
+            this.startYearComboBox.ForeColor = System.Drawing.Color.DarkOrange;
+            this.startYearComboBox.FormattingEnabled = true;
+            this.startYearComboBox.Location = new System.Drawing.Point(2, 5);
+            this.startYearComboBox.Margin = new System.Windows.Forms.Padding(2);
+            this.startYearComboBox.Name = "startYearComboBox";
+            this.startYearComboBox.Size = new System.Drawing.Size(92, 23);
+            this.startYearComboBox.TabIndex = 9;
+            this.startYearComboBox.Text = "Yıl seçiniz";
+            this.startYearComboBox.SelectedIndexChanged += new System.EventHandler(this.startYearComboBox_SelectedIndexChanged);
             // 
             // yearApproveButton
             // 
-            this.yearApproveButton.Location = new System.Drawing.Point(1064, 58);
-            this.yearApproveButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.yearApproveButton.Location = new System.Drawing.Point(61, 33);
             this.yearApproveButton.Name = "yearApproveButton";
-            this.yearApproveButton.Size = new System.Drawing.Size(100, 28);
+            this.yearApproveButton.Size = new System.Drawing.Size(75, 28);
             this.yearApproveButton.TabIndex = 11;
             this.yearApproveButton.Text = "Onayla";
             this.yearApproveButton.UseVisualStyleBackColor = true;
@@ -320,128 +501,27 @@ namespace SLF
             // 
             // endYearComboBox
             // 
+            this.endYearComboBox.ForeColor = System.Drawing.Color.DarkOrange;
             this.endYearComboBox.FormattingEnabled = true;
-            this.endYearComboBox.Location = new System.Drawing.Point(935, 59);
-            this.endYearComboBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.endYearComboBox.Location = new System.Drawing.Point(121, 5);
+            this.endYearComboBox.Margin = new System.Windows.Forms.Padding(2);
             this.endYearComboBox.Name = "endYearComboBox";
-            this.endYearComboBox.Size = new System.Drawing.Size(121, 26);
+            this.endYearComboBox.Size = new System.Drawing.Size(92, 23);
             this.endYearComboBox.TabIndex = 10;
             this.endYearComboBox.Text = "Yıl seçiniz";
             this.endYearComboBox.SelectedIndexChanged += new System.EventHandler(this.endYearComboBox_SelectedIndexChanged);
             // 
-            // startYearComboBox
+            // panel7
             // 
-            this.startYearComboBox.FormattingEnabled = true;
-            this.startYearComboBox.Location = new System.Drawing.Point(799, 59);
-            this.startYearComboBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.startYearComboBox.Name = "startYearComboBox";
-            this.startYearComboBox.Size = new System.Drawing.Size(121, 26);
-            this.startYearComboBox.TabIndex = 9;
-            this.startYearComboBox.Text = "Yıl seçiniz";
-            this.startYearComboBox.SelectedIndexChanged += new System.EventHandler(this.startYearComboBox_SelectedIndexChanged);
-            // 
-            // csvExportButton
-            // 
-            this.csvExportButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.csvExportButton.BackColor = System.Drawing.Color.White;
-            this.csvExportButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("csvExportButton.BackgroundImage")));
-            this.csvExportButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.csvExportButton.ForeColor = System.Drawing.Color.Transparent;
-            this.csvExportButton.Location = new System.Drawing.Point(1284, 59);
-            this.csvExportButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.csvExportButton.Name = "csvExportButton";
-            this.csvExportButton.Size = new System.Drawing.Size(76, 66);
-            this.csvExportButton.TabIndex = 8;
-            this.csvExportButton.UseVisualStyleBackColor = false;
-            this.csvExportButton.Click += new System.EventHandler(this.csvExportButton_Click);
-            // 
-            // ExcelDownloadButton
-            // 
-            this.ExcelDownloadButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ExcelDownloadButton.BackColor = System.Drawing.Color.White;
-            this.ExcelDownloadButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("ExcelDownloadButton.BackgroundImage")));
-            this.ExcelDownloadButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.ExcelDownloadButton.ForeColor = System.Drawing.Color.Transparent;
-            this.ExcelDownloadButton.Location = new System.Drawing.Point(1175, 59);
-            this.ExcelDownloadButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ExcelDownloadButton.Name = "ExcelDownloadButton";
-            this.ExcelDownloadButton.Size = new System.Drawing.Size(76, 66);
-            this.ExcelDownloadButton.TabIndex = 7;
-            this.ExcelDownloadButton.UseVisualStyleBackColor = false;
-            this.ExcelDownloadButton.Click += new System.EventHandler(this.ExcelDownloadButton_Click);
-            // 
-            // raporGoruntuleButonu
-            // 
-            this.raporGoruntuleButonu.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.raporGoruntuleButonu.BackColor = System.Drawing.Color.White;
-            this.raporGoruntuleButonu.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("raporGoruntuleButonu.BackgroundImage")));
-            this.raporGoruntuleButonu.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.raporGoruntuleButonu.ForeColor = System.Drawing.Color.Transparent;
-            this.raporGoruntuleButonu.Location = new System.Drawing.Point(1389, 59);
-            this.raporGoruntuleButonu.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.raporGoruntuleButonu.Name = "raporGoruntuleButonu";
-            this.raporGoruntuleButonu.Size = new System.Drawing.Size(76, 66);
-            this.raporGoruntuleButonu.TabIndex = 6;
-            this.raporGoruntuleButonu.UseVisualStyleBackColor = false;
-            this.raporGoruntuleButonu.Click += new System.EventHandler(this.raporGoruntuleButonu_Click);
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(47, 145);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(101, 18);
-            this.label3.TabIndex = 5;
-            this.label3.Text = "Aktarılan Veri:";
-            // 
-            // dataGridView1
-            // 
-            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(45, 166);
-            this.dataGridView1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.ReadOnly = true;
-            this.dataGridView1.RowHeadersWidth = 51;
-            this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(1420, 455);
-            this.dataGridView1.TabIndex = 4;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(532, 75);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(130, 24);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "Dosya Seçimi:";
-            // 
-            // button1
-            // 
-            this.button1.BackColor = System.Drawing.Color.White;
-            this.button1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("button1.BackgroundImage")));
-            this.button1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.button1.ForeColor = System.Drawing.Color.Transparent;
-            this.button1.Location = new System.Drawing.Point(701, 57);
-            this.button1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(76, 66);
-            this.button1.TabIndex = 2;
-            this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(40, 34);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(183, 24);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Veri Dosyası Seçimi:";
+            this.panel7.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.panel7.Controls.Add(this.veri_listesi_seçimi);
+            this.panel7.Controls.Add(this.label1);
+            this.panel7.Controls.Add(this.label2);
+            this.panel7.Controls.Add(this.SelectFolderButton);
+            this.panel7.Location = new System.Drawing.Point(357, 2);
+            this.panel7.Name = "panel7";
+            this.panel7.Size = new System.Drawing.Size(399, 64);
+            this.panel7.TabIndex = 13;
             // 
             // veri_listesi_seçimi
             // 
@@ -462,34 +542,70 @@ namespace SLF
             "İmar Verileri",
             "Enerji Müsaadeleri Verileri",
             "Yeni Projelendirilmiş DTR Verileri"});
-            this.veri_listesi_seçimi.Location = new System.Drawing.Point(44, 75);
-            this.veri_listesi_seçimi.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.veri_listesi_seçimi.Location = new System.Drawing.Point(15, 32);
+            this.veri_listesi_seçimi.Margin = new System.Windows.Forms.Padding(2);
             this.veri_listesi_seçimi.Name = "veri_listesi_seçimi";
-            this.veri_listesi_seçimi.Size = new System.Drawing.Size(361, 32);
+            this.veri_listesi_seçimi.Size = new System.Drawing.Size(161, 28);
             this.veri_listesi_seçimi.TabIndex = 0;
             this.veri_listesi_seçimi.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.veri_listesi_seçimi_DrawItem);
             this.veri_listesi_seçimi.SelectedIndexChanged += new System.EventHandler(this.veri_listesi_seçimi_SelectedIndexChanged);
             this.veri_listesi_seçimi.MouseDown += new System.Windows.Forms.MouseEventHandler(this.veri_listesi_seçimi_MouseDown);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(12, 6);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(139, 17);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "Dosya Veri Tipi Seçimi:";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(207, 6);
+            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(88, 17);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "Dosya Seçimi:";
+            // 
+            // SelectFolderButton
+            // 
+            this.SelectFolderButton.BackColor = System.Drawing.Color.White;
+            this.SelectFolderButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("SelectFolderButton.BackgroundImage")));
+            this.SelectFolderButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.SelectFolderButton.ForeColor = System.Drawing.Color.Transparent;
+            this.SelectFolderButton.Location = new System.Drawing.Point(299, 24);
+            this.SelectFolderButton.Margin = new System.Windows.Forms.Padding(2);
+            this.SelectFolderButton.Name = "SelectFolderButton";
+            this.SelectFolderButton.Size = new System.Drawing.Size(42, 36);
+            this.SelectFolderButton.TabIndex = 2;
+            this.SelectFolderButton.UseVisualStyleBackColor = false;
+            this.SelectFolderButton.Click += new System.EventHandler(this.SelectFolderButton_Click);
             // 
             // tab_dek
             // 
             this.tab_dek.Controls.Add(this.button8);
             this.tab_dek.Controls.Add(this.label16);
             this.tab_dek.Controls.Add(this.dataGridView4);
-            this.tab_dek.Location = new System.Drawing.Point(4, 91);
-            this.tab_dek.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tab_dek.Location = new System.Drawing.Point(4, 48);
+            this.tab_dek.Margin = new System.Windows.Forms.Padding(2);
             this.tab_dek.Name = "tab_dek";
-            this.tab_dek.Size = new System.Drawing.Size(1472, 605);
+            this.tab_dek.Size = new System.Drawing.Size(1221, 507);
             this.tab_dek.TabIndex = 6;
             this.tab_dek.Text = "DEK Modülü";
             this.tab_dek.UseVisualStyleBackColor = true;
             // 
             // button8
             // 
-            this.button8.Location = new System.Drawing.Point(19, 44);
-            this.button8.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.button8.Location = new System.Drawing.Point(14, 36);
+            this.button8.Margin = new System.Windows.Forms.Padding(2);
             this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(159, 44);
+            this.button8.Size = new System.Drawing.Size(119, 36);
             this.button8.TabIndex = 16;
             this.button8.Text = "Dosya Seç";
             this.button8.UseVisualStyleBackColor = true;
@@ -498,9 +614,10 @@ namespace SLF
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(364, 17);
+            this.label16.Location = new System.Drawing.Point(273, 14);
+            this.label16.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(148, 24);
+            this.label16.Size = new System.Drawing.Size(98, 17);
             this.label16.TabIndex = 15;
             this.label16.Text = "Veri Ön İzleme:";
             // 
@@ -510,12 +627,12 @@ namespace SLF
             | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView4.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView4.Location = new System.Drawing.Point(368, 44);
-            this.dataGridView4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.dataGridView4.Location = new System.Drawing.Point(276, 36);
+            this.dataGridView4.Margin = new System.Windows.Forms.Padding(2);
             this.dataGridView4.Name = "dataGridView4";
             this.dataGridView4.RowHeadersWidth = 51;
             this.dataGridView4.RowTemplate.Height = 24;
-            this.dataGridView4.Size = new System.Drawing.Size(1099, 564);
+            this.dataGridView4.Size = new System.Drawing.Size(752, 453);
             this.dataGridView4.TabIndex = 14;
             // 
             // tab_ea
@@ -530,10 +647,10 @@ namespace SLF
             this.tab_ea.Controls.Add(this.EA_list_box);
             this.tab_ea.Controls.Add(this.gMapControl_EA);
             this.tab_ea.Controls.Add(this.button7);
-            this.tab_ea.Location = new System.Drawing.Point(4, 91);
-            this.tab_ea.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tab_ea.Location = new System.Drawing.Point(4, 48);
+            this.tab_ea.Margin = new System.Windows.Forms.Padding(2);
             this.tab_ea.Name = "tab_ea";
-            this.tab_ea.Size = new System.Drawing.Size(1472, 605);
+            this.tab_ea.Size = new System.Drawing.Size(1221, 507);
             this.tab_ea.TabIndex = 5;
             this.tab_ea.Text = "EA Şarj Modülü";
             this.tab_ea.UseVisualStyleBackColor = true;
@@ -541,27 +658,30 @@ namespace SLF
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(13, 244);
+            this.label14.Location = new System.Drawing.Point(10, 198);
+            this.label14.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(105, 24);
+            this.label14.Size = new System.Drawing.Size(74, 17);
             this.label14.TabIndex = 35;
             this.label14.Text = "Katmanlar:";
             // 
             // mesafe_metre_ea
             // 
             this.mesafe_metre_ea.AutoSize = true;
-            this.mesafe_metre_ea.Location = new System.Drawing.Point(467, 41);
+            this.mesafe_metre_ea.Location = new System.Drawing.Point(350, 33);
+            this.mesafe_metre_ea.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.mesafe_metre_ea.Name = "mesafe_metre_ea";
-            this.mesafe_metre_ea.Size = new System.Drawing.Size(0, 24);
+            this.mesafe_metre_ea.Size = new System.Drawing.Size(0, 17);
             this.mesafe_metre_ea.TabIndex = 34;
             this.mesafe_metre_ea.Visible = false;
             // 
             // Mesafe_ea
             // 
             this.Mesafe_ea.AutoSize = true;
-            this.Mesafe_ea.Location = new System.Drawing.Point(383, 41);
+            this.Mesafe_ea.Location = new System.Drawing.Point(287, 33);
+            this.Mesafe_ea.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.Mesafe_ea.Name = "Mesafe_ea";
-            this.Mesafe_ea.Size = new System.Drawing.Size(78, 24);
+            this.Mesafe_ea.Size = new System.Drawing.Size(54, 17);
             this.Mesafe_ea.TabIndex = 33;
             this.Mesafe_ea.Text = "Mesafe:";
             this.Mesafe_ea.Visible = false;
@@ -588,7 +708,7 @@ namespace SLF
             this.toolStripSeparator16});
             this.toolStrip2.Location = new System.Drawing.Point(0, 0);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(1472, 32);
+            this.toolStrip2.Size = new System.Drawing.Size(1221, 27);
             this.toolStrip2.TabIndex = 32;
             this.toolStrip2.Text = "toolStrip2";
             // 
@@ -605,7 +725,7 @@ namespace SLF
             this.EA_Seç.Margin = new System.Windows.Forms.Padding(204, 1, 0, 2);
             this.EA_Seç.Name = "EA_Seç";
             this.EA_Seç.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.EA_Seç.Size = new System.Drawing.Size(73, 29);
+            this.EA_Seç.Size = new System.Drawing.Size(66, 24);
             this.EA_Seç.Tag = "";
             this.EA_Seç.Text = "Seç";
             this.EA_Seç.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -618,7 +738,7 @@ namespace SLF
             this.toolStripSeparator9.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator9.Name = "toolStripSeparator9";
             this.toolStripSeparator9.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator9.Size = new System.Drawing.Size(6, 32);
+            this.toolStripSeparator9.Size = new System.Drawing.Size(6, 27);
             // 
             // EA_Kaydır
             // 
@@ -633,7 +753,7 @@ namespace SLF
             this.EA_Kaydır.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
             this.EA_Kaydır.Name = "EA_Kaydır";
             this.EA_Kaydır.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.EA_Kaydır.Size = new System.Drawing.Size(95, 29);
+            this.EA_Kaydır.Size = new System.Drawing.Size(85, 24);
             this.EA_Kaydır.Tag = "";
             this.EA_Kaydır.Text = "Kaydır";
             this.EA_Kaydır.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -646,7 +766,7 @@ namespace SLF
             this.toolStripSeparator10.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator10.Name = "toolStripSeparator10";
             this.toolStripSeparator10.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator10.Size = new System.Drawing.Size(6, 32);
+            this.toolStripSeparator10.Size = new System.Drawing.Size(6, 27);
             // 
             // EA_Mesafe_Ölç
             // 
@@ -661,7 +781,7 @@ namespace SLF
             this.EA_Mesafe_Ölç.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
             this.EA_Mesafe_Ölç.Name = "EA_Mesafe_Ölç";
             this.EA_Mesafe_Ölç.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.EA_Mesafe_Ölç.Size = new System.Drawing.Size(134, 29);
+            this.EA_Mesafe_Ölç.Size = new System.Drawing.Size(117, 24);
             this.EA_Mesafe_Ölç.Tag = "";
             this.EA_Mesafe_Ölç.Text = "Mesafe Ölç";
             this.EA_Mesafe_Ölç.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -674,7 +794,7 @@ namespace SLF
             this.toolStripSeparator11.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator11.Name = "toolStripSeparator11";
             this.toolStripSeparator11.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator11.Size = new System.Drawing.Size(6, 32);
+            this.toolStripSeparator11.Size = new System.Drawing.Size(6, 27);
             // 
             // EA_Alan_Ölç
             // 
@@ -689,7 +809,7 @@ namespace SLF
             this.EA_Alan_Ölç.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
             this.EA_Alan_Ölç.Name = "EA_Alan_Ölç";
             this.EA_Alan_Ölç.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.EA_Alan_Ölç.Size = new System.Drawing.Size(112, 29);
+            this.EA_Alan_Ölç.Size = new System.Drawing.Size(99, 24);
             this.EA_Alan_Ölç.Tag = "";
             this.EA_Alan_Ölç.Text = "Alan Ölç";
             this.EA_Alan_Ölç.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -701,7 +821,7 @@ namespace SLF
             this.toolStripSeparator12.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator12.Name = "toolStripSeparator12";
             this.toolStripSeparator12.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator12.Size = new System.Drawing.Size(6, 32);
+            this.toolStripSeparator12.Size = new System.Drawing.Size(6, 27);
             // 
             // EA_Poligon
             // 
@@ -716,7 +836,7 @@ namespace SLF
             this.EA_Poligon.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
             this.EA_Poligon.Name = "EA_Poligon";
             this.EA_Poligon.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.EA_Poligon.Size = new System.Drawing.Size(106, 29);
+            this.EA_Poligon.Size = new System.Drawing.Size(93, 24);
             this.EA_Poligon.Tag = "";
             this.EA_Poligon.Text = "Poligon";
             this.EA_Poligon.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -729,7 +849,7 @@ namespace SLF
             this.toolStripSeparator13.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator13.Name = "toolStripSeparator13";
             this.toolStripSeparator13.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator13.Size = new System.Drawing.Size(6, 32);
+            this.toolStripSeparator13.Size = new System.Drawing.Size(6, 27);
             // 
             // EA_Nokta
             // 
@@ -744,7 +864,7 @@ namespace SLF
             this.EA_Nokta.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
             this.EA_Nokta.Name = "EA_Nokta";
             this.EA_Nokta.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.EA_Nokta.Size = new System.Drawing.Size(94, 29);
+            this.EA_Nokta.Size = new System.Drawing.Size(83, 24);
             this.EA_Nokta.Tag = "";
             this.EA_Nokta.Text = "Nokta";
             this.EA_Nokta.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -757,7 +877,7 @@ namespace SLF
             this.toolStripSeparator14.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator14.Name = "toolStripSeparator14";
             this.toolStripSeparator14.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator14.Size = new System.Drawing.Size(6, 32);
+            this.toolStripSeparator14.Size = new System.Drawing.Size(6, 27);
             // 
             // toolStripButton15
             // 
@@ -772,7 +892,7 @@ namespace SLF
             this.toolStripButton15.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
             this.toolStripButton15.Name = "toolStripButton15";
             this.toolStripButton15.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.toolStripButton15.Size = new System.Drawing.Size(142, 29);
+            this.toolStripButton15.Size = new System.Drawing.Size(122, 24);
             this.toolStripButton15.Tag = "";
             this.toolStripButton15.Text = "Grid Oluştur";
             this.toolStripButton15.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -784,7 +904,7 @@ namespace SLF
             this.toolStripSeparator15.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator15.Name = "toolStripSeparator15";
             this.toolStripSeparator15.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator15.Size = new System.Drawing.Size(6, 32);
+            this.toolStripSeparator15.Size = new System.Drawing.Size(6, 27);
             // 
             // toolStripButton16
             // 
@@ -799,7 +919,7 @@ namespace SLF
             this.toolStripButton16.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
             this.toolStripButton16.Name = "toolStripButton16";
             this.toolStripButton16.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.toolStripButton16.Size = new System.Drawing.Size(146, 29);
+            this.toolStripButton16.Size = new System.Drawing.Size(125, 24);
             this.toolStripButton16.Tag = "";
             this.toolStripButton16.Text = "Fonksiyonlar";
             this.toolStripButton16.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -811,7 +931,7 @@ namespace SLF
             this.toolStripSeparator16.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator16.Name = "toolStripSeparator16";
             this.toolStripSeparator16.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator16.Size = new System.Drawing.Size(6, 32);
+            this.toolStripSeparator16.Size = new System.Drawing.Size(6, 27);
             // 
             // buton_ea_harita_katmanlar
             // 
@@ -820,10 +940,10 @@ namespace SLF
             this.buton_ea_harita_katmanlar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.buton_ea_harita_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
             this.buton_ea_harita_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_ea_harita_katmanlar.Location = new System.Drawing.Point(373, 638);
-            this.buton_ea_harita_katmanlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.buton_ea_harita_katmanlar.Location = new System.Drawing.Point(280, 487);
+            this.buton_ea_harita_katmanlar.Margin = new System.Windows.Forms.Padding(2);
             this.buton_ea_harita_katmanlar.Name = "buton_ea_harita_katmanlar";
-            this.buton_ea_harita_katmanlar.Size = new System.Drawing.Size(61, 52);
+            this.buton_ea_harita_katmanlar.Size = new System.Drawing.Size(46, 42);
             this.buton_ea_harita_katmanlar.TabIndex = 31;
             this.buton_ea_harita_katmanlar.UseVisualStyleBackColor = true;
             // 
@@ -838,13 +958,13 @@ namespace SLF
             this.OSM,
             this.Uydu});
             this.harita_katmanları_right_click.Name = "harita_katmanları_right_click";
-            this.harita_katmanları_right_click.Size = new System.Drawing.Size(196, 160);
+            this.harita_katmanları_right_click.Size = new System.Drawing.Size(168, 160);
             // 
             // Arazi
             // 
             this.Arazi.Image = ((System.Drawing.Image)(resources.GetObject("Arazi.Image")));
             this.Arazi.Name = "Arazi";
-            this.Arazi.Size = new System.Drawing.Size(195, 26);
+            this.Arazi.Size = new System.Drawing.Size(167, 26);
             this.Arazi.Text = "Arazi";
             this.Arazi.Click += new System.EventHandler(this.Arazi_Click);
             // 
@@ -852,7 +972,7 @@ namespace SLF
             // 
             this.Google_Earth.Image = ((System.Drawing.Image)(resources.GetObject("Google_Earth.Image")));
             this.Google_Earth.Name = "Google_Earth";
-            this.Google_Earth.Size = new System.Drawing.Size(195, 26);
+            this.Google_Earth.Size = new System.Drawing.Size(167, 26);
             this.Google_Earth.Text = "GE Online";
             this.Google_Earth.Click += new System.EventHandler(this.Google_Earth_Click);
             // 
@@ -860,7 +980,7 @@ namespace SLF
             // 
             this.Google_Earth_Desktop.Image = ((System.Drawing.Image)(resources.GetObject("Google_Earth_Desktop.Image")));
             this.Google_Earth_Desktop.Name = "Google_Earth_Desktop";
-            this.Google_Earth_Desktop.Size = new System.Drawing.Size(195, 26);
+            this.Google_Earth_Desktop.Size = new System.Drawing.Size(167, 26);
             this.Google_Earth_Desktop.Text = "GE Pro Desktop";
             this.Google_Earth_Desktop.Click += new System.EventHandler(this.Google_Earth_Desktop_Click);
             // 
@@ -868,7 +988,7 @@ namespace SLF
             // 
             this.Harita.Image = ((System.Drawing.Image)(resources.GetObject("Harita.Image")));
             this.Harita.Name = "Harita";
-            this.Harita.Size = new System.Drawing.Size(195, 26);
+            this.Harita.Size = new System.Drawing.Size(167, 26);
             this.Harita.Text = "Harita";
             this.Harita.Click += new System.EventHandler(this.Harita_Click);
             // 
@@ -876,7 +996,7 @@ namespace SLF
             // 
             this.OSM.Image = ((System.Drawing.Image)(resources.GetObject("OSM.Image")));
             this.OSM.Name = "OSM";
-            this.OSM.Size = new System.Drawing.Size(195, 26);
+            this.OSM.Size = new System.Drawing.Size(167, 26);
             this.OSM.Text = "Open Street Map";
             this.OSM.Click += new System.EventHandler(this.OSM_Click);
             // 
@@ -884,16 +1004,16 @@ namespace SLF
             // 
             this.Uydu.Image = ((System.Drawing.Image)(resources.GetObject("Uydu.Image")));
             this.Uydu.Name = "Uydu";
-            this.Uydu.Size = new System.Drawing.Size(195, 26);
+            this.Uydu.Size = new System.Drawing.Size(167, 26);
             this.Uydu.Text = "Uydu";
             this.Uydu.Click += new System.EventHandler(this.Uydu_Click);
             // 
             // ButtonKml
             // 
-            this.ButtonKml.Location = new System.Drawing.Point(8, 126);
-            this.ButtonKml.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.ButtonKml.Location = new System.Drawing.Point(6, 102);
+            this.ButtonKml.Margin = new System.Windows.Forms.Padding(2);
             this.ButtonKml.Name = "ButtonKml";
-            this.ButtonKml.Size = new System.Drawing.Size(143, 39);
+            this.ButtonKml.Size = new System.Drawing.Size(107, 32);
             this.ButtonKml.TabIndex = 30;
             this.ButtonKml.Text = "KML Yükle";
             this.ButtonKml.UseVisualStyleBackColor = true;
@@ -901,10 +1021,10 @@ namespace SLF
             // 
             // oznitelikAc
             // 
-            this.oznitelikAc.Location = new System.Drawing.Point(17, 542);
-            this.oznitelikAc.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.oznitelikAc.Location = new System.Drawing.Point(13, 440);
+            this.oznitelikAc.Margin = new System.Windows.Forms.Padding(2);
             this.oznitelikAc.Name = "oznitelikAc";
-            this.oznitelikAc.Size = new System.Drawing.Size(195, 38);
+            this.oznitelikAc.Size = new System.Drawing.Size(146, 31);
             this.oznitelikAc.TabIndex = 29;
             this.oznitelikAc.Text = "Öznitelikleri Göster";
             this.oznitelikAc.UseVisualStyleBackColor = true;
@@ -912,11 +1032,11 @@ namespace SLF
             // EA_list_box
             // 
             this.EA_list_box.FormattingEnabled = true;
-            this.EA_list_box.ItemHeight = 24;
-            this.EA_list_box.Location = new System.Drawing.Point(17, 271);
-            this.EA_list_box.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.EA_list_box.ItemHeight = 17;
+            this.EA_list_box.Location = new System.Drawing.Point(13, 220);
+            this.EA_list_box.Margin = new System.Windows.Forms.Padding(2);
             this.EA_list_box.Name = "EA_list_box";
-            this.EA_list_box.Size = new System.Drawing.Size(244, 124);
+            this.EA_list_box.Size = new System.Drawing.Size(184, 89);
             this.EA_list_box.TabIndex = 20;
             // 
             // gMapControl_EA
@@ -930,8 +1050,8 @@ namespace SLF
             this.gMapControl_EA.GrayScaleMode = false;
             this.gMapControl_EA.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
             this.gMapControl_EA.LevelsKeepInMemory = 5;
-            this.gMapControl_EA.Location = new System.Drawing.Point(373, 41);
-            this.gMapControl_EA.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.gMapControl_EA.Location = new System.Drawing.Point(280, 33);
+            this.gMapControl_EA.Margin = new System.Windows.Forms.Padding(2);
             this.gMapControl_EA.MarkersEnabled = true;
             this.gMapControl_EA.MaxZoom = 2;
             this.gMapControl_EA.MinZoom = 2;
@@ -945,7 +1065,7 @@ namespace SLF
             this.gMapControl_EA.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_EA.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_EA.ShowTileGridLines = false;
-            this.gMapControl_EA.Size = new System.Drawing.Size(1096, 647);
+            this.gMapControl_EA.Size = new System.Drawing.Size(746, 495);
             this.gMapControl_EA.TabIndex = 18;
             this.gMapControl_EA.Zoom = 0D;
             this.gMapControl_EA.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_EA_OnMapClick);
@@ -956,10 +1076,10 @@ namespace SLF
             // 
             // button7
             // 
-            this.button7.Location = new System.Drawing.Point(8, 41);
-            this.button7.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.button7.Location = new System.Drawing.Point(6, 33);
+            this.button7.Margin = new System.Windows.Forms.Padding(2);
             this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(143, 39);
+            this.button7.Size = new System.Drawing.Size(107, 32);
             this.button7.TabIndex = 17;
             this.button7.Text = "CSV Yükle";
             this.button7.UseVisualStyleBackColor = true;
@@ -967,162 +1087,170 @@ namespace SLF
             // 
             // tab_ekonometrik
             // 
-            this.tab_ekonometrik.Controls.Add(this.panel2);
-            this.tab_ekonometrik.Controls.Add(this.checkBox8);
-            this.tab_ekonometrik.Controls.Add(this.textBox1);
-            this.tab_ekonometrik.Controls.Add(this.label9);
-            this.tab_ekonometrik.Controls.Add(this.button10);
-            this.tab_ekonometrik.Controls.Add(this.label12);
-            this.tab_ekonometrik.Controls.Add(this.dataGridView2);
-            this.tab_ekonometrik.Location = new System.Drawing.Point(4, 91);
-            this.tab_ekonometrik.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tab_ekonometrik.AutoScroll = true;
+            this.tab_ekonometrik.Controls.Add(this.ELFGraphicsPanel);
+            this.tab_ekonometrik.Controls.Add(this.ELFTablePanel);
+            this.tab_ekonometrik.Controls.Add(this.panel5);
+            this.tab_ekonometrik.Location = new System.Drawing.Point(4, 48);
+            this.tab_ekonometrik.Margin = new System.Windows.Forms.Padding(2);
             this.tab_ekonometrik.Name = "tab_ekonometrik";
-            this.tab_ekonometrik.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tab_ekonometrik.Size = new System.Drawing.Size(1472, 605);
+            this.tab_ekonometrik.Padding = new System.Windows.Forms.Padding(2);
+            this.tab_ekonometrik.Size = new System.Drawing.Size(1221, 507);
             this.tab_ekonometrik.TabIndex = 1;
             this.tab_ekonometrik.Text = "Ekonometrik Talep Tahmini Modülü";
             this.tab_ekonometrik.UseVisualStyleBackColor = true;
             // 
-            // panel2
+            // ELFGraphicsPanel
             // 
-            this.panel2.Controls.Add(this.button5);
-            this.panel2.Controls.Add(this.label11);
-            this.panel2.Controls.Add(this.comboBox4);
-            this.panel2.Controls.Add(this.label10);
-            this.panel2.Controls.Add(this.comboBox3);
-            this.panel2.Location = new System.Drawing.Point(13, 252);
-            this.panel2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(405, 311);
-            this.panel2.TabIndex = 21;
-            this.panel2.Visible = false;
+            this.ELFGraphicsPanel.Controls.Add(this.label9);
+            this.ELFGraphicsPanel.Controls.Add(this.pictureBox2);
+            this.ELFGraphicsPanel.Controls.Add(this.pictureBox1);
+            this.ELFGraphicsPanel.Dock = System.Windows.Forms.DockStyle.Right;
+            this.ELFGraphicsPanel.Location = new System.Drawing.Point(1031, 2);
+            this.ELFGraphicsPanel.Name = "ELFGraphicsPanel";
+            this.ELFGraphicsPanel.Size = new System.Drawing.Size(188, 503);
+            this.ELFGraphicsPanel.TabIndex = 23;
             // 
-            // button5
+            // ELFTablePanel
             // 
-            this.button5.Location = new System.Drawing.Point(5, 118);
-            this.button5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(160, 58);
-            this.button5.TabIndex = 6;
-            this.button5.Text = "Tahmin Yap";
-            this.button5.UseVisualStyleBackColor = true;
+            this.ELFTablePanel.Controls.Add(this.dataGridView2);
+            this.ELFTablePanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ELFTablePanel.Location = new System.Drawing.Point(179, 2);
+            this.ELFTablePanel.Margin = new System.Windows.Forms.Padding(2);
+            this.ELFTablePanel.Name = "ELFTablePanel";
+            this.ELFTablePanel.Size = new System.Drawing.Size(1040, 503);
+            this.ELFTablePanel.TabIndex = 21;
             // 
-            // label11
+            // dataGridView2
             // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(3, 224);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(145, 24);
-            this.label11.TabIndex = 4;
-            this.label11.Text = "Senaryo Seçimi:";
+            this.dataGridView2.AllowUserToOrderColumns = true;
+            this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView2.Location = new System.Drawing.Point(0, 0);
+            this.dataGridView2.Margin = new System.Windows.Forms.Padding(2);
+            this.dataGridView2.Name = "dataGridView2";
+            this.dataGridView2.RowHeadersWidth = 51;
+            this.dataGridView2.RowTemplate.Height = 24;
+            this.dataGridView2.Size = new System.Drawing.Size(1040, 503);
+            this.dataGridView2.TabIndex = 0;
             // 
-            // comboBox4
+            // panel5
             // 
-            this.comboBox4.FormattingEnabled = true;
-            this.comboBox4.Location = new System.Drawing.Point(5, 266);
-            this.comboBox4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.comboBox4.Name = "comboBox4";
-            this.comboBox4.Size = new System.Drawing.Size(212, 32);
-            this.comboBox4.TabIndex = 3;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(5, 7);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(176, 24);
-            this.label10.TabIndex = 2;
-            this.label10.Text = "Tahmin Yılı Aralığı:";
-            // 
-            // comboBox3
-            // 
-            this.comboBox3.FormattingEnabled = true;
-            this.comboBox3.Location = new System.Drawing.Point(5, 55);
-            this.comboBox3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.comboBox3.Name = "comboBox3";
-            this.comboBox3.Size = new System.Drawing.Size(252, 32);
-            this.comboBox3.TabIndex = 1;
-            // 
-            // checkBox8
-            // 
-            this.checkBox8.AutoSize = true;
-            this.checkBox8.Location = new System.Drawing.Point(20, 213);
-            this.checkBox8.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.checkBox8.Name = "checkBox8";
-            this.checkBox8.Size = new System.Drawing.Size(232, 28);
-            this.checkBox8.TabIndex = 20;
-            this.checkBox8.Text = "Tahmin Gerçekleştirme";
-            this.checkBox8.UseVisualStyleBackColor = true;
-            this.checkBox8.CheckedChanged += new System.EventHandler(this.checkBox8_CheckedChanged);
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(20, 154);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(401, 31);
-            this.textBox1.TabIndex = 19;
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(20, 113);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(175, 24);
-            this.label9.TabIndex = 18;
-            this.label9.Text = "Seçilen Dosya İsmi:";
-            // 
-            // button10
-            // 
-            this.button10.Location = new System.Drawing.Point(20, 49);
-            this.button10.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button10.Name = "button10";
-            this.button10.Size = new System.Drawing.Size(159, 44);
-            this.button10.TabIndex = 17;
-            this.button10.Text = "Dosya Seç";
-            this.button10.UseVisualStyleBackColor = true;
-            this.button10.Click += new System.EventHandler(this.button10_Click);
+            this.panel5.AutoScroll = true;
+            this.panel5.Controls.Add(this.label12);
+            this.panel5.Controls.Add(this.button10);
+            this.panel5.Controls.Add(this.comboBox1);
+            this.panel5.Controls.Add(this.label15);
+            this.panel5.Controls.Add(this.ELFPredictionButton);
+            this.panel5.Controls.Add(this.comboBox4);
+            this.panel5.Controls.Add(this.PredictionCheckBox);
+            this.panel5.Controls.Add(this.label11);
+            this.panel5.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel5.Location = new System.Drawing.Point(2, 2);
+            this.panel5.Name = "panel5";
+            this.panel5.Size = new System.Drawing.Size(177, 503);
+            this.panel5.TabIndex = 22;
             // 
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(447, 22);
+            this.label12.Location = new System.Drawing.Point(75, 10);
+            this.label12.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(148, 24);
+            this.label12.Size = new System.Drawing.Size(98, 17);
             this.label12.TabIndex = 7;
             this.label12.Text = "Veri Ön İzleme:";
             // 
-            // dataGridView2
+            // button10
             // 
-            this.dataGridView2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView2.Location = new System.Drawing.Point(451, 49);
-            this.dataGridView2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.dataGridView2.Name = "dataGridView2";
-            this.dataGridView2.RowHeadersWidth = 51;
-            this.dataGridView2.RowTemplate.Height = 24;
-            this.dataGridView2.Size = new System.Drawing.Size(1015, 559);
-            this.dataGridView2.TabIndex = 0;
+            this.button10.Location = new System.Drawing.Point(21, 392);
+            this.button10.Margin = new System.Windows.Forms.Padding(2);
+            this.button10.Name = "button10";
+            this.button10.Size = new System.Drawing.Size(119, 36);
+            this.button10.TabIndex = 17;
+            this.button10.Text = "Dosya Seç";
+            this.button10.UseVisualStyleBackColor = true;
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(3, 173);
+            this.comboBox1.Margin = new System.Windows.Forms.Padding(2);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(160, 25);
+            this.comboBox1.TabIndex = 21;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(3, 145);
+            this.label15.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(120, 17);
+            this.label15.TabIndex = 22;
+            this.label15.Text = "Bağımsız Değişken";
+            // 
+            // ELFPredictionButton
+            // 
+            this.ELFPredictionButton.Location = new System.Drawing.Point(20, 219);
+            this.ELFPredictionButton.Margin = new System.Windows.Forms.Padding(2);
+            this.ELFPredictionButton.Name = "ELFPredictionButton";
+            this.ELFPredictionButton.Size = new System.Drawing.Size(120, 39);
+            this.ELFPredictionButton.TabIndex = 6;
+            this.ELFPredictionButton.Text = "Tahmin Yap";
+            this.ELFPredictionButton.UseVisualStyleBackColor = true;
+            this.ELFPredictionButton.Click += new System.EventHandler(this.ELFPredictionButton_Click);
+            // 
+            // comboBox4
+            // 
+            this.comboBox4.FormattingEnabled = true;
+            this.comboBox4.Location = new System.Drawing.Point(3, 118);
+            this.comboBox4.Margin = new System.Windows.Forms.Padding(2);
+            this.comboBox4.Name = "comboBox4";
+            this.comboBox4.Size = new System.Drawing.Size(160, 25);
+            this.comboBox4.TabIndex = 3;
+            // 
+            // PredictionCheckBox
+            // 
+            this.PredictionCheckBox.AutoSize = true;
+            this.PredictionCheckBox.Checked = true;
+            this.PredictionCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.PredictionCheckBox.Location = new System.Drawing.Point(2, 52);
+            this.PredictionCheckBox.Margin = new System.Windows.Forms.Padding(2);
+            this.PredictionCheckBox.Name = "PredictionCheckBox";
+            this.PredictionCheckBox.Size = new System.Drawing.Size(164, 21);
+            this.PredictionCheckBox.TabIndex = 20;
+            this.PredictionCheckBox.Text = "Tahmin Gerçekleştirme";
+            this.PredictionCheckBox.UseVisualStyleBackColor = true;
+            this.PredictionCheckBox.CheckedChanged += new System.EventHandler(this.PredictionCheckBox_CheckedChanged);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(3, 90);
+            this.label11.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(103, 17);
+            this.label11.TabIndex = 4;
+            this.label11.Text = "Senaryo Seçimi:";
             // 
             // tab_imar
             // 
             this.tab_imar.Controls.Add(this.button6);
-            this.tab_imar.Location = new System.Drawing.Point(4, 91);
-            this.tab_imar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tab_imar.Location = new System.Drawing.Point(4, 48);
+            this.tab_imar.Margin = new System.Windows.Forms.Padding(2);
             this.tab_imar.Name = "tab_imar";
-            this.tab_imar.Size = new System.Drawing.Size(1472, 605);
+            this.tab_imar.Size = new System.Drawing.Size(1221, 507);
             this.tab_imar.TabIndex = 4;
             this.tab_imar.Text = "İmar Analizleri";
             this.tab_imar.UseVisualStyleBackColor = true;
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(67, 151);
-            this.button6.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.button6.Location = new System.Drawing.Point(50, 123);
+            this.button6.Margin = new System.Windows.Forms.Padding(2);
             this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(123, 39);
+            this.button6.Size = new System.Drawing.Size(92, 32);
             this.button6.TabIndex = 19;
             this.button6.Text = "Temizle";
             this.button6.UseVisualStyleBackColor = true;
@@ -1130,20 +1258,20 @@ namespace SLF
             // 
             // tab_optDTR
             // 
-            this.tab_optDTR.Location = new System.Drawing.Point(4, 91);
-            this.tab_optDTR.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tab_optDTR.Location = new System.Drawing.Point(4, 48);
+            this.tab_optDTR.Margin = new System.Windows.Forms.Padding(2);
             this.tab_optDTR.Name = "tab_optDTR";
-            this.tab_optDTR.Size = new System.Drawing.Size(1472, 605);
+            this.tab_optDTR.Size = new System.Drawing.Size(1221, 507);
             this.tab_optDTR.TabIndex = 7;
             this.tab_optDTR.Text = "Optimal DTR Konumlandırma";
             this.tab_optDTR.UseVisualStyleBackColor = true;
             // 
             // tab_senaryo
             // 
-            this.tab_senaryo.Location = new System.Drawing.Point(4, 91);
-            this.tab_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tab_senaryo.Location = new System.Drawing.Point(4, 48);
+            this.tab_senaryo.Margin = new System.Windows.Forms.Padding(2);
             this.tab_senaryo.Name = "tab_senaryo";
-            this.tab_senaryo.Size = new System.Drawing.Size(1472, 605);
+            this.tab_senaryo.Size = new System.Drawing.Size(1221, 507);
             this.tab_senaryo.TabIndex = 3;
             this.tab_senaryo.Text = "Senaryo Oluşturma Modülü";
             this.tab_senaryo.UseVisualStyleBackColor = true;
@@ -1170,10 +1298,10 @@ namespace SLF
             this.tab_stokastik.Controls.Add(this.label13);
             this.tab_stokastik.Controls.Add(this.stokastik_dosya_seçimi);
             this.tab_stokastik.Controls.Add(this.Seç_Stokastik);
-            this.tab_stokastik.Location = new System.Drawing.Point(4, 91);
-            this.tab_stokastik.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tab_stokastik.Location = new System.Drawing.Point(4, 48);
+            this.tab_stokastik.Margin = new System.Windows.Forms.Padding(2);
             this.tab_stokastik.Name = "tab_stokastik";
-            this.tab_stokastik.Size = new System.Drawing.Size(1472, 605);
+            this.tab_stokastik.Size = new System.Drawing.Size(1221, 507);
             this.tab_stokastik.TabIndex = 2;
             this.tab_stokastik.Text = "Stokastik Yük Tahmini Modülü";
             this.tab_stokastik.UseVisualStyleBackColor = true;
@@ -1182,10 +1310,10 @@ namespace SLF
             // 
             this.checkBox21.AutoSize = true;
             this.checkBox21.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox21.Location = new System.Drawing.Point(8, 578);
-            this.checkBox21.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox21.Location = new System.Drawing.Point(6, 470);
+            this.checkBox21.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox21.Name = "checkBox21";
-            this.checkBox21.Size = new System.Drawing.Size(132, 28);
+            this.checkBox21.Size = new System.Drawing.Size(96, 21);
             this.checkBox21.TabIndex = 35;
             this.checkBox21.Text = "checkBox21";
             this.checkBox21.UseVisualStyleBackColor = true;
@@ -1200,7 +1328,7 @@ namespace SLF
             this.temizleToolStripMenuItem,
             this.kaydetToolStripMenuItem});
             this.katmanlar_right_click.Name = "katmanlar_right_click";
-            this.katmanlar_right_click.Size = new System.Drawing.Size(177, 108);
+            this.katmanlar_right_click.Size = new System.Drawing.Size(152, 108);
             this.katmanlar_right_click.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.katmanlar_right_click_Closing);
             this.katmanlar_right_click.Opening += new System.ComponentModel.CancelEventHandler(this.katmanlar_right_click_Opening);
             // 
@@ -1209,7 +1337,7 @@ namespace SLF
             this.tabloyuGörToolStripMenuItem.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.tabloyuGörToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("tabloyuGörToolStripMenuItem.Image")));
             this.tabloyuGörToolStripMenuItem.Name = "tabloyuGörToolStripMenuItem";
-            this.tabloyuGörToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
+            this.tabloyuGörToolStripMenuItem.Size = new System.Drawing.Size(151, 26);
             this.tabloyuGörToolStripMenuItem.Text = "Tabloyu Gör";
             this.tabloyuGörToolStripMenuItem.Click += new System.EventHandler(this.tabloyuGörToolStripMenuItem_Click);
             // 
@@ -1217,7 +1345,7 @@ namespace SLF
             // 
             this.rengiDeğiştirToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("rengiDeğiştirToolStripMenuItem.Image")));
             this.rengiDeğiştirToolStripMenuItem.Name = "rengiDeğiştirToolStripMenuItem";
-            this.rengiDeğiştirToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
+            this.rengiDeğiştirToolStripMenuItem.Size = new System.Drawing.Size(151, 26);
             this.rengiDeğiştirToolStripMenuItem.Text = "Rengi Değiştir";
             this.rengiDeğiştirToolStripMenuItem.Click += new System.EventHandler(this.rengiDeğiştirToolStripMenuItem_Click);
             // 
@@ -1225,7 +1353,7 @@ namespace SLF
             // 
             this.temizleToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("temizleToolStripMenuItem.Image")));
             this.temizleToolStripMenuItem.Name = "temizleToolStripMenuItem";
-            this.temizleToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
+            this.temizleToolStripMenuItem.Size = new System.Drawing.Size(151, 26);
             this.temizleToolStripMenuItem.Text = "Temizle";
             this.temizleToolStripMenuItem.Click += new System.EventHandler(this.temizleToolStripMenuItem_Click);
             // 
@@ -1233,7 +1361,7 @@ namespace SLF
             // 
             this.kaydetToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("kaydetToolStripMenuItem.Image")));
             this.kaydetToolStripMenuItem.Name = "kaydetToolStripMenuItem";
-            this.kaydetToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
+            this.kaydetToolStripMenuItem.Size = new System.Drawing.Size(151, 26);
             this.kaydetToolStripMenuItem.Text = "Kaydet";
             this.kaydetToolStripMenuItem.Click += new System.EventHandler(this.kaydetToolStripMenuItem_Click);
             // 
@@ -1241,10 +1369,10 @@ namespace SLF
             // 
             this.checkBox20.AutoSize = true;
             this.checkBox20.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox20.Location = new System.Drawing.Point(8, 544);
-            this.checkBox20.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox20.Location = new System.Drawing.Point(6, 442);
+            this.checkBox20.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox20.Name = "checkBox20";
-            this.checkBox20.Size = new System.Drawing.Size(136, 28);
+            this.checkBox20.Size = new System.Drawing.Size(98, 21);
             this.checkBox20.TabIndex = 34;
             this.checkBox20.Text = "checkBox20";
             this.checkBox20.UseVisualStyleBackColor = true;
@@ -1254,10 +1382,10 @@ namespace SLF
             // 
             this.checkBox19.AutoSize = true;
             this.checkBox19.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox19.Location = new System.Drawing.Point(9, 510);
-            this.checkBox19.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox19.Location = new System.Drawing.Point(7, 414);
+            this.checkBox19.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox19.Name = "checkBox19";
-            this.checkBox19.Size = new System.Drawing.Size(132, 28);
+            this.checkBox19.Size = new System.Drawing.Size(96, 21);
             this.checkBox19.TabIndex = 33;
             this.checkBox19.Text = "checkBox19";
             this.checkBox19.UseVisualStyleBackColor = true;
@@ -1266,18 +1394,20 @@ namespace SLF
             // mesafe_metre_stokastik
             // 
             this.mesafe_metre_stokastik.AutoSize = true;
-            this.mesafe_metre_stokastik.Location = new System.Drawing.Point(408, 57);
+            this.mesafe_metre_stokastik.Location = new System.Drawing.Point(306, 46);
+            this.mesafe_metre_stokastik.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.mesafe_metre_stokastik.Name = "mesafe_metre_stokastik";
-            this.mesafe_metre_stokastik.Size = new System.Drawing.Size(0, 24);
+            this.mesafe_metre_stokastik.Size = new System.Drawing.Size(0, 17);
             this.mesafe_metre_stokastik.TabIndex = 32;
             this.mesafe_metre_stokastik.Visible = false;
             // 
             // Mesafe_stokastik
             // 
             this.Mesafe_stokastik.AutoSize = true;
-            this.Mesafe_stokastik.Location = new System.Drawing.Point(315, 57);
+            this.Mesafe_stokastik.Location = new System.Drawing.Point(236, 46);
+            this.Mesafe_stokastik.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.Mesafe_stokastik.Name = "Mesafe_stokastik";
-            this.Mesafe_stokastik.Size = new System.Drawing.Size(78, 24);
+            this.Mesafe_stokastik.Size = new System.Drawing.Size(54, 17);
             this.Mesafe_stokastik.TabIndex = 31;
             this.Mesafe_stokastik.Text = "Mesafe:";
             this.Mesafe_stokastik.Visible = false;
@@ -1295,8 +1425,8 @@ namespace SLF
             this.gMapControl_stokastik.GrayScaleMode = false;
             this.gMapControl_stokastik.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
             this.gMapControl_stokastik.LevelsKeepInMemory = 5;
-            this.gMapControl_stokastik.Location = new System.Drawing.Point(307, 47);
-            this.gMapControl_stokastik.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.gMapControl_stokastik.Location = new System.Drawing.Point(230, 38);
+            this.gMapControl_stokastik.Margin = new System.Windows.Forms.Padding(2);
             this.gMapControl_stokastik.MarkersEnabled = true;
             this.gMapControl_stokastik.MaxZoom = 2;
             this.gMapControl_stokastik.MinZoom = 2;
@@ -1310,7 +1440,7 @@ namespace SLF
             this.gMapControl_stokastik.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_stokastik.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_stokastik.ShowTileGridLines = false;
-            this.gMapControl_stokastik.Size = new System.Drawing.Size(1159, 583);
+            this.gMapControl_stokastik.Size = new System.Drawing.Size(797, 513);
             this.gMapControl_stokastik.TabIndex = 30;
             this.gMapControl_stokastik.Zoom = 0D;
             this.gMapControl_stokastik.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_stokastik_OnMapClick);
@@ -1327,10 +1457,10 @@ namespace SLF
             this.buton_stokastik_harita_katmanlar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.buton_stokastik_harita_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
             this.buton_stokastik_harita_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_stokastik_harita_katmanlar.Location = new System.Drawing.Point(307, 578);
-            this.buton_stokastik_harita_katmanlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.buton_stokastik_harita_katmanlar.Location = new System.Drawing.Point(230, 509);
+            this.buton_stokastik_harita_katmanlar.Margin = new System.Windows.Forms.Padding(2);
             this.buton_stokastik_harita_katmanlar.Name = "buton_stokastik_harita_katmanlar";
-            this.buton_stokastik_harita_katmanlar.Size = new System.Drawing.Size(61, 52);
+            this.buton_stokastik_harita_katmanlar.Size = new System.Drawing.Size(46, 42);
             this.buton_stokastik_harita_katmanlar.TabIndex = 29;
             this.buton_stokastik_harita_katmanlar.UseVisualStyleBackColor = true;
             // 
@@ -1338,10 +1468,10 @@ namespace SLF
             // 
             this.checkBox18.AutoSize = true;
             this.checkBox18.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox18.Location = new System.Drawing.Point(8, 476);
-            this.checkBox18.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox18.Location = new System.Drawing.Point(6, 387);
+            this.checkBox18.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox18.Name = "checkBox18";
-            this.checkBox18.Size = new System.Drawing.Size(132, 28);
+            this.checkBox18.Size = new System.Drawing.Size(96, 21);
             this.checkBox18.TabIndex = 28;
             this.checkBox18.Text = "checkBox18";
             this.checkBox18.UseVisualStyleBackColor = true;
@@ -1351,10 +1481,10 @@ namespace SLF
             // 
             this.checkBox17.AutoSize = true;
             this.checkBox17.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox17.Location = new System.Drawing.Point(8, 442);
-            this.checkBox17.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox17.Location = new System.Drawing.Point(6, 359);
+            this.checkBox17.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox17.Name = "checkBox17";
-            this.checkBox17.Size = new System.Drawing.Size(132, 28);
+            this.checkBox17.Size = new System.Drawing.Size(96, 21);
             this.checkBox17.TabIndex = 27;
             this.checkBox17.Text = "checkBox17";
             this.checkBox17.UseVisualStyleBackColor = true;
@@ -1364,10 +1494,10 @@ namespace SLF
             // 
             this.checkBox16.AutoSize = true;
             this.checkBox16.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox16.Location = new System.Drawing.Point(8, 409);
-            this.checkBox16.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox16.Location = new System.Drawing.Point(6, 332);
+            this.checkBox16.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox16.Name = "checkBox16";
-            this.checkBox16.Size = new System.Drawing.Size(132, 28);
+            this.checkBox16.Size = new System.Drawing.Size(96, 21);
             this.checkBox16.TabIndex = 26;
             this.checkBox16.Text = "checkBox16";
             this.checkBox16.UseVisualStyleBackColor = true;
@@ -1377,10 +1507,10 @@ namespace SLF
             // 
             this.checkBox15.AutoSize = true;
             this.checkBox15.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox15.Location = new System.Drawing.Point(8, 374);
-            this.checkBox15.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox15.Location = new System.Drawing.Point(6, 304);
+            this.checkBox15.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox15.Name = "checkBox15";
-            this.checkBox15.Size = new System.Drawing.Size(132, 28);
+            this.checkBox15.Size = new System.Drawing.Size(96, 21);
             this.checkBox15.TabIndex = 25;
             this.checkBox15.Text = "checkBox15";
             this.checkBox15.UseVisualStyleBackColor = true;
@@ -1390,10 +1520,10 @@ namespace SLF
             // 
             this.checkBox14.AutoSize = true;
             this.checkBox14.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox14.Location = new System.Drawing.Point(8, 340);
-            this.checkBox14.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox14.Location = new System.Drawing.Point(6, 276);
+            this.checkBox14.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox14.Name = "checkBox14";
-            this.checkBox14.Size = new System.Drawing.Size(132, 28);
+            this.checkBox14.Size = new System.Drawing.Size(96, 21);
             this.checkBox14.TabIndex = 24;
             this.checkBox14.Text = "checkBox14";
             this.checkBox14.UseVisualStyleBackColor = true;
@@ -1403,10 +1533,10 @@ namespace SLF
             // 
             this.checkBox13.AutoSize = true;
             this.checkBox13.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox13.Location = new System.Drawing.Point(8, 306);
-            this.checkBox13.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox13.Location = new System.Drawing.Point(6, 249);
+            this.checkBox13.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox13.Name = "checkBox13";
-            this.checkBox13.Size = new System.Drawing.Size(132, 28);
+            this.checkBox13.Size = new System.Drawing.Size(96, 21);
             this.checkBox13.TabIndex = 23;
             this.checkBox13.Text = "checkBox13";
             this.checkBox13.UseVisualStyleBackColor = true;
@@ -1416,10 +1546,10 @@ namespace SLF
             // 
             this.checkBox12.AutoSize = true;
             this.checkBox12.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox12.Location = new System.Drawing.Point(8, 272);
-            this.checkBox12.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox12.Location = new System.Drawing.Point(6, 221);
+            this.checkBox12.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox12.Name = "checkBox12";
-            this.checkBox12.Size = new System.Drawing.Size(132, 28);
+            this.checkBox12.Size = new System.Drawing.Size(96, 21);
             this.checkBox12.TabIndex = 22;
             this.checkBox12.Text = "checkBox12";
             this.checkBox12.UseVisualStyleBackColor = true;
@@ -1429,10 +1559,10 @@ namespace SLF
             // 
             this.checkBox11.AutoSize = true;
             this.checkBox11.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox11.Location = new System.Drawing.Point(8, 238);
-            this.checkBox11.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox11.Location = new System.Drawing.Point(6, 193);
+            this.checkBox11.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox11.Name = "checkBox11";
-            this.checkBox11.Size = new System.Drawing.Size(129, 28);
+            this.checkBox11.Size = new System.Drawing.Size(94, 21);
             this.checkBox11.TabIndex = 21;
             this.checkBox11.Text = "checkBox11";
             this.checkBox11.UseVisualStyleBackColor = true;
@@ -1442,10 +1572,10 @@ namespace SLF
             // 
             this.checkBox10.AutoSize = true;
             this.checkBox10.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox10.Location = new System.Drawing.Point(8, 204);
-            this.checkBox10.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox10.Location = new System.Drawing.Point(6, 166);
+            this.checkBox10.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox10.Name = "checkBox10";
-            this.checkBox10.Size = new System.Drawing.Size(133, 28);
+            this.checkBox10.Size = new System.Drawing.Size(96, 21);
             this.checkBox10.TabIndex = 20;
             this.checkBox10.Text = "checkBox10";
             this.checkBox10.UseVisualStyleBackColor = true;
@@ -1456,10 +1586,10 @@ namespace SLF
             this.checkBox9.AutoSize = true;
             this.checkBox9.BackColor = System.Drawing.Color.Transparent;
             this.checkBox9.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox9.Location = new System.Drawing.Point(8, 170);
-            this.checkBox9.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox9.Location = new System.Drawing.Point(6, 138);
+            this.checkBox9.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox9.Name = "checkBox9";
-            this.checkBox9.Size = new System.Drawing.Size(124, 28);
+            this.checkBox9.Size = new System.Drawing.Size(91, 21);
             this.checkBox9.TabIndex = 19;
             this.checkBox9.Text = "checkBox9";
             this.checkBox9.UseVisualStyleBackColor = false;
@@ -1469,18 +1599,19 @@ namespace SLF
             // 
             this.label13.AutoSize = true;
             this.label13.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label13.Location = new System.Drawing.Point(24, 129);
+            this.label13.Location = new System.Drawing.Point(18, 105);
+            this.label13.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(99, 24);
+            this.label13.Size = new System.Drawing.Size(81, 19);
             this.label13.TabIndex = 18;
             this.label13.Text = "Katmanlar";
             // 
             // stokastik_dosya_seçimi
             // 
-            this.stokastik_dosya_seçimi.Location = new System.Drawing.Point(8, 47);
-            this.stokastik_dosya_seçimi.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.stokastik_dosya_seçimi.Location = new System.Drawing.Point(6, 38);
+            this.stokastik_dosya_seçimi.Margin = new System.Windows.Forms.Padding(2);
             this.stokastik_dosya_seçimi.Name = "stokastik_dosya_seçimi";
-            this.stokastik_dosya_seçimi.Size = new System.Drawing.Size(173, 44);
+            this.stokastik_dosya_seçimi.Size = new System.Drawing.Size(130, 36);
             this.stokastik_dosya_seçimi.TabIndex = 17;
             this.stokastik_dosya_seçimi.Text = "Dosya Seç";
             this.stokastik_dosya_seçimi.UseVisualStyleBackColor = true;
@@ -1508,7 +1639,7 @@ namespace SLF
             this.Stokastik_Fonksiyonlar});
             this.Seç_Stokastik.Location = new System.Drawing.Point(0, 0);
             this.Seç_Stokastik.Name = "Seç_Stokastik";
-            this.Seç_Stokastik.Size = new System.Drawing.Size(1159, 32);
+            this.Seç_Stokastik.Size = new System.Drawing.Size(793, 27);
             this.Seç_Stokastik.TabIndex = 1;
             this.Seç_Stokastik.Text = "toolStrip1";
             // 
@@ -1525,7 +1656,7 @@ namespace SLF
             this.Stokastik_Seç.Margin = new System.Windows.Forms.Padding(300, 1, 0, 2);
             this.Stokastik_Seç.Name = "Stokastik_Seç";
             this.Stokastik_Seç.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.Stokastik_Seç.Size = new System.Drawing.Size(73, 29);
+            this.Stokastik_Seç.Size = new System.Drawing.Size(66, 24);
             this.Stokastik_Seç.Tag = "";
             this.Stokastik_Seç.Text = "Seç";
             this.Stokastik_Seç.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1538,7 +1669,7 @@ namespace SLF
             this.toolStripSeparator1.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 32);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
             // 
             // Stokastik_Kaydır
             // 
@@ -1553,7 +1684,7 @@ namespace SLF
             this.Stokastik_Kaydır.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
             this.Stokastik_Kaydır.Name = "Stokastik_Kaydır";
             this.Stokastik_Kaydır.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.Stokastik_Kaydır.Size = new System.Drawing.Size(95, 29);
+            this.Stokastik_Kaydır.Size = new System.Drawing.Size(85, 24);
             this.Stokastik_Kaydır.Tag = "";
             this.Stokastik_Kaydır.Text = "Kaydır";
             this.Stokastik_Kaydır.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1566,7 +1697,7 @@ namespace SLF
             this.toolStripSeparator2.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 32);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 27);
             // 
             // Stokastik_Mesafe_Ölç
             // 
@@ -1581,7 +1712,7 @@ namespace SLF
             this.Stokastik_Mesafe_Ölç.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
             this.Stokastik_Mesafe_Ölç.Name = "Stokastik_Mesafe_Ölç";
             this.Stokastik_Mesafe_Ölç.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.Stokastik_Mesafe_Ölç.Size = new System.Drawing.Size(134, 29);
+            this.Stokastik_Mesafe_Ölç.Size = new System.Drawing.Size(117, 24);
             this.Stokastik_Mesafe_Ölç.Tag = "";
             this.Stokastik_Mesafe_Ölç.Text = "Mesafe Ölç";
             this.Stokastik_Mesafe_Ölç.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1594,7 +1725,7 @@ namespace SLF
             this.toolStripSeparator3.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator3.Name = "toolStripSeparator3";
             this.toolStripSeparator3.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 32);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 27);
             // 
             // Stokastik_Poligon
             // 
@@ -1609,7 +1740,7 @@ namespace SLF
             this.Stokastik_Poligon.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
             this.Stokastik_Poligon.Name = "Stokastik_Poligon";
             this.Stokastik_Poligon.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.Stokastik_Poligon.Size = new System.Drawing.Size(106, 29);
+            this.Stokastik_Poligon.Size = new System.Drawing.Size(93, 24);
             this.Stokastik_Poligon.Tag = "";
             this.Stokastik_Poligon.Text = "Poligon";
             this.Stokastik_Poligon.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1622,7 +1753,7 @@ namespace SLF
             this.toolStripSeparator7.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator7.Name = "toolStripSeparator7";
             this.toolStripSeparator7.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator7.Size = new System.Drawing.Size(6, 32);
+            this.toolStripSeparator7.Size = new System.Drawing.Size(6, 27);
             // 
             // Stokastik_Nokta
             // 
@@ -1637,7 +1768,7 @@ namespace SLF
             this.Stokastik_Nokta.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
             this.Stokastik_Nokta.Name = "Stokastik_Nokta";
             this.Stokastik_Nokta.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.Stokastik_Nokta.Size = new System.Drawing.Size(94, 29);
+            this.Stokastik_Nokta.Size = new System.Drawing.Size(83, 24);
             this.Stokastik_Nokta.Tag = "";
             this.Stokastik_Nokta.Text = "Nokta";
             this.Stokastik_Nokta.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1650,7 +1781,7 @@ namespace SLF
             this.toolStripSeparator5.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator5.Name = "toolStripSeparator5";
             this.toolStripSeparator5.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 32);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 27);
             // 
             // Stokastik_Grid_Oluştur
             // 
@@ -1665,7 +1796,7 @@ namespace SLF
             this.Stokastik_Grid_Oluştur.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
             this.Stokastik_Grid_Oluştur.Name = "Stokastik_Grid_Oluştur";
             this.Stokastik_Grid_Oluştur.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.Stokastik_Grid_Oluştur.Size = new System.Drawing.Size(142, 29);
+            this.Stokastik_Grid_Oluştur.Size = new System.Drawing.Size(122, 24);
             this.Stokastik_Grid_Oluştur.Tag = "";
             this.Stokastik_Grid_Oluştur.Text = "Grid Oluştur";
             this.Stokastik_Grid_Oluştur.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1678,7 +1809,7 @@ namespace SLF
             this.toolStripSeparator6.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator6.Name = "toolStripSeparator6";
             this.toolStripSeparator6.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator6.Size = new System.Drawing.Size(6, 32);
+            this.toolStripSeparator6.Size = new System.Drawing.Size(6, 27);
             // 
             // Stokastik_Fonksiyonlar
             // 
@@ -1693,7 +1824,7 @@ namespace SLF
             this.Stokastik_Fonksiyonlar.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
             this.Stokastik_Fonksiyonlar.Name = "Stokastik_Fonksiyonlar";
             this.Stokastik_Fonksiyonlar.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.Stokastik_Fonksiyonlar.Size = new System.Drawing.Size(146, 29);
+            this.Stokastik_Fonksiyonlar.Size = new System.Drawing.Size(125, 24);
             this.Stokastik_Fonksiyonlar.Tag = "";
             this.Stokastik_Fonksiyonlar.Text = "Fonksiyonlar";
             this.Stokastik_Fonksiyonlar.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1715,10 +1846,10 @@ namespace SLF
             this.tab_yükHaritası.Controls.Add(this.button3);
             this.tab_yükHaritası.Controls.Add(this.webView21);
             this.tab_yükHaritası.Controls.Add(this.panel1);
-            this.tab_yükHaritası.Location = new System.Drawing.Point(4, 91);
-            this.tab_yükHaritası.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tab_yükHaritası.Location = new System.Drawing.Point(4, 48);
+            this.tab_yükHaritası.Margin = new System.Windows.Forms.Padding(2);
             this.tab_yükHaritası.Name = "tab_yükHaritası";
-            this.tab_yükHaritası.Size = new System.Drawing.Size(1472, 605);
+            this.tab_yükHaritası.Size = new System.Drawing.Size(1221, 507);
             this.tab_yükHaritası.TabIndex = 9;
             this.tab_yükHaritası.Text = "Yük Haritası Modülü";
             this.tab_yükHaritası.UseVisualStyleBackColor = true;
@@ -1726,10 +1857,10 @@ namespace SLF
             // checkBox7
             // 
             this.checkBox7.AutoSize = true;
-            this.checkBox7.Location = new System.Drawing.Point(8, 337);
-            this.checkBox7.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox7.Location = new System.Drawing.Point(6, 274);
+            this.checkBox7.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox7.Name = "checkBox7";
-            this.checkBox7.Size = new System.Drawing.Size(107, 28);
+            this.checkBox7.Size = new System.Drawing.Size(77, 21);
             this.checkBox7.TabIndex = 17;
             this.checkBox7.Text = "Grafikler";
             this.checkBox7.UseVisualStyleBackColor = true;
@@ -1737,10 +1868,10 @@ namespace SLF
             // checkBox6
             // 
             this.checkBox6.AutoSize = true;
-            this.checkBox6.Location = new System.Drawing.Point(8, 370);
-            this.checkBox6.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox6.Location = new System.Drawing.Point(6, 301);
+            this.checkBox6.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox6.Name = "checkBox6";
-            this.checkBox6.Size = new System.Drawing.Size(125, 28);
+            this.checkBox6.Size = new System.Drawing.Size(93, 21);
             this.checkBox6.TabIndex = 16;
             this.checkBox6.Text = "İstatistikler";
             this.checkBox6.UseVisualStyleBackColor = true;
@@ -1749,10 +1880,10 @@ namespace SLF
             // checkBox5
             // 
             this.checkBox5.AutoSize = true;
-            this.checkBox5.Location = new System.Drawing.Point(43, 244);
-            this.checkBox5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox5.Location = new System.Drawing.Point(32, 198);
+            this.checkBox5.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox5.Name = "checkBox5";
-            this.checkBox5.Size = new System.Drawing.Size(132, 28);
+            this.checkBox5.Size = new System.Drawing.Size(96, 21);
             this.checkBox5.TabIndex = 15;
             this.checkBox5.Text = "Aydınlatma";
             this.checkBox5.UseVisualStyleBackColor = true;
@@ -1760,10 +1891,10 @@ namespace SLF
             // checkBox4
             // 
             this.checkBox4.AutoSize = true;
-            this.checkBox4.Location = new System.Drawing.Point(43, 210);
-            this.checkBox4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox4.Location = new System.Drawing.Point(32, 171);
+            this.checkBox4.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox4.Name = "checkBox4";
-            this.checkBox4.Size = new System.Drawing.Size(173, 28);
+            this.checkBox4.Size = new System.Drawing.Size(124, 21);
             this.checkBox4.TabIndex = 14;
             this.checkBox4.Text = "Tarımsal Sulama";
             this.checkBox4.UseVisualStyleBackColor = true;
@@ -1771,10 +1902,10 @@ namespace SLF
             // checkBox3
             // 
             this.checkBox3.AutoSize = true;
-            this.checkBox3.Location = new System.Drawing.Point(43, 176);
-            this.checkBox3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox3.Location = new System.Drawing.Point(32, 143);
+            this.checkBox3.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox3.Name = "checkBox3";
-            this.checkBox3.Size = new System.Drawing.Size(133, 28);
+            this.checkBox3.Size = new System.Drawing.Size(97, 21);
             this.checkBox3.TabIndex = 13;
             this.checkBox3.Text = "Ticarethane";
             this.checkBox3.UseVisualStyleBackColor = true;
@@ -1782,10 +1913,10 @@ namespace SLF
             // checkBox2
             // 
             this.checkBox2.AutoSize = true;
-            this.checkBox2.Location = new System.Drawing.Point(43, 142);
-            this.checkBox2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox2.Location = new System.Drawing.Point(32, 115);
+            this.checkBox2.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(87, 28);
+            this.checkBox2.Size = new System.Drawing.Size(66, 21);
             this.checkBox2.TabIndex = 12;
             this.checkBox2.Text = "Sanayi";
             this.checkBox2.UseVisualStyleBackColor = true;
@@ -1793,10 +1924,10 @@ namespace SLF
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(43, 108);
-            this.checkBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox1.Location = new System.Drawing.Point(32, 88);
+            this.checkBox1.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(99, 28);
+            this.checkBox1.Size = new System.Drawing.Size(74, 21);
             this.checkBox1.TabIndex = 11;
             this.checkBox1.Text = "Mesken";
             this.checkBox1.UseVisualStyleBackColor = true;
@@ -1805,19 +1936,20 @@ namespace SLF
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(36, 64);
+            this.label4.Location = new System.Drawing.Point(27, 52);
+            this.label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(120, 24);
+            this.label4.Size = new System.Drawing.Size(99, 19);
             this.label4.TabIndex = 10;
             this.label4.Text = "Abone Sınıfı:";
             // 
             // button4
             // 
             this.button4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button4.Location = new System.Drawing.Point(1287, 9);
-            this.button4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.button4.Location = new System.Drawing.Point(893, 7);
+            this.button4.Margin = new System.Windows.Forms.Padding(2);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(172, 33);
+            this.button4.Size = new System.Drawing.Size(129, 27);
             this.button4.TabIndex = 2;
             this.button4.Text = "OpenStreetMap";
             this.button4.UseVisualStyleBackColor = true;
@@ -1826,10 +1958,10 @@ namespace SLF
             // button3
             // 
             this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button3.Location = new System.Drawing.Point(1083, 9);
-            this.button3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.button3.Location = new System.Drawing.Point(740, 7);
+            this.button3.Margin = new System.Windows.Forms.Padding(2);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(172, 33);
+            this.button3.Size = new System.Drawing.Size(129, 27);
             this.button3.TabIndex = 1;
             this.button3.Text = "Google Maps";
             this.button3.UseVisualStyleBackColor = true;
@@ -1844,10 +1976,10 @@ namespace SLF
             this.webView21.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.webView21.CreationProperties = null;
             this.webView21.DefaultBackgroundColor = System.Drawing.Color.White;
-            this.webView21.Location = new System.Drawing.Point(253, 64);
-            this.webView21.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.webView21.Location = new System.Drawing.Point(190, 52);
+            this.webView21.Margin = new System.Windows.Forms.Padding(2);
             this.webView21.Name = "webView21";
-            this.webView21.Size = new System.Drawing.Size(1223, 526);
+            this.webView21.Size = new System.Drawing.Size(845, 386);
             this.webView21.Source = new System.Uri("https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu", System.UriKind.Absolute);
             this.webView21.TabIndex = 0;
             this.webView21.ZoomFactor = 1D;
@@ -1862,99 +1994,103 @@ namespace SLF
             this.panel1.Controls.Add(this.label7);
             this.panel1.Controls.Add(this.label6);
             this.panel1.Controls.Add(this.label5);
-            this.panel1.Location = new System.Drawing.Point(8, 405);
-            this.panel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.panel1.Location = new System.Drawing.Point(6, 329);
+            this.panel1.Margin = new System.Windows.Forms.Padding(2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(233, 185);
+            this.panel1.Size = new System.Drawing.Size(175, 150);
             this.panel1.TabIndex = 18;
             this.panel1.Visible = false;
             // 
             // textBox5
             // 
-            this.textBox5.Location = new System.Drawing.Point(121, 117);
-            this.textBox5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.textBox5.Location = new System.Drawing.Point(91, 95);
+            this.textBox5.Margin = new System.Windows.Forms.Padding(2);
             this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(100, 31);
+            this.textBox5.Size = new System.Drawing.Size(76, 25);
             this.textBox5.TabIndex = 7;
             // 
             // textBox4
             // 
-            this.textBox4.Location = new System.Drawing.Point(121, 82);
-            this.textBox4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.textBox4.Location = new System.Drawing.Point(91, 67);
+            this.textBox4.Margin = new System.Windows.Forms.Padding(2);
             this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(100, 31);
+            this.textBox4.Size = new System.Drawing.Size(76, 25);
             this.textBox4.TabIndex = 6;
             // 
             // textBox3
             // 
-            this.textBox3.Location = new System.Drawing.Point(121, 48);
-            this.textBox3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.textBox3.Location = new System.Drawing.Point(91, 39);
+            this.textBox3.Margin = new System.Windows.Forms.Padding(2);
             this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(100, 31);
+            this.textBox3.Size = new System.Drawing.Size(76, 25);
             this.textBox3.TabIndex = 5;
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(121, 11);
-            this.textBox2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.textBox2.Location = new System.Drawing.Point(91, 9);
+            this.textBox2.Margin = new System.Windows.Forms.Padding(2);
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(100, 31);
+            this.textBox2.Size = new System.Drawing.Size(76, 25);
             this.textBox2.TabIndex = 4;
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(13, 121);
-            this.label8.MaximumSize = new System.Drawing.Size(83, 84);
-            this.label8.MinimumSize = new System.Drawing.Size(83, 84);
+            this.label8.Location = new System.Drawing.Point(10, 98);
+            this.label8.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label8.MaximumSize = new System.Drawing.Size(62, 68);
+            this.label8.MinimumSize = new System.Drawing.Size(62, 68);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(83, 84);
+            this.label8.Size = new System.Drawing.Size(62, 68);
             this.label8.TabIndex = 3;
             this.label8.Text = "label8";
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(13, 82);
+            this.label7.Location = new System.Drawing.Point(10, 67);
+            this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(62, 24);
+            this.label7.Size = new System.Drawing.Size(43, 17);
             this.label7.TabIndex = 2;
             this.label7.Text = "label7";
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(13, 48);
+            this.label6.Location = new System.Drawing.Point(10, 39);
+            this.label6.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(62, 24);
+            this.label6.Size = new System.Drawing.Size(43, 17);
             this.label6.TabIndex = 1;
             this.label6.Text = "label6";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(13, 14);
+            this.label5.Location = new System.Drawing.Point(10, 11);
+            this.label5.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(62, 24);
+            this.label5.Size = new System.Drawing.Size(43, 17);
             this.label5.TabIndex = 0;
             this.label5.Text = "label5";
             // 
             // tab_rapor
             // 
-            this.tab_rapor.Location = new System.Drawing.Point(4, 91);
-            this.tab_rapor.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tab_rapor.Location = new System.Drawing.Point(4, 48);
+            this.tab_rapor.Margin = new System.Windows.Forms.Padding(2);
             this.tab_rapor.Name = "tab_rapor";
-            this.tab_rapor.Size = new System.Drawing.Size(1472, 605);
+            this.tab_rapor.Size = new System.Drawing.Size(1221, 507);
             this.tab_rapor.TabIndex = 8;
             this.tab_rapor.Text = "Raporlama";
             this.tab_rapor.UseVisualStyleBackColor = true;
             // 
             // tab_validasyon
             // 
-            this.tab_validasyon.Location = new System.Drawing.Point(4, 91);
-            this.tab_validasyon.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tab_validasyon.Location = new System.Drawing.Point(4, 48);
+            this.tab_validasyon.Margin = new System.Windows.Forms.Padding(2);
             this.tab_validasyon.Name = "tab_validasyon";
-            this.tab_validasyon.Size = new System.Drawing.Size(1472, 605);
+            this.tab_validasyon.Size = new System.Drawing.Size(1221, 507);
             this.tab_validasyon.TabIndex = 10;
             this.tab_validasyon.Text = "Validasyon Modülü";
             this.tab_validasyon.UseVisualStyleBackColor = true;
@@ -1968,16 +2104,18 @@ namespace SLF
             this.tabPage1.Text = "Validasyon Modülü";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // button2
+            // HomePageButton
             // 
-            this.button2.BackColor = System.Drawing.Color.White;
-            this.button2.Location = new System.Drawing.Point(12, 33);
-            this.button2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(113, 47);
-            this.button2.TabIndex = 4;
-            this.button2.Text = "Ana Sayfa";
-            this.button2.UseVisualStyleBackColor = false;
+            this.HomePageButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.HomePageButton.BackColor = System.Drawing.Color.White;
+            this.HomePageButton.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.HomePageButton.Location = new System.Drawing.Point(1150, 0);
+            this.HomePageButton.Margin = new System.Windows.Forms.Padding(2);
+            this.HomePageButton.Name = "HomePageButton";
+            this.HomePageButton.Size = new System.Drawing.Size(79, 30);
+            this.HomePageButton.TabIndex = 4;
+            this.HomePageButton.Text = "Ana Sayfa";
+            this.HomePageButton.UseVisualStyleBackColor = true;
             // 
             // ContextMenuStrip_Nokta
             // 
@@ -1987,13 +2125,13 @@ namespace SLF
             this.Nokta_Sil,
             this.Kaydet});
             this.ContextMenuStrip_Nokta.Name = "EA_ContextMenuStrip_Nokta";
-            this.ContextMenuStrip_Nokta.Size = new System.Drawing.Size(154, 82);
+            this.ContextMenuStrip_Nokta.Size = new System.Drawing.Size(135, 82);
             // 
             // Nokta_Ekle
             // 
             this.Nokta_Ekle.Image = ((System.Drawing.Image)(resources.GetObject("Nokta_Ekle.Image")));
             this.Nokta_Ekle.Name = "Nokta_Ekle";
-            this.Nokta_Ekle.Size = new System.Drawing.Size(153, 26);
+            this.Nokta_Ekle.Size = new System.Drawing.Size(134, 26);
             this.Nokta_Ekle.Text = "Nokta Ekle";
             this.Nokta_Ekle.Click += new System.EventHandler(this.Nokta_Ekle_Click);
             // 
@@ -2001,14 +2139,14 @@ namespace SLF
             // 
             this.Nokta_Sil.Image = ((System.Drawing.Image)(resources.GetObject("Nokta_Sil.Image")));
             this.Nokta_Sil.Name = "Nokta_Sil";
-            this.Nokta_Sil.Size = new System.Drawing.Size(153, 26);
+            this.Nokta_Sil.Size = new System.Drawing.Size(134, 26);
             this.Nokta_Sil.Text = "Nokta Sil";
             // 
             // Kaydet
             // 
             this.Kaydet.Image = ((System.Drawing.Image)(resources.GetObject("Kaydet.Image")));
             this.Kaydet.Name = "Kaydet";
-            this.Kaydet.Size = new System.Drawing.Size(153, 26);
+            this.Kaydet.Size = new System.Drawing.Size(134, 26);
             this.Kaydet.Text = "Kaydet";
             // 
             // ContextMenuStrip_Poligon
@@ -2019,13 +2157,13 @@ namespace SLF
             this.Poligon_Sil,
             this.Poligon_Kaydet});
             this.ContextMenuStrip_Poligon.Name = "ContextMenuStrip_Poligon";
-            this.ContextMenuStrip_Poligon.Size = new System.Drawing.Size(183, 82);
+            this.ContextMenuStrip_Poligon.Size = new System.Drawing.Size(159, 82);
             // 
             // Poligon_Çiz
             // 
             this.Poligon_Çiz.Image = ((System.Drawing.Image)(resources.GetObject("Poligon_Çiz.Image")));
             this.Poligon_Çiz.Name = "Poligon_Çiz";
-            this.Poligon_Çiz.Size = new System.Drawing.Size(182, 26);
+            this.Poligon_Çiz.Size = new System.Drawing.Size(158, 26);
             this.Poligon_Çiz.Text = "Poligon Çiz";
             this.Poligon_Çiz.Click += new System.EventHandler(this.Poligon_Çiz_Click);
             // 
@@ -2033,7 +2171,7 @@ namespace SLF
             // 
             this.Poligon_Sil.Image = ((System.Drawing.Image)(resources.GetObject("Poligon_Sil.Image")));
             this.Poligon_Sil.Name = "Poligon_Sil";
-            this.Poligon_Sil.Size = new System.Drawing.Size(182, 26);
+            this.Poligon_Sil.Size = new System.Drawing.Size(158, 26);
             this.Poligon_Sil.Text = "Poligon Sil";
             this.Poligon_Sil.Click += new System.EventHandler(this.Poligon_Sil_Click);
             // 
@@ -2041,7 +2179,7 @@ namespace SLF
             // 
             this.Poligon_Kaydet.Image = ((System.Drawing.Image)(resources.GetObject("Poligon_Kaydet.Image")));
             this.Poligon_Kaydet.Name = "Poligon_Kaydet";
-            this.Poligon_Kaydet.Size = new System.Drawing.Size(182, 26);
+            this.Poligon_Kaydet.Size = new System.Drawing.Size(158, 26);
             this.Poligon_Kaydet.Text = "Poligon Kaydet";
             this.Poligon_Kaydet.Click += new System.EventHandler(this.Poligon_Kaydet_Click);
             // 
@@ -2052,13 +2190,13 @@ namespace SLF
             this.katman_birleştir,
             this.overlap_analizi});
             this.ContextMenuStrip_Fonksiyon.Name = "ContextMenuStrip_Fonksiyon";
-            this.ContextMenuStrip_Fonksiyon.Size = new System.Drawing.Size(188, 56);
+            this.ContextMenuStrip_Fonksiyon.Size = new System.Drawing.Size(162, 56);
             // 
             // katman_birleştir
             // 
             this.katman_birleştir.Image = ((System.Drawing.Image)(resources.GetObject("katman_birleştir.Image")));
             this.katman_birleştir.Name = "katman_birleştir";
-            this.katman_birleştir.Size = new System.Drawing.Size(187, 26);
+            this.katman_birleştir.Size = new System.Drawing.Size(161, 26);
             this.katman_birleştir.Text = "Katman Birleştir";
             this.katman_birleştir.Click += new System.EventHandler(this.katman_birleştir_Click);
             // 
@@ -2066,27 +2204,75 @@ namespace SLF
             // 
             this.overlap_analizi.Image = ((System.Drawing.Image)(resources.GetObject("overlap_analizi.Image")));
             this.overlap_analizi.Name = "overlap_analizi";
-            this.overlap_analizi.Size = new System.Drawing.Size(187, 26);
+            this.overlap_analizi.Size = new System.Drawing.Size(161, 26);
             this.overlap_analizi.Text = "Overlap Analizi";
+            // 
+            // ModuleTabPanel
+            // 
+            this.ModuleTabPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ModuleTabPanel.Controls.Add(this.Modül_Tabları);
+            this.ModuleTabPanel.Location = new System.Drawing.Point(0, 54);
+            this.ModuleTabPanel.Name = "ModuleTabPanel";
+            this.ModuleTabPanel.Size = new System.Drawing.Size(1229, 559);
+            this.ModuleTabPanel.TabIndex = 5;
+            this.ModuleTabPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.ModuleTabPanel_Paint);
+            // 
+            // HeaderPanel
+            // 
+            this.HeaderPanel.BackColor = System.Drawing.Color.NavajoWhite;
+            this.HeaderPanel.Controls.Add(this.HomePageButton);
+            this.HeaderPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.HeaderPanel.Location = new System.Drawing.Point(0, 24);
+            this.HeaderPanel.Name = "HeaderPanel";
+            this.HeaderPanel.Size = new System.Drawing.Size(1229, 31);
+            this.HeaderPanel.TabIndex = 3;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Location = new System.Drawing.Point(5, 68);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(185, 162);
+            this.pictureBox1.TabIndex = 0;
+            this.pictureBox1.TabStop = false;
+            // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Location = new System.Drawing.Point(3, 268);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(185, 160);
+            this.pictureBox2.TabIndex = 1;
+            this.pictureBox2.TabStop = false;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(12, 10);
+            this.label9.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(62, 17);
+            this.label9.TabIndex = 8;
+            this.label9.Text = "Grafikler:";
             // 
             // ModülFormu
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.Disable;
             this.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.ClientSize = new System.Drawing.Size(1484, 802);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.Modül_Tabları);
+            this.ClientSize = new System.Drawing.Size(1229, 612);
+            this.Controls.Add(this.HeaderPanel);
+            this.Controls.Add(this.ModuleTabPanel);
             this.Controls.Add(this.menuStrip1);
             this.DoubleBuffered = true;
+            this.ForeColor = System.Drawing.Color.DarkOrange;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.MinimumSize = new System.Drawing.Size(1498, 819);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "ModülFormu";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Modüller";
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ModülFormu_FormClosing);
             this.Load += new System.EventHandler(this.ModülFormu_Load);
             this.menuStrip1.ResumeLayout(false);
@@ -2094,7 +2280,15 @@ namespace SLF
             this.Modül_Tabları.ResumeLayout(false);
             this.tab_girdi.ResumeLayout(false);
             this.tab_girdi.PerformLayout();
+            this.OpenModuleButtonPanel.ResumeLayout(false);
+            this.panel9.ResumeLayout(false);
+            this.panel9.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.panel8.ResumeLayout(false);
+            this.panel8.PerformLayout();
+            this.panel6.ResumeLayout(false);
+            this.panel7.ResumeLayout(false);
+            this.panel7.PerformLayout();
             this.tab_dek.ResumeLayout(false);
             this.tab_dek.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView4)).EndInit();
@@ -2104,10 +2298,12 @@ namespace SLF
             this.toolStrip2.PerformLayout();
             this.harita_katmanları_right_click.ResumeLayout(false);
             this.tab_ekonometrik.ResumeLayout(false);
-            this.tab_ekonometrik.PerformLayout();
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
+            this.ELFGraphicsPanel.ResumeLayout(false);
+            this.ELFGraphicsPanel.PerformLayout();
+            this.ELFTablePanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
+            this.panel5.ResumeLayout(false);
+            this.panel5.PerformLayout();
             this.tab_imar.ResumeLayout(false);
             this.tab_stokastik.ResumeLayout(false);
             this.tab_stokastik.PerformLayout();
@@ -2122,6 +2318,10 @@ namespace SLF
             this.ContextMenuStrip_Nokta.ResumeLayout(false);
             this.ContextMenuStrip_Poligon.ResumeLayout(false);
             this.ContextMenuStrip_Fonksiyon.ResumeLayout(false);
+            this.ModuleTabPanel.ResumeLayout(false);
+            this.HeaderPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -2148,7 +2348,6 @@ namespace SLF
         private System.Windows.Forms.TabControl Modül_Tabları;
         private System.Windows.Forms.TabPage tab_girdi;
         private System.Windows.Forms.TabPage tab_ekonometrik;
-        private System.Windows.Forms.TabPage tab_senaryo;
         private System.Windows.Forms.TabPage tab_imar;
         private System.Windows.Forms.TabPage tab_ea;
         private System.Windows.Forms.TabPage tab_dek;
@@ -2157,10 +2356,9 @@ namespace SLF
         private System.Windows.Forms.TabPage tab_yükHaritası;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox veri_listesi_seçimi;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button SelectFolderButton;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button3;
         private Microsoft.Web.WebView2.WinForms.WebView2 webView21;
@@ -2183,21 +2381,15 @@ namespace SLF
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.ComboBox comboBox4;
-        private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.ComboBox comboBox3;
         private System.Windows.Forms.DataGridView dataGridView2;
-        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button ELFPredictionButton;
         private System.Windows.Forms.TabPage tab_validasyon;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.DataGridView dataGridView4;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Button button8;
-        private System.Windows.Forms.Button button10;
         private System.Windows.Forms.Button button6;
-        private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.CheckBox checkBox8;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Panel ELFTablePanel;
         private System.Windows.Forms.TabPage tab_stokastik;
         private System.Windows.Forms.Button stokastik_dosya_seçimi;
         private System.Windows.Forms.Label label13;
@@ -2211,7 +2403,7 @@ namespace SLF
         private System.Windows.Forms.CheckBox checkBox11;
         private System.Windows.Forms.CheckBox checkBox10;
         private System.Windows.Forms.CheckBox checkBox9;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button HomePageButton;
         private System.Windows.Forms.ContextMenuStrip katmanlar_right_click;
         private System.Windows.Forms.ToolStripMenuItem tabloyuGörToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rengiDeğiştirToolStripMenuItem;
@@ -2291,5 +2483,26 @@ namespace SLF
         private ComboBox endYearComboBox;
         private ComboBox startYearComboBox;
         private Button yearApproveButton;
+        private Panel ModuleTabPanel;
+        private Panel HeaderPanel;
+        private Panel panel5;
+        private Panel panel6;
+        private Panel panel9;
+        private Panel panel8;
+        private Panel panel7;
+        private ComboBox comboBox1;
+        private Label label15;
+        private TabPage tab_senaryo;
+        private Button button10;
+        private CheckBox PredictionCheckBox;
+        private Label label17;
+        private Label label18;
+        private Label label3;
+        private Panel ELFGraphicsPanel;
+        private Button OpenModuleButton;
+        private Panel OpenModuleButtonPanel;
+        private Label label9;
+        private PictureBox pictureBox2;
+        private PictureBox pictureBox1;
     }
 }
