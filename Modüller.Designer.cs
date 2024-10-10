@@ -183,6 +183,7 @@ namespace SLF
             this.ContextMenuStrip_Fonksiyon = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.katman_birleştir = new System.Windows.Forms.ToolStripMenuItem();
             this.overlap_analizi = new System.Windows.Forms.ToolStripMenuItem();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.menuStrip1.SuspendLayout();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
@@ -592,6 +593,7 @@ namespace SLF
             this.toolStrip2.Size = new System.Drawing.Size(1472, 32);
             this.toolStrip2.TabIndex = 32;
             this.toolStrip2.Text = "toolStrip2";
+            this.toolStrip2.Click += new System.EventHandler(this.EA_Mesafe_Ölç_Click);
             // 
             // EA_Seç
             // 
@@ -779,6 +781,7 @@ namespace SLF
             this.toolStripButton15.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.toolStripButton15.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
             this.toolStripButton15.ToolTipText = "Belirli bir alan seçilip bu alanda mxn şeklinde bir grid (ızgara) tanımlar.";
+            this.toolStripButton15.Click += new System.EventHandler(this.ea_Grid_Oluştur_Click);
             // 
             // toolStripSeparator15
             // 
@@ -919,7 +922,6 @@ namespace SLF
             this.EA_list_box.Name = "EA_list_box";
             this.EA_list_box.Size = new System.Drawing.Size(244, 124);
             this.EA_list_box.TabIndex = 20;
-            //this.EA_list_box.SelectedIndexChanged += new System.EventHandler(this.EA_list_box_SelectedIndexChanged);
             // 
             // gMapControl_EA
             // 
@@ -932,7 +934,7 @@ namespace SLF
             this.gMapControl_EA.GrayScaleMode = false;
             this.gMapControl_EA.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
             this.gMapControl_EA.LevelsKeepInMemory = 5;
-            this.gMapControl_EA.Location = new System.Drawing.Point(373, 41);
+            this.gMapControl_EA.Location = new System.Drawing.Point(372, 41);
             this.gMapControl_EA.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.gMapControl_EA.MarkersEnabled = true;
             this.gMapControl_EA.MaxZoom = 2;
@@ -2147,12 +2149,13 @@ namespace SLF
         private System.Windows.Forms.ToolStripMenuItem exportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem yardımToolStripMenuItem;
-        private System.Windows.Forms.TabControl Modül_Tabları;
+        public System.Windows.Forms.TabControl Modül_Tabları;
+        public System.Windows.Forms.TabPage tab_stokastik;
+        public System.Windows.Forms.TabPage tab_ea;
         private System.Windows.Forms.TabPage tab_girdi;
         private System.Windows.Forms.TabPage tab_ekonometrik;
         private System.Windows.Forms.TabPage tab_senaryo;
         private System.Windows.Forms.TabPage tab_imar;
-        private System.Windows.Forms.TabPage tab_ea;
         private System.Windows.Forms.TabPage tab_dek;
         private System.Windows.Forms.TabPage tab_optDTR;
         private System.Windows.Forms.TabPage tab_rapor;
@@ -2200,7 +2203,6 @@ namespace SLF
         private System.Windows.Forms.CheckBox checkBox8;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.TabPage tab_stokastik;
         private System.Windows.Forms.Button stokastik_dosya_seçimi;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.CheckBox checkBox18;
@@ -2293,5 +2295,6 @@ namespace SLF
         private ComboBox endYearComboBox;
         private ComboBox startYearComboBox;
         private Button yearApproveButton;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }

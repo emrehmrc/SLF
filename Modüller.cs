@@ -30,6 +30,7 @@ namespace SLF
 {
     public partial class ModülFormu : Form
     {
+
         private double startX = 0, startY = 0;
 
         public int slfStartYear = 0, slfEndYear = 0;
@@ -65,7 +66,7 @@ namespace SLF
         private GMapOverlay markerOverlay_stokastik = new GMapOverlay("markerOverlay_stokastik");
         private GMapOverlay markerOverlay_ea = new GMapOverlay("markerOverlay_ea");
 
-        // variables to be used to create polygons
+        // variables to be used to create polygonspolygonOverlay_stokastik
         private GMapOverlay polygonOverlay_ea = new GMapOverlay("polygonOverlay_ea");
         public GMapOverlay polygonOverlay_stokastik;
         private List<PointLatLng> polygonPoints_ea = new List<PointLatLng>();
@@ -133,6 +134,8 @@ namespace SLF
             public double Boylam { get; set; }
             public double Bina_Demandi { get; set; }
             public int Abone_Sayısı { get; set; }
+            
+            
         }
 
         public enum FileType
@@ -1679,6 +1682,7 @@ namespace SLF
             {
                 // Show the ContextMenuStrip at the mouse position
                 ContextMenuStrip_Poligon.Show(Cursor.Position);
+                Console.WriteLine("buradayım");
             }
         }
 
@@ -1711,38 +1715,63 @@ namespace SLF
 
         private void gMapControl_EA_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
-            // boolean control for marker selection when clicking on the map
-            if (isSelecting_marker)
+            if (e.Button == MouseButtons.Left)
             {
-                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
-                markerOverlay_ea.Markers.Add(marker);
-
-                NoktaVeri noktaVeri_marker = new NoktaVeri
+                // İşaretleyici seçimi kontrolü
+                if (isSelecting_marker)
                 {
-                    Enlem = Math.Round(pointClick.Lat, 4),
-                    Boylam = Math.Round(pointClick.Lng, 4)
-                };
+                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
+                    markerOverlay_ea.Markers.Add(marker);
 
-                marker.Tag = noktaVeri_marker;
+                    NoktaVeri noktaVeri_marker = new NoktaVeri
+                    {
+                        Enlem = Math.Round(pointClick.Lat, 4),
+                        Boylam = Math.Round(pointClick.Lng, 4)
+                    };
 
-            }
+                    marker.Tag = noktaVeri_marker;
+                }
 
-            // boolean control for polygon selection when clicking on the map
-            if (isSelecting_polygon)
-            {
-                polygonPoints_ea.Add(pointClick);
-                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
-                markerOverlay_ea.Markers.Add(marker);
-                gMapControl_EA.Refresh();
-            }
+                // Poligon seçimi kontrolü
+                if (isSelecting_polygon)
+                {
+                    polygonPoints_ea.Add(pointClick);
+                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
+                    markerOverlay_stokastik.Markers.Add(marker);
 
-            // eğer gmapControl_OnMapClick event'i ile 2 den fazla nokta seçilirse,
-            // bu noktalar arasında bir poligon çiz
-            if (polygonPoints_ea.Count >= 3)
-            {
-                Draw_Polygon(polygonPoints_ea, polygonOverlay_ea, gMapControl_EA);
+                    if (polygonOverlay_ea != null)
+                    {
+                        gMapControl_stokastik.Overlays.Remove(polygonOverlay_ea);
+                    }
+
+                    layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
+
+                    // Dizide boş yer olup olmadığını kontrol et
+                    if (layer_index == -1)
+                    {
+                        MessageBox.Show("En fazla katman sayısına ulaşıldı. Daha fazla katman ekleyemezsiniz.");
+                        return;
+                    }
+
+                    polygonOverlay_ea = new GMapOverlay("polygonOverlay_" + layer_index.ToString());
+                    gMapControl_EA.Overlays.Add(polygonOverlay_ea);
+                    gMapControl_EA.Refresh();
+
+                    // Eğer 3 veya daha fazla nokta varsa, poligon çiz
+                    if (polygonPoints_ea.Count >= 3)
+                    {
+                        Draw_Polygon(polygonPoints_ea, polygonOverlay_ea, gMapControl_EA);
+
+                        double area = CalculatePolygonArea(polygonPoints_ea);
+
+                        mesafe_metre_ea.Visible = true;
+                        Mesafe_ea.Visible = true;
+                        Mesafe_ea.Text = "Seçili Alan: " + Math.Round(area, 0).ToString() + " m²";
+                    }
+                }
             }
         }
+
 
         private void gMapControl_EA_MouseDown(object sender, MouseEventArgs e)
         {
@@ -1763,6 +1792,7 @@ namespace SLF
                 // bir marker objesi oluştur ve seçilen noktalara marker ata
                 GMapMarker marker_ea = new GMarkerGoogle(point, GMarkerGoogleType.orange_dot);
                 markerOverlay_ea.Markers.Add(marker_ea);
+                
 
                 // 2 adet nokta seçildiği anda aralarındaki mesafeyi hesapla, göster, sonrasında
                 // ise noktaların tutulduğu listeyi temizle
@@ -1996,6 +2026,7 @@ namespace SLF
                     };
 
                     marker.Tag = noktaVeri_marker;
+                    
                 }
 
                 // boolean control for polygon selection when clicking on the map
@@ -2370,7 +2401,7 @@ namespace SLF
             // grid e ait oluşturulmuş mxm hücreleri "polygons" listesiyle return et.
             return polygons;
         }
-
+        
         // creates a grid and adds it onto the map
         public void AddGridToMap()
         {
@@ -3359,105 +3390,120 @@ namespace SLF
         }
         private void calculateChargeStation(int greenAc, int redDc)
         {
+            if (this.InvokeRequired)
+            {
+                // Eğer bu metod arka plandan çağrıldıysa, UI güncellemesini UI thread'ine taşı.
+                this.Invoke(new Action(() => calculateChargeStation(greenAc, redDc)));
+                return;
+            }
+
             // Önce mevcut label'ı bulup, varsa kaldırıyoruz
-            var existingLabel = this.Controls.Find("istasyonAdetLabel", true).FirstOrDefault();
+            var existingLabel = gMapControl_EA.Controls.Find("istasyonAdetLabel", true).FirstOrDefault();
             if (existingLabel != null)
             {
-                this.Controls.Remove(existingLabel);
+                gMapControl_EA.Controls.Remove(existingLabel);  // gMapControl_EA'den kaldır
+                Console.WriteLine("Label kaldırıldı");
             }
 
             // Yeni bir label oluşturuyoruz
             System.Windows.Forms.Label istasyonAdetLabel = new System.Windows.Forms.Label();
+
+            // İstasyon sayılarını eksiltmeden gösteriyoruz
             istasyonAdetLabel.Text = $"AC istasyonlar: {greenAc-1}, DC istasyonlar: {redDc-1}";
 
-            // GMap kontrolünün sağ üst köşesine yerleştiriyoruz
-            istasyonAdetLabel.Location = new System.Drawing.Point(gMapControl_EA.Width - 400, 10);  // Sağ üst köşeye yerleştir
-            istasyonAdetLabel.AutoSize = true;  // Label boyutunu otomatik ayarla
+            // Debug için konsola yazdır (log)
+            Console.WriteLine($"AC Sayısı: {greenAc}, DC Sayısı: {redDc}");
 
-            // Kalın font ve büyük boyut
+            // Haritanın sağ üst köşesine etiketi yerleştiriyoruz
+            istasyonAdetLabel.Location = new System.Drawing.Point(gMapControl_EA.Width - 400, 10);
+            istasyonAdetLabel.AutoSize = true;  // Otomatik boyutlandırma
+
+            // Yazı tipi ve stil ayarları
             istasyonAdetLabel.Font = new System.Drawing.Font("Arial", 16, System.Drawing.FontStyle.Bold);
-            istasyonAdetLabel.BackColor = System.Drawing.Color.Transparent;
-            istasyonAdetLabel.ForeColor = System.Drawing.Color.White;  // Yazı rengi siyah
-            //istasyonAdetLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle; // Kenarlık ekleyelim
-            istasyonAdetLabel.BackColor = System.Drawing.Color.Transparent;
-            // Sağ üst köşeye sabitlenecek şekilde anchor ayarlıyoruz (gMapControl içinde)
-            istasyonAdetLabel.Anchor = (AnchorStyles.Top | AnchorStyles.Right);
-            istasyonAdetLabel.Name = "istasyonAdetLabel";  // Label'in adı, gelecekte bulmak için
+            istasyonAdetLabel.ForeColor = System.Drawing.Color.White;  // Yazı rengini beyaz yapıyoruz
+            istasyonAdetLabel.BackColor = System.Drawing.Color.Transparent;  // Arka planı şeffaf yapıyoruz
 
-            // Label'i gMapControl_EA'nin bir alt kontrolü olarak ekliyoruz
+            // Etiketi sağ üst köşeye sabitliyoruz
+            istasyonAdetLabel.Anchor = (AnchorStyles.Top | AnchorStyles.Right);
+            istasyonAdetLabel.Name = "istasyonAdetLabel";  // İleride bulabilmek için ad veriyoruz
+
+            // Label'i gMapControl_EA'ye ekliyoruz
             gMapControl_EA.Controls.Add(istasyonAdetLabel);
 
-            // GMap kontrolünü yeniden çizdiriyoruz
+            // Haritayı yeniden çiziyoruz
             gMapControl_EA.Refresh();
         }
 
 
         private async Task eaHaritayaVeriYukleAsync()
-        {  // backend işlemleri tamamlandıgında pointlerin haritada gösterilme işlemleri
+        {
             int redDc = 0;
             int greenAc = 0;
 
             try
             {
-                // EA haritası için bir katman (overlay) oluştur
                 GMapOverlay eaOverlay = new GMapOverlay("EA Layer");
 
-                // Eğer DataGridView1'de veri yoksa uyarı ver
                 if (dataGridView1.DataSource == null)
                 {
                     MessageBox.Show("Veri kaynağı bulunamadı. Lütfen verileri kontrol edin.");
                     return;
                 }
 
-                // Önce mevcut overlay'leri temizleyin
                 gMapControl_EA.Overlays.Clear();
 
-                // Verilerin işlenmesini asenkron şekilde başlatıyoruz (arka planda)
                 DataTable eaData = await Task.Run(() => DataGridViewToDataTable(dataGridView1));
 
-                // Veri işlemi başarılıysa devam edin
                 if (eaData != null && eaData.Rows.Count > 0)
                 {
-                    // UI işlemlerini ana thread'e aktarıyoruz
+                    greenAc = 0;  // Ensure counters are reset
+                    redDc = 0;
+
                     Invoke(new Action(() =>
                     {
-                        // EA verilerini harita üzerine işaretleyici (marker) olarak ekliyoruz
                         foreach (DataRow row in eaData.Rows)
                         {
-                            // Koordinatların null veya boş olup olmadığını kontrol edin
                             if (!girdiModülü.IsNullLike(row["EA_X_KOORDINAT"]) && !girdiModülü.IsNullLike(row["EA_Y_KOORDINAT"]))
                             {
-                                // Koordinatları al
                                 double x = Convert.ToDouble(row["EA_X_KOORDINAT"]);
                                 double y = Convert.ToDouble(row["EA_Y_KOORDINAT"]);
 
-                                // İstasyon gücünü kontrol edin ve işaretleyiciyi ekleyin
                                 if (int.TryParse(row["ISTASYON_GUCU"].ToString(), out int istasyonGucu))
                                 {
                                     GMarkerGoogle marker;
 
-                                    // İstasyon gücüne göre yeşil veya kırmızı işaretleyici ekleyin
                                     if (istasyonGucu <= 22)
                                     {
                                         marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.green);
-                                        greenAc++;  // AC istasyonu için sayaç artır
+                                        greenAc++;
                                     }
                                     else
                                     {
                                         marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.red);
-                                        redDc++;  // DC istasyonu için sayaç artır
+                                        redDc++;
                                     }
 
-                                    eaOverlay.Markers.Add(marker);  // Marker'ı overlay'e ekle
+                                    eaOverlay.Markers.Add(marker);
                                 }
                             }
                         }
 
-                        // Yeni overlay'i ekleyin ve haritayı güncelleyin
+                        // Log counters for debugging purposes
+                        
+                        
+                        // Call the function and catch any potential errors
+                        try
+                        {
+                            Console.WriteLine($"Green AC: {greenAc}, Red DC: {redDc}");
+                            calculateChargeStation(greenAc, redDc);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Error in calculateChargeStation: {ex.Message}");
+                        }
+
                         gMapControl_EA.Overlays.Add(eaOverlay);
                         gMapControl_EA.Refresh();
-
-                        calculateChargeStation(greenAc, redDc);
                     }));
                 }
                 else
@@ -3470,7 +3516,7 @@ namespace SLF
                 MessageBox.Show($"Bir hata oluştu: {ex.Message}");
             }
         }
-        
+
 
         public DataTable DataGridViewToDataTable(DataGridView dataGridView) // datagridview verilerinin datatable donusumu 
         {
@@ -3519,10 +3565,29 @@ namespace SLF
             }
         }
 
-        //private void EA_list_box_SelectedIndexChanged(object sender, EventArgs e) // ea katman kısmı 
-        //{
+        private void ea_Grid_Oluştur_Click(object sender, EventArgs e)
+        {
+            Grid_Seçenekler grid_formu = new Grid_Seçenekler();
+            grid_formu.Tag = this;
+            grid_formu.Owner = this;
+            grid_formu.Show();
+            grid_formu.Activate();
+            grid_formu.StartPosition = FormStartPosition.CenterParent;
+            
+        }
 
-        //}
+
+
+
+
+
+
+        private void EA_list_box_SelectedIndexChanged(object sender, EventArgs e) // ea katman kısmı 
+        {
+
+        }
+
+        
 
         private void yearApproveButton_Click(object sender, EventArgs e)
         {
