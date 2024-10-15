@@ -345,9 +345,6 @@ namespace SLF
             // 
             // Modül_Tabları
             // 
-            this.Modül_Tabları.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.Modül_Tabları.Controls.Add(this.tab_girdi);
             this.Modül_Tabları.Controls.Add(this.tab_dek);
             this.Modül_Tabları.Controls.Add(this.tab_ea);
@@ -650,7 +647,7 @@ namespace SLF
             // SelectFolderButton
             // 
             this.SelectFolderButton.BackColor = System.Drawing.Color.White;
-            this.SelectFolderButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("SelectFolderButton.BackgroundImage")));
+            this.SelectFolderButton.BackgroundImage = global::SLF.Properties.Resources.download_folder_file_icon_219533;
             this.SelectFolderButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.SelectFolderButton.ForeColor = System.Drawing.Color.Transparent;
             this.SelectFolderButton.Location = new System.Drawing.Point(299, 24);
@@ -1155,6 +1152,7 @@ namespace SLF
             this.gMapControl_EA.ShowTileGridLines = false;
             this.gMapControl_EA.Size = new System.Drawing.Size(746, 539);
             this.gMapControl_EA.TabIndex = 18;
+            this.gMapControl_EA.UseWaitCursor = true;
             this.gMapControl_EA.Zoom = 0D;
             this.gMapControl_EA.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_EA_OnMapClick);
             this.gMapControl_EA.OnMapDoubleClick += new GMap.NET.WindowsForms.MapDoubleClick(this.gMapControl_EA_OnMapDoubleClick);
@@ -1351,6 +1349,7 @@ namespace SLF
             this.ELFGraphicsPanel.Name = "ELFGraphicsPanel";
             this.ELFGraphicsPanel.Size = new System.Drawing.Size(425, 503);
             this.ELFGraphicsPanel.TabIndex = 22;
+            this.ELFGraphicsPanel.UseWaitCursor = true;
             // 
             // label10
             // 
@@ -1643,6 +1642,7 @@ namespace SLF
             this.SenaryoModuleTabControl.TabButtonSize = new System.Drawing.Size(180, 40);
             this.SenaryoModuleTabControl.TabIndex = 0;
             this.SenaryoModuleTabControl.TabMenuBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            this.SenaryoModuleTabControl.UseWaitCursor = true;
             // 
             // EkonometrikSenaryoTabPage
             // 
@@ -1654,6 +1654,7 @@ namespace SLF
             this.EkonometrikSenaryoTabPage.TabIndex = 0;
             this.EkonometrikSenaryoTabPage.Text = "Ekonometrik Senaryolar";
             this.EkonometrikSenaryoTabPage.UseVisualStyleBackColor = true;
+            this.EkonometrikSenaryoTabPage.UseWaitCursor = true;
             // 
             // EkonometrikSenaryoOutputsPanel
             // 
@@ -1666,6 +1667,7 @@ namespace SLF
             this.EkonometrikSenaryoOutputsPanel.Name = "EkonometrikSenaryoOutputsPanel";
             this.EkonometrikSenaryoOutputsPanel.Size = new System.Drawing.Size(1130, 493);
             this.EkonometrikSenaryoOutputsPanel.TabIndex = 0;
+            this.EkonometrikSenaryoOutputsPanel.UseWaitCursor = true;
             // 
             // ELFSenaryoTabControls
             // 
@@ -1682,6 +1684,7 @@ namespace SLF
             this.ELFSenaryoTabControls.SelectedIndex = 0;
             this.ELFSenaryoTabControls.Size = new System.Drawing.Size(922, 497);
             this.ELFSenaryoTabControls.TabIndex = 2;
+            this.ELFSenaryoTabControls.UseWaitCursor = true;
             // 
             // tabPage2
             // 
@@ -1693,6 +1696,7 @@ namespace SLF
             this.tabPage2.TabIndex = 0;
             this.tabPage2.Text = "Minimum Senaryo";
             this.tabPage2.UseVisualStyleBackColor = true;
+            this.tabPage2.UseWaitCursor = true;
             // 
             // ELFMinSenaryoTable
             // 
@@ -1803,6 +1807,7 @@ namespace SLF
             this.EkonometrikSenaryoElementsPanel.Name = "EkonometrikSenaryoElementsPanel";
             this.EkonometrikSenaryoElementsPanel.Size = new System.Drawing.Size(207, 493);
             this.EkonometrikSenaryoElementsPanel.TabIndex = 1;
+            this.EkonometrikSenaryoElementsPanel.UseWaitCursor = true;
             // 
             // richTextBox1
             // 
@@ -1815,6 +1820,7 @@ namespace SLF
             this.richTextBox1.TabIndex = 10;
             this.richTextBox1.Text = "Tablolar üzerinde değişiklik yaparak senaryo üretebilirsiniz. Yeni senaryo tahmin" +
     " sonuçlarını görüntülemek için lütfen önce değişiklikleri kaydedin.";
+            this.richTextBox1.UseWaitCursor = true;
             // 
             // ELFPredictionShowResultsGunaButton
             // 
