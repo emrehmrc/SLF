@@ -89,63 +89,52 @@ namespace SLF
         {
             FileInfo file = new FileInfo(filePath);
 
-            bool fileLocked = true;
-            while (fileLocked)
+            using (ExcelPackage package = new ExcelPackage(file))
             {
                 try
                 {
-                    using (ExcelPackage package = new ExcelPackage(file))
+                    // İlk sayfayı alıyoruz
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // İlk sayfa (0. index)
+
+                    // Excel dosyasındaki satır ve sütun sayısı
+                    int rowCount = worksheet.Dimension.Rows;
+                    int colCount = worksheet.Dimension.Columns;
+
+                    // currentDataTable içeriğini Excel'e yazdır
+                    for (int row = 0; row < dataTable.Rows.Count; row++)
                     {
-                        // İlk sayfayı alıyoruz
-                        ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // İlk sayfa (0. index)
-
-                        // Excel dosyasındaki satır ve sütun sayısı
-                        int rowCount = worksheet.Dimension.Rows;
-                        int colCount = worksheet.Dimension.Columns;
-
-                        // currentDataTable içeriğini Excel'e yazdır
-                        for (int row = 0; row < dataTable.Rows.Count; row++)
+                        for (int col = 0; col < dataTable.Columns.Count; col++)
                         {
-                            for (int col = 0; col < dataTable.Columns.Count; col++)
+                            var cell = worksheet.Cells[row + 2, col + 1]; // 2. satırdan itibaren yazıyoruz (1. satır başlık için)
+
+                            // Eğer hücrede formül yoksa
+                            if (string.IsNullOrEmpty(cell.Formula)) // Formula yoksa
                             {
-                                var cell = worksheet.Cells[row + 2, col + 1]; // 2. satırdan itibaren yazıyoruz (1. satır başlık için)
+                                var cellValue = dataTable.Rows[row][col];
 
-                                // Eğer hücrede formül yoksa
-                                if (string.IsNullOrEmpty(cell.Formula)) // Formula yoksa
+                                // Eğer hücre değeri sayısal ise biçimlendirme uygula
+                                if (double.TryParse(cellValue.ToString(), out double numericValue))
                                 {
-                                    var cellValue = dataTable.Rows[row][col];
-
-                                    // Eğer hücre değeri sayısal ise biçimlendirme uygula
-                                    if (double.TryParse(cellValue.ToString(), out double numericValue))
-                                    {
-                                        // Hücreye sayısal değeri yaz ve formatla (binlik ayırıcı ve iki ondalık basamak ile)
-                                        cell.Value = numericValue;
-                                        cell.Style.Numberformat.Format = "#,##0.00"; // Binlik ayırıcı ve iki ondalık basamak
-                                    }
-                                    else
-                                    {
-                                        // Sayısal değilse normal değer olarak yaz
-                                        cell.Value = cellValue;
-                                    }
+                                    // Hücreye sayısal değeri yaz ve formatla (binlik ayırıcı ve iki ondalık basamak ile)
+                                    cell.Value = numericValue;
+                                    cell.Style.Numberformat.Format = "#,##0.00"; // Binlik ayırıcı ve iki ondalık basamak
+                                }
+                                else
+                                {
+                                    // Sayısal değilse normal değer olarak yaz
+                                    cell.Value = cellValue;
                                 }
                             }
                         }
-
-                        // Dosyayı kaydet
-                        package.Save();
-                        Console.WriteLine("Excel dosyası başarıyla güncellendi.");
-                        fileLocked = false;
                     }
-                }
-                catch (IOException)
-                {
-                    MessageBox.Show("Lütfen Excel dosyasını kapatın ve tekrar deneyin.", "Excel Dosyası Açık", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    System.Threading.Thread.Sleep(3000); // 3 saniye bekle
+
+                    // Dosyayı kaydet
+                    package.Save();
+                    Console.WriteLine("Excel dosyası başarıyla güncellendi.");
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Bir hata oluştu: {ex.Message}");
-                    fileLocked = false;
                 }
             }
         }
@@ -204,8 +193,6 @@ namespace SLF
         }
 
 
-        // Formül olan sütunları güncellemeyerek koruma
-        
         private void ReleaseObject(object obj)
         {
             try

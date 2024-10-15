@@ -207,7 +207,7 @@ namespace SLF
         //        }
         //    }
         //}
-       
+
         private void ReportDagıtılanCounts()
         {
             float nullPercentage = 1.0f;
@@ -478,6 +478,16 @@ namespace SLF
                                 kkoImpute++;
                             }
                         }
+
+                        // KKO için ek kontrol: 0.04'ten küçükse
+                        if (column.ColumnName == "KKO" && currentValue < 0.04)
+                        {
+                            if (!kkoLowYearRows.Contains(row[yil].ToString()))
+                            {
+                                kkoLowYearRows.Add(row[yil].ToString());
+                                kkoImpute++;
+                            }
+                        }
                     }
                 }
 
@@ -588,10 +598,10 @@ namespace SLF
         {
             List<int> problematicRows = new List<int>();
             int totalRows = 0;
-            
+
 
             int startYear = slfStartYear - 1;  // slfStartYear 2024 ise başlangıç yılı 2023 olacak
-            int endYear = slfStartYear -5;
+            int endYear = slfStartYear - 5;
             List<int> yearsToCheck = Enumerable.Range(endYear, (startYear - endYear) + 1).ToList();  // [2023, 2022, 2021, 2020, 2019]
 
             for (int i = 0; i < currentDataTable.Rows.Count; i++)
@@ -599,7 +609,7 @@ namespace SLF
                 var row = currentDataTable.Rows[i];
 
                 // Yıl kontrolü
-                if (!int.TryParse(row["YIL"].ToString(), out int  rowYear) || rowYear < endYear || rowYear > startYear)
+                if (!int.TryParse(row["YIL"].ToString(), out int rowYear) || rowYear < endYear || rowYear > startYear)
                 {
                     continue; // Geçersiz yıl veya kontrol aralığı dışında, bu satırı atla
                 }
@@ -724,16 +734,16 @@ namespace SLF
                         kkmValue = Math.Max(kkmValue, minThreshold * toplamFaturalananValue);
                         row[kkm] = kkmValue;
                     }
-                
 
-                // KKO'yu yüzde formatında göstermek
-                //if (!IsNullLike(row[kko]))
-                //{
-                //    double kkoValue;
-                //    if (TryParseToDouble(row[kko], out kkoValue))
-                //    {
-                //        row[kko] = ConvertToPercentage(kkoValue); // Yüzdeye çeviriyoruz
-                //    }
+
+                    // KKO'yu yüzde formatında göstermek
+                    //if (!IsNullLike(row[kko]))
+                    //{
+                    //    double kkoValue;
+                    //    if (TryParseToDouble(row[kko], out kkoValue))
+                    //    {
+                    //        row[kko] = ConvertToPercentage(kkoValue); // Yüzdeye çeviriyoruz
+                    //    }
                 }
             }
         }
@@ -833,17 +843,18 @@ namespace SLF
             NegativeOrZeroDetect();
             //CheckConsecutiveYears();
             //CheckBetweenDagıtılanAndKayip();
-            
+
             CheckAndReportKkoKkmDag(slfStartYear);
             CheckDataCompleteness(slfStartYear);
-            CheckPercentageIncreaseLoadSanayiTicarethaneFaturalanan(); 
-            ReportDagıtılanCounts();        }
+            CheckPercentageIncreaseLoadSanayiTicarethaneFaturalanan();
+            ReportDagıtılanCounts();
+        }
         public override void Impute()
-       {
+        {
             ImputeKkmKkoDag();
             ImputeDagıtılan();
             //FormatDataTablePercentages();
-            string filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx"; // Excel dosyasının tam yolu
+            string filePath = @"C:\Users\begum.orhan\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx"; // Excel dosyasının tam yolu
             ExcelExporter exporter = new ExcelExporter();
             exporter.UpdateExcelFileFirstSheet(filePath, currentDataTable);
         }

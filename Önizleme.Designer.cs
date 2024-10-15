@@ -116,7 +116,7 @@
             this.Onizleme_Hata.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_Hata.Name = "Onizleme_Hata";
             this.Onizleme_Hata.Padding = new System.Windows.Forms.Padding(2);
-            this.Onizleme_Hata.Size = new System.Drawing.Size(878, 432);
+            this.Onizleme_Hata.Size = new System.Drawing.Size(876, 432);
             this.Onizleme_Hata.TabIndex = 1;
             this.Onizleme_Hata.Text = "Hatalar";
             this.Onizleme_Hata.UseVisualStyleBackColor = true;
@@ -144,7 +144,7 @@
             this.Onizleme_Warning.Location = new System.Drawing.Point(4, 26);
             this.Onizleme_Warning.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_Warning.Name = "Onizleme_Warning";
-            this.Onizleme_Warning.Size = new System.Drawing.Size(878, 432);
+            this.Onizleme_Warning.Size = new System.Drawing.Size(876, 432);
             this.Onizleme_Warning.TabIndex = 2;
             this.Onizleme_Warning.Text = "Düzeltilecekler";
             this.Onizleme_Warning.UseVisualStyleBackColor = true;
@@ -172,7 +172,7 @@
             this.Onizleme_Information.Location = new System.Drawing.Point(4, 26);
             this.Onizleme_Information.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_Information.Name = "Onizleme_Information";
-            this.Onizleme_Information.Size = new System.Drawing.Size(878, 432);
+            this.Onizleme_Information.Size = new System.Drawing.Size(876, 432);
             this.Onizleme_Information.TabIndex = 3;
             this.Onizleme_Information.Text = "Silinecekler";
             this.Onizleme_Information.UseVisualStyleBackColor = true;
@@ -200,7 +200,7 @@
             this.Onizleme_Statistics.Location = new System.Drawing.Point(4, 26);
             this.Onizleme_Statistics.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_Statistics.Name = "Onizleme_Statistics";
-            this.Onizleme_Statistics.Size = new System.Drawing.Size(878, 432);
+            this.Onizleme_Statistics.Size = new System.Drawing.Size(876, 432);
             this.Onizleme_Statistics.TabIndex = 4;
             this.Onizleme_Statistics.Text = "Bilgiler";
             this.Onizleme_Statistics.UseVisualStyleBackColor = true;
@@ -236,7 +236,7 @@
             this.buton_YUKLE.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buton_YUKLE.Enabled = false;
             this.buton_YUKLE.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.buton_YUKLE.Location = new System.Drawing.Point(628, 474);
+            this.buton_YUKLE.Location = new System.Drawing.Point(771, 477);
             this.buton_YUKLE.Margin = new System.Windows.Forms.Padding(2);
             this.buton_YUKLE.Name = "buton_YUKLE";
             this.buton_YUKLE.Size = new System.Drawing.Size(124, 31);
@@ -249,7 +249,7 @@
             // 
             this.buton_ÇIK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buton_ÇIK.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.buton_ÇIK.Location = new System.Drawing.Point(769, 474);
+            this.buton_ÇIK.Location = new System.Drawing.Point(515, 477);
             this.buton_ÇIK.Margin = new System.Windows.Forms.Padding(2);
             this.buton_ÇIK.Name = "buton_ÇIK";
             this.buton_ÇIK.Size = new System.Drawing.Size(124, 31);
@@ -262,7 +262,7 @@
             // 
             this.buton_İlerle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buton_İlerle.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.buton_İlerle.Location = new System.Drawing.Point(483, 474);
+            this.buton_İlerle.Location = new System.Drawing.Point(643, 477);
             this.buton_İlerle.Margin = new System.Windows.Forms.Padding(2);
             this.buton_İlerle.Name = "buton_İlerle";
             this.buton_İlerle.Size = new System.Drawing.Size(124, 31);
