@@ -24,6 +24,7 @@ using NetTopologySuite.Features;
 using NetTopologySuite.Operation;
 using MapWinGIS;
 using SharpMap.Data.Providers;
+using System.Drawing.Drawing2D;
 using System.Threading;
 
 namespace SLF
@@ -32,7 +33,6 @@ namespace SLF
     {
 
         private double startX = 0, startY = 0;
-
         public int slfStartYear = 0, slfEndYear = 0;
 
         // form objeleri
@@ -168,7 +168,8 @@ namespace SLF
             gmap.DragButton = MouseButtons.Left;
         }
 
-        public ModülFormu() {
+        public ModülFormu()
+        {
 
             InitializeComponent();
             InitializeGMap(gMapControl_stokastik);
@@ -176,6 +177,8 @@ namespace SLF
             
 
             SortTabPagesAlphabetically(Modül_Tabları, true);
+            ModuleTabPanel.Paint += new PaintEventHandler(ModuleTabPanel_Paint);
+            //HeaderPanel.Paint += new PaintEventHandler(HeaderPanel_Paint);
 
             Modül_Tabları.SelectedTab = tab_girdi;
 
@@ -1323,22 +1326,22 @@ namespace SLF
                 label6.Text = "kW/m" + "\u00B2" + ":";
                 label7.Text = "kWh:";
                 label8.Text = "Abone Sayısı:";
-                textBox1.CausesValidation = true;
+                //textBox1.CausesValidation = true; //this line can be removed textbox1 not relevant to checkbox6
             }
             else
             {
                 panel1.Visible = false;
             }
         }
-        private void checkBox8_CheckedChanged(object sender, EventArgs e)
+        private void PredictionCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBox8.Checked)
+            if (PredictionCheckBox.Checked)
             {
-                panel2.Visible = true;
+                ELFTablePanel.Visible = true;
             }
             else
             {
-                panel2.Visible = false;
+                ELFTablePanel.Visible = false;
             }
         }
 
@@ -2574,26 +2577,160 @@ namespace SLF
             gMapControl_EA.Refresh();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+//THESE METHODS ARE ADDED FOR ELF METHOD SELECTION FROM METHODS FORM
+
+        private string selectedMethod;  // Store the method
+        public List<TabPage> hiddenTabs = new List<TabPage>();
+
+        public ModülFormu(string selectedMethod = "", string tabToSelect = "")
         {
-            // Girdi modülündeki dosya yükleme butonuna tıklandığında çalışacak kodlar
+            InitializeComponent();
+            this.selectedMethod = selectedMethod;  // Store the method
+            if (!string.IsNullOrEmpty(tabToSelect))
+            {
+                InitializeTabs(tabToSelect);
+            }
+            else
+            {
+                InitializeFormBasedOnMethod();
+            }
+        }
+
+        private void InitializeTabs(string tabToSelect)
+        {
+            // Select the specific tab and hide others
+            if (tabToSelect == "tab_girdi")
+            {
+                Modül_Tabları.SelectedTab = Modül_Tabları.TabPages["tab_girdi"];
+                veri_listesi_seçimi.Text = "Ekonometrik Yük Tahmini Verileri";
+                veri_listesi_seçimi.Enabled = false;
+
+                HideOtherTabs("tab_girdi");
+            }
+        }
+
+        private void HideOtherTabs(string tabToKeep)
+        {
+            // Hide all tabs except the specified one
+            foreach (TabPage tabPage in Modül_Tabları.TabPages.Cast<TabPage>().ToList())
+            {
+                if (tabPage.Name != tabToKeep)
+                {
+                    hiddenTabs.Add(tabPage);  // Add to hiddenTabs list
+                    Modül_Tabları.TabPages.Remove(tabPage);  // Remove tab
+                }
+            }
+        }
+
+        private void InitializeFormBasedOnMethod()
+        {
+            if (selectedMethod == "ELF (Ekonometrik)")
+            {
+                // Show only the tab_girdi tab and hide others
+                Modül_Tabları.SelectedTab = Modül_Tabları.TabPages["tab_girdi"];
+                veri_listesi_seçimi.Text = "Ekonometrik Yük Tahmini Verileri";
+                veri_listesi_seçimi.Enabled = false;
+
+                // Hide all other tabs
+                HideOtherTabs("tab_girdi");
+            }
+            else if (selectedMethod == "SLF (Jeo-Uzamsal)")
+            {
+                // For SLF, do not hide any tabs
+                // Optionally, add other logic if needed
+            }
+        }
+
+        public void RestoreHiddenTabs()
+        {
+            foreach (TabPage tabPage in hiddenTabs)
+            {
+                Modül_Tabları.TabPages.Add(tabPage);  // Add back the hidden tabs
+            }
+
+            hiddenTabs.Clear();  // Clear the list after restoring
+        }
+
+        private void SelectFolderButton_Click(object sender, EventArgs e)
+        {
+            // Handle file loading logic for the "Girdi" module
             if (slfStartYear == 0 || slfEndYear == 0)
             {
                 MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+            // Check if an item is selected in the ComboBox before accessing it
+            if (veri_listesi_seçimi.SelectedItem == null)
+            {
+                MessageBox.Show("Lütfen bir veri tipi seçin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return; // Exit if no valid data type is selected
+            }
 
-            // Veri listesinde seçilen veri tipine göre dosya seçme işlemi yapılacak
+            // Perform file selection based on the selected data type
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+
+            // Ensure girdiModülü is properly initialized
+            if (!girdiModülleri.ContainsKey(seçilenVeriTipi))
+            {
+                MessageBox.Show("Geçersiz veri tipi seçildi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return; // Exit if the selected data type is not valid
+            }
+
+            // Use the selectedMethod here
+            if (selectedMethod == "ELF (Ekonometrik)")
+            {
+                // Logic for ELF selection
+                MessageBox.Show("ELF method selected, skipping prerequisites.");
+            }
+            else if (selectedMethod == "SLF (Jeo-Uzamsal)")
+            {
+                // Logic for SLF selection
+                MessageBox.Show("SLF method selected, prerequisites are required.");
+            }
+            else
+            {
+                // Handle other cases or invalid selection
+                MessageBox.Show("No valid method selected.");
+            }
+
             girdiModülü = girdiModülleri[seçilenVeriTipi];
             girdiModülü.SlfStartYear = slfStartYear;
             girdiModülü.SlfEndYear = slfEndYear;
-            var isImported = girdiModülü.VEERProcess(seçilenVeriTipi);
-            if (isImported) {
+
+            // Check if "ELF" is selected to skip prerequisites
+            bool skipPrerequisites = (selectedMethod == "ELF (Ekonometrik)");
+
+            // Call VEERProcess with skipPrerequisites flag
+            var isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
+            if (isImported)
+            {
                 veri_listesi_seçimi.Refresh();
                 dataGridView1.DataSource = girdiModülü.CurrentDataTable;
             }
         }
+
+
+        /*        private void button1_Click(object sender, EventArgs e)
+                {
+                    // Girdi modülündeki dosya yükleme butonuna tıklandığında çalışacak kodlar
+                    if (slfStartYear == 0 || slfEndYear == 0)
+                    {
+                        MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    // Veri listesinde seçilen veri tipine göre dosya seçme işlemi yapılacak
+                    string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+                    girdiModülü = girdiModülleri[seçilenVeriTipi];
+                    girdiModülü.SlfStartYear = slfStartYear;
+                    girdiModülü.SlfEndYear = slfEndYear;
+                    var isImported = girdiModülü.VEERProcess(seçilenVeriTipi);
+                    if (isImported)
+                    {
+                        veri_listesi_seçimi.Refresh();
+                        dataGridView1.DataSource = girdiModülü.CurrentDataTable;
+                    }
+                }*/
 
         private void DrawRuler_ea(GMapOverlay rulerOverlay, List<PointLatLng> rulerPoints)
         {
@@ -3036,7 +3173,8 @@ namespace SLF
                         {
                             resultingAttributes[$"{column}_Min"] = mins[column];
                         }
-                    } else
+                    }
+                    else
                     {
                         MessageBox.Show("null");
                     }
@@ -3322,6 +3460,15 @@ namespace SLF
                 MessageBox.Show("Dosya seçilmedi.");
             }
         }
+        private void veri_listesi_seçimi_MouseDown(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        /* -------------------------------------------------------------------------------------------*/
+
+
+        //////////////// YEAR SELECTION EVENTS ////////////////
 
         private void ResetYearSelectionProcessGirdiModulu()
         {
@@ -3346,17 +3493,12 @@ namespace SLF
             startYearComboBox.Enabled = true;
             endYearComboBox.Enabled = false;
             yearApproveButton.Enabled = false;
-            veri_listesi_seçimi.Enabled = false;
+           // veri_listesi_seçimi.Enabled = false;
         }
         private void ModülFormu_Load(object sender, EventArgs e)
         {
             // Modül formunu yüklerken reset year selection sürecini başlat
             ResetYearSelectionProcessGirdiModulu();
-        }
-
-        private void veri_listesi_seçimi_MouseDown(object sender, MouseEventArgs e)
-        {
-
         }
 
         private void startYearComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -3367,6 +3509,7 @@ namespace SLF
             }
             // Get the selected year
             int selectedYear = (int)startYearComboBox.SelectedItem;
+
 
             // Enable the endYearComboBox
             endYearComboBox.Enabled = true;
@@ -3404,6 +3547,7 @@ namespace SLF
                 gMapControl_EA.Controls.Remove(existingLabel);  // gMapControl_EA'den kaldır
                 Console.WriteLine("Label kaldırıldı");
             }
+
 
             // Yeni bir label oluşturuyoruz
             System.Windows.Forms.Label istasyonAdetLabel = new System.Windows.Forms.Label();
@@ -3591,13 +3735,13 @@ namespace SLF
 
         private void yearApproveButton_Click(object sender, EventArgs e)
         {
-            if(endYearComboBox.SelectedIndex == -1)
+            if (endYearComboBox.SelectedIndex == -1)
             {
                 // if the end year is not chosen, it means we are still in selection process
                 MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            else if(startYearComboBox.Enabled == false && endYearComboBox.Enabled == false)
+            else if (startYearComboBox.Enabled == false && endYearComboBox.Enabled == false)
             {
                 // but if both combobox are disabled, it means the selection process is already done
                 // Check if any DataTable in girdiModülleri has rows
@@ -3624,7 +3768,7 @@ namespace SLF
                 // selections are completed
                 startYearComboBox.Enabled = false;
                 endYearComboBox.Enabled = false;
-                veri_listesi_seçimi.Enabled = true;
+                //veri_listesi_seçimi.Enabled = true;
                 slfStartYear = (int)startYearComboBox.SelectedItem;
                 slfEndYear = (int)endYearComboBox.SelectedItem;
                 MessageBox.Show($"Başlangıç yılı: {slfStartYear}, Bitiş yılı: {slfEndYear}", "Yıllar belirlendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -3632,6 +3776,249 @@ namespace SLF
                 yearApproveButton.Text = "Sıfırla";
             }
         }
+        //VISUAL CHANGES
+        private void ModuleTabPanel_Paint(object sender, PaintEventArgs e)
+        {
+            // Get the Graphics object from the PaintEventArgs
+            Graphics graphics = e.Graphics;
+
+            // Create a rectangle the same size as the panel
+            Rectangle gradient_rectangle = new Rectangle(0, 0, ModuleTabPanel.Width, ModuleTabPanel.Height);
+
+            // Define the gradient's properties
+            Brush brush = new LinearGradientBrush(gradient_rectangle, Color.FromArgb(100, 252, 179, 38), Color.FromArgb(100, 0, 253, 147), 85f);
+
+            // Apply the gradient by filling the rectangle with the brush
+            graphics.FillRectangle(brush, gradient_rectangle);
+
+            // Optionally, set the panel's background color to be fully transparent
+            ModuleTabPanel.BackColor = Color.Transparent;
+        }
+
+        /*        private void HeaderPanel_Paint(object sender, PaintEventArgs e)
+                {
+                    // Get the Graphics object from the PaintEventArgs
+                    Graphics graphics = e.Graphics;
+
+                    // Create a rectangle the same size as the panel
+                    Rectangle gradient_rectangle = new Rectangle(0, 0, HeaderPanel.Width, HeaderPanel.Height);
+
+                    // Define the gradient's properties
+                    Brush brush = new LinearGradientBrush(gradient_rectangle, Color.FromArgb(100, 252, 179, 38), Color.FromArgb(100, 0, 253, 147), 65f);
+
+                    // Apply the gradient by filling the rectangle with the brush
+                    graphics.FillRectangle(brush, gradient_rectangle);
+
+                    // Optionally, set the panel's background color to be fully transparent
+                    HeaderPanel.BackColor = Color.Transparent;
+                }*/
+
+
+        /// <summary>
+        /// ELF METHOD RELATED CHANGES&UPDATES
+        /// </summary>
+        // Assuming you have a class like this
+        public class ScriptProcessor
+        {
+            public void ReScript(string scriptName, string parameters)
+            {
+                // Your script processing logic here
+                Console.WriteLine($"Processing script: {scriptName} with parameters: {parameters}");
+            }
+        }
+
+        // Inside your form or class, you would create an instance of ScriptProcessor
+        private ScriptProcessor wdC = new ScriptProcessor();
+
+        private void ELFPredictionButton_Click(object sender, EventArgs e)
+        {
+            // Check if the ComboBox has at least two items
+            if (comboBox1.Items.Count >= 2)
+            {
+                // Get the first and second selected items from the ComboBox
+                string parametre1 = comboBox1.Items[0].ToString();
+                string parametre2 = comboBox1.Items[1].ToString();
+
+                // Concatenate the parameters (adjust for your R script's needs)
+                string combinedParameters = $"{parametre1} {parametre2}"; // Space-separated parameters
+
+                // Assuming wdC is an instance of ScriptProcessor
+                wdC.ReScript("vanilin kods.R", combinedParameters);
+
+                // Full path to your R script
+                string rScriptPath = @"C:\path\to\your\script.R";
+
+                // Pass the combined parameters to ExecuteCommand to run the R script
+                ExecuteCommand(rScriptPath, combinedParameters);
+            }
+            else
+            {
+                MessageBox.Show("ComboBox does not have enough items!");
+            }
+        }
+
+        public void ExecuteCommand(string scriptPath, string arguments)
+        {
+            // Path to the Rscript executable
+            string rScriptExecutable = @"C:\Program Files\R\R-X.X.X\bin\Rscript.exe"; // Adjust for your R installation path
+
+            // Prepare the full command with the script path and parameters
+            string command = $"\"{scriptPath}\" {arguments}";
+
+            ProcessStartInfo processInfo = new ProcessStartInfo(rScriptExecutable, command)
+            {
+                CreateNoWindow = true,
+                UseShellExecute = false, // Allows output redirection
+                RedirectStandardOutput = true, // To capture output from R script
+                RedirectStandardError = true
+            };
+
+            using (Process process = Process.Start(processInfo))
+            {
+                // Capture and log the output if needed
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+
+                process.WaitForExit();
+
+                // Log or handle the output
+                Console.WriteLine("Output: " + output);
+                if (!string.IsNullOrEmpty(error))
+                {
+                    Console.WriteLine("Error: " + error);
+                }
+            }
+        }
+/*        // Assuming you have a class like this
+        public class ScriptProcessor
+        {
+            public void ReScript(string scriptName, string parameters)
+            {
+                // Your script processing logic here
+                Console.WriteLine($"Processing script: {scriptName} with parameters: {parameters}");
+            }
+        }
+
+        // Inside your form or class, you would create an instance of ScriptProcessor
+        private ScriptProcessor wdC = new ScriptProcessor();
+
+        private void ELFPredictionButton_Click(object sender, EventArgs e)
+        {
+            // Check if the ComboBox has at least one item
+            if (comboBox1.Items.Count >= 1)
+            {
+                // Create a list to hold up to 5 parameters
+                List<string> parameters = new List<string>();
+
+                // Loop through the ComboBox items (up to 5 items)
+                for (int i = 0; i < comboBox1.Items.Count && i < 5; i++)
+                {
+                    parameters.Add(comboBox1.Items[i].ToString());
+                }
+
+                // Join the parameters with space separation
+                string combinedParameters = string.Join(" ", parameters);
+
+                // Assuming wdC is an instance of ScriptProcessor
+                wdC.ReScript("vanilin kods.R", combinedParameters);
+
+                // Full path to your R script
+                string rScriptPath = @"C:\path\to\your\script.R";
+
+                // Pass the combined parameters to ExecuteCommand to run the R script
+                ExecuteCommand(rScriptPath, combinedParameters);
+            }
+            else
+            {
+                MessageBox.Show("ComboBox does not have enough items!");
+            }
+        }
+
+        public void ExecuteCommand(string scriptPath, string arguments)
+        {
+            // Path to the Rscript executable
+            string rScriptExecutable = @"C:\Program Files\R\R-X.X.X\bin\Rscript.exe"; // Adjust for your R installation path
+
+            // Prepare the full command with the script path and parameters
+            string command = $"\"{scriptPath}\" {arguments}";
+
+            ProcessStartInfo processInfo = new ProcessStartInfo(rScriptExecutable, command)
+            {
+                CreateNoWindow = true,
+                UseShellExecute = false, // Allows output redirection
+                RedirectStandardOutput = true, // To capture output from R script
+                RedirectStandardError = true
+            };
+
+            using (Process process = Process.Start(processInfo))
+            {
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+
+                process.WaitForExit();
+
+                if (!string.IsNullOrEmpty(error))
+                {
+                    Console.WriteLine("Error: " + error);
+                }
+                else
+                {
+                    // Load table data into DataGridView as before
+                    DataTable table = ReadCsvToDataTable(@"C:\path\to\output.csv");
+                    dataGridView1.DataSource = table;
+
+                    // Load graphical output (PNG) into PictureBox controls
+                    LoadImagesIntoPictureBoxes();
+                }
+            }
+        }
+        private void LoadImagesIntoPictureBoxes()
+        {
+            // Path to the folder where the images are saved
+            string imageFolderPath = @"C:\path\to\output\";
+
+            // Load the first image into pictureBox1
+            string imagePath1 = Path.Combine(imageFolderPath, "plot1.png");
+            if (File.Exists(imagePath1))
+            {
+                pictureBox1.Image = Image.FromFile(imagePath1);
+            }
+
+            // Load the second image into pictureBox2
+            string imagePath2 = Path.Combine(imageFolderPath, "plot2.png");
+            if (File.Exists(imagePath2))
+            {
+                pictureBox2.Image = Image.FromFile(imagePath2);
+            }
+
+            // Add more PictureBox assignments as needed
+        }
+
+        public DataTable ReadCsvToDataTable(string filePath)
+        {
+            DataTable dataTable = new DataTable();
+            using (StreamReader reader = new StreamReader(filePath))
+            {
+                string[] headers = reader.ReadLine().Split(','); // Adjust delimiter for TSV if needed
+                foreach (string header in headers)
+                {
+                    dataTable.Columns.Add(header); // Add columns
+                }
+
+                while (!reader.EndOfStream)
+                {
+                    string[] rows = reader.ReadLine().Split(',');
+                    DataRow dataRow = dataTable.NewRow();
+                    for (int i = 0; i < headers.Length; i++)
+                    {
+                        dataRow[i] = rows[i];
+                    }
+                    dataTable.Rows.Add(dataRow);
+                }
+            }
+            return dataTable;
+        }*/
+
 
         public async Task JoinAttributesByLocation_summary()
         {

@@ -433,10 +433,10 @@ namespace SLF
                 float overDecreaseCount = 0.0f;
                 float kkoImpute = 0.0f;
 
-                for (int i = 1; i < totalRows; i++)
-                {
-                    var previousRow = currentDataTable.Rows[i - 1];
-                    var row = currentDataTable.Rows[i];
+                        for (int i = 1; i < totalRows; i++)
+                        {
+                            var previousRow = currentDataTable.Rows[i - 1];
+                            var row = currentDataTable.Rows[i];
 
                     // Sütunun değeri DBNull değilse işlemi devam ettir
                     if (!IsNullLike(row[column]) && !IsNullLike(previousRow[column]))
