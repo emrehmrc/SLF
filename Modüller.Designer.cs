@@ -42,6 +42,8 @@ namespace SLF
             this.Modül_Tabları = new System.Windows.Forms.TabControl();
             this.tab_girdi = new System.Windows.Forms.TabPage();
             this.label3 = new System.Windows.Forms.Label();
+            this.OpenModuleButtonPanel = new System.Windows.Forms.Panel();
+            this.OpenModuleButton = new System.Windows.Forms.Button();
             this.panel9 = new System.Windows.Forms.Panel();
             this.label17 = new System.Windows.Forms.Label();
             this.raporGoruntuleButonu = new System.Windows.Forms.Button();
@@ -232,19 +234,17 @@ namespace SLF
             this.HeaderPanel = new System.Windows.Forms.Panel();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.menuStrip1.SuspendLayout();
-            this.panel6.SuspendLayout();
-            this.panel7.SuspendLayout();
+            this.Modül_Tabları.SuspendLayout();
+            this.tab_girdi.SuspendLayout();
             this.OpenModuleButtonPanel.SuspendLayout();
-            this.panel7.SuspendLayout();
-            this.panel6.SuspendLayout();
+            this.panel9.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel8.SuspendLayout();
+            this.panel6.SuspendLayout();
             this.panel7.SuspendLayout();
-            this.ELFTablePanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.tab_dek.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView4)).BeginInit();
-            this.panel2.SuspendLayout();
+            this.tab_ea.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.harita_katmanları_right_click.SuspendLayout();
             this.tab_ekonometrik.SuspendLayout();
@@ -283,13 +283,12 @@ namespace SLF
             ((System.ComponentModel.ISupportInitialize)(this.ELFMaxSenaryoTable)).BeginInit();
             this.EkonometrikSenaryoElementsPanel.SuspendLayout();
             this.tab_stokastik.SuspendLayout();
-            this.ModuleTabPanel.SuspendLayout();
-            this.HeaderPanel.SuspendLayout();
-            this.OpenModuleButtonPanel.SuspendLayout();
+            this.katmanlar_right_click.SuspendLayout();
+            this.Seç_Stokastik.SuspendLayout();
             this.tab_yükHaritası.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.webView21)).BeginInit();
-            this.panel3.SuspendLayout();
-            this.panel4.SuspendLayout();
+            this.panel1.SuspendLayout();
+            this.ContextMenuStrip_Nokta.SuspendLayout();
             this.ContextMenuStrip_Poligon.SuspendLayout();
             this.ContextMenuStrip_Fonksiyon.SuspendLayout();
             this.ModuleTabPanel.SuspendLayout();
@@ -377,14 +376,6 @@ namespace SLF
             this.tab_girdi.Controls.Add(this.label3);
             this.tab_girdi.Controls.Add(this.OpenModuleButtonPanel);
             this.tab_girdi.Controls.Add(this.panel9);
-            this.Modül_Tabları.Size = new System.Drawing.Size(1229, 559);
-            this.tab_girdi.BackColor = System.Drawing.Color.Transparent;
-            this.tab_girdi.Controls.Add(this.panel9);
-            this.tab_girdi.Controls.Add(this.label3);
-            // 
-            this.tab_girdi.BackColor = System.Drawing.Color.Transparent;
-            this.tab_girdi.Controls.Add(this.panel9);
-            this.tab_girdi.Controls.Add(this.label3);
             this.tab_girdi.Controls.Add(this.dataGridView1);
             this.tab_girdi.Controls.Add(this.panel8);
             this.tab_girdi.Controls.Add(this.panel6);
@@ -413,13 +404,7 @@ namespace SLF
             this.label3.Text = "Veri Önizleme:";
             this.label3.UseWaitCursor = true;
             // 
-            this.tab_girdi.Location = new System.Drawing.Point(4, 48);
-            this.tab_girdi.Margin = new System.Windows.Forms.Padding(2);
-            this.tab_girdi.Name = "tab_girdi";
-            this.tab_girdi.Padding = new System.Windows.Forms.Padding(2);
-            this.tab_girdi.Size = new System.Drawing.Size(1221, 507);
-            this.tab_girdi.TabIndex = 0;
-            this.tab_girdi.Text = "Girdi Modülü";
+            // OpenModuleButtonPanel
             // 
             this.OpenModuleButtonPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.OpenModuleButtonPanel.Controls.Add(this.OpenModuleButton);
@@ -495,7 +480,6 @@ namespace SLF
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.Size = new System.Drawing.Size(1210, 350);
             this.dataGridView1.TabIndex = 4;
-            this.dataGridView1.UseWaitCursor = true;
             // 
             // panel8
             // 
@@ -572,7 +556,6 @@ namespace SLF
             this.startYearComboBox.Size = new System.Drawing.Size(92, 23);
             this.startYearComboBox.TabIndex = 9;
             this.startYearComboBox.Text = "Yıl seçiniz";
-            this.startYearComboBox.UseWaitCursor = true;
             this.startYearComboBox.SelectedIndexChanged += new System.EventHandler(this.startYearComboBox_SelectedIndexChanged);
             // 
             // yearApproveButton
@@ -583,7 +566,6 @@ namespace SLF
             this.yearApproveButton.TabIndex = 11;
             this.yearApproveButton.Text = "Onayla";
             this.yearApproveButton.UseVisualStyleBackColor = true;
-            this.yearApproveButton.UseWaitCursor = true;
             this.yearApproveButton.Click += new System.EventHandler(this.yearApproveButton_Click);
             // 
             // endYearComboBox
@@ -596,7 +578,6 @@ namespace SLF
             this.endYearComboBox.Size = new System.Drawing.Size(92, 23);
             this.endYearComboBox.TabIndex = 10;
             this.endYearComboBox.Text = "Yıl seçiniz";
-            this.endYearComboBox.UseWaitCursor = true;
             this.endYearComboBox.SelectedIndexChanged += new System.EventHandler(this.endYearComboBox_SelectedIndexChanged);
             // 
             // panel7
@@ -635,7 +616,6 @@ namespace SLF
             this.veri_listesi_seçimi.Name = "veri_listesi_seçimi";
             this.veri_listesi_seçimi.Size = new System.Drawing.Size(161, 28);
             this.veri_listesi_seçimi.TabIndex = 0;
-            this.veri_listesi_seçimi.UseWaitCursor = true;
             this.veri_listesi_seçimi.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.veri_listesi_seçimi_DrawItem);
             this.veri_listesi_seçimi.SelectedIndexChanged += new System.EventHandler(this.veri_listesi_seçimi_SelectedIndexChanged);
             this.veri_listesi_seçimi.MouseDown += new System.Windows.Forms.MouseEventHandler(this.veri_listesi_seçimi_MouseDown);
@@ -662,7 +642,6 @@ namespace SLF
             this.label2.Size = new System.Drawing.Size(88, 17);
             this.label2.TabIndex = 3;
             this.label2.Text = "Dosya Seçimi:";
-            this.label2.UseWaitCursor = true;
             // 
             // SelectFolderButton
             // 
@@ -676,154 +655,7 @@ namespace SLF
             this.SelectFolderButton.Size = new System.Drawing.Size(42, 36);
             this.SelectFolderButton.TabIndex = 2;
             this.SelectFolderButton.UseVisualStyleBackColor = false;
-            this.SelectFolderButton.UseWaitCursor = true;
             this.SelectFolderButton.Click += new System.EventHandler(this.SelectFolderButton_Click);
-            this.button1.Size = new System.Drawing.Size(57, 54);
-            this.button1.TabIndex = 2;
-            this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // panel6
-            // 
-            this.panel6.Controls.Add(this.startYearComboBox);
-            this.panel6.Controls.Add(this.yearApproveButton);
-            this.tab_dek.Size = new System.Drawing.Size(1221, 529);
-            this.panel6.Location = new System.Drawing.Point(19, 29);
-            this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(248, 59);
-            this.panel6.TabIndex = 12;
-            // 
-            // startYearComboBox
-            // 
-            this.startYearComboBox.ForeColor = System.Drawing.Color.DarkOrange;
-            this.startYearComboBox.FormattingEnabled = true;
-            this.startYearComboBox.Location = new System.Drawing.Point(2, 5);
-            this.startYearComboBox.Margin = new System.Windows.Forms.Padding(2);
-            this.startYearComboBox.Name = "startYearComboBox";
-            this.startYearComboBox.Size = new System.Drawing.Size(92, 23);
-            this.startYearComboBox.TabIndex = 9;
-            this.startYearComboBox.Text = "Yıl seçiniz";
-            this.startYearComboBox.SelectedIndexChanged += new System.EventHandler(this.startYearComboBox_SelectedIndexChanged);
-            // 
-            // yearApproveButton
-            // 
-            this.yearApproveButton.Location = new System.Drawing.Point(75, 33);
-            this.yearApproveButton.Name = "yearApproveButton";
-            this.yearApproveButton.Size = new System.Drawing.Size(75, 23);
-            this.yearApproveButton.TabIndex = 11;
-            this.yearApproveButton.Text = "Onayla";
-            this.yearApproveButton.UseVisualStyleBackColor = true;
-            this.yearApproveButton.Click += new System.EventHandler(this.yearApproveButton_Click);
-            // 
-            // endYearComboBox
-            // 
-            this.endYearComboBox.ForeColor = System.Drawing.Color.DarkOrange;
-            this.endYearComboBox.FormattingEnabled = true;
-            this.endYearComboBox.Location = new System.Drawing.Point(121, 5);
-            this.endYearComboBox.Margin = new System.Windows.Forms.Padding(2);
-            this.endYearComboBox.Name = "endYearComboBox";
-            this.endYearComboBox.Size = new System.Drawing.Size(92, 23);
-            this.endYearComboBox.TabIndex = 10;
-            this.endYearComboBox.Text = "Yıl seçiniz";
-            this.endYearComboBox.SelectedIndexChanged += new System.EventHandler(this.endYearComboBox_SelectedIndexChanged);
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(37, 120);
-            this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(83, 15);
-            this.label3.TabIndex = 5;
-            this.label3.Text = "Aktarılan Veri:";
-            // 
-            // dataGridView1
-            // 
-            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tab_ea.Size = new System.Drawing.Size(1221, 529);
-            this.dataGridView1.Location = new System.Drawing.Point(19, 158);
-            this.dataGridView1.Margin = new System.Windows.Forms.Padding(2);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.ReadOnly = true;
-            this.dataGridView1.RowHeadersWidth = 51;
-            this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(1093, 299);
-            this.dataGridView1.TabIndex = 4;
-            this.button1.Size = new System.Drawing.Size(57, 54);
-            this.button1.TabIndex = 2;
-            this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // panel6
-            // 
-            this.panel6.Controls.Add(this.startYearComboBox);
-            this.panel6.Controls.Add(this.yearApproveButton);
-            this.tab_dek.Size = new System.Drawing.Size(1132, 398);
-            this.panel6.Location = new System.Drawing.Point(19, 29);
-            this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(248, 59);
-            this.panel6.TabIndex = 12;
-            // 
-            // startYearComboBox
-            // 
-            this.startYearComboBox.ForeColor = System.Drawing.Color.DarkOrange;
-            this.startYearComboBox.FormattingEnabled = true;
-            this.startYearComboBox.Location = new System.Drawing.Point(2, 5);
-            this.startYearComboBox.Margin = new System.Windows.Forms.Padding(2);
-            this.startYearComboBox.Name = "startYearComboBox";
-            this.startYearComboBox.Size = new System.Drawing.Size(92, 23);
-            this.startYearComboBox.TabIndex = 9;
-            this.startYearComboBox.Text = "Yıl seçiniz";
-            this.startYearComboBox.SelectedIndexChanged += new System.EventHandler(this.startYearComboBox_SelectedIndexChanged);
-            // 
-            // yearApproveButton
-            // 
-            this.yearApproveButton.Location = new System.Drawing.Point(75, 33);
-            this.yearApproveButton.Name = "yearApproveButton";
-            this.yearApproveButton.Size = new System.Drawing.Size(75, 23);
-            this.yearApproveButton.TabIndex = 11;
-            this.yearApproveButton.Text = "Onayla";
-            this.yearApproveButton.UseVisualStyleBackColor = true;
-            this.yearApproveButton.Click += new System.EventHandler(this.yearApproveButton_Click);
-            // 
-            // endYearComboBox
-            // 
-            this.endYearComboBox.ForeColor = System.Drawing.Color.DarkOrange;
-            this.endYearComboBox.FormattingEnabled = true;
-            this.endYearComboBox.Location = new System.Drawing.Point(121, 5);
-            this.endYearComboBox.Margin = new System.Windows.Forms.Padding(2);
-            this.endYearComboBox.Name = "endYearComboBox";
-            this.endYearComboBox.Size = new System.Drawing.Size(92, 23);
-            this.endYearComboBox.TabIndex = 10;
-            this.endYearComboBox.Text = "Yıl seçiniz";
-            this.endYearComboBox.SelectedIndexChanged += new System.EventHandler(this.endYearComboBox_SelectedIndexChanged);
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(37, 120);
-            this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(83, 15);
-            this.label3.TabIndex = 5;
-            this.label3.Text = "Aktarılan Veri:";
-            // 
-            // dataGridView1
-            // 
-            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tab_ea.Size = new System.Drawing.Size(1132, 398);
-            this.dataGridView1.Location = new System.Drawing.Point(19, 158);
-            this.dataGridView1.Margin = new System.Windows.Forms.Padding(2);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.ReadOnly = true;
-            this.dataGridView1.RowHeadersWidth = 51;
-            this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(1093, 299);
-            this.dataGridView1.TabIndex = 4;
             // 
             // tab_dek
             // 
@@ -1197,28 +1029,30 @@ namespace SLF
             // 
             // harita_katmanları_right_click
             // 
-            this.tab_ekonometrik.Size = new System.Drawing.Size(1221, 529);
+            this.harita_katmanları_right_click.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.harita_katmanları_right_click.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.Arazi,
             this.Google_Earth,
             this.Google_Earth_Desktop,
             this.Harita,
             this.OSM,
-            this.ELFGraphicsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.ELFGraphicsPanel.Location = new System.Drawing.Point(1031, 2);
-            this.ELFGraphicsPanel.Name = "ELFGraphicsPanel";
-            this.ELFGraphicsPanel.Size = new System.Drawing.Size(188, 525);
-            this.ELFGraphicsPanel.TabIndex = 23;
+            this.Uydu});
+            this.harita_katmanları_right_click.Name = "harita_katmanları_right_click";
+            this.harita_katmanları_right_click.Size = new System.Drawing.Size(168, 160);
+            // 
+            // Arazi
+            // 
+            this.Arazi.Image = ((System.Drawing.Image)(resources.GetObject("Arazi.Image")));
             this.Arazi.Name = "Arazi";
             this.Arazi.Size = new System.Drawing.Size(167, 26);
             this.Arazi.Text = "Arazi";
-            this.ELFTablePanel.Controls.Add(this.dataGridView2);
-            this.ELFTablePanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ELFTablePanel.Location = new System.Drawing.Point(179, 2);
-            this.ELFTablePanel.Margin = new System.Windows.Forms.Padding(2);
-            this.ELFTablePanel.Name = "ELFTablePanel";
-            this.ELFTablePanel.Size = new System.Drawing.Size(1040, 525);
-            this.ELFTablePanel.TabIndex = 21;
+            this.Arazi.Click += new System.EventHandler(this.Arazi_Click);
+            // 
+            // Google_Earth
+            // 
+            this.Google_Earth.Image = ((System.Drawing.Image)(resources.GetObject("Google_Earth.Image")));
+            this.Google_Earth.Name = "Google_Earth";
+            this.Google_Earth.Size = new System.Drawing.Size(167, 26);
             this.Google_Earth.Text = "GE Online";
             this.Google_Earth.Click += new System.EventHandler(this.Google_Earth_Click);
             // 
@@ -1230,7 +1064,7 @@ namespace SLF
             this.Google_Earth_Desktop.Text = "GE Pro Desktop";
             this.Google_Earth_Desktop.Click += new System.EventHandler(this.Google_Earth_Desktop_Click);
             // 
-            this.dataGridView2.Size = new System.Drawing.Size(1040, 525);
+            // Harita
             // 
             this.Harita.Image = ((System.Drawing.Image)(resources.GetObject("Harita.Image")));
             this.Harita.Name = "Harita";
@@ -1247,29 +1081,9 @@ namespace SLF
             this.OSM.Click += new System.EventHandler(this.OSM_Click);
             // 
             // Uydu
-            this.panel5.Size = new System.Drawing.Size(177, 525);
+            // 
             this.Uydu.Image = ((System.Drawing.Image)(resources.GetObject("Uydu.Image")));
             this.Uydu.Name = "Uydu";
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(75, 0);
-            this.label12.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(98, 17);
-            this.label12.TabIndex = 7;
-            this.label12.Text = "Veri Ön İzleme:";
-            // 
-            // button10
-            // 
-            this.button10.Location = new System.Drawing.Point(21, 392);
-            this.button10.Margin = new System.Windows.Forms.Padding(2);
-            this.button10.Name = "button10";
-            this.button10.Size = new System.Drawing.Size(119, 36);
-            this.button10.TabIndex = 17;
-            this.button10.Text = "Dosya Seç";
-            this.button10.UseVisualStyleBackColor = true;
-            // 
             this.Uydu.Size = new System.Drawing.Size(167, 26);
             this.Uydu.Text = "Uydu";
             this.Uydu.Click += new System.EventHandler(this.Uydu_Click);
@@ -1289,7 +1103,7 @@ namespace SLF
             // oznitelikAc
             // 
             this.oznitelikAc.Location = new System.Drawing.Point(13, 440);
-            this.tab_ekonometrik.Size = new System.Drawing.Size(1132, 462);
+            this.oznitelikAc.Margin = new System.Windows.Forms.Padding(2);
             this.oznitelikAc.Name = "oznitelikAc";
             this.oznitelikAc.Size = new System.Drawing.Size(146, 31);
             this.oznitelikAc.TabIndex = 29;
@@ -1297,24 +1111,24 @@ namespace SLF
             this.oznitelikAc.UseVisualStyleBackColor = true;
             this.oznitelikAc.UseWaitCursor = true;
             // 
-            this.panel2.Controls.Add(this.label12);
-            this.panel2.Controls.Add(this.dataGridView2);
-            this.panel2.Location = new System.Drawing.Point(240, 19);
-            this.panel2.Margin = new System.Windows.Forms.Padding(2);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(890, 429);
-            this.panel2.TabIndex = 21;
+            // EA_list_box
+            // 
+            this.EA_list_box.FormattingEnabled = true;
+            this.EA_list_box.ItemHeight = 17;
+            this.EA_list_box.Location = new System.Drawing.Point(13, 220);
+            this.EA_list_box.Margin = new System.Windows.Forms.Padding(2);
+            this.EA_list_box.Name = "EA_list_box";
             this.EA_list_box.Size = new System.Drawing.Size(184, 89);
             this.EA_list_box.TabIndex = 20;
             this.EA_list_box.UseWaitCursor = true;
             // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(8, 4);
-            this.label12.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(98, 17);
-            this.label12.TabIndex = 7;
-            this.label12.Text = "Veri Ön İzleme:";
+            // gMapControl_EA
+            // 
+            this.gMapControl_EA.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gMapControl_EA.Bearing = 0F;
+            this.gMapControl_EA.CanDragMap = true;
             this.gMapControl_EA.EmptyTileColor = System.Drawing.Color.Navy;
             this.gMapControl_EA.GrayScaleMode = false;
             this.gMapControl_EA.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
@@ -1326,7 +1140,7 @@ namespace SLF
             this.gMapControl_EA.MinZoom = 2;
             this.gMapControl_EA.MouseWheelZoomEnabled = true;
             this.gMapControl_EA.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
-            this.dataGridView2.Size = new System.Drawing.Size(846, 396);
+            this.gMapControl_EA.Name = "gMapControl_EA";
             this.gMapControl_EA.NegativeMode = false;
             this.gMapControl_EA.PolygonsEnabled = true;
             this.gMapControl_EA.RetryLoadTile = 0;
@@ -1336,15 +1150,14 @@ namespace SLF
             this.gMapControl_EA.ShowTileGridLines = false;
             this.gMapControl_EA.Size = new System.Drawing.Size(746, 539);
             this.gMapControl_EA.TabIndex = 18;
-            this.gMapControl_EA.UseWaitCursor = true;
             this.gMapControl_EA.Zoom = 0D;
             this.gMapControl_EA.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_EA_OnMapClick);
             this.gMapControl_EA.OnMapDoubleClick += new GMap.NET.WindowsForms.MapDoubleClick(this.gMapControl_EA_OnMapDoubleClick);
             this.gMapControl_EA.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(this.gMapControl_EA_OnMarkerClick);
             this.gMapControl_EA.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_EA_MouseDown);
             this.gMapControl_EA.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_EA_MouseMove);
-            this.tab_imar.Size = new System.Drawing.Size(1221, 529);
-            this.panel5.Size = new System.Drawing.Size(229, 443);
+            // 
+            // button7
             // 
             this.button7.Location = new System.Drawing.Point(6, 33);
             this.button7.Margin = new System.Windows.Forms.Padding(2);
@@ -1533,7 +1346,6 @@ namespace SLF
             this.ELFGraphicsPanel.Name = "ELFGraphicsPanel";
             this.ELFGraphicsPanel.Size = new System.Drawing.Size(425, 503);
             this.ELFGraphicsPanel.TabIndex = 22;
-            this.ELFGraphicsPanel.UseWaitCursor = true;
             // 
             // label10
             // 
@@ -1649,37 +1461,6 @@ namespace SLF
             this.ELFHighSenaryoRadioButton.UncheckedState.FillColor = System.Drawing.Color.Transparent;
             this.ELFHighSenaryoRadioButton.UncheckedState.InnerColor = System.Drawing.Color.Transparent;
             this.ELFHighSenaryoRadioButton.UseWaitCursor = true;
-            // 
-            // ELFBaseSenaryoRadioButton
-            // 
-            this.ELFBaseSenaryoRadioButton.AutoSize = true;
-            this.ELFBaseSenaryoRadioButton.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.ELFBaseSenaryoRadioButton.CheckedState.BorderThickness = 0;
-            this.ELFBaseSenaryoRadioButton.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.ELFBaseSenaryoRadioButton.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.ELFBaseSenaryoRadioButton.CheckedState.InnerOffset = -4;
-            this.ELFBaseSenaryoRadioButton.Location = new System.Drawing.Point(3, 67);
-            this.ELFBaseSenaryoRadioButton.Name = "ELFBaseSenaryoRadioButton";
-            this.ELFBaseSenaryoRadioButton.Size = new System.Drawing.Size(101, 21);
-            this.ELFBaseSenaryoRadioButton.TabIndex = 25;
-            this.ELFBaseSenaryoRadioButton.Text = "Baz Senaryo";
-            this.ELFBaseSenaryoRadioButton.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
-            this.ELFBaseSenaryoRadioButton.UncheckedState.BorderThickness = 2;
-            this.ELFBaseSenaryoRadioButton.UncheckedState.FillColor = System.Drawing.Color.Transparent;
-            this.ELFBaseSenaryoRadioButton.UncheckedState.InnerColor = System.Drawing.Color.Transparent;
-            this.ELFBaseSenaryoRadioButton.UseWaitCursor = true;
-            // 
-            // button2
-            // 
-            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button2.Location = new System.Drawing.Point(204, 133);
-            this.button2.Margin = new System.Windows.Forms.Padding(2);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(132, 57);
-            this.button2.TabIndex = 19;
-            this.button2.Text = "Tüm Sonuçları Görüntüle";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.UseWaitCursor = true;
             // 
             // ELFBaseSenaryoRadioButton
             // 
@@ -1916,6 +1697,7 @@ namespace SLF
             this.ELFMinSenaryoTable.Name = "ELFMinSenaryoTable";
             this.ELFMinSenaryoTable.Size = new System.Drawing.Size(908, 461);
             this.ELFMinSenaryoTable.TabIndex = 0;
+            this.ELFMinSenaryoTable.UseWaitCursor = true;
             // 
             // tabPage3
             // 
@@ -1927,6 +1709,7 @@ namespace SLF
             this.tabPage3.TabIndex = 1;
             this.tabPage3.Text = "Düşük Senaryo";
             this.tabPage3.UseVisualStyleBackColor = true;
+            this.tabPage3.UseWaitCursor = true;
             // 
             // ELFLowSenaryoTable
             // 
@@ -1936,6 +1719,7 @@ namespace SLF
             this.ELFLowSenaryoTable.Name = "ELFLowSenaryoTable";
             this.ELFLowSenaryoTable.Size = new System.Drawing.Size(908, 461);
             this.ELFLowSenaryoTable.TabIndex = 1;
+            this.ELFLowSenaryoTable.UseWaitCursor = true;
             // 
             // tabPage4
             // 
@@ -1947,6 +1731,7 @@ namespace SLF
             this.tabPage4.TabIndex = 2;
             this.tabPage4.Text = "Baz Senaryo";
             this.tabPage4.UseVisualStyleBackColor = true;
+            this.tabPage4.UseWaitCursor = true;
             // 
             // ELFBaseSenaryoTable
             // 
@@ -1956,6 +1741,7 @@ namespace SLF
             this.ELFBaseSenaryoTable.Name = "ELFBaseSenaryoTable";
             this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(908, 461);
             this.ELFBaseSenaryoTable.TabIndex = 1;
+            this.ELFBaseSenaryoTable.UseWaitCursor = true;
             // 
             // tabPage5
             // 
@@ -1967,6 +1753,7 @@ namespace SLF
             this.tabPage5.TabIndex = 3;
             this.tabPage5.Text = "Yüksek Senaryo";
             this.tabPage5.UseVisualStyleBackColor = true;
+            this.tabPage5.UseWaitCursor = true;
             // 
             // ELFHighSenaryoTable
             // 
@@ -1976,6 +1763,7 @@ namespace SLF
             this.ELFHighSenaryoTable.Name = "ELFHighSenaryoTable";
             this.ELFHighSenaryoTable.Size = new System.Drawing.Size(908, 461);
             this.ELFHighSenaryoTable.TabIndex = 1;
+            this.ELFHighSenaryoTable.UseWaitCursor = true;
             // 
             // tabPage6
             // 
@@ -1987,6 +1775,7 @@ namespace SLF
             this.tabPage6.TabIndex = 4;
             this.tabPage6.Text = "Maksimum Senaryo";
             this.tabPage6.UseVisualStyleBackColor = true;
+            this.tabPage6.UseWaitCursor = true;
             // 
             // ELFMaxSenaryoTable
             // 
@@ -1996,6 +1785,7 @@ namespace SLF
             this.ELFMaxSenaryoTable.Name = "ELFMaxSenaryoTable";
             this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(908, 461);
             this.ELFMaxSenaryoTable.TabIndex = 1;
+            this.ELFMaxSenaryoTable.UseWaitCursor = true;
             // 
             // EkonometrikSenaryoElementsPanel
             // 
@@ -2034,6 +1824,7 @@ namespace SLF
             this.ELFPredictionShowResultsGunaButton.Size = new System.Drawing.Size(204, 45);
             this.ELFPredictionShowResultsGunaButton.TabIndex = 9;
             this.ELFPredictionShowResultsGunaButton.Text = "Tahmin Sonuçlarını Göster";
+            this.ELFPredictionShowResultsGunaButton.UseWaitCursor = true;
             this.ELFPredictionShowResultsGunaButton.Click += new System.EventHandler(this.ELFPredictionShowResultsGunaButton_Click);
             // 
             // ELFScenerioSaveGunaButton
@@ -2049,6 +1840,7 @@ namespace SLF
             this.ELFScenerioSaveGunaButton.Size = new System.Drawing.Size(206, 45);
             this.ELFScenerioSaveGunaButton.TabIndex = 6;
             this.ELFScenerioSaveGunaButton.Text = "Senaryo Değişikliklerini Kaydet";
+            this.ELFScenerioSaveGunaButton.UseWaitCursor = true;
             this.ELFScenerioSaveGunaButton.Click += new System.EventHandler(this.ELFScenerioSaveGunaButton_Click);
             // 
             // StokastikSenaryoTabPage
@@ -2060,6 +1852,7 @@ namespace SLF
             this.StokastikSenaryoTabPage.TabIndex = 1;
             this.StokastikSenaryoTabPage.Text = "Stokastik Senaryolar";
             this.StokastikSenaryoTabPage.UseVisualStyleBackColor = true;
+            this.StokastikSenaryoTabPage.UseWaitCursor = true;
             // 
             // EASarjSenaryoTabPage
             // 
@@ -2070,6 +1863,7 @@ namespace SLF
             this.EASarjSenaryoTabPage.TabIndex = 2;
             this.EASarjSenaryoTabPage.Text = "EA Şarj Senaryoları";
             this.EASarjSenaryoTabPage.UseVisualStyleBackColor = true;
+            this.EASarjSenaryoTabPage.UseWaitCursor = true;
             // 
             // DEKSenaryoTabPage
             // 
@@ -2080,6 +1874,7 @@ namespace SLF
             this.DEKSenaryoTabPage.TabIndex = 3;
             this.DEKSenaryoTabPage.Text = "DEK Senaryoları";
             this.DEKSenaryoTabPage.UseVisualStyleBackColor = true;
+            this.DEKSenaryoTabPage.UseWaitCursor = true;
             // 
             // tabPage8
             // 
@@ -2090,6 +1885,7 @@ namespace SLF
             this.tabPage8.TabIndex = 4;
             this.tabPage8.Text = "Yeni Genişleme Alanları ";
             this.tabPage8.UseVisualStyleBackColor = true;
+            this.tabPage8.UseWaitCursor = true;
             // 
             // tab_stokastik
             // 
@@ -2120,7 +1916,6 @@ namespace SLF
             this.tab_stokastik.TabIndex = 2;
             this.tab_stokastik.Text = "Stokastik Yük Tahmini Modülü";
             this.tab_stokastik.UseVisualStyleBackColor = true;
-            this.tab_stokastik.UseWaitCursor = true;
             // 
             // checkBox21
             // 
@@ -2133,7 +1928,6 @@ namespace SLF
             this.checkBox21.TabIndex = 35;
             this.checkBox21.Text = "checkBox21";
             this.checkBox21.UseVisualStyleBackColor = true;
-            this.checkBox21.UseWaitCursor = true;
             this.checkBox21.Visible = false;
             // 
             // katmanlar_right_click
@@ -2193,7 +1987,6 @@ namespace SLF
             this.checkBox20.TabIndex = 34;
             this.checkBox20.Text = "checkBox20";
             this.checkBox20.UseVisualStyleBackColor = true;
-            this.checkBox20.UseWaitCursor = true;
             this.checkBox20.Visible = false;
             // 
             // checkBox19
@@ -2207,7 +2000,6 @@ namespace SLF
             this.checkBox19.TabIndex = 33;
             this.checkBox19.Text = "checkBox19";
             this.checkBox19.UseVisualStyleBackColor = true;
-            this.checkBox19.UseWaitCursor = true;
             this.checkBox19.Visible = false;
             // 
             // mesafe_metre_stokastik
@@ -2218,7 +2010,6 @@ namespace SLF
             this.mesafe_metre_stokastik.Name = "mesafe_metre_stokastik";
             this.mesafe_metre_stokastik.Size = new System.Drawing.Size(0, 17);
             this.mesafe_metre_stokastik.TabIndex = 32;
-            this.mesafe_metre_stokastik.UseWaitCursor = true;
             this.mesafe_metre_stokastik.Visible = false;
             // 
             // Mesafe_stokastik
@@ -2230,7 +2021,6 @@ namespace SLF
             this.Mesafe_stokastik.Size = new System.Drawing.Size(54, 17);
             this.Mesafe_stokastik.TabIndex = 31;
             this.Mesafe_stokastik.Text = "Mesafe:";
-            this.Mesafe_stokastik.UseWaitCursor = true;
             this.Mesafe_stokastik.Visible = false;
             // 
             // gMapControl_stokastik
@@ -2241,7 +2031,7 @@ namespace SLF
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gMapControl_stokastik.Bearing = 0F;
             this.gMapControl_stokastik.CanDragMap = true;
-            this.gMapControl_stokastik.Cursor = System.Windows.Forms.Cursors.WaitCursor;
+            this.gMapControl_stokastik.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.gMapControl_stokastik.EmptyTileColor = System.Drawing.Color.Navy;
             this.gMapControl_stokastik.GrayScaleMode = false;
             this.gMapControl_stokastik.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
@@ -2263,7 +2053,6 @@ namespace SLF
             this.gMapControl_stokastik.ShowTileGridLines = false;
             this.gMapControl_stokastik.Size = new System.Drawing.Size(797, 513);
             this.gMapControl_stokastik.TabIndex = 30;
-            this.gMapControl_stokastik.UseWaitCursor = true;
             this.gMapControl_stokastik.Zoom = 0D;
             this.gMapControl_stokastik.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_stokastik_OnMapClick);
             this.gMapControl_stokastik.OnMapDoubleClick += new GMap.NET.WindowsForms.MapDoubleClick(this.gMapControl_stokastik_OnMapDoubleClick);
@@ -2285,7 +2074,6 @@ namespace SLF
             this.buton_stokastik_harita_katmanlar.Size = new System.Drawing.Size(46, 42);
             this.buton_stokastik_harita_katmanlar.TabIndex = 29;
             this.buton_stokastik_harita_katmanlar.UseVisualStyleBackColor = true;
-            this.buton_stokastik_harita_katmanlar.UseWaitCursor = true;
             // 
             // checkBox18
             // 
@@ -2298,7 +2086,6 @@ namespace SLF
             this.checkBox18.TabIndex = 28;
             this.checkBox18.Text = "checkBox18";
             this.checkBox18.UseVisualStyleBackColor = true;
-            this.checkBox18.UseWaitCursor = true;
             this.checkBox18.Visible = false;
             // 
             // checkBox17
@@ -2312,7 +2099,6 @@ namespace SLF
             this.checkBox17.TabIndex = 27;
             this.checkBox17.Text = "checkBox17";
             this.checkBox17.UseVisualStyleBackColor = true;
-            this.checkBox17.UseWaitCursor = true;
             this.checkBox17.Visible = false;
             // 
             // checkBox16
@@ -2326,7 +2112,6 @@ namespace SLF
             this.checkBox16.TabIndex = 26;
             this.checkBox16.Text = "checkBox16";
             this.checkBox16.UseVisualStyleBackColor = true;
-            this.checkBox16.UseWaitCursor = true;
             this.checkBox16.Visible = false;
             // 
             // checkBox15
@@ -2340,7 +2125,6 @@ namespace SLF
             this.checkBox15.TabIndex = 25;
             this.checkBox15.Text = "checkBox15";
             this.checkBox15.UseVisualStyleBackColor = true;
-            this.checkBox15.UseWaitCursor = true;
             this.checkBox15.Visible = false;
             // 
             // checkBox14
@@ -2354,7 +2138,6 @@ namespace SLF
             this.checkBox14.TabIndex = 24;
             this.checkBox14.Text = "checkBox14";
             this.checkBox14.UseVisualStyleBackColor = true;
-            this.checkBox14.UseWaitCursor = true;
             this.checkBox14.Visible = false;
             // 
             // checkBox13
@@ -2368,7 +2151,6 @@ namespace SLF
             this.checkBox13.TabIndex = 23;
             this.checkBox13.Text = "checkBox13";
             this.checkBox13.UseVisualStyleBackColor = true;
-            this.checkBox13.UseWaitCursor = true;
             this.checkBox13.Visible = false;
             // 
             // checkBox12
@@ -2382,7 +2164,6 @@ namespace SLF
             this.checkBox12.TabIndex = 22;
             this.checkBox12.Text = "checkBox12";
             this.checkBox12.UseVisualStyleBackColor = true;
-            this.checkBox12.UseWaitCursor = true;
             this.checkBox12.Visible = false;
             // 
             // checkBox11
@@ -2396,7 +2177,6 @@ namespace SLF
             this.checkBox11.TabIndex = 21;
             this.checkBox11.Text = "checkBox11";
             this.checkBox11.UseVisualStyleBackColor = true;
-            this.checkBox11.UseWaitCursor = true;
             this.checkBox11.Visible = false;
             // 
             // checkBox10
@@ -2410,7 +2190,6 @@ namespace SLF
             this.checkBox10.TabIndex = 20;
             this.checkBox10.Text = "checkBox10";
             this.checkBox10.UseVisualStyleBackColor = true;
-            this.checkBox10.UseWaitCursor = true;
             this.checkBox10.Visible = false;
             // 
             // checkBox9
@@ -2425,7 +2204,6 @@ namespace SLF
             this.checkBox9.TabIndex = 19;
             this.checkBox9.Text = "checkBox9";
             this.checkBox9.UseVisualStyleBackColor = false;
-            this.checkBox9.UseWaitCursor = true;
             this.checkBox9.Visible = false;
             // 
             // label13
@@ -2438,7 +2216,6 @@ namespace SLF
             this.label13.Size = new System.Drawing.Size(81, 19);
             this.label13.TabIndex = 18;
             this.label13.Text = "Katmanlar";
-            this.label13.UseWaitCursor = true;
             // 
             // stokastik_dosya_seçimi
             // 
@@ -2449,7 +2226,6 @@ namespace SLF
             this.stokastik_dosya_seçimi.TabIndex = 17;
             this.stokastik_dosya_seçimi.Text = "Dosya Seç";
             this.stokastik_dosya_seçimi.UseVisualStyleBackColor = true;
-            this.stokastik_dosya_seçimi.UseWaitCursor = true;
             this.stokastik_dosya_seçimi.Click += new System.EventHandler(this.stokastik_dosya_seçimi_Click);
             // 
             // Seç_Stokastik
@@ -2476,7 +2252,6 @@ namespace SLF
             this.Seç_Stokastik.Size = new System.Drawing.Size(1159, 27);
             this.Seç_Stokastik.TabIndex = 1;
             this.Seç_Stokastik.Text = "toolStrip1";
-            this.Seç_Stokastik.UseWaitCursor = true;
             // 
             // Stokastik_Seç
             // 
@@ -2959,13 +2734,10 @@ namespace SLF
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Size = new System.Drawing.Size(1471, 618);
             this.tabPage1.TabIndex = 10;
-            this.OpenModuleButton.Dock = System.Windows.Forms.DockStyle.Right;
-            this.OpenModuleButton.Location = new System.Drawing.Point(3, 0);
-            this.OpenModuleButton.Name = "OpenModuleButton";
-            this.OpenModuleButton.Size = new System.Drawing.Size(108, 36);
-            this.OpenModuleButton.TabIndex = 16;
-            this.OpenModuleButton.Text = "Modüle Git";
-            this.OpenModuleButton.UseVisualStyleBackColor = true;
+            this.tabPage1.Text = "Validasyon Modülü";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // HomePageButton
             // 
             this.HomePageButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.HomePageButton.BackColor = System.Drawing.Color.White;
@@ -2979,12 +2751,6 @@ namespace SLF
             this.HomePageButton.UseVisualStyleBackColor = true;
             this.HomePageButton.Click += new System.EventHandler(this.HomePageButton_Click);
             // 
-            this.OpenModuleButtonPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.OpenModuleButtonPanel.Controls.Add(this.OpenModuleButton);
-            this.OpenModuleButtonPanel.Location = new System.Drawing.Point(1106, 462);
-            this.OpenModuleButtonPanel.Name = "OpenModuleButtonPanel";
-            this.OpenModuleButtonPanel.Size = new System.Drawing.Size(111, 36);
-            this.OpenModuleButtonPanel.TabIndex = 17;
             // ContextMenuStrip_Nokta
             // 
             this.ContextMenuStrip_Nokta.ImageScalingSize = new System.Drawing.Size(20, 20);
@@ -3007,79 +2773,57 @@ namespace SLF
             // 
             this.Nokta_Sil.Image = ((System.Drawing.Image)(resources.GetObject("Nokta_Sil.Image")));
             this.Nokta_Sil.Name = "Nokta_Sil";
-            this.panel3.Controls.Add(this.Modül_Tabları);
-            this.panel3.Location = new System.Drawing.Point(0, 71);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(1144, 510);
-            this.panel3.TabIndex = 5;
+            this.Nokta_Sil.Size = new System.Drawing.Size(134, 26);
+            this.Nokta_Sil.Text = "Nokta Sil";
             // 
-            // panel4
+            // Kaydet
             // 
-            this.panel4.Controls.Add(this.button2);
-            this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel4.Location = new System.Drawing.Point(0, 24);
-            this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(1144, 41);
-            this.panel4.TabIndex = 3;
+            this.Kaydet.Image = ((System.Drawing.Image)(resources.GetObject("Kaydet.Image")));
+            this.Kaydet.Name = "Kaydet";
+            this.Kaydet.Size = new System.Drawing.Size(134, 26);
+            this.Kaydet.Text = "Kaydet";
             // 
-            // comboBox3
+            // ContextMenuStrip_Poligon
             // 
-            this.comboBox3.FormattingEnabled = true;
-            this.comboBox3.Location = new System.Drawing.Point(15, 172);
-            this.comboBox3.Margin = new System.Windows.Forms.Padding(2);
-            this.comboBox3.Name = "comboBox3";
-            this.comboBox3.Size = new System.Drawing.Size(190, 25);
-            this.ELFTablePanel.ResumeLayout(false);
-            // label10
+            this.ContextMenuStrip_Poligon.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.ContextMenuStrip_Poligon.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.Poligon_Çiz,
+            this.Poligon_Sil,
+            this.Poligon_Kaydet});
+            this.ContextMenuStrip_Poligon.Name = "ContextMenuStrip_Poligon";
+            this.ContextMenuStrip_Poligon.Size = new System.Drawing.Size(159, 82);
             // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(16, 153);
-            this.label10.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(118, 17);
-            this.label10.TabIndex = 2;
-            this.label10.Text = "Tahmin Yılı Aralığı:";
+            // Poligon_Çiz
             // 
-            // button10
-            // 
-            this.button10.Location = new System.Drawing.Point(21, 106);
-            this.button10.Margin = new System.Windows.Forms.Padding(2);
-            this.button10.Name = "button10";
-            this.button10.Size = new System.Drawing.Size(119, 36);
-            this.button10.TabIndex = 17;
-            this.ModuleTabPanel.ResumeLayout(false);
-            this.HeaderPanel.ResumeLayout(false);
-            this.OpenModuleButtonPanel.ResumeLayout(false);
+            this.Poligon_Çiz.Image = ((System.Drawing.Image)(resources.GetObject("Poligon_Çiz.Image")));
+            this.Poligon_Çiz.Name = "Poligon_Çiz";
             this.Poligon_Çiz.Size = new System.Drawing.Size(158, 26);
-            // textBox1
+            this.Poligon_Çiz.Text = "Poligon Çiz";
             this.Poligon_Çiz.Click += new System.EventHandler(this.Poligon_Çiz_Click);
-            this.textBox1.Location = new System.Drawing.Point(8, 69);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(2);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(197, 25);
-            this.textBox1.TabIndex = 19;
+            // 
+            // Poligon_Sil
+            // 
+            this.Poligon_Sil.Image = ((System.Drawing.Image)(resources.GetObject("Poligon_Sil.Image")));
+            this.Poligon_Sil.Name = "Poligon_Sil";
             this.Poligon_Sil.Size = new System.Drawing.Size(158, 26);
             this.Poligon_Sil.Text = "Poligon Sil";
             this.Poligon_Sil.Click += new System.EventHandler(this.Poligon_Sil_Click);
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(18, 37);
-            this.label9.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(122, 17);
-            this.label9.TabIndex = 18;
-            this.label9.Text = "Seçilen Dosya İsmi:";
             // 
-            // checkBox8
+            // Poligon_Kaydet
             // 
-            this.checkBox8.AutoSize = true;
-            this.checkBox8.Location = new System.Drawing.Point(21, 14);
-            this.checkBox8.Margin = new System.Windows.Forms.Padding(2);
-            this.checkBox8.Name = "checkBox8";
-            this.checkBox8.Size = new System.Drawing.Size(164, 21);
-            this.checkBox8.TabIndex = 20;
-            this.checkBox8.Text = "Tahmin Gerçekleştirme";
-            this.checkBox8.UseVisualStyleBackColor = true;
-            this.checkBox8.CheckedChanged += new System.EventHandler(this.checkBox8_CheckedChanged);
+            this.Poligon_Kaydet.Image = ((System.Drawing.Image)(resources.GetObject("Poligon_Kaydet.Image")));
+            this.Poligon_Kaydet.Name = "Poligon_Kaydet";
+            this.Poligon_Kaydet.Size = new System.Drawing.Size(158, 26);
+            this.Poligon_Kaydet.Text = "Poligon Kaydet";
+            this.Poligon_Kaydet.Click += new System.EventHandler(this.Poligon_Kaydet_Click);
+            // 
+            // ContextMenuStrip_Fonksiyon
+            // 
+            this.ContextMenuStrip_Fonksiyon.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.ContextMenuStrip_Fonksiyon.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.katman_birleştir,
+            this.overlap_analizi});
+            this.ContextMenuStrip_Fonksiyon.Name = "ContextMenuStrip_Fonksiyon";
             this.ContextMenuStrip_Fonksiyon.Size = new System.Drawing.Size(162, 56);
             // 
             // katman_birleştir
@@ -3111,14 +2855,7 @@ namespace SLF
             this.ModuleTabPanel.TabIndex = 5;
             this.ModuleTabPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.ModuleTabPanel_Paint);
             // 
-            this.comboBox3.FormattingEnabled = true;
-            this.comboBox3.Location = new System.Drawing.Point(15, 172);
-            this.comboBox3.Margin = new System.Windows.Forms.Padding(2);
-            this.comboBox3.Name = "comboBox3";
-            this.comboBox3.Size = new System.Drawing.Size(190, 25);
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
-            // label10
+            // HeaderPanel
             // 
             this.HeaderPanel.BackColor = System.Drawing.Color.NavajoWhite;
             this.HeaderPanel.Controls.Add(this.HomePageButton);
@@ -3294,12 +3031,12 @@ namespace SLF
         private System.Windows.Forms.CheckBox checkBox16;
         private System.Windows.Forms.CheckBox checkBox15;
         private System.Windows.Forms.CheckBox checkBox14;
-        private Label label10;
-        private ComboBox comboBox3;
-        private Label label9;
-        private Button button10;
-        private TextBox textBox1;
-        private CheckBox checkBox8;
+        private System.Windows.Forms.CheckBox checkBox13;
+        private System.Windows.Forms.CheckBox checkBox12;
+        private System.Windows.Forms.CheckBox checkBox11;
+        private System.Windows.Forms.CheckBox checkBox10;
+        private System.Windows.Forms.CheckBox checkBox9;
+        private System.Windows.Forms.Button HomePageButton;
         private System.Windows.Forms.ContextMenuStrip katmanlar_right_click;
         private System.Windows.Forms.ToolStripMenuItem tabloyuGörToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rengiDeğiştirToolStripMenuItem;

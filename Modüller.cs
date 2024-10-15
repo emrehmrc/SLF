@@ -420,9 +420,6 @@ namespace SLF
             Modül_Tabları.SelectedTab = tab_senaryo;
         }
 
-
-
-
         /*        // Event handler for opening the Senaryo module
                 private void OpenModuleButton_Click(object sender, EventArgs e)
                 {
@@ -445,30 +442,112 @@ namespace SLF
                     }
                 }*/
 
+
+        /// <summary>
+        /// ELF METHOD Model RScript Run RELATED CHANGES & UPDATES
+        /// </summary>
+
         private void ELFScenerioSaveGunaButton_Click(object sender, EventArgs e)
         {
             string originalFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
             string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
 
-            // Create a copy of the original Excel file
-            File.Copy(originalFilePath, modifiedFilePath, true);
+            // Dictionary to store original formulas
+            var originalFormulas = new Dictionary<string, string>();
 
-            // Load the copied Excel file and update it with user changes
-            using (var package = new ExcelPackage(new FileInfo(modifiedFilePath)))
+            // Load the original Excel file and read formulas
+            try
             {
-                // Update worksheets with changes from the DataGridViews
-                UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[1], ELFMinSenaryoTable);
-                UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[2], ELFLowSenaryoTable);
-                UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[3], ELFBaseSenaryoTable);
-                UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[4], ELFHighSenaryoTable);
-                UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[5], ELFMaxSenaryoTable);
+                using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
+                {
+                    // Loop through each worksheet and store formulas
+                    foreach (var worksheet in package.Workbook.Worksheets)
+                    {
+                        for (int row = 1; row <= worksheet.Dimension.Rows; row++)
+                        {
+                            for (int col = 1; col <= worksheet.Dimension.Columns; col++)
+                            {
+                                var cell = worksheet.Cells[row, col];
 
-                // Save the changes to the copied Excel file
-                package.Save();
+                                // Store formulas in the dictionary
+                                if (!string.IsNullOrEmpty(cell.Formula))
+                                {
+                                    // Generate a unique key for the cell based on its address
+                                    originalFormulas[$"{worksheet.Name}!{cell.Address}"] = cell.Formula;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error reading original Excel file: {ex.Message}");
+                return;
             }
 
-            MessageBox.Show("User changes saved to the modified Excel file.");
+            // Load the original file again to allow modifications
+            try
+            {
+                using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
+                {
+                    // Access the first worksheet for any required operations (preserving formulas)
+                    ExcelWorksheet firstWorksheet = package.Workbook.Worksheets[0];
+
+                    // Update worksheets with data from DataGridViews
+                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[1], ELFMinSenaryoTable);
+                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[2], ELFLowSenaryoTable);
+                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[3], ELFBaseSenaryoTable);
+                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[4], ELFHighSenaryoTable);
+                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[5], ELFMaxSenaryoTable);
+
+                    // Restore original formulas
+                    foreach (var kvp in originalFormulas)
+                    {
+                        var parts = kvp.Key.Split('!');
+                        var sheetName = parts[0];
+                        var cellAddress = parts[1];
+
+                        var worksheet = package.Workbook.Worksheets[sheetName];
+                        var cell = worksheet.Cells[cellAddress];
+
+                        // Apply the original formula
+                        cell.Formula = kvp.Value;
+                    }
+
+                    // Save the modified Excel file
+                    package.SaveAs(new FileInfo(modifiedFilePath));
+                }
+
+                // Inform the user that the changes were saved successfully
+                MessageBox.Show("User changes saved to the modified Excel file.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating Excel file: {ex.Message}");
+            }
         }
+
+        // Load the original Excel file into DataGridView for display
+        private void LoadDataIntoDataGridView(ExcelWorksheet worksheet, DataGridView dgv)
+        {
+            dgv.Rows.Clear(); // Clear existing rows
+
+            for (int row = 1; row <= worksheet.Dimension.Rows; row++)
+            {
+                int rowIndex = dgv.Rows.Add(); // Add a new row to the DataGridView
+
+                for (int col = 1; col <= worksheet.Dimension.Columns; col++)
+                {
+                    var cell = worksheet.Cells[row, col];
+
+                    // Store the original value in the cell's tag for later use
+                    dgv.Rows[rowIndex].Cells[col - 1].Value = Math.Round(cell.GetValue<double>(), 1); // Display as 4.9%
+                    dgv.Rows[rowIndex].Cells[col - 1].Tag = cell.Value; // Preserve full value
+                }
+            }
+        }
+
         // Helper method to update an Excel worksheet based on the DataGridView
         private void UpdateWorksheetFromDataGridView(ExcelWorksheet worksheet, DataGridView dgv)
         {
@@ -476,10 +555,189 @@ namespace SLF
             {
                 for (int col = 0; col < dgv.Columns.Count; col++)
                 {
-                    worksheet.Cells[row + 2, col + 1].Value = dgv.Rows[row].Cells[col].Value;
+                    var cell = worksheet.Cells[row + 2, col + 1]; // Start at row 2 in Excel
+                    var cellValue = dgv.Rows[row].Cells[col].Tag; // Get the original full value
+
+                    // Only update cell values if the original value is not null
+                    if (cellValue != null)
+                    {
+                        // Set the numeric value directly
+                        cell.Value = cellValue;
+
+                        // Preserve the original format from the original file
+                        cell.Style.Numberformat.Format = "0.000000000000000%"; // Preserve full precision
+                    }
                 }
             }
         }
+
+
+
+        /*        private void ELFScenerioSaveGunaButton_Click(object sender, EventArgs e)
+                {
+                    string originalFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+                    string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+
+                    // Dictionary to store original formulas
+                    var originalFormulas = new Dictionary<string, string>();
+
+                    // Load the original Excel file and read formulas
+                    try
+                    {
+                        using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
+                        {
+                            // Loop through each worksheet and store formulas
+                            foreach (var worksheet in package.Workbook.Worksheets)
+                            {
+                                for (int row = 1; row <= worksheet.Dimension.Rows; row++)
+                                {
+                                    for (int col = 1; col <= worksheet.Dimension.Columns; col++)
+                                    {
+                                        var cell = worksheet.Cells[row, col];
+
+                                        // Store formulas in the dictionary
+                                        if (!string.IsNullOrEmpty(cell.Formula))
+                                        {
+                                            // Generate a unique key for the cell based on its address
+                                            originalFormulas[$"{worksheet.Name}!{cell.Address}"] = cell.Formula;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error reading original Excel file: {ex.Message}");
+                        return;
+                    }
+
+                    // Load the original file again to allow modifications
+                    try
+                    {
+                        using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
+                        {
+                            // Access the first worksheet for any required operations (preserving formulas)
+                            ExcelWorksheet firstWorksheet = package.Workbook.Worksheets[0];
+
+                            // Update worksheets with data from DataGridViews
+                            UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[1], ELFMinSenaryoTable, originalFormats);
+                            UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[2], ELFLowSenaryoTable, originalFormats);
+                            UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[3], ELFBaseSenaryoTable, originalFormats);
+                            UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[4], ELFHighSenaryoTable, originalFormats);
+                            UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[5], ELFMaxSenaryoTable, originalFormats);
+
+                            // Restore original formulas
+                            foreach (var kvp in originalFormulas)
+                            {
+                                var parts = kvp.Key.Split('!');
+                                var sheetName = parts[0];
+                                var cellAddress = parts[1];
+
+                                var worksheet = package.Workbook.Worksheets[sheetName];
+                                var cell = worksheet.Cells[cellAddress];
+
+                                // Apply the original formula
+                                cell.Formula = kvp.Value;
+                            }
+
+                            // Save the modified Excel file
+                            package.SaveAs(new FileInfo(modifiedFilePath));
+                        }
+
+                        // Inform the user that the changes were saved successfully
+                        MessageBox.Show("User changes saved to the modified Excel file.");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error updating Excel file: {ex.Message}");
+                    }
+                }
+
+                // Load the original Excel file into DataGridView for display
+                private void LoadDataIntoDataGridView(ExcelWorksheet worksheet, DataGridView dgv)
+                {
+                    dgv.Rows.Clear(); // Clear existing rows
+
+                    for (int row = 1; row <= worksheet.Dimension.Rows; row++)
+                    {
+                        int rowIndex = dgv.Rows.Add(); // Add a new row to the DataGridView
+
+                        for (int col = 1; col <= worksheet.Dimension.Columns; col++)
+                        {
+                            var cell = worksheet.Cells[row, col];
+
+                            // Store the original value in the cell's tag for later use
+                            dgv.Rows[rowIndex].Cells[col - 1].Value = Math.Round(cell.GetValue<double>(), 1); // Display as 4.9%
+                            dgv.Rows[rowIndex].Cells[col - 1].Tag = cell.Value; // Preserve full value
+                        }
+                    }
+                }
+
+                // Helper method to update an Excel worksheet based on the DataGridView
+                private void UpdateWorksheetFromDataGridView(ExcelWorksheet worksheet, DataGridView dgv)
+                {
+                    for (int row = 0; row < dgv.Rows.Count; row++)
+                    {
+                        for (int col = 0; col < dgv.Columns.Count; col++)
+                        {
+                            var cell = worksheet.Cells[row + 2, col + 1]; // Start at row 2 in Excel
+                            var cellValue = dgv.Rows[row].Cells[col].Tag; // Get the original full value
+
+                            // Set the value to the cell, ensuring that empty cells are handled
+                            cell.Value = cellValue ?? (object)DBNull.Value; // Preserve the value or set to DBNull for empty cells
+
+                            // Preserve the original format from the original file
+                            cell.Style.Numberformat.Format = "0.000000000000000%"; // Preserve full precision
+                        }
+                    }
+                }*/
+        // Helper method to update an Excel worksheet based on the DataGridView
+        /*        private void UpdateWorksheetFromDataGridView(ExcelWorksheet worksheet, DataGridView dgv, Dictionary<string, string> originalFormats)
+                {
+                    for (int row = 0; row < dgv.Rows.Count; row++)
+                    {
+                        for (int col = 0; col < dgv.Columns.Count; col++)
+                        {
+                            var cell = worksheet.Cells[row + 2, col + 1]; // Start at row 2 in Excel
+                            var cellValue = dgv.Rows[row].Cells[col].Value;
+
+                            // Get the original format from the dictionary using the cell address as a key
+                            string cellAddress = cell.Address; // Get the current cell address
+                            string existingFormat = originalFormats.ContainsKey(cellAddress) ? originalFormats[cellAddress] : string.Empty;
+
+                            // Update cell values
+                            if (cellValue != null)
+                            {
+                                // If the value is a double (or can be converted), keep the full precision
+                                if (double.TryParse(cellValue.ToString(), out double numericValue))
+                                {
+                                    // Set the numeric value directly
+                                    cell.Value = numericValue;
+
+                                    // Set the format to preserve the original format from the original file
+                                    cell.Style.Numberformat.Format = string.IsNullOrEmpty(existingFormat) ? "0.000000000000000%" : existingFormat;
+                                }
+                                else
+                                {
+                                    // For non-numeric values, just update the cell value
+                                    cell.Value = cellValue;
+                                    // Preserve existing format for non-numeric values as well
+                                    cell.Style.Numberformat.Format = existingFormat;
+                                }
+                            }
+                        }
+                    }
+                }
+        */
+
+
+
+        /// <summary>
+        /// ELF METHOD Model RScript Run RELATED CHANGES & UPDATES
+        /// </summary>
+
+
         private void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e)
         {
             string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
@@ -492,57 +750,80 @@ namespace SLF
             }
 
             // Run the R script
-            RunModelRScript(modifiedFilePath);
+            string resultsFilePath = RunModelRScript(modifiedFilePath);
 
             // Load results into tab_ekonometrik
-            LoadResultsToTabEkonometrik();
+            LoadResultsToTabEkonometrik(resultsFilePath);
         }
 
         // Method to run the R script
-        private void RunModelRScript(string modifiedFilePath)
+        private string RunModelRScript(string modifiedFilePath)
         {
             string rScriptPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\model.R";
+            string resultsFilePath = "";
 
-            // Run the R script using ProcessStartInfo
+            // Set up process info
             var processInfo = new ProcessStartInfo()
             {
-                FileName = "Rscript.exe", // Path to Rscript.exe
-                Arguments = $"\"{rScriptPath}\" \"{modifiedFilePath}\"", // Pass the modified Excel file as an argument
+                FileName = "Rscript.exe",
+                Arguments = $"\"{rScriptPath}\" \"{modifiedFilePath}\"",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
 
+            // Start the process
             using (var process = Process.Start(processInfo))
             {
-                process.OutputDataReceived += (sender, args) => Console.WriteLine(args.Data);
+                // Capture output from the R script
+                process.OutputDataReceived += (sender, args) => {
+                    if (!string.IsNullOrEmpty(args.Data))
+                    {
+                        Console.WriteLine(args.Data);
+                        resultsFilePath = args.Data;  // Capture the file path
+                    }
+                };
+
                 process.ErrorDataReceived += (sender, args) => Console.WriteLine("ERROR: " + args.Data);
+
                 process.BeginOutputReadLine();
                 process.WaitForExit();
             }
 
-            MessageBox.Show("R script executed successfully.");
+            if (string.IsNullOrEmpty(resultsFilePath))
+            {
+                MessageBox.Show("Error: No results file path was generated by the R script.");
+                return null;
+            }
+
+            MessageBox.Show("R script executed successfully. Results saved in: " + resultsFilePath);
+            return resultsFilePath;  // Return the results file path
         }
 
         // Method to load results into tab_ekonometrik
-        private void LoadResultsToTabEkonometrik()
+        private void LoadResultsToTabEkonometrik(string resultsFilePath)
         {
-            string resultsFilePath = @"C:\Path\To\Results.xlsx"; // Adjust with your actual results file path
+            if (!File.Exists(resultsFilePath))
+            {
+                MessageBox.Show("The results file does not exist.");
+                return;
+            }
 
             using (var package = new ExcelPackage(new FileInfo(resultsFilePath)))
             {
                 // Load the corresponding results into each DataGridView
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[1], ELFMinResultsTable);   // Sheet 1 -> ELFMinResultsTable
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[2], ELFLowResultsTable);   // Sheet 2 -> ELFLowResultsTable
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[3], ELFBaseResultsTable);  // Sheet 3 -> ELFBaseResultsTable
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[4], ELFHighResultsTable);  // Sheet 4 -> ELFHighResultsTable
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[5], ELFMaxResultsTable);   // Sheet 5 -> ELFMaxResultsTable
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[1], ELFMinResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[2], ELFLowResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[3], ELFBaseResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[4], ELFHighResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[5], ELFMaxResultsTable);
             }
 
             // Switch to the results tab after loading all the data
             Modül_Tabları.SelectedTab = tab_ekonometrik;
         }
+
 
         // Helper method to load data from an Excel worksheet into a DataGridView
         private void LoadWorksheetToDataGridView(ExcelWorksheet worksheet, DataGridView dataGridView)
