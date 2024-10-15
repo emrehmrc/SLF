@@ -2394,7 +2394,6 @@ namespace SLF
         private System.Windows.Forms.Button button8;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Panel ELFTablePanel;
-        private System.Windows.Forms.TabPage tab_stokastik;
         private System.Windows.Forms.Button stokastik_dosya_seçimi;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.CheckBox checkBox18;
