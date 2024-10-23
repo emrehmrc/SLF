@@ -24,15 +24,20 @@ using NetTopologySuite.Features;
 using NetTopologySuite.Operation;
 using MapWinGIS;
 using SharpMap.Data.Providers;
+using System.Drawing.Drawing2D;
+using ClosedXML.Excel;
+using OfficeOpenXml;
+using DrawingImage = System.Drawing.Image;
 
 namespace SLF
 {
     public partial class ModülFormu : Form
     {
-        private double startX = 0, startY = 0;
 
+        private double startX = 0, startY = 0;
+        public int slfStartYear = 0, slfEndYear = 0;
         // form objeleri
-        public GirişFormu gir1;
+        public HomePageForm gir1;
         private GirdiModülü girdiModülü;
         private Dictionary<string, GirdiModülü> girdiModülleri = new Dictionary<string, GirdiModülü> {
             {"Abone Verileri", new AboneVerileri()},
@@ -61,8 +66,8 @@ namespace SLF
         private bool isRulerActive = false; // enable the drawing of a ruler
         private GMapOverlay markerOverlay_stokastik = new GMapOverlay("markerOverlay_stokastik");
         private GMapOverlay markerOverlay_ea = new GMapOverlay("markerOverlay_ea");
-        
-        // variables to be used to create polygons
+
+        // variables to be used to create polygonspolygonOverlay_stokastik
         private GMapOverlay polygonOverlay_ea = new GMapOverlay("polygonOverlay_ea");
         public GMapOverlay polygonOverlay_stokastik;
         private List<PointLatLng> polygonPoints_ea = new List<PointLatLng>();
@@ -130,6 +135,8 @@ namespace SLF
             public double Boylam { get; set; }
             public double Bina_Demandi { get; set; }
             public int Abone_Sayısı { get; set; }
+            
+            
         }
 
         public enum FileType
@@ -162,57 +169,1031 @@ namespace SLF
             gmap.DragButton = MouseButtons.Left;
         }
 
-        public ModülFormu() {
-
+        private string selectedMethod;  // Store the method
+        public List<TabPage> hiddenTabs = new List<TabPage>();  // To store hidden tabs
+        public ModülFormu() : this("", "")
+        {
+        }
+        // Main constructor with parameters for selectedMethod and tabToSelect
+        public ModülFormu(string selectedMethod = "", string tabToSelect = "")
+        {
             InitializeComponent();
+            this.DoubleBuffered = true;
+            this.selectedMethod = selectedMethod;  // Store the method
+            // Initialize the maps and other UI components
+            InitializeFormComponents();
+
+            if (!string.IsNullOrEmpty(tabToSelect))
+            {
+                InitializeTabs(tabToSelect);  // Select the specific tab and hide others
+            }
+            else
+            {
+                InitializeFormBasedOnMethod();  // Initialize based on the selected method
+            }
+        }
+
+        // Initialize all form components (called in the constructors)
+        private void InitializeFormComponents()
+        {
             InitializeGMap(gMapControl_stokastik);
             InitializeGMap(gMapControl_EA);
+            
 
             SortTabPagesAlphabetically(Modül_Tabları, true);
+            // Enable double buffering for the form to reduce flickering
+            this.DoubleBuffered = true;
 
+            ModuleTabPanel.Paint += new PaintEventHandler(ModuleTabPanel_Paint);
+
+            // Default selected tab
             Modül_Tabları.SelectedTab = tab_girdi;
 
+            // Initialize the arrays and other components
             tüm_katmanlar_array_names = new string[13];
             tüm_katmanlar_array = new GMapOverlay[13];
             shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[13];
             tüm_katmanlar_datatable = new DataTable[13];
 
-            // define the initial directory to be shown when the user opens up the import file dialog
             targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
 
-            // bring the layers buttons that are positioned on the bottom left of the maps to front
             buton_stokastik_harita_katmanlar.BringToFront();
             buton_ea_harita_katmanlar.BringToFront();
 
-            // initialization of the polygonAttributes object that gets to be displayed when double clicking
-            // on the map
             polygonAttributes = new Dictionary<GMapPolygon, DataRow>();
             polygonAttributes_grid = new Dictionary<NetTopologySuite.Geometries.Polygon, DataRow>();
 
-            // stokastik haritası cetvel, nokta, poligon üst katmanları
+            // Add overlays to the maps
             gMapControl_stokastik.Overlays.Add(rulerOverlay_stokastik);
             gMapControl_stokastik.Overlays.Add(markerOverlay_stokastik);
-            
-            //
             gMapControl_stokastik.Overlays.Add(gridOverlay);
             stokastik_haritası_checkboxes_init();
 
-            // EA haritası cetvel, nokta, poligon üst katmanları
             gMapControl_EA.Overlays.Add(rulerOverlay_ea);
             gMapControl_EA.Overlays.Add(markerOverlay_ea);
             gMapControl_EA.Overlays.Add(polygonOverlay_ea);
 
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
 
-            // Girdi Modülü'nde default olarak "Abone Verileri" seçeneğini göster
-            veri_listesi_seçimi.SelectedIndex = 0;    
+            // Default selection for veri_listesi_seçimi
+            veri_listesi_seçimi.SelectedIndex = 2;
 
-            // initialize the previously declared tablo_formu instance.
+            // Initialize the tablo_formu instance
             tablo_formu = new Tablo_Formu();
+        }
+        //VISUAL CHANGES
+        private void ModuleTabPanel_Paint(object sender, PaintEventArgs e)
+        {
+            // Get the Graphics object from the PaintEventArgs
+/*            Graphics graphics = e.Graphics;
+
+
+            // Create a rectangle the same size as the panel
+            Rectangle gradient_rectangle = new Rectangle(0, 0, ModuleTabPanel.Width, ModuleTabPanel.Height);
+
+            // Define the gradient's properties
+            Brush brush = new LinearGradientBrush(gradient_rectangle, Color.FromArgb(100, 252, 179, 38), Color.FromArgb(100, 0, 253, 147), 85f);
+
+            // Apply the gradient by filling the rectangle with the brush
+            graphics.FillRectangle(brush, gradient_rectangle);
+
+            // Optionally, set the panel's background color to be fully transparent
+            ModuleTabPanel.BackColor = Color.Transparent;
+            this.DoubleBuffered = true;*/
+        }
+
+        /*        private void HeaderPanel_Paint(object sender, PaintEventArgs e)
+                {
+                    // Get the Graphics object from the PaintEventArgs
+                    Graphics graphics = e.Graphics;
+
+                    // Create a rectangle the same size as the panel
+                    Rectangle gradient_rectangle = new Rectangle(0, 0, HeaderPanel.Width, HeaderPanel.Height);
+
+                    // Define the gradient's properties
+                    Brush brush = new LinearGradientBrush(gradient_rectangle, Color.FromArgb(100, 252, 179, 38), Color.FromArgb(100, 0, 253, 147), 65f);
+
+                    // Apply the gradient by filling the rectangle with the brush
+                    graphics.FillRectangle(brush, gradient_rectangle);
+
+                    // Optionally, set the panel's background color to be fully transparent
+                    HeaderPanel.BackColor = Color.Transparent;
+                }*/
+        // Initialize specific tabs and hide others
+        private void InitializeTabs(params string[] tabsToSelect)
+        {
+            foreach (string tabToSelect in tabsToSelect)
+            {
+                if (Modül_Tabları.TabPages.ContainsKey(tabToSelect))
+                {
+                    // Make sure the tab is selected in Modül_Tabları
+                    Modül_Tabları.SelectedTab = Modül_Tabları.TabPages[tabToSelect];
+                    // Custom logic for specific tabs in Modül_Tabları
+                    if (tabToSelect == "tab_girdi")
+                    {
+                        veri_listesi_seçimi.Text = "Ekonometrik Yük Tahmini Verileri";
+                        veri_listesi_seçimi.Enabled = false;
+                    }
+                }
+                else if (SenaryoModuleTabControl.TabPages.ContainsKey(tabToSelect))
+                {
+                    // Make sure the tab is selected in SenaryoModuleTabControl
+                    SenaryoModuleTabControl.SelectedTab = SenaryoModuleTabControl.TabPages[tabToSelect];
+                    // Custom logic for specific tabs in SenaryoModuleTabControl
+                }
+                else
+                {
+                    throw new ArgumentException($"Tab '{tabToSelect}' does not exist in either TabControl.");
+                }
+            }
+
+            // Hide all other tabs except the specified ones
+            HideOtherTabs(tabsToSelect);
+        }
+
+        // Hide all tabs except the ones specified
+        private void HideOtherTabs(params string[] tabsToKeep)
+        {
+            // Handle Modül_Tabları
+            foreach (TabPage tabPage in Modül_Tabları.TabPages.Cast<TabPage>().ToList())
+            {
+                if (!tabsToKeep.Contains(tabPage.Name) && !hiddenTabs.Contains(tabPage))  // Ensure tab isn't already hidden
+                {
+                    hiddenTabs.Add(tabPage);
+                    Modül_Tabları.TabPages.Remove(tabPage);
+                }
+            }
+
+            // Handle SenaryoModuleTabControl
+            foreach (TabPage tabPage in SenaryoModuleTabControl.TabPages.Cast<TabPage>().ToList())
+            {
+                if (!tabsToKeep.Contains(tabPage.Name) && !hiddenTabs.Contains(tabPage))  // Ensure tab isn't already hidden
+                {
+                    hiddenTabs.Add(tabPage);
+                    SenaryoModuleTabControl.TabPages.Remove(tabPage);
+                }
+            }
+        }
+
+        // Initialize form based on the selected method
+        private void InitializeFormBasedOnMethod()
+        {
+            if (selectedMethod == "ELF (Ekonometrik)")
+            {
+                // Show both the "tab_girdi" and "tab_ekonometrik" tabs and hide others
+                InitializeTabs("tab_girdi", "tab_ekonometrik", "tab_senaryo", "EkonometrikSenaryoTabPage");
+                Modül_Tabları.SelectedTab = tab_girdi;
+            }
+            else if (selectedMethod == "SLF (Jeo-Uzamsal)")
+            {
+                // For SLF, do not hide any tabs. Add logic here if needed.
+            }
+        }
+
+        // Restore hidden tabs
+        public void RestoreHiddenTabs()
+        {
+            // Restore tabs for Modül_Tabları
+            foreach (TabPage tabPage in hiddenTabs.ToList())
+            {
+                if (!Modül_Tabları.TabPages.Contains(tabPage))
+                {
+                    Modül_Tabları.TabPages.Add(tabPage);
+                }
+            }
+
+            // Restore tabs for SenaryoModuleTabControl
+            foreach (TabPage tabPage in hiddenTabs.ToList())
+            {
+                if (!SenaryoModuleTabControl.TabPages.Contains(tabPage))
+                {
+                    SenaryoModuleTabControl.TabPages.Add(tabPage);
+                }
+            }
+
+            hiddenTabs.Clear();  // Clear the list after restoring
+        }
+
+        private void OpenModuleButton_Click(object sender, EventArgs e)
+        {
+            string filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+
+            // Load the Excel package
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                // Clear previous data
+                ELFMinSenaryoTable.DataSource = null;
+                ELFLowSenaryoTable.DataSource = null;
+                ELFBaseSenaryoTable.DataSource = null;
+                ELFHighSenaryoTable.DataSource = null;
+                ELFMaxSenaryoTable.DataSource = null;
+
+                // Load only sheets 2 to 6 (indices 1 to 5)
+                for (int i = 0; i <= 5; i++) // i = 1 corresponds to sheet 2, i = 5 corresponds to sheet 6
+                {
+                    var worksheet = package.Workbook.Worksheets[i + 1]; // Worksheets are 1-indexed, so i + 1 is used here
+                    DataTable dt = new DataTable();
+
+                    // Load header
+                    for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+                    {
+                        dt.Columns.Add(worksheet.Cells[1, col].Text);
+                    }
+
+                    // Load data
+                    for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+                    {
+                        var newRow = dt.NewRow();
+                        for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+                        {
+                            newRow[col - 1] = worksheet.Cells[row, col].Text;
+                        }
+                        dt.Rows.Add(newRow);
+                    }
+
+                    // Set the data source for the corresponding DataGridView
+                    if (i < 5) // Adjust to match the DataGridView indices
+                    {
+                        var dataGrids = new[] { ELFMinSenaryoTable, ELFLowSenaryoTable, ELFBaseSenaryoTable, ELFHighSenaryoTable, ELFMaxSenaryoTable };
+                        dataGrids[i].DataSource = dt;
+                    }
+                }
+            }
+
+            // Optionally set the selected tab to tab_senaryo
+            Modül_Tabları.SelectedTab = tab_senaryo;
+        }
+
+        /*        // Event handler for opening the Senaryo module
+                private void OpenModuleButton_Click(object sender, EventArgs e)
+                {
+                    Modül_Tabları.SelectedTab = tab_senaryo;
+
+
+                    if (veri_listesi_seçimi.Text == "EA Şarj Verileri")
+                    {
+                        // List of tab names to hide
+                        string[] tabsToHide = { "StokastikSenaryoTabPage", "DEKSenaryoTabPage", "EkonometrikSenaryoTabPage" };
+
+                        // Loop through each tab name and remove it if it exists
+                        foreach (string tabName in tabsToHide)
+                        {
+                            if (SenaryoModuleTabControl.TabPages.ContainsKey(tabName))
+                            {
+                                SenaryoModuleTabControl.TabPages.RemoveByKey(tabName);
+                            }
+                        }
+                    }
+                }*/
+
+
+        /// <summary>
+        /// ELF METHOD Model RScript Run RELATED CHANGES & UPDATES
+        /// </summary>
+
+        private void ELFScenerioSaveGunaButton_Click(object sender, EventArgs e)
+        {
+            string originalFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+            string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+
+            // Dictionary to store original formulas
+            var originalFormulas = new Dictionary<string, string>();
+
+            // Load the original Excel file and read formulas
+            try
+            {
+                using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
+                {
+                    // Loop through each worksheet and store formulas
+                    foreach (var worksheet in package.Workbook.Worksheets)
+                    {
+                        for (int row = 1; row <= worksheet.Dimension.Rows; row++)
+                        {
+                            for (int col = 1; col <= worksheet.Dimension.Columns; col++)
+                            {
+                                var cell = worksheet.Cells[row, col];
+
+                                // Store formulas in the dictionary
+                                if (!string.IsNullOrEmpty(cell.Formula))
+                                {
+                                    // Generate a unique key for the cell based on its address
+                                    originalFormulas[$"{worksheet.Name}!{cell.Address}"] = cell.Formula;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error reading original Excel file: {ex.Message}");
+                return;
+            }
+
+            // Load the original file again to allow modifications
+            try
+            {
+                using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
+                {
+                    // Access the first worksheet for any required operations (preserving formulas)
+                    ExcelWorksheet firstWorksheet = package.Workbook.Worksheets[0];
+
+                    // Update worksheets with data from DataGridViews
+                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[1], ELFMinSenaryoTable);
+                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[2], ELFLowSenaryoTable);
+                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[3], ELFBaseSenaryoTable);
+                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[4], ELFHighSenaryoTable);
+                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[5], ELFMaxSenaryoTable);
+
+                    // Restore original formulas
+                    foreach (var kvp in originalFormulas)
+                    {
+                        var parts = kvp.Key.Split('!');
+                        var sheetName = parts[0];
+                        var cellAddress = parts[1];
+
+                        var worksheet = package.Workbook.Worksheets[sheetName];
+                        var cell = worksheet.Cells[cellAddress];
+
+                        // Apply the original formula
+                        cell.Formula = kvp.Value;
+                    }
+
+                    // Save the modified Excel file
+                    package.SaveAs(new FileInfo(modifiedFilePath));
+                }
+
+                // Inform the user that the changes were saved successfully
+                MessageBox.Show("User changes saved to the modified Excel file.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating Excel file: {ex.Message}");
+            }
+        }
+
+        // Load the original Excel file into DataGridView for display
+        private void LoadDataIntoDataGridView(ExcelWorksheet worksheet, DataGridView dgv)
+        {
+            dgv.Rows.Clear(); // Clear existing rows
+
+            for (int row = 1; row <= worksheet.Dimension.Rows; row++)
+            {
+                int rowIndex = dgv.Rows.Add(); // Add a new row to the DataGridView
+
+                for (int col = 1; col <= worksheet.Dimension.Columns; col++)
+                {
+                    var cell = worksheet.Cells[row, col];
+
+                    // Store the original value in the cell's tag for later use
+                    dgv.Rows[rowIndex].Cells[col - 1].Value = Math.Round(cell.GetValue<double>(), 1); // Display as 4.9%
+                    dgv.Rows[rowIndex].Cells[col - 1].Tag = cell.Value; // Preserve full value
+                }
+            }
+        }
+
+        // Helper method to update an Excel worksheet based on the DataGridView
+        private void UpdateWorksheetFromDataGridView(ExcelWorksheet worksheet, DataGridView dgv)
+        {
+            for (int row = 0; row < dgv.Rows.Count; row++)
+            {
+                for (int col = 0; col < dgv.Columns.Count; col++)
+                {
+                    var cell = worksheet.Cells[row + 2, col + 1]; // Start at row 2 in Excel
+                    var cellValue = dgv.Rows[row].Cells[col].Tag; // Get the original full value
+
+                    // Only update cell values if the original value is not null
+                    if (cellValue != null)
+                    {
+                        // Set the numeric value directly
+                        cell.Value = cellValue;
+
+                        // Preserve the original format from the original file
+                        cell.Style.Numberformat.Format = "0.000000000000000%"; // Preserve full precision
+                    }
+                }
+            }
+        }
+
+
+
+        /*        private void ELFScenerioSaveGunaButton_Click(object sender, EventArgs e)
+                {
+                    string originalFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+                    string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+
+                    // Dictionary to store original formulas
+                    var originalFormulas = new Dictionary<string, string>();
+
+                    // Load the original Excel file and read formulas
+                    try
+                    {
+                        using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
+                        {
+                            // Loop through each worksheet and store formulas
+                            foreach (var worksheet in package.Workbook.Worksheets)
+                            {
+                                for (int row = 1; row <= worksheet.Dimension.Rows; row++)
+                                {
+                                    for (int col = 1; col <= worksheet.Dimension.Columns; col++)
+                                    {
+                                        var cell = worksheet.Cells[row, col];
+
+                                        // Store formulas in the dictionary
+                                        if (!string.IsNullOrEmpty(cell.Formula))
+                                        {
+                                            // Generate a unique key for the cell based on its address
+                                            originalFormulas[$"{worksheet.Name}!{cell.Address}"] = cell.Formula;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error reading original Excel file: {ex.Message}");
+                        return;
+                    }
+
+                    // Load the original file again to allow modifications
+                    try
+                    {
+                        using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
+                        {
+                            // Access the first worksheet for any required operations (preserving formulas)
+                            ExcelWorksheet firstWorksheet = package.Workbook.Worksheets[0];
+
+                            // Update worksheets with data from DataGridViews
+                            UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[1], ELFMinSenaryoTable, originalFormats);
+                            UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[2], ELFLowSenaryoTable, originalFormats);
+                            UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[3], ELFBaseSenaryoTable, originalFormats);
+                            UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[4], ELFHighSenaryoTable, originalFormats);
+                            UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[5], ELFMaxSenaryoTable, originalFormats);
+
+                            // Restore original formulas
+                            foreach (var kvp in originalFormulas)
+                            {
+                                var parts = kvp.Key.Split('!');
+                                var sheetName = parts[0];
+                                var cellAddress = parts[1];
+
+                                var worksheet = package.Workbook.Worksheets[sheetName];
+                                var cell = worksheet.Cells[cellAddress];
+
+                                // Apply the original formula
+                                cell.Formula = kvp.Value;
+                            }
+
+                            // Save the modified Excel file
+                            package.SaveAs(new FileInfo(modifiedFilePath));
+                        }
+
+                        // Inform the user that the changes were saved successfully
+                        MessageBox.Show("User changes saved to the modified Excel file.");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error updating Excel file: {ex.Message}");
+                    }
+                }
+
+                // Load the original Excel file into DataGridView for display
+                private void LoadDataIntoDataGridView(ExcelWorksheet worksheet, DataGridView dgv)
+                {
+                    dgv.Rows.Clear(); // Clear existing rows
+
+                    for (int row = 1; row <= worksheet.Dimension.Rows; row++)
+                    {
+                        int rowIndex = dgv.Rows.Add(); // Add a new row to the DataGridView
+
+                        for (int col = 1; col <= worksheet.Dimension.Columns; col++)
+                        {
+                            var cell = worksheet.Cells[row, col];
+
+                            // Store the original value in the cell's tag for later use
+                            dgv.Rows[rowIndex].Cells[col - 1].Value = Math.Round(cell.GetValue<double>(), 1); // Display as 4.9%
+                            dgv.Rows[rowIndex].Cells[col - 1].Tag = cell.Value; // Preserve full value
+                        }
+                    }
+                }
+
+                // Helper method to update an Excel worksheet based on the DataGridView
+                private void UpdateWorksheetFromDataGridView(ExcelWorksheet worksheet, DataGridView dgv)
+                {
+                    for (int row = 0; row < dgv.Rows.Count; row++)
+                    {
+                        for (int col = 0; col < dgv.Columns.Count; col++)
+                        {
+                            var cell = worksheet.Cells[row + 2, col + 1]; // Start at row 2 in Excel
+                            var cellValue = dgv.Rows[row].Cells[col].Tag; // Get the original full value
+
+                            // Set the value to the cell, ensuring that empty cells are handled
+                            cell.Value = cellValue ?? (object)DBNull.Value; // Preserve the value or set to DBNull for empty cells
+
+                            // Preserve the original format from the original file
+                            cell.Style.Numberformat.Format = "0.000000000000000%"; // Preserve full precision
+                        }
+                    }
+                }*/
+        // Helper method to update an Excel worksheet based on the DataGridView
+        /*        private void UpdateWorksheetFromDataGridView(ExcelWorksheet worksheet, DataGridView dgv, Dictionary<string, string> originalFormats)
+                {
+                    for (int row = 0; row < dgv.Rows.Count; row++)
+                    {
+                        for (int col = 0; col < dgv.Columns.Count; col++)
+                        {
+                            var cell = worksheet.Cells[row + 2, col + 1]; // Start at row 2 in Excel
+                            var cellValue = dgv.Rows[row].Cells[col].Value;
+
+                            // Get the original format from the dictionary using the cell address as a key
+                            string cellAddress = cell.Address; // Get the current cell address
+                            string existingFormat = originalFormats.ContainsKey(cellAddress) ? originalFormats[cellAddress] : string.Empty;
+
+                            // Update cell values
+                            if (cellValue != null)
+                            {
+                                // If the value is a double (or can be converted), keep the full precision
+                                if (double.TryParse(cellValue.ToString(), out double numericValue))
+                                {
+                                    // Set the numeric value directly
+                                    cell.Value = numericValue;
+
+                                    // Set the format to preserve the original format from the original file
+                                    cell.Style.Numberformat.Format = string.IsNullOrEmpty(existingFormat) ? "0.000000000000000%" : existingFormat;
+                                }
+                                else
+                                {
+                                    // For non-numeric values, just update the cell value
+                                    cell.Value = cellValue;
+                                    // Preserve existing format for non-numeric values as well
+                                    cell.Style.Numberformat.Format = existingFormat;
+                                }
+                            }
+                        }
+                    }
+                }
+        */
+
+
+
+        /// <summary>
+        /// ELF METHOD Model RScript Run RELATED CHANGES & UPDATES
+        /// </summary>
+
+
+        private void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e)
+        {
+            string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+
+            // Check if the modified file exists
+            if (!File.Exists(modifiedFilePath))
+            {
+                MessageBox.Show("The modified Excel file does not exist. Please save the scenario first.");
+                return;
+            }
+
+            // Run the R script
+            string resultsFilePath = RunModelRScript(modifiedFilePath);
+
+            // Load results into tab_ekonometrik
+            LoadResultsToTabEkonometrik(resultsFilePath);
+        }
+
+        // Method to run the R script
+        private string RunModelRScript(string modifiedFilePath)
+        {
+            string rScriptPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\model.R";
+            string resultsFilePath = "";
+
+            // Set up process info
+            var processInfo = new ProcessStartInfo()
+            {
+                FileName = "Rscript.exe",
+                Arguments = $"\"{rScriptPath}\" \"{modifiedFilePath}\"",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            // Start the process
+            using (var process = Process.Start(processInfo))
+            {
+                // Capture output from the R script
+                process.OutputDataReceived += (sender, args) => {
+                    if (!string.IsNullOrEmpty(args.Data))
+                    {
+                        Console.WriteLine(args.Data);
+                        resultsFilePath = args.Data;  // Capture the file path
+                    }
+                };
+
+                process.ErrorDataReceived += (sender, args) => Console.WriteLine("ERROR: " + args.Data);
+
+                process.BeginOutputReadLine();
+                process.WaitForExit();
+            }
+
+            if (string.IsNullOrEmpty(resultsFilePath))
+            {
+                MessageBox.Show("Error: No results file path was generated by the R script.");
+                return null;
+            }
+
+            MessageBox.Show("R script executed successfully. Results saved in: " + resultsFilePath);
+            return resultsFilePath;  // Return the results file path
+        }
+
+        // Method to load results into tab_ekonometrik
+        private void LoadResultsToTabEkonometrik(string resultsFilePath)
+        {
+            if (!File.Exists(resultsFilePath))
+            {
+                MessageBox.Show("The results file does not exist.");
+                return;
+            }
+
+            using (var package = new ExcelPackage(new FileInfo(resultsFilePath)))
+            {
+                // Load the corresponding results into each DataGridView
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[1], ELFMinResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[2], ELFLowResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[3], ELFBaseResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[4], ELFHighResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[5], ELFMaxResultsTable);
+            }
+
+            // Switch to the results tab after loading all the data
+            Modül_Tabları.SelectedTab = tab_ekonometrik;
+        }
+
+
+        // Helper method to load data from an Excel worksheet into a DataGridView
+        private void LoadWorksheetToDataGridView(ExcelWorksheet worksheet, DataGridView dataGridView)
+        {
+            DataTable dt = new DataTable();
+
+            // Load headers from the first row
+            for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+            {
+                dt.Columns.Add(worksheet.Cells[1, col].Text);
+            }
+
+            // Load data from the worksheet into the DataTable (starting from row 2)
+            for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+            {
+                var newRow = dt.NewRow();
+                for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+                {
+                    newRow[col - 1] = worksheet.Cells[row, col].Text;
+                }
+                dt.Rows.Add(newRow);
+            }
+
+            // Assign the DataTable as the DataSource of the DataGridView
+            dataGridView.DataSource = dt;
+        }
+
+
+
+        private void LoadImageIntoPictureBox(PictureBox pictureBox, string imagePath)
+        {
+            if (File.Exists(imagePath))
+            {
+                using (DrawingImage img = DrawingImage.FromFile(imagePath))
+                {
+                    pictureBox.Image = new Bitmap(img); // Create a new Bitmap to avoid file lock issues
+                }
+            }
+            else
+            {
+                MessageBox.Show($"Image not found: {imagePath}", "Image Load Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+        public DataTable ReadExcelToDataTable(string filePath)
+        {
+            // Check if file exists
+            if (!File.Exists(filePath))
+            {
+                MessageBox.Show($"Excel file not found: {filePath}");
+                return null;
+            }
+
+            DataTable dataTable = new DataTable();
+
+            try
+            {
+                // Load the Excel file
+                using (var workbook = new XLWorkbook(filePath))
+                {
+                    // Get the first worksheet in the Excel file
+                    var worksheet = workbook.Worksheet(1);
+
+                    // Read the header (assuming the first row contains column names)
+                    bool headerRow = true;
+                    foreach (var row in worksheet.RowsUsed())
+                    {
+                        if (headerRow)
+                        {
+                            foreach (var cell in row.Cells())
+                            {
+                                dataTable.Columns.Add(cell.Value.ToString()); // Create columns based on the first row
+                            }
+                            headerRow = false; // Only process the header row once
+                        }
+                        else
+                        {
+                            // Create a new DataRow for each subsequent row in the Excel file
+                            DataRow dataRow = dataTable.NewRow();
+                            int columnIndex = 0;
+
+                            foreach (var cell in row.Cells())
+                            {
+                                dataRow[columnIndex] = cell.Value.ToString(); // Assign cell values to the DataRow
+                                columnIndex++;
+                            }
+
+                            dataTable.Rows.Add(dataRow); // Add DataRow to DataTable
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error reading Excel file: {ex.Message}");
+                return null;
+            }
+
+            return dataTable;
+        }
+        /// <summary>
+        /// ELF METHOD RScript Run RELATED CHANGES & UPDATES
+        /// </summary>
+        // Assuming you have a class like this
+        /*        public class ScriptProcessor
+                {
+                    public void ReScript(string scriptName, string parameters)
+                    {
+                        // Your script processing logic here
+                        Console.WriteLine($"Processing script: {scriptName} with parameters: {parameters}");
+                    }
+                }
+
+                // Inside your form or class, you would create an instance of ScriptProcessor
+                private ScriptProcessor wdC = new ScriptProcessor();
+
+                private void ELFPredictionButton_Click(object sender, EventArgs e)
+                {
+                    // Check if the ComboBox has at least two items
+                    if (comboBox1.Items.Count >= 2)
+                    {
+                        // Get the first and second selected items from the ComboBox
+                        string parametre1 = comboBox1.Items[0].ToString();
+                        string parametre2 = comboBox1.Items[1].ToString();
+
+                        // Concatenate the parameters (adjust for your R script's needs)
+                        string combinedParameters = $"{parametre1} {parametre2}"; // Space-separated parameters
+
+                        // Assuming wdC is an instance of ScriptProcessor
+                        wdC.ReScript("vanilin kods.R", combinedParameters);
+
+                        // Full path to your R script
+                        string rScriptPath = @"C:\path\to\your\script.R";
+
+                        // Pass the combined parameters to ExecuteCommand to run the R script
+                        ExecuteCommand(rScriptPath, combinedParameters);
+                    }
+                    else
+                    {
+                        MessageBox.Show("ComboBox does not have enough items!");
+                    }
+                }
+
+                public void ExecuteCommand(string scriptPath, string arguments)
+                {
+                    // Path to the Rscript executable
+                    string rScriptExecutable = @"C:\Program Files\R\R-X.X.X\bin\Rscript.exe"; // Adjust for your R installation path
+
+                    // Prepare the full command with the script path and parameters
+                    string command = $"\"{scriptPath}\" {arguments}";
+
+                    ProcessStartInfo processInfo = new ProcessStartInfo(rScriptExecutable, command)
+                    {
+                        CreateNoWindow = true,
+                        UseShellExecute = false, // Allows output redirection
+                        RedirectStandardOutput = true, // To capture output from R script
+                        RedirectStandardError = true
+                    };
+
+                    using (Process process = Process.Start(processInfo))
+                    {
+                        // Capture and log the output if needed
+                        string output = process.StandardOutput.ReadToEnd();
+                        string error = process.StandardError.ReadToEnd();
+
+                        process.WaitForExit();
+
+                        // Log or handle the output
+                        Console.WriteLine("Output: " + output);
+                        if (!string.IsNullOrEmpty(error))
+                        {
+                            Console.WriteLine("Error: " + error);
+                        }
+                    }
+                }
+                // Assuming you have a class like this
+                public class ScriptProcessor
+                {
+                    public void ReScript(string scriptName, string parameters)
+                    {
+                        // Your script processing logic here
+                        Console.WriteLine($"Processing script: {scriptName} with parameters: {parameters}");
+                    }
+                }
+
+                // Inside your form or class, you would create an instance of ScriptProcessor
+                private ScriptProcessor wdC = new ScriptProcessor();
+
+                private void ELFPredictionButton_Click(object sender, EventArgs e)
+                {
+                    // Check if the ComboBox has at least one item
+                    if (comboBox1.Items.Count >= 1)
+                    {
+                        // Create a list to hold up to 5 parameters
+                        List<string> parameters = new List<string>();
+
+                        // Loop through the ComboBox items (up to 5 items)
+                        for (int i = 0; i < comboBox1.Items.Count && i < 5; i++)
+                        {
+                            parameters.Add(comboBox1.Items[i].ToString());
+                        }
+
+                        // Join the parameters with space separation
+                        string combinedParameters = string.Join(" ", parameters);
+
+                        // Assuming wdC is an instance of ScriptProcessor
+                        wdC.ReScript("vanilin kods.R", combinedParameters);
+
+                        // Full path to your R script
+                        string rScriptPath = @"C:\path\to\your\script.R";
+
+                        // Pass the combined parameters to ExecuteCommand to run the R script
+                        ExecuteCommand(rScriptPath, combinedParameters);
+                    }
+                    else
+                    {
+                        MessageBox.Show("ComboBox does not have enough items!");
+                    }
+                }
+
+                public void ExecuteCommand(string scriptPath, string arguments)
+                {
+                    // Path to the Rscript executable
+                    string rScriptExecutable = @"C:\Program Files\R\R-X.X.X\bin\Rscript.exe"; // Adjust for your R installation path
+
+                    // Prepare the full command with the script path and parameters
+                    string command = $"\"{scriptPath}\" {arguments}";
+
+                    ProcessStartInfo processInfo = new ProcessStartInfo(rScriptExecutable, command)
+                    {
+                        CreateNoWindow = true,
+                        UseShellExecute = false, // Allows output redirection
+                        RedirectStandardOutput = true, // To capture output from R script
+                        RedirectStandardError = true
+                    };
+
+                    try
+                    {
+                        using (Process process = Process.Start(processInfo))
+                        {
+                            string output = process.StandardOutput.ReadToEnd();
+                            string error = process.StandardError.ReadToEnd();
+
+                            process.WaitForExit();
+
+                            if (!string.IsNullOrEmpty(error))
+                            {
+                                MessageBox.Show("Error: " + error, "Execution Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                            else
+                            {
+                                // Load table data into DataGridView
+                                DataTable table = ReadExcelToDataTable(@"C:\path\to\output.csv");
+                                if (table != null)
+                                {
+                                    dataGridView2.DataSource = table;
+                                }
+
+                                // Load graphical output (PNG) into PictureBox controls
+                                LoadImagesIntoPictureBoxes();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("An error occurred: " + ex.Message, "Execution Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+
+                private void LoadImagesIntoPictureBoxes()
+                {
+                    // Path to the folder where the images are saved
+                    string imageFolderPath = @"C:\path\to\output\";
+
+                    // Load images into PictureBox controls with checks
+                    LoadImageIntoPictureBox(pictureBox1, Path.Combine(imageFolderPath, "plot1.png"));
+                    LoadImageIntoPictureBox(pictureBox2, Path.Combine(imageFolderPath, "plot2.png"));
+                    // Add more PictureBox assignments as needed
+                }
+
+                private void LoadImageIntoPictureBox(PictureBox pictureBox, string imagePath)
+                {
+                    if (File.Exists(imagePath))
+                    {
+                        using (DrawingImage img = DrawingImage.FromFile(imagePath))
+                        {
+                            pictureBox.Image = new Bitmap(img); // Create a new Bitmap to avoid file lock issues
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Image not found: {imagePath}", "Image Load Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }*/
+
+        /*        public DataTable ReadCsvToDataTable(string filePath)
+                {
+                    DataTable dataTable = new DataTable();
+                    using (StreamReader reader = new StreamReader(filePath))
+                    {
+                        string[] headers = reader.ReadLine().Split(','); // Adjust delimiter for TSV if needed
+                        foreach (string header in headers)
+                        {
+                            dataTable.Columns.Add(header); // Add columns
+                        }
+
+                        while (!reader.EndOfStream)
+                        {
+                            string[] rows = reader.ReadLine().Split(',');
+                            DataRow dataRow = dataTable.NewRow();
+                            for (int i = 0; i < headers.Length; i++)
+                            {
+                                dataRow[i] = rows[i];
+                            }
+                            dataTable.Rows.Add(dataRow);
+                        }
+                    }
+                    return dataTable;
+                }*/
+
+
+        /*        private void ELFPredictionButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Load table data into DataGridView from Excel
+                DataTable table = ReadExcelToDataTable(@"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı
+\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\SONUCLAR.xlsx");
+                if (table != null)
+                {
+                    dataGridView2.DataSource = table;
+                }
+                else
+                {
+                    MessageBox.Show("Failed to load data from Excel.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+                // Load graphical output (PNG) into PictureBox controls
+                LoadImagesIntoPictureBoxes();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("An error occurred: " + ex.Message, "Execution Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            // run thşs code:
+            // C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep
+            // Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\model.R
+
 
         }
 
-        private DataTable LoadAttributeTable(DataRow row, DataGridView dataGridView, 
+        private void LoadImagesIntoPictureBoxes()
+        {
+            // Path to the folder where the images are saved
+            string imageFolderPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Grafik Outputs";
+
+            // Load images into PictureBox controls with checks
+            LoadImageIntoPictureBox(pictureBox1, Path.Combine(imageFolderPath, "afyon_aydınlatma_gdp.png"));
+            // Add more PictureBox assignments as needed
+        }*/
+
+        /// <summary>
+        /// ELF METHOD RScript Run RELATED CHANGES & UPDATES END
+        /// </summary>
+        /// 
+        private DataTable LoadAttributeTable(DataRow row, DataGridView dataGridView,
                 ShapefileDataReader shapefile_reader, DataTable data_table, int row_cnt)
         {
 
@@ -232,10 +1213,10 @@ namespace SLF
             return (data_table);
         }
 
-        private async Task LoadShapefile(string filepath, GMapOverlay shapeFileOverlay, 
+        private async Task LoadShapefile(string filepath, GMapOverlay shapeFileOverlay,
                                     DataTable shapefile_datatable)
         {
-            
+
             // eğer dosya bulunamadıysa uyarı ver
             if (!File.Exists(filepath))
             {
@@ -274,7 +1255,7 @@ namespace SLF
                 // create a new row for the datatable and then populate it by
                 // using the LoadAttributeTable() method
                 DataRow row = shapefile_datatable.NewRow();
-                shapefile_datatable = LoadAttributeTable(row, tablo_formu.attribute_table ,
+                shapefile_datatable = LoadAttributeTable(row, tablo_formu.attribute_table,
                             shpReader, shapefile_datatable, row_cnt);
 
                 row_cnt++;
@@ -290,7 +1271,7 @@ namespace SLF
                     foreach (NetTopologySuite.Geometries.Polygon poly in multiPolygon.Geometries)
                     {
                         AddPolygonToOverlay(poly, shapeFileOverlay, "shapeFilePolygon", row);
-                        
+
                     }
                 }
             }
@@ -312,7 +1293,7 @@ namespace SLF
             {
                 gMapControl_stokastik.Refresh();
             }
-            else if(Modül_Tabları.SelectedTab == tab_ea)
+            else if (Modül_Tabları.SelectedTab == tab_ea)
             {
                 gMapControl_EA.Refresh();
             }
@@ -387,9 +1368,9 @@ namespace SLF
                 // root node olan <kml> node'una eriş
                 var kml = parser.Root as Kml;
                 var folder = kml?.Feature as SharpKml.Dom.Folder;
-                
+
                 // <kml> node'unun child node'unun <folder> veya <Document> olup olmadığının kontrolü
-                if(folder != null)
+                if (folder != null)
                 {
                     // <folder> node'unun içindeki <Document> node'larını okumaya başla
                     foreach (var documents in folder.Features)
@@ -425,7 +1406,7 @@ namespace SLF
                                         row["Row_No"] = row_cnt;
                                         row[simpleData.Name] = simpleData.Text;
                                     }
-                                }  
+                                }
 
                                 // <ExtendedData> içindeki dataları Attribute Table'da ilgili sütunlara yaz
                                 foreach (var data in placemark.ExtendedData.Data)
@@ -459,11 +1440,11 @@ namespace SLF
                             foreach (SharpKml.Dom.Point points in placemark.Flatten().OfType<SharpKml.Dom.Point>())
                             {
                                 // Convert the coordinates to a string
-                                string point_coordinates = Math.Round(points.Coordinate.Longitude,6).ToString() + 
-                                    " ; " + Math.Round(points.Coordinate.Latitude,6).ToString();
+                                string point_coordinates = Math.Round(points.Coordinate.Longitude, 6).ToString() +
+                                    " ; " + Math.Round(points.Coordinate.Latitude, 6).ToString();
                                 row["Row_No"] = row_cnt;
                                 row["coordinates"] = point_coordinates;
-                                    
+
                             }
 
                             // add linestring coordinates to "coordinates" column if any linestring exists
@@ -564,7 +1545,7 @@ namespace SLF
                                     row["Row_No"] = row_cnt;
                                     row[simpleData.Name] = simpleData.Text;
                                 }
-                            }   
+                            }
 
                             foreach (var data in placemark.ExtendedData.Data)
                             {
@@ -585,8 +1566,8 @@ namespace SLF
                                 foreach (SharpKml.Dom.LinearRing linearRing in outerBoundary.Flatten().OfType<SharpKml.Dom.LinearRing>())
                                 {
                                     // Convert the coordinates to a string
-                                    string coordinatesString = string.Join(" ; ", 
-                                        linearRing.Coordinates.Select(coord => $"{Math.Round(coord.Longitude,6)},{Math.Round(coord.Latitude,6)}"));
+                                    string coordinatesString = string.Join(" ; ",
+                                        linearRing.Coordinates.Select(coord => $"{Math.Round(coord.Longitude, 6)},{Math.Round(coord.Latitude, 6)}"));
                                     row["Row_No"] = row_cnt;
                                     row["coordinates"] = coordinatesString;
                                 }
@@ -643,8 +1624,8 @@ namespace SLF
                     }
                 }
             }
-            
-            if(Modül_Tabları.SelectedTab == tab_stokastik)
+
+            if (Modül_Tabları.SelectedTab == tab_stokastik)
             {
                 gMapControl_stokastik.Refresh();
             }
@@ -682,7 +1663,7 @@ namespace SLF
             }
         }
 
-        private void AddPolygonToOverlay_kml(SharpKml.Dom.Polygon kmlPolygon, 
+        private void AddPolygonToOverlay_kml(SharpKml.Dom.Polygon kmlPolygon,
                                             GMapOverlay overlay,
                                             DataRow attributes)
         {
@@ -804,7 +1785,7 @@ namespace SLF
             var kmlDocument = new Document();
             var kml = new Kml { Feature = kmlDocument };
 
-            if(overlay.Polygons != null)
+            if (overlay.Polygons != null)
             {
                 foreach (var polygon in overlay.Polygons)
                 {
@@ -813,7 +1794,7 @@ namespace SLF
                 }
             }
 
-            if(overlay.Routes != null)
+            if (overlay.Routes != null)
             {
                 foreach (var route in overlay.Routes)
                 {
@@ -903,7 +1884,7 @@ namespace SLF
 
             if (result == DialogResult.OK)
             {
-                string filepath = vektorel_veri_seçimi.FileName; 
+                string filepath = vektorel_veri_seçimi.FileName;
                 string filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
                 string extension = filename.Substring(filename.Length - 3);
 
@@ -921,7 +1902,7 @@ namespace SLF
                     {
                         gMapControl_EA.Overlays.Add(shapeFileOverlay);
                     }
-                    
+
                     // create a new datatable to be added to the tüm_katmanlar_datatable array
                     DataTable shapefile_datatable = new DataTable();
 
@@ -953,7 +1934,7 @@ namespace SLF
                     DataTable kml_datatable = new DataTable();
                     this.Cursor = Cursors.WaitCursor;
                     await LoadKmlFile(filepath, kmlOverlay, kml_datatable);
-                    
+
                     tüm_katmanlar_array[layer_index] = kmlOverlay;
                     tüm_katmanlar_array_names[layer_index] = filename;
                     tüm_katmanlar_datatable[layer_index] = kml_datatable;
@@ -974,7 +1955,7 @@ namespace SLF
                         associatedCheckBox.Text = tüm_katmanlar_array_names[layer_index];
                     }
                 }
-            }       
+            }
         }
 
         private System.Windows.Forms.CheckBox GetCheckBoxByIndex(int index)
@@ -1079,12 +2060,12 @@ namespace SLF
             yenidenAdlandırToolStripMenuItem.Tag = sender_checkbox;
 
             if (tüm_katmanlar_array[checkbox_index] != null)
-             {
-                 tablo_formu.Text = "Veri Tablosu -- " + tüm_katmanlar_array_names[checkbox_index] +
-                    " -- " + tüm_katmanlar_datatable[checkbox_index].Rows.Count + " satır -- " +
-                    tüm_katmanlar_datatable[checkbox_index].Columns.Count + " sütun";
-                 ShowAttributeTable(tüm_katmanlar_datatable[checkbox_index]);
-             }
+            {
+                tablo_formu.Text = "Veri Tablosu -- " + tüm_katmanlar_array_names[checkbox_index] +
+                   " -- " + tüm_katmanlar_datatable[checkbox_index].Rows.Count + " satır -- " +
+                   tüm_katmanlar_datatable[checkbox_index].Columns.Count + " sütun";
+                ShowAttributeTable(tüm_katmanlar_datatable[checkbox_index]);
+            }
         }
 
         // display or hide the layers by checkboxes of the stokastik_yuk_tahmini form
@@ -1092,7 +2073,7 @@ namespace SLF
         {
             System.Windows.Forms.CheckBox checkBox = (System.Windows.Forms.CheckBox)sender;
             int index = int.Parse(checkBox.Tag.ToString()) - 1;
-            
+
             if (tüm_katmanlar_array[index] != null)
             {
                 tüm_katmanlar_array[index].IsVisibile = checkBox.Checked;
@@ -1129,15 +2110,15 @@ namespace SLF
 
                 if (checkbox_index < 0 || checkbox_index >= tüm_katmanlar_array.Length)
                 {
-                    MessageBox.Show("Yanlış katman endeksi!","",
-                        MessageBoxButtons.OK,MessageBoxIcon.Error);
+                    MessageBox.Show("Yanlış katman endeksi!", "",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
                 GMapOverlay overlay = tüm_katmanlar_array[checkbox_index];
                 if (overlay == null)
                 {
-                    MessageBox.Show("Katmanda herhangi bir data bulunamadı.", 
+                    MessageBox.Show("Katmanda herhangi bir data bulunamadı.",
                         "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
@@ -1252,7 +2233,7 @@ namespace SLF
                 int checkbox_index = int.Parse(checkBox.Tag.ToString()) - 1;
 
                 SaveFileDialog kaydet_file_dialog = new SaveFileDialog();
-                
+
                 kaydet_file_dialog.Filter = "Shapefile |*.shp|MapInfo File|*.tab|Google Earth File|*.kml";
                 kaydet_file_dialog.InitialDirectory = targetDirectory;
 
@@ -1264,7 +2245,7 @@ namespace SLF
                     string filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
                     string extension = filename.Substring(filename.Length - 3);
 
-                    if(extension == "shp")
+                    if (extension == "shp")
                     {
                         MapWinGIS.Shapefile shapefile = shapeFileArray_MapWinGIS[checkbox_index];
 
@@ -1274,14 +2255,14 @@ namespace SLF
                         }*/
 
                         int fieldIndex;
-                        
+
                         /*fieldIndex = shapefile.get_FieldIndexByName("Cell_No");
 
                         if(fieldIndex  != -1)
                         {
                             MessageBox.Show("a");
                             shapefile.EditDeleteField(fieldIndex);
-                        }      */      
+                        }      */
 
                         fieldIndex = shapefile.get_FieldIndexByName("MWShapeID");
 
@@ -1370,26 +2351,13 @@ namespace SLF
                 label6.Text = "kW/m" + "\u00B2" + ":";
                 label7.Text = "kWh:";
                 label8.Text = "Abone Sayısı:";
-                textBox1.CausesValidation= true;
-            } 
+                //textBox1.CausesValidation = true; //this line can be removed textbox1 not relevant to checkbox6
+            }
             else
             {
                 panel1.Visible = false;
             }
         }
-        private void checkBox8_CheckedChanged(object sender, EventArgs e)
-        {
-            if (checkBox8.Checked)
-            {
-                panel2.Visible = true;
-            }
-            else 
-            { 
-                panel2.Visible= false; 
-            }
-        }
-
-
 
 
         /* ------------------------------------------------------------------------------------*/
@@ -1409,16 +2377,6 @@ namespace SLF
             string url2 = "https://www.openstreetmap.org/#map=15/38.4600/27.1153";
             webView21.CoreWebView2.Navigate(url2);
         }
-
-        private void button10_Click(object sender, EventArgs e)
-        {
-
-            Modül_Tabları.SelectTab(tab_girdi);
-            veri_listesi_seçimi.Text = "Ekonometrik Yük Tahmini Verileri";
-            veri_listesi_seçimi.Enabled = false;
-
-        }
-
         private void button7_Click(object sender, EventArgs e)
         {
             Modül_Tabları.SelectTab(tab_girdi);
@@ -1443,7 +2401,7 @@ namespace SLF
         // haritalardaki arazi katmanı
         private void Arazi_Click(object sender, EventArgs e) // Harita katmanları seçimi - Arazi
         {
-            if(Modül_Tabları.SelectedTab == tab_ea)
+            if (Modül_Tabları.SelectedTab == tab_ea)
             {
                 gMapControl_EA.MapProvider = GMapProviders.GoogleTerrainMap;
             }
@@ -1451,7 +2409,7 @@ namespace SLF
             if (Modül_Tabları.SelectedTab == tab_stokastik)
             {
                 gMapControl_stokastik.MapProvider = GMapProviders.GoogleTerrainMap;
-            }   
+            }
         }
 
         // haritalardaki harita katmanı
@@ -1465,7 +2423,7 @@ namespace SLF
             if (Modül_Tabları.SelectedTab == tab_stokastik)
             {
                 gMapControl_stokastik.MapProvider = GMapProviders.GoogleMap;
-            }                 
+            }
         }
 
         // haritalardaki uydu katmanı
@@ -1479,7 +2437,7 @@ namespace SLF
             if (Modül_Tabları.SelectedTab == tab_stokastik)
             {
                 gMapControl_stokastik.MapProvider = GMapProviders.GoogleSatelliteMap;
-            }                 
+            }
         }
 
         // haritalardaki OSM katmanı
@@ -1493,7 +2451,7 @@ namespace SLF
             if (Modül_Tabları.SelectedTab == tab_stokastik)
             {
                 gMapControl_stokastik.MapProvider = GMapProviders.OpenStreetMap;
-            }                     
+            }
         }
 
         // haritalardaki Google Earth katmanı
@@ -1549,14 +2507,14 @@ namespace SLF
                 }
                 else
                 {
-                    MessageBox.Show("Bir sorun oluştu. Lütfen haritada başka bir yeri seçiniz.", 
+                    MessageBox.Show("Bir sorun oluştu. Lütfen haritada başka bir yeri seçiniz.",
                         "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Google Earth Desktop uygulaması açılamadı. Lütfen ilgili yüklemenin bilgi" +
-                    "sayarınızda halihazırda yüklü olduğunu teyit ediniz!   >" + 
+                    "sayarınızda halihazırda yüklü olduğunu teyit ediniz!   >" +
                     $"An error occurred: {ex.Message}", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
@@ -1729,6 +2687,7 @@ namespace SLF
             {
                 // Show the ContextMenuStrip at the mouse position
                 ContextMenuStrip_Poligon.Show(Cursor.Position);
+                Console.WriteLine("buradayım");
             }
         }
 
@@ -1761,38 +2720,63 @@ namespace SLF
 
         private void gMapControl_EA_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
-            // boolean control for marker selection when clicking on the map
-            if (isSelecting_marker)
+            if (e.Button == MouseButtons.Left)
             {
-                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
-                markerOverlay_ea.Markers.Add(marker);
-
-                NoktaVeri noktaVeri_marker = new NoktaVeri
+                // İşaretleyici seçimi kontrolü
+                if (isSelecting_marker)
                 {
-                    Enlem = Math.Round(pointClick.Lat, 4),
-                    Boylam = Math.Round(pointClick.Lng, 4)
-                };
+                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
+                    markerOverlay_ea.Markers.Add(marker);
 
-                marker.Tag = noktaVeri_marker;
+                    NoktaVeri noktaVeri_marker = new NoktaVeri
+                    {
+                        Enlem = Math.Round(pointClick.Lat, 4),
+                        Boylam = Math.Round(pointClick.Lng, 4)
+                    };
 
-            }
+                    marker.Tag = noktaVeri_marker;
+                }
 
-            // boolean control for polygon selection when clicking on the map
-            if (isSelecting_polygon)
-            {
-                polygonPoints_ea.Add(pointClick);
-                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
-                markerOverlay_ea.Markers.Add(marker);
-                gMapControl_EA.Refresh();
-            }
+                // Poligon seçimi kontrolü
+                if (isSelecting_polygon)
+                {
+                    polygonPoints_ea.Add(pointClick);
+                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
+                    markerOverlay_stokastik.Markers.Add(marker);
 
-            // eğer gmapControl_OnMapClick event'i ile 2 den fazla nokta seçilirse,
-            // bu noktalar arasında bir poligon çiz
-            if (polygonPoints_ea.Count >= 3)
-            {
-                Draw_Polygon(polygonPoints_ea, polygonOverlay_ea, gMapControl_EA);
+                    if (polygonOverlay_ea != null)
+                    {
+                        gMapControl_stokastik.Overlays.Remove(polygonOverlay_ea);
+                    }
+
+                    layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
+
+                    // Dizide boş yer olup olmadığını kontrol et
+                    if (layer_index == -1)
+                    {
+                        MessageBox.Show("En fazla katman sayısına ulaşıldı. Daha fazla katman ekleyemezsiniz.");
+                        return;
+                    }
+
+                    polygonOverlay_ea = new GMapOverlay("polygonOverlay_" + layer_index.ToString());
+                    gMapControl_EA.Overlays.Add(polygonOverlay_ea);
+                    gMapControl_EA.Refresh();
+
+                    // Eğer 3 veya daha fazla nokta varsa, poligon çiz
+                    if (polygonPoints_ea.Count >= 3)
+                    {
+                        Draw_Polygon(polygonPoints_ea, polygonOverlay_ea, gMapControl_EA);
+
+                        double area = CalculatePolygonArea(polygonPoints_ea);
+
+                        mesafe_metre_ea.Visible = true;
+                        Mesafe_ea.Visible = true;
+                        Mesafe_ea.Text = "Seçili Alan: " + Math.Round(area, 0).ToString() + " m²";
+                    }
+                }
             }
         }
+
 
         private void gMapControl_EA_MouseDown(object sender, MouseEventArgs e)
         {
@@ -1813,6 +2797,7 @@ namespace SLF
                 // bir marker objesi oluştur ve seçilen noktalara marker ata
                 GMapMarker marker_ea = new GMarkerGoogle(point, GMarkerGoogleType.orange_dot);
                 markerOverlay_ea.Markers.Add(marker_ea);
+                
 
                 // 2 adet nokta seçildiği anda aralarındaki mesafeyi hesapla, göster, sonrasında
                 // ise noktaların tutulduğu listeyi temizle
@@ -1840,7 +2825,7 @@ namespace SLF
             // eğer sadece 1 adet nokta seçilmişse, ve ikinci nokta dinamik olarak farklı yerlere
             // tıklanarak seçiliyorsa, mesafeyi de buna göre güncelle.
             if (isRulerActive && rulerPoints_ea.Count == 1 && isRulerEnabled == true)
-            {             
+            {
                 var point = gMapControl_EA.FromLocalToLatLng(e.X, e.Y);
                 if (rulerRoute_ea != null)
                 {
@@ -1856,7 +2841,7 @@ namespace SLF
         private void gMapControl_stokastik_MouseDown(object sender, MouseEventArgs e)
         {
             // boolean controlu ile grid oluşturulacak alan seçimine başlanması
-            if(e.Button == MouseButtons.Left && isSelecting_grid == true)
+            if (e.Button == MouseButtons.Left && isSelecting_grid == true)
             {
                 gMapControl_stokastik.CanDragMap = false;
                 starting_point = gMapControl_stokastik.FromLocalToLatLng(e.X, e.Y);
@@ -1890,7 +2875,7 @@ namespace SLF
 
                 // seçilen noktaları bir listeye koy
                 rulerPoints_stokastik.Add(point);
-                
+
                 // 2 adet nokta seçildiği anda aralarındaki mesafeyi hesapla ve noktaların
                 // tutulduğu listeyi temizle
                 if (rulerPoints_stokastik.Count == 2)
@@ -1913,27 +2898,27 @@ namespace SLF
 
             if (e.Button == MouseButtons.Right && isSelecting_polygon)
             {
-                if(markerOverlay_stokastik.Markers != null)
+                if (markerOverlay_stokastik.Markers != null)
                 {
                     markerOverlay_stokastik.Markers.Clear();
                 }
 
-                if(polygonPoints_stokastik != null)
+                if (polygonPoints_stokastik != null)
                 {
                     polygonPoints_stokastik.Clear();
                 }
 
-                if(polygonOverlay_stokastik != null)
+                if (polygonOverlay_stokastik != null)
                 {
                     polygonOverlay_stokastik.Clear();
                 }
-                
+
                 Mesafe_stokastik.Visible = false;
                 mesafe_metre_stokastik.Visible = false;
 
                 gMapControl_stokastik.Refresh();
             }
-        }      
+        }
 
         private void gMapControl_stokastik_MouseMove(object sender, MouseEventArgs e)
         {
@@ -1956,7 +2941,7 @@ namespace SLF
             // tıklanarak seçiliyorsa, mesafeyi de buna göre güncelle.
             if (isRulerActive && rulerPoints_stokastik.Count == 1 && isRulerEnabled == true)
             {
-                
+
                 var point = gMapControl_stokastik.FromLocalToLatLng(e.X, e.Y);
                 if (rulerRoute_stokastik != null)
                 {
@@ -2031,7 +3016,7 @@ namespace SLF
 
         private void gMapControl_stokastik_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
-            if(e.Button == MouseButtons.Left)
+            if (e.Button == MouseButtons.Left)
             {
                 // boolean control for marker selection when clicking on the map
                 if (isSelecting_marker)
@@ -2046,6 +3031,7 @@ namespace SLF
                     };
 
                     marker.Tag = noktaVeri_marker;
+                    
                 }
 
                 // boolean control for polygon selection when clicking on the map
@@ -2055,11 +3041,11 @@ namespace SLF
                     GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
                     markerOverlay_stokastik.Markers.Add(marker);
 
-                    if(polygonOverlay_stokastik != null)
+                    if (polygonOverlay_stokastik != null)
                     {
                         gMapControl_stokastik.Overlays.Remove(polygonOverlay_stokastik);
-                    }                  
-                    
+                    }
+
                     layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
                     polygonOverlay_stokastik = new GMapOverlay("polygonOverlay_" + layer_index.ToString());
                     gMapControl_stokastik.Overlays.Add(polygonOverlay_stokastik);
@@ -2082,7 +3068,7 @@ namespace SLF
             }
         }
 
-        private void Draw_Polygon(List<PointLatLng> polygonPoints, GMapOverlay polygonOverlay,GMapControl gmap)
+        private void Draw_Polygon(List<PointLatLng> polygonPoints, GMapOverlay polygonOverlay, GMapControl gmap)
         {
             // bu noktalar arasında poligon çiz, mavi ile işaretle, ve de 
             // polygonOverlay katmanına ekle.
@@ -2106,7 +3092,7 @@ namespace SLF
 
                 layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
                 GMapOverlay overlay_to_be_saved = polygonOverlay_stokastik;
-                tüm_katmanlar_array[layer_index] = overlay_to_be_saved; 
+                tüm_katmanlar_array[layer_index] = overlay_to_be_saved;
                 tüm_katmanlar_array_names[layer_index] = "Polygon_" + "_" + (layer_index + 1).ToString();
 
                 // Convert gridOverlay to MapWinGIS.Shapefile so that it could be exported by the MapWinGIS
@@ -2157,7 +3143,7 @@ namespace SLF
             DataRow row = dt.NewRow();
             row["PolygonID"] = polygonId;
             row["Coordinates"] = coordinates;
-            row["Area_Size(m2)"] = Math.Round(area,0).ToString();
+            row["Area_Size(m2)"] = Math.Round(area, 0).ToString();
             dt.Rows.Add(row);
 
             return dt;
@@ -2194,7 +3180,7 @@ namespace SLF
             ContextMenuStrip contextMenuStrip = (ContextMenuStrip)sender;
 
             // Get the checkbox associated with the context menu strip and set its font to bold
-            System.Windows.Forms.CheckBox clickedCheckBox = (System.Windows.Forms.CheckBox)contextMenuStrip.SourceControl; 
+            System.Windows.Forms.CheckBox clickedCheckBox = (System.Windows.Forms.CheckBox)contextMenuStrip.SourceControl;
             clickedCheckBox.Font = new Font(clickedCheckBox.Font, System.Drawing.FontStyle.Bold);
 
         }
@@ -2403,7 +3389,7 @@ namespace SLF
 
                     // her bir oluşturulan hücreyi/poligonu listeye ekle
                     polygons.Add(polygon);
-                        
+
                     // Add the coordinates to the DataTable
                     DataRow row = gridTable.NewRow();
                     row["Cell_No"] = cell_no;
@@ -2420,7 +3406,7 @@ namespace SLF
             // grid e ait oluşturulmuş mxm hücreleri "polygons" listesiyle return et.
             return polygons;
         }
-
+        
         // creates a grid and adds it onto the map
         public void AddGridToMap()
         {
@@ -2443,7 +3429,7 @@ namespace SLF
             // Create grid and DataTable
             DataTable gridTable;
             var polygonAttributes_grid = new Dictionary<NetTopologySuite.Geometries.Polygon, DataRow>();
-            var grid = CreateGrid(xMin, yMin, xMax, yMax, cellSizeDegreesLat, cellSizeDegreesLon, 
+            var grid = CreateGrid(xMin, yMin, xMax, yMax, cellSizeDegreesLat, cellSizeDegreesLon,
                 out gridTable, polygonAttributes_grid);
 
             // Add grid polygons to the overlay
@@ -2593,19 +3579,64 @@ namespace SLF
             gMapControl_EA.Refresh();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void SelectFolderButton_Click(object sender, EventArgs e)
         {
-            // Girdi modülündeki dosya yükleme butonuna tıklandığında çalışacak kodlar
+            // Handle file loading logic for the "Girdi" module
+            if (slfStartYear == 0 || slfEndYear == 0)
+            {
+                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            // Check if an item is selected in the ComboBox before accessing it
+            if (veri_listesi_seçimi.SelectedItem == null)
+            {
+                MessageBox.Show("Lütfen bir veri tipi seçin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return; // Exit if no valid data type is selected
+            }
 
-            // Veri listesinde seçilen veri tipine göre dosya seçme işlemi yapılacak
+            // Perform file selection based on the selected data type
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+
+            // Ensure girdiModülü is properly initialized
+            if (!girdiModülleri.ContainsKey(seçilenVeriTipi))
+            {
+                MessageBox.Show("Geçersiz veri tipi seçildi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return; // Exit if the selected data type is not valid
+            }
+
+            // Use the selectedMethod here
+            if (selectedMethod == "ELF (Ekonometrik)")
+            {
+                // Logic for ELF selection
+               // MessageBox.Show("ELF method selected, skipping prerequisites.");
+            }
+            else if (selectedMethod == "SLF (Jeo-Uzamsal)")
+            {
+                // Logic for SLF selection
+               // MessageBox.Show("SLF method selected, prerequisites are required.");
+            }
+            else
+            {
+                // Handle other cases or invalid selection
+                MessageBox.Show("No valid method selected.");
+            }
+
             girdiModülü = girdiModülleri[seçilenVeriTipi];
-            var isImported = girdiModülü.VEERProcess(seçilenVeriTipi);
-            if (isImported) {
+            girdiModülü.SlfStartYear = slfStartYear;
+            girdiModülü.SlfEndYear = slfEndYear;
+
+            // Check if "ELF" is selected to skip prerequisites
+            bool skipPrerequisites = (selectedMethod == "ELF (Ekonometrik)");
+
+            // Call VEERProcess with skipPrerequisites flag
+            var isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
+            if (isImported)
+            {
                 veri_listesi_seçimi.Refresh();
                 dataGridView1.DataSource = girdiModülü.CurrentDataTable;
             }
         }
+
 
         private void DrawRuler_ea(GMapOverlay rulerOverlay, List<PointLatLng> rulerPoints)
         {
@@ -2723,7 +3754,7 @@ namespace SLF
                     {
                         HighlightPolygon(polygon, layer_index);
 
-                        if(polygonAttributes.TryGetValue(polygon, out DataRow row))
+                        if (polygonAttributes.TryGetValue(polygon, out DataRow row))
                         {
                             ShowAttributeRow(row);
                             tablo_formu.Show();
@@ -2738,7 +3769,7 @@ namespace SLF
         {
             DataTable singleRowTable = row.Table.Clone(); // Clone the structure of the original table
             singleRowTable.ImportRow(row); // Import the specific row into the new table
-            ShowAttributeTable(singleRowTable); 
+            ShowAttributeTable(singleRowTable);
         }
 
         // show information about polygons when double-clicking on the map
@@ -2809,7 +3840,7 @@ namespace SLF
 
             var coordinates1 = polygon1.Points.Select(p => new NetTopologySuite.Geometries.Coordinate(p.Lng, p.Lat)).ToArray();
             var coordinates2 = polygon2.Points.Select(p => new NetTopologySuite.Geometries.Coordinate(p.Lng, p.Lat)).ToArray();
-            
+
             var ntsPolygon1 = geometryFactory.CreatePolygon(coordinates1);
             var ntsPolygon2 = geometryFactory.CreatePolygon(coordinates2);
 
@@ -2910,7 +3941,7 @@ namespace SLF
             // initialize a list named "joinedData" that will hold the info about the polygon that is created
             // due to the intersection operation, and the corresponding data
             List<(GMapPolygon ResultingPolygon, DataRow ResultingAttributes)> joinedData = new List<(GMapPolygon, DataRow)>();
-                  
+
             // polygon-wise spatial join of the two polygons
             foreach (var (gridPolygon, gridAttributes) in layer_1)
             {
@@ -2928,23 +3959,23 @@ namespace SLF
 
         // take two polygons with <GMapPolygon, DataRow> dictionary structure and combine them into
         // a new combined polygon with the same structure
-        private List<(GMapPolygon ResultingPolygon, DataRow ResultingAttributes, 
-            Dictionary<string, double> Counts, 
-            Dictionary<string, double> Sums, 
-            Dictionary<string, double> Mins, 
+        private List<(GMapPolygon ResultingPolygon, DataRow ResultingAttributes,
+            Dictionary<string, double> Counts,
+            Dictionary<string, double> Sums,
+            Dictionary<string, double> Mins,
             Dictionary<string, double> Maxs)> PerformSpatialJoinWithAggregations(
             List<(GMapPolygon Polygon, DataRow Attributes)> layer_1,
             List<(GMapPolygon Polygon, DataRow Attributes)> layer_2,
             List<string> selectedColumns)
         {
-            List<(GMapPolygon ResultingPolygon, DataRow ResultingAttributes, 
-                Dictionary<string, double> Counts, 
-                Dictionary<string, double> Sums, 
-                Dictionary<string, double> Mins, 
-                Dictionary<string, double> Maxs)> joinedData = new List<(GMapPolygon, DataRow, 
-                            Dictionary<string, double>, 
-                            Dictionary<string, double>, 
-                            Dictionary<string, double>, 
+            List<(GMapPolygon ResultingPolygon, DataRow ResultingAttributes,
+                Dictionary<string, double> Counts,
+                Dictionary<string, double> Sums,
+                Dictionary<string, double> Mins,
+                Dictionary<string, double> Maxs)> joinedData = new List<(GMapPolygon, DataRow,
+                            Dictionary<string, double>,
+                            Dictionary<string, double>,
+                            Dictionary<string, double>,
                             Dictionary<string, double>)>();
 
             foreach (var (gridPolygon, gridAttributes) in layer_1)
@@ -2954,14 +3985,14 @@ namespace SLF
                 var sums = selectedColumns.ToDictionary(column => column, column => 0.0);
                 var mins = selectedColumns.ToDictionary(column => column, column => double.MinValue);
                 var maxs = selectedColumns.ToDictionary(column => column, column => double.MaxValue);
-                
+
                 // add all of the columns from the first layer, and only the aggregate columns
                 // from the second layer
                 DataRow combinedAttributes = gridAttributes.Table.NewRow();
 
-                foreach(DataColumn columns_original in gridAttributes.Table.Columns)
+                foreach (DataColumn columns_original in gridAttributes.Table.Columns)
                 {
-                    combinedAttributes[columns_original] = gridAttributes[columns_original];  
+                    combinedAttributes[columns_original] = gridAttributes[columns_original];
                 }
 
                 foreach (string column in selectedColumns)
@@ -2979,7 +4010,7 @@ namespace SLF
                 {
                     if (PolygonsIntersect(gridPolygon, shapePolygon))
                     {
-                        combinedAttributes = CombineAttributesWithAggregations(combinedAttributes, shapeAttributes, 
+                        combinedAttributes = CombineAttributesWithAggregations(combinedAttributes, shapeAttributes,
                             counts, sums, mins, maxs, selectedColumns);
                     }
                 }
@@ -3005,17 +4036,17 @@ namespace SLF
                 resultingPolygon.Stroke = new Pen(Color.LightSeaGreen, 3);
                 resultingPolygon.Fill = new SolidBrush(Color.FromArgb(50, Color.Transparent));
             }
-            
+
             return resultingOverlay;
         }
 
         // create the polygons and the affiliated data to the specified objects
         // that are the results of the jabl-summary functionality
         private GMapOverlay CreateResultingOverlayWithSummaries(
-            List<(GMapPolygon ResultingPolygon, DataRow ResultingAttributes, 
-                Dictionary<string, double> Counts, 
-                Dictionary<string, double> Sums, 
-                Dictionary<string, double> Mins, 
+            List<(GMapPolygon ResultingPolygon, DataRow ResultingAttributes,
+                Dictionary<string, double> Counts,
+                Dictionary<string, double> Sums,
+                Dictionary<string, double> Mins,
                 Dictionary<string, double> Maxs)> joinedData,
             List<string> selectedColumns)
         {
@@ -3025,8 +4056,8 @@ namespace SLF
             {
                 foreach (string column in selectedColumns)
                 {
-                    
-                    if(resultingAttributes != null)
+
+                    if (resultingAttributes != null)
                     {
                         resultingAttributes[$"{column}_Count"] = counts[column];
                         resultingAttributes[$"{column}_Sum"] = sums[column];
@@ -3048,7 +4079,8 @@ namespace SLF
                         {
                             resultingAttributes[$"{column}_Min"] = mins[column];
                         }
-                    } else
+                    }
+                    else
                     {
                         MessageBox.Show("null");
                     }
@@ -3147,15 +4179,15 @@ namespace SLF
         private void raporGoruntuleButonu_Click(object sender, EventArgs e)
         {
             // Girdi modülündeki dosya yükleme butonuna tıklandığında çalışacak kodlar
-
+            if (slfStartYear == 0 || slfEndYear == 0)
+            {
+                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             // Veri listesinde seçilen veri tipine göre dosya seçme işlemi yapılacak
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
             girdiModülü = girdiModülleri[seçilenVeriTipi];
             girdiModülü.VEERReport(seçilenVeriTipi);
-            //if (isImported) {
-            //    veri_listesi_seçimi.Refresh();
-            //    dataGridView1.DataSource = girdiModülü.CurrentDataTable;
-            //}
         }
 
 
@@ -3168,21 +4200,21 @@ namespace SLF
 
             // find the indices of the layers that are selected in the "jabl" functionality/interface
             // in the "tüm_katmanlar_array_names"
-            firstLayerToJoin = Array.FindIndex(tüm_katmanlar_array_names, 
+            firstLayerToJoin = Array.FindIndex(tüm_katmanlar_array_names,
                 name => name == firstLayerName);
-            secondLayerToJoin = Array.FindIndex(tüm_katmanlar_array_names, 
+            secondLayerToJoin = Array.FindIndex(tüm_katmanlar_array_names,
                 name => name == secondLayerName);
-            
+
             // extract the first and second overlay layers according to their specified indices
-            GMapOverlay firstOverlay = tüm_katmanlar_array[firstLayerToJoin]; 
-            GMapOverlay secondOverlay = tüm_katmanlar_array[secondLayerToJoin]; 
+            GMapOverlay firstOverlay = tüm_katmanlar_array[firstLayerToJoin];
+            GMapOverlay secondOverlay = tüm_katmanlar_array[secondLayerToJoin];
 
             // extract the data of the first layer from the "tüm_katmanlar_datatable" array
-            List<(GMapPolygon Polygon, DataRow Attributes)> firstLayerData = 
+            List<(GMapPolygon Polygon, DataRow Attributes)> firstLayerData =
                 ExtractPolygonsAndAttributes(firstOverlay, tüm_katmanlar_datatable[firstLayerToJoin]);
 
             // extract the data of the second layer from the "tüm_katmanlar_datatable" array
-            List<(GMapPolygon Polygon, DataRow Attributes)> secondLayerData = 
+            List<(GMapPolygon Polygon, DataRow Attributes)> secondLayerData =
                 ExtractPolygonsAndAttributes(secondOverlay, tüm_katmanlar_datatable[secondLayerToJoin]);
 
             // spatially join the two layers and store the results in the "joinedData" List object
@@ -3209,7 +4241,7 @@ namespace SLF
 
             if (joinedData.Count > 0)
             {
-                
+
                 // Use the first DataRow to define the columns of the DataTable
                 DataRow firstRow = joinedData[0].ResultingAttributes;
 
@@ -3217,7 +4249,7 @@ namespace SLF
                 {
                     joined_data_table.Columns.Add(column.ColumnName, column.DataType);
                 }
-                
+
                 // Add each DataRow within the resulting "joinedData" object to the "joined_data_table" object
                 foreach (var (_, dataRow) in joinedData)
                 {
@@ -3258,8 +4290,11 @@ namespace SLF
 
         private void ExcelDownloadButton_Click(object sender, EventArgs e)
         {
-
-            const string FileDialogTitle = "Kaydedeceğiniz dosyanın adını giriniz.";
+            if (slfStartYear == 0 || slfEndYear == 0)
+            {
+                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             const string FilterExcelFiles = "Excel dosyaları (*.xlsx)|*.xlsx";
             const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
@@ -3269,23 +4304,24 @@ namespace SLF
                 MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Excel dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            var fileDialog = new SaveFileDialog();
-            fileDialog.Title = FileDialogTitle;
-            fileDialog.Filter = $"{FilterExcelFiles}|{FilterAllFiles}"; ;
+            else if (dataTable.Rows.Count > 50000)
+            {
+                MessageBox.Show($"{seçilenVeriTipi} için veri boyutu çok büyük. CSV olarak dışa aktarmayı deneyebilirsiniz.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            var fileDialog = new SaveFileDialog
+            {
+                Title = "Kaydedeceğiniz dosyanın adını giriniz.",
+                Filter = $"{FilterExcelFiles}|{FilterAllFiles}"
+            };
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
                 var filePath = fileDialog.FileName;
-                var dataTableList = new List<DataTable> {
-                    dataTable,
-                };
-                var sheetNames = new List<string> {
-                    seçilenVeriTipi,
-                };
                 var excelExporter = new ExcelExporter();
                 excelExporter.ExportExcelFile(
                     filePath,
-                    dataTableList,
-                    sheetNames
+                    dataTable,
+                    seçilenVeriTipi
                 );
             }
             else
@@ -3295,6 +4331,349 @@ namespace SLF
 
         }
 
+        private void csvExportButton_Click(object sender, EventArgs e)
+        {
+            if (slfStartYear == 0 || slfEndYear == 0)
+            {
+                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            const string FilterCsvFiles = "Csv dosyaları (*.csv)|*.csv";
+            const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
+            if (dataTable.Rows.Count == 0)
+            {
+                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Csv dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            var fileDialog = new SaveFileDialog
+            {
+                Title = "Kaydedeceğiniz dosyanın adını giriniz.",
+                Filter = $"{FilterCsvFiles}|{FilterAllFiles}"
+            };
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var filePath = fileDialog.FileName;
+                var csvHandler = new CsvHandler();
+                csvHandler.ExportCsvFile(
+                    filePath,
+                    dataTable
+                );
+            }
+            else
+            {
+                MessageBox.Show("Dosya seçilmedi.");
+            }
+        }
+        private void veri_listesi_seçimi_MouseDown(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        /* -------------------------------------------------------------------------------------------*/
+
+
+        //////////////// YEAR SELECTION EVENTS ////////////////
+
+        private void ResetYearSelectionProcessGirdiModulu()
+        {
+            slfStartYear = slfEndYear = 0;
+            int currentYear = DateTime.Now.Year;
+            int lastYear = currentYear - 1;
+
+            startYearComboBox.SelectedIndex = -1;
+            startYearComboBox.Text = "Yıl seçiniz";
+            endYearComboBox.SelectedIndex = -1;
+            endYearComboBox.Text = "Yıl seçiniz";
+            yearApproveButton.Text = "Onayla";
+
+            //// Clear any existing items in the ComboBox
+            startYearComboBox.Items.Clear();
+
+            // Add the years to the ComboBox
+            startYearComboBox.Items.Add(lastYear);
+            startYearComboBox.Items.Add(currentYear);
+
+            // Disable the endYearComboBox initially
+            startYearComboBox.Enabled = true;
+            endYearComboBox.Enabled = false;
+            yearApproveButton.Enabled = false;
+           // veri_listesi_seçimi.Enabled = false;
+        }
+        private void ModülFormu_Load(object sender, EventArgs e)
+        {
+            // Modül formunu yüklerken reset year selection sürecini başlat
+            ResetYearSelectionProcessGirdiModulu();
+        }
+
+        private void startYearComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startYearComboBox.SelectedIndex == -1)
+            {
+                return;
+            }
+            // Get the selected year
+            int selectedYear = (int)startYearComboBox.SelectedItem;
+
+
+            // Enable the endYearComboBox
+            endYearComboBox.Enabled = true;
+
+            // Clear any existing items in the ComboBox
+            endYearComboBox.Items.Clear();
+
+            // Add years from selectedYear + 4 to selectedYear + 14
+            for (int year = selectedYear + 4; year <= selectedYear + 14; year++)
+            {
+                endYearComboBox.Items.Add(year);
+            }
+
+            // Optionally, set the first year as the selected item
+            //endYearComboBox.SelectedIndex = 0;
+        }
+
+        private void endYearComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            yearApproveButton.Enabled = true;
+        }
+
+        private void HomePageButton_Click(object sender, EventArgs e)
+        {
+            HomePageForm homePageForm = new HomePageForm();
+            homePageForm.Show();
+            this.Hide();
+        }
+
+        private void yearApproveButton_Click(object sender, EventArgs e)
+        {
+            if (endYearComboBox.SelectedIndex == -1)
+            {
+                // if the end year is not chosen, it means we are still in selection process
+                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            else if (startYearComboBox.Enabled == false && endYearComboBox.Enabled == false)
+            {
+                // but if both combobox are disabled, it means the selection process is already done
+                // Check if any DataTable in girdiModülleri has rows
+                bool anyTableHasRows = girdiModülleri.Values.Any(girdiModülü =>
+                    girdiModülü.importedDataTable != null && girdiModülü.importedDataTable.Rows.Count > 0);
+                if (anyTableHasRows)
+                {
+                    var dialogResult = MessageBox.Show("Yılları değiştirirseniz verileri tekrardan içeri aktarmanız gerekecek, devam etmek istiyor musunuz?", "Uyarı!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (dialogResult != DialogResult.Yes)
+                    {
+                        return;
+                    }
+                }
+                ResetYearSelectionProcessGirdiModulu();
+                foreach (var girdiModülü in girdiModülleri.Values)
+                {
+                    //girdiModülü.importedDataTable?.Clear(); // Clear the DataTable if it is not null
+                    girdiModülü.importedDataTable = new DataTable();
+                }
+                dataGridView1.DataSource = null;
+            }
+            else
+            {
+                // selections are completed
+                startYearComboBox.Enabled = false;
+                endYearComboBox.Enabled = false;
+                //veri_listesi_seçimi.Enabled = true;
+                slfStartYear = (int)startYearComboBox.SelectedItem;
+                slfEndYear = (int)endYearComboBox.SelectedItem;
+                MessageBox.Show($"Başlangıç yılı: {slfStartYear}, Bitiş yılı: {slfEndYear}", "Yıllar belirlendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                //yearApproveButton.Enabled = false;
+                yearApproveButton.Text = "Sıfırla";
+            }
+        }
+        private void calculateChargeStation(int greenAc, int redDc)
+        {
+            if (this.InvokeRequired)
+            {
+                // Eğer bu metod arka plandan çağrıldıysa, UI güncellemesini UI thread'ine taşı.
+                this.Invoke(new Action(() => calculateChargeStation(greenAc, redDc)));
+                return;
+            }
+
+            // Önce mevcut label'ı bulup, varsa kaldırıyoruz
+            var existingLabel = gMapControl_EA.Controls.Find("istasyonAdetLabel", true).FirstOrDefault();
+            if (existingLabel != null)
+            {
+                gMapControl_EA.Controls.Remove(existingLabel);  // gMapControl_EA'den kaldır
+                Console.WriteLine("Label kaldırıldı");
+            }
+
+
+            // Yeni bir label oluşturuyoruz
+            System.Windows.Forms.Label istasyonAdetLabel = new System.Windows.Forms.Label();
+
+            // İstasyon sayılarını eksiltmeden gösteriyoruz
+            istasyonAdetLabel.Text = $"AC istasyonlar: {greenAc - 1}, DC istasyonlar: {redDc - 1}";
+
+            // Debug için konsola yazdır (log)
+            Console.WriteLine($"AC Sayısı: {greenAc}, DC Sayısı: {redDc}");
+
+            // Haritanın sağ üst köşesine etiketi yerleştiriyoruz
+            istasyonAdetLabel.Location = new System.Drawing.Point(gMapControl_EA.Width - 400, 10);
+            istasyonAdetLabel.AutoSize = true;  // Otomatik boyutlandırma
+
+            // Yazı tipi ve stil ayarları
+            istasyonAdetLabel.Font = new System.Drawing.Font("Arial", 16, System.Drawing.FontStyle.Bold);
+            istasyonAdetLabel.ForeColor = System.Drawing.Color.White;  // Yazı rengini beyaz yapıyoruz
+            istasyonAdetLabel.BackColor = System.Drawing.Color.Transparent;  // Arka planı şeffaf yapıyoruz
+
+            // Etiketi sağ üst köşeye sabitliyoruz
+            istasyonAdetLabel.Anchor = (AnchorStyles.Top | AnchorStyles.Right);
+            istasyonAdetLabel.Name = "istasyonAdetLabel";  // İleride bulabilmek için ad veriyoruz
+
+            // Label'i gMapControl_EA'ye ekliyoruz
+            gMapControl_EA.Controls.Add(istasyonAdetLabel);
+
+            // Haritayı yeniden çiziyoruz
+            gMapControl_EA.Refresh();
+        }
+
+
+        private async Task eaHaritayaVeriYukleAsync()
+        {
+            int redDc = 0;
+            int greenAc = 0;
+
+            try
+            {
+                GMapOverlay eaOverlay = new GMapOverlay("EA Layer");
+
+                if (dataGridView1.DataSource == null)
+                {
+                    MessageBox.Show("Veri kaynağı bulunamadı. Lütfen verileri kontrol edin.");
+                    return;
+                }
+
+                gMapControl_EA.Overlays.Clear();
+
+                DataTable eaData = await Task.Run(() => DataGridViewToDataTable(dataGridView1));
+
+                if (eaData != null && eaData.Rows.Count > 0)
+                {
+                    greenAc = 0;  // Ensure counters are reset
+                    redDc = 0;
+
+                    Invoke(new Action(() =>
+                    {
+                        foreach (DataRow row in eaData.Rows)
+                        {
+                            if (!girdiModülü.IsNullLike(row["EA_X_KOORDINAT"]) && !girdiModülü.IsNullLike(row["EA_Y_KOORDINAT"]))
+                            {
+                                double x = Convert.ToDouble(row["EA_X_KOORDINAT"]);
+                                double y = Convert.ToDouble(row["EA_Y_KOORDINAT"]);
+
+                                if (int.TryParse(row["ISTASYON_GUCU"].ToString(), out int istasyonGucu))
+                                {
+                                    GMarkerGoogle marker;
+
+                                    if (istasyonGucu <= 22)
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.green);
+                                        greenAc++;
+                                    }
+                                    else
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.red);
+                                        redDc++;
+                                    }
+
+                                    eaOverlay.Markers.Add(marker);
+                                }
+                            }
+                        }
+
+                        // Log counters for debugging purposes
+
+                        // Call the function and catch any potential errors
+                        try
+                        {
+                            Console.WriteLine($"Green AC: {greenAc}, Red DC: {redDc}");
+                            calculateChargeStation(greenAc, redDc);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Error in calculateChargeStation: {ex.Message}");
+                        }
+
+                        gMapControl_EA.Overlays.Add(eaOverlay);
+                        gMapControl_EA.Refresh();
+                    }));
+                }
+                else
+                {
+                    MessageBox.Show("Lütfen Ea şarj noktalarını görebilmek için verilerinizi yükleyiniz.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Bir hata oluştu: {ex.Message}");
+            }
+        }
+
+
+        public DataTable DataGridViewToDataTable(DataGridView dataGridView) // datagridview verilerinin datatable donusumu 
+        {
+            DataTable dataTable = new DataTable();
+
+            // Sütunları ekleyin
+            foreach (DataGridViewColumn column in dataGridView.Columns)
+            {
+                // DataTable'e sütunları ekleyin
+                dataTable.Columns.Add(column.Name, column.ValueType);
+            }
+
+            // Satırları ekleyin
+            foreach (DataGridViewRow row in dataGridView.Rows)
+            {
+                // Eğer satır doluysa veri ekleyin (son satır boş olabilir)
+                if (!row.IsNewRow)
+                {
+                    DataRow dataRow = dataTable.NewRow();
+
+                    foreach (DataGridViewCell cell in row.Cells)
+                    {
+                        dataRow[cell.ColumnIndex] = cell.Value ?? DBNull.Value; // Hücre dolu değilse DBNull olarak ayarlayın
+                    }
+
+                    dataTable.Rows.Add(dataRow);
+                }
+            }
+
+            return dataTable;
+        }
+
+        private async void Modül_Tabları_SelectedIndexChanged(object sender, EventArgs e) // ea sarj modulu butonu tıklandgında baslayan event fonksiyonu
+        {
+            // Sadece "EA Şarj Modülü" tabına tıklandığında işlem yapalım
+            if (Modül_Tabları.SelectedTab.Text == "EA Şarj Modülü")
+            {
+                if (dataGridView1.DataSource == null)
+                {
+                    MessageBox.Show("Lütfen önce verileri yükleyin.");
+                    return;
+                }
+
+                // Harita işlemini başlat
+                await eaHaritayaVeriYukleAsync();
+            }
+        }
+
+        private void ea_Grid_Oluştur_Click(object sender, EventArgs e)
+        {
+            Grid_Seçenekler grid_formu = new Grid_Seçenekler();
+            grid_formu.Tag = this;
+            grid_formu.Owner = this;
+            grid_formu.Show();
+            grid_formu.Activate();
+            grid_formu.StartPosition = FormStartPosition.CenterParent;
+        }
         public async Task JoinAttributesByLocation_summary()
         {
             // Assume selectedColumns is populated from the ComboBox selections

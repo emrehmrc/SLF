@@ -72,7 +72,7 @@ namespace SLF
                     //"İstatistikler"
                 };
                 var excelExporter = new ExcelExporter();
-                excelExporter.ExportExcelFile(
+                excelExporter.ExportExcelFileWithMultipleSheets(
                     filePath,
                     dataTableList,
                     sheetNames

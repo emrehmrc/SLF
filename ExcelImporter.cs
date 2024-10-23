@@ -89,41 +89,62 @@ namespace SLF
             }
             },
                         {
-                "Ekonometrik Yük Tahmini Verileri", new List<string> {
-                    "YIL",
-                    "NUFUS",
-                    "GRP",
-                    "GRP_TARIMSAL_URETIM",
-                    "GRP_SANAYI_URETIM",
-                    "GRP_HIZMET_URETIM",
-                    "GRP_TARIMSAL_URETIM_lag1",
-                    "GRP_SANAYI_URETIM_lag1",
-                    "GRP_HIZMET_URETIM_lag1",
-                    "CDD",
-                    "HDD",
-                    "MESKEN_DAGITILAN",
-                    "SANAYI_DAGITILAN",
-                    "TICARETHANE_DAGITILAN",
-                    "TARIMSAL_SULAMA_DAGITILAN",
-                    "AYDINLATMA_DAGITILAN",
-                    "TOPLAM_DAGITILAN",
-                    "KKO",
-                    "KKM",
-                    "MESKEN_FATURALANAN",
-                    "SANAYI_FATURALANAN",
-                    "TICARETHANE_FATURALANAN",
-                    "TARIMSAL_SULAMA_FATURALANAN",
-                    "AYDINLATMA_FATURALANAN",
-                    "TOPLAM_FATURALANAN",
-                    "PUANT_YAZ",
-                    "PUANT_KIŞ",
-                    "MESKEN_ABONE_SAYISI",
-                    "SANAYI_ABONE_SAYISI",
-                    "TICARETHANE_ABONE_SAYISI",
-                    "TARIMSAL_SULAMA_ABONE_SAYISI",
-                    "AYDINLATMA_ABONE_SAYISI",
-                    "TOPLAM_ABONE_SAYISI",
-            }
+"Ekonometrik Yük Tahmini Verileri", new List<string> {
+    "YIL",
+    "GDP_GROWTH",
+    "ULKE_NUFUS",
+    "BOLGE_NUFUS",
+    "KKO",
+    "KKM",
+    "MESKEN_DAGITILAN",
+    "SANAYI_DAGITILAN",
+    "TICARETHANE_DAGITILAN",
+    "TARIMSAL_SULAMA_DAGITILAN",
+    "AYDINLATMA_DAGITILAN",
+    "TOPLAM_DAGITILAN",
+    "MESKEN_FATURALANAN",
+    "SANAYI_FATURALANAN",
+    "TICARETHANE_FATURALANAN",
+    "TARIMSAL_SULAMA_FATURALANAN",
+    "AYDINLATMA_FATURALANAN",
+    "TOPLAM_FATURALANAN",
+    "MESKEN_ABONE_SAYISI",
+    "SANAYI_ABONE_SAYISI",
+    "TICARETHANE_ABONE_SAYISI",
+    "TARIMSAL_SULAMA_ABONE_SAYISI",
+    "AYDINLATMA_ABONE_SAYISI",
+    "TOPLAM_ABONE_SAYISI",
+    "BOLGE_YAZ_PUANT",
+    "BOLGE_KIS_PUANT",
+    "GRP",
+    "GRP_TARIMSAL_URETIM",
+    "GRP_SANAYI_URETIM",
+    "GRP_HIZMET_URETIM",
+    "GRP_INSAAT_URETIM",
+    "GRP_TARIMSAL_URETIM_%",
+    "GRP_SANAYI_URETIM_%",
+    "GRP_HIZMET_URETIM_%",
+    "GRP_INSAAT_URETIM_%",
+    "GDP",
+    "GDP_TARIMSAL_URETIM",
+    "GDP_SANAYI_URETIM",
+    "GDP_HIZMET_URETIM",
+    "GDP_INSAAT_URETIM",
+    "GDP_TARIMSAL_URETIM_%",
+    "GDP_SANAYI_URETIM_%",
+    "GDP_HIZMET_URETIM_%",
+    "GDP_INSAAT_URETIM_%",
+    "CDD",
+    "HDD",
+    "ULKE_NUFUS_%",
+    "BOLGE_NUFUS_%",
+    "EA_Talep",
+    "DEK_Uretim",
+    "Other"
+}
+
+
+
             },
             {
                 "Fider Verileri", new List<string> {
@@ -189,6 +210,7 @@ namespace SLF
             // Example of measuring import time
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
+            
             using (var package = new ExcelPackage(new FileInfo(filePath)))
             {
                 ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // Assuming data is in the first worksheet

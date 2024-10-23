@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
+
 
 namespace SLF
 {
-    public class NoFileSelectedException : Exception
+    public class NoFileSelectedException : Exception // dosyanın yuklenme durumları mesajları
     {
         public NoFileSelectedException(string message) : base(message)
         {
@@ -25,8 +28,8 @@ namespace SLF
     public class GirdiModülü
     {
         protected Önizleme onizleme1 = new Önizleme();
-        protected Raporlama raporlama1 = new Raporlama();
-        protected readonly List<string> veri_listesi_requires_xlsx = new List<string> {
+        protected Raporlama raporlama1 = new Raporlama(); // excel sayfası için yapılmıs calısma excelexporter ve excel importer için bakılabilir ileri durumlarda 
+        protected readonly List<string> veri_listesi_requires_xlsx = new List<string> {  // 2. ekran list kosullar tanımlı birbirine baglı olan moduller ekle olup olmadıgı kontrolu yapılıyor
             "EA Şarj Verileri",
             "Ekonometrik Yük Tahmini Verileri",
             "Fider Verileri",
@@ -37,10 +40,14 @@ namespace SLF
             "Enerji Müsaadeleri Verileri",
             "Yeni Projelendirilmiş DTR Verileri"
         };
-        protected readonly List<string> veri_listesi_requires_csv = new List<string> { };
+        protected static readonly List<int> TRAFO_KAPASITE_LISTESI = new List<int> // trafo yakınsama için kullanılan list
+        {
+            15, 25, 40, 50, 63, 100, 160, 200, 250, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500
+        };
+        protected readonly List<string> veri_listesi_requires_csv = new List<string> { }; 
         protected readonly List<string> veri_listesi_requires_tabular = new List<string> { };
 
-        protected readonly List<string> nullLikeStrings = new List<string>
+        protected readonly List<string> nullLikeStrings = new List<string> // doluluk bosluk check kısımları kontrolu yapılıyor
         {
             "",
             "null",
@@ -49,11 +56,36 @@ namespace SLF
         };
 
         protected string seçilenVeriTipi;
-        protected virtual List<string> Prerequisites { get; } = new List<string>();
+        protected int slfStartYear;
+        protected int slfEndYear;
+        public int SlfStartYear
+        {
+            get { return slfStartYear; }
+            set { slfStartYear = value; }
+        }
+
+        public int SlfEndYear
+        {
+            get { return slfEndYear; }
+            set { slfEndYear = value; }
+        }
+        protected virtual List<string> Prerequisites { get; } = new List<string>(); 
 
         protected const int HoursInYear = 8760;
-        protected readonly int lastYear = DateTime.Now.Year - 1;
-        protected readonly int penultimateYear = DateTime.Now.Year - 2;
+        protected int lastYear
+        {
+            get { return slfStartYear - 1; }
+        }
+        protected int penultimateYear
+        {
+            get { return slfStartYear - 2; }
+        }
+        protected int horizonYear
+        {
+            get { return slfStartYear; }
+        }
+        //protected int lastYear; = DateTime.Now.Year - 1;
+        //protected readonly int penultimateYear = DateTime.Now.Year - 2;
 
         protected const string FileDialogTitle = "Bir veri dosyası seçiniz.";
         protected const string FilterExcelFiles = "Excel dosyaları (*.xlsx)|*.xlsx";
@@ -107,7 +139,22 @@ namespace SLF
         };
         protected double K_FACTOR = 2.5;
 
-        protected bool IsNullLike(object value, bool isZero=false)
+        protected int RoundUpTrafoKapasitesi(double yeniTrafoKapasitesi)
+        {
+            // Find the smallest value in the list that is greater than or equal to yeniTrafoKapasitesi
+            int roundedKapasite = TRAFO_KAPASITE_LISTESI.FirstOrDefault(kapasite => kapasite >= yeniTrafoKapasitesi);
+
+            // If no such value is found (meaning yeniTrafoKapasitesi is larger than any value in the list), 
+            // return the maximum value in the list
+            if (roundedKapasite == 0)
+            {
+                roundedKapasite = TRAFO_KAPASITE_LISTESI.Max();
+            }
+
+            return roundedKapasite;
+        }
+
+        public bool IsNullLike(object value, bool isZero=false)
         {
             if (value == null || value == DBNull.Value)
             {
@@ -122,7 +169,8 @@ namespace SLF
             return nullLikeStrings.Contains(stringValue, StringComparer.OrdinalIgnoreCase);
         }
 
-        public void VEERReport(string seçilenVeriTipi) {
+        public void VEERReport(string seçilenVeriTipi)
+        {
             DataTable dataTable = importedDataTable;
             if (dataTable != null && dataTable.Rows.Count > 0)
             {
@@ -134,14 +182,22 @@ namespace SLF
                 MessageBox.Show($"{seçilenVeriTipi}'ni yüklemeden rapor tablosunu göremezsiniz.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
-        public bool VEERProcess(string seçilenVeriTipi)
+        // bool skipPrerequisites is added for direct access to ELF Method
+
+        public bool VEERProcess(string seçilenVeriTipi, bool skipPrerequisites = false)
         {
             try
             {
-                CheckPrerequisites(seçilenVeriTipi); // Check the required datatables for the given module
+                // Skip prerequisite check if the flag is true
+                if (!skipPrerequisites)
+                {
+                    CheckPrerequisites(seçilenVeriTipi); // Check the required datatables for the given module
+                }
+
                 // ProcessFileSelection metodu ile dosya seçme işlemi yapılır ve seçilen dosya veri tablosuna yüklenir
                 ProcessFileSelection(seçilenVeriTipi);
                 DataTable dataTable = CurrentDataTable;
+
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
                     Onizleme1.Onizleme_DataGrid1.DataSource = dataTable;
@@ -158,8 +214,8 @@ namespace SLF
                         AppendAllToReportDataTables();
                         if (IsError())
                         {
-                            //onizleme1.Buton_YUKLE.Enabled = false;
-                            //onizleme1.Buton_İLERLE.Enabled = false;
+                            onizleme1.Buton_YUKLE.Enabled = false;
+                            onizleme1.Buton_İLERLE.Enabled = false;
                         }
 
                         // Exit the loop if there are no info or warning messages
@@ -167,6 +223,7 @@ namespace SLF
                         {
                             onizleme1.Buton_YUKLE.Enabled = true;
                             onizleme1.Buton_İLERLE.Enabled = false;
+
                         }
                         var dialogResult = Onizleme1.ShowDialog();
                         if (dialogResult == DialogResult.Cancel)
@@ -207,7 +264,6 @@ namespace SLF
             }
             return false;
         }
-
         public void ShowImportedMessage()
         {
             StringBuilder sb = new StringBuilder();
@@ -253,7 +309,7 @@ namespace SLF
         }
 
         protected static (float Min, float Max) InfoWarningBoundary(float boundary)
-        {
+        { 
             // Bi verinin "boundary"ye kadar olan kısmı info, "boundary"den sonrası warning
             return (boundary, MAX_THRESHOLD);
         }
@@ -343,11 +399,89 @@ namespace SLF
                 }
             }
         }
-
+        /*        protected void ImportProcessedData()
+                {
+                    importedDataTable = currentDataTable.Copy();
+                    dataTablesByType[seçilenVeriTipi] = importedDataTable;
+                }*/
         protected void ImportProcessedData()
         {
             importedDataTable = currentDataTable.Copy();
             dataTablesByType[seçilenVeriTipi] = importedDataTable;
+
+            // If "Ekonometrik Yük Tahmini Verileri" is selected, export to Excel and run the R script
+            if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
+            {
+                // Define the fixed file path for the Excel file
+                string filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx"; // Update this with your actual path
+
+                try
+                {
+                    var excelExporter = new ExcelExporter();
+
+                    // Update the first sheet of the Excel file with the imputed data
+                    excelExporter.UpdateExcelFileFirstSheet(filePath, importedDataTable);
+
+                    // Running the R script after the export
+                    RunRScript(filePath);  // Call the method to run the R script
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Dosya kaydedilirken bir hata oluştu: {ex.Message}");
+                }
+            }
+        }
+
+        private void RunRScript(string excelFilePath)
+        {
+            try
+            {
+                string rScriptPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\senaryolar.R";
+                string logFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\script_output_log.txt"; // Change as needed
+
+                if (string.IsNullOrWhiteSpace(excelFilePath) || !File.Exists(excelFilePath))
+                {
+                    MessageBox.Show("The specified Excel file does not exist.");
+                    return;
+                }
+
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "Rscript.exe",
+                        Arguments = $"\"{rScriptPath}\" \"{excelFilePath}\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+
+                process.Start();
+
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+
+                process.WaitForExit();
+
+                // Log the output and error messages
+                File.AppendAllText(logFilePath, $"Output:\n{output}\nError:\n{error}\n\n");
+
+                if (process.ExitCode != 0)
+                {
+                    MessageBox.Show($"R script encountered an error. Check the log file for details: {logFilePath}");
+                }
+                else
+                {
+                    // MessageBox.Show("R script successfully executed. Check the log file for output: " + logFilePath);
+                    MessageBox.Show("R script successfully executed.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred while running the R script: {ex.Message}");
+            }
         }
 
         public void ProcessFileSelection(string seçilenVeriTipi)
@@ -456,22 +590,22 @@ namespace SLF
 
         public virtual void Remove()
         {
-        
+
         }
 
         public virtual void Impute()
         {
-        
+
         }
 
         public virtual void Preprocess()
         {
-        
+
         }
 
         public virtual void Postprocess()
         {
-        
+
         }
 
         protected void ClearRows()

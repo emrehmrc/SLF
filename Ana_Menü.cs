@@ -11,25 +11,26 @@ using System.Windows.Forms;
 
 namespace SLF
 {
-    public partial class GirişFormu : Form
+    public partial class HomePageForm : Form
     {
         public ModülFormu mod1;
         public Hakkında mod2;
 
-        public GirişFormu()
+        public HomePageForm()
         {
             InitializeComponent();
-
+            this.DoubleBuffered = true;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+
+        private void StartButton_Click(object sender, EventArgs e)
         {
-            mod1 = new ModülFormu();
-            mod1.Tag = this;
-            mod1.Show();
-            this.Hide();
-        }
+            MethodForm optionForm = new MethodForm();
+            //this.Hide();
+            optionForm.ShowDialog();
+            this.Show();
 
+        }
         private void roundButton2_Click(object sender, EventArgs e)
         {
             Yardım yardım_formu = new Yardım();
