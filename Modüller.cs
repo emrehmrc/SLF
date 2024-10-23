@@ -3002,7 +3002,7 @@ namespace SLF
                     fonksiyonFormu.tum_sutunlar.Items.Add(columns.ToString());
                     ResumeLayout();
                 }
-
+                
                 fonksiyonFormu.Show();
                 fonksiyonFormu.BringToFront();
                 fonksiyonFormu.Focus();
