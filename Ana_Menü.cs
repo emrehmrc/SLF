@@ -11,15 +11,15 @@ using System.Windows.Forms;
 
 namespace SLF
 {
-    public partial class GirişFormu : Form
+    public partial class HomePageForm : Form
     {
         public ModülFormu mod1;
         public Hakkında mod2;
 
-        public GirişFormu()
+        public HomePageForm()
         {
             InitializeComponent();
-
+            this.DoubleBuffered = true;
         }
 
 
@@ -31,33 +31,6 @@ namespace SLF
             this.Show();
 
         }
-
-
-        /*
-                private void button1_Click(object sender, EventArgs e)
-                {
-                    // Initialize the class-level mod1 variable
-                    mod1 = new ModülFormu();
-
-                    // Hide the current form (GirişFormu)
-                    this.Hide();
-
-                    // Show the new form
-                    mod1.ShowDialog();
-
-                    // Once the new form is closed, show the current form (GirişFormu) again
-                    this.Show();
-                }
-        */
-        /*
-                private void button1_Click(object sender, EventArgs e)
-                {
-                    mod1 = new ModülFormu();
-                    mod1.Tag = this;
-                    mod1.Show();
-                    this.Hide();
-                }
-        */
         private void roundButton2_Click(object sender, EventArgs e)
         {
             Yardım yardım_formu = new Yardım();

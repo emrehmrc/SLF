@@ -9,12 +9,12 @@ using System.Windows.Forms;
 namespace SLF
 {
     public class EASarjModulu : GirdiModülü
-        
+
     {
-        protected override List<string> Prerequisites => new List<string> { "DTR Verileri"};
+        protected override List<string> Prerequisites => new List<string> { "DTR Verileri" };
         private void PreprocessMismatchedTrafoKodu()
         {
-            DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+            DataTable trafoDataTable = dataTablesByType["DTR Verileri"];    // datatablebytype ile birbirne baglı olana modullerin check ve imputasyonlar buradan başlıyor 
             var validTrafos = new HashSet<string>(trafoDataTable.AsEnumerable()
                                       .Select(row => row["TRAFO_KODU"].ToString())
                                       .Distinct()
@@ -36,7 +36,7 @@ namespace SLF
         private void ImputeCoordinate()
         {
             // "DTR Verileri" tablosunu al
-            DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+            DataTable trafoDataTable = dataTablesByType["DTR Verileri"]; 
 
             // Her satırı dolaş
             foreach (DataRow row in currentDataTable.Rows)

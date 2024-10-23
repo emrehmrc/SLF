@@ -13,11 +13,14 @@ namespace SLF
     public partial class Grid_Seçenekler : Form
     {
         public ModülFormu modül;
-
+        public TabControl Modül_Tabları;
+        public TabPage tab_stokastik;
+        public TabPage tab_ea;
         public Grid_Seçenekler()
         {
             InitializeComponent();
-        }
+            
+    }
 
         private void radioButton2_CheckedChanged(object sender, EventArgs e)
         {
@@ -33,44 +36,51 @@ namespace SLF
 
         private void grid_tamam_Click(object sender, EventArgs e)
         {
-            
+            // ModülFormu'nun aktif tabını kontrol ediyoruz
+            modül = (ModülFormu)Tag;
+
+            // Seçilen grid boyutunu ayarlıyoruz
             if (combobox_grid_sizes.SelectedIndex == 0)
             {
-                modül = (ModülFormu)Tag;
                 modül.grid_size = 100;
-                modül.Show();
-                this.Close();
-                modül.isSelecting_grid = true;
-                modül.gMapControl_stokastik.Cursor = Cursors.Arrow;
             }
             else if (combobox_grid_sizes.SelectedIndex == 1)
             {
-                modül = (ModülFormu)Tag;
                 modül.grid_size = 250;
-                modül.Show();
-                this.Close();
-                modül.isSelecting_grid = true;
-                modül.gMapControl_stokastik.Cursor = Cursors.Arrow;
             }
             else if (combobox_grid_sizes.SelectedIndex == 2)
             {
-                modül = (ModülFormu)Tag;
                 modül.grid_size = 400;
-                modül.Show();
-                this.Close();
-                modül.isSelecting_grid = true;
-                modül.gMapControl_stokastik.Cursor = Cursors.Arrow;
             }
             else
             {
-                modül = (ModülFormu)Tag;
                 modül.grid_size = 1000;
-                modül.Show();
-                this.Close();
+            }
+
+            modül.Show();
+            this.Close();
+
+            // Stokastik Modül mü yoksa EA Şarj Modülü mü aktif?
+            if (modül.Modül_Tabları.SelectedTab == modül.tab_stokastik)
+            {
+                // Stokastik modül için grid oluştur
                 modül.isSelecting_grid = true;
                 modül.gMapControl_stokastik.Cursor = Cursors.Arrow;
+            }
+            else if (modül.Modül_Tabları.SelectedTab == modül.tab_ea)
+            {
+                // EA Şarj Modülü için grid oluştur
+                modül.isSelecting_grid = true;
+                modül.gMapControl_EA.Cursor = Cursors.Arrow;
+                Console.WriteLine("buradayım");
+            }
+            else
+            {
+                MessageBox.Show("Geçerli bir modül seçmediniz.");
             }
         }
 
     }
+
 }
+
