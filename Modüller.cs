@@ -4665,6 +4665,17 @@ namespace SLF
             }
         }
 
+        private void buton_stokastik_harita_katmanlar_MouseClick(object sender, MouseEventArgs e)
+        {
+            if(e.Button == MouseButtons.Right)
+            {
+                harita_katmanları_right_click.Show();
+            } else
+            {
+                harita_katmanları_right_click.Hide();
+            }
+        }
+
         private void ea_Grid_Oluştur_Click(object sender, EventArgs e)
         {
             Grid_Seçenekler grid_formu = new Grid_Seçenekler();
