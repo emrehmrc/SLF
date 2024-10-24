@@ -177,6 +177,7 @@ namespace SLF
             this.tabloyuGörToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.rengiDeğiştirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.temizleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.yenidenAdlandırToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.kaydetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkBox20 = new System.Windows.Forms.CheckBox();
             this.checkBox19 = new System.Windows.Forms.CheckBox();
@@ -2288,9 +2289,10 @@ namespace SLF
             this.tabloyuGörToolStripMenuItem,
             this.rengiDeğiştirToolStripMenuItem,
             this.temizleToolStripMenuItem,
+            this.yenidenAdlandırToolStripMenuItem,
             this.kaydetToolStripMenuItem});
             this.katmanlar_right_click.Name = "katmanlar_right_click";
-            this.katmanlar_right_click.Size = new System.Drawing.Size(177, 108);
+            this.katmanlar_right_click.Size = new System.Drawing.Size(196, 134);
             this.katmanlar_right_click.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.katmanlar_right_click_Closing);
             this.katmanlar_right_click.Opening += new System.ComponentModel.CancelEventHandler(this.katmanlar_right_click_Opening);
             // 
@@ -2299,7 +2301,7 @@ namespace SLF
             this.tabloyuGörToolStripMenuItem.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.tabloyuGörToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("tabloyuGörToolStripMenuItem.Image")));
             this.tabloyuGörToolStripMenuItem.Name = "tabloyuGörToolStripMenuItem";
-            this.tabloyuGörToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
+            this.tabloyuGörToolStripMenuItem.Size = new System.Drawing.Size(195, 26);
             this.tabloyuGörToolStripMenuItem.Text = "Tabloyu Gör";
             this.tabloyuGörToolStripMenuItem.Click += new System.EventHandler(this.tabloyuGörToolStripMenuItem_Click);
             // 
@@ -2307,7 +2309,7 @@ namespace SLF
             // 
             this.rengiDeğiştirToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("rengiDeğiştirToolStripMenuItem.Image")));
             this.rengiDeğiştirToolStripMenuItem.Name = "rengiDeğiştirToolStripMenuItem";
-            this.rengiDeğiştirToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
+            this.rengiDeğiştirToolStripMenuItem.Size = new System.Drawing.Size(195, 26);
             this.rengiDeğiştirToolStripMenuItem.Text = "Rengi Değiştir";
             this.rengiDeğiştirToolStripMenuItem.Click += new System.EventHandler(this.rengiDeğiştirToolStripMenuItem_Click);
             // 
@@ -2315,15 +2317,23 @@ namespace SLF
             // 
             this.temizleToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("temizleToolStripMenuItem.Image")));
             this.temizleToolStripMenuItem.Name = "temizleToolStripMenuItem";
-            this.temizleToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
+            this.temizleToolStripMenuItem.Size = new System.Drawing.Size(195, 26);
             this.temizleToolStripMenuItem.Text = "Temizle";
             this.temizleToolStripMenuItem.Click += new System.EventHandler(this.temizleToolStripMenuItem_Click);
+            // 
+            // yenidenAdlandırToolStripMenuItem
+            // 
+            this.yenidenAdlandırToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("yenidenAdlandırToolStripMenuItem.Image")));
+            this.yenidenAdlandırToolStripMenuItem.Name = "yenidenAdlandırToolStripMenuItem";
+            this.yenidenAdlandırToolStripMenuItem.Size = new System.Drawing.Size(195, 26);
+            this.yenidenAdlandırToolStripMenuItem.Text = "Yeniden Adlandır";
+            this.yenidenAdlandırToolStripMenuItem.Click += new System.EventHandler(this.yenidenAdlandırToolStripMenuItem_Click);
             // 
             // kaydetToolStripMenuItem
             // 
             this.kaydetToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("kaydetToolStripMenuItem.Image")));
             this.kaydetToolStripMenuItem.Name = "kaydetToolStripMenuItem";
-            this.kaydetToolStripMenuItem.Size = new System.Drawing.Size(176, 26);
+            this.kaydetToolStripMenuItem.Size = new System.Drawing.Size(195, 26);
             this.kaydetToolStripMenuItem.Text = "Kaydet";
             this.kaydetToolStripMenuItem.Click += new System.EventHandler(this.kaydetToolStripMenuItem_Click);
             // 
@@ -3184,6 +3194,14 @@ namespace SLF
             this.overlap_analizi.Size = new System.Drawing.Size(187, 26);
             this.overlap_analizi.Text = "Overlap Analizi";
             // 
+            // yenidenAdlandırToolStripMenuItem
+            // 
+            this.yenidenAdlandırToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("yenidenAdlandırToolStripMenuItem.Image")));
+            this.yenidenAdlandırToolStripMenuItem.Name = "yenidenAdlandırToolStripMenuItem";
+            this.yenidenAdlandırToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
+            this.yenidenAdlandırToolStripMenuItem.Text = "Yeniden Adlandır";
+            this.yenidenAdlandırToolStripMenuItem.Click += new System.EventHandler(this.yenidenAdlandırToolStripMenuItem_Click);
+            // 
             // ModuleTabPanel
             // 
             this.ModuleTabPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -3458,6 +3476,7 @@ namespace SLF
         private ToolStripButton Stokastik_Fonksiyonlar;
         private Button raporGoruntuleButonu;
         private Button ExcelDownloadButton;
+        private ToolStripMenuItem yenidenAdlandırToolStripMenuItem;
         private Button csvExportButton;
         private ComboBox endYearComboBox;
         private ComboBox startYearComboBox;

@@ -70,6 +70,7 @@
             this.comboBox_fonksiyonlar_2.Name = "comboBox_fonksiyonlar_2";
             this.comboBox_fonksiyonlar_2.Size = new System.Drawing.Size(248, 32);
             this.comboBox_fonksiyonlar_2.TabIndex = 1;
+            this.comboBox_fonksiyonlar_2.TextChanged += new System.EventHandler(this.comboBox_fonksiyonlar_2_TextChanged);
             // 
             // label1
             // 
