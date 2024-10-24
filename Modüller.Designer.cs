@@ -251,6 +251,7 @@ namespace SLF
             this.HeaderPanel = new System.Windows.Forms.Panel();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.button5 = new System.Windows.Forms.Button();
+            this.button9 = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
@@ -681,6 +682,7 @@ namespace SLF
             // 
             // tab_dek
             // 
+            this.tab_dek.Controls.Add(this.button9);
             this.tab_dek.Controls.Add(this.toolStrip1);
             this.tab_dek.Controls.Add(this.gMapControl_Dek);
             this.tab_dek.Controls.Add(this.button8);
@@ -3200,6 +3202,16 @@ namespace SLF
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
+            // button9
+            // 
+            this.button9.Location = new System.Drawing.Point(1532, 58);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(190, 54);
+            this.button9.TabIndex = 34;
+            this.button9.Text = "Dagıtık Üretim Merkezi Ekle ";
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
+            // 
             // ModülFormu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -3534,5 +3546,6 @@ namespace SLF
         private ToolStripButton toolStripButton8;
         private ToolStripSeparator toolStripSeparator22;
         private Button button5;
+        private Button button9;
     }
 }

@@ -80,8 +80,7 @@ namespace SLF
         //private List<PoligonVeri> poligonlar_stokastik = new List<PoligonVeri>();
         private List<PointLatLng> polygonPoints_Dek = new List<PointLatLng>();
         private bool isAddingChargingStation = false; // Sadece şarj istasyonu eklenirken true olacak.
-
-
+        private bool isAddingDekPoint = false; // Sadece dek noktası eklenirken  true olacak.
         // variables to be used to create a grid
         public GMapOverlay bounding_box_overlay;
         private GMapOverlay gridOverlay = new GMapOverlay("grid");
@@ -2856,6 +2855,8 @@ namespace SLF
             popupForm.Text = "Şarj İstasyonu Bilgileri";
             popupForm.Size = new System.Drawing.Size(500, 300);
 
+            bool isOperationCancelled = true;  // İşlemin iptal edilip edilmediğini kontrol etmek için
+
             // Yeni bir DataGridView oluşturuyoruz
             DataGridView gridView = new DataGridView
             {
@@ -2867,64 +2868,74 @@ namespace SLF
             // DTR Verileri tablosundan trafo kodlarını almak için
             DataTable trafoDataTable = GirdiModülü.dataTablesByType["DTR Verileri"];
 
-            // Geçerli trafo kodlarını bir listeye ekliyoruz
+            // Trafo kodlarını listeye ekliyoruz
             List<string> trafoKoduListesi = trafoDataTable.AsEnumerable()
                                          .Select(row => row["TRAFO_KODU"].ToString())
                                          .Distinct()
                                          .ToList();
 
             // DataGridView sütunlarını oluşturuyoruz
-            gridView.Columns.Add(new DataGridViewTextBoxColumn { Name = "ISTASYON_ADI", HeaderText = "İstasyon Adı" });
-            gridView.Columns.Add(new DataGridViewTextBoxColumn { Name = "ISTASYON_TIPI", HeaderText = "İstasyon Tipi" });
-            gridView.Columns.Add(new DataGridViewTextBoxColumn { Name = "ISTASYON_GUCU", HeaderText = "İstasyon Gücü" });
+            gridView.Columns.Add(new DataGridViewTextBoxColumn { Name = "ISTASYON_ADI", HeaderText = "ISTASYON_ADI" });
+            gridView.Columns.Add(new DataGridViewTextBoxColumn { Name = "ISTASYON_TIPI", HeaderText = "ISTASYON_TIPI" });
+            gridView.Columns.Add(new DataGridViewTextBoxColumn { Name = "ISTASYON_GUCU", HeaderText = "ISTASYON_GUCU" });
 
             // EA_TRAFO_KODU için ComboBox sütunu oluşturuyoruz
             DataGridViewComboBoxColumn comboBoxColumn = new DataGridViewComboBoxColumn
             {
                 Name = "EA_TRAFO_KODU",
                 HeaderText = "Trafo Kodu",
-                DataSource = trafoKoduListesi,  // ComboBox'a trafo kodlarını ekliyoruz
+                DataSource = trafoKoduListesi,
                 DropDownWidth = 160,
                 FlatStyle = FlatStyle.Flat
             };
             gridView.Columns.Add(comboBoxColumn);
 
-            gridView.Columns.Add(new DataGridViewTextBoxColumn { Name = "EA_X_KOORDINAT", HeaderText = "X Koordinatı" });
-            gridView.Columns.Add(new DataGridViewTextBoxColumn { Name = "EA_Y_KOORDINAT", HeaderText = "Y Koordinatı" });
+            gridView.Columns.Add(new DataGridViewTextBoxColumn { Name = "EA_X_KOORDINAT", HeaderText = "EA_X_KOORDINAT" });
+            gridView.Columns.Add(new DataGridViewTextBoxColumn { Name = "EA_Y_KOORDINAT", HeaderText = "EA_Y_KOORDINAT" });
 
             // Şarj İstasyonu koordinatlarını otomatik olarak dolduruyoruz
-            gridView.Rows.Add();  // Sadece 1 satır ekliyoruz
+            gridView.Rows.Add();
             gridView.Rows[0].Cells["EA_X_KOORDINAT"].Value = veri.Enlem; // X Koordinatı
             gridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value = veri.Boylam; // Y Koordinatı
 
-            // Tamam butonu oluştur
+            // Tamam butonu
             Button btnTamam = new Button
             {
                 Text = "Tamam",
-                Dock = DockStyle.Bottom
+                Dock = DockStyle.Right
+            };
+
+            // İptal butonu
+            Button btnIptal = new Button
+            {
+                Text = "İptal",
+                Dock = DockStyle.Left
+            };
+
+            // İptal butonuna tıklanıldığında formu kapat
+            btnIptal.Click += (sender, e) =>
+            {
+                popupForm.Close();
             };
 
             // Eğer DataGridView1'in DataSource'u DataTable değilse, yeni bir DataTable oluştur
             DataTable dataTable = dataGridView1.DataSource as DataTable;
-
             if (dataTable == null)
             {
-                // Eğer DataTable mevcut değilse, yeni bir DataTable oluşturuyoruz
+                // Yeni bir DataTable oluştur
                 dataTable = new DataTable();
                 dataTable.Columns.Add("ISTASYON_ADI", typeof(string));
                 dataTable.Columns.Add("ISTASYON_TIPI", typeof(string));
                 dataTable.Columns.Add("ISTASYON_GUCU", typeof(int));
-                dataTable.Columns.Add("EA_TRAFO_KODU", typeof(string));  // Trafo Kodu dropdown menü ile seçiliyor
+                dataTable.Columns.Add("EA_TRAFO_KODU", typeof(string));
                 dataTable.Columns.Add("EA_X_KOORDINAT", typeof(double));
                 dataTable.Columns.Add("EA_Y_KOORDINAT", typeof(double));
-
                 dataGridView1.DataSource = dataTable;
             }
 
             // Tamam butonuna tıklanıldığında veriyi DataGridView1'e ekleyelim
             btnTamam.Click += (sender, e) =>
             {
-                // Tüm alanların doldurulmuş olduğunu kontrol edelim
                 foreach (DataGridViewCell cell in gridView.Rows[0].Cells)
                 {
                     if (cell.Value == null || string.IsNullOrWhiteSpace(cell.Value.ToString()))
@@ -2939,51 +2950,67 @@ namespace SLF
                     double.TryParse(gridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value.ToString(), out double boylam) &&
                     int.TryParse(gridView.Rows[0].Cells["ISTASYON_GUCU"].Value.ToString(), out int istasyonGucu))
                 {
-                    // Yeni bir satır oluşturuyoruz
                     DataRow newRow = dataTable.NewRow();
                     newRow["ISTASYON_ADI"] = gridView.Rows[0].Cells["ISTASYON_ADI"].Value.ToString();
                     newRow["ISTASYON_TIPI"] = gridView.Rows[0].Cells["ISTASYON_TIPI"].Value.ToString();
                     newRow["ISTASYON_GUCU"] = istasyonGucu;
-                    newRow["EA_TRAFO_KODU"] = gridView.Rows[0].Cells["EA_TRAFO_KODU"].Value.ToString();  // Seçilen Trafo Kodu
+                    newRow["EA_TRAFO_KODU"] = gridView.Rows[0].Cells["EA_TRAFO_KODU"].Value.ToString();
                     newRow["EA_X_KOORDINAT"] = enlem;
                     newRow["EA_Y_KOORDINAT"] = boylam;
 
-                    // Yeni satırı DataTable'a ekliyoruz
                     dataTable.Rows.Add(newRow);
 
-                    // Popup'u kapat
+                    isOperationCancelled = false;
                     popupForm.Close();
                 }
                 else
                 {
-                    // Girilen veriler geçerli değilse kullanıcıya hata mesajı gösterelim
                     MessageBox.Show("Lütfen geçerli değerler girin.");
                 }
             };
 
-            // Popup formuna eklemek için GridView ve Tamam butonunu form kontrollerine ekliyoruz
-            popupForm.Controls.Add(gridView);
-            popupForm.Controls.Add(btnTamam);
+            // Form kapanırken işlemin iptal edilip edilmediğini kontrol ediyoruz
+            popupForm.FormClosing += (s, e) =>
+            {
+                if (isOperationCancelled)
+                {
+                    MessageBox.Show("İşlem iptal edildi.");
+                }
+            };
 
-            // Popup formunu gösteriyoruz
+            // FlowLayoutPanel oluşturuyoruz ve Tamam ile İptal butonlarını ekliyoruz
+            FlowLayoutPanel panel = new FlowLayoutPanel { Dock = DockStyle.Bottom, FlowDirection = FlowDirection.LeftToRight };
+            panel.Controls.Add(btnIptal);
+            panel.Controls.Add(btnTamam);
+
+            popupForm.Controls.Add(gridView);
+            popupForm.Controls.Add(panel);
+
             popupForm.ShowDialog();
         }
         private void gMapControl_Dek_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
+            // Sol tuşla tıklama yapılmazsa işlemi durdur
             if (e.Button != MouseButtons.Left) return;
 
+            // Marker ekleme işlemi
             if (isSelecting_marker && markerOverlay_Dek != null)
             {
                 GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
                 markerOverlay_Dek.Markers.Add(marker);
+
                 NoktaVeri noktaVeri_marker = new NoktaVeri
                 {
                     Enlem = Math.Round(pointClick.Lat, 4),
                     Boylam = Math.Round(pointClick.Lng, 4)
                 };
                 marker.Tag = noktaVeri_marker;
+
+                // Marker seçiliyken popup ekranı açmak için StartDekPointPopup fonksiyonunu çağırıyoruz
+                StartDekPointPopup(noktaVeri_marker);  // Noktayı popup'a gönderiyoruz
             }
 
+            // Poligon çizme işlemi
             if (isSelecting_polygon)
             {
                 if (polygonPoints_Dek == null)
@@ -3042,6 +3069,155 @@ namespace SLF
                     }
                 }
             }
+        }
+        private void StartDekPointPopup(NoktaVeri noktaVeri)
+        {
+            // Yeni bir popup formu oluşturuyoruz
+            Form popupForm = new Form();
+            popupForm.Text = "DEK Modülü Bilgileri";
+            popupForm.Size = new System.Drawing.Size(600, 400);
+
+            bool isOperationCancelled = true; // İşlem iptal durumunu kontrol etmek için
+
+            // Yeni bir DataGridView oluşturuyoruz
+            DataGridView gridView = new DataGridView
+            {
+                Dock = DockStyle.Top,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                AllowUserToAddRows = false, // Kullanıcı yeni satır ekleyemesin
+                ColumnCount = 7 // 7 sütun (ComboBox sütunu hariç)
+            };
+
+            // Sütun başlıklarını ekliyoruz
+            gridView.Columns[0].Name = "ILCE_ADI";
+            gridView.Columns[0].HeaderText = "ILCE_ADI";
+            gridView.Columns[1].Name = "KAYNAK_TIPI";
+            gridView.Columns[1].HeaderText = "KAYNAK_TIPI";
+            gridView.Columns[2].Name = "DEK_KURULU_GUCU";
+            gridView.Columns[2].HeaderText = "DEK_KURULU_GUCU";
+            gridView.Columns[3].Name = "DEK_X_KOORDINAT";
+            gridView.Columns[3].HeaderText = "DEK_X_KOORDINAT";
+            gridView.Columns[4].Name = "DEK_Y_KOORDINAT";
+            gridView.Columns[4].HeaderText = "DEK_Y_KOORDINAT";
+            gridView.Columns[5].Name = "DEK_TM_ADI";
+            gridView.Columns[5].HeaderText = "DEK_TM_ADI";
+            gridView.Columns[6].Name = "DEK_KURULUM_YERI";
+            gridView.Columns[6].HeaderText = "DEK_KURULUM_YERI";
+
+            // Trafo Kodu için ComboBox sütunu oluşturuyoruz
+            DataGridViewComboBoxColumn comboBoxColumn = new DataGridViewComboBoxColumn
+            {
+                Name = "DEK_BAGLANDIGI_TRAFO_KODU",
+                HeaderText = "Bağlandığı Trafo Kodu"
+            };
+
+            // DTR Verileri tablosundan trafo kodlarını almak için
+            DataTable trafoDataTable = GirdiModülü.dataTablesByType["DTR Verileri"];
+
+            // Geçerli trafo kodlarını bir listeye ekliyoruz
+            List<string> trafoKoduListesi = trafoDataTable.AsEnumerable()
+                                         .Select(row => row["TRAFO_KODU"].ToString())
+                                         .Distinct()
+                                         .ToList();
+
+            // ComboBox sütununa trafo kodlarını ekliyoruz
+            comboBoxColumn.Items.AddRange(trafoKoduListesi.ToArray());
+
+            // ComboBox sütununu DataGridView'e ekliyoruz
+            gridView.Columns.Add(comboBoxColumn);
+
+            // Sadece 1 satır ekliyoruz (ilk veri girişi için)
+            gridView.Rows.Add();
+
+            // Koordinatları direkt NoktaVeri'den dolduruyoruz
+            gridView.Rows[0].Cells["DEK_X_KOORDINAT"].Value = noktaVeri.Boylam;
+            gridView.Rows[0].Cells["DEK_Y_KOORDINAT"].Value = noktaVeri.Enlem;
+
+            // Tamam butonu oluştur
+            Button btnTamam = new Button
+            {
+                Text = "Tamam",
+                Dock = DockStyle.Right
+            };
+
+            // İptal butonu oluştur
+            Button btnIptal = new Button
+            {
+                Text = "İptal",
+                Dock = DockStyle.Left
+            };
+
+            // İptal butonuna tıklanıldığında popup formunu kapatalım
+            btnIptal.Click += (s, eArgs) =>
+            {
+                popupForm.Close();
+            };
+
+            // Tamam butonuna tıklanıldığında işlem tamamlansın
+            btnTamam.Click += (s, eArgs) =>
+            {
+                // Tüm alanların doldurulmuş olduğunu kontrol ediyoruz
+                foreach (DataGridViewCell cell in gridView.Rows[0].Cells)
+                {
+                    if (cell.Value == null || string.IsNullOrWhiteSpace(cell.Value.ToString()))
+                    {
+                        MessageBox.Show("Lütfen tüm alanları doldurun.");
+                        return;
+                    }
+                }
+
+                // Yeni satır oluşturup DataGridView1'e ekleyeceğiz
+                DataTable dataTable = dataGridView1.DataSource as DataTable;
+                if (dataTable == null)
+                {
+                    dataTable = new DataTable();
+                    dataTable.Columns.Add("ILCE_ADI", typeof(string));
+                    dataTable.Columns.Add("KAYNAK_TIPI", typeof(string));
+                    dataTable.Columns.Add("DEK_KURULU_GUCU", typeof(double));
+                    dataTable.Columns.Add("DEK_X_KOORDINAT", typeof(double));
+                    dataTable.Columns.Add("DEK_Y_KOORDINAT", typeof(double));
+                    dataTable.Columns.Add("DEK_TM_ADI", typeof(string));
+                    dataTable.Columns.Add("DEK_KURULUM_YERI", typeof(string));
+                    dataTable.Columns.Add("DEK_BAGLANDIGI_TRAFO_KODU", typeof(string));
+                    dataGridView1.DataSource = dataTable;
+                }
+
+                DataRow newRow = dataTable.NewRow();
+                newRow["ILCE_ADI"] = gridView.Rows[0].Cells["ILCE_ADI"].Value.ToString();
+                newRow["KAYNAK_TIPI"] = gridView.Rows[0].Cells["KAYNAK_TIPI"].Value.ToString();
+                newRow["DEK_KURULU_GUCU"] = Convert.ToDouble(gridView.Rows[0].Cells["DEK_KURULU_GUCU"].Value);
+                newRow["DEK_X_KOORDINAT"] = noktaVeri.Boylam; // Boylam from NoktaVeri
+                newRow["DEK_Y_KOORDINAT"] = noktaVeri.Enlem;  // Enlem from NoktaVeri
+                newRow["DEK_TM_ADI"] = gridView.Rows[0].Cells["DEK_TM_ADI"].Value.ToString();
+                newRow["DEK_KURULUM_YERI"] = gridView.Rows[0].Cells["DEK_KURULUM_YERI"].Value.ToString();
+                newRow["DEK_BAGLANDIGI_TRAFO_KODU"] = gridView.Rows[0].Cells["DEK_BAGLANDIGI_TRAFO_KODU"].Value.ToString();
+
+                // Yeni satırı DataTable'a ekliyoruz
+                dataTable.Rows.Add(newRow);
+
+                isOperationCancelled = false;
+                popupForm.Close();
+            };
+
+            // Popup formu kapatılmaya çalışıldığında işlem iptal kontrolü yapalım
+            popupForm.FormClosing += (s, eArgs) =>
+            {
+                if (isOperationCancelled)
+                {
+                    MessageBox.Show("İşlem iptal edildi.");
+                }
+            };
+
+            // Popup formuna eklemek için GridView, Tamam ve İptal butonlarını ekliyoruz
+            FlowLayoutPanel panel = new FlowLayoutPanel { Dock = DockStyle.Bottom, FlowDirection = FlowDirection.LeftToRight };
+            panel.Controls.Add(btnIptal);
+            panel.Controls.Add(btnTamam);
+
+            popupForm.Controls.Add(gridView);
+            popupForm.Controls.Add(panel);
+
+            // Popup formunu gösteriyoruz
+            popupForm.ShowDialog();
         }
 
         private void gMapControl_EA_MouseDown(object sender, MouseEventArgs e)
@@ -5170,6 +5346,24 @@ namespace SLF
 
                 // İşaretleme işlemi başladığı için flag'i true yapıyoruz
                 isAddingChargingStation = true;
+            }
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            // "DTR Verileri" tablosunun olup olmadığını kontrol ediyoruz
+            if (GirdiModülü.dataTablesByType["DTR Verileri"] == null || GirdiModülü.dataTablesByType["DEK Verileri"].Rows.Count == 0)
+            {
+                // Tablonun olmadığını veya boş olduğunu belirtip kullanıcıya uyarı veriyoruz
+                MessageBox.Show("Lütfen Dağıtık Üretim verilerinizi ekleyin.");
+            }
+            else
+            {
+                // Şarj istasyonu ekleme işlemini başlatıyoruz
+                MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
+
+                // İşaretleme işlemi başladığı için flag'i true yapıyoruz
+                isAddingDekPoint = true;
             }
         }
 
