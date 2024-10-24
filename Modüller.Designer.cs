@@ -250,6 +250,7 @@ namespace SLF
             this.ModuleTabPanel = new System.Windows.Forms.Panel();
             this.HeaderPanel = new System.Windows.Forms.Panel();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.button5 = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
@@ -948,7 +949,7 @@ namespace SLF
             this.gMapControl_Dek.GrayScaleMode = false;
             this.gMapControl_Dek.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
             this.gMapControl_Dek.LevelsKeepInMemory = 5;
-            this.gMapControl_Dek.Location = new System.Drawing.Point(281, 53);
+            this.gMapControl_Dek.Location = new System.Drawing.Point(373, 41);
             this.gMapControl_Dek.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.gMapControl_Dek.MarkersEnabled = true;
             this.gMapControl_Dek.MaxZoom = 2;
@@ -964,8 +965,13 @@ namespace SLF
             this.gMapControl_Dek.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_Dek.ShowTileGridLines = false;
             this.gMapControl_Dek.Size = new System.Drawing.Size(995, 663);
-            this.gMapControl_Dek.TabIndex = 19;
+            this.gMapControl_Dek.TabIndex = 18;
             this.gMapControl_Dek.Zoom = 0D;
+            this.gMapControl_Dek.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_Dek_OnMapClick);
+            this.gMapControl_Dek.OnMapDoubleClick += new GMap.NET.WindowsForms.MapDoubleClick(this.gMapControl_Dek_OnMapDoubleClick);
+            this.gMapControl_Dek.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(this.gMapControl_Dek_OnMarkerClick);
+            this.gMapControl_Dek.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_Dek_MouseDown);
+            this.gMapControl_Dek.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_Dek_MouseMove);
             // 
             // button8
             // 
@@ -981,6 +987,7 @@ namespace SLF
             // 
             // tab_ea
             // 
+            this.tab_ea.Controls.Add(this.button5);
             this.tab_ea.Controls.Add(this.label14);
             this.tab_ea.Controls.Add(this.mesafe_metre_ea);
             this.tab_ea.Controls.Add(this.Mesafe_ea);
@@ -1183,8 +1190,6 @@ namespace SLF
             this.EA_Poligon.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.EA_Poligon.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
             this.EA_Poligon.ToolTipText = "Poligon çizme, silme veya kaydetme fonksiyonlarını yerine getirir.";
-            //this.EA_Poligon.Click += new System.EventHandler(this.EA_Poligon_Click);
-           
             // 
             // toolStripSeparator13
             // 
@@ -1418,39 +1423,6 @@ namespace SLF
             this.gMapControl_EA.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_EA_MouseDown);
             this.gMapControl_EA.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_EA_MouseMove);
             // 
-            this.gMapControl_Dek.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.gMapControl_Dek.Bearing = 0F;
-            this.gMapControl_Dek.CanDragMap = true;
-            this.gMapControl_Dek.Cursor = System.Windows.Forms.Cursors.Default;
-            this.gMapControl_Dek.EmptyTileColor = System.Drawing.Color.Navy;
-            this.gMapControl_Dek.GrayScaleMode = false;
-            this.gMapControl_Dek.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
-            this.gMapControl_Dek.LevelsKeepInMemory = 5;
-            this.gMapControl_Dek.Location = new System.Drawing.Point(373, 41);
-            this.gMapControl_Dek.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.gMapControl_Dek.MarkersEnabled = true;
-            this.gMapControl_Dek.MaxZoom = 2;
-            this.gMapControl_Dek.MinZoom = 2;
-            this.gMapControl_Dek.MouseWheelZoomEnabled = true;
-            this.gMapControl_Dek.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
-            this.gMapControl_Dek.Name = "gMapControl_EA";
-            this.gMapControl_Dek.NegativeMode = false;
-            this.gMapControl_Dek.PolygonsEnabled = true;
-            this.gMapControl_Dek.RetryLoadTile = 0;
-            this.gMapControl_Dek.RoutesEnabled = true;
-            this.gMapControl_Dek.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
-            this.gMapControl_Dek.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
-            this.gMapControl_Dek.ShowTileGridLines = false;
-            this.gMapControl_Dek.Size = new System.Drawing.Size(995, 663);
-            this.gMapControl_Dek.TabIndex = 18;
-            this.gMapControl_Dek.Zoom = 0D;
-            this.gMapControl_Dek.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_Dek_OnMapClick);
-            this.gMapControl_Dek.OnMapDoubleClick += new GMap.NET.WindowsForms.MapDoubleClick(this.gMapControl_Dek_OnMapDoubleClick);
-            this.gMapControl_Dek.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(this.gMapControl_Dek_OnMarkerClick);
-            this.gMapControl_Dek.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_Dek_MouseDown);
-            this.gMapControl_Dek.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_Dek_MouseMove);
             // button7
             // 
             this.button7.Location = new System.Drawing.Point(8, 41);
@@ -1461,7 +1433,6 @@ namespace SLF
             this.button7.Text = "CSV Yükle";
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
-
             // 
             // tab_ekonometrik
             // 
@@ -2323,7 +2294,6 @@ namespace SLF
             // 
             // yenidenAdlandırToolStripMenuItem
             // 
-            this.yenidenAdlandırToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("yenidenAdlandırToolStripMenuItem.Image")));
             this.yenidenAdlandırToolStripMenuItem.Name = "yenidenAdlandırToolStripMenuItem";
             this.yenidenAdlandırToolStripMenuItem.Size = new System.Drawing.Size(195, 26);
             this.yenidenAdlandırToolStripMenuItem.Text = "Yeniden Adlandır";
@@ -3194,14 +3164,6 @@ namespace SLF
             this.overlap_analizi.Size = new System.Drawing.Size(187, 26);
             this.overlap_analizi.Text = "Overlap Analizi";
             // 
-            // yenidenAdlandırToolStripMenuItem
-            // 
-            this.yenidenAdlandırToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("yenidenAdlandırToolStripMenuItem.Image")));
-            this.yenidenAdlandırToolStripMenuItem.Name = "yenidenAdlandırToolStripMenuItem";
-            this.yenidenAdlandırToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
-            this.yenidenAdlandırToolStripMenuItem.Text = "Yeniden Adlandır";
-            this.yenidenAdlandırToolStripMenuItem.Click += new System.EventHandler(this.yenidenAdlandırToolStripMenuItem_Click);
-            // 
             // ModuleTabPanel
             // 
             this.ModuleTabPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -3227,6 +3189,16 @@ namespace SLF
             this.HeaderPanel.Name = "HeaderPanel";
             this.HeaderPanel.Size = new System.Drawing.Size(1776, 42);
             this.HeaderPanel.TabIndex = 3;
+            // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(1502, 56);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(216, 62);
+            this.button5.TabIndex = 36;
+            this.button5.Text = "EA Şarj İstasyonu Ekle";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // ModülFormu
             // 
@@ -3561,5 +3533,6 @@ namespace SLF
         private ToolStripSeparator toolStripSeparator21;
         private ToolStripButton toolStripButton8;
         private ToolStripSeparator toolStripSeparator22;
+        private Button button5;
     }
 }
