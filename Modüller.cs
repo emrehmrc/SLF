@@ -133,7 +133,7 @@ namespace SLF
         // variables that are to be used to export .kml files
         public Dictionary<GMapPolygon, DataRow> polygonAttributes_kml;
         public Dictionary<GMapRoute, DataRow> routeAttributes_kml;
-
+        private bool isDtrLoaded = false;
         // Nokta veri yapısı
         public class NoktaVeri
         {
@@ -295,6 +295,7 @@ namespace SLF
             {
                 if (Modül_Tabları.TabPages.ContainsKey(tabToSelect))
                 {
+                    
                     // Make sure the tab is selected in Modül_Tabları
                     Modül_Tabları.SelectedTab = Modül_Tabları.TabPages[tabToSelect];
                     // Custom logic for specific tabs in Modül_Tabları
@@ -2762,6 +2763,7 @@ namespace SLF
 
         private void gMapControl_EA_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
+           
             if (e.Button == MouseButtons.Left)
             {
                 // İşaretleyici (marker) seçimi kontrolü
@@ -2781,8 +2783,13 @@ namespace SLF
                     // marker.Tag'i NoktaVeri tipine dönüştürüp enlem ve boylamı yazdırabilirsiniz.
                     NoktaVeri veri = (NoktaVeri)marker.Tag;
                     Console.WriteLine($"Enlem: {veri.Enlem}, Boylam: {veri.Boylam}");
+                    
+                    
                 }
-
+                else
+                {
+                    Console.WriteLine("Bilinmeyen tıklama türü");
+                }
                 // Poligon seçimi kontrolü
                 if (isSelecting_polygon)
                 {
@@ -2848,7 +2855,28 @@ namespace SLF
                 }
             }
         }
-        private void ShowChargingStationPopup(NoktaVeri veri)
+        private void RemoveMarkerAtPosition(PointLatLng pointClick)
+        {
+            
+            
+            double tolerance = 0.0001;  // Tolerance for matching coordinates
+            GMapMarker markerToRemove = markerOverlay_ea.Markers
+                .FirstOrDefault(m =>
+                    Math.Abs(m.Position.Lat - pointClick.Lat) < tolerance &&
+                    Math.Abs(m.Position.Lng - pointClick.Lng) < tolerance);
+
+            if (markerToRemove != null)
+            {
+                markerOverlay_ea.Markers.Remove(markerToRemove);  // Remove the marker
+                gMapControl_EA.Refresh();  // Refresh the map to reflect changes
+                Console.WriteLine("İşaretleyici kaldırıldı.");
+            }
+            else
+            {
+                Console.WriteLine("Kaldırılacak işaretleyici bulunamadı.");
+            }
+        }
+        private async Task ShowChargingStationPopup(NoktaVeri veri)
         {
             // Yeni bir popup formu oluşturuyoruz
             Form popupForm = new Form();
@@ -2898,19 +2926,33 @@ namespace SLF
             gridView.Rows[0].Cells["EA_X_KOORDINAT"].Value = veri.Enlem; // X Koordinatı
             gridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value = veri.Boylam; // Y Koordinatı
 
+            // Butonlar için panel oluştur
+            FlowLayoutPanel buttonPanel = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Bottom,
+                Height = 40,
+                Padding = new Padding(5)
+            };
+
             // Tamam butonu
             Button btnTamam = new Button
             {
                 Text = "Tamam",
-                Dock = DockStyle.Right
+                Width = 75,
+                Height = 30,
             };
 
             // İptal butonu
             Button btnIptal = new Button
             {
                 Text = "İptal",
-                Dock = DockStyle.Left
+                Width = 75,
+                Height = 30
             };
+
+            // Butonları panele ekle
+            buttonPanel.Controls.Add(btnIptal);
+            buttonPanel.Controls.Add(btnTamam);
 
             // İptal butonuna tıklanıldığında formu kapat
             btnIptal.Click += (sender, e) =>
@@ -2978,16 +3020,14 @@ namespace SLF
                 }
             };
 
-            // FlowLayoutPanel oluşturuyoruz ve Tamam ile İptal butonlarını ekliyoruz
-            FlowLayoutPanel panel = new FlowLayoutPanel { Dock = DockStyle.Bottom, FlowDirection = FlowDirection.LeftToRight };
-            panel.Controls.Add(btnIptal);
-            panel.Controls.Add(btnTamam);
-
+            // Kontrolleri forma ekle
             popupForm.Controls.Add(gridView);
-            popupForm.Controls.Add(panel);
+            popupForm.Controls.Add(buttonPanel);
 
             popupForm.ShowDialog();
+            await eaHaritayaVeriYukleAsync();
         }
+
         private void gMapControl_Dek_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
             // Sol tuşla tıklama yapılmazsa işlemi durdur
@@ -3007,7 +3047,10 @@ namespace SLF
                 marker.Tag = noktaVeri_marker;
 
                 // Marker seçiliyken popup ekranı açmak için StartDekPointPopup fonksiyonunu çağırıyoruz
+                if (isAddingDekPoint) { 
                 StartDekPointPopup(noktaVeri_marker);  // Noktayı popup'a gönderiyoruz
+                    isAddingDekPoint = false;
+                }
             }
 
             // Poligon çizme işlemi
@@ -3070,7 +3113,7 @@ namespace SLF
                 }
             }
         }
-        private void StartDekPointPopup(NoktaVeri noktaVeri)
+        private async Task StartDekPointPopup(NoktaVeri noktaVeri)
         {
             // Yeni bir popup formu oluşturuyoruz
             Form popupForm = new Form();
@@ -3130,26 +3173,29 @@ namespace SLF
             gridView.Rows.Add();
 
             // Koordinatları direkt NoktaVeri'den dolduruyoruz
-            gridView.Rows[0].Cells["DEK_X_KOORDINAT"].Value = noktaVeri.Boylam;
-            gridView.Rows[0].Cells["DEK_Y_KOORDINAT"].Value = noktaVeri.Enlem;
+            gridView.Rows[0].Cells["DEK_X_KOORDINAT"].Value = noktaVeri.Enlem;
+            gridView.Rows[0].Cells["DEK_Y_KOORDINAT"].Value = noktaVeri.Boylam;
 
             // Tamam butonu oluştur
             Button btnTamam = new Button
             {
                 Text = "Tamam",
-                Dock = DockStyle.Right
+                Width = 100,
+                Height = 30
             };
 
             // İptal butonu oluştur
             Button btnIptal = new Button
             {
                 Text = "İptal",
-                Dock = DockStyle.Left
+                Width = 100,
+                Height = 30
             };
 
             // İptal butonuna tıklanıldığında popup formunu kapatalım
             btnIptal.Click += (s, eArgs) =>
             {
+                isOperationCancelled = true;
                 popupForm.Close();
             };
 
@@ -3209,16 +3255,24 @@ namespace SLF
             };
 
             // Popup formuna eklemek için GridView, Tamam ve İptal butonlarını ekliyoruz
-            FlowLayoutPanel panel = new FlowLayoutPanel { Dock = DockStyle.Bottom, FlowDirection = FlowDirection.LeftToRight };
-            panel.Controls.Add(btnIptal);
+            FlowLayoutPanel panel = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Bottom,
+                Height = 50,
+                FlowDirection = FlowDirection.RightToLeft,
+                Padding = new Padding(10)
+            };
             panel.Controls.Add(btnTamam);
+            panel.Controls.Add(btnIptal);
 
-            popupForm.Controls.Add(gridView);
             popupForm.Controls.Add(panel);
+            popupForm.Controls.Add(gridView);
 
             // Popup formunu gösteriyoruz
             popupForm.ShowDialog();
+            await dekHaritayaVeriYukleAsync();
         }
+
 
         private void gMapControl_EA_MouseDown(object sender, MouseEventArgs e)
         {
@@ -3261,7 +3315,32 @@ namespace SLF
                 }
             }
         }
+        //private void HandleLeftClick(PointLatLng pointClick)
+        //{
+        //    // İşaretleyici (marker) seçimi kontrolü
+        //    if (isSelecting_marker)
+        //    {
+        //        GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
+        //        markerOverlay_ea.Markers.Add(marker);
 
+        //        NoktaVeri noktaVeri_marker = new NoktaVeri
+        //        {
+        //            Enlem = Math.Round(pointClick.Lat, 4),
+        //            Boylam = Math.Round(pointClick.Lng, 4)
+        //        };
+
+        //        marker.Tag = noktaVeri_marker;
+        //        Console.WriteLine("Marker eklendi: Enlem: " + noktaVeri_marker.Enlem + ", Boylam: " + noktaVeri_marker.Boylam);
+        //    }
+
+        //    // Diğer işlemler (poligon vs.)
+        //    // ...
+        //}
+
+        // Sağ tıklama ile marker silme işlemi
+        // Genel işaretleyici kaldırma fonksiyonu
+        
+        
         private void gMapControl_EA_MouseMove(object sender, MouseEventArgs e)
         {
             // eğer sadece 1 adet nokta seçilmişse, ve ikinci nokta dinamik olarak farklı yerlere
@@ -3424,6 +3503,21 @@ namespace SLF
                 gMapControl_Dek.Overlays.Remove(bounding_box_overlay);
                 AddGridToMap();
                 gMapControl_Dek.Refresh();
+            }
+        }
+        private void gMapControl_ea_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && isSelecting_grid)
+            {
+                // grid oluşturmak için seçilen alan (bounding box) ın son noktası
+                ending_point = gMapControl_EA.FromLocalToLatLng(e.X, e.Y);
+                isSelecting_grid = false;
+                gMapControl_EA.CanDragMap = true;
+
+                // Clear the selection polygon and refresh the map
+                gMapControl_EA.Overlays.Remove(bounding_box_overlay);
+                AddGridToMap();
+                gMapControl_EA.Refresh();
             }
         }
         private void gMapControl_Dek_MouseDown(object sender, MouseEventArgs e)
@@ -3825,8 +3919,15 @@ namespace SLF
 
         private void NoktaBilgileriniGoster(NoktaVeri nokta)
         {
-            MessageBox.Show($"Enlem: {nokta.Enlem}\nBoylam: {nokta.Boylam}\nBina Dem: " +
+            // Nokta bilgilerini göster
+            MessageBox.Show($"Enlem: {nokta.Enlem}\nBoylam: {nokta.Boylam}\nBina Demandi: " +
                 $"{nokta.Bina_Demandi}\nAbone Sayısı: {nokta.Abone_Sayısı}");
+
+            // Noktayı silmek için enlem ve boylamdan PointLatLng oluşturuyoruz
+            PointLatLng point = new PointLatLng(nokta.Enlem, nokta.Boylam);
+
+            // Marker'ı verilen noktaya göre kaldırıyoruz
+            RemoveMarkerAtPosition(point);
         }
 
         private void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
@@ -3835,6 +3936,7 @@ namespace SLF
             {
                 NoktaVeri seçili_nokta = item.Tag as NoktaVeri;
                 NoktaBilgileriniGoster(seçili_nokta);
+                
             }
         }
         private void gMapControl_Dek_OnMarkerClick(GMapMarker item, MouseEventArgs e)
@@ -4139,7 +4241,9 @@ namespace SLF
             var isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
             if (isImported)
             {
+                
                 veri_listesi_seçimi.Refresh();
+                
                 dataGridView1.DataSource = girdiModülü.CurrentDataTable;
             }
         }
@@ -4661,6 +4765,7 @@ namespace SLF
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
             girdiModülü = girdiModülleri[seçilenVeriTipi];
             dataGridView1.DataSource = girdiModülü.importedDataTable;
+            
         }
 
         private void SortTabPagesAlphabetically(TabControl tabControl, bool ascending = true)
@@ -4685,7 +4790,6 @@ namespace SLF
 
         private void veri_listesi_seçimi_DrawItem(object sender, DrawItemEventArgs e)
         {
-
             // Check if the index is valid
             if (e.Index < 0)
                 return;
@@ -4696,6 +4800,13 @@ namespace SLF
             // Determine the color based on some condition
             Color textColor = Color.Red;
             var girdiModülü = girdiModülleri[text];
+
+            // Eğer "DTR Verileri" yüklüyse isDtrLoaded'ı true yap ve renk yeşil olsun
+            if (text == "DTR Verileri" && girdiModülü.importedDataTable.Rows.Count > 0)
+            {
+                isDtrLoaded = true;
+                textColor = Color.Green;
+            }
             if (girdiModülü.importedDataTable.Rows.Count > 0)
             {
                 textColor = Color.Green;
@@ -4711,6 +4822,9 @@ namespace SLF
             // Draw the focus rectangle if the item is selected
             e.DrawFocusRectangle();
         }
+
+        // Modül tabları geçişini kontrol etmek için Selecting olayını kullanıyoruz
+       
 
         private void raporGoruntuleButonu_Click(object sender, EventArgs e)
         {
@@ -5041,12 +5155,11 @@ namespace SLF
                 Console.WriteLine("Label kaldırıldı");
             }
 
-
             // Yeni bir label oluşturuyoruz
             System.Windows.Forms.Label istasyonAdetLabel = new System.Windows.Forms.Label();
 
-            // İstasyon sayılarını eksiltmeden gösteriyoruz
-            istasyonAdetLabel.Text = $"AC istasyonlar: {greenAc - 1}, DC istasyonlar: {redDc - 1}";
+            // İstasyon sayılarını doğru gösteriyoruz
+            istasyonAdetLabel.Text = $"AC istasyonlar: {greenAc}, DC istasyonlar: {redDc}";
 
             // Debug için konsola yazdır (log)
             Console.WriteLine($"AC Sayısı: {greenAc}, DC Sayısı: {redDc}");
@@ -5107,7 +5220,7 @@ namespace SLF
                                 !eaData.Columns.Contains("EA_Y_KOORDINAT") ||
                                 !eaData.Columns.Contains("ISTASYON_GUCU"))
                             {
-                                //MessageBox.Show("Gerekli sütunlar veri tablosunda mevcut değil. Lütfen verilerinizi kontrol edin.");
+                                MessageBox.Show("Lütfen EA Sarj mödülü verilerinizi yükleyin.");
                                 return;
                             }
 
@@ -5191,7 +5304,7 @@ namespace SLF
                                 !dekData.Columns.Contains("DEK_Y_KOORDINAT") ||
                                 !dekData.Columns.Contains("KAYNAK_TIPI"))
                             {
-                                MessageBox.Show("Gerekli sütunlar veri tablosunda mevcut değil. Lütfen verilerinizi kontrol edin.");
+                                MessageBox.Show("Lütfen DEK mödülü verilerinizi yükleyin.");
                                 return;
                             }
 
@@ -5278,12 +5391,22 @@ namespace SLF
             return dataTable;
         }
 
-        private async void Modül_Tabları_SelectedIndexChanged(object sender, EventArgs e) // EA Şarj Modülü butonu tıklandığında başlayan event fonksiyonu
+        private async void Modül_Tabları_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // Sadece "EA Şarj Modülü" veya "Dek Modülü" tabına tıklandığında işlem yapalım
+            // Eğer DTR Verileri henüz yüklenmediyse, kullanıcı sadece "Girdi Modülü" sekmesine erişebilir
+            if (!isDtrLoaded && Modül_Tabları.SelectedTab != tab_girdi)
+            {
+                // Sekme geçişini tamamen iptal et
+                MessageBox.Show("DTR verileri yüklenmeden diğer sekmelere geçiş yapılamaz.");
+                Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
+                Modül_Tabları.SelectedTab = tab_girdi;
+                Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
+                return;
+            }
+
+            // EA Şarj Modülü tabına tıklanmışsa
             if (Modül_Tabları.SelectedTab.Text == "EA Şarj Modülü")
             {
-                
                 if (dataGridView1.DataSource == null)
                 {
                     MessageBox.Show("Lütfen önce verileri yükleyin.");
@@ -5293,9 +5416,10 @@ namespace SLF
                 // Harita işlemini başlat
                 await eaHaritayaVeriYukleAsync();
             }
+            // DEK Modülü tabına tıklanmışsa
             else if (Modül_Tabları.SelectedTab.Text == "DEK Modülü")
             {
-                Console.WriteLine("dek modulu");
+                Console.WriteLine("DEK Modülü");
                 if (dataGridView1.DataSource == null)
                 {
                     MessageBox.Show("Lütfen önce verileri yükleyin.");
@@ -5306,9 +5430,6 @@ namespace SLF
                 await dekHaritayaVeriYukleAsync();
             }
         }
-
-
-
 
         private void ea_Grid_Oluştur_Click(object sender, EventArgs e)
         {
@@ -5351,21 +5472,29 @@ namespace SLF
 
         private void button9_Click(object sender, EventArgs e)
         {
-            // "DTR Verileri" tablosunun olup olmadığını kontrol ediyoruz
-            if (GirdiModülü.dataTablesByType["DTR Verileri"] == null || GirdiModülü.dataTablesByType["DEK Verileri"].Rows.Count == 0)
+            // First, check if "DTR Verileri" exists and has data
+            if (!GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri") ||
+                GirdiModülü.dataTablesByType["DTR Verileri"] == null ||
+                GirdiModülü.dataTablesByType["DTR Verileri"].Rows.Count == 0)
             {
-                // Tablonun olmadığını veya boş olduğunu belirtip kullanıcıya uyarı veriyoruz
                 MessageBox.Show("Lütfen Dağıtık Üretim verilerinizi ekleyin.");
+            }
+            // Then check if "DEK Verileri" exists and has data
+            else if (!GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri") ||
+                     GirdiModülü.dataTablesByType["DEK Verileri"] == null ||
+                     GirdiModülü.dataTablesByType["DEK Verileri"].Rows.Count == 0)
+            {
+                MessageBox.Show("Lütfen DEK verilerinizi ekleyin.");
             }
             else
             {
-                // Şarj istasyonu ekleme işlemini başlatıyoruz
-                MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
-
-                // İşaretleme işlemi başladığı için flag'i true yapıyoruz
-                isAddingDekPoint = true;
+                // Start the DEK point marking process if both tables have data
+                MessageBox.Show("Lütfen harita üzerinde DEK noktası koordinatlarınızı belirleyiniz.");
+                isAddingDekPoint = true; // Set flag for DEK point marking
             }
         }
+
+        
 
         private void Dek_Grid_Oluştur_Click(object sender, EventArgs e)
         {

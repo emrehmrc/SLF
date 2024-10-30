@@ -360,7 +360,6 @@ namespace SLF
             int startYear = slfStartYear - 1;  // slfStartYear 2024 ise başlangıç yılı 2023 olacak
             List<int> yearsToCheck = Enumerable.Range(startYear - 4, 5).ToList();  // [2023, 2022, 2021, 2020, 2019]
 
-            // Eksik veri ve hatalı veri olan yılları ve hata mesajlarını tutacak yapı
             Dictionary<int, List<string>> missingDataErrors = new Dictionary<int, List<string>>();
 
             foreach (DataColumn column in currentDataTable.Columns)
@@ -378,12 +377,20 @@ namespace SLF
                 for (int i = 0; i < totalRows; i++)
                 {
                     var row = currentDataTable.Rows[i];
-                    int year = Convert.ToInt32(row["YIL"]);
 
-                    // Eğer yıl, slfStartYear ve 5 yıllık aralık içinde değilse kontrol etme
-                    if (!yearsToCheck.Contains(year))
+                    // YIL sütununda dönüştürme yapılırken TryParse kullan
+                    if (int.TryParse(row["YIL"]?.ToString(), out int year))
                     {
-                        continue;
+                        // Eğer yıl, slfStartYear ve 5 yıllık aralık içinde değilse kontrol etme
+                        if (!yearsToCheck.Contains(year))
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"YIL sütunu hatalı formatta: {row["YIL"]}");
+                        continue; // Eğer dönüşüm başarısızsa, bu satırı geç
                     }
 
                     // Eğer sütun değeri null veya boş ise null satırlar listesine ekle
@@ -394,13 +401,10 @@ namespace SLF
                     }
                 }
 
-                // Boş satırları map'e ekle
                 columnNullRowsMap[column.ColumnName] = nullRows;
 
-                // Boş veri yüzdesini hesapla
                 float nullPercentage = (float)nullCount / yearsToCheck.Count;
 
-                // Eğer yüzde sıfırdan büyükse, eşikleri kontrol et ve uygun mesajı ekle
                 if (nullPercentage > 0)
                 {
                     var thresholds = fiveYearsDataCheck[column.ColumnName];
@@ -854,7 +858,7 @@ namespace SLF
             ImputeKkmKkoDag();
             ImputeDagıtılan();
             //FormatDataTablePercentages();
-            string filePath = @"C:\Users\begum.orhan\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx"; // Excel dosyasının tam yolu
+            string filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE.xlsx"; // Excel dosyasının tam yolu
             ExcelExporter exporter = new ExcelExporter();
             exporter.UpdateExcelFileFirstSheet(filePath, currentDataTable);
         }
