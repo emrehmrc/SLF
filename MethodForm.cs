@@ -28,6 +28,7 @@ namespace SLF
             {
                 selectedMethod = MethodComboBox.SelectedItem.ToString();
                 OpenModülFormuBasedOnSelection(selectedMethod);
+
             }
             else
             {
@@ -38,7 +39,7 @@ namespace SLF
         private void OpenModülFormuBasedOnSelection(string method)
         {
             mod1 = new ModülFormu(method);  // Pass selectedMethod to ModülFormu
-            this.Hide();  // Hide current form
+           // this.Hide();  // Hide current form
             mod1.ShowDialog();  // Show the new form as a dialog
             this.Show();  // Show current form again after new form is closed
         }

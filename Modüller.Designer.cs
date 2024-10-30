@@ -33,6 +33,17 @@ namespace SLF
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ModülFormu));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -43,7 +54,7 @@ namespace SLF
             this.tab_girdi = new System.Windows.Forms.TabPage();
             this.label3 = new System.Windows.Forms.Label();
             this.OpenModuleButtonPanel = new System.Windows.Forms.Panel();
-            this.OpenModuleButton = new System.Windows.Forms.Button();
+            this.OpenModuleButton = new Guna.UI2.WinForms.Guna2Button();
             this.panel9 = new System.Windows.Forms.Panel();
             this.label17 = new System.Windows.Forms.Label();
             this.raporGoruntuleButonu = new System.Windows.Forms.Button();
@@ -104,6 +115,8 @@ namespace SLF
             this.toolStripSeparator15 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripButton16 = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator16 = new System.Windows.Forms.ToolStripSeparator();
+            this.ButtonKml = new System.Windows.Forms.Button();
+            this.oznitelikAc = new System.Windows.Forms.Button();
             this.buton_ea_harita_katmanlar = new System.Windows.Forms.Button();
             this.harita_katmanları_right_click = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.Arazi = new System.Windows.Forms.ToolStripMenuItem();
@@ -112,17 +125,13 @@ namespace SLF
             this.Harita = new System.Windows.Forms.ToolStripMenuItem();
             this.OSM = new System.Windows.Forms.ToolStripMenuItem();
             this.Uydu = new System.Windows.Forms.ToolStripMenuItem();
-            this.ButtonKml = new System.Windows.Forms.Button();
-            this.oznitelikAc = new System.Windows.Forms.Button();
             this.EA_list_box = new System.Windows.Forms.ListBox();
             this.gMapControl_EA = new GMap.NET.WindowsForms.GMapControl();
             this.button7 = new System.Windows.Forms.Button();
             this.tab_ekonometrik = new System.Windows.Forms.TabPage();
-            this.ELFTablePanel = new System.Windows.Forms.Panel();
             this.ELFResultsTabControls = new System.Windows.Forms.TabControl();
             this.ELFMinResultsTabPage = new System.Windows.Forms.TabPage();
             this.ELFMinResultsTable = new System.Windows.Forms.DataGridView();
-            this.ELFMinSenaryoGraphPicBox = new System.Windows.Forms.PictureBox();
             this.ELFLowResultsTabPage = new System.Windows.Forms.TabPage();
             this.ELFLowResultsTable = new System.Windows.Forms.DataGridView();
             this.ELFBaseResultsTabPage = new System.Windows.Forms.TabPage();
@@ -131,21 +140,10 @@ namespace SLF
             this.ELFHighResultsTable = new System.Windows.Forms.DataGridView();
             this.ELFMaxResultsTabPage = new System.Windows.Forms.TabPage();
             this.ELFMaxResultsTable = new System.Windows.Forms.DataGridView();
+            this.ELFTablePanel = new System.Windows.Forms.Panel();
             this.ELFGraphicsPanel = new System.Windows.Forms.Panel();
-            this.label10 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.ELFRadioButtonsPanel = new System.Windows.Forms.Panel();
-            this.ELFLowSenaryoRadioButton = new Guna.UI2.WinForms.Guna2RadioButton();
-            this.ELFMaxSenaryoRadioButton = new Guna.UI2.WinForms.Guna2RadioButton();
-            this.ELFMinSenaryoRadioButton = new Guna.UI2.WinForms.Guna2RadioButton();
-            this.ELFHighSenaryoRadioButton = new Guna.UI2.WinForms.Guna2RadioButton();
-            this.ELFBaseSenaryoRadioButton = new Guna.UI2.WinForms.Guna2RadioButton();
-            this.button2 = new System.Windows.Forms.Button();
-            this.ELFPredictionButton = new System.Windows.Forms.Button();
-            this.SenaryoSelectionButton = new System.Windows.Forms.Button();
-            this.label12 = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.label9 = new System.Windows.Forms.Label();
+            this.SenaryoNewSelectionButton = new Guna.UI2.WinForms.Guna2Button();
+            this.SenaryoResultsLabel = new System.Windows.Forms.Label();
             this.tab_imar = new System.Windows.Forms.TabPage();
             this.button6 = new System.Windows.Forms.Button();
             this.tab_optDTR = new System.Windows.Forms.TabPage();
@@ -166,6 +164,9 @@ namespace SLF
             this.tabPage6 = new System.Windows.Forms.TabPage();
             this.ELFMaxSenaryoTable = new System.Windows.Forms.DataGridView();
             this.EkonometrikSenaryoElementsPanel = new System.Windows.Forms.Panel();
+            this.guna2GradientButton3 = new Guna.UI2.WinForms.Guna2GradientButton();
+            this.guna2GradientButton1 = new Guna.UI2.WinForms.Guna2GradientButton();
+            this.ShowResults = new Guna.UI2.WinForms.Guna2Button();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.ELFPredictionShowResultsGunaButton = new Guna.UI2.WinForms.Guna2Button();
             this.ELFScenerioSaveGunaButton = new Guna.UI2.WinForms.Guna2Button();
@@ -186,7 +187,6 @@ namespace SLF
             this.mesafe_metre_stokastik = new System.Windows.Forms.Label();
             this.Mesafe_stokastik = new System.Windows.Forms.Label();
             this.gMapControl_stokastik = new GMap.NET.WindowsForms.GMapControl();
-            this.buton_stokastik_harita_katmanlar = new System.Windows.Forms.Button();
             this.checkBox18 = new System.Windows.Forms.CheckBox();
             this.checkBox17 = new System.Windows.Forms.CheckBox();
             this.checkBox16 = new System.Windows.Forms.CheckBox();
@@ -213,6 +213,7 @@ namespace SLF
             this.Stokastik_Grid_Oluştur = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.Stokastik_Fonksiyonlar = new System.Windows.Forms.ToolStripButton();
+            this.buton_stokastik_harita_katmanlar = new System.Windows.Forms.Button();
             this.tab_yükHaritası = new System.Windows.Forms.TabPage();
             this.checkBox7 = new System.Windows.Forms.CheckBox();
             this.checkBox6 = new System.Windows.Forms.CheckBox();
@@ -237,7 +238,6 @@ namespace SLF
             this.tab_rapor = new System.Windows.Forms.TabPage();
             this.tab_validasyon = new System.Windows.Forms.TabPage();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.HomePageButton = new System.Windows.Forms.Button();
             this.ContextMenuStrip_Nokta = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.Nokta_Ekle = new System.Windows.Forms.ToolStripMenuItem();
             this.Nokta_Sil = new System.Windows.Forms.ToolStripMenuItem();
@@ -251,6 +251,7 @@ namespace SLF
             this.overlap_analizi = new System.Windows.Forms.ToolStripMenuItem();
             this.ModuleTabPanel = new System.Windows.Forms.Panel();
             this.HeaderPanel = new System.Windows.Forms.Panel();
+            this.HomePageButton = new Guna.UI2.WinForms.Guna2GradientButton();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.menuStrip1.SuspendLayout();
             this.Modül_Tabları.SuspendLayout();
@@ -267,11 +268,9 @@ namespace SLF
             this.toolStrip2.SuspendLayout();
             this.harita_katmanları_right_click.SuspendLayout();
             this.tab_ekonometrik.SuspendLayout();
-            this.ELFTablePanel.SuspendLayout();
             this.ELFResultsTabControls.SuspendLayout();
             this.ELFMinResultsTabPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ELFMinResultsTable)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ELFMinSenaryoGraphPicBox)).BeginInit();
             this.ELFLowResultsTabPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ELFLowResultsTable)).BeginInit();
             this.ELFBaseResultsTabPage.SuspendLayout();
@@ -281,8 +280,6 @@ namespace SLF
             this.ELFMaxResultsTabPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ELFMaxResultsTable)).BeginInit();
             this.ELFGraphicsPanel.SuspendLayout();
-            this.ELFRadioButtonsPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tab_imar.SuspendLayout();
             this.tab_senaryo.SuspendLayout();
             this.SenaryoModulePanel.SuspendLayout();
@@ -409,6 +406,7 @@ namespace SLF
             this.tab_girdi.Size = new System.Drawing.Size(1324, 507);
             this.tab_girdi.TabIndex = 0;
             this.tab_girdi.Text = "Girdi Modülü";
+            this.tab_girdi.UseVisualStyleBackColor = true;
             // 
             // label3
             // 
@@ -416,11 +414,11 @@ namespace SLF
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Maiandra GD", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Font = new System.Drawing.Font("Maiandra GD", 9.75F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label3.Location = new System.Drawing.Point(2, 78);
             this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(105, 16);
+            this.label3.Size = new System.Drawing.Size(91, 16);
             this.label3.TabIndex = 5;
             this.label3.Text = "Veri Önizleme:";
             this.label3.UseWaitCursor = true;
@@ -429,22 +427,25 @@ namespace SLF
             // 
             this.OpenModuleButtonPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.OpenModuleButtonPanel.Controls.Add(this.OpenModuleButton);
-            this.OpenModuleButtonPanel.Location = new System.Drawing.Point(1106, 462);
+            this.OpenModuleButtonPanel.Location = new System.Drawing.Point(1128, 451);
             this.OpenModuleButtonPanel.Name = "OpenModuleButtonPanel";
-            this.OpenModuleButtonPanel.Size = new System.Drawing.Size(111, 36);
+            this.OpenModuleButtonPanel.Size = new System.Drawing.Size(191, 47);
             this.OpenModuleButtonPanel.TabIndex = 17;
-            this.OpenModuleButtonPanel.UseWaitCursor = true;
             // 
             // OpenModuleButton
             // 
-            this.OpenModuleButton.Dock = System.Windows.Forms.DockStyle.Right;
+            this.OpenModuleButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.OpenModuleButton.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.OpenModuleButton.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.OpenModuleButton.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.OpenModuleButton.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.OpenModuleButton.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.OpenModuleButton.ForeColor = System.Drawing.Color.White;
             this.OpenModuleButton.Location = new System.Drawing.Point(0, 0);
             this.OpenModuleButton.Name = "OpenModuleButton";
-            this.OpenModuleButton.Size = new System.Drawing.Size(111, 36);
-            this.OpenModuleButton.TabIndex = 16;
+            this.OpenModuleButton.Size = new System.Drawing.Size(191, 47);
+            this.OpenModuleButton.TabIndex = 18;
             this.OpenModuleButton.Text = "Modüle Git";
-            this.OpenModuleButton.UseVisualStyleBackColor = true;
-            this.OpenModuleButton.UseWaitCursor = true;
             this.OpenModuleButton.Click += new System.EventHandler(this.OpenModuleButton_Click);
             // 
             // panel9
@@ -491,15 +492,27 @@ namespace SLF
             this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridView1.BackgroundColor = System.Drawing.Color.WhiteSmoke;
+            this.dataGridView1.BackgroundColor = System.Drawing.Color.Snow;
+            this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle12.Font = new System.Drawing.Font("Maiandra GD", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle12.ForeColor = System.Drawing.Color.DarkOrange;
+            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle12;
+            this.dataGridView1.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.dataGridView1.Location = new System.Drawing.Point(7, 96);
             this.dataGridView1.Margin = new System.Windows.Forms.Padding(2);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
-            this.dataGridView1.RowHeadersWidth = 51;
+            this.dataGridView1.RowHeadersWidth = 18;
+            dataGridViewCellStyle13.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle13;
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(1210, 350);
+            this.dataGridView1.Size = new System.Drawing.Size(1290, 350);
             this.dataGridView1.TabIndex = 4;
             // 
             // panel8
@@ -538,7 +551,6 @@ namespace SLF
             this.ExcelDownloadButton.Size = new System.Drawing.Size(42, 36);
             this.ExcelDownloadButton.TabIndex = 7;
             this.ExcelDownloadButton.UseVisualStyleBackColor = false;
-            this.ExcelDownloadButton.UseWaitCursor = true;
             this.ExcelDownloadButton.Click += new System.EventHandler(this.ExcelDownloadButton_Click);
             // 
             // csvExportButton
@@ -553,8 +565,7 @@ namespace SLF
             this.csvExportButton.Name = "csvExportButton";
             this.csvExportButton.Size = new System.Drawing.Size(42, 36);
             this.csvExportButton.TabIndex = 8;
-            this.csvExportButton.UseVisualStyleBackColor = false;
-            this.csvExportButton.UseWaitCursor = true;
+            this.csvExportButton.UseVisualStyleBackColor = true;
             this.csvExportButton.Click += new System.EventHandler(this.csvExportButton_Click);
             // 
             // panel6
@@ -987,16 +998,39 @@ namespace SLF
             // 
             // button8
             // 
-            this.button8.Location = new System.Drawing.Point(21, 72);
+            this.button8.Location = new System.Drawing.Point(7, 103);
             this.button8.Margin = new System.Windows.Forms.Padding(2);
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(119, 36);
             this.button8.TabIndex = 16;
             this.button8.Text = "Dosya Seç";
             this.button8.UseVisualStyleBackColor = true;
-            this.button8.UseWaitCursor = true;
             this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
+            // label16
+            // 
+/*            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(273, 14);
+            this.label16.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(98, 17);
+            this.label16.TabIndex = 15;
+            this.label16.Text = "Veri Ön İzleme:";*/
+            // 
+            // dataGridView4
+            // 
+/*            this.dataGridView4.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridView4.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView4.Location = new System.Drawing.Point(276, 36);
+            this.dataGridView4.Margin = new System.Windows.Forms.Padding(2);
+            this.dataGridView4.Name = "dataGridView4";
+            this.dataGridView4.RowHeadersWidth = 51;
+            this.dataGridView4.RowTemplate.Height = 24;
+            this.dataGridView4.Size = new System.Drawing.Size(752, 563);
+            this.dataGridView4.TabIndex = 14;
+            // */
             // tab_ea
             // 
             this.tab_ea.Controls.Add(this.button5);
@@ -1004,9 +1038,9 @@ namespace SLF
             this.tab_ea.Controls.Add(this.mesafe_metre_ea);
             this.tab_ea.Controls.Add(this.Mesafe_ea);
             this.tab_ea.Controls.Add(this.toolStrip2);
-            this.tab_ea.Controls.Add(this.buton_ea_harita_katmanlar);
             this.tab_ea.Controls.Add(this.ButtonKml);
             this.tab_ea.Controls.Add(this.oznitelikAc);
+            this.tab_ea.Controls.Add(this.buton_ea_harita_katmanlar);
             this.tab_ea.Controls.Add(this.EA_list_box);
             this.tab_ea.Controls.Add(this.gMapControl_EA);
             this.tab_ea.Controls.Add(this.button7);
@@ -1308,6 +1342,27 @@ namespace SLF
             this.toolStripSeparator16.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
             this.toolStripSeparator16.Size = new System.Drawing.Size(6, 27);
             // 
+            // ButtonKml
+            // 
+            this.ButtonKml.Location = new System.Drawing.Point(6, 102);
+            this.ButtonKml.Margin = new System.Windows.Forms.Padding(2);
+            this.ButtonKml.Name = "ButtonKml";
+            this.ButtonKml.Size = new System.Drawing.Size(107, 32);
+            this.ButtonKml.TabIndex = 30;
+            this.ButtonKml.Text = "KML Yükle";
+            this.ButtonKml.UseVisualStyleBackColor = true;
+            this.ButtonKml.Click += new System.EventHandler(this.ButtonKml_Click);
+            // 
+            // oznitelikAc
+            // 
+            this.oznitelikAc.Location = new System.Drawing.Point(13, 440);
+            this.oznitelikAc.Margin = new System.Windows.Forms.Padding(2);
+            this.oznitelikAc.Name = "oznitelikAc";
+            this.oznitelikAc.Size = new System.Drawing.Size(146, 31);
+            this.oznitelikAc.TabIndex = 29;
+            this.oznitelikAc.Text = "Öznitelikleri Göster";
+            this.oznitelikAc.UseVisualStyleBackColor = true;
+            // 
             // buton_ea_harita_katmanlar
             // 
             this.buton_ea_harita_katmanlar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -1315,7 +1370,7 @@ namespace SLF
             this.buton_ea_harita_katmanlar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.buton_ea_harita_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
             this.buton_ea_harita_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_ea_harita_katmanlar.Location = new System.Drawing.Point(280, 531);
+            this.buton_ea_harita_katmanlar.Location = new System.Drawing.Point(280, 553);
             this.buton_ea_harita_katmanlar.Margin = new System.Windows.Forms.Padding(2);
             this.buton_ea_harita_katmanlar.Name = "buton_ea_harita_katmanlar";
             this.buton_ea_harita_katmanlar.Size = new System.Drawing.Size(46, 42);
@@ -1441,7 +1496,7 @@ namespace SLF
             this.gMapControl_EA.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_EA.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_EA.ShowTileGridLines = false;
-            this.gMapControl_EA.Size = new System.Drawing.Size(746, 539);
+            this.gMapControl_EA.Size = new System.Drawing.Size(746, 561);
             this.gMapControl_EA.TabIndex = 18;
             this.gMapControl_EA.Zoom = 0D;
             this.gMapControl_EA.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_EA_OnMapClick);
@@ -1464,8 +1519,10 @@ namespace SLF
             // tab_ekonometrik
             // 
             this.tab_ekonometrik.AutoScroll = true;
+            this.tab_ekonometrik.Controls.Add(this.ELFResultsTabControls);
             this.tab_ekonometrik.Controls.Add(this.ELFTablePanel);
             this.tab_ekonometrik.Controls.Add(this.ELFGraphicsPanel);
+            this.tab_ekonometrik.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
             this.tab_ekonometrik.Location = new System.Drawing.Point(4, 48);
             this.tab_ekonometrik.Margin = new System.Windows.Forms.Padding(2);
             this.tab_ekonometrik.Name = "tab_ekonometrik";
@@ -1474,20 +1531,6 @@ namespace SLF
             this.tab_ekonometrik.TabIndex = 1;
             this.tab_ekonometrik.Text = "Ekonometrik Talep Tahmini Modülü";
             this.tab_ekonometrik.UseVisualStyleBackColor = true;
-            this.tab_ekonometrik.UseWaitCursor = true;
-            // 
-            // ELFTablePanel
-            // 
-            this.ELFTablePanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ELFTablePanel.Controls.Add(this.ELFResultsTabControls);
-            this.ELFTablePanel.Location = new System.Drawing.Point(433, 2);
-            this.ELFTablePanel.Margin = new System.Windows.Forms.Padding(2);
-            this.ELFTablePanel.Name = "ELFTablePanel";
-            this.ELFTablePanel.Size = new System.Drawing.Size(889, 524);
-            this.ELFTablePanel.TabIndex = 21;
-            this.ELFTablePanel.UseWaitCursor = true;
             // 
             // ELFResultsTabControls
             // 
@@ -1496,46 +1539,46 @@ namespace SLF
             this.ELFResultsTabControls.Controls.Add(this.ELFBaseResultsTabPage);
             this.ELFResultsTabControls.Controls.Add(this.ELFHighResultsTabPage);
             this.ELFResultsTabControls.Controls.Add(this.ELFMaxResultsTabPage);
+            this.ELFResultsTabControls.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.ELFResultsTabControls.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ELFResultsTabControls.Location = new System.Drawing.Point(0, 0);
+            this.ELFResultsTabControls.Location = new System.Drawing.Point(200, 2);
             this.ELFResultsTabControls.Name = "ELFResultsTabControls";
             this.ELFResultsTabControls.SelectedIndex = 0;
-            this.ELFResultsTabControls.Size = new System.Drawing.Size(889, 524);
+            this.ELFResultsTabControls.Size = new System.Drawing.Size(1122, 503);
             this.ELFResultsTabControls.TabIndex = 3;
-            this.ELFResultsTabControls.UseWaitCursor = true;
             // 
             // ELFMinResultsTabPage
             // 
             this.ELFMinResultsTabPage.Controls.Add(this.ELFMinResultsTable);
-            this.ELFMinResultsTabPage.Controls.Add(this.ELFMinSenaryoGraphPicBox);
             this.ELFMinResultsTabPage.Location = new System.Drawing.Point(4, 26);
             this.ELFMinResultsTabPage.Name = "ELFMinResultsTabPage";
             this.ELFMinResultsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.ELFMinResultsTabPage.Size = new System.Drawing.Size(881, 494);
+            this.ELFMinResultsTabPage.Size = new System.Drawing.Size(1114, 473);
             this.ELFMinResultsTabPage.TabIndex = 0;
             this.ELFMinResultsTabPage.Text = "Minimum Sonuçlar";
             this.ELFMinResultsTabPage.UseVisualStyleBackColor = true;
-            this.ELFMinResultsTabPage.UseWaitCursor = true;
             // 
             // ELFMinResultsTable
             // 
+            this.ELFMinResultsTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ELFMinResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.ELFMinResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFMinResultsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.ELFMinResultsTable.Location = new System.Drawing.Point(6, 6);
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle14.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle14.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle14.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFMinResultsTable.DefaultCellStyle = dataGridViewCellStyle14;
+            this.ELFMinResultsTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.ELFMinResultsTable.Location = new System.Drawing.Point(4, 0);
             this.ELFMinResultsTable.Name = "ELFMinResultsTable";
-            this.ELFMinResultsTable.RowHeadersWidth = 51;
-            this.ELFMinResultsTable.Size = new System.Drawing.Size(546, 453);
+            this.ELFMinResultsTable.Size = new System.Drawing.Size(1109, 470);
             this.ELFMinResultsTable.TabIndex = 0;
-            this.ELFMinResultsTable.UseWaitCursor = true;
-            // 
-            // ELFMinSenaryoGraphPicBox
-            // 
-            this.ELFMinSenaryoGraphPicBox.Location = new System.Drawing.Point(607, 47);
-            this.ELFMinSenaryoGraphPicBox.Name = "ELFMinSenaryoGraphPicBox";
-            this.ELFMinSenaryoGraphPicBox.Size = new System.Drawing.Size(231, 171);
-            this.ELFMinSenaryoGraphPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.ELFMinSenaryoGraphPicBox.TabIndex = 22;
-            this.ELFMinSenaryoGraphPicBox.TabStop = false;
-            this.ELFMinSenaryoGraphPicBox.UseWaitCursor = true;
             // 
             // ELFLowResultsTabPage
             // 
@@ -1543,21 +1586,24 @@ namespace SLF
             this.ELFLowResultsTabPage.Location = new System.Drawing.Point(4, 26);
             this.ELFLowResultsTabPage.Name = "ELFLowResultsTabPage";
             this.ELFLowResultsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.ELFLowResultsTabPage.Size = new System.Drawing.Size(881, 494);
+            this.ELFLowResultsTabPage.Size = new System.Drawing.Size(1114, 473);
             this.ELFLowResultsTabPage.TabIndex = 1;
             this.ELFLowResultsTabPage.Text = "Düşük Sonuçlar";
             this.ELFLowResultsTabPage.UseVisualStyleBackColor = true;
-            this.ELFLowResultsTabPage.UseWaitCursor = true;
             // 
             // ELFLowResultsTable
             // 
+            this.ELFLowResultsTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ELFLowResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.ELFLowResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFLowResultsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.ELFLowResultsTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFLowResultsTable.Location = new System.Drawing.Point(3, 0);
             this.ELFLowResultsTable.Name = "ELFLowResultsTable";
-            this.ELFLowResultsTable.RowHeadersWidth = 51;
-            this.ELFLowResultsTable.Size = new System.Drawing.Size(508, 465);
+            this.ELFLowResultsTable.Size = new System.Drawing.Size(1108, 479);
             this.ELFLowResultsTable.TabIndex = 1;
-            this.ELFLowResultsTable.UseWaitCursor = true;
             // 
             // ELFBaseResultsTabPage
             // 
@@ -1565,21 +1611,24 @@ namespace SLF
             this.ELFBaseResultsTabPage.Location = new System.Drawing.Point(4, 26);
             this.ELFBaseResultsTabPage.Name = "ELFBaseResultsTabPage";
             this.ELFBaseResultsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.ELFBaseResultsTabPage.Size = new System.Drawing.Size(881, 494);
+            this.ELFBaseResultsTabPage.Size = new System.Drawing.Size(1114, 473);
             this.ELFBaseResultsTabPage.TabIndex = 2;
             this.ELFBaseResultsTabPage.Text = "Baz Sonuçlar";
             this.ELFBaseResultsTabPage.UseVisualStyleBackColor = true;
-            this.ELFBaseResultsTabPage.UseWaitCursor = true;
             // 
             // ELFBaseResultsTable
             // 
+            this.ELFBaseResultsTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ELFBaseResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.ELFBaseResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFBaseResultsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.ELFBaseResultsTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFBaseResultsTable.Location = new System.Drawing.Point(6, 3);
             this.ELFBaseResultsTable.Name = "ELFBaseResultsTable";
-            this.ELFBaseResultsTable.RowHeadersWidth = 51;
-            this.ELFBaseResultsTable.Size = new System.Drawing.Size(668, 461);
+            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1107, 479);
             this.ELFBaseResultsTable.TabIndex = 1;
-            this.ELFBaseResultsTable.UseWaitCursor = true;
             // 
             // ELFHighResultsTabPage
             // 
@@ -1587,21 +1636,24 @@ namespace SLF
             this.ELFHighResultsTabPage.Location = new System.Drawing.Point(4, 26);
             this.ELFHighResultsTabPage.Name = "ELFHighResultsTabPage";
             this.ELFHighResultsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.ELFHighResultsTabPage.Size = new System.Drawing.Size(881, 494);
+            this.ELFHighResultsTabPage.Size = new System.Drawing.Size(1114, 473);
             this.ELFHighResultsTabPage.TabIndex = 3;
             this.ELFHighResultsTabPage.Text = "Yüksek Sonuçlar";
             this.ELFHighResultsTabPage.UseVisualStyleBackColor = true;
-            this.ELFHighResultsTabPage.UseWaitCursor = true;
             // 
             // ELFHighResultsTable
             // 
+            this.ELFHighResultsTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ELFHighResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.ELFHighResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFHighResultsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.ELFHighResultsTable.Location = new System.Drawing.Point(83, 0);
+            this.ELFHighResultsTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.ELFHighResultsTable.Location = new System.Drawing.Point(6, 0);
             this.ELFHighResultsTable.Name = "ELFHighResultsTable";
-            this.ELFHighResultsTable.RowHeadersWidth = 51;
-            this.ELFHighResultsTable.Size = new System.Drawing.Size(574, 461);
+            this.ELFHighResultsTable.Size = new System.Drawing.Size(1102, 479);
             this.ELFHighResultsTable.TabIndex = 1;
-            this.ELFHighResultsTable.UseWaitCursor = true;
             // 
             // ELFMaxResultsTabPage
             // 
@@ -1609,243 +1661,75 @@ namespace SLF
             this.ELFMaxResultsTabPage.Location = new System.Drawing.Point(4, 26);
             this.ELFMaxResultsTabPage.Name = "ELFMaxResultsTabPage";
             this.ELFMaxResultsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.ELFMaxResultsTabPage.Size = new System.Drawing.Size(881, 494);
+            this.ELFMaxResultsTabPage.Size = new System.Drawing.Size(1114, 473);
             this.ELFMaxResultsTabPage.TabIndex = 4;
             this.ELFMaxResultsTabPage.Text = "Maksimum Sonuçlar";
             this.ELFMaxResultsTabPage.UseVisualStyleBackColor = true;
-            this.ELFMaxResultsTabPage.UseWaitCursor = true;
             // 
             // ELFMaxResultsTable
             // 
+            this.ELFMaxResultsTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ELFMaxResultsTable.BackgroundColor = System.Drawing.Color.Snow;
+            this.ELFMaxResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFMaxResultsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.ELFMaxResultsTable.Location = new System.Drawing.Point(34, 3);
+            this.ELFMaxResultsTable.Cursor = System.Windows.Forms.Cursors.Default;
+            this.ELFMaxResultsTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.ELFMaxResultsTable.Location = new System.Drawing.Point(0, 3);
             this.ELFMaxResultsTable.Name = "ELFMaxResultsTable";
-            this.ELFMaxResultsTable.RowHeadersWidth = 51;
-            this.ELFMaxResultsTable.Size = new System.Drawing.Size(690, 461);
+            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1112, 483);
             this.ELFMaxResultsTable.TabIndex = 1;
-            this.ELFMaxResultsTable.UseWaitCursor = true;
+            // 
+            // ELFTablePanel
+            // 
+            this.ELFTablePanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ELFTablePanel.Location = new System.Drawing.Point(306, 2);
+            this.ELFTablePanel.Margin = new System.Windows.Forms.Padding(2);
+            this.ELFTablePanel.Name = "ELFTablePanel";
+            this.ELFTablePanel.Size = new System.Drawing.Size(1016, 525);
+            this.ELFTablePanel.TabIndex = 21;
             // 
             // ELFGraphicsPanel
             // 
             this.ELFGraphicsPanel.AutoScroll = true;
-            this.ELFGraphicsPanel.BackColor = System.Drawing.Color.Transparent;
-            this.ELFGraphicsPanel.Controls.Add(this.label10);
-            this.ELFGraphicsPanel.Controls.Add(this.button1);
-            this.ELFGraphicsPanel.Controls.Add(this.ELFRadioButtonsPanel);
-            this.ELFGraphicsPanel.Controls.Add(this.button2);
-            this.ELFGraphicsPanel.Controls.Add(this.ELFPredictionButton);
-            this.ELFGraphicsPanel.Controls.Add(this.SenaryoSelectionButton);
-            this.ELFGraphicsPanel.Controls.Add(this.label12);
-            this.ELFGraphicsPanel.Controls.Add(this.pictureBox1);
-            this.ELFGraphicsPanel.Controls.Add(this.label9);
+            this.ELFGraphicsPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            this.ELFGraphicsPanel.Controls.Add(this.SenaryoNewSelectionButton);
+            this.ELFGraphicsPanel.Controls.Add(this.SenaryoResultsLabel);
+            this.ELFGraphicsPanel.Cursor = System.Windows.Forms.Cursors.Default;
             this.ELFGraphicsPanel.Dock = System.Windows.Forms.DockStyle.Left;
             this.ELFGraphicsPanel.Location = new System.Drawing.Point(2, 2);
             this.ELFGraphicsPanel.Name = "ELFGraphicsPanel";
-            this.ELFGraphicsPanel.Size = new System.Drawing.Size(425, 503);
+            this.ELFGraphicsPanel.Size = new System.Drawing.Size(198, 503);
             this.ELFGraphicsPanel.TabIndex = 22;
-            this.ELFGraphicsPanel.UseWaitCursor = true;
             // 
-            // label10
+            // SenaryoNewSelectionButton
             // 
-            this.label10.AutoSize = true;
-            this.label10.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(201, 58);
-            this.label10.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(99, 17);
-            this.label10.TabIndex = 30;
-            this.label10.Text = "Senaryo Seçimi:";
-            this.label10.UseWaitCursor = true;
+            this.SenaryoNewSelectionButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.SenaryoNewSelectionButton.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.SenaryoNewSelectionButton.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.SenaryoNewSelectionButton.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.SenaryoNewSelectionButton.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.SenaryoNewSelectionButton.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.SenaryoNewSelectionButton.ForeColor = System.Drawing.Color.White;
+            this.SenaryoNewSelectionButton.Location = new System.Drawing.Point(19, 238);
+            this.SenaryoNewSelectionButton.Name = "SenaryoNewSelectionButton";
+            this.SenaryoNewSelectionButton.Size = new System.Drawing.Size(163, 45);
+            this.SenaryoNewSelectionButton.TabIndex = 31;
+            this.SenaryoNewSelectionButton.Text = "Yeniden Senaryo Oluştur";
             // 
-            // button1
+            // SenaryoResultsLabel
             // 
-            this.button1.BackColor = System.Drawing.Color.White;
-            this.button1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("button1.BackgroundImage")));
-            this.button1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.button1.ForeColor = System.Drawing.Color.Transparent;
-            this.button1.Location = new System.Drawing.Point(319, 58);
-            this.button1.Margin = new System.Windows.Forms.Padding(2);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(42, 36);
-            this.button1.TabIndex = 29;
-            this.button1.UseVisualStyleBackColor = false;
-            this.button1.UseWaitCursor = true;
-            // 
-            // ELFRadioButtonsPanel
-            // 
-            this.ELFRadioButtonsPanel.Controls.Add(this.ELFLowSenaryoRadioButton);
-            this.ELFRadioButtonsPanel.Controls.Add(this.ELFMaxSenaryoRadioButton);
-            this.ELFRadioButtonsPanel.Controls.Add(this.ELFMinSenaryoRadioButton);
-            this.ELFRadioButtonsPanel.Controls.Add(this.ELFHighSenaryoRadioButton);
-            this.ELFRadioButtonsPanel.Controls.Add(this.ELFBaseSenaryoRadioButton);
-            this.ELFRadioButtonsPanel.Location = new System.Drawing.Point(6, 6);
-            this.ELFRadioButtonsPanel.Name = "ELFRadioButtonsPanel";
-            this.ELFRadioButtonsPanel.Size = new System.Drawing.Size(175, 168);
-            this.ELFRadioButtonsPanel.TabIndex = 28;
-            this.ELFRadioButtonsPanel.UseWaitCursor = true;
-            // 
-            // ELFLowSenaryoRadioButton
-            // 
-            this.ELFLowSenaryoRadioButton.AutoSize = true;
-            this.ELFLowSenaryoRadioButton.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.ELFLowSenaryoRadioButton.CheckedState.BorderThickness = 0;
-            this.ELFLowSenaryoRadioButton.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.ELFLowSenaryoRadioButton.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.ELFLowSenaryoRadioButton.CheckedState.InnerOffset = -4;
-            this.ELFLowSenaryoRadioButton.Location = new System.Drawing.Point(3, 40);
-            this.ELFLowSenaryoRadioButton.Name = "ELFLowSenaryoRadioButton";
-            this.ELFLowSenaryoRadioButton.Size = new System.Drawing.Size(118, 21);
-            this.ELFLowSenaryoRadioButton.TabIndex = 24;
-            this.ELFLowSenaryoRadioButton.Text = "Düşük Senaryo";
-            this.ELFLowSenaryoRadioButton.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
-            this.ELFLowSenaryoRadioButton.UncheckedState.BorderThickness = 2;
-            this.ELFLowSenaryoRadioButton.UncheckedState.FillColor = System.Drawing.Color.Transparent;
-            this.ELFLowSenaryoRadioButton.UncheckedState.InnerColor = System.Drawing.Color.Transparent;
-            this.ELFLowSenaryoRadioButton.UseWaitCursor = true;
-            // 
-            // ELFMaxSenaryoRadioButton
-            // 
-            this.ELFMaxSenaryoRadioButton.AutoSize = true;
-            this.ELFMaxSenaryoRadioButton.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.ELFMaxSenaryoRadioButton.CheckedState.BorderThickness = 0;
-            this.ELFMaxSenaryoRadioButton.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.ELFMaxSenaryoRadioButton.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.ELFMaxSenaryoRadioButton.CheckedState.InnerOffset = -4;
-            this.ELFMaxSenaryoRadioButton.Location = new System.Drawing.Point(3, 127);
-            this.ELFMaxSenaryoRadioButton.Name = "ELFMaxSenaryoRadioButton";
-            this.ELFMaxSenaryoRadioButton.Size = new System.Drawing.Size(147, 21);
-            this.ELFMaxSenaryoRadioButton.TabIndex = 27;
-            this.ELFMaxSenaryoRadioButton.Text = "Maksimum Senaryo";
-            this.ELFMaxSenaryoRadioButton.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
-            this.ELFMaxSenaryoRadioButton.UncheckedState.BorderThickness = 2;
-            this.ELFMaxSenaryoRadioButton.UncheckedState.FillColor = System.Drawing.Color.Transparent;
-            this.ELFMaxSenaryoRadioButton.UncheckedState.InnerColor = System.Drawing.Color.Transparent;
-            this.ELFMaxSenaryoRadioButton.UseWaitCursor = true;
-            // 
-            // ELFMinSenaryoRadioButton
-            // 
-            this.ELFMinSenaryoRadioButton.AutoSize = true;
-            this.ELFMinSenaryoRadioButton.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.ELFMinSenaryoRadioButton.CheckedState.BorderThickness = 0;
-            this.ELFMinSenaryoRadioButton.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.ELFMinSenaryoRadioButton.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.ELFMinSenaryoRadioButton.CheckedState.InnerOffset = -4;
-            this.ELFMinSenaryoRadioButton.Location = new System.Drawing.Point(3, 8);
-            this.ELFMinSenaryoRadioButton.Name = "ELFMinSenaryoRadioButton";
-            this.ELFMinSenaryoRadioButton.Size = new System.Drawing.Size(138, 21);
-            this.ELFMinSenaryoRadioButton.TabIndex = 23;
-            this.ELFMinSenaryoRadioButton.Text = "Minimum Senaryo";
-            this.ELFMinSenaryoRadioButton.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
-            this.ELFMinSenaryoRadioButton.UncheckedState.BorderThickness = 2;
-            this.ELFMinSenaryoRadioButton.UncheckedState.FillColor = System.Drawing.Color.Transparent;
-            this.ELFMinSenaryoRadioButton.UncheckedState.InnerColor = System.Drawing.Color.Transparent;
-            this.ELFMinSenaryoRadioButton.UseWaitCursor = true;
-            // 
-            // ELFHighSenaryoRadioButton
-            // 
-            this.ELFHighSenaryoRadioButton.AutoSize = true;
-            this.ELFHighSenaryoRadioButton.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.ELFHighSenaryoRadioButton.CheckedState.BorderThickness = 0;
-            this.ELFHighSenaryoRadioButton.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.ELFHighSenaryoRadioButton.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.ELFHighSenaryoRadioButton.CheckedState.InnerOffset = -4;
-            this.ELFHighSenaryoRadioButton.Location = new System.Drawing.Point(3, 94);
-            this.ELFHighSenaryoRadioButton.Name = "ELFHighSenaryoRadioButton";
-            this.ELFHighSenaryoRadioButton.Size = new System.Drawing.Size(122, 21);
-            this.ELFHighSenaryoRadioButton.TabIndex = 26;
-            this.ELFHighSenaryoRadioButton.Text = "Yüksek Senaryo";
-            this.ELFHighSenaryoRadioButton.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
-            this.ELFHighSenaryoRadioButton.UncheckedState.BorderThickness = 2;
-            this.ELFHighSenaryoRadioButton.UncheckedState.FillColor = System.Drawing.Color.Transparent;
-            this.ELFHighSenaryoRadioButton.UncheckedState.InnerColor = System.Drawing.Color.Transparent;
-            this.ELFHighSenaryoRadioButton.UseWaitCursor = true;
-            // 
-            // ELFBaseSenaryoRadioButton
-            // 
-            this.ELFBaseSenaryoRadioButton.AutoSize = true;
-            this.ELFBaseSenaryoRadioButton.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.ELFBaseSenaryoRadioButton.CheckedState.BorderThickness = 0;
-            this.ELFBaseSenaryoRadioButton.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.ELFBaseSenaryoRadioButton.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.ELFBaseSenaryoRadioButton.CheckedState.InnerOffset = -4;
-            this.ELFBaseSenaryoRadioButton.Location = new System.Drawing.Point(3, 67);
-            this.ELFBaseSenaryoRadioButton.Name = "ELFBaseSenaryoRadioButton";
-            this.ELFBaseSenaryoRadioButton.Size = new System.Drawing.Size(101, 21);
-            this.ELFBaseSenaryoRadioButton.TabIndex = 25;
-            this.ELFBaseSenaryoRadioButton.Text = "Baz Senaryo";
-            this.ELFBaseSenaryoRadioButton.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
-            this.ELFBaseSenaryoRadioButton.UncheckedState.BorderThickness = 2;
-            this.ELFBaseSenaryoRadioButton.UncheckedState.FillColor = System.Drawing.Color.Transparent;
-            this.ELFBaseSenaryoRadioButton.UncheckedState.InnerColor = System.Drawing.Color.Transparent;
-            this.ELFBaseSenaryoRadioButton.UseWaitCursor = true;
-            // 
-            // button2
-            // 
-            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button2.Location = new System.Drawing.Point(204, 125);
-            this.button2.Margin = new System.Windows.Forms.Padding(2);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(132, 57);
-            this.button2.TabIndex = 19;
-            this.button2.Text = "Tüm Sonuçları Görüntüle";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.UseWaitCursor = true;
-            // 
-            // ELFPredictionButton
-            // 
-            this.ELFPredictionButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ELFPredictionButton.Location = new System.Drawing.Point(71, 189);
-            this.ELFPredictionButton.Margin = new System.Windows.Forms.Padding(2);
-            this.ELFPredictionButton.Name = "ELFPredictionButton";
-            this.ELFPredictionButton.Size = new System.Drawing.Size(120, 36);
-            this.ELFPredictionButton.TabIndex = 18;
-            this.ELFPredictionButton.Text = "Tahmin Yap";
-            this.ELFPredictionButton.UseVisualStyleBackColor = true;
-            this.ELFPredictionButton.UseWaitCursor = true;
-            // 
-            // SenaryoSelectionButton
-            // 
-            this.SenaryoSelectionButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.SenaryoSelectionButton.Location = new System.Drawing.Point(27, 441);
-            this.SenaryoSelectionButton.Margin = new System.Windows.Forms.Padding(2);
-            this.SenaryoSelectionButton.Name = "SenaryoSelectionButton";
-            this.SenaryoSelectionButton.Size = new System.Drawing.Size(119, 36);
-            this.SenaryoSelectionButton.TabIndex = 17;
-            this.SenaryoSelectionButton.Text = "Senaryo Seç";
-            this.SenaryoSelectionButton.UseVisualStyleBackColor = true;
-            this.SenaryoSelectionButton.UseWaitCursor = true;
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(326, 6);
-            this.label12.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(98, 17);
-            this.label12.TabIndex = 7;
-            this.label12.Text = "Veri Ön İzleme:";
-            this.label12.UseWaitCursor = true;
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Location = new System.Drawing.Point(6, 245);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(229, 171);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
-            this.pictureBox1.UseWaitCursor = true;
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(5, 225);
-            this.label9.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(62, 17);
-            this.label9.TabIndex = 8;
-            this.label9.Text = "Grafikler:";
-            this.label9.UseWaitCursor = true;
+            this.SenaryoResultsLabel.AutoSize = true;
+            this.SenaryoResultsLabel.ForeColor = System.Drawing.Color.DarkOrange;
+            this.SenaryoResultsLabel.Location = new System.Drawing.Point(5, 43);
+            this.SenaryoResultsLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.SenaryoResultsLabel.Name = "SenaryoResultsLabel";
+            this.SenaryoResultsLabel.Size = new System.Drawing.Size(120, 17);
+            this.SenaryoResultsLabel.TabIndex = 7;
+            this.SenaryoResultsLabel.Text = "Senaryo Sonuçları:";
             // 
             // tab_imar
             // 
@@ -1857,7 +1741,6 @@ namespace SLF
             this.tab_imar.TabIndex = 4;
             this.tab_imar.Text = "İmar Analizleri";
             this.tab_imar.UseVisualStyleBackColor = true;
-            this.tab_imar.UseWaitCursor = true;
             // 
             // button6
             // 
@@ -1868,7 +1751,6 @@ namespace SLF
             this.button6.TabIndex = 19;
             this.button6.Text = "Temizle";
             this.button6.UseVisualStyleBackColor = true;
-            this.button6.UseWaitCursor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // tab_optDTR
@@ -1880,7 +1762,6 @@ namespace SLF
             this.tab_optDTR.TabIndex = 7;
             this.tab_optDTR.Text = "Optimal DTR Konumlandırma";
             this.tab_optDTR.UseVisualStyleBackColor = true;
-            this.tab_optDTR.UseWaitCursor = true;
             // 
             // tab_senaryo
             // 
@@ -1892,7 +1773,6 @@ namespace SLF
             this.tab_senaryo.TabIndex = 3;
             this.tab_senaryo.Text = "Senaryo Oluşturma Modülü";
             this.tab_senaryo.UseVisualStyleBackColor = true;
-            this.tab_senaryo.UseWaitCursor = true;
             // 
             // SenaryoModulePanel
             // 
@@ -1902,7 +1782,6 @@ namespace SLF
             this.SenaryoModulePanel.Name = "SenaryoModulePanel";
             this.SenaryoModulePanel.Size = new System.Drawing.Size(1324, 507);
             this.SenaryoModulePanel.TabIndex = 0;
-            this.SenaryoModulePanel.UseWaitCursor = true;
             // 
             // SenaryoModuleTabControl
             // 
@@ -1912,6 +1791,7 @@ namespace SLF
             this.SenaryoModuleTabControl.Controls.Add(this.EASarjSenaryoTabPage);
             this.SenaryoModuleTabControl.Controls.Add(this.DEKSenaryoTabPage);
             this.SenaryoModuleTabControl.Controls.Add(this.tabPage8);
+            this.SenaryoModuleTabControl.Cursor = System.Windows.Forms.Cursors.Default;
             this.SenaryoModuleTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SenaryoModuleTabControl.ItemSize = new System.Drawing.Size(180, 40);
             this.SenaryoModuleTabControl.Location = new System.Drawing.Point(0, 0);
@@ -1936,7 +1816,6 @@ namespace SLF
             this.SenaryoModuleTabControl.TabButtonSize = new System.Drawing.Size(180, 40);
             this.SenaryoModuleTabControl.TabIndex = 0;
             this.SenaryoModuleTabControl.TabMenuBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            this.SenaryoModuleTabControl.UseWaitCursor = true;
             // 
             // EkonometrikSenaryoTabPage
             // 
@@ -1948,7 +1827,6 @@ namespace SLF
             this.EkonometrikSenaryoTabPage.TabIndex = 0;
             this.EkonometrikSenaryoTabPage.Text = "Ekonometrik Senaryolar";
             this.EkonometrikSenaryoTabPage.UseVisualStyleBackColor = true;
-            this.EkonometrikSenaryoTabPage.UseWaitCursor = true;
             // 
             // EkonometrikSenaryoOutputsPanel
             // 
@@ -1961,7 +1839,6 @@ namespace SLF
             this.EkonometrikSenaryoOutputsPanel.Name = "EkonometrikSenaryoOutputsPanel";
             this.EkonometrikSenaryoOutputsPanel.Size = new System.Drawing.Size(1130, 493);
             this.EkonometrikSenaryoOutputsPanel.TabIndex = 0;
-            this.EkonometrikSenaryoOutputsPanel.UseWaitCursor = true;
             // 
             // ELFSenaryoTabControls
             // 
@@ -1978,11 +1855,11 @@ namespace SLF
             this.ELFSenaryoTabControls.SelectedIndex = 0;
             this.ELFSenaryoTabControls.Size = new System.Drawing.Size(922, 497);
             this.ELFSenaryoTabControls.TabIndex = 2;
-            this.ELFSenaryoTabControls.UseWaitCursor = true;
             // 
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.ELFMinSenaryoTable);
+            this.tabPage2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
             this.tabPage2.Location = new System.Drawing.Point(4, 26);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
@@ -1990,22 +1867,43 @@ namespace SLF
             this.tabPage2.TabIndex = 0;
             this.tabPage2.Text = "Minimum Senaryo";
             this.tabPage2.UseVisualStyleBackColor = true;
-            this.tabPage2.UseWaitCursor = true;
             // 
             // ELFMinSenaryoTable
             // 
+            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.Color.Navy;
+            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFMinSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle15;
+            this.ELFMinSenaryoTable.BackgroundColor = System.Drawing.Color.Snow;
+            this.ELFMinSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFMinSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle16.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle16.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle16.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle16.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle16.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFMinSenaryoTable.DefaultCellStyle = dataGridViewCellStyle16;
             this.ELFMinSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ELFMinSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFMinSenaryoTable.Location = new System.Drawing.Point(3, 3);
             this.ELFMinSenaryoTable.Name = "ELFMinSenaryoTable";
-            this.ELFMinSenaryoTable.RowHeadersWidth = 51;
+            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle17.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle17.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle17.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ELFMinSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle17;
+            this.ELFMinSenaryoTable.RowHeadersWidth = 18;
             this.ELFMinSenaryoTable.Size = new System.Drawing.Size(908, 461);
             this.ELFMinSenaryoTable.TabIndex = 0;
-            this.ELFMinSenaryoTable.UseWaitCursor = true;
             // 
             // tabPage3
             // 
             this.tabPage3.Controls.Add(this.ELFLowSenaryoTable);
+            this.tabPage3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
             this.tabPage3.Location = new System.Drawing.Point(4, 26);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
@@ -2013,22 +1911,29 @@ namespace SLF
             this.tabPage3.TabIndex = 1;
             this.tabPage3.Text = "Düşük Senaryo";
             this.tabPage3.UseVisualStyleBackColor = true;
-            this.tabPage3.UseWaitCursor = true;
             // 
             // ELFLowSenaryoTable
             // 
+            dataGridViewCellStyle18.SelectionBackColor = System.Drawing.Color.Navy;
+            dataGridViewCellStyle18.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFLowSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle18;
+            this.ELFLowSenaryoTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ELFLowSenaryoTable.BackgroundColor = System.Drawing.Color.Snow;
+            this.ELFLowSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFLowSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.ELFLowSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ELFLowSenaryoTable.Location = new System.Drawing.Point(3, 3);
+            this.ELFLowSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.ELFLowSenaryoTable.Location = new System.Drawing.Point(6, -1);
             this.ELFLowSenaryoTable.Name = "ELFLowSenaryoTable";
-            this.ELFLowSenaryoTable.RowHeadersWidth = 51;
-            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(908, 461);
+            this.ELFLowSenaryoTable.RowHeadersWidth = 18;
+            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(908, 477);
             this.ELFLowSenaryoTable.TabIndex = 1;
-            this.ELFLowSenaryoTable.UseWaitCursor = true;
             // 
             // tabPage4
             // 
             this.tabPage4.Controls.Add(this.ELFBaseSenaryoTable);
+            this.tabPage4.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
             this.tabPage4.Location = new System.Drawing.Point(4, 26);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
@@ -2036,22 +1941,35 @@ namespace SLF
             this.tabPage4.TabIndex = 2;
             this.tabPage4.Text = "Baz Senaryo";
             this.tabPage4.UseVisualStyleBackColor = true;
-            this.tabPage4.UseWaitCursor = true;
             // 
             // ELFBaseSenaryoTable
             // 
+            dataGridViewCellStyle19.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle19.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFBaseSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle19;
+            this.ELFBaseSenaryoTable.BackgroundColor = System.Drawing.Color.Snow;
+            this.ELFBaseSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFBaseSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle20.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle20.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle20.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle20.SelectionBackColor = System.Drawing.Color.MidnightBlue;
+            dataGridViewCellStyle20.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle20.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFBaseSenaryoTable.DefaultCellStyle = dataGridViewCellStyle20;
             this.ELFBaseSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ELFBaseSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFBaseSenaryoTable.Location = new System.Drawing.Point(3, 3);
             this.ELFBaseSenaryoTable.Name = "ELFBaseSenaryoTable";
-            this.ELFBaseSenaryoTable.RowHeadersWidth = 51;
+            this.ELFBaseSenaryoTable.RowHeadersWidth = 18;
             this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(908, 461);
             this.ELFBaseSenaryoTable.TabIndex = 1;
-            this.ELFBaseSenaryoTable.UseWaitCursor = true;
             // 
             // tabPage5
             // 
             this.tabPage5.Controls.Add(this.ELFHighSenaryoTable);
+            this.tabPage5.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
             this.tabPage5.Location = new System.Drawing.Point(4, 26);
             this.tabPage5.Name = "tabPage5";
             this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
@@ -2059,22 +1977,35 @@ namespace SLF
             this.tabPage5.TabIndex = 3;
             this.tabPage5.Text = "Yüksek Senaryo";
             this.tabPage5.UseVisualStyleBackColor = true;
-            this.tabPage5.UseWaitCursor = true;
             // 
             // ELFHighSenaryoTable
             // 
+            dataGridViewCellStyle21.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle21.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFHighSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle21;
+            this.ELFHighSenaryoTable.BackgroundColor = System.Drawing.Color.Snow;
+            this.ELFHighSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFHighSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle22.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle22.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle22.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle22.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle22.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle22.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFHighSenaryoTable.DefaultCellStyle = dataGridViewCellStyle22;
             this.ELFHighSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ELFHighSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFHighSenaryoTable.Location = new System.Drawing.Point(3, 3);
             this.ELFHighSenaryoTable.Name = "ELFHighSenaryoTable";
             this.ELFHighSenaryoTable.RowHeadersWidth = 51;
             this.ELFHighSenaryoTable.Size = new System.Drawing.Size(908, 461);
             this.ELFHighSenaryoTable.TabIndex = 1;
-            this.ELFHighSenaryoTable.UseWaitCursor = true;
             // 
             // tabPage6
             // 
             this.tabPage6.Controls.Add(this.ELFMaxSenaryoTable);
+            this.tabPage6.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
             this.tabPage6.Location = new System.Drawing.Point(4, 26);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
@@ -2082,22 +2013,26 @@ namespace SLF
             this.tabPage6.TabIndex = 4;
             this.tabPage6.Text = "Maksimum Senaryo";
             this.tabPage6.UseVisualStyleBackColor = true;
-            this.tabPage6.UseWaitCursor = true;
             // 
             // ELFMaxSenaryoTable
             // 
+            this.ELFMaxSenaryoTable.BackgroundColor = System.Drawing.Color.Snow;
+            this.ELFMaxSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFMaxSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ELFMaxSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ELFMaxSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFMaxSenaryoTable.Location = new System.Drawing.Point(3, 3);
             this.ELFMaxSenaryoTable.Name = "ELFMaxSenaryoTable";
             this.ELFMaxSenaryoTable.RowHeadersWidth = 51;
             this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(908, 461);
             this.ELFMaxSenaryoTable.TabIndex = 1;
-            this.ELFMaxSenaryoTable.UseWaitCursor = true;
             // 
             // EkonometrikSenaryoElementsPanel
             // 
             this.EkonometrikSenaryoElementsPanel.BackColor = System.Drawing.Color.Snow;
+            this.EkonometrikSenaryoElementsPanel.Controls.Add(this.guna2GradientButton3);
+            this.EkonometrikSenaryoElementsPanel.Controls.Add(this.guna2GradientButton1);
+            this.EkonometrikSenaryoElementsPanel.Controls.Add(this.ShowResults);
             this.EkonometrikSenaryoElementsPanel.Controls.Add(this.richTextBox1);
             this.EkonometrikSenaryoElementsPanel.Controls.Add(this.ELFPredictionShowResultsGunaButton);
             this.EkonometrikSenaryoElementsPanel.Controls.Add(this.ELFScenerioSaveGunaButton);
@@ -2106,7 +2041,53 @@ namespace SLF
             this.EkonometrikSenaryoElementsPanel.Name = "EkonometrikSenaryoElementsPanel";
             this.EkonometrikSenaryoElementsPanel.Size = new System.Drawing.Size(207, 493);
             this.EkonometrikSenaryoElementsPanel.TabIndex = 1;
-            this.EkonometrikSenaryoElementsPanel.UseWaitCursor = true;
+            // 
+            // guna2GradientButton3
+            // 
+            this.guna2GradientButton3.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.guna2GradientButton3.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.guna2GradientButton3.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.guna2GradientButton3.DisabledState.FillColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.guna2GradientButton3.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.guna2GradientButton3.FillColor = System.Drawing.Color.LightSalmon;
+            this.guna2GradientButton3.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.guna2GradientButton3.ForeColor = System.Drawing.Color.White;
+            this.guna2GradientButton3.Location = new System.Drawing.Point(8, 386);
+            this.guna2GradientButton3.Name = "guna2GradientButton3";
+            this.guna2GradientButton3.Size = new System.Drawing.Size(180, 45);
+            this.guna2GradientButton3.TabIndex = 13;
+            this.guna2GradientButton3.Text = "guna2GradientButton3";
+            // 
+            // guna2GradientButton1
+            // 
+            this.guna2GradientButton1.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.guna2GradientButton1.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.guna2GradientButton1.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.guna2GradientButton1.DisabledState.FillColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.guna2GradientButton1.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.guna2GradientButton1.FillColor = System.Drawing.Color.LightSalmon;
+            this.guna2GradientButton1.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.guna2GradientButton1.ForeColor = System.Drawing.Color.White;
+            this.guna2GradientButton1.Location = new System.Drawing.Point(8, 335);
+            this.guna2GradientButton1.Name = "guna2GradientButton1";
+            this.guna2GradientButton1.Size = new System.Drawing.Size(180, 45);
+            this.guna2GradientButton1.TabIndex = 12;
+            this.guna2GradientButton1.Text = "guna2GradientButton1";
+            // 
+            // ShowResults
+            // 
+            this.ShowResults.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.ShowResults.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.ShowResults.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.ShowResults.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.ShowResults.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.ShowResults.ForeColor = System.Drawing.Color.White;
+            this.ShowResults.Location = new System.Drawing.Point(0, 284);
+            this.ShowResults.Name = "ShowResults";
+            this.ShowResults.Size = new System.Drawing.Size(204, 45);
+            this.ShowResults.TabIndex = 11;
+            this.ShowResults.Text = " Sonuçları Göster";
+            this.ShowResults.Click += new System.EventHandler(this.ShowResults_Click);
             // 
             // richTextBox1
             // 
@@ -2119,7 +2100,6 @@ namespace SLF
             this.richTextBox1.TabIndex = 10;
             this.richTextBox1.Text = "Tablolar üzerinde değişiklik yaparak senaryo üretebilirsiniz. Yeni senaryo tahmin" +
     " sonuçlarını görüntülemek için lütfen önce değişiklikleri kaydedin.";
-            this.richTextBox1.UseWaitCursor = true;
             // 
             // ELFPredictionShowResultsGunaButton
             // 
@@ -2133,8 +2113,7 @@ namespace SLF
             this.ELFPredictionShowResultsGunaButton.Name = "ELFPredictionShowResultsGunaButton";
             this.ELFPredictionShowResultsGunaButton.Size = new System.Drawing.Size(204, 45);
             this.ELFPredictionShowResultsGunaButton.TabIndex = 9;
-            this.ELFPredictionShowResultsGunaButton.Text = "Tahmin Sonuçlarını Göster";
-            this.ELFPredictionShowResultsGunaButton.UseWaitCursor = true;
+            this.ELFPredictionShowResultsGunaButton.Text = "Tahmin Yap/ Sonuçlarını Göster";
             this.ELFPredictionShowResultsGunaButton.Click += new System.EventHandler(this.ELFPredictionShowResultsGunaButton_Click);
             // 
             // ELFScenerioSaveGunaButton
@@ -2150,7 +2129,6 @@ namespace SLF
             this.ELFScenerioSaveGunaButton.Size = new System.Drawing.Size(206, 45);
             this.ELFScenerioSaveGunaButton.TabIndex = 6;
             this.ELFScenerioSaveGunaButton.Text = "Senaryo Değişikliklerini Kaydet";
-            this.ELFScenerioSaveGunaButton.UseWaitCursor = true;
             this.ELFScenerioSaveGunaButton.Click += new System.EventHandler(this.ELFScenerioSaveGunaButton_Click);
             // 
             // StokastikSenaryoTabPage
@@ -2162,7 +2140,6 @@ namespace SLF
             this.StokastikSenaryoTabPage.TabIndex = 1;
             this.StokastikSenaryoTabPage.Text = "Stokastik Senaryolar";
             this.StokastikSenaryoTabPage.UseVisualStyleBackColor = true;
-            this.StokastikSenaryoTabPage.UseWaitCursor = true;
             // 
             // EASarjSenaryoTabPage
             // 
@@ -2173,7 +2150,6 @@ namespace SLF
             this.EASarjSenaryoTabPage.TabIndex = 2;
             this.EASarjSenaryoTabPage.Text = "EA Şarj Senaryoları";
             this.EASarjSenaryoTabPage.UseVisualStyleBackColor = true;
-            this.EASarjSenaryoTabPage.UseWaitCursor = true;
             // 
             // DEKSenaryoTabPage
             // 
@@ -2184,7 +2160,6 @@ namespace SLF
             this.DEKSenaryoTabPage.TabIndex = 3;
             this.DEKSenaryoTabPage.Text = "DEK Senaryoları";
             this.DEKSenaryoTabPage.UseVisualStyleBackColor = true;
-            this.DEKSenaryoTabPage.UseWaitCursor = true;
             // 
             // tabPage8
             // 
@@ -2195,7 +2170,6 @@ namespace SLF
             this.tabPage8.TabIndex = 4;
             this.tabPage8.Text = "Yeni Genişleme Alanları ";
             this.tabPage8.UseVisualStyleBackColor = true;
-            this.tabPage8.UseWaitCursor = true;
             // 
             // tab_stokastik
             // 
@@ -2205,7 +2179,6 @@ namespace SLF
             this.tab_stokastik.Controls.Add(this.mesafe_metre_stokastik);
             this.tab_stokastik.Controls.Add(this.Mesafe_stokastik);
             this.tab_stokastik.Controls.Add(this.gMapControl_stokastik);
-            this.tab_stokastik.Controls.Add(this.buton_stokastik_harita_katmanlar);
             this.tab_stokastik.Controls.Add(this.checkBox18);
             this.tab_stokastik.Controls.Add(this.checkBox17);
             this.tab_stokastik.Controls.Add(this.checkBox16);
@@ -2219,6 +2192,7 @@ namespace SLF
             this.tab_stokastik.Controls.Add(this.label13);
             this.tab_stokastik.Controls.Add(this.stokastik_dosya_seçimi);
             this.tab_stokastik.Controls.Add(this.Seç_Stokastik);
+            this.tab_stokastik.Controls.Add(this.buton_stokastik_harita_katmanlar);
             this.tab_stokastik.Location = new System.Drawing.Point(4, 48);
             this.tab_stokastik.Margin = new System.Windows.Forms.Padding(2);
             this.tab_stokastik.Name = "tab_stokastik";
@@ -2760,6 +2734,20 @@ namespace SLF
             this.Stokastik_Fonksiyonlar.ToolTipText = "Çeşitli vektörel veya tabular algoritmaları içerir.";
             this.Stokastik_Fonksiyonlar.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Stokastik_Fonksiyonlar_MouseDown);
             // 
+            // buton_stokastik_harita_katmanlar
+            // 
+            this.buton_stokastik_harita_katmanlar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buton_stokastik_harita_katmanlar.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buton_stokastik_harita_katmanlar.BackgroundImage")));
+            this.buton_stokastik_harita_katmanlar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.buton_stokastik_harita_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
+            this.buton_stokastik_harita_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.buton_stokastik_harita_katmanlar.Location = new System.Drawing.Point(230, 509);
+            this.buton_stokastik_harita_katmanlar.Margin = new System.Windows.Forms.Padding(2);
+            this.buton_stokastik_harita_katmanlar.Name = "buton_stokastik_harita_katmanlar";
+            this.buton_stokastik_harita_katmanlar.Size = new System.Drawing.Size(46, 42);
+            this.buton_stokastik_harita_katmanlar.TabIndex = 29;
+            this.buton_stokastik_harita_katmanlar.UseVisualStyleBackColor = true;
+            // 
             // tab_yükHaritası
             // 
             this.tab_yükHaritası.Controls.Add(this.checkBox7);
@@ -2781,7 +2769,6 @@ namespace SLF
             this.tab_yükHaritası.TabIndex = 9;
             this.tab_yükHaritası.Text = "Yük Haritası Modülü";
             this.tab_yükHaritası.UseVisualStyleBackColor = true;
-            this.tab_yükHaritası.UseWaitCursor = true;
             // 
             // checkBox7
             // 
@@ -2793,7 +2780,6 @@ namespace SLF
             this.checkBox7.TabIndex = 17;
             this.checkBox7.Text = "Grafikler";
             this.checkBox7.UseVisualStyleBackColor = true;
-            this.checkBox7.UseWaitCursor = true;
             // 
             // checkBox6
             // 
@@ -2805,7 +2791,6 @@ namespace SLF
             this.checkBox6.TabIndex = 16;
             this.checkBox6.Text = "İstatistikler";
             this.checkBox6.UseVisualStyleBackColor = true;
-            this.checkBox6.UseWaitCursor = true;
             this.checkBox6.CheckedChanged += new System.EventHandler(this.checkBox6_CheckedChanged);
             // 
             // checkBox5
@@ -2818,7 +2803,6 @@ namespace SLF
             this.checkBox5.TabIndex = 15;
             this.checkBox5.Text = "Aydınlatma";
             this.checkBox5.UseVisualStyleBackColor = true;
-            this.checkBox5.UseWaitCursor = true;
             // 
             // checkBox4
             // 
@@ -2830,7 +2814,6 @@ namespace SLF
             this.checkBox4.TabIndex = 14;
             this.checkBox4.Text = "Tarımsal Sulama";
             this.checkBox4.UseVisualStyleBackColor = true;
-            this.checkBox4.UseWaitCursor = true;
             // 
             // checkBox3
             // 
@@ -2842,7 +2825,6 @@ namespace SLF
             this.checkBox3.TabIndex = 13;
             this.checkBox3.Text = "Ticarethane";
             this.checkBox3.UseVisualStyleBackColor = true;
-            this.checkBox3.UseWaitCursor = true;
             // 
             // checkBox2
             // 
@@ -2854,7 +2836,6 @@ namespace SLF
             this.checkBox2.TabIndex = 12;
             this.checkBox2.Text = "Sanayi";
             this.checkBox2.UseVisualStyleBackColor = true;
-            this.checkBox2.UseWaitCursor = true;
             // 
             // checkBox1
             // 
@@ -2866,7 +2847,6 @@ namespace SLF
             this.checkBox1.TabIndex = 11;
             this.checkBox1.Text = "Mesken";
             this.checkBox1.UseVisualStyleBackColor = true;
-            this.checkBox1.UseWaitCursor = true;
             // 
             // label4
             // 
@@ -2878,7 +2858,6 @@ namespace SLF
             this.label4.Size = new System.Drawing.Size(99, 19);
             this.label4.TabIndex = 10;
             this.label4.Text = "Abone Sınıfı:";
-            this.label4.UseWaitCursor = true;
             // 
             // button4
             // 
@@ -2890,7 +2869,6 @@ namespace SLF
             this.button4.TabIndex = 2;
             this.button4.Text = "OpenStreetMap";
             this.button4.UseVisualStyleBackColor = true;
-            this.button4.UseWaitCursor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // button3
@@ -2903,7 +2881,6 @@ namespace SLF
             this.button3.TabIndex = 1;
             this.button3.Text = "Google Maps";
             this.button3.UseVisualStyleBackColor = true;
-            this.button3.UseWaitCursor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click_1);
             // 
             // webView21
@@ -2921,7 +2898,6 @@ namespace SLF
             this.webView21.Size = new System.Drawing.Size(845, 386);
             this.webView21.Source = new System.Uri("https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu", System.UriKind.Absolute);
             this.webView21.TabIndex = 0;
-            this.webView21.UseWaitCursor = true;
             this.webView21.ZoomFactor = 1D;
             
             // 
@@ -2940,7 +2916,6 @@ namespace SLF
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(175, 150);
             this.panel1.TabIndex = 18;
-            this.panel1.UseWaitCursor = true;
             this.panel1.Visible = false;
             // 
             // textBox5
@@ -2950,7 +2925,6 @@ namespace SLF
             this.textBox5.Name = "textBox5";
             this.textBox5.Size = new System.Drawing.Size(76, 25);
             this.textBox5.TabIndex = 7;
-            this.textBox5.UseWaitCursor = true;
             // 
             // textBox4
             // 
@@ -2959,7 +2933,6 @@ namespace SLF
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(76, 25);
             this.textBox4.TabIndex = 6;
-            this.textBox4.UseWaitCursor = true;
             // 
             // textBox3
             // 
@@ -2968,7 +2941,6 @@ namespace SLF
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(76, 25);
             this.textBox3.TabIndex = 5;
-            this.textBox3.UseWaitCursor = true;
             // 
             // textBox2
             // 
@@ -2977,7 +2949,6 @@ namespace SLF
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(76, 25);
             this.textBox2.TabIndex = 4;
-            this.textBox2.UseWaitCursor = true;
             // 
             // label8
             // 
@@ -2990,7 +2961,6 @@ namespace SLF
             this.label8.Size = new System.Drawing.Size(62, 68);
             this.label8.TabIndex = 3;
             this.label8.Text = "label8";
-            this.label8.UseWaitCursor = true;
             // 
             // label7
             // 
@@ -3001,7 +2971,6 @@ namespace SLF
             this.label7.Size = new System.Drawing.Size(43, 17);
             this.label7.TabIndex = 2;
             this.label7.Text = "label7";
-            this.label7.UseWaitCursor = true;
             // 
             // label6
             // 
@@ -3012,7 +2981,6 @@ namespace SLF
             this.label6.Size = new System.Drawing.Size(43, 17);
             this.label6.TabIndex = 1;
             this.label6.Text = "label6";
-            this.label6.UseWaitCursor = true;
             // 
             // label5
             // 
@@ -3023,7 +2991,6 @@ namespace SLF
             this.label5.Size = new System.Drawing.Size(43, 17);
             this.label5.TabIndex = 0;
             this.label5.Text = "label5";
-            this.label5.UseWaitCursor = true;
             // 
             // tab_rapor
             // 
@@ -3034,7 +3001,6 @@ namespace SLF
             this.tab_rapor.TabIndex = 8;
             this.tab_rapor.Text = "Raporlama";
             this.tab_rapor.UseVisualStyleBackColor = true;
-            this.tab_rapor.UseWaitCursor = true;
             // 
             // tab_validasyon
             // 
@@ -3045,7 +3011,6 @@ namespace SLF
             this.tab_validasyon.TabIndex = 10;
             this.tab_validasyon.Text = "Validasyon Modülü";
             this.tab_validasyon.UseVisualStyleBackColor = true;
-            this.tab_validasyon.UseWaitCursor = true;
             // 
             // tabPage1
             // 
@@ -3055,20 +3020,6 @@ namespace SLF
             this.tabPage1.TabIndex = 10;
             this.tabPage1.Text = "Validasyon Modülü";
             this.tabPage1.UseVisualStyleBackColor = true;
-            // 
-            // HomePageButton
-            // 
-            this.HomePageButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.HomePageButton.BackColor = System.Drawing.Color.White;
-            this.HomePageButton.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.HomePageButton.Location = new System.Drawing.Point(1242, 2);
-            this.HomePageButton.Margin = new System.Windows.Forms.Padding(2);
-            this.HomePageButton.Name = "HomePageButton";
-            this.HomePageButton.Size = new System.Drawing.Size(79, 30);
-            this.HomePageButton.TabIndex = 4;
-            this.HomePageButton.Text = "Ana Sayfa";
-            this.HomePageButton.UseVisualStyleBackColor = true;
-            this.HomePageButton.Click += new System.EventHandler(this.HomePageButton_Click);
             // 
             // ContextMenuStrip_Nokta
             // 
@@ -3184,6 +3135,26 @@ namespace SLF
             this.HeaderPanel.Size = new System.Drawing.Size(1332, 34);
             this.HeaderPanel.TabIndex = 3;
             // 
+            // HomePageButton
+            // 
+            this.HomePageButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.HomePageButton.BorderRadius = 1;
+            this.HomePageButton.BorderStyle = System.Drawing.Drawing2D.DashStyle.Dash;
+            this.HomePageButton.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.HomePageButton.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.HomePageButton.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.HomePageButton.DisabledState.FillColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.HomePageButton.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.HomePageButton.FillColor = System.Drawing.Color.LightSalmon;
+            this.HomePageButton.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.HomePageButton.ForeColor = System.Drawing.Color.White;
+            this.HomePageButton.Location = new System.Drawing.Point(1206, 3);
+            this.HomePageButton.Name = "HomePageButton";
+            this.HomePageButton.Size = new System.Drawing.Size(123, 28);
+            this.HomePageButton.TabIndex = 5;
+            this.HomePageButton.Text = "Ana Sayfa";
+            this.HomePageButton.Click += new System.EventHandler(this.HomePageButton_Click);
+            // 
             // ModülFormu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -3228,11 +3199,9 @@ namespace SLF
             this.toolStrip2.PerformLayout();
             this.harita_katmanları_right_click.ResumeLayout(false);
             this.tab_ekonometrik.ResumeLayout(false);
-            this.ELFTablePanel.ResumeLayout(false);
             this.ELFResultsTabControls.ResumeLayout(false);
             this.ELFMinResultsTabPage.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.ELFMinResultsTable)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ELFMinSenaryoGraphPicBox)).EndInit();
             this.ELFLowResultsTabPage.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.ELFLowResultsTable)).EndInit();
             this.ELFBaseResultsTabPage.ResumeLayout(false);
@@ -3243,9 +3212,6 @@ namespace SLF
             ((System.ComponentModel.ISupportInitialize)(this.ELFMaxResultsTable)).EndInit();
             this.ELFGraphicsPanel.ResumeLayout(false);
             this.ELFGraphicsPanel.PerformLayout();
-            this.ELFRadioButtonsPanel.ResumeLayout(false);
-            this.ELFRadioButtonsPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.tab_imar.ResumeLayout(false);
             this.tab_senaryo.ResumeLayout(false);
             this.SenaryoModulePanel.ResumeLayout(false);
@@ -3338,7 +3304,9 @@ namespace SLF
         private System.Windows.Forms.TextBox textBox3;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.TabPage tab_validasyon;
-        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.DataGridView dataGridView4;
+        private System.Windows.Forms.Label SenaryoResultsLabel;
         private System.Windows.Forms.Button button8;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Panel ELFTablePanel;
@@ -3354,7 +3322,6 @@ namespace SLF
         private System.Windows.Forms.CheckBox checkBox11;
         private System.Windows.Forms.CheckBox checkBox10;
         private System.Windows.Forms.CheckBox checkBox9;
-        private System.Windows.Forms.Button HomePageButton;
         private System.Windows.Forms.ContextMenuStrip katmanlar_right_click;
         private System.Windows.Forms.ToolStripMenuItem tabloyuGörToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rengiDeğiştirToolStripMenuItem;
@@ -3444,15 +3411,11 @@ namespace SLF
         private Panel panel8;
         private Panel panel7;
         private TabPage tab_senaryo;
-        private Button SenaryoSelectionButton;
         private Label label17;
         private Label label18;
         private Label label3;
         private Panel ELFGraphicsPanel;
-        private Button OpenModuleButton;
         private Panel OpenModuleButtonPanel;
-        private Label label9;
-        private PictureBox pictureBox1;
         private Guna.UI2.WinForms.Guna2TabControl SenaryoModuleTabControl;
         private TabPage EkonometrikSenaryoTabPage;
         private TabPage StokastikSenaryoTabPage;
@@ -3476,15 +3439,6 @@ namespace SLF
         private Guna.UI2.WinForms.Guna2Button ELFScenerioSaveGunaButton;
         private Guna.UI2.WinForms.Guna2Button ELFPredictionShowResultsGunaButton;
         private TabPage tabPage8;
-        private Button ELFPredictionButton;
-        private Button button2;
-        private Guna.UI2.WinForms.Guna2RadioButton ELFMaxSenaryoRadioButton;
-        private Guna.UI2.WinForms.Guna2RadioButton ELFHighSenaryoRadioButton;
-        private Guna.UI2.WinForms.Guna2RadioButton ELFBaseSenaryoRadioButton;
-        private Guna.UI2.WinForms.Guna2RadioButton ELFLowSenaryoRadioButton;
-        private Guna.UI2.WinForms.Guna2RadioButton ELFMinSenaryoRadioButton;
-        private PictureBox ELFMinSenaryoGraphPicBox;
-        private Panel ELFRadioButtonsPanel;
         private TabControl ELFResultsTabControls;
         private TabPage ELFMinResultsTabPage;
         private DataGridView ELFMinResultsTable;
@@ -3496,9 +3450,13 @@ namespace SLF
         private DataGridView ELFHighResultsTable;
         private TabPage ELFMaxResultsTabPage;
         private DataGridView ELFMaxResultsTable;
-        private Label label10;
-        private Button button1;
         private RichTextBox richTextBox1;
+        private Guna.UI2.WinForms.Guna2Button ShowResults;
+        private Guna.UI2.WinForms.Guna2Button OpenModuleButton;
+        private Guna.UI2.WinForms.Guna2GradientButton guna2GradientButton1;
+        private Guna.UI2.WinForms.Guna2Button SenaryoNewSelectionButton;
+        private Guna.UI2.WinForms.Guna2GradientButton HomePageButton;
+        private Guna.UI2.WinForms.Guna2GradientButton guna2GradientButton3;
         public GMap.NET.WindowsForms.GMapControl gMapControl_Dek;
         private ToolStrip toolStrip1;
         private ToolStripButton toolStripButton1;

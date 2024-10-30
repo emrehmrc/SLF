@@ -21,9 +21,9 @@ namespace SLF
         public DataGridView Onizleme_DataGrid3 { get { return Onizleme_dataGrid3;} }
         public DataGridView Onizleme_DataGrid4 { get { return Onizleme_dataGrid4;} }
         public DataGridView Onizleme_DataGrid5 { get { return Onizleme_dataGrid5;} }
-        public Button Buton_YUKLE { get { return buton_YUKLE; } }
-        public Button Buton_ÇIK { get { return buton_ÇIK; } }
-        public Button Buton_İLERLE { get { return buton_İlerle; } }
+        public Guna.UI2.WinForms.Guna2Button Buton_YUKLE { get { return buton_YUKLE; } }
+        public Guna.UI2.WinForms.Guna2Button Buton_ÇIK { get { return buton_ÇIK; } }
+        public Guna.UI2.WinForms.Guna2Button Buton_İLERLE { get { return buton_İlerle; } }
         public TabPage Onizleme_Hata_Sekmesi { get { return Onizleme_Hata; } }
         public TabPage Onizleme_Warning_Sekmesi { get { return Onizleme_Warning; } }
         public TabPage Onizleme_Information_Sekmesi { get { return Onizleme_Information; } }

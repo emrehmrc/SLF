@@ -1,41 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
+﻿using ClosedXML.Excel;
 using GMap.NET;
 using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
-using System.Xml;
+using MapWinGIS;
 using NetTopologySuite.IO;
+using OfficeOpenXml;
 using SharpKml.Base;
 using SharpKml.Dom;
 using SharpKml.Engine;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using Avalonia;
-using NetTopologySuite.Geometries;
-using NetTopologySuite.Features;
-using NetTopologySuite.Operation;
-using MapWinGIS;
-using SharpMap.Data.Providers;
-using System.Drawing.Drawing2D;
-using ClosedXML.Excel;
-using OfficeOpenXml;
+using System.Windows.Forms;
+using System.Xml;
+using static SLF.ModülFormu;
 using DrawingImage = System.Drawing.Image;
 
 namespace SLF
 {
     public partial class ModülFormu : Form
     {
-
+        TextBox logTextBox; // Declare logTextBox here
         private double startX = 0, startY = 0;
         public int slfStartYear = 0, slfEndYear = 0;
+        private ExcelService _excelService;
         // form objeleri
         public HomePageForm gir1;
         private GirdiModülü girdiModülü;
@@ -141,8 +137,8 @@ namespace SLF
             public double Boylam { get; set; }
             public double Bina_Demandi { get; set; }
             public int Abone_Sayısı { get; set; }
-            
-            
+
+
         }
 
         public enum FileType
@@ -184,6 +180,8 @@ namespace SLF
         public ModülFormu(string selectedMethod = "", string tabToSelect = "")
         {
             InitializeComponent();
+            _excelService = new ExcelService();
+            InitializeLogTextBox(); // Initialize logTextBox
             this.DoubleBuffered = true;
             this.selectedMethod = selectedMethod;  // Store the method
             // Initialize the maps and other UI components
@@ -253,42 +251,31 @@ namespace SLF
         //VISUAL CHANGES
         private void ModuleTabPanel_Paint(object sender, PaintEventArgs e)
         {
-            // Get the Graphics object from the PaintEventArgs
-/*            Graphics graphics = e.Graphics;
-
-
-            // Create a rectangle the same size as the panel
-            Rectangle gradient_rectangle = new Rectangle(0, 0, ModuleTabPanel.Width, ModuleTabPanel.Height);
-
-            // Define the gradient's properties
-            Brush brush = new LinearGradientBrush(gradient_rectangle, Color.FromArgb(100, 252, 179, 38), Color.FromArgb(100, 0, 253, 147), 85f);
-
-            // Apply the gradient by filling the rectangle with the brush
-            graphics.FillRectangle(brush, gradient_rectangle);
-
-            // Optionally, set the panel's background color to be fully transparent
-            ModuleTabPanel.BackColor = Color.Transparent;
-            this.DoubleBuffered = true;*/
         }
-
-        /*        private void HeaderPanel_Paint(object sender, PaintEventArgs e)
-                {
-                    // Get the Graphics object from the PaintEventArgs
-                    Graphics graphics = e.Graphics;
-
-                    // Create a rectangle the same size as the panel
-                    Rectangle gradient_rectangle = new Rectangle(0, 0, HeaderPanel.Width, HeaderPanel.Height);
-
-                    // Define the gradient's properties
-                    Brush brush = new LinearGradientBrush(gradient_rectangle, Color.FromArgb(100, 252, 179, 38), Color.FromArgb(100, 0, 253, 147), 65f);
-
-                    // Apply the gradient by filling the rectangle with the brush
-                    graphics.FillRectangle(brush, gradient_rectangle);
-
-                    // Optionally, set the panel's background color to be fully transparent
-                    HeaderPanel.BackColor = Color.Transparent;
-                }*/
         // Initialize specific tabs and hide others
+        // Method to hide a specific item from the ComboBox
+        private void HideComboBoxItem(string itemToHide)
+        {
+            // Create a new list excluding the item you want to hide
+            var filteredItems = new List<string>();
+            foreach (var item in veri_listesi_seçimi.Items)
+            {
+                if (item.ToString() != itemToHide) // Check if the item is not the one to hide
+                {
+                    filteredItems.Add(item.ToString());
+                }
+            }
+
+            // Clear existing items and add the filtered list
+            veri_listesi_seçimi.Items.Clear();
+            veri_listesi_seçimi.Items.AddRange(filteredItems.ToArray());
+
+            // Set the default selection, if applicable
+            if (filteredItems.Count > 0)
+            {
+                veri_listesi_seçimi.SelectedIndex = 2; // Select the first item or another index as needed
+            }
+        }
         private void InitializeTabs(params string[] tabsToSelect)
         {
             foreach (string tabToSelect in tabsToSelect)
@@ -356,7 +343,24 @@ namespace SLF
             }
             else if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
+                // Hide the specific item you want to remove
+                HideComboBoxItem("Ekonometrik Yük Tahmini Verileri"); // Replace with the actual item you want to hide
                 // For SLF, do not hide any tabs. Add logic here if needed.
+                // List of tab names to hide
+                string[] tabsToHide = {"EkonometrikSenaryoTabPage", "tab_ekonometrik"};
+
+                // Loop through each tab name and remove it if it exists
+                foreach (string tabName in tabsToHide)
+                {
+                    if (SenaryoModuleTabControl.TabPages.ContainsKey(tabName))
+                    {
+                        SenaryoModuleTabControl.TabPages.RemoveByKey(tabName);
+                    }
+                    if (Modül_Tabları.TabPages.ContainsKey(tabName))
+                    {
+                        Modül_Tabları.TabPages.RemoveByKey(tabName);
+                    }
+                }
             }
         }
 
@@ -384,33 +388,437 @@ namespace SLF
             hiddenTabs.Clear();  // Clear the list after restoring
         }
 
-        private void OpenModuleButton_Click(object sender, EventArgs e)
+
+        /// <summary>
+        /// ELF METHOD Model RScript Run RELATED CHANGES & UPDATES
+        /// </summary>
+
+
+        public class ExcelService
         {
-            string filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
-
-            // Load the Excel package
-            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            // Load the worksheet into a DataTable for displaying in DataGridView
+            public DataTable LoadWorksheetIntoDataTable(ExcelWorksheet worksheet)
             {
-                // Clear previous data
-                ELFMinSenaryoTable.DataSource = null;
-                ELFLowSenaryoTable.DataSource = null;
-                ELFBaseSenaryoTable.DataSource = null;
-                ELFHighSenaryoTable.DataSource = null;
-                ELFMaxSenaryoTable.DataSource = null;
+                DataTable dt = new DataTable();
 
-                // Load only sheets 2 to 6 (indices 1 to 5)
-                for (int i = 0; i <= 5; i++) // i = 1 corresponds to sheet 2, i = 5 corresponds to sheet 6
+                // Load header
+                for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
                 {
-                    var worksheet = package.Workbook.Worksheets[i + 1]; // Worksheets are 1-indexed, so i + 1 is used here
+                    dt.Columns.Add(worksheet.Cells[1, col].Text);
+                }
+
+                // Load data
+                for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+                {
+                    var newRow = dt.NewRow();
+                    for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+                    {
+                        newRow[col - 1] = worksheet.Cells[row, col].Text;
+                    }
+                    dt.Rows.Add(newRow);
+                }
+
+                return dt;
+            }
+
+            // Update the worksheet from DataGridView based on user's changes
+            public void UpdateWorksheetFromDataGridView(ExcelWorksheet worksheet, DataGridView dgv)
+            {
+                for (int row = 0; row < dgv.Rows.Count; row++)
+                {
+                    for (int col = 0; col < dgv.Columns.Count; col++)
+                    {
+                        var cell = worksheet.Cells[row + 2, col + 1]; // Start at row 2 in Excel (headers are in row 1)
+                        var cellDisplayedValue = dgv.Rows[row].Cells[col].Value; // Get displayed value from DataGridView
+
+                        // Update the cell value in Excel
+                        if (cellDisplayedValue != null)
+                        {
+                            // If the displayed value is numeric (including percentages), update the Excel cell
+                            if (double.TryParse(cellDisplayedValue.ToString().Replace("%", ""), out double updatedValue))
+                            {
+                                if (cellDisplayedValue.ToString().Contains("%"))
+                                {
+                                    // Convert percentage back to a decimal before updating (e.g., 5.2% -> 0.052)
+                                    cell.Value = updatedValue / 100;
+                                }
+                                else
+                                {
+                                    // Otherwise, use the updated value directly
+                                    cell.Value = updatedValue;
+                                }
+                            }
+                            else
+                            {
+                                // If not numeric, update as text
+                                cell.Value = cellDisplayedValue;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        private async void OpenModuleButton_Click(object sender, EventArgs e)
+        {
+            // Disable the button initially
+            OpenModuleButton.Enabled = false;
+
+            string filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+
+            // Load the data table for the selected type
+            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
+
+            // Check if the data table has any rows
+            if (dataTable == null || dataTable.Rows.Count == 0)
+            {
+                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Excel dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                OpenModuleButton.Enabled = true; // Re-enable the button before returning
+                return;
+            }
+
+            // Asynchronous task to load the Excel package
+            await Task.Run(() =>
+            {
+                using (var package = new ExcelPackage(new FileInfo(filePath)))
+                {
+                    Invoke(new Action(() =>
+                    {
+                        // Clear previous data
+                        ELFMinSenaryoTable.DataSource = null;
+                        ELFLowSenaryoTable.DataSource = null;
+                        ELFBaseSenaryoTable.DataSource = null;
+                        ELFHighSenaryoTable.DataSource = null;
+                        ELFMaxSenaryoTable.DataSource = null;
+                    }));
+
+                    // Load sheets 2 to 6 into respective DataGridViews
+                    for (int i = 1; i <= 5; i++)
+                    {
+                        var worksheet = package.Workbook.Worksheets[i];
+                        DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
+
+                        Invoke(new Action(() =>
+                        {
+                            var dataGrids = new[] { ELFMinSenaryoTable, ELFLowSenaryoTable, ELFBaseSenaryoTable, ELFHighSenaryoTable, ELFMaxSenaryoTable };
+                            dataGrids[i - 1].DataSource = dt;
+                        }));
+                    }
+                }
+            });
+
+            // After loading the data, enable the button
+            OpenModuleButton.Enabled = true;
+
+            if (veri_listesi_seçimi.Text == "Ekonometrik Yük Tahmini Verileri")
+            {
+                Modül_Tabları.SelectedTab = tab_senaryo; // Move this line here to ensure it only executes after loading data
+            }
+            if (veri_listesi_seçimi.Text == "EA Şarj Verileri")
+            {
+                Modül_Tabları.SelectedTab = tab_ea;
+            }
+/*            if (veri_listesi_seçimi.Text == "DTR Verileri")
+            {
+                Modül_Tabları.SelectedTab = tab_optDTR;
+            }*/
+        }
+
+        /// <summary>
+        /// ELF METHOD Model RScript Run RELATED CHANGES & UPDATES
+        /// </summary>
+        // Helper method for logging
+
+        /// <summary>
+        /// ELF METHOD Model RScript Run RELATED CHANGES & UPDATES
+        /// </summary>
+
+        // Save button logic to update Excel file with changes from DataGridViews
+        private async void ELFScenerioSaveGunaButton_Click(object sender, EventArgs e)
+        {
+            string originalFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+            string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+
+            try
+            {
+                await Task.Run(() =>
+                {
+                    using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
+                    {
+                        // Update worksheets with data from DataGridViews
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[0], ELFMinSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[1], ELFLowSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[2], ELFBaseSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[3], ELFHighSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[4], ELFMaxSenaryoTable);
+
+                        // Save the modified Excel file
+                        package.SaveAs(new FileInfo(modifiedFilePath));
+                    }
+                });
+
+                MessageBox.Show("User changes saved to the modified Excel file.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating Excel file: {ex.Message}");
+            }
+        }
+        private async void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e)
+        {
+            // Set cursor to wait
+            Cursor.Current = Cursors.WaitCursor;
+
+            // Define paths for the R script and modified input file
+            string rScriptPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\begum_model_deneme.R";
+            string modifiedInputFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+            string logFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\script_output_log2.txt";
+
+            try
+            {
+                // Check if the modified input file exists
+                if (!File.Exists(modifiedInputFilePath))
+                {
+                    LogOutput("The specified modified input file does not exist.");
+                    return;
+                }
+
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "Rscript.exe", // Ensure Rscript.exe is accessible in your PATH
+                        Arguments = $"\"{rScriptPath}\" \"{modifiedInputFilePath}\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+
+                process.Start();
+
+                string output = await process.StandardOutput.ReadToEndAsync();
+                string error = await process.StandardError.ReadToEndAsync();
+
+                process.WaitForExit();
+
+                // Log the output and error
+                File.AppendAllText(logFilePath, $"Output:\n{output}\nError:\n{error}\n\n");
+
+                if (process.ExitCode != 0)
+                {
+                    LogOutput($"R script encountered an error. Check the log file for details: {logFilePath}");
+                }
+                else
+                {
+                    LogOutput("R script executed successfully.");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogOutput($"An error occurred while running the R script: {ex.Message}");
+            }
+            finally
+            {
+                // Restore cursor to default
+                Cursor.Current = Cursors.Default;
+            }
+        }
+
+        // Helper method for logging output to logTextBox
+        private void LogOutput(string message)
+        {
+            if (logTextBox != null)
+            {
+                if (logTextBox.InvokeRequired)
+                {
+                    logTextBox.Invoke(new Action<string>(LogOutput), message);
+                }
+                else
+                {
+                    logTextBox.AppendText(message + Environment.NewLine);
+                }
+            }
+        }
+
+        private void InitializeLogTextBox()
+        {
+            logTextBox = new TextBox
+            {
+                Multiline = true,
+                Dock = DockStyle.Bottom, // Dock it at the bottom of the form
+                Height = 100, // Adjust height as necessary
+                ScrollBars = ScrollBars.Vertical // Enable vertical scroll
+            };
+            this.Controls.Add(logTextBox); // Add to the form controls
+        }
+
+        private async void ShowResults_Click(object sender, EventArgs e)
+        {
+            // Path to the Excel file
+            string filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\ELF_Tahmin_Sonuçları_2024-10-21 16_59_43.xlsx";
+
+            // Asynchronous task to load the Excel package
+            await Task.Run(() =>
+            {
+                using (var package = new ExcelPackage(new FileInfo(filePath)))
+                {
+                    // Clear previous data in the DataGridViews
+                    Invoke(new Action(() =>
+                    {
+                        // Set DataSources to null to clear previous data
+                        ELFMinResultsTable.DataSource = null;
+                        ELFLowResultsTable.DataSource = null;
+                        ELFBaseResultsTable.DataSource = null;
+                        ELFHighResultsTable.DataSource = null;
+                        ELFMaxResultsTable.DataSource = null;
+                    }));
+
+                    // Load sheets into their respective DataGridViews
+                    var worksheets = new[] { "Bagımlı_Degisken_Tahminleri_1", "Bagımlı_Degisken_Tahminleri_2", "Bagımlı_Degisken_Tahminleri_3", "Bagımlı_Degisken_Tahminleri_4", "Bagımlı_Degisken_Tahminleri_5" }; // Replace with actual sheet names if needed
+                    var dataGrids = new[] { ELFMinResultsTable, ELFLowResultsTable, ELFBaseResultsTable, ELFHighResultsTable, ELFMaxResultsTable };
+
+                    for (int i = 0; i < worksheets.Length; i++)
+                    {
+                        var worksheet = package.Workbook.Worksheets[worksheets[i]];
+                        if (worksheet != null)
+                        {
+                            DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
+
+                            Invoke(new Action(() =>
+                            {
+                                dataGrids[i].DataSource = dt; // Set DataGridView's DataSource
+                            }));
+                        }
+                    }
+                }
+            });
+
+            // Optionally, switch to the results tab
+            Modül_Tabları.SelectedTab = tab_ekonometrik;
+        }
+
+
+
+
+        /*
+                private void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e)
+                {
+                    try
+                    {
+                        // Set cursor to wait while running the operations
+                        Cursor.Current = Cursors.WaitCursor;
+
+                        string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+
+                        // Check if the modified file exists
+                        if (!File.Exists(modifiedFilePath))
+                        {
+                            MessageBox.Show("The modified Excel file does not exist. Please save the scena" +
+                                "rio first.");
+                            return;
+                        }
+
+                        // Run the R script
+                        string resultsFilePath = RunModelRScript(modifiedFilePath);
+
+                        if (resultsFilePath == null)
+                        {
+                            // If R script failed or no results path was returned, stop further execution
+                            return;
+                        }
+
+                        // Load results into tab_ekonometrik
+                        LoadResultsToTabEkonometrik(resultsFilePath);
+                    }
+                    finally
+                    {
+                        // Restore cursor to default
+                        Cursor.Current = Cursors.Default;
+                    }
+                }
+
+                // Method to run the R script
+                private string RunModelRScript(string modifiedFilePath)
+                {
+                    string rScriptPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\begum_model_deneme.R";
+                    string resultsFilePath = "";
+
+                    // Set up process info
+                    var processInfo = new ProcessStartInfo()
+                    {
+                        FileName = "Rscript.exe",
+                        Arguments = $"\"{rScriptPath}\" \"{modifiedFilePath}\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+
+                    // Start the process
+                    using (var process = Process.Start(processInfo))
+                    {
+                        process.OutputDataReceived += (sender, args) =>
+                        {
+                            if (!string.IsNullOrEmpty(args.Data))
+                            {
+                                Console.WriteLine(args.Data);
+                                resultsFilePath = args.Data;  // Capture the file path
+                            }
+                        };
+
+                        process.ErrorDataReceived += (sender, args) => Console.WriteLine("ERROR: " + args.Data);
+
+                        process.BeginOutputReadLine();
+                        process.WaitForExit();
+                    }
+
+                    if (string.IsNullOrEmpty(resultsFilePath))
+                    {
+                        MessageBox.Show("Error: No results file path was generated by the R script.");
+                        return null;
+                    }
+
+                    MessageBox.Show("R script executed successfully. Results saved in: " + resultsFilePath);
+                    return resultsFilePath;  // Return the results file path
+                }
+
+                // Method to load results into tab_ekonometrik
+                private void LoadResultsToTabEkonometrik(string resultsFilePath)
+                {
+                    if (!File.Exists(resultsFilePath))
+                    {
+                        MessageBox.Show("The results file does not exist.");
+                        return;
+                    }
+
+                    using (var package = new ExcelPackage(new FileInfo(resultsFilePath)))
+                    {
+                        // Load the corresponding results into each DataGridView
+                        LoadWorksheetToDataGridView(package.Workbook.Worksheets[1], ELFMinResultsTable);
+                        LoadWorksheetToDataGridView(package.Workbook.Worksheets[2], ELFLowResultsTable);
+                        LoadWorksheetToDataGridView(package.Workbook.Worksheets[3], ELFBaseResultsTable);
+                        LoadWorksheetToDataGridView(package.Workbook.Worksheets[4], ELFHighResultsTable);
+                        LoadWorksheetToDataGridView(package.Workbook.Worksheets[5], ELFMaxResultsTable);
+                    }
+
+                    // Switch to the results tab after loading all the data
+                    Modül_Tabları.SelectedTab = tab_ekonometrik;
+                }
+
+                // Helper method to load data from an Excel worksheet into a DataGridView
+                private void LoadWorksheetToDataGridView(ExcelWorksheet worksheet, DataGridView dataGridView)
+                {
                     DataTable dt = new DataTable();
 
-                    // Load header
+                    // Load headers from the first row
                     for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
                     {
                         dt.Columns.Add(worksheet.Cells[1, col].Text);
                     }
 
-                    // Load data
+                    // Load data from the worksheet into the DataTable (starting from row 2)
                     for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
                     {
                         var newRow = dt.NewRow();
@@ -421,452 +829,16 @@ namespace SLF
                         dt.Rows.Add(newRow);
                     }
 
-                    // Set the data source for the corresponding DataGridView
-                    if (i < 5) // Adjust to match the DataGridView indices
-                    {
-                        var dataGrids = new[] { ELFMinSenaryoTable, ELFLowSenaryoTable, ELFBaseSenaryoTable, ELFHighSenaryoTable, ELFMaxSenaryoTable };
-                        dataGrids[i].DataSource = dt;
-                    }
-                }
-            }
-
-            // Optionally set the selected tab to tab_senaryo
-            Modül_Tabları.SelectedTab = tab_senaryo;
-        }
-
-        /*        // Event handler for opening the Senaryo module
-                private void OpenModuleButton_Click(object sender, EventArgs e)
-                {
-                    Modül_Tabları.SelectedTab = tab_senaryo;
-
-
-                    if (veri_listesi_seçimi.Text == "EA Şarj Verileri")
-                    {
-                        // List of tab names to hide
-                        string[] tabsToHide = { "StokastikSenaryoTabPage", "DEKSenaryoTabPage", "EkonometrikSenaryoTabPage" };
-
-                        // Loop through each tab name and remove it if it exists
-                        foreach (string tabName in tabsToHide)
-                        {
-                            if (SenaryoModuleTabControl.TabPages.ContainsKey(tabName))
-                            {
-                                SenaryoModuleTabControl.TabPages.RemoveByKey(tabName);
-                            }
-                        }
-                    }
-                }*/
-
-
-        /// <summary>
-        /// ELF METHOD Model RScript Run RELATED CHANGES & UPDATES
-        /// </summary>
-
-        private void ELFScenerioSaveGunaButton_Click(object sender, EventArgs e)
-        {
-            string originalFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
-            string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
-
-            // Dictionary to store original formulas
-            var originalFormulas = new Dictionary<string, string>();
-
-            // Load the original Excel file and read formulas
-            try
-            {
-                using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
-                {
-                    // Loop through each worksheet and store formulas
-                    foreach (var worksheet in package.Workbook.Worksheets)
-                    {
-                        for (int row = 1; row <= worksheet.Dimension.Rows; row++)
-                        {
-                            for (int col = 1; col <= worksheet.Dimension.Columns; col++)
-                            {
-                                var cell = worksheet.Cells[row, col];
-
-                                // Store formulas in the dictionary
-                                if (!string.IsNullOrEmpty(cell.Formula))
-                                {
-                                    // Generate a unique key for the cell based on its address
-                                    originalFormulas[$"{worksheet.Name}!{cell.Address}"] = cell.Formula;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error reading original Excel file: {ex.Message}");
-                return;
-            }
-
-            // Load the original file again to allow modifications
-            try
-            {
-                using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
-                {
-                    // Access the first worksheet for any required operations (preserving formulas)
-                    ExcelWorksheet firstWorksheet = package.Workbook.Worksheets[0];
-
-                    // Update worksheets with data from DataGridViews
-                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[1], ELFMinSenaryoTable);
-                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[2], ELFLowSenaryoTable);
-                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[3], ELFBaseSenaryoTable);
-                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[4], ELFHighSenaryoTable);
-                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[5], ELFMaxSenaryoTable);
-
-                    // Restore original formulas
-                    foreach (var kvp in originalFormulas)
-                    {
-                        var parts = kvp.Key.Split('!');
-                        var sheetName = parts[0];
-                        var cellAddress = parts[1];
-
-                        var worksheet = package.Workbook.Worksheets[sheetName];
-                        var cell = worksheet.Cells[cellAddress];
-
-                        // Apply the original formula
-                        cell.Formula = kvp.Value;
-                    }
-
-                    // Save the modified Excel file
-                    package.SaveAs(new FileInfo(modifiedFilePath));
-                }
-
-                // Inform the user that the changes were saved successfully
-                MessageBox.Show("User changes saved to the modified Excel file.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error updating Excel file: {ex.Message}");
-            }
-        }
-
-        // Load the original Excel file into DataGridView for display
-        private void LoadDataIntoDataGridView(ExcelWorksheet worksheet, DataGridView dgv)
-        {
-            dgv.Rows.Clear(); // Clear existing rows
-
-            for (int row = 1; row <= worksheet.Dimension.Rows; row++)
-            {
-                int rowIndex = dgv.Rows.Add(); // Add a new row to the DataGridView
-
-                for (int col = 1; col <= worksheet.Dimension.Columns; col++)
-                {
-                    var cell = worksheet.Cells[row, col];
-
-                    // Store the original value in the cell's tag for later use
-                    dgv.Rows[rowIndex].Cells[col - 1].Value = Math.Round(cell.GetValue<double>(), 1); // Display as 4.9%
-                    dgv.Rows[rowIndex].Cells[col - 1].Tag = cell.Value; // Preserve full value
-                }
-            }
-        }
-
-        // Helper method to update an Excel worksheet based on the DataGridView
-        private void UpdateWorksheetFromDataGridView(ExcelWorksheet worksheet, DataGridView dgv)
-        {
-            for (int row = 0; row < dgv.Rows.Count; row++)
-            {
-                for (int col = 0; col < dgv.Columns.Count; col++)
-                {
-                    var cell = worksheet.Cells[row + 2, col + 1]; // Start at row 2 in Excel
-                    var cellValue = dgv.Rows[row].Cells[col].Tag; // Get the original full value
-
-                    // Only update cell values if the original value is not null
-                    if (cellValue != null)
-                    {
-                        // Set the numeric value directly
-                        cell.Value = cellValue;
-
-                        // Preserve the original format from the original file
-                        cell.Style.Numberformat.Format = "0.000000000000000%"; // Preserve full precision
-                    }
-                }
-            }
-        }
-
-
-
-        /*        private void ELFScenerioSaveGunaButton_Click(object sender, EventArgs e)
-                {
-                    string originalFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
-                    string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
-
-                    // Dictionary to store original formulas
-                    var originalFormulas = new Dictionary<string, string>();
-
-                    // Load the original Excel file and read formulas
-                    try
-                    {
-                        using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
-                        {
-                            // Loop through each worksheet and store formulas
-                            foreach (var worksheet in package.Workbook.Worksheets)
-                            {
-                                for (int row = 1; row <= worksheet.Dimension.Rows; row++)
-                                {
-                                    for (int col = 1; col <= worksheet.Dimension.Columns; col++)
-                                    {
-                                        var cell = worksheet.Cells[row, col];
-
-                                        // Store formulas in the dictionary
-                                        if (!string.IsNullOrEmpty(cell.Formula))
-                                        {
-                                            // Generate a unique key for the cell based on its address
-                                            originalFormulas[$"{worksheet.Name}!{cell.Address}"] = cell.Formula;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error reading original Excel file: {ex.Message}");
-                        return;
-                    }
-
-                    // Load the original file again to allow modifications
-                    try
-                    {
-                        using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
-                        {
-                            // Access the first worksheet for any required operations (preserving formulas)
-                            ExcelWorksheet firstWorksheet = package.Workbook.Worksheets[0];
-
-                            // Update worksheets with data from DataGridViews
-                            UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[1], ELFMinSenaryoTable, originalFormats);
-                            UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[2], ELFLowSenaryoTable, originalFormats);
-                            UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[3], ELFBaseSenaryoTable, originalFormats);
-                            UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[4], ELFHighSenaryoTable, originalFormats);
-                            UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[5], ELFMaxSenaryoTable, originalFormats);
-
-                            // Restore original formulas
-                            foreach (var kvp in originalFormulas)
-                            {
-                                var parts = kvp.Key.Split('!');
-                                var sheetName = parts[0];
-                                var cellAddress = parts[1];
-
-                                var worksheet = package.Workbook.Worksheets[sheetName];
-                                var cell = worksheet.Cells[cellAddress];
-
-                                // Apply the original formula
-                                cell.Formula = kvp.Value;
-                            }
-
-                            // Save the modified Excel file
-                            package.SaveAs(new FileInfo(modifiedFilePath));
-                        }
-
-                        // Inform the user that the changes were saved successfully
-                        MessageBox.Show("User changes saved to the modified Excel file.");
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error updating Excel file: {ex.Message}");
-                    }
-                }
-
-                // Load the original Excel file into DataGridView for display
-                private void LoadDataIntoDataGridView(ExcelWorksheet worksheet, DataGridView dgv)
-                {
-                    dgv.Rows.Clear(); // Clear existing rows
-
-                    for (int row = 1; row <= worksheet.Dimension.Rows; row++)
-                    {
-                        int rowIndex = dgv.Rows.Add(); // Add a new row to the DataGridView
-
-                        for (int col = 1; col <= worksheet.Dimension.Columns; col++)
-                        {
-                            var cell = worksheet.Cells[row, col];
-
-                            // Store the original value in the cell's tag for later use
-                            dgv.Rows[rowIndex].Cells[col - 1].Value = Math.Round(cell.GetValue<double>(), 1); // Display as 4.9%
-                            dgv.Rows[rowIndex].Cells[col - 1].Tag = cell.Value; // Preserve full value
-                        }
-                    }
-                }
-
-                // Helper method to update an Excel worksheet based on the DataGridView
-                private void UpdateWorksheetFromDataGridView(ExcelWorksheet worksheet, DataGridView dgv)
-                {
-                    for (int row = 0; row < dgv.Rows.Count; row++)
-                    {
-                        for (int col = 0; col < dgv.Columns.Count; col++)
-                        {
-                            var cell = worksheet.Cells[row + 2, col + 1]; // Start at row 2 in Excel
-                            var cellValue = dgv.Rows[row].Cells[col].Tag; // Get the original full value
-
-                            // Set the value to the cell, ensuring that empty cells are handled
-                            cell.Value = cellValue ?? (object)DBNull.Value; // Preserve the value or set to DBNull for empty cells
-
-                            // Preserve the original format from the original file
-                            cell.Style.Numberformat.Format = "0.000000000000000%"; // Preserve full precision
-                        }
-                    }
-                }*/
-        // Helper method to update an Excel worksheet based on the DataGridView
-        /*        private void UpdateWorksheetFromDataGridView(ExcelWorksheet worksheet, DataGridView dgv, Dictionary<string, string> originalFormats)
-                {
-                    for (int row = 0; row < dgv.Rows.Count; row++)
-                    {
-                        for (int col = 0; col < dgv.Columns.Count; col++)
-                        {
-                            var cell = worksheet.Cells[row + 2, col + 1]; // Start at row 2 in Excel
-                            var cellValue = dgv.Rows[row].Cells[col].Value;
-
-                            // Get the original format from the dictionary using the cell address as a key
-                            string cellAddress = cell.Address; // Get the current cell address
-                            string existingFormat = originalFormats.ContainsKey(cellAddress) ? originalFormats[cellAddress] : string.Empty;
-
-                            // Update cell values
-                            if (cellValue != null)
-                            {
-                                // If the value is a double (or can be converted), keep the full precision
-                                if (double.TryParse(cellValue.ToString(), out double numericValue))
-                                {
-                                    // Set the numeric value directly
-                                    cell.Value = numericValue;
-
-                                    // Set the format to preserve the original format from the original file
-                                    cell.Style.Numberformat.Format = string.IsNullOrEmpty(existingFormat) ? "0.000000000000000%" : existingFormat;
-                                }
-                                else
-                                {
-                                    // For non-numeric values, just update the cell value
-                                    cell.Value = cellValue;
-                                    // Preserve existing format for non-numeric values as well
-                                    cell.Style.Numberformat.Format = existingFormat;
-                                }
-                            }
-                        }
-                    }
+                    // Assign the DataTable as the DataSource of the DataGridView
+                    dataGridView.DataSource = dt;
                 }
         */
 
 
 
         /// <summary>
-        /// ELF METHOD Model RScript Run RELATED CHANGES & UPDATES
+        /// ELF METHOD MODEL GRAPH RELATED CHANGES & UPDATES
         /// </summary>
-
-
-        private void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e)
-        {
-            string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
-
-            // Check if the modified file exists
-            if (!File.Exists(modifiedFilePath))
-            {
-                MessageBox.Show("The modified Excel file does not exist. Please save the scenario first.");
-                return;
-            }
-
-            // Run the R script
-            string resultsFilePath = RunModelRScript(modifiedFilePath);
-
-            // Load results into tab_ekonometrik
-            LoadResultsToTabEkonometrik(resultsFilePath);
-        }
-
-        // Method to run the R script
-        private string RunModelRScript(string modifiedFilePath)
-        {
-            string rScriptPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\model.R";
-            string resultsFilePath = "";
-
-            // Set up process info
-            var processInfo = new ProcessStartInfo()
-            {
-                FileName = "Rscript.exe",
-                Arguments = $"\"{rScriptPath}\" \"{modifiedFilePath}\"",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            // Start the process
-            using (var process = Process.Start(processInfo))
-            {
-                // Capture output from the R script
-                process.OutputDataReceived += (sender, args) => {
-                    if (!string.IsNullOrEmpty(args.Data))
-                    {
-                        Console.WriteLine(args.Data);
-                        resultsFilePath = args.Data;  // Capture the file path
-                    }
-                };
-
-                process.ErrorDataReceived += (sender, args) => Console.WriteLine("ERROR: " + args.Data);
-
-                process.BeginOutputReadLine();
-                process.WaitForExit();
-            }
-
-            if (string.IsNullOrEmpty(resultsFilePath))
-            {
-                MessageBox.Show("Error: No results file path was generated by the R script.");
-                return null;
-            }
-
-            MessageBox.Show("R script executed successfully. Results saved in: " + resultsFilePath);
-            return resultsFilePath;  // Return the results file path
-        }
-
-        // Method to load results into tab_ekonometrik
-        private void LoadResultsToTabEkonometrik(string resultsFilePath)
-        {
-            if (!File.Exists(resultsFilePath))
-            {
-                MessageBox.Show("The results file does not exist.");
-                return;
-            }
-
-            using (var package = new ExcelPackage(new FileInfo(resultsFilePath)))
-            {
-                // Load the corresponding results into each DataGridView
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[1], ELFMinResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[2], ELFLowResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[3], ELFBaseResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[4], ELFHighResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[5], ELFMaxResultsTable);
-            }
-
-            // Switch to the results tab after loading all the data
-            Modül_Tabları.SelectedTab = tab_ekonometrik;
-        }
-
-
-        // Helper method to load data from an Excel worksheet into a DataGridView
-        private void LoadWorksheetToDataGridView(ExcelWorksheet worksheet, DataGridView dataGridView)
-        {
-            DataTable dt = new DataTable();
-
-            // Load headers from the first row
-            for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
-            {
-                dt.Columns.Add(worksheet.Cells[1, col].Text);
-            }
-
-            // Load data from the worksheet into the DataTable (starting from row 2)
-            for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
-            {
-                var newRow = dt.NewRow();
-                for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
-                {
-                    newRow[col - 1] = worksheet.Cells[row, col].Text;
-                }
-                dt.Rows.Add(newRow);
-            }
-
-            // Assign the DataTable as the DataSource of the DataGridView
-            dataGridView.DataSource = dt;
-        }
-
-
-
         private void LoadImageIntoPictureBox(PictureBox pictureBox, string imagePath)
         {
             if (File.Exists(imagePath))
@@ -938,174 +910,11 @@ namespace SLF
             return dataTable;
         }
         /// <summary>
-        /// ELF METHOD RScript Run RELATED CHANGES & UPDATES
+        /// ELF METHOD RScript SHOW RESULTS RELATED CHANGES & UPDATES END
         /// </summary>
         // Assuming you have a class like this
-        /*        public class ScriptProcessor
-                {
-                    public void ReScript(string scriptName, string parameters)
-                    {
-                        // Your script processing logic here
-                        Console.WriteLine($"Processing script: {scriptName} with parameters: {parameters}");
-                    }
-                }
 
-                // Inside your form or class, you would create an instance of ScriptProcessor
-                private ScriptProcessor wdC = new ScriptProcessor();
-
-                private void ELFPredictionButton_Click(object sender, EventArgs e)
-                {
-                    // Check if the ComboBox has at least two items
-                    if (comboBox1.Items.Count >= 2)
-                    {
-                        // Get the first and second selected items from the ComboBox
-                        string parametre1 = comboBox1.Items[0].ToString();
-                        string parametre2 = comboBox1.Items[1].ToString();
-
-                        // Concatenate the parameters (adjust for your R script's needs)
-                        string combinedParameters = $"{parametre1} {parametre2}"; // Space-separated parameters
-
-                        // Assuming wdC is an instance of ScriptProcessor
-                        wdC.ReScript("vanilin kods.R", combinedParameters);
-
-                        // Full path to your R script
-                        string rScriptPath = @"C:\path\to\your\script.R";
-
-                        // Pass the combined parameters to ExecuteCommand to run the R script
-                        ExecuteCommand(rScriptPath, combinedParameters);
-                    }
-                    else
-                    {
-                        MessageBox.Show("ComboBox does not have enough items!");
-                    }
-                }
-
-                public void ExecuteCommand(string scriptPath, string arguments)
-                {
-                    // Path to the Rscript executable
-                    string rScriptExecutable = @"C:\Program Files\R\R-X.X.X\bin\Rscript.exe"; // Adjust for your R installation path
-
-                    // Prepare the full command with the script path and parameters
-                    string command = $"\"{scriptPath}\" {arguments}";
-
-                    ProcessStartInfo processInfo = new ProcessStartInfo(rScriptExecutable, command)
-                    {
-                        CreateNoWindow = true,
-                        UseShellExecute = false, // Allows output redirection
-                        RedirectStandardOutput = true, // To capture output from R script
-                        RedirectStandardError = true
-                    };
-
-                    using (Process process = Process.Start(processInfo))
-                    {
-                        // Capture and log the output if needed
-                        string output = process.StandardOutput.ReadToEnd();
-                        string error = process.StandardError.ReadToEnd();
-
-                        process.WaitForExit();
-
-                        // Log or handle the output
-                        Console.WriteLine("Output: " + output);
-                        if (!string.IsNullOrEmpty(error))
-                        {
-                            Console.WriteLine("Error: " + error);
-                        }
-                    }
-                }
-                // Assuming you have a class like this
-                public class ScriptProcessor
-                {
-                    public void ReScript(string scriptName, string parameters)
-                    {
-                        // Your script processing logic here
-                        Console.WriteLine($"Processing script: {scriptName} with parameters: {parameters}");
-                    }
-                }
-
-                // Inside your form or class, you would create an instance of ScriptProcessor
-                private ScriptProcessor wdC = new ScriptProcessor();
-
-                private void ELFPredictionButton_Click(object sender, EventArgs e)
-                {
-                    // Check if the ComboBox has at least one item
-                    if (comboBox1.Items.Count >= 1)
-                    {
-                        // Create a list to hold up to 5 parameters
-                        List<string> parameters = new List<string>();
-
-                        // Loop through the ComboBox items (up to 5 items)
-                        for (int i = 0; i < comboBox1.Items.Count && i < 5; i++)
-                        {
-                            parameters.Add(comboBox1.Items[i].ToString());
-                        }
-
-                        // Join the parameters with space separation
-                        string combinedParameters = string.Join(" ", parameters);
-
-                        // Assuming wdC is an instance of ScriptProcessor
-                        wdC.ReScript("vanilin kods.R", combinedParameters);
-
-                        // Full path to your R script
-                        string rScriptPath = @"C:\path\to\your\script.R";
-
-                        // Pass the combined parameters to ExecuteCommand to run the R script
-                        ExecuteCommand(rScriptPath, combinedParameters);
-                    }
-                    else
-                    {
-                        MessageBox.Show("ComboBox does not have enough items!");
-                    }
-                }
-
-                public void ExecuteCommand(string scriptPath, string arguments)
-                {
-                    // Path to the Rscript executable
-                    string rScriptExecutable = @"C:\Program Files\R\R-X.X.X\bin\Rscript.exe"; // Adjust for your R installation path
-
-                    // Prepare the full command with the script path and parameters
-                    string command = $"\"{scriptPath}\" {arguments}";
-
-                    ProcessStartInfo processInfo = new ProcessStartInfo(rScriptExecutable, command)
-                    {
-                        CreateNoWindow = true,
-                        UseShellExecute = false, // Allows output redirection
-                        RedirectStandardOutput = true, // To capture output from R script
-                        RedirectStandardError = true
-                    };
-
-                    try
-                    {
-                        using (Process process = Process.Start(processInfo))
-                        {
-                            string output = process.StandardOutput.ReadToEnd();
-                            string error = process.StandardError.ReadToEnd();
-
-                            process.WaitForExit();
-
-                            if (!string.IsNullOrEmpty(error))
-                            {
-                                MessageBox.Show("Error: " + error, "Execution Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            }
-                            else
-                            {
-                                // Load table data into DataGridView
-                                DataTable table = ReadExcelToDataTable(@"C:\path\to\output.csv");
-                                if (table != null)
-                                {
-                                    dataGridView2.DataSource = table;
-                                }
-
-                                // Load graphical output (PNG) into PictureBox controls
-                                LoadImagesIntoPictureBoxes();
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("An error occurred: " + ex.Message, "Execution Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-
+        /*
                 private void LoadImagesIntoPictureBoxes()
                 {
                     // Path to the folder where the images are saved
@@ -1158,51 +967,30 @@ namespace SLF
                 }*/
 
 
-        /*        private void ELFPredictionButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                // Load table data into DataGridView from Excel
-                DataTable table = ReadExcelToDataTable(@"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı
-\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\SONUCLAR.xlsx");
-                if (table != null)
-                {
-                    dataGridView2.DataSource = table;
-                }
-                else
-                {
-                    MessageBox.Show("Failed to load data from Excel.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-
-                // Load graphical output (PNG) into PictureBox controls
-                LoadImagesIntoPictureBoxes();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("An error occurred: " + ex.Message, "Execution Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            // run thşs code:
-            // C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep
-            // Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\model.R
-
-
-        }
-
-        private void LoadImagesIntoPictureBoxes()
-        {
-            // Path to the folder where the images are saved
-            string imageFolderPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Grafik Outputs";
-
-            // Load images into PictureBox controls with checks
-            LoadImageIntoPictureBox(pictureBox1, Path.Combine(imageFolderPath, "afyon_aydınlatma_gdp.png"));
-            // Add more PictureBox assignments as needed
-        }*/
 
         /// <summary>
-        /// ELF METHOD RScript Run RELATED CHANGES & UPDATES END
+        /// ELF METHOD RScript SHOW RESULTS RELATED CHANGES & UPDATES END
         /// </summary>
         /// 
+        private void HomePageButton_Click(object sender, EventArgs e)
+        {
+            // Show the confirmation dialog for navigating to the home page
+            DialogResult result = MessageBox.Show(
+                "Ana sayfaya dönmek istediğinize emin misiniz? Kaydedilmeyen veriler kaybolacaktır!",
+                "Ana Sayfaya Dön",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                // If the user confirms, proceed to open the home page and hide this form
+                HomePageForm homePageForm = new HomePageForm();
+                homePageForm.Show();
+                //this.Hide(); // Hide the current form
+            }
+            // If the user clicks 'No', do nothing and stay on the current form
+        }
         private DataTable LoadAttributeTable(DataRow row, DataGridView dataGridView,
                 ShapefileDataReader shapefile_reader, DataTable data_table, int row_cnt)
         {
@@ -3293,7 +3081,7 @@ namespace SLF
                 // bir marker objesi oluştur ve seçilen noktalara marker ata
                 GMapMarker marker_ea = new GMarkerGoogle(point, GMarkerGoogleType.orange_dot);
                 markerOverlay_ea.Markers.Add(marker_ea);
-                
+
 
                 // 2 adet nokta seçildiği anda aralarındaki mesafeyi hesapla, göster, sonrasında
                 // ise noktaların tutulduğu listeyi temizle
@@ -3625,7 +3413,7 @@ namespace SLF
                     };
 
                     marker.Tag = noktaVeri_marker;
-                    
+
                 }
 
                 // boolean control for polygon selection when clicking on the map
@@ -4015,7 +3803,7 @@ namespace SLF
             // grid e ait oluşturulmuş mxm hücreleri "polygons" listesiyle return et.
             return polygons;
         }
-        
+
         // creates a grid and adds it onto the map
         public void AddGridToMap()
         {
@@ -4217,12 +4005,12 @@ namespace SLF
             if (selectedMethod == "ELF (Ekonometrik)")
             {
                 // Logic for ELF selection
-               // MessageBox.Show("ELF method selected, skipping prerequisites.");
+                // MessageBox.Show("ELF method selected, skipping prerequisites.");
             }
             else if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
                 // Logic for SLF selection
-               // MessageBox.Show("SLF method selected, prerequisites are required.");
+                // MessageBox.Show("SLF method selected, prerequisites are required.");
             }
             else
             {
@@ -5049,7 +4837,7 @@ namespace SLF
             startYearComboBox.Enabled = true;
             endYearComboBox.Enabled = false;
             yearApproveButton.Enabled = false;
-           // veri_listesi_seçimi.Enabled = false;
+            // veri_listesi_seçimi.Enabled = false;
         }
         private void ModülFormu_Load(object sender, EventArgs e)
         {
@@ -5086,13 +4874,6 @@ namespace SLF
         private void endYearComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             yearApproveButton.Enabled = true;
-        }
-
-        private void HomePageButton_Click(object sender, EventArgs e)
-        {
-            HomePageForm homePageForm = new HomePageForm();
-            homePageForm.Show();
-            this.Hide();
         }
 
         private void yearApproveButton_Click(object sender, EventArgs e)
@@ -5430,6 +5211,8 @@ namespace SLF
                 await dekHaritayaVeriYukleAsync();
             }
         }
+
+
 
         private void ea_Grid_Oluştur_Click(object sender, EventArgs e)
         {

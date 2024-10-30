@@ -54,7 +54,6 @@ namespace SLF
             "N/A",
             "#N/A"
         };
-
         protected string seçilenVeriTipi;
         protected int slfStartYear;
         protected int slfEndYear;
@@ -399,36 +398,44 @@ namespace SLF
                 }
             }
         }
-        /*        protected void ImportProcessedData()
-                {
-                    importedDataTable = currentDataTable.Copy();
-                    dataTablesByType[seçilenVeriTipi] = importedDataTable;
-                }*/
-        protected void ImportProcessedData()
+
+
+        public void ImportProcessedData()
         {
-            importedDataTable = currentDataTable.Copy();
-            dataTablesByType[seçilenVeriTipi] = importedDataTable;
-
-            // If "Ekonometrik Yük Tahmini Verileri" is selected, export to Excel and run the R script
-            if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
+            try
             {
-                // Define the fixed file path for the Excel file
-                string filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx"; // Update this with your actual path
+                // Set cursor to wait
+                Cursor.Current = Cursors.WaitCursor;
 
-                try
+                importedDataTable = currentDataTable.Copy();
+                dataTablesByType[seçilenVeriTipi] = importedDataTable;
+
+                // If "Ekonometrik Yük Tahmini Verileri" is selected, export to Excel and run the R script
+                if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
                 {
-                    var excelExporter = new ExcelExporter();
+                    string filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
 
-                    // Update the first sheet of the Excel file with the imputed data
-                    excelExporter.UpdateExcelFileFirstSheet(filePath, importedDataTable);
 
-                    // Running the R script after the export
-                    RunRScript(filePath);  // Call the method to run the R script
+                    try
+                    {
+                        var excelExporter = new ExcelExporter();
+
+                        // Update the first sheet of the Excel file with the imported data
+                        excelExporter.UpdateExcelFileFirstSheet(filePath, importedDataTable);
+
+                        // Run the R script after exporting to Excel
+                        RunRScript(filePath); // Call the synchronous method
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error while saving the file: {ex.Message}");
+                    }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Dosya kaydedilirken bir hata oluştu: {ex.Message}");
-                }
+            }
+            finally
+            {
+                // Restore cursor to default
+                Cursor.Current = Cursors.Default;
             }
         }
 
@@ -436,10 +443,10 @@ namespace SLF
         {
             try
             {
-                string rScriptPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\senaryolar.R";
-                string logFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\script_output_log.txt"; // Change as needed
+                string rScriptPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\begum_senaryolar_deneme.R";
+                string logFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\script_output_log.txt";
 
-                if (string.IsNullOrWhiteSpace(excelFilePath) || !File.Exists(excelFilePath))
+                if (!File.Exists(excelFilePath))
                 {
                     MessageBox.Show("The specified Excel file does not exist.");
                     return;
@@ -465,7 +472,7 @@ namespace SLF
 
                 process.WaitForExit();
 
-                // Log the output and error messages
+                // Log the output and error
                 File.AppendAllText(logFilePath, $"Output:\n{output}\nError:\n{error}\n\n");
 
                 if (process.ExitCode != 0)
@@ -474,8 +481,7 @@ namespace SLF
                 }
                 else
                 {
-                    // MessageBox.Show("R script successfully executed. Check the log file for output: " + logFilePath);
-                    MessageBox.Show("R script successfully executed.");
+                    MessageBox.Show("R script başarıyla çalıştırıldı.");
                 }
             }
             catch (Exception ex)
@@ -483,6 +489,7 @@ namespace SLF
                 MessageBox.Show($"An error occurred while running the R script: {ex.Message}");
             }
         }
+
 
         public void ProcessFileSelection(string seçilenVeriTipi)
         {
