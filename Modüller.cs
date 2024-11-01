@@ -5371,7 +5371,7 @@ namespace SLF
             ////    monteCarloScreen.Show(); // Formu aç
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void yilSecimiMonteCarlo(object sender, EventArgs e)
         {
             // Yıl seçimi yapıldığında işlemler
             int selectedYear = (int)comboBox1.SelectedItem;
@@ -5379,7 +5379,7 @@ namespace SLF
 
         }
 
-        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        private void ilSEcimiMonteCarlo(object sender, EventArgs e)
         {
             string selectedCity = (string)comboBox2.SelectedItem;
             
