@@ -32,6 +32,7 @@ namespace SLF
         private double startX = 0, startY = 0;
         public int slfStartYear = 0, slfEndYear = 0;
         private ExcelService _excelService;
+        private ExcelService excelService = new ExcelService();
         // form objeleri
         public HomePageForm gir1;
         private GirdiModülü girdiModülü;
@@ -85,7 +86,7 @@ namespace SLF
         public bool isSelecting_grid = false;
         private PointLatLng starting_point;
         private PointLatLng ending_point;
-
+        int selectedYear;
         // Get the user's profile path
         public string userProfilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         public string targetDirectory;
@@ -99,7 +100,7 @@ namespace SLF
         // X and Y coordinates of the center location of the gMapControl object
         public string centerX;
         public string centerY;
-
+        private DataTable veriMonteCarlo;
         // create a list of gMapOverlay's that will hold the imported vector files
         public GMapOverlay[] tüm_katmanlar_array;
         public MapWinGIS.Shapefile[] shapeFileArray_MapWinGIS;
@@ -119,7 +120,7 @@ namespace SLF
 
         // Find the first available slot in the array that holds shapefile overlay layers
         public int layer_index;
-
+        
         // variables to be used in the "join attributes by location" functionality
         public int firstLayerToJoin;
         public int secondLayerToJoin;
@@ -147,6 +148,7 @@ namespace SLF
             Poligon
         }
 
+        
         public struct YüklenenDosya
         {
             public string file_name { get; set; }
@@ -186,6 +188,8 @@ namespace SLF
             this.selectedMethod = selectedMethod;  // Store the method
             // Initialize the maps and other UI components
             InitializeFormComponents();
+            InitializeComboBoxes();
+
 
             if (!string.IsNullOrEmpty(tabToSelect))
             {
@@ -198,6 +202,24 @@ namespace SLF
         }
 
         // Initialize all form components (called in the constructors)
+        private void InitializeComboBoxes()
+        {
+
+
+
+            // Yıl aralığını ComboBox1'e ekleyin
+            var yearList = new List<int>();
+            for (int year = slfStartYear; year <= slfEndYear; year++)
+            {
+                yearList.Add(year);
+            }
+            comboBox1.DataSource = yearList; // Yıl seçimi için ComboBox1
+
+            // Şehir isimlerini ComboBox2'ye ekleyin
+            comboBox2.Items.Clear();
+            comboBox2.Items.Add("İzmir");
+            comboBox2.Items.Add("Eskişehir");
+        }
         private void InitializeFormComponents()
         {
             InitializeGMap(gMapControl_stokastik);
@@ -2551,7 +2573,7 @@ namespace SLF
 
         private void gMapControl_EA_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
-           
+
             if (e.Button == MouseButtons.Left)
             {
                 // İşaretleyici (marker) seçimi kontrolü
@@ -2571,8 +2593,8 @@ namespace SLF
                     // marker.Tag'i NoktaVeri tipine dönüştürüp enlem ve boylamı yazdırabilirsiniz.
                     NoktaVeri veri = (NoktaVeri)marker.Tag;
                     Console.WriteLine($"Enlem: {veri.Enlem}, Boylam: {veri.Boylam}");
-                    
-                    
+
+
                 }
                 else
                 {
@@ -2581,65 +2603,58 @@ namespace SLF
                 // Poligon seçimi kontrolü
                 if (isSelecting_polygon)
                 {
-                    polygonPoints_ea.Add(pointClick); // Poligon noktalarını listeye ekle
-                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue); // Mavi marker ile göster
-                    markerOverlay_ea.Markers.Add(marker); // Marker ekle
+                    polygonPoints_stokastik.Add(pointClick);
+                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
+                    markerOverlay_stokastik.Markers.Add(marker);
 
-                    if (polygonOverlay_ea != null)
+                    if (polygonOverlay_stokastik != null)
                     {
-                        gMapControl_EA.Overlays.Remove(polygonOverlay_ea); // Eski poligon katmanını kaldır
+                        gMapControl_stokastik.Overlays.Remove(polygonOverlay_stokastik);
                     }
 
-                    layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null); // Boş katman bul
+                    layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
+                    polygonOverlay_stokastik = new GMapOverlay("polygonOverlay_" + layer_index.ToString());
+                    gMapControl_stokastik.Overlays.Add(polygonOverlay_stokastik);
+                    gMapControl_stokastik.Refresh();
 
-                    // Dizide boş yer olup olmadığını kontrol et
-                    if (layer_index == -1)
+                    // eğer gmapControl_OnMapClick event'i ile 2 den fazla nokta seçilirse,
+                    // bu noktalar arasında bir poligon çiz
+                    if (polygonPoints_stokastik.Count >= 3)
                     {
-                        MessageBox.Show("En fazla katman sayısına ulaşıldı. Daha fazla katman ekleyemezsiniz.");
-                        return;
+
+                        Draw_Polygon(polygonPoints_stokastik, polygonOverlay_stokastik, gMapControl_stokastik);
+
+                        double area = CalculatePolygonArea(polygonPoints_stokastik);
+
+                        mesafe_metre_stokastik.Visible = true;
+                        Mesafe_stokastik.Visible = true;
+                        Mesafe_stokastik.Text = "Seçili Alan: " + Math.Round(area, 0).ToString() + " m²";
                     }
 
-                    // Yeni poligon katmanı ekle
-                    polygonOverlay_ea = new GMapOverlay("polygonOverlay_" + layer_index.ToString());
-                    gMapControl_EA.Overlays.Add(polygonOverlay_ea);
-                    gMapControl_EA.Refresh();
-
-                    // Eğer 3 veya daha fazla nokta varsa, poligon çiz
-                    if (polygonPoints_ea.Count >= 3)
+                    // Şarj İstasyonu Ekleme kontrolü
+                    if (isAddingChargingStation)
                     {
-                        Draw_Polygon(polygonPoints_ea, polygonOverlay_ea, gMapControl_EA);
+                        GMapMarker marker1 = new GMarkerGoogle(pointClick, GMarkerGoogleType.red); // Şarj istasyonu için kırmızı marker
+                        markerOverlay_stokastik.Markers.Add(marker);
 
-                        double area = CalculatePolygonArea(polygonPoints_ea); // Alan hesapla
+                        NoktaVeri noktaVeri_marker = new NoktaVeri
+                        {
+                            Enlem = Math.Round(pointClick.Lat, 4),
+                            Boylam = Math.Round(pointClick.Lng, 4)
+                        };
 
-                        mesafe_metre_ea.Visible = true;
-                        Mesafe_ea.Visible = true;
-                        Mesafe_ea.Text = "Seçili Alan: " + Math.Round(area, 0).ToString() + " m²";
+                        marker.Tag = noktaVeri_marker;
+
+                        // marker.Tag'i NoktaVeri tipine dönüştürüp enlem ve boylamı yazdırabilirsiniz.
+                        NoktaVeri veri = (NoktaVeri)marker.Tag;
+                        Console.WriteLine($"Şarj İstasyonu Eklendi - Enlem: {veri.Enlem}, Boylam: {veri.Boylam}");
+
+                        // Bu aşamada şarj istasyonu popup formu veya veri girişi ekranı açılabilir
+                        ShowChargingStationPopup(veri);
+
+                        // Şarj istasyonu ekleme işlemi tamamlandığında flag'i kapat
+                        isAddingChargingStation = false;
                     }
-                }
-
-                // Şarj İstasyonu Ekleme kontrolü
-                if (isAddingChargingStation)
-                {
-                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.red); // Şarj istasyonu için kırmızı marker
-                    markerOverlay_ea.Markers.Add(marker);
-
-                    NoktaVeri noktaVeri_marker = new NoktaVeri
-                    {
-                        Enlem = Math.Round(pointClick.Lat, 4),
-                        Boylam = Math.Round(pointClick.Lng, 4)
-                    };
-
-                    marker.Tag = noktaVeri_marker;
-
-                    // marker.Tag'i NoktaVeri tipine dönüştürüp enlem ve boylamı yazdırabilirsiniz.
-                    NoktaVeri veri = (NoktaVeri)marker.Tag;
-                    Console.WriteLine($"Şarj İstasyonu Eklendi - Enlem: {veri.Enlem}, Boylam: {veri.Boylam}");
-
-                    // Bu aşamada şarj istasyonu popup formu veya veri girişi ekranı açılabilir
-                    ShowChargingStationPopup(veri);
-
-                    // Şarj istasyonu ekleme işlemi tamamlandığında flag'i kapat
-                    isAddingChargingStation = false;
                 }
             }
         }
@@ -2835,8 +2850,9 @@ namespace SLF
                 marker.Tag = noktaVeri_marker;
 
                 // Marker seçiliyken popup ekranı açmak için StartDekPointPopup fonksiyonunu çağırıyoruz
-                if (isAddingDekPoint) { 
-                StartDekPointPopup(noktaVeri_marker);  // Noktayı popup'a gönderiyoruz
+                if (isAddingDekPoint)
+                {
+                    StartDekPointPopup(noktaVeri_marker);  // Noktayı popup'a gönderiyoruz
                     isAddingDekPoint = false;
                 }
             }
@@ -2844,7 +2860,44 @@ namespace SLF
             // Poligon çizme işlemi
             if (isSelecting_polygon)
             {
-                if (polygonPoints_Dek == null)
+                // İlk olarak poligon tamamlandığında yeni bir çizim için listeyi temizle
+                if (polygonPoints_stokastik == null || polygonPoints_stokastik.Count == 0)
+                {
+                    polygonPoints_stokastik = new List<PointLatLng>();
+                }
+
+                polygonPoints_stokastik.Add(pointClick);
+                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
+                markerOverlay_stokastik.Markers.Add(marker);
+
+                if (polygonOverlay_stokastik != null)
+                {
+                    gMapControl_stokastik.Overlays.Remove(polygonOverlay_stokastik);
+                }
+
+                layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
+                polygonOverlay_stokastik = new GMapOverlay("polygonOverlay_" + layer_index.ToString());
+                gMapControl_stokastik.Overlays.Add(polygonOverlay_stokastik);
+                gMapControl_stokastik.Refresh();
+
+                // Poligon 3 nokta ve üzerindeyse çiz
+                if (polygonPoints_stokastik.Count >= 3)
+                {
+                    Draw_Polygon(polygonPoints_stokastik, polygonOverlay_stokastik, gMapControl_stokastik);
+                    double area = CalculatePolygonArea(polygonPoints_stokastik);
+
+                    mesafe_metre_stokastik.Visible = true;
+                    Mesafe_stokastik.Visible = true;
+                    Mesafe_stokastik.Text = "Seçili Alan: " + Math.Round(area, 0).ToString() + " m²";
+
+                    // Çizim tamamlandıktan sonra listeyi temizle
+                    polygonPoints_stokastik.Clear();
+                }
+            }
+
+            if (isSelecting_polygon)
+            {
+                if (polygonPoints_Dek == null || polygonPoints_Dek.Count == 0)
                 {
                     polygonPoints_Dek = new List<PointLatLng>();
                 }
@@ -2897,6 +2950,9 @@ namespace SLF
                             Mesafe_Dek.Visible = true;
                             Mesafe_Dek.Text = "Seçili Alan: " + Math.Round(area, 0).ToString() + " m²";
                         }
+
+                        // Çizim tamamlandıktan sonra listeyi temizle
+                        polygonPoints_Dek.Clear();
                     }
                 }
             }
@@ -3073,32 +3129,32 @@ namespace SLF
                 isRulerActive = true;
 
                 // seçilen piksel noktaları latitude ve longitude bilgisine dönüştür.
-                var point = gMapControl_EA.FromLocalToLatLng(e.X, e.Y);
+                var point = gMapControl_stokastik.FromLocalToLatLng(e.X, e.Y);
 
                 // seçilen noktaları bir listeye koy
-                rulerPoints_ea.Add(point);
+                rulerPoints_stokastik.Add(point);
 
                 // bir marker objesi oluştur ve seçilen noktalara marker ata
                 GMapMarker marker_ea = new GMarkerGoogle(point, GMarkerGoogleType.orange_dot);
-                markerOverlay_ea.Markers.Add(marker_ea);
+                markerOverlay_stokastik.Markers.Add(marker_ea);
 
 
                 // 2 adet nokta seçildiği anda aralarındaki mesafeyi hesapla, göster, sonrasında
                 // ise noktaların tutulduğu listeyi temizle
-                if (rulerPoints_ea.Count == 2)
+                if (rulerPoints_stokastik.Count == 2)
                 {
-                    markerOverlay_ea.Markers.Clear();
+                    markerOverlay_stokastik.Markers.Clear();
 
                     foreach (var rulerPoint in rulerPoints_ea)
                     {
                         GMapMarker marker_1 = new GMarkerGoogle(rulerPoint, GMarkerGoogleType.orange_dot);
-                        markerOverlay_ea.Markers.Add(marker_1);
+                        markerOverlay_stokastik.Markers.Add(marker_1);
                     }
 
-                    rulerRoute_ea.Dispose();
-                    DrawRuler_ea(rulerOverlay_ea, rulerPoints_ea);
-                    CalculateDistance(gMapControl_EA, mesafe_metre_ea, rulerPoints_ea);
-                    rulerPoints_ea.Clear();
+                    rulerRoute_stokastik.Dispose();
+                    DrawRuler_ea(rulerOverlay_stokastik, rulerPoints_stokastik);
+                    CalculateDistance(gMapControl_stokastik, mesafe_metre_stokastik, rulerPoints_stokastik);
+                    rulerPoints_stokastik.Clear();
                     isRulerActive = false;
                 }
             }
@@ -4021,7 +4077,7 @@ namespace SLF
             girdiModülü = girdiModülleri[seçilenVeriTipi];
             girdiModülü.SlfStartYear = slfStartYear;
             girdiModülü.SlfEndYear = slfEndYear;
-
+            InitializeComboBoxes();
             // Check if "ELF" is selected to skip prerequisites
             bool skipPrerequisites = (selectedMethod == "ELF (Ekonometrik)");
 
@@ -5001,7 +5057,7 @@ namespace SLF
                                 !eaData.Columns.Contains("EA_Y_KOORDINAT") ||
                                 !eaData.Columns.Contains("ISTASYON_GUCU"))
                             {
-                                MessageBox.Show("Lütfen EA Sarj mödülü verilerinizi yükleyin.");
+                                MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
                                 return;
                             }
 
@@ -5085,7 +5141,7 @@ namespace SLF
                                 !dekData.Columns.Contains("DEK_Y_KOORDINAT") ||
                                 !dekData.Columns.Contains("KAYNAK_TIPI"))
                             {
-                                MessageBox.Show("Lütfen DEK mödülü verilerinizi yükleyin.");
+                                MessageBox.Show("Lütfen DEK modülü verilerinizi yükleyin.");
                                 return;
                             }
 
@@ -5175,7 +5231,7 @@ namespace SLF
         private async void Modül_Tabları_SelectedIndexChanged(object sender, EventArgs e)
         {
             // Eğer DTR Verileri henüz yüklenmediyse, kullanıcı sadece "Girdi Modülü" sekmesine erişebilir
-            if (!isDtrLoaded && Modül_Tabları.SelectedTab != tab_girdi)
+            if (!isDtrLoaded && Modül_Tabları.SelectedTab != tab_girdi && selectedMethod == "SLF (Jeo-Uzamsal)")
             {
                 // Sekme geçişini tamamen iptal et
                 MessageBox.Show("DTR verileri yüklenmeden diğer sekmelere geçiş yapılamaz.");
@@ -5190,11 +5246,13 @@ namespace SLF
             {
                 if (dataGridView1.DataSource == null)
                 {
+                    
                     MessageBox.Show("Lütfen önce verileri yükleyin.");
                     return;
                 }
 
                 // Harita işlemini başlat
+                InitializeComboBoxes();
                 await eaHaritayaVeriYukleAsync();
             }
             // DEK Modülü tabına tıklanmışsa
@@ -5277,7 +5335,55 @@ namespace SLF
             }
         }
 
-        
+        private void gelecekSimilasyonGoruntule(object sender, EventArgs e)
+        {
+            string filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\Arşiv\montecarlo-deneme.xlsx";
+
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                veriMonteCarlo = excelService.LoadWorksheetIntoDataTable(worksheet);
+            }
+
+            // Veri başarıyla yüklendiğinde bir bildirim gösterin
+            MessageBox.Show("Veri başarıyla yüklendi.");
+            int selectedYear = comboBox1.SelectedItem != null ? (int)comboBox1.SelectedItem : 0;
+            string selectedCity = comboBox2.SelectedItem != null ? (string)comboBox2.SelectedItem : "";
+            // Yeni bir DataGridView oluştur
+            
+            DataGridView dataGridView = new DataGridView
+            {
+                DataSource = veriMonteCarlo,  // DataTable'ı bağla
+                Dock = DockStyle.Fill,        // Formu doldurması için konumunu ayarla
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill // Sütunları otomatik boyutlandır
+            };
+
+            // Form üzerinde yeni bir pencerede aç
+            Form popupForm = new Form
+            {
+                Text = "Veri Görüntüleme",
+                Width = 800,
+                Height = 600
+            };
+            popupForm.Controls.Add(dataGridView);
+            popupForm.Show(); // Yeni pencereyi göster
+            ////    MonteCarloScreen monteCarloScreen = new MonteCarloScreen();
+            ////    monteCarloScreen.Show(); // Formu aç
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Yıl seçimi yapıldığında işlemler
+            int selectedYear = (int)comboBox1.SelectedItem;
+            
+
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string selectedCity = (string)comboBox2.SelectedItem;
+            
+        }
 
         private void Dek_Grid_Oluştur_Click(object sender, EventArgs e)
         {
