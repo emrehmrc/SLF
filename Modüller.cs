@@ -137,8 +137,6 @@ namespace SLF
             public double Boylam { get; set; }
             public double Bina_Demandi { get; set; }
             public int Abone_Sayısı { get; set; }
-
-
         }
 
         public enum FileType
@@ -472,7 +470,7 @@ namespace SLF
             // Check if the data table has any rows
             if (dataTable == null || dataTable.Rows.Count == 0)
             {
-                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Excel dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından modüle gidilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 OpenModuleButton.Enabled = true; // Re-enable the button before returning
                 return;
             }
@@ -5175,7 +5173,7 @@ namespace SLF
         private async void Modül_Tabları_SelectedIndexChanged(object sender, EventArgs e)
         {
             // Eğer DTR Verileri henüz yüklenmediyse, kullanıcı sadece "Girdi Modülü" sekmesine erişebilir
-            if (!isDtrLoaded && Modül_Tabları.SelectedTab != tab_girdi)
+            if (!isDtrLoaded && Modül_Tabları.SelectedTab != tab_girdi && selectedMethod == "SLF (Jeo-Uzamsal)")
             {
                 // Sekme geçişini tamamen iptal et
                 MessageBox.Show("DTR verileri yüklenmeden diğer sekmelere geçiş yapılamaz.");
@@ -5228,30 +5226,87 @@ namespace SLF
         {
 
         }
-
-        private void button5_Click(object sender, EventArgs e)
+        private void EAStationAddButton_Click(object sender, EventArgs e)
         {
-            // Eğer "EA Şarj Verileri" anahtarı mevcut değilse
+            // Check if the "EA Şarj Verileri" key exists
             if (!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
             {
-                MessageBox.Show("Lütfen EA SARJ verilerinizi ekleyin.");
+                MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
+                return; // Exit if the key does not exist
             }
-            // Eğer "EA Şarj Verileri" null ise veya satır sayısı 0 ise
-            else if (GirdiModülü.dataTablesByType["EA Şarj Verileri"] == null || GirdiModülü.dataTablesByType["EA Şarj Verileri"].Rows.Count == 0)
-            {
-                MessageBox.Show("Lütfen EA SARJ verilerinizi ekleyin.");
-            }
-            // Eğer "DEK Verileri" anahtarı mevcut değilse veya null ise
-            
-            else
-            {
-                // Şarj istasyonu ekleme işlemine başla
-                MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
 
-                // İşaretleme işlemi başladığı için flag'i true yapıyoruz
+            // Check if "EA Şarj Verileri" is null or has no rows
+            if (GirdiModülü.dataTablesByType["EA Şarj Verileri"] == null || GirdiModülü.dataTablesByType["EA Şarj Verileri"].Rows.Count == 0)
+            {
+                MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
+                return; // Exit if the data table is null or empty
+            }
+
+            // Assume you have a method to get the clicked point on the map
+            var pointClick = gMapControl_EA.FromLocalToLatLng(MousePosition.X, MousePosition.Y);
+
+            if (isSelecting_marker)
+            {
+                // Create and add the marker to the overlay
+                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
+                markerOverlay_ea.Markers.Add(marker);
+
+                // Create a NoktaVeri instance with the clicked coordinates
+                NoktaVeri noktaVeri_marker = new NoktaVeri
+                {
+                    Enlem = Math.Round(pointClick.Lat, 4),
+                    Boylam = Math.Round(pointClick.Lng, 4)
+                };
+
+                marker.Tag = noktaVeri_marker;
+
+                // Retrieve the NoktaVeri from the marker's Tag and log the coordinates
+                NoktaVeri veri = (NoktaVeri)marker.Tag;
+                Console.WriteLine($"Enlem: {veri.Enlem}, Boylam: {veri.Boylam}");
+
+                // Show the ChargingStationPopupForm with the NoktaVeri instance
+                using (ChargingStationPopupForm popupForm = new ChargingStationPopupForm(veri))
+                {
+                    if (popupForm.ShowDialog() == DialogResult.OK)
+                    {
+                        // Handle any result from the popup if necessary
+                    }
+                }
+
+                // Indicate that the process of adding a charging station has started
+                MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
                 isAddingChargingStation = true;
             }
+            else
+            {
+                Console.WriteLine("Bilinmeyen tıklama türü");
+            }
         }
+
+
+        /*        private void EAStationAddButton_Click(object sender, EventArgs e)
+                {
+                    // Eğer "EA Şarj Verileri" anahtarı mevcut değilse
+                    if (!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
+                    {
+                        MessageBox.Show("Lütfen EA SARJ verilerinizi ekleyin.");
+                    }
+                    // Eğer "EA Şarj Verileri" null ise veya satır sayısı 0 ise
+                    else if (GirdiModülü.dataTablesByType["EA Şarj Verileri"] == null || GirdiModülü.dataTablesByType["EA Şarj Verileri"].Rows.Count == 0)
+                    {
+                        MessageBox.Show("Lütfen EA SARJ verilerinizi ekleyin.");
+                    }
+                    // Eğer "DEK Verileri" anahtarı mevcut değilse veya null ise
+
+                    else
+                    {
+                        // Şarj istasyonu ekleme işlemine başla
+                        MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
+
+                        // İşaretleme işlemi başladığı için flag'i true yapıyoruz
+                        isAddingChargingStation = true;
+                    }
+                }*/
 
         private void button9_Click(object sender, EventArgs e)
         {
