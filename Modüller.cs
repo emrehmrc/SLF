@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Bibliography;
 using GMap.NET;
 using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
@@ -90,6 +91,8 @@ namespace SLF
         // Get the user's profile path
         public string userProfilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         public string targetDirectory;
+        private int _selectedYear = -1;
+        private string _selectedCity = null;
 
         // boolean variable to control the polygon selection by mouse down event
         private bool isSelecting_polygon = false;
@@ -131,7 +134,65 @@ namespace SLF
         public Dictionary<GMapPolygon, DataRow> polygonAttributes_kml;
         public Dictionary<GMapRoute, DataRow> routeAttributes_kml;
         private bool isDtrLoaded = false;
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            // Başlangıçta butonu devre dışı bırak
+            button1.Enabled = false;
+
+            // Checkbox'ları başlangıçta görünmez yap
+            checkBox22.Visible = false;
+            checkBox23.Visible = false;
+            checkBox24.Visible = false;
+            checkBox25.Visible = false;
+
+            // Checkbox arka planını şeffaf yap
+            checkBox22.BackColor = Color.Transparent;
+            checkBox23.BackColor = Color.Transparent;
+            checkBox24.BackColor = Color.Transparent;
+            checkBox25.BackColor = Color.Transparent;
+
+            // Checkbox'ları başlangıçta işaretli yap
+            checkBox22.Checked = true;
+            checkBox23.Checked = true;
+            checkBox24.Checked = true;
+            checkBox25.Checked = true;
+
+            // Checkbox olaylarını bağla
+            checkBox22.CheckedChanged += checkBox_Ac_Home;
+            checkBox23.CheckedChanged += checkBox_Ac_Work;
+            checkBox24.CheckedChanged += checkBox_Ac_Public;
+            checkBox25.CheckedChanged += checkBox_Dc_Fast;
+
+            // ComboBox olaylarını bağla
+            comboBox1.SelectedIndexChanged += yilSecimiMonteCarlo;
+            comboBox2.SelectedIndexChanged += ilSecimiMonteCarlo;
+
+            // İlk durumda tüm marker'ları göster
+            ToggleMarkers("AC-HOME", checkBox22.Checked);
+            ToggleMarkers("AC-WORK", checkBox23.Checked);
+            ToggleMarkers("AC-PUBLIC", checkBox24.Checked);
+            ToggleMarkers("Fast-DC", checkBox25.Checked);
+        }
         // Nokta veri yapısı
+        public int SelectedYear
+        {
+            get => _selectedYear;
+            set
+            {
+                _selectedYear = value;
+                CheckSelections();
+            }
+        }
+
+        public string SelectedCity
+        {
+            get => _selectedCity;
+            set
+            {
+                _selectedCity = value;
+                CheckSelections();
+            }
+        }
         public class NoktaVeri
         {
             public double Enlem { get; set; }
@@ -204,9 +265,7 @@ namespace SLF
         // Initialize all form components (called in the constructors)
         private void InitializeComboBoxes()
         {
-
-
-
+            
             // Yıl aralığını ComboBox1'e ekleyin
             var yearList = new List<int>();
             for (int year = slfStartYear; year <= slfEndYear; year++)
@@ -5020,7 +5079,45 @@ namespace SLF
             // Haritayı yeniden çiziyoruz
             gMapControl_EA.Refresh();
         }
+        private void calculateChargeStationCount()
+        {
+            int greenAcCount = 0;
+            int redDcCount = 0;
+            int blueAcWorkCount = 0;
+            int yellowAcPublicCount = 0;
 
+            // Harita üzerindeki tüm marker'ları dolaşarak türlerine göre sayım yap
+            foreach (var overlay in gMapControl_EA.Overlays)
+            {
+                foreach (var marker in overlay.Markers)
+                {
+                    if (marker is GMarkerGoogle googleMarker)
+                    {
+                        switch (googleMarker.ToolTipText)
+                        {
+                            case "AC-HOME":
+                                greenAcCount++;
+                                break;
+                            case "AC-WORK":
+                                blueAcWorkCount++;
+                                break;
+                            case "AC-PUBLIC":
+                                yellowAcPublicCount++;
+                                break;
+                            case "Fast-DC":
+                                redDcCount++;
+                                break;
+                        }
+                    }
+                }
+            }
+
+            // Toplamları yazdırmak için calculateChargeStation metodunu çağırıyoruz
+            calculateChargeStation(greenAcCount, redDcCount);
+
+            // Ek sayımlar için ayrıca konsola yazdırıyoruz (isteğe bağlı)
+            Console.WriteLine($"AC-HOME Sayısı: {greenAcCount}, AC-WORK Sayısı: {blueAcWorkCount}, AC-PUBLIC Sayısı: {yellowAcPublicCount}, Fast-DC Sayısı: {redDcCount}");
+        }
 
         private async Task eaHaritayaVeriYukleAsync()
         {
@@ -5335,28 +5432,64 @@ namespace SLF
             }
         }
 
-        private void gelecekSimilasyonGoruntule(object sender, EventArgs e)
+        private async void gelecekSimilasyonGoruntule(object sender, EventArgs e)
         {
-            string filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\Arşiv\montecarlo-deneme.xlsx";
+            // Checkbox'ları görünür hale getir
+            checkBox22.Visible = true;
+            checkBox23.Visible = true;
+            checkBox24.Visible = true;
+            checkBox25.Visible = true;
 
-            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            // Şehir seçimine göre dosya yolunu ayarla
+            string filePath = "";
+
+            if (SelectedCity == "İzmir")
             {
-                ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
-                veriMonteCarlo = excelService.LoadWorksheetIntoDataTable(worksheet);
+                Console.WriteLine("path burda");
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\Arşiv\evcs_monte_carlo_distribution_2025_2030_5.xlsx";
+            }
+            else if (SelectedCity == "Eskisehir")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\Arşiv\montecarlo-deneme-Eskisehir.xlsx";
+            }
+            else
+            {
+                MessageBox.Show("Lütfen geçerli bir şehir seçiniz.");
+                return; // Geçerli bir şehir seçilmediyse işlemi sonlandır
             }
 
-            // Veri başarıyla yüklendiğinde bir bildirim gösterin
-            MessageBox.Show("Veri başarıyla yüklendi.");
-            int selectedYear = comboBox1.SelectedItem != null ? (int)comboBox1.SelectedItem : 0;
-            string selectedCity = comboBox2.SelectedItem != null ? (string)comboBox2.SelectedItem : "";
+            try
+            {
+                // Excel dosyasını aç
+                using (var package = new ExcelPackage(new FileInfo(filePath)))
+                {
+                    // Yıl seçimine göre sayfayı seç (SelectedYear değeri, sayfa indeksini temsil eder)
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
+
+                    // Veriyi DataTable'a yükle
+                    veriMonteCarlo = excelService.LoadWorksheetIntoDataTable(worksheet);
+                }
+
+                // Veri başarıyla yüklendiğinde bir bildirim gösterin
+                MessageBox.Show("Veri başarıyla yüklendi.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
+                return; // Hata durumunda işlemi sonlandır
+            }
+
             // Yeni bir DataGridView oluştur
-            
             DataGridView dataGridView = new DataGridView
             {
                 DataSource = veriMonteCarlo,  // DataTable'ı bağla
                 Dock = DockStyle.Fill,        // Formu doldurması için konumunu ayarla
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill // Sütunları otomatik boyutlandır
             };
+
+            // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
+            HesaplaMerkezNoktaVeEkle(veriMonteCarlo);
+             await HaritaUzerindeSimulasyonGosterimi(veriMonteCarlo);
 
             // Form üzerinde yeni bir pencerede aç
             Form popupForm = new Form
@@ -5365,25 +5498,223 @@ namespace SLF
                 Width = 800,
                 Height = 600
             };
+
             popupForm.Controls.Add(dataGridView);
             popupForm.Show(); // Yeni pencereyi göster
-            ////    MonteCarloScreen monteCarloScreen = new MonteCarloScreen();
-            ////    monteCarloScreen.Show(); // Formu aç
+        }
+        private void CheckSelections()
+        {
+            // Seçimlerin yapıldığını kontrol ederek butonu etkinleştir
+            button1.Enabled = SelectedYear != -1 && SelectedCity != null;
         }
 
+        // Yıl seçimi yapıldığında çağrılan metot
         private void yilSecimiMonteCarlo(object sender, EventArgs e)
         {
-            // Yıl seçimi yapıldığında işlemler
-            int selectedYear = (int)comboBox1.SelectedItem;
-            
-
+            if (comboBox1.SelectedIndex != -1)  // Geçerli bir seçim yapıldığında
+            {
+                SelectedYear = comboBox1.SelectedIndex;  // Yıl indeksini ayarla
+                CheckSelections();  // Seçim durumunu kontrol et
+            }
         }
 
-        private void ilSEcimiMonteCarlo(object sender, EventArgs e)
+        // Şehir seçimi yapıldığında çağrılan metot
+        private void ilSecimiMonteCarlo(object sender, EventArgs e)
         {
-            string selectedCity = (string)comboBox2.SelectedItem;
-            
+            if (comboBox2.SelectedItem != null)  // Geçerli bir seçim yapıldığında
+            {
+                SelectedCity = comboBox2.SelectedItem.ToString();  // Şehir adını ayarla
+                CheckSelections();  // Seçim durumunu kontrol et
+            }
         }
+        private void HesaplaMerkezNoktaVeEkle(DataTable dataTable)
+        {
+            // Eğer "MerkezEnlem" ve "MerkezBoylam" sütunları yoksa bu sütunları ekle
+            if (!dataTable.Columns.Contains("Enlem"))
+            {
+                dataTable.Columns.Add("Enlem", typeof(double));
+            }
+            if (!dataTable.Columns.Contains("Boylam"))
+            {
+                dataTable.Columns.Add("Boylam", typeof(double));
+            }
+
+            // DataTable'daki verileri gezmek için
+            foreach (DataRow row in dataTable.Rows)
+            {
+                // Koordinatları kontrol et ve null değilse işlemi yap
+                if (row["left"] != DBNull.Value &&
+                    row["top"] != DBNull.Value &&
+                    row["right"] != DBNull.Value &&
+                    row["bottom"] != DBNull.Value)
+                {
+                    // Sol, sağ, üst, alt koordinatları double olarak al
+                    double left = Convert.ToDouble(row["left"]);
+                    double top = Convert.ToDouble(row["top"]);
+                    double right = Convert.ToDouble(row["right"]);
+                    double bottom = Convert.ToDouble(row["bottom"]);
+
+                    // Merkez koordinatları hesapla
+                    double centerLat = (top + bottom) / 2;
+                    double centerLng = (left + right) / 2;
+
+                    // Hesaplanan merkez enlem ve boylam değerlerini ilgili satıra ekle
+                    row["Enlem"] = centerLat;
+                    row["Boylam"] = centerLng;
+                }
+            }
+        }
+        private void ToggleMarkers(string markerType, bool isVisible)
+        {
+            // gMapControl_EA üzerindeki tüm overlay'leri dolaşarak marker'ları kontrol ediyoruz
+            foreach (var overlay in gMapControl_EA.Overlays)
+            {
+                foreach (var marker in overlay.Markers)
+                {
+                    // Marker, GMarkerGoogle türündeyse ve ToolTipText ile belirtilen türle eşleşiyorsa
+                    if (marker is GMarkerGoogle googleMarker && googleMarker.ToolTipText == markerType)
+                    {
+                        // Marker'ın görünürlük durumunu güncelle
+                        googleMarker.IsVisible = isVisible;
+                    }
+                }
+            }
+
+            // Harita güncellenmesi için refresh yapıyoruz
+            gMapControl_EA.Refresh();
+        }
+
+
+
+        private Task HaritaUzerindeSimulasyonGosterimi(DataTable veriTablosu)
+        {
+            // EA için ayrı bir GMap katmanı oluştur
+            
+            GMapOverlay eaOverlay = new GMapOverlay("Simulasyon_Layer");
+            Dictionary<(double, double, string), GMarkerGoogle> markerDictionary = new Dictionary<(double, double, string), GMarkerGoogle>();
+            foreach (DataColumn column in veriTablosu.Columns)
+            {
+                Console.WriteLine(column.ColumnName);
+            }
+                foreach (DataRow row in veriTablosu.Rows)
+            {
+                if (row["Enlem"] != DBNull.Value && row["Boylam"] != DBNull.Value)
+                {
+                    double enlem = Convert.ToDouble(row["Enlem"]);
+                    double boylam = Convert.ToDouble(row["Boylam"]);
+
+                    bool acHome = row["AC (Home)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Home)_count"]) != 0;
+                    bool acWork = row["AC (Work)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Work)_count"]) != 0;
+                    bool acPublic = row["AC (Public)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Public)_count"]) != 0;
+                    bool fastDc = row["Fast DC_count"] != DBNull.Value && Convert.ToInt32(row["Fast DC_count"]) != 0;
+
+                    // Her kategori için bağımsız olarak marker ekleme
+                    if (acHome)
+                    {
+                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.green);
+                        marker.ToolTipText = "AC-Home";
+                        
+                        markerDictionary[(enlem, boylam, "AC-Home")] = marker;
+
+                    }
+                    if (acWork)
+                    {
+                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.blue);
+                        marker.ToolTipText = "AC-Work";
+                        markerDictionary[(enlem, boylam, "AC-Work")] = marker;
+                       
+                    }
+                    if (acPublic)
+                    {
+                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.yellow);
+                        marker.ToolTipText = "AC-Public";
+                        markerDictionary[(enlem, boylam, "AC-Public")] = marker;
+                    }
+                    if (fastDc)
+                    {
+                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.red);
+                        marker.ToolTipText = "DC-Fast";
+                        markerDictionary[(enlem, boylam, "DC-Fast")] = marker;
+                    }
+                }
+            }
+
+            // Marker'ları overlay'e ekleyin
+            foreach (var marker in markerDictionary.Values)
+            {
+                eaOverlay.Markers.Add(marker);
+            }
+
+            // Haritayı güncelleyin
+            Invoke(new Action(() =>
+            {
+                gMapControl_EA.Overlays.Clear();
+                gMapControl_EA.Overlays.Add(eaOverlay);
+                gMapControl_EA.Refresh();
+            }));
+
+            return Task.CompletedTask;
+        }
+
+
+
+        private void calculateChargeStationWithFilter(int acHomeCount, int acWorkCount, int acPublicCount, int fastDcCount)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(() => calculateChargeStationWithFilter(acHomeCount, acWorkCount, acPublicCount, fastDcCount)));
+                return;
+            }
+
+            // Mevcut paneli temizle
+            var existingControls = this.Controls.Find("istasyonAdetLabelPanel", true);
+            foreach (var control in existingControls)
+            {
+                this.Controls.Remove(control);
+            }
+
+            // Paneli oluştur ve ana formun üzerine ekle
+            FlowLayoutPanel panel = new FlowLayoutPanel
+            {
+                Location = new System.Drawing.Point(10, 10), // Sol üst köşeye yerleştir
+                Size = new System.Drawing.Size(200, 150),    // Sabit boyut belirle
+                Anchor = AnchorStyles.Top | AnchorStyles.Left,
+                BackColor = Color.FromArgb(200, 255, 255, 255), // Yarı saydam beyaz arka plan
+                Name = "istasyonAdetLabelPanel",
+                Padding = new Padding(5),
+                BorderStyle = BorderStyle.FixedSingle        // Çerçeve ekleyerek görünürlüğü artır
+            };
+
+            
+
+            // Paneli ana forma ekleyin
+            this.Controls.Add(panel);
+            panel.BringToFront(); // Paneli öne getir
+        }
+
+        private void checkBox_Ac_Home(object sender, EventArgs e)
+        {
+            ToggleMarkers("AC-Home", checkBox22.Checked);
+        }
+
+        private void checkBox_Ac_Work(object sender, EventArgs e)
+        {
+            ToggleMarkers("AC-Work", checkBox23.Checked);
+        }
+
+        private void checkBox_Ac_Public(object sender, EventArgs e)
+        {
+            ToggleMarkers("AC-Public", checkBox24.Checked);
+
+        }
+
+        private void checkBox_Dc_Fast(object sender, EventArgs e)
+        {
+            ToggleMarkers("DC-Fast", checkBox25.Checked);
+
+        }
+
+      
 
         private void Dek_Grid_Oluştur_Click(object sender, EventArgs e)
         {
