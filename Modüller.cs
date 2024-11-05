@@ -145,11 +145,7 @@ namespace SLF
             checkBox24.Visible = false;
             checkBox25.Visible = false;
 
-            // Checkbox arka planını şeffaf yap
-            checkBox22.BackColor = Color.Transparent;
-            checkBox23.BackColor = Color.Transparent;
-            checkBox24.BackColor = Color.Transparent;
-            checkBox25.BackColor = Color.Transparent;
+           
 
             // Checkbox'ları başlangıçta işaretli yap
             checkBox22.Checked = true;
