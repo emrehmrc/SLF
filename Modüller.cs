@@ -5448,8 +5448,8 @@ namespace SLF
                 Console.WriteLine("path burda");
                 filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\Arşiv\evcs_monte_carlo_distribution_2025_2030_5.xlsx";
             }
-            else if (SelectedCity == "Eskisehir")
-            {
+            else if (SelectedCity == "Eskişehir")
+            {   
                 filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\Arşiv\montecarlo-deneme-Eskisehir.xlsx";
             }
             else
@@ -5713,8 +5713,6 @@ namespace SLF
             ToggleMarkers("DC-Fast", checkBox25.Checked);
 
         }
-
-      
 
         private void Dek_Grid_Oluştur_Click(object sender, EventArgs e)
         {
