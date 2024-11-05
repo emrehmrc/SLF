@@ -55,8 +55,8 @@ namespace SLF
             "#N/A"
         };
         protected string seçilenVeriTipi;
-        protected int slfStartYear;
-        protected int slfEndYear;
+        public int slfStartYear;
+        public int slfEndYear;
         public int SlfStartYear
         {
             get { return slfStartYear; }
@@ -108,7 +108,7 @@ namespace SLF
         protected DataTable infoDataTableReport = new DataTable();
         protected DataTable statDataTableReport = new DataTable();
         protected DataTable reportDataTableReport = new DataTable();
-
+        
         protected Dictionary<string, List<int>> columnNullRowsMap = new Dictionary<string, List<int>>();
         protected Dictionary<string, List<int>> imputableRowsMap = new Dictionary<string, List<int>>();
         protected Dictionary<string, (double X, double Y)> binaIdToMostFrequentCoordinates = new Dictionary<string, (double X, double Y)>();
@@ -319,7 +319,7 @@ namespace SLF
         public DataTable WarningDataTable { get { return warningDataTable; }}
         public DataTable InfoDataTable { get { return infoDataTable; }}
         public Önizleme Onizleme1 { get { return onizleme1; }}
-
+        
         public GirdiModülü()
         {
             combinedExcelFilter = $"{FilterExcelFiles}|{FilterAllFiles}";
