@@ -93,7 +93,7 @@ namespace SLF
         public string targetDirectory;
         private int _selectedYear = -1;
         private string _selectedCity = null;
-
+        private Form popupForm; // easim ekran popup 
         // boolean variable to control the polygon selection by mouse down event
         private bool isSelecting_polygon = false;
 
@@ -5428,6 +5428,8 @@ namespace SLF
             }
         }
 
+       
+
         private async void gelecekSimilasyonGoruntule(object sender, EventArgs e)
         {
             // Checkbox'ları görünür hale getir
@@ -5445,7 +5447,7 @@ namespace SLF
                 filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\Arşiv\evcs_monte_carlo_distribution_2025_2030_5.xlsx";
             }
             else if (SelectedCity == "Eskişehir")
-            {   
+            {
                 filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\Arşiv\montecarlo-deneme-Eskisehir.xlsx";
             }
             else
@@ -5485,12 +5487,19 @@ namespace SLF
 
             // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
             HesaplaMerkezNoktaVeEkle(veriMonteCarlo);
-             await HaritaUzerindeSimulasyonGosterimi(veriMonteCarlo);
+            await HaritaUzerindeSimulasyonGosterimi(veriMonteCarlo);
 
-            // Form üzerinde yeni bir pencerede aç
-            Form popupForm = new Form
+            // Önceki popupForm varsa kapatın
+            if (popupForm != null && !popupForm.IsDisposed)
             {
-                Text = "Veri Görüntüleme",
+                popupForm.Close();
+                popupForm.Dispose();  // Eski formu serbest bırak
+            }
+
+            // Yeni popupForm'u oluşturun ve açın
+            popupForm = new Form
+            {
+                Text = "Hücre Analizi",
                 Width = 800,
                 Height = 600
             };
@@ -5498,6 +5507,7 @@ namespace SLF
             popupForm.Controls.Add(dataGridView);
             popupForm.Show(); // Yeni pencereyi göster
         }
+
         private void CheckSelections()
         {
             // Seçimlerin yapıldığını kontrol ederek butonu etkinleştir
