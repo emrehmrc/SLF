@@ -33,16 +33,16 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.ChargingStationDataGridView = new Guna.UI2.WinForms.Guna2DataGridView();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.CancelButton = new Guna.UI2.WinForms.Guna2Button();
-            this.TamamButton = new Guna.UI2.WinForms.Guna2Button();
-            this.guna2AnimateWindow1 = new Guna.UI2.WinForms.Guna2AnimateWindow(this.components);
             this.ISTASYON_ADI = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ISTASYON_TIPI = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.ISTASYON_GUCU = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.EA_X_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.EA_Y_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.CancelButton = new Guna.UI2.WinForms.Guna2Button();
+            this.TamamButton = new Guna.UI2.WinForms.Guna2Button();
+            this.guna2AnimateWindow1 = new Guna.UI2.WinForms.Guna2AnimateWindow(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.ChargingStationDataGridView)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -85,7 +85,7 @@
             this.ChargingStationDataGridView.Name = "ChargingStationDataGridView";
             this.ChargingStationDataGridView.RowHeadersVisible = false;
             this.ChargingStationDataGridView.RowHeadersWidth = 18;
-            this.ChargingStationDataGridView.Size = new System.Drawing.Size(718, 346);
+            this.ChargingStationDataGridView.Size = new System.Drawing.Size(701, 363);
             this.ChargingStationDataGridView.TabIndex = 0;
             this.ChargingStationDataGridView.ThemeStyle.AlternatingRowsStyle.BackColor = System.Drawing.Color.White;
             this.ChargingStationDataGridView.ThemeStyle.AlternatingRowsStyle.Font = null;
@@ -109,16 +109,50 @@
             this.ChargingStationDataGridView.ThemeStyle.RowsStyle.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255)))));
             this.ChargingStationDataGridView.ThemeStyle.RowsStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
             // 
+            // ISTASYON_ADI
+            // 
+            this.ISTASYON_ADI.HeaderText = "ISTASYON_ADI";
+            this.ISTASYON_ADI.Name = "ISTASYON_ADI";
+            this.ISTASYON_ADI.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.ISTASYON_ADI.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // ISTASYON_TIPI
+            // 
+            this.ISTASYON_TIPI.HeaderText = "ISTASYON_TIPI";
+            this.ISTASYON_TIPI.Items.AddRange(new object[] {
+            "AC",
+            "DC"});
+            this.ISTASYON_TIPI.Name = "ISTASYON_TIPI";
+            // 
+            // ISTASYON_GUCU
+            // 
+            this.ISTASYON_GUCU.HeaderText = "ISTASYON_GUCU";
+            this.ISTASYON_GUCU.Items.AddRange(new object[] {
+            "4",
+            "5",
+            "4"});
+            this.ISTASYON_GUCU.Name = "ISTASYON_GUCU";
+            // 
+            // EA_X_KOORDINAT
+            // 
+            this.EA_X_KOORDINAT.HeaderText = "EA_X_KOORDINAT";
+            this.EA_X_KOORDINAT.Name = "EA_X_KOORDINAT";
+            this.EA_X_KOORDINAT.ReadOnly = true;
+            // 
+            // EA_Y_KOORDINAT
+            // 
+            this.EA_Y_KOORDINAT.HeaderText = "EA_Y_KOORDINAT";
+            this.EA_Y_KOORDINAT.Name = "EA_Y_KOORDINAT";
+            this.EA_Y_KOORDINAT.ReadOnly = true;
+            // 
             // panel1
             // 
-            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.panel1.BackColor = System.Drawing.Color.NavajoWhite;
             this.panel1.Controls.Add(this.ChargingStationDataGridView);
-            this.panel1.Location = new System.Drawing.Point(1, 2);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(799, 390);
+            this.panel1.Size = new System.Drawing.Size(800, 450);
             this.panel1.TabIndex = 1;
             // 
             // panel2
@@ -165,42 +199,6 @@
             this.TamamButton.Size = new System.Drawing.Size(180, 45);
             this.TamamButton.TabIndex = 2;
             this.TamamButton.Text = "TAMAM";
-            // 
-            // ISTASYON_ADI
-            // 
-            this.ISTASYON_ADI.HeaderText = "ISTASYON_ADI";
-            this.ISTASYON_ADI.Name = "ISTASYON_ADI";
-            this.ISTASYON_ADI.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.ISTASYON_ADI.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // ISTASYON_TIPI
-            // 
-            this.ISTASYON_TIPI.HeaderText = "ISTASYON_TIPI";
-            this.ISTASYON_TIPI.Items.AddRange(new object[] {
-            "AC",
-            "DC"});
-            this.ISTASYON_TIPI.Name = "ISTASYON_TIPI";
-            // 
-            // ISTASYON_GUCU
-            // 
-            this.ISTASYON_GUCU.HeaderText = "ISTASYON_GUCU";
-            this.ISTASYON_GUCU.Items.AddRange(new object[] {
-            "4",
-            "5",
-            "4"});
-            this.ISTASYON_GUCU.Name = "ISTASYON_GUCU";
-            // 
-            // EA_X_KOORDINAT
-            // 
-            this.EA_X_KOORDINAT.HeaderText = "EA_X_KOORDINAT";
-            this.EA_X_KOORDINAT.Name = "EA_X_KOORDINAT";
-            this.EA_X_KOORDINAT.ReadOnly = true;
-            // 
-            // EA_Y_KOORDINAT
-            // 
-            this.EA_Y_KOORDINAT.HeaderText = "EA_Y_KOORDINAT";
-            this.EA_Y_KOORDINAT.Name = "EA_Y_KOORDINAT";
-            this.EA_Y_KOORDINAT.ReadOnly = true;
             // 
             // ChargingStationPopupForm
             // 

@@ -75,7 +75,7 @@ namespace SLF
         private List<PointLatLng> polygonPoints_stokastik = new List<PointLatLng>();
         //private List<PoligonVeri> poligonlar_stokastik = new List<PoligonVeri>();
         private List<PointLatLng> polygonPoints_Dek = new List<PointLatLng>();
-        private bool isAddingChargingStation = false; // Sadece şarj istasyonu eklenirken true olacak.
+        public bool isAddingChargingStation = false; // Sadece şarj istasyonu eklenirken true olacak.
         private bool isAddingDekPoint = false; // Sadece dek noktası eklenirken  true olacak.
         // variables to be used to create a grid
         public GMapOverlay bounding_box_overlay;
@@ -2546,13 +2546,44 @@ namespace SLF
                 ContextMenuStrip_Nokta.Show(Cursor.Position);
             }
         }
-
-        private void gMapControl_EA_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        private async void gMapControl_EA_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
-           
             if (e.Button == MouseButtons.Left)
             {
-                // İşaretleyici (marker) seçimi kontrolü
+                // Priority check for adding a charging station
+                if (isAddingChargingStation)
+                {
+                    // Add the red marker for charging station
+                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow);
+                    markerOverlay_ea.Markers.Add(marker);
+
+                    // Create the coordinate object for the popup form
+                    NoktaVeri noktaVeri_marker = new NoktaVeri
+                    {
+                        Enlem = Math.Round(pointClick.Lat, 4),
+                        Boylam = Math.Round(pointClick.Lng, 4)
+                    };
+
+                    using (ChargingStationPopupForm popupForm = new ChargingStationPopupForm(dataGridView1.DataSource as DataTable, noktaVeri_marker))
+                    {
+                        if (popupForm.ShowDialog() == DialogResult.OK)
+                        {
+                            // On success, update the map with the new station details
+                            await eaHaritayaVeriYukleAsync();
+                        }
+                        else if (popupForm.OperationCancelled)
+                        {
+                            // If canceled, remove the added marker
+                            markerOverlay_ea.Markers.Remove(marker);
+                        }
+                    }
+
+                    // Reset the flag after handling the form
+                    isAddingChargingStation = false;
+                    return; // Exit to ensure other actions aren’t triggered
+                }
+
+                // Marker selection check (only if not adding a charging station)
                 if (isSelecting_marker)
                 {
                     GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
@@ -2565,82 +2596,142 @@ namespace SLF
                     };
 
                     marker.Tag = noktaVeri_marker;
-
-                    // marker.Tag'i NoktaVeri tipine dönüştürüp enlem ve boylamı yazdırabilirsiniz.
                     NoktaVeri veri = (NoktaVeri)marker.Tag;
                     Console.WriteLine($"Enlem: {veri.Enlem}, Boylam: {veri.Boylam}");
-                    
-                    
                 }
-                else
-                {
-                    Console.WriteLine("Bilinmeyen tıklama türü");
-                }
-                // Poligon seçimi kontrolü
+
+                // Polygon selection check (only if not adding a charging station)
                 if (isSelecting_polygon)
                 {
-                    polygonPoints_ea.Add(pointClick); // Poligon noktalarını listeye ekle
-                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue); // Mavi marker ile göster
-                    markerOverlay_ea.Markers.Add(marker); // Marker ekle
+                    polygonPoints_ea.Add(pointClick);
+                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
+                    markerOverlay_ea.Markers.Add(marker);
 
                     if (polygonOverlay_ea != null)
                     {
-                        gMapControl_EA.Overlays.Remove(polygonOverlay_ea); // Eski poligon katmanını kaldır
+                        gMapControl_EA.Overlays.Remove(polygonOverlay_ea);
                     }
 
-                    layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null); // Boş katman bul
+                    layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
 
-                    // Dizide boş yer olup olmadığını kontrol et
                     if (layer_index == -1)
                     {
                         MessageBox.Show("En fazla katman sayısına ulaşıldı. Daha fazla katman ekleyemezsiniz.");
                         return;
                     }
 
-                    // Yeni poligon katmanı ekle
                     polygonOverlay_ea = new GMapOverlay("polygonOverlay_" + layer_index.ToString());
                     gMapControl_EA.Overlays.Add(polygonOverlay_ea);
                     gMapControl_EA.Refresh();
 
-                    // Eğer 3 veya daha fazla nokta varsa, poligon çiz
                     if (polygonPoints_ea.Count >= 3)
                     {
                         Draw_Polygon(polygonPoints_ea, polygonOverlay_ea, gMapControl_EA);
 
-                        double area = CalculatePolygonArea(polygonPoints_ea); // Alan hesapla
-
+                        double area = CalculatePolygonArea(polygonPoints_ea);
                         mesafe_metre_ea.Visible = true;
                         Mesafe_ea.Visible = true;
                         Mesafe_ea.Text = "Seçili Alan: " + Math.Round(area, 0).ToString() + " m²";
                     }
                 }
-
-                // Şarj İstasyonu Ekleme kontrolü
-                if (isAddingChargingStation)
-                {
-                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.red); // Şarj istasyonu için kırmızı marker
-                    markerOverlay_ea.Markers.Add(marker);
-
-                    NoktaVeri noktaVeri_marker = new NoktaVeri
-                    {
-                        Enlem = Math.Round(pointClick.Lat, 4),
-                        Boylam = Math.Round(pointClick.Lng, 4)
-                    };
-
-                    marker.Tag = noktaVeri_marker;
-
-                    // marker.Tag'i NoktaVeri tipine dönüştürüp enlem ve boylamı yazdırabilirsiniz.
-                    NoktaVeri veri = (NoktaVeri)marker.Tag;
-                    Console.WriteLine($"Şarj İstasyonu Eklendi - Enlem: {veri.Enlem}, Boylam: {veri.Boylam}");
-
-                    // Bu aşamada şarj istasyonu popup formu veya veri girişi ekranı açılabilir
-                    ShowChargingStationPopup(veri);
-
-                    // Şarj istasyonu ekleme işlemi tamamlandığında flag'i kapat
-                    isAddingChargingStation = false;
-                }
             }
         }
+
+
+        /*        private void gMapControl_EA_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+                {
+
+                    if (e.Button == MouseButtons.Left)
+                    {
+                        // İşaretleyici (marker) seçimi kontrolü
+                        if (isSelecting_marker)
+                        {
+                            GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
+                            markerOverlay_ea.Markers.Add(marker);
+
+                            NoktaVeri noktaVeri_marker = new NoktaVeri
+                            {
+                                Enlem = Math.Round(pointClick.Lat, 4),
+                                Boylam = Math.Round(pointClick.Lng, 4)
+                            };
+
+                            marker.Tag = noktaVeri_marker;
+
+                            // marker.Tag'i NoktaVeri tipine dönüştürüp enlem ve boylamı yazdırabilirsiniz.
+                            NoktaVeri veri = (NoktaVeri)marker.Tag;
+                            Console.WriteLine($"Enlem: {veri.Enlem}, Boylam: {veri.Boylam}");
+
+
+                        }
+                        else
+                        {
+                            Console.WriteLine("Bilinmeyen tıklama türü");
+                        }
+                        // Poligon seçimi kontrolü
+                        if (isSelecting_polygon)
+                        {
+                            polygonPoints_ea.Add(pointClick); // Poligon noktalarını listeye ekle
+                            GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue); // Mavi marker ile göster
+                            markerOverlay_ea.Markers.Add(marker); // Marker ekle
+
+                            if (polygonOverlay_ea != null)
+                            {
+                                gMapControl_EA.Overlays.Remove(polygonOverlay_ea); // Eski poligon katmanını kaldır
+                            }
+
+                            layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null); // Boş katman bul
+
+                            // Dizide boş yer olup olmadığını kontrol et
+                            if (layer_index == -1)
+                            {
+                                MessageBox.Show("En fazla katman sayısına ulaşıldı. Daha fazla katman ekleyemezsiniz.");
+                                return;
+                            }
+
+                            // Yeni poligon katmanı ekle
+                            polygonOverlay_ea = new GMapOverlay("polygonOverlay_" + layer_index.ToString());
+                            gMapControl_EA.Overlays.Add(polygonOverlay_ea);
+                            gMapControl_EA.Refresh();
+
+                            // Eğer 3 veya daha fazla nokta varsa, poligon çiz
+                            if (polygonPoints_ea.Count >= 3)
+                            {
+                                Draw_Polygon(polygonPoints_ea, polygonOverlay_ea, gMapControl_EA);
+
+                                double area = CalculatePolygonArea(polygonPoints_ea); // Alan hesapla
+
+                                mesafe_metre_ea.Visible = true;
+                                Mesafe_ea.Visible = true;
+                                Mesafe_ea.Text = "Seçili Alan: " + Math.Round(area, 0).ToString() + " m²";
+                            }
+                        }
+
+                        // Şarj İstasyonu Ekleme kontrolü
+                        if (isAddingChargingStation)
+                        {
+                            GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.red); // Şarj istasyonu için kırmızı marker
+                            markerOverlay_ea.Markers.Add(marker);
+
+                            NoktaVeri noktaVeri_marker = new NoktaVeri
+                            {
+                                Enlem = Math.Round(pointClick.Lat, 4),
+                                Boylam = Math.Round(pointClick.Lng, 4)
+                            };
+
+                            marker.Tag = noktaVeri_marker;
+
+                            // marker.Tag'i NoktaVeri tipine dönüştürüp enlem ve boylamı yazdırabilirsiniz.
+                            NoktaVeri veri = (NoktaVeri)marker.Tag;
+                            Console.WriteLine($"Şarj İstasyonu Eklendi - Enlem: {veri.Enlem}, Boylam: {veri.Boylam}");
+
+                            // Bu aşamada şarj istasyonu popup formu veya veri girişi ekranı açılabilir
+                            ShowChargingStationPopup(veri);
+
+                            // Şarj istasyonu ekleme işlemi tamamlandığında flag'i kapat
+                            isAddingChargingStation = false;
+                        }
+                    }
+                }*/
         private void RemoveMarkerAtPosition(PointLatLng pointClick)
         {
             
@@ -2662,7 +2753,7 @@ namespace SLF
                 Console.WriteLine("Kaldırılacak işaretleyici bulunamadı.");
             }
         }
-        private async Task ShowChargingStationPopup(NoktaVeri veri)
+/*        private async Task ShowChargingStationPopup(NoktaVeri veri)
         {
             // Yeni bir popup formu oluşturuyoruz
             Form popupForm = new Form();
@@ -2812,7 +2903,7 @@ namespace SLF
 
             popupForm.ShowDialog();
             await eaHaritayaVeriYukleAsync();
-        }
+        }*/
 
         private void gMapControl_Dek_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
@@ -3713,7 +3804,7 @@ namespace SLF
             PointLatLng point = new PointLatLng(nokta.Enlem, nokta.Boylam);
 
             // Marker'ı verilen noktaya göre kaldırıyoruz
-            RemoveMarkerAtPosition(point);
+            //RemoveMarkerAtPosition(point);
         }
 
         private void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
@@ -4999,7 +5090,7 @@ namespace SLF
                                 !eaData.Columns.Contains("EA_Y_KOORDINAT") ||
                                 !eaData.Columns.Contains("ISTASYON_GUCU"))
                             {
-                                MessageBox.Show("Lütfen EA Sarj mödülü verilerinizi yükleyin.");
+                                MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
                                 return;
                             }
 
@@ -5210,8 +5301,6 @@ namespace SLF
             }
         }
 
-
-
         private void ea_Grid_Oluştur_Click(object sender, EventArgs e)
         {
             Grid_Seçenekler grid_formu = new Grid_Seçenekler();
@@ -5221,94 +5310,72 @@ namespace SLF
             grid_formu.Activate();
             grid_formu.StartPosition = FormStartPosition.CenterParent;
         }
-
-        private void De(object sender, MouseEventArgs e)
-        {
-
-        }
         private void EAStationAddButton_Click(object sender, EventArgs e)
         {
-            // Check if the "EA Şarj Verileri" key exists
+            // Check if the "EA Şarj Verileri" key exists in the dataTablesByType dictionary
             if (!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
             {
                 MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
-                return; // Exit if the key does not exist
+                return;
             }
 
-            // Check if "EA Şarj Verileri" is null or has no rows
-            if (GirdiModülü.dataTablesByType["EA Şarj Verileri"] == null || GirdiModülü.dataTablesByType["EA Şarj Verileri"].Rows.Count == 0)
+            // Use dataGridView1.DataSource as the DataTable instead of eaDataTable
+            DataTable dataTable = dataGridView1.DataSource as DataTable;
+            if (dataTable == null || dataTable.Rows.Count == 0)
             {
                 MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
-                return; // Exit if the data table is null or empty
+                return;
             }
 
-            // Assume you have a method to get the clicked point on the map
+            // Assume a method to get the clicked point on the map
             var pointClick = gMapControl_EA.FromLocalToLatLng(MousePosition.X, MousePosition.Y);
-
-            if (isSelecting_marker)
+            // Indicate that the process of adding a charging station has started
+            if (!isAddingChargingStation)
             {
-                // Create and add the marker to the overlay
-                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
-                markerOverlay_ea.Markers.Add(marker);
-
-                // Create a NoktaVeri instance with the clicked coordinates
-                NoktaVeri noktaVeri_marker = new NoktaVeri
-                {
-                    Enlem = Math.Round(pointClick.Lat, 4),
-                    Boylam = Math.Round(pointClick.Lng, 4)
-                };
-
-                marker.Tag = noktaVeri_marker;
-
-                // Retrieve the NoktaVeri from the marker's Tag and log the coordinates
-                NoktaVeri veri = (NoktaVeri)marker.Tag;
-                Console.WriteLine($"Enlem: {veri.Enlem}, Boylam: {veri.Boylam}");
-
-                // Show the ChargingStationPopupForm with the NoktaVeri instance
-                using (ChargingStationPopupForm popupForm = new ChargingStationPopupForm(veri))
-                {
-                    if (popupForm.ShowDialog() == DialogResult.OK)
-                    {
-                        // Handle any result from the popup if necessary
-                    }
-                }
-
-                // Indicate that the process of adding a charging station has started
                 MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
                 isAddingChargingStation = true;
             }
+            /*            else if (isAddingChargingStation)
+                        {
+
+                            // Create and add the marker to the overlay
+                            GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
+                            markerOverlay_ea.Markers.Add(marker);
+
+                            // Create a NoktaVeri instance with the clicked coordinates
+                            NoktaVeri noktaVeri_marker = new NoktaVeri
+                            {
+                                Enlem = Math.Round(pointClick.Lat, 4),
+                                Boylam = Math.Round(pointClick.Lng, 4)
+                            };
+
+                            marker.Tag = noktaVeri_marker;
+
+                            // Retrieve the NoktaVeri from the marker's Tag and log the coordinates
+                            NoktaVeri veri = (NoktaVeri)marker.Tag;
+                            Console.WriteLine($"Enlem: {veri.Enlem}, Boylam: {veri.Boylam}");
+
+                            // Show the ChargingStationPopupForm with the NoktaVeri instance and existing DataTable
+                            using (ChargingStationPopupForm popupForm = new ChargingStationPopupForm(dataTable, veri))
+                            {
+                                if (popupForm.ShowDialog() == DialogResult.OK)
+                                {
+                                    // After the popup form closes and confirms, update the map asynchronously
+                                    await eaHaritayaVeriYukleAsync();
+
+                                }
+                            }
+                            // Indicate that the process of adding a charging station has started
+                            //MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
+                            //isAddingChargingStation = true;
+                        }*/
             else
             {
                 Console.WriteLine("Bilinmeyen tıklama türü");
             }
         }
 
-
-        /*        private void EAStationAddButton_Click(object sender, EventArgs e)
-                {
-                    // Eğer "EA Şarj Verileri" anahtarı mevcut değilse
-                    if (!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
-                    {
-                        MessageBox.Show("Lütfen EA SARJ verilerinizi ekleyin.");
-                    }
-                    // Eğer "EA Şarj Verileri" null ise veya satır sayısı 0 ise
-                    else if (GirdiModülü.dataTablesByType["EA Şarj Verileri"] == null || GirdiModülü.dataTablesByType["EA Şarj Verileri"].Rows.Count == 0)
-                    {
-                        MessageBox.Show("Lütfen EA SARJ verilerinizi ekleyin.");
-                    }
-                    // Eğer "DEK Verileri" anahtarı mevcut değilse veya null ise
-
-                    else
-                    {
-                        // Şarj istasyonu ekleme işlemine başla
-                        MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
-
-                        // İşaretleme işlemi başladığı için flag'i true yapıyoruz
-                        isAddingChargingStation = true;
-                    }
-                }*/
-
-        private void button9_Click(object sender, EventArgs e)
+        private void DEKCenterAddButton_Click(object sender, EventArgs e)
         {
             // First, check if "DTR Verileri" exists and has data
             if (!GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri") ||
