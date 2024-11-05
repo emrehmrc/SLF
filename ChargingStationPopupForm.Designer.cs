@@ -85,7 +85,7 @@
             this.ChargingStationDataGridView.Name = "ChargingStationDataGridView";
             this.ChargingStationDataGridView.RowHeadersVisible = false;
             this.ChargingStationDataGridView.RowHeadersWidth = 18;
-            this.ChargingStationDataGridView.Size = new System.Drawing.Size(701, 363);
+            this.ChargingStationDataGridView.Size = new System.Drawing.Size(727, 363);
             this.ChargingStationDataGridView.TabIndex = 0;
             this.ChargingStationDataGridView.ThemeStyle.AlternatingRowsStyle.BackColor = System.Drawing.Color.White;
             this.ChargingStationDataGridView.ThemeStyle.AlternatingRowsStyle.Font = null;

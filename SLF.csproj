@@ -579,6 +579,12 @@
       <DependentUpon>ChargingStationPopupForm.cs</DependentUpon>
     </Compile>
     <Compile Include="CsvHandler.cs" />
+    <Compile Include="DEKCenterPopupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DEKCenterPopupForm.Designer.cs">
+      <DependentUpon>DEKCenterPopupForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ExcelExporter.cs" />
     <Compile Include="MethodForm.cs">
       <SubType>Form</SubType>
@@ -682,6 +688,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ChargingStationPopupForm.resx">
       <DependentUpon>ChargingStationPopupForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DEKCenterPopupForm.resx">
+      <DependentUpon>DEKCenterPopupForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Fonksiyon Oluştur.resx">
       <DependentUpon>Fonksiyon Oluştur.cs</DependentUpon>
