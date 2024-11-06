@@ -326,19 +326,19 @@ namespace SLF
             // importToolStripMenuItem
             // 
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(169, 26);
             this.importToolStripMenuItem.Text = "İçeri Aktar";
             // 
             // exportToolStripMenuItem
             // 
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(169, 26);
             this.exportToolStripMenuItem.Text = "Dışarı Aktar";
             // 
             // saToolStripMenuItem
             // 
             this.saToolStripMenuItem.Name = "saToolStripMenuItem";
-            this.saToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.saToolStripMenuItem.Size = new System.Drawing.Size(169, 26);
             this.saToolStripMenuItem.Text = "Kaydet";
             // 
             // yardımToolStripMenuItem
@@ -413,7 +413,7 @@ namespace SLF
             this.OpenModuleButtonPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.OpenModuleButtonPanel.Controls.Add(this.OpenModuleButton);
             this.OpenModuleButtonPanel.Location = new System.Drawing.Point(1019, 569);
-            this.OpenModuleButtonPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.OpenModuleButtonPanel.Margin = new System.Windows.Forms.Padding(4);
             this.OpenModuleButtonPanel.Name = "OpenModuleButtonPanel";
             this.OpenModuleButtonPanel.Size = new System.Drawing.Size(148, 44);
             this.OpenModuleButtonPanel.TabIndex = 17;
@@ -423,7 +423,7 @@ namespace SLF
             // 
             this.OpenModuleButton.Dock = System.Windows.Forms.DockStyle.Right;
             this.OpenModuleButton.Location = new System.Drawing.Point(0, 0);
-            this.OpenModuleButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.OpenModuleButton.Margin = new System.Windows.Forms.Padding(4);
             this.OpenModuleButton.Name = "OpenModuleButton";
             this.OpenModuleButton.Size = new System.Drawing.Size(148, 44);
             this.OpenModuleButton.TabIndex = 16;
@@ -438,7 +438,7 @@ namespace SLF
             this.panel9.Controls.Add(this.label17);
             this.panel9.Controls.Add(this.raporGoruntuleButonu);
             this.panel9.Location = new System.Drawing.Point(1141, 11);
-            this.panel9.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel9.Margin = new System.Windows.Forms.Padding(4);
             this.panel9.Name = "panel9";
             this.panel9.Size = new System.Drawing.Size(129, 81);
             this.panel9.TabIndex = 15;
@@ -494,7 +494,7 @@ namespace SLF
             this.panel8.Controls.Add(this.ExcelDownloadButton);
             this.panel8.Controls.Add(this.csvExportButton);
             this.panel8.Location = new System.Drawing.Point(837, 33);
-            this.panel8.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel8.Margin = new System.Windows.Forms.Padding(4);
             this.panel8.Name = "panel8";
             this.panel8.Size = new System.Drawing.Size(280, 59);
             this.panel8.TabIndex = 14;
@@ -548,7 +548,7 @@ namespace SLF
             this.panel6.Controls.Add(this.yearApproveButton);
             this.panel6.Controls.Add(this.endYearComboBox);
             this.panel6.Location = new System.Drawing.Point(4, 4);
-            this.panel6.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel6.Margin = new System.Windows.Forms.Padding(4);
             this.panel6.Name = "panel6";
             this.panel6.Size = new System.Drawing.Size(306, 88);
             this.panel6.TabIndex = 12;
@@ -568,7 +568,7 @@ namespace SLF
             // yearApproveButton
             // 
             this.yearApproveButton.Location = new System.Drawing.Point(81, 41);
-            this.yearApproveButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.yearApproveButton.Margin = new System.Windows.Forms.Padding(4);
             this.yearApproveButton.Name = "yearApproveButton";
             this.yearApproveButton.Size = new System.Drawing.Size(100, 34);
             this.yearApproveButton.TabIndex = 11;
@@ -596,7 +596,7 @@ namespace SLF
             this.panel7.Controls.Add(this.label2);
             this.panel7.Controls.Add(this.SelectFolderButton);
             this.panel7.Location = new System.Drawing.Point(318, 4);
-            this.panel7.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel7.Margin = new System.Windows.Forms.Padding(4);
             this.panel7.Name = "panel7";
             this.panel7.Size = new System.Drawing.Size(511, 88);
             this.panel7.TabIndex = 13;
@@ -672,7 +672,7 @@ namespace SLF
             this.tab_dek.Location = new System.Drawing.Point(4, 56);
             this.tab_dek.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tab_dek.Name = "tab_dek";
-            this.tab_dek.Size = new System.Drawing.Size(1768, 628);
+            this.tab_dek.Size = new System.Drawing.Size(1312, 628);
             this.tab_dek.TabIndex = 6;
             this.tab_dek.Text = "DEK Modülü";
             this.tab_dek.UseVisualStyleBackColor = true;
@@ -730,7 +730,7 @@ namespace SLF
             this.tab_ea.Location = new System.Drawing.Point(4, 56);
             this.tab_ea.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tab_ea.Name = "tab_ea";
-            this.tab_ea.Size = new System.Drawing.Size(1768, 628);
+            this.tab_ea.Size = new System.Drawing.Size(1312, 628);
             this.tab_ea.TabIndex = 5;
             this.tab_ea.Text = "EA Şarj Modülü";
             this.tab_ea.UseVisualStyleBackColor = true;
@@ -789,7 +789,7 @@ namespace SLF
             this.toolStripSeparator16});
             this.toolStrip2.Location = new System.Drawing.Point(0, 0);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(1768, 32);
+            this.toolStrip2.Size = new System.Drawing.Size(1312, 32);
             this.toolStrip2.TabIndex = 32;
             this.toolStrip2.Text = "toolStrip2";
             this.toolStrip2.UseWaitCursor = true;
@@ -1211,7 +1211,7 @@ namespace SLF
             this.ELFResultsTabControls.Controls.Add(this.ELFMaxResultsTabPage);
             this.ELFResultsTabControls.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFResultsTabControls.Location = new System.Drawing.Point(0, 0);
-            this.ELFResultsTabControls.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFResultsTabControls.Margin = new System.Windows.Forms.Padding(4);
             this.ELFResultsTabControls.Name = "ELFResultsTabControls";
             this.ELFResultsTabControls.SelectedIndex = 0;
             this.ELFResultsTabControls.Size = new System.Drawing.Size(729, 619);
@@ -1223,9 +1223,9 @@ namespace SLF
             this.ELFMinResultsTabPage.Controls.Add(this.ELFMinResultsTable);
             this.ELFMinResultsTabPage.Controls.Add(this.ELFMinSenaryoGraphPicBox);
             this.ELFMinResultsTabPage.Location = new System.Drawing.Point(4, 30);
-            this.ELFMinResultsTabPage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFMinResultsTabPage.Margin = new System.Windows.Forms.Padding(4);
             this.ELFMinResultsTabPage.Name = "ELFMinResultsTabPage";
-            this.ELFMinResultsTabPage.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFMinResultsTabPage.Padding = new System.Windows.Forms.Padding(4);
             this.ELFMinResultsTabPage.Size = new System.Drawing.Size(721, 585);
             this.ELFMinResultsTabPage.TabIndex = 0;
             this.ELFMinResultsTabPage.Text = "Minimum Sonuçlar";
@@ -1236,7 +1236,7 @@ namespace SLF
             // 
             this.ELFMinResultsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ELFMinResultsTable.Location = new System.Drawing.Point(8, 7);
-            this.ELFMinResultsTable.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFMinResultsTable.Margin = new System.Windows.Forms.Padding(4);
             this.ELFMinResultsTable.Name = "ELFMinResultsTable";
             this.ELFMinResultsTable.RowHeadersWidth = 51;
             this.ELFMinResultsTable.Size = new System.Drawing.Size(728, 558);
@@ -1246,7 +1246,7 @@ namespace SLF
             // ELFMinSenaryoGraphPicBox
             // 
             this.ELFMinSenaryoGraphPicBox.Location = new System.Drawing.Point(809, 58);
-            this.ELFMinSenaryoGraphPicBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFMinSenaryoGraphPicBox.Margin = new System.Windows.Forms.Padding(4);
             this.ELFMinSenaryoGraphPicBox.Name = "ELFMinSenaryoGraphPicBox";
             this.ELFMinSenaryoGraphPicBox.Size = new System.Drawing.Size(308, 210);
             this.ELFMinSenaryoGraphPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -1258,10 +1258,10 @@ namespace SLF
             // 
             this.ELFLowResultsTabPage.Controls.Add(this.ELFLowResultsTable);
             this.ELFLowResultsTabPage.Location = new System.Drawing.Point(4, 30);
-            this.ELFLowResultsTabPage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFLowResultsTabPage.Margin = new System.Windows.Forms.Padding(4);
             this.ELFLowResultsTabPage.Name = "ELFLowResultsTabPage";
-            this.ELFLowResultsTabPage.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.ELFLowResultsTabPage.Size = new System.Drawing.Size(1177, 585);
+            this.ELFLowResultsTabPage.Padding = new System.Windows.Forms.Padding(4);
+            this.ELFLowResultsTabPage.Size = new System.Drawing.Size(721, 585);
             this.ELFLowResultsTabPage.TabIndex = 1;
             this.ELFLowResultsTabPage.Text = "Düşük Sonuçlar";
             this.ELFLowResultsTabPage.UseVisualStyleBackColor = true;
@@ -1271,7 +1271,7 @@ namespace SLF
             // 
             this.ELFLowResultsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ELFLowResultsTable.Location = new System.Drawing.Point(4, 0);
-            this.ELFLowResultsTable.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFLowResultsTable.Margin = new System.Windows.Forms.Padding(4);
             this.ELFLowResultsTable.Name = "ELFLowResultsTable";
             this.ELFLowResultsTable.RowHeadersWidth = 51;
             this.ELFLowResultsTable.Size = new System.Drawing.Size(677, 572);
@@ -1282,10 +1282,10 @@ namespace SLF
             // 
             this.ELFBaseResultsTabPage.Controls.Add(this.ELFBaseResultsTable);
             this.ELFBaseResultsTabPage.Location = new System.Drawing.Point(4, 30);
-            this.ELFBaseResultsTabPage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFBaseResultsTabPage.Margin = new System.Windows.Forms.Padding(4);
             this.ELFBaseResultsTabPage.Name = "ELFBaseResultsTabPage";
-            this.ELFBaseResultsTabPage.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.ELFBaseResultsTabPage.Size = new System.Drawing.Size(1177, 585);
+            this.ELFBaseResultsTabPage.Padding = new System.Windows.Forms.Padding(4);
+            this.ELFBaseResultsTabPage.Size = new System.Drawing.Size(721, 585);
             this.ELFBaseResultsTabPage.TabIndex = 2;
             this.ELFBaseResultsTabPage.Text = "Baz Sonuçlar";
             this.ELFBaseResultsTabPage.UseVisualStyleBackColor = true;
@@ -1295,7 +1295,7 @@ namespace SLF
             // 
             this.ELFBaseResultsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ELFBaseResultsTable.Location = new System.Drawing.Point(8, 4);
-            this.ELFBaseResultsTable.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFBaseResultsTable.Margin = new System.Windows.Forms.Padding(4);
             this.ELFBaseResultsTable.Name = "ELFBaseResultsTable";
             this.ELFBaseResultsTable.RowHeadersWidth = 51;
             this.ELFBaseResultsTable.Size = new System.Drawing.Size(891, 567);
@@ -1306,10 +1306,10 @@ namespace SLF
             // 
             this.ELFHighResultsTabPage.Controls.Add(this.ELFHighResultsTable);
             this.ELFHighResultsTabPage.Location = new System.Drawing.Point(4, 30);
-            this.ELFHighResultsTabPage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFHighResultsTabPage.Margin = new System.Windows.Forms.Padding(4);
             this.ELFHighResultsTabPage.Name = "ELFHighResultsTabPage";
-            this.ELFHighResultsTabPage.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.ELFHighResultsTabPage.Size = new System.Drawing.Size(1177, 585);
+            this.ELFHighResultsTabPage.Padding = new System.Windows.Forms.Padding(4);
+            this.ELFHighResultsTabPage.Size = new System.Drawing.Size(721, 585);
             this.ELFHighResultsTabPage.TabIndex = 3;
             this.ELFHighResultsTabPage.Text = "Yüksek Sonuçlar";
             this.ELFHighResultsTabPage.UseVisualStyleBackColor = true;
@@ -1319,7 +1319,7 @@ namespace SLF
             // 
             this.ELFHighResultsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ELFHighResultsTable.Location = new System.Drawing.Point(111, 0);
-            this.ELFHighResultsTable.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFHighResultsTable.Margin = new System.Windows.Forms.Padding(4);
             this.ELFHighResultsTable.Name = "ELFHighResultsTable";
             this.ELFHighResultsTable.RowHeadersWidth = 51;
             this.ELFHighResultsTable.Size = new System.Drawing.Size(765, 567);
@@ -1330,10 +1330,10 @@ namespace SLF
             // 
             this.ELFMaxResultsTabPage.Controls.Add(this.ELFMaxResultsTable);
             this.ELFMaxResultsTabPage.Location = new System.Drawing.Point(4, 30);
-            this.ELFMaxResultsTabPage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFMaxResultsTabPage.Margin = new System.Windows.Forms.Padding(4);
             this.ELFMaxResultsTabPage.Name = "ELFMaxResultsTabPage";
-            this.ELFMaxResultsTabPage.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.ELFMaxResultsTabPage.Size = new System.Drawing.Size(1177, 585);
+            this.ELFMaxResultsTabPage.Padding = new System.Windows.Forms.Padding(4);
+            this.ELFMaxResultsTabPage.Size = new System.Drawing.Size(721, 585);
             this.ELFMaxResultsTabPage.TabIndex = 4;
             this.ELFMaxResultsTabPage.Text = "Maksimum Sonuçlar";
             this.ELFMaxResultsTabPage.UseVisualStyleBackColor = true;
@@ -1343,7 +1343,7 @@ namespace SLF
             // 
             this.ELFMaxResultsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ELFMaxResultsTable.Location = new System.Drawing.Point(45, 4);
-            this.ELFMaxResultsTable.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFMaxResultsTable.Margin = new System.Windows.Forms.Padding(4);
             this.ELFMaxResultsTable.Name = "ELFMaxResultsTable";
             this.ELFMaxResultsTable.RowHeadersWidth = 51;
             this.ELFMaxResultsTable.Size = new System.Drawing.Size(920, 567);
@@ -1365,7 +1365,7 @@ namespace SLF
             this.ELFGraphicsPanel.Controls.Add(this.label9);
             this.ELFGraphicsPanel.Dock = System.Windows.Forms.DockStyle.Left;
             this.ELFGraphicsPanel.Location = new System.Drawing.Point(3, 2);
-            this.ELFGraphicsPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFGraphicsPanel.Margin = new System.Windows.Forms.Padding(4);
             this.ELFGraphicsPanel.Name = "ELFGraphicsPanel";
             this.ELFGraphicsPanel.Size = new System.Drawing.Size(567, 624);
             this.ELFGraphicsPanel.TabIndex = 22;
@@ -1404,7 +1404,7 @@ namespace SLF
             this.ELFRadioButtonsPanel.Controls.Add(this.ELFHighSenaryoRadioButton);
             this.ELFRadioButtonsPanel.Controls.Add(this.ELFBaseSenaryoRadioButton);
             this.ELFRadioButtonsPanel.Location = new System.Drawing.Point(8, 7);
-            this.ELFRadioButtonsPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFRadioButtonsPanel.Margin = new System.Windows.Forms.Padding(4);
             this.ELFRadioButtonsPanel.Name = "ELFRadioButtonsPanel";
             this.ELFRadioButtonsPanel.Size = new System.Drawing.Size(233, 207);
             this.ELFRadioButtonsPanel.TabIndex = 28;
@@ -1419,7 +1419,7 @@ namespace SLF
             this.ELFLowSenaryoRadioButton.CheckedState.InnerColor = System.Drawing.Color.White;
             this.ELFLowSenaryoRadioButton.CheckedState.InnerOffset = -4;
             this.ELFLowSenaryoRadioButton.Location = new System.Drawing.Point(4, 49);
-            this.ELFLowSenaryoRadioButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFLowSenaryoRadioButton.Margin = new System.Windows.Forms.Padding(4);
             this.ELFLowSenaryoRadioButton.Name = "ELFLowSenaryoRadioButton";
             this.ELFLowSenaryoRadioButton.Size = new System.Drawing.Size(147, 27);
             this.ELFLowSenaryoRadioButton.TabIndex = 24;
@@ -1439,7 +1439,7 @@ namespace SLF
             this.ELFMaxSenaryoRadioButton.CheckedState.InnerColor = System.Drawing.Color.White;
             this.ELFMaxSenaryoRadioButton.CheckedState.InnerOffset = -4;
             this.ELFMaxSenaryoRadioButton.Location = new System.Drawing.Point(4, 156);
-            this.ELFMaxSenaryoRadioButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFMaxSenaryoRadioButton.Margin = new System.Windows.Forms.Padding(4);
             this.ELFMaxSenaryoRadioButton.Name = "ELFMaxSenaryoRadioButton";
             this.ELFMaxSenaryoRadioButton.Size = new System.Drawing.Size(184, 27);
             this.ELFMaxSenaryoRadioButton.TabIndex = 27;
@@ -1459,7 +1459,7 @@ namespace SLF
             this.ELFMinSenaryoRadioButton.CheckedState.InnerColor = System.Drawing.Color.White;
             this.ELFMinSenaryoRadioButton.CheckedState.InnerOffset = -4;
             this.ELFMinSenaryoRadioButton.Location = new System.Drawing.Point(4, 10);
-            this.ELFMinSenaryoRadioButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFMinSenaryoRadioButton.Margin = new System.Windows.Forms.Padding(4);
             this.ELFMinSenaryoRadioButton.Name = "ELFMinSenaryoRadioButton";
             this.ELFMinSenaryoRadioButton.Size = new System.Drawing.Size(173, 27);
             this.ELFMinSenaryoRadioButton.TabIndex = 23;
@@ -1479,7 +1479,7 @@ namespace SLF
             this.ELFHighSenaryoRadioButton.CheckedState.InnerColor = System.Drawing.Color.White;
             this.ELFHighSenaryoRadioButton.CheckedState.InnerOffset = -4;
             this.ELFHighSenaryoRadioButton.Location = new System.Drawing.Point(4, 116);
-            this.ELFHighSenaryoRadioButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFHighSenaryoRadioButton.Margin = new System.Windows.Forms.Padding(4);
             this.ELFHighSenaryoRadioButton.Name = "ELFHighSenaryoRadioButton";
             this.ELFHighSenaryoRadioButton.Size = new System.Drawing.Size(152, 27);
             this.ELFHighSenaryoRadioButton.TabIndex = 26;
@@ -1499,7 +1499,7 @@ namespace SLF
             this.ELFBaseSenaryoRadioButton.CheckedState.InnerColor = System.Drawing.Color.White;
             this.ELFBaseSenaryoRadioButton.CheckedState.InnerOffset = -4;
             this.ELFBaseSenaryoRadioButton.Location = new System.Drawing.Point(4, 82);
-            this.ELFBaseSenaryoRadioButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFBaseSenaryoRadioButton.Margin = new System.Windows.Forms.Padding(4);
             this.ELFBaseSenaryoRadioButton.Name = "ELFBaseSenaryoRadioButton";
             this.ELFBaseSenaryoRadioButton.Size = new System.Drawing.Size(126, 27);
             this.ELFBaseSenaryoRadioButton.TabIndex = 25;
@@ -1559,7 +1559,7 @@ namespace SLF
             // pictureBox1
             // 
             this.pictureBox1.Location = new System.Drawing.Point(8, 302);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(305, 210);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -1618,7 +1618,7 @@ namespace SLF
             this.tab_senaryo.Location = new System.Drawing.Point(4, 56);
             this.tab_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tab_senaryo.Name = "tab_senaryo";
-            this.tab_senaryo.Size = new System.Drawing.Size(1768, 628);
+            this.tab_senaryo.Size = new System.Drawing.Size(1312, 628);
             this.tab_senaryo.TabIndex = 3;
             this.tab_senaryo.Text = "Senaryo Oluşturma Modülü";
             this.tab_senaryo.UseVisualStyleBackColor = true;
@@ -1629,9 +1629,9 @@ namespace SLF
             this.SenaryoModulePanel.Controls.Add(this.SenaryoModuleTabControl);
             this.SenaryoModulePanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SenaryoModulePanel.Location = new System.Drawing.Point(0, 0);
-            this.SenaryoModulePanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.SenaryoModulePanel.Margin = new System.Windows.Forms.Padding(4);
             this.SenaryoModulePanel.Name = "SenaryoModulePanel";
-            this.SenaryoModulePanel.Size = new System.Drawing.Size(1768, 628);
+            this.SenaryoModulePanel.Size = new System.Drawing.Size(1312, 628);
             this.SenaryoModulePanel.TabIndex = 0;
             this.SenaryoModulePanel.UseWaitCursor = true;
             // 
@@ -1646,10 +1646,10 @@ namespace SLF
             this.SenaryoModuleTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SenaryoModuleTabControl.ItemSize = new System.Drawing.Size(180, 40);
             this.SenaryoModuleTabControl.Location = new System.Drawing.Point(0, 0);
-            this.SenaryoModuleTabControl.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.SenaryoModuleTabControl.Margin = new System.Windows.Forms.Padding(4);
             this.SenaryoModuleTabControl.Name = "SenaryoModuleTabControl";
             this.SenaryoModuleTabControl.SelectedIndex = 0;
-            this.SenaryoModuleTabControl.Size = new System.Drawing.Size(1768, 628);
+            this.SenaryoModuleTabControl.Size = new System.Drawing.Size(1312, 628);
             this.SenaryoModuleTabControl.TabButtonHoverState.BorderColor = System.Drawing.Color.Empty;
             this.SenaryoModuleTabControl.TabButtonHoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
             this.SenaryoModuleTabControl.TabButtonHoverState.Font = new System.Drawing.Font("Segoe UI Semibold", 10F);
@@ -1674,10 +1674,10 @@ namespace SLF
             // 
             this.EkonometrikSenaryoTabPage.Controls.Add(this.EkonometrikSenaryoOutputsPanel);
             this.EkonometrikSenaryoTabPage.Location = new System.Drawing.Point(184, 4);
-            this.EkonometrikSenaryoTabPage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.EkonometrikSenaryoTabPage.Margin = new System.Windows.Forms.Padding(4);
             this.EkonometrikSenaryoTabPage.Name = "EkonometrikSenaryoTabPage";
-            this.EkonometrikSenaryoTabPage.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.EkonometrikSenaryoTabPage.Size = new System.Drawing.Size(1580, 620);
+            this.EkonometrikSenaryoTabPage.Padding = new System.Windows.Forms.Padding(4);
+            this.EkonometrikSenaryoTabPage.Size = new System.Drawing.Size(1124, 620);
             this.EkonometrikSenaryoTabPage.TabIndex = 0;
             this.EkonometrikSenaryoTabPage.Text = "Ekonometrik Senaryolar";
             this.EkonometrikSenaryoTabPage.UseVisualStyleBackColor = true;
@@ -1691,9 +1691,9 @@ namespace SLF
             this.EkonometrikSenaryoOutputsPanel.Controls.Add(this.ELFSenaryoTabControls);
             this.EkonometrikSenaryoOutputsPanel.Controls.Add(this.EkonometrikSenaryoElementsPanel);
             this.EkonometrikSenaryoOutputsPanel.Location = new System.Drawing.Point(4, 4);
-            this.EkonometrikSenaryoOutputsPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.EkonometrikSenaryoOutputsPanel.Margin = new System.Windows.Forms.Padding(4);
             this.EkonometrikSenaryoOutputsPanel.Name = "EkonometrikSenaryoOutputsPanel";
-            this.EkonometrikSenaryoOutputsPanel.Size = new System.Drawing.Size(1510, 611);
+            this.EkonometrikSenaryoOutputsPanel.Size = new System.Drawing.Size(1054, 611);
             this.EkonometrikSenaryoOutputsPanel.TabIndex = 0;
             this.EkonometrikSenaryoOutputsPanel.UseWaitCursor = true;
             // 
@@ -1708,10 +1708,10 @@ namespace SLF
             this.ELFSenaryoTabControls.Controls.Add(this.tabPage5);
             this.ELFSenaryoTabControls.Controls.Add(this.tabPage6);
             this.ELFSenaryoTabControls.Location = new System.Drawing.Point(4, 4);
-            this.ELFSenaryoTabControls.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFSenaryoTabControls.Margin = new System.Windows.Forms.Padding(4);
             this.ELFSenaryoTabControls.Name = "ELFSenaryoTabControls";
             this.ELFSenaryoTabControls.SelectedIndex = 0;
-            this.ELFSenaryoTabControls.Size = new System.Drawing.Size(1232, 616);
+            this.ELFSenaryoTabControls.Size = new System.Drawing.Size(776, 616);
             this.ELFSenaryoTabControls.TabIndex = 2;
             this.ELFSenaryoTabControls.UseWaitCursor = true;
             // 
@@ -1719,10 +1719,10 @@ namespace SLF
             // 
             this.tabPage2.Controls.Add(this.ELFMinSenaryoTable);
             this.tabPage2.Location = new System.Drawing.Point(4, 30);
-            this.tabPage2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage2.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.tabPage2.Size = new System.Drawing.Size(1224, 582);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(4);
+            this.tabPage2.Size = new System.Drawing.Size(768, 582);
             this.tabPage2.TabIndex = 0;
             this.tabPage2.Text = "Minimum Senaryo";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -1733,10 +1733,10 @@ namespace SLF
             this.ELFMinSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ELFMinSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFMinSenaryoTable.Location = new System.Drawing.Point(4, 4);
-            this.ELFMinSenaryoTable.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFMinSenaryoTable.Margin = new System.Windows.Forms.Padding(4);
             this.ELFMinSenaryoTable.Name = "ELFMinSenaryoTable";
             this.ELFMinSenaryoTable.RowHeadersWidth = 51;
-            this.ELFMinSenaryoTable.Size = new System.Drawing.Size(1216, 574);
+            this.ELFMinSenaryoTable.Size = new System.Drawing.Size(760, 574);
             this.ELFMinSenaryoTable.TabIndex = 0;
             this.ELFMinSenaryoTable.UseWaitCursor = true;
             // 
@@ -1744,10 +1744,10 @@ namespace SLF
             // 
             this.tabPage3.Controls.Add(this.ELFLowSenaryoTable);
             this.tabPage3.Location = new System.Drawing.Point(4, 30);
-            this.tabPage3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage3.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.tabPage3.Size = new System.Drawing.Size(1221, 578);
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(4);
+            this.tabPage3.Size = new System.Drawing.Size(768, 582);
             this.tabPage3.TabIndex = 1;
             this.tabPage3.Text = "Düşük Senaryo";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -1758,10 +1758,10 @@ namespace SLF
             this.ELFLowSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ELFLowSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFLowSenaryoTable.Location = new System.Drawing.Point(4, 4);
-            this.ELFLowSenaryoTable.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFLowSenaryoTable.Margin = new System.Windows.Forms.Padding(4);
             this.ELFLowSenaryoTable.Name = "ELFLowSenaryoTable";
             this.ELFLowSenaryoTable.RowHeadersWidth = 51;
-            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(1213, 570);
+            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(760, 574);
             this.ELFLowSenaryoTable.TabIndex = 1;
             this.ELFLowSenaryoTable.UseWaitCursor = true;
             // 
@@ -1769,10 +1769,10 @@ namespace SLF
             // 
             this.tabPage4.Controls.Add(this.ELFBaseSenaryoTable);
             this.tabPage4.Location = new System.Drawing.Point(4, 30);
-            this.tabPage4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage4.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.tabPage4.Size = new System.Drawing.Size(1221, 578);
+            this.tabPage4.Padding = new System.Windows.Forms.Padding(4);
+            this.tabPage4.Size = new System.Drawing.Size(768, 582);
             this.tabPage4.TabIndex = 2;
             this.tabPage4.Text = "Baz Senaryo";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -1783,10 +1783,10 @@ namespace SLF
             this.ELFBaseSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ELFBaseSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFBaseSenaryoTable.Location = new System.Drawing.Point(4, 4);
-            this.ELFBaseSenaryoTable.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFBaseSenaryoTable.Margin = new System.Windows.Forms.Padding(4);
             this.ELFBaseSenaryoTable.Name = "ELFBaseSenaryoTable";
             this.ELFBaseSenaryoTable.RowHeadersWidth = 51;
-            this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(1213, 570);
+            this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(760, 574);
             this.ELFBaseSenaryoTable.TabIndex = 1;
             this.ELFBaseSenaryoTable.UseWaitCursor = true;
             // 
@@ -1794,10 +1794,10 @@ namespace SLF
             // 
             this.tabPage5.Controls.Add(this.ELFHighSenaryoTable);
             this.tabPage5.Location = new System.Drawing.Point(4, 30);
-            this.tabPage5.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage5.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.tabPage5.Size = new System.Drawing.Size(1221, 578);
+            this.tabPage5.Padding = new System.Windows.Forms.Padding(4);
+            this.tabPage5.Size = new System.Drawing.Size(768, 582);
             this.tabPage5.TabIndex = 3;
             this.tabPage5.Text = "Yüksek Senaryo";
             this.tabPage5.UseVisualStyleBackColor = true;
@@ -1808,10 +1808,10 @@ namespace SLF
             this.ELFHighSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ELFHighSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFHighSenaryoTable.Location = new System.Drawing.Point(4, 4);
-            this.ELFHighSenaryoTable.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFHighSenaryoTable.Margin = new System.Windows.Forms.Padding(4);
             this.ELFHighSenaryoTable.Name = "ELFHighSenaryoTable";
             this.ELFHighSenaryoTable.RowHeadersWidth = 51;
-            this.ELFHighSenaryoTable.Size = new System.Drawing.Size(1213, 570);
+            this.ELFHighSenaryoTable.Size = new System.Drawing.Size(760, 574);
             this.ELFHighSenaryoTable.TabIndex = 1;
             this.ELFHighSenaryoTable.UseWaitCursor = true;
             // 
@@ -1819,10 +1819,10 @@ namespace SLF
             // 
             this.tabPage6.Controls.Add(this.ELFMaxSenaryoTable);
             this.tabPage6.Location = new System.Drawing.Point(4, 30);
-            this.tabPage6.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage6.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage6.Name = "tabPage6";
-            this.tabPage6.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.tabPage6.Size = new System.Drawing.Size(1221, 578);
+            this.tabPage6.Padding = new System.Windows.Forms.Padding(4);
+            this.tabPage6.Size = new System.Drawing.Size(768, 582);
             this.tabPage6.TabIndex = 4;
             this.tabPage6.Text = "Maksimum Senaryo";
             this.tabPage6.UseVisualStyleBackColor = true;
@@ -1833,10 +1833,10 @@ namespace SLF
             this.ELFMaxSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ELFMaxSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFMaxSenaryoTable.Location = new System.Drawing.Point(4, 4);
-            this.ELFMaxSenaryoTable.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFMaxSenaryoTable.Margin = new System.Windows.Forms.Padding(4);
             this.ELFMaxSenaryoTable.Name = "ELFMaxSenaryoTable";
             this.ELFMaxSenaryoTable.RowHeadersWidth = 51;
-            this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(1213, 570);
+            this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(760, 574);
             this.ELFMaxSenaryoTable.TabIndex = 1;
             this.ELFMaxSenaryoTable.UseWaitCursor = true;
             // 
@@ -1847,8 +1847,8 @@ namespace SLF
             this.EkonometrikSenaryoElementsPanel.Controls.Add(this.ELFPredictionShowResultsGunaButton);
             this.EkonometrikSenaryoElementsPanel.Controls.Add(this.ELFScenerioSaveGunaButton);
             this.EkonometrikSenaryoElementsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.EkonometrikSenaryoElementsPanel.Location = new System.Drawing.Point(1234, 0);
-            this.EkonometrikSenaryoElementsPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.EkonometrikSenaryoElementsPanel.Location = new System.Drawing.Point(778, 0);
+            this.EkonometrikSenaryoElementsPanel.Margin = new System.Windows.Forms.Padding(4);
             this.EkonometrikSenaryoElementsPanel.Name = "EkonometrikSenaryoElementsPanel";
             this.EkonometrikSenaryoElementsPanel.Size = new System.Drawing.Size(276, 611);
             this.EkonometrikSenaryoElementsPanel.TabIndex = 1;
@@ -1860,7 +1860,7 @@ namespace SLF
             this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.richTextBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.richTextBox1.Location = new System.Drawing.Point(9, 39);
-            this.richTextBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.richTextBox1.Margin = new System.Windows.Forms.Padding(4);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.Size = new System.Drawing.Size(271, 122);
             this.richTextBox1.TabIndex = 10;
@@ -1877,7 +1877,7 @@ namespace SLF
             this.ELFPredictionShowResultsGunaButton.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.ELFPredictionShowResultsGunaButton.ForeColor = System.Drawing.Color.White;
             this.ELFPredictionShowResultsGunaButton.Location = new System.Drawing.Point(0, 287);
-            this.ELFPredictionShowResultsGunaButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFPredictionShowResultsGunaButton.Margin = new System.Windows.Forms.Padding(4);
             this.ELFPredictionShowResultsGunaButton.Name = "ELFPredictionShowResultsGunaButton";
             this.ELFPredictionShowResultsGunaButton.Size = new System.Drawing.Size(272, 55);
             this.ELFPredictionShowResultsGunaButton.TabIndex = 9;
@@ -1894,7 +1894,7 @@ namespace SLF
             this.ELFScenerioSaveGunaButton.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.ELFScenerioSaveGunaButton.ForeColor = System.Drawing.Color.White;
             this.ELFScenerioSaveGunaButton.Location = new System.Drawing.Point(0, 209);
-            this.ELFScenerioSaveGunaButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFScenerioSaveGunaButton.Margin = new System.Windows.Forms.Padding(4);
             this.ELFScenerioSaveGunaButton.Name = "ELFScenerioSaveGunaButton";
             this.ELFScenerioSaveGunaButton.Size = new System.Drawing.Size(275, 55);
             this.ELFScenerioSaveGunaButton.TabIndex = 6;
@@ -1905,10 +1905,10 @@ namespace SLF
             // StokastikSenaryoTabPage
             // 
             this.StokastikSenaryoTabPage.Location = new System.Drawing.Point(184, 4);
-            this.StokastikSenaryoTabPage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.StokastikSenaryoTabPage.Margin = new System.Windows.Forms.Padding(4);
             this.StokastikSenaryoTabPage.Name = "StokastikSenaryoTabPage";
-            this.StokastikSenaryoTabPage.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.StokastikSenaryoTabPage.Size = new System.Drawing.Size(1577, 616);
+            this.StokastikSenaryoTabPage.Padding = new System.Windows.Forms.Padding(4);
+            this.StokastikSenaryoTabPage.Size = new System.Drawing.Size(1124, 620);
             this.StokastikSenaryoTabPage.TabIndex = 1;
             this.StokastikSenaryoTabPage.Text = "Stokastik Senaryolar";
             this.StokastikSenaryoTabPage.UseVisualStyleBackColor = true;
@@ -1917,10 +1917,10 @@ namespace SLF
             // EASarjSenaryoTabPage
             // 
             this.EASarjSenaryoTabPage.Location = new System.Drawing.Point(184, 4);
-            this.EASarjSenaryoTabPage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.EASarjSenaryoTabPage.Margin = new System.Windows.Forms.Padding(4);
             this.EASarjSenaryoTabPage.Name = "EASarjSenaryoTabPage";
-            this.EASarjSenaryoTabPage.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.EASarjSenaryoTabPage.Size = new System.Drawing.Size(1577, 616);
+            this.EASarjSenaryoTabPage.Padding = new System.Windows.Forms.Padding(4);
+            this.EASarjSenaryoTabPage.Size = new System.Drawing.Size(1124, 620);
             this.EASarjSenaryoTabPage.TabIndex = 2;
             this.EASarjSenaryoTabPage.Text = "EA Şarj Senaryoları";
             this.EASarjSenaryoTabPage.UseVisualStyleBackColor = true;
@@ -1929,10 +1929,10 @@ namespace SLF
             // DEKSenaryoTabPage
             // 
             this.DEKSenaryoTabPage.Location = new System.Drawing.Point(184, 4);
-            this.DEKSenaryoTabPage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.DEKSenaryoTabPage.Margin = new System.Windows.Forms.Padding(4);
             this.DEKSenaryoTabPage.Name = "DEKSenaryoTabPage";
-            this.DEKSenaryoTabPage.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.DEKSenaryoTabPage.Size = new System.Drawing.Size(1577, 616);
+            this.DEKSenaryoTabPage.Padding = new System.Windows.Forms.Padding(4);
+            this.DEKSenaryoTabPage.Size = new System.Drawing.Size(1124, 620);
             this.DEKSenaryoTabPage.TabIndex = 3;
             this.DEKSenaryoTabPage.Text = "DEK Senaryoları";
             this.DEKSenaryoTabPage.UseVisualStyleBackColor = true;
@@ -1941,10 +1941,10 @@ namespace SLF
             // tabPage8
             // 
             this.tabPage8.Location = new System.Drawing.Point(184, 4);
-            this.tabPage8.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage8.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage8.Name = "tabPage8";
-            this.tabPage8.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.tabPage8.Size = new System.Drawing.Size(1577, 616);
+            this.tabPage8.Padding = new System.Windows.Forms.Padding(4);
+            this.tabPage8.Size = new System.Drawing.Size(1124, 620);
             this.tabPage8.TabIndex = 4;
             this.tabPage8.Text = "Yeni Genişleme Alanları ";
             this.tabPage8.UseVisualStyleBackColor = true;
@@ -2034,6 +2034,7 @@ namespace SLF
             // 
             // yenidenAdlandırToolStripMenuItem
             // 
+            this.yenidenAdlandırToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("yenidenAdlandırToolStripMenuItem.Image")));
             this.yenidenAdlandırToolStripMenuItem.Name = "yenidenAdlandırToolStripMenuItem";
             this.yenidenAdlandırToolStripMenuItem.Size = new System.Drawing.Size(195, 26);
             this.yenidenAdlandırToolStripMenuItem.Text = "Yeniden Adlandır";
@@ -2916,11 +2917,10 @@ namespace SLF
             this.ModuleTabPanel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.ModuleTabPanel.Controls.Add(this.Modül_Tabları);
             this.ModuleTabPanel.Location = new System.Drawing.Point(0, 66);
-            this.ModuleTabPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ModuleTabPanel.Margin = new System.Windows.Forms.Padding(4);
             this.ModuleTabPanel.Name = "ModuleTabPanel";
             this.ModuleTabPanel.Size = new System.Drawing.Size(1320, 688);
             this.ModuleTabPanel.TabIndex = 5;
-            this.ModuleTabPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.ModuleTabPanel_Paint);
             // 
             // HeaderPanel
             // 
@@ -2929,7 +2929,7 @@ namespace SLF
             this.HeaderPanel.BackColor = System.Drawing.Color.NavajoWhite;
             this.HeaderPanel.Controls.Add(this.HomePageButton);
             this.HeaderPanel.Location = new System.Drawing.Point(0, 30);
-            this.HeaderPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.HeaderPanel.Margin = new System.Windows.Forms.Padding(4);
             this.HeaderPanel.Name = "HeaderPanel";
             this.HeaderPanel.Size = new System.Drawing.Size(1776, 42);
             this.HeaderPanel.TabIndex = 3;

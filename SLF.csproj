@@ -572,6 +572,7 @@
     <Compile Include="Ana_Menü.Designer.cs">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
     </Compile>
+    <Compile Include="CBS.cs" />
     <Compile Include="CsvHandler.cs" />
     <Compile Include="ExcelExporter.cs" />
     <Compile Include="MethodForm.cs">
