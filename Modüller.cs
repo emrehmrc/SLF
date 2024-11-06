@@ -162,7 +162,7 @@ namespace SLF
             // ComboBox olaylarını bağla
             comboBox1.SelectedIndexChanged += yilSecimiMonteCarlo;
             comboBox2.SelectedIndexChanged += ilSecimiMonteCarlo;
-
+            comboBox3.SelectedIndexChanged += dek_list_years;
             // İlk durumda tüm marker'ları göster
             ToggleMarkers("AC-HOME", checkBox22.Checked);
             ToggleMarkers("AC-WORK", checkBox23.Checked);
@@ -170,8 +170,8 @@ namespace SLF
             ToggleMarkers("Fast-DC", checkBox25.Checked);
         }
         // Nokta veri yapısı
-        public int SelectedYear
-        {
+        public int SelectedYear 
+        {  // ea ve dek yıl ekranları 
             get => _selectedYear;
             set
             {
@@ -267,18 +267,22 @@ namespace SLF
                 yearList.Add(year);
             }
             comboBox1.DataSource = yearList; // Yıl seçimi için ComboBox1
-
+            comboBox3.DataSource = yearList; // DEK yılı seçimi için ComboBox3
             // Şehir isimlerini ComboBox2'ye ekleyin
-            comboBox2.Items.Clear();
+            comboBox4.Items.Clear(); // dek
+            comboBox2.Items.Clear();   // ea 
             comboBox2.Items.Add("İzmir");
             comboBox2.Items.Add("Eskişehir");
+            comboBox4.Items.Add("İzmir");
+            comboBox4.Items.Add("Eskişehir");
         }
         private void InitializeFormComponents()
         {
             InitializeGMap(gMapControl_stokastik);
             InitializeGMap(gMapControl_EA);
             InitializeGMap(gMapControl_Dek);
-
+            InitializeGMap(gMapControl_optimal_dtr);
+            
             SortTabPagesAlphabetically(Modül_Tabları, true);
             // Enable double buffering for the form to reduce flickering
             this.DoubleBuffered = true;
@@ -5577,7 +5581,7 @@ namespace SLF
             }
             else if (SelectedCity == "Eskişehir")
             {
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\Arşiv\montecarlo-deneme-Eskisehir.xlsx";
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\Arşiv\evcs_monte_carlo_distribution_updated_esk.xlsx";
             }
             else
             {
@@ -5605,17 +5609,18 @@ namespace SLF
                 MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
                 return; // Hata durumunda işlemi sonlandır
             }
-
+            DataTable cıktıPopup = FormatEATableForDisplay(veriMonteCarlo);
             // Yeni bir DataGridView oluştur
             DataGridView dataGridView = new DataGridView
             {
-                DataSource = veriMonteCarlo,  // DataTable'ı bağla
+                DataSource = cıktıPopup,  // DataTable'ı bağla
                 Dock = DockStyle.Fill,        // Formu doldurması için konumunu ayarla
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill // Sütunları otomatik boyutlandır
             };
 
             // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
             HesaplaMerkezNoktaVeEkle(veriMonteCarlo);
+            
             await HaritaUzerindeSimulasyonGosterimi(veriMonteCarlo);
 
             // Önceki popupForm varsa kapatın
@@ -5848,6 +5853,218 @@ namespace SLF
             ToggleMarkers("DC-Fast", checkBox25.Checked);
 
         }
+
+        private void dek_list_years(object sender, EventArgs e) // 
+        {
+            if (comboBox3.SelectedIndex != -1)  // Geçerli bir seçim yapıldığında
+            {
+                SelectedYear = comboBox3.SelectedIndex;  // Yıl indeksini ayarla
+                CheckSelections();  // Seçim durumunu kontrol et
+            }
+        }
+
+        private void dek_city_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox4.SelectedItem != null)  // Geçerli bir seçim yapıldığında
+            {
+                SelectedCity = comboBox4.SelectedItem.ToString();  // Şehir adını ayarla
+                CheckSelections();  // Seçim durumunu kontrol et
+            }
+        }
+        private async void dekSimulasyonGoruntule(object sender, EventArgs e)
+        {
+            // Checkbox'ları görünür hale getir
+            
+
+            // Şehir seçimine göre dosya yolunu ayarla
+            string filePath = "";
+
+            if (SelectedCity == "İzmir")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\dek_distribution_2025_2030_2_1-izmir.xlsx";
+            }
+            else if (SelectedCity == "Eskişehir")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\DEK\eskisehir-dek-verileri.xlsx";
+            }
+            else
+            {
+                MessageBox.Show("Lütfen geçerli bir şehir seçiniz.");
+                return; // Geçerli bir şehir seçilmediyse işlemi sonlandır
+            }
+
+            DataTable dek_veri;
+
+            try
+            {
+                // Excel dosyasını aç
+                using (var package = new ExcelPackage(new FileInfo(filePath)))
+                {
+                    // Yıl seçimine göre sayfayı seç (SelectedYear değeri, sayfa indeksini temsil eder)
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
+
+                    // Veriyi DataTable'a yükle
+                    dek_veri = excelService.LoadWorksheetIntoDataTable(worksheet);
+                }
+
+                // Veri başarıyla yüklendiğinde bir bildirim gösterin
+                MessageBox.Show("Veri başarıyla yüklendi.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
+                return; // Hata durumunda işlemi sonlandır
+            }
+
+            // Yeni bir DataGridView oluştur
+            HesaplaMerkezNoktaVeEkle(dek_veri);
+            DataTable dekResultPopup = FormatDEKTableForDisplay(dek_veri);
+
+            DataGridView dataGridView = new DataGridView
+            {
+                DataSource = dekResultPopup,  // DataTable'ı bağla
+                Dock = DockStyle.Fill,        // Formu doldurması için konumunu ayarla
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill // Sütunları otomatik boyutlandır
+            };
+
+            // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
+           
+            
+            await HaritaUzerindeDEKSimulasyonGosterimi(dek_veri);
+            //await HaritaUzerindeDekSimulasyonGosterimi(dek_veri);
+
+            // Önceki popupForm varsa kapatın
+            if (popupForm != null && !popupForm.IsDisposed)
+            {
+                popupForm.Close();
+                popupForm.Dispose();  // Eski formu serbest bırak
+            }
+
+            // Yeni popupForm'u oluşturun ve açın
+            popupForm = new Form
+            {
+                Text = "DEK Hücre Analizi",
+                Width = 800,
+                Height = 600
+            };
+
+            popupForm.Controls.Add(dataGridView);
+            popupForm.Show(); // Yeni pencereyi göster
+        }
+
+        private Task HaritaUzerindeDEKSimulasyonGosterimi(DataTable veriTablosu)
+        {
+            // DEK için özel bir GMap overlay katmanı oluştur
+            GMapOverlay dekOverlay = new GMapOverlay("DEK_Simulasyon_Layer");
+
+            foreach (DataRow row in veriTablosu.Rows)
+            {
+                // Sadece DEK_distributed değeri 0'dan büyük olan satırları işleme al
+                if (row["DEK_distributed"] != DBNull.Value && Convert.ToDouble(row["DEK_distributed"]) > 0)
+                {
+                    // Enlem ve Boylam değerlerini al
+                    double enlem = Convert.ToDouble(row["Enlem"]);
+                    double boylam = Convert.ToDouble(row["Boylam"]);
+
+                    // ID ve DEK_distributed değerlerini al
+                    string id = row["id"].ToString();
+                    double dekValue = Convert.ToDouble(row["DEK_distributed"]);
+
+                    // Yeni bir marker oluştur ve haritada göster
+                    var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.blue);
+                    marker.ToolTipText = $"ID: {id}\nDEK: {dekValue}";
+
+                    // Marker'ı overlay'e ekle
+                    dekOverlay.Markers.Add(marker);
+                }
+            }
+
+            // DEK overlay'ini haritada göster
+            gMapControl_Dek.Overlays.Clear();
+            gMapControl_Dek.Overlays.Add(dekOverlay);
+            gMapControl_Dek.Refresh(); // Haritayı güncelle
+
+            return Task.CompletedTask;
+        }
+        private DataTable FormatDEKTableForDisplay(DataTable originalDEKTable)
+        {
+            // Yeni bir DataTable oluşturun
+            DataTable formattedDEKTable = new DataTable();
+
+            // İhtiyacınız olan sütunları ekleyin
+            formattedDEKTable.Columns.Add("ID", typeof(string));
+            formattedDEKTable.Columns.Add("Ilce", typeof(string)); // İlçe isimleri Çiğli ve Karşıyaka olarak ayarlanacak
+            formattedDEKTable.Columns.Add("DEK Değeri", typeof(double));
+            
+
+            // Orijinal tablodaki her bir satırı işleyin
+            foreach (DataRow row in originalDEKTable.Rows)
+            {
+                // `DEK_distributed` değeri 0 olan satırları atla
+                if (row["DEK_distributed"] != DBNull.Value && Convert.ToDouble(row["DEK_distributed"]) != 0)
+                {
+                    // Yeni bir satır oluşturun
+                    DataRow newRow = formattedDEKTable.NewRow();
+
+                    // ID, İlçe ve diğer sütunları doldurun
+                    newRow["ID"] = row["id"].ToString();
+
+                    // İlçe değerini dönüştür (1 = Çiğli, 2 = Karşıyaka, diğerleri "Bilinmeyen")
+                    int ilceValue = Convert.ToInt32(row["ilce"]);
+                    newRow["Ilce"] = ilceValue == 1 ? "Çiğli" : ilceValue == 2 ? "Karşıyaka" : "Bilinmeyen";
+
+                    // Diğer değerler
+                    newRow["DEK Değeri"] = Convert.ToDouble(row["DEK_distributed"]);
+                    //newRow["Enlem"] = Convert.ToDouble(row["Enlem"]);
+                    //newRow["Boylam"] = Convert.ToDouble(row["Boylam"]);
+
+                    // Yeni satırı formatlanmış tabloya ekleyin
+                    formattedDEKTable.Rows.Add(newRow);
+                }
+            }
+
+            return formattedDEKTable;
+        }
+        private DataTable FormatEATableForDisplay(DataTable originalEATable)
+        {
+            // Yeni bir DataTable oluşturun
+            DataTable formattedEATable = new DataTable();
+
+            // İhtiyacınız olan sütunları ekleyin
+            formattedEATable.Columns.Add("ID", typeof(string));
+            formattedEATable.Columns.Add("Ilce", typeof(string)); // İlçe isimleri Çiğli ve Karşıyaka olarak ayarlanacak
+            formattedEATable.Columns.Add("AC (Home)", typeof(int));
+            formattedEATable.Columns.Add("AC (Work)", typeof(int));
+            formattedEATable.Columns.Add("AC (Public)", typeof(int));
+            formattedEATable.Columns.Add("Fast DC", typeof(int));
+
+            // Orijinal tablodaki her bir satırı işleyin
+            foreach (DataRow row in originalEATable.Rows)
+            {
+                // Yeni bir satır oluşturun
+                DataRow newRow = formattedEATable.NewRow();
+
+                // ID değerini alın
+                newRow["ID"] = row["id"].ToString();
+
+                // İlçe değerini dönüştür (1 = Çiğli, 2 = Karşıyaka)
+                int ilceValue = Convert.ToInt32(row["ilce"]);
+                newRow["Ilce"] = ilceValue == 1 ? "Çiğli" : ilceValue == 2 ? "Karşıyaka" : "Eskişehir";
+
+                // AC ve DC istasyon sayısını alın
+                newRow["AC (Home)"] = Convert.ToInt32(row["AC (Home)_count"]);
+                newRow["AC (Work)"] = Convert.ToInt32(row["AC (Work)_count"]);
+                newRow["AC (Public)"] = Convert.ToInt32(row["AC (Public)_count"]);
+                newRow["Fast DC"] = Convert.ToInt32(row["Fast DC_count"]);
+
+                // Yeni satırı formatlanmış tabloya ekleyin
+                formattedEATable.Rows.Add(newRow);
+            }
+
+            return formattedEATable;
+        }
+
+        
 
         private void Dek_Grid_Oluştur_Click(object sender, EventArgs e)
         {
