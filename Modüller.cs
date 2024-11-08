@@ -138,7 +138,7 @@ namespace SLF
         private void Form1_Load(object sender, EventArgs e)
         {
             // Başlangıçta butonu devre dışı bırak
-            button1.Enabled = false;
+            GelecekSimButton.Enabled = false;
 
             // Checkbox'ları başlangıçta görünmez yap
             checkBox22.Visible = false;
@@ -2263,12 +2263,12 @@ namespace SLF
             string url2 = "https://www.openstreetmap.org/#map=15/38.4600/27.1153";
             webView21.CoreWebView2.Navigate(url2);
         }
-        private void button7_Click(object sender, EventArgs e)
+/*        private void button7_Click(object sender, EventArgs e) //EA EKRANINDAN KALDIRILAN CSV YÜKLE BUTONU EVENTİ 
         {
             Modül_Tabları.SelectTab(tab_girdi);
             veri_listesi_seçimi.Text = "EA Şarj Verileri";
             veri_listesi_seçimi.Enabled = false;
-        }
+        }*/
 
         private void button8_Click(object sender, EventArgs e)
         {
@@ -3790,7 +3790,7 @@ namespace SLF
 
         }
 
-        private void ButtonKml_Click(object sender, EventArgs e)
+/*        private void ButtonKml_Click(object sender, EventArgs e) //EA EKRANINDAN KALDIRILAN KML YÜKLE BUTONU EVENTİ
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "KML Files (*.kml)|*.kml|All files (*.*)|*.*";
@@ -3801,7 +3801,7 @@ namespace SLF
                 string kmlFilePath = openFileDialog.FileName;
                 KMLYukle(kmlFilePath);
             }
-        }
+        }*/
 
         private void KMLYukle(string kmlFilePath)
         {
@@ -5679,7 +5679,7 @@ namespace SLF
         private void CheckSelections()
         {
             // Seçimlerin yapıldığını kontrol ederek butonu etkinleştir
-            button1.Enabled = SelectedYear != -1 && SelectedCity != null;
+            GelecekSimButton.Enabled = SelectedYear != -1 && SelectedCity != null;
         }
 
         // Yıl seçimi yapıldığında çağrılan metot
