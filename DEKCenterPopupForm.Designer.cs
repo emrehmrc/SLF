@@ -32,12 +32,8 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DEKCenterPopupForm));
             this.DEKCenterDataGridView = new Guna.UI2.WinForms.Guna2DataGridView();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.DEKCancelButton = new Guna.UI2.WinForms.Guna2Button();
-            this.DEKTamamButton = new Guna.UI2.WinForms.Guna2Button();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.guna2AnimateWindow1 = new Guna.UI2.WinForms.Guna2AnimateWindow(this.components);
             this.ILCE_ADI = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.KAYNAK_TIPI = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.DEK_KURULU_GUCU = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -45,6 +41,11 @@
             this.DEK_Y_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DEK_TM_ADI = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DEK_KURULUM_YERI = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.DEKCancelButton = new Guna.UI2.WinForms.Guna2Button();
+            this.DEKTamamButton = new Guna.UI2.WinForms.Guna2Button();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.guna2AnimateWindow1 = new Guna.UI2.WinForms.Guna2AnimateWindow(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.DEKCenterDataGridView)).BeginInit();
             this.panel2.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -113,6 +114,57 @@
             this.DEKCenterDataGridView.ThemeStyle.RowsStyle.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255)))));
             this.DEKCenterDataGridView.ThemeStyle.RowsStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
             // 
+            // ILCE_ADI
+            // 
+            this.ILCE_ADI.FillWeight = 57.73196F;
+            this.ILCE_ADI.HeaderText = "ILCE_ADI";
+            this.ILCE_ADI.Name = "ILCE_ADI";
+            this.ILCE_ADI.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.ILCE_ADI.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // KAYNAK_TIPI
+            // 
+            this.KAYNAK_TIPI.FillWeight = 84.90324F;
+            this.KAYNAK_TIPI.HeaderText = "KAYNAK_TIPI";
+            this.KAYNAK_TIPI.Name = "KAYNAK_TIPI";
+            this.KAYNAK_TIPI.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            // 
+            // DEK_KURULU_GUCU
+            // 
+            this.DEK_KURULU_GUCU.FillWeight = 120.7607F;
+            this.DEK_KURULU_GUCU.HeaderText = "DEK_KURULU_GUCU";
+            this.DEK_KURULU_GUCU.Name = "DEK_KURULU_GUCU";
+            this.DEK_KURULU_GUCU.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.DEK_KURULU_GUCU.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // DEK_X_KOORDINAT
+            // 
+            this.DEK_X_KOORDINAT.FillWeight = 129.1611F;
+            this.DEK_X_KOORDINAT.HeaderText = "DEK_X_KOORDINAT";
+            this.DEK_X_KOORDINAT.Name = "DEK_X_KOORDINAT";
+            this.DEK_X_KOORDINAT.ReadOnly = true;
+            // 
+            // DEK_Y_KOORDINAT
+            // 
+            this.DEK_Y_KOORDINAT.FillWeight = 120.1783F;
+            this.DEK_Y_KOORDINAT.HeaderText = "DEK_Y_KOORDINAT";
+            this.DEK_Y_KOORDINAT.Name = "DEK_Y_KOORDINAT";
+            this.DEK_Y_KOORDINAT.ReadOnly = true;
+            // 
+            // DEK_TM_ADI
+            // 
+            this.DEK_TM_ADI.FillWeight = 66.81672F;
+            this.DEK_TM_ADI.HeaderText = "DEK_TM_ADI";
+            this.DEK_TM_ADI.Name = "DEK_TM_ADI";
+            this.DEK_TM_ADI.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.DEK_TM_ADI.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // DEK_KURULUM_YERI
+            // 
+            this.DEK_KURULUM_YERI.FillWeight = 120.448F;
+            this.DEK_KURULUM_YERI.HeaderText = "DEK_KURULUM_YERI";
+            this.DEK_KURULUM_YERI.Name = "DEK_KURULUM_YERI";
+            // 
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.NavajoWhite;
@@ -166,57 +218,6 @@
             this.panel1.Size = new System.Drawing.Size(1029, 455);
             this.panel1.TabIndex = 3;
             // 
-            // ILCE_ADI
-            // 
-            this.ILCE_ADI.FillWeight = 57.73196F;
-            this.ILCE_ADI.HeaderText = "ILCE_ADI";
-            this.ILCE_ADI.Name = "ILCE_ADI";
-            this.ILCE_ADI.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.ILCE_ADI.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // KAYNAK_TIPI
-            // 
-            this.KAYNAK_TIPI.FillWeight = 84.90324F;
-            this.KAYNAK_TIPI.HeaderText = "KAYNAK_TIPI";
-            this.KAYNAK_TIPI.Name = "KAYNAK_TIPI";
-            this.KAYNAK_TIPI.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            // 
-            // DEK_KURULU_GUCU
-            // 
-            this.DEK_KURULU_GUCU.FillWeight = 120.7607F;
-            this.DEK_KURULU_GUCU.HeaderText = "DEK_KURULU_GUCU";
-            this.DEK_KURULU_GUCU.Name = "DEK_KURULU_GUCU";
-            this.DEK_KURULU_GUCU.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.DEK_KURULU_GUCU.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // DEK_X_KOORDINAT
-            // 
-            this.DEK_X_KOORDINAT.FillWeight = 129.1611F;
-            this.DEK_X_KOORDINAT.HeaderText = "DEK_X_KOORDINAT";
-            this.DEK_X_KOORDINAT.Name = "DEK_X_KOORDINAT";
-            this.DEK_X_KOORDINAT.ReadOnly = true;
-            // 
-            // DEK_Y_KOORDINAT
-            // 
-            this.DEK_Y_KOORDINAT.FillWeight = 120.1783F;
-            this.DEK_Y_KOORDINAT.HeaderText = "DEK_Y_KOORDINAT";
-            this.DEK_Y_KOORDINAT.Name = "DEK_Y_KOORDINAT";
-            this.DEK_Y_KOORDINAT.ReadOnly = true;
-            // 
-            // DEK_TM_ADI
-            // 
-            this.DEK_TM_ADI.FillWeight = 66.81672F;
-            this.DEK_TM_ADI.HeaderText = "DEK_TM_ADI";
-            this.DEK_TM_ADI.Name = "DEK_TM_ADI";
-            this.DEK_TM_ADI.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.DEK_TM_ADI.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // DEK_KURULUM_YERI
-            // 
-            this.DEK_KURULUM_YERI.FillWeight = 120.448F;
-            this.DEK_KURULUM_YERI.HeaderText = "DEK_KURULUM_YERI";
-            this.DEK_KURULUM_YERI.Name = "DEK_KURULUM_YERI";
-            // 
             // DEKCenterPopupForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -224,6 +225,7 @@
             this.ClientSize = new System.Drawing.Size(1029, 455);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "DEKCenterPopupForm";
             this.Text = "DEK Merkezi Bilgileri";
             ((System.ComponentModel.ISupportInitialize)(this.DEKCenterDataGridView)).EndInit();
