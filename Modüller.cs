@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net.Configuration;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
@@ -129,11 +130,11 @@ namespace SLF
         public int secondLayerToJoin;
         public string firstLayerName;
         public string secondLayerName;
-
+        List<string> modulescheck = new List<string>();
         // variables that are to be used to export .kml files
         public Dictionary<GMapPolygon, DataRow> polygonAttributes_kml;
         public Dictionary<GMapRoute, DataRow> routeAttributes_kml;
-        private bool isDtrLoaded = false;
+        
         private void Form1_Load(object sender, EventArgs e)
         {
             // Başlangıçta butonu devre dışı bırak
@@ -4232,18 +4233,23 @@ namespace SLF
             girdiModülü = girdiModülleri[seçilenVeriTipi];
             girdiModülü.SlfStartYear = slfStartYear;
             girdiModülü.SlfEndYear = slfEndYear;
-            InitializeComboBoxes();
+
+            InitializeComboBoxes(); // yılların guncellenmesi 
             // Check if "ELF" is selected to skip prerequisites
             bool skipPrerequisites = (selectedMethod == "ELF (Ekonometrik)");
 
             // Call VEERProcess with skipPrerequisites flag
             var isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
+
             if (isImported)
             {
-                
+                modulescheck.Add(seçilenVeriTipi);
                 veri_listesi_seçimi.Refresh();
-                
+                Console.WriteLine(modulescheck.Count);
                 dataGridView1.DataSource = girdiModülü.CurrentDataTable;
+                
+
+
             }
         }
 
@@ -4803,12 +4809,14 @@ namespace SLF
             // Eğer "DTR Verileri" yüklüyse isDtrLoaded'ı true yap ve renk yeşil olsun
             if (text == "DTR Verileri" && girdiModülü.importedDataTable.Rows.Count > 0)
             {
-                isDtrLoaded = true;
+                
                 textColor = Color.Green;
+                
             }
             if (girdiModülü.importedDataTable.Rows.Count > 0)
             {
                 textColor = Color.Green;
+
             }
 
             e.DrawBackground();
@@ -4816,10 +4824,12 @@ namespace SLF
             using (Brush brush = new SolidBrush(textColor))
             {
                 e.Graphics.DrawString(text, e.Font, brush, e.Bounds);
+               
             }
 
             // Draw the focus rectangle if the item is selected
             e.DrawFocusRectangle();
+            
         }
 
         // Modül tabları geçişini kontrol etmek için Selecting olayını kullanıyoruz
@@ -5423,23 +5433,46 @@ namespace SLF
 
         private async void Modül_Tabları_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // Eğer DTR Verileri henüz yüklenmediyse, kullanıcı sadece "Girdi Modülü" sekmesine erişebilir
-            if (!isDtrLoaded && Modül_Tabları.SelectedTab != tab_girdi && selectedMethod == "SLF (Jeo-Uzamsal)")
+            // Gerekli kontrolleri yapmak için seçilen sekmeyi ve modülleri kontrol et
+            string selectedTabText = Modül_Tabları.SelectedTab.Text;
+
+            // Modüllerin yüklü olup olmadığını kontrol et
+            if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
-                // Sekme geçişini tamamen iptal et
-                MessageBox.Show("DTR verileri yüklenmeden diğer sekmelere geçiş yapılamaz.");
-                Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
-                Modül_Tabları.SelectedTab = tab_girdi;
-                Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
-                return;
+                if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Haritası Modülü") && !modulescheck.Contains("DTR Verileri"))
+                {
+                    // Sekme geçişini tamamen iptal et
+                    MessageBox.Show("DTR verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
+                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
+                    return;
+                }
+                else if (selectedTabText == "İmar Analizleri" && !modulescheck.Contains("İmar Planı"))
+                {
+                    // Sekme geçişini tamamen iptal et
+                    MessageBox.Show("İmar planı verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
+                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
+                    return;
+                }
+                else if (selectedTabText == "Optimal DTR Konumlandırma" && (!modulescheck.Contains("DTR Verileri") || !modulescheck.Contains("İmar Planı")))
+                {
+                    // Sekme geçişini tamamen iptal et
+                    MessageBox.Show("DTR verileri ve İmar planı yüklenmeden bu sekmeye geçiş yapılamaz.");
+                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
+                    return;
+                }
             }
 
             // EA Şarj Modülü tabına tıklanmışsa
-            if (Modül_Tabları.SelectedTab.Text == "EA Şarj Modülü")
+            if (selectedTabText == "EA Şarj Modülü")
             {
                 if (dataGridView1.DataSource == null)
                 {
-                    
                     MessageBox.Show("Lütfen önce verileri yükleyin.");
                     return;
                 }
@@ -5449,7 +5482,7 @@ namespace SLF
                 await eaHaritayaVeriYukleAsync();
             }
             // DEK Modülü tabına tıklanmışsa
-            else if (Modül_Tabları.SelectedTab.Text == "DEK Modülü")
+            else if (selectedTabText == "DEK Modülü")
             {
                 Console.WriteLine("DEK Modülü");
                 if (dataGridView1.DataSource == null)
@@ -5462,6 +5495,7 @@ namespace SLF
                 await dekHaritayaVeriYukleAsync();
             }
         }
+
 
         private void ea_Grid_Oluştur_Click(object sender, EventArgs e)
         {
@@ -5881,11 +5915,11 @@ namespace SLF
 
             if (SelectedCity == "İzmir")
             {
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\dek_distribution_2025_2030_2_1-izmir.xlsx";
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\arda-dek-ea\dek_distribution_2024_2030_3_İzmir_3K.xlsx";
             }
             else if (SelectedCity == "Eskişehir")
             {
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\DEK\eskisehir-dek-verileri.xlsx";
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\arda-dek-ea\dek_distribution_2024_2030_esk1_3K.xlsx";
             }
             else
             {
