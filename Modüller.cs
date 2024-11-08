@@ -53,7 +53,7 @@ namespace SLF
 
         // declare an instance of the Tablo_Formu to be used to see the Attribute Table of the vector layers
         public Tablo_Formu tablo_formu;
-
+        private string SelectedSpeed = "";
         // variables to be used to create "ruler" in Stochastic/EA modules
         private List<PointLatLng> rulerPoints_stokastik = new List<PointLatLng>();
         private List<PointLatLng> rulerPoints_ea = new List<PointLatLng>();
@@ -2646,7 +2646,7 @@ namespace SLF
                         Boylam = Math.Round(pointClick.Lng, 4)
                     };
 
-                    using (ChargingStationPopupForm popupForm = new ChargingStationPopupForm(dataGridView1.DataSource as DataTable, noktaVeri_marker))
+                    using (ChargingStationPopupForm popupForm = new ChargingStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
                     {
                         if (popupForm.ShowDialog() == DialogResult.OK)
                         {
@@ -3213,7 +3213,7 @@ namespace SLF
                 }
 
                 // Yeni satır oluşturup DataGridView1'e ekleyeceğiz
-                DataTable dataTable = dataGridView1.DataSource as DataTable;
+                DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
                 if (dataTable == null)
                 {
                     dataTable = new DataTable();
@@ -3225,7 +3225,7 @@ namespace SLF
                     dataTable.Columns.Add("DEK_TM_ADI", typeof(string));
                     dataTable.Columns.Add("DEK_KURULUM_YERI", typeof(string));
                     dataTable.Columns.Add("DEK_BAGLANDIGI_TRAFO_KODU", typeof(string));
-                    dataGridView1.DataSource = dataTable;
+                    dataGridView_girdi.DataSource = dataTable;
                 }
 
                 DataRow newRow = dataTable.NewRow();
@@ -4246,7 +4246,7 @@ namespace SLF
                 modulescheck.Add(seçilenVeriTipi);
                 veri_listesi_seçimi.Refresh();
                 Console.WriteLine(modulescheck.Count);
-                dataGridView1.DataSource = girdiModülü.CurrentDataTable;
+                dataGridView_girdi.DataSource = girdiModülü.CurrentDataTable;
                 
 
 
@@ -4769,7 +4769,7 @@ namespace SLF
         {
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
             girdiModülü = girdiModülleri[seçilenVeriTipi];
-            dataGridView1.DataSource = girdiModülü.importedDataTable;
+            dataGridView_girdi.DataSource = girdiModülü.importedDataTable;
             
         }
 
@@ -5125,7 +5125,7 @@ namespace SLF
                     //girdiModülü.importedDataTable?.Clear(); // Clear the DataTable if it is not null
                     girdiModülü.importedDataTable = new DataTable();
                 }
-                dataGridView1.DataSource = null;
+                dataGridView_girdi.DataSource = null;
             }
             else
             {
@@ -5234,7 +5234,7 @@ namespace SLF
             {
                 GMapOverlay eaOverlay = new GMapOverlay("EA Layer");
 
-                if (dataGridView1.DataSource == null)
+                if (dataGridView_girdi.DataSource == null)
                 {
                     MessageBox.Show("Veri kaynağı bulunamadı. Lütfen verileri kontrol edin.");
                     return;
@@ -5245,7 +5245,7 @@ namespace SLF
                     gMapControl_EA.Overlays.Remove(eaOverlay);
                 }
 
-                DataTable eaData = await Task.Run(() => DataGridViewToDataTable(dataGridView1));
+                DataTable eaData = await Task.Run(() => DataGridViewToDataTable(dataGridView_girdi));
 
                 if (eaData != null && eaData.Rows.Count > 0)
                 {
@@ -5321,7 +5321,7 @@ namespace SLF
             {
                 GMapOverlay dekOverlay = new GMapOverlay("Dek Layer");
 
-                if (dataGridView1.DataSource == null)
+                if (dataGridView_girdi.DataSource == null)
                 {
                     MessageBox.Show("Veri kaynağı bulunamadı. Lütfen verileri kontrol edin.");
                     return;
@@ -5332,7 +5332,7 @@ namespace SLF
                     gMapControl_Dek.Overlays.Remove(dekOverlay);
                 }
 
-                DataTable dekData = await Task.Run(() => DataGridViewToDataTable(dataGridView1));
+                DataTable dekData = await Task.Run(() => DataGridViewToDataTable(dataGridView_girdi));
 
                 if (dekData != null && dekData.Rows.Count > 0)
                 {
@@ -5471,7 +5471,7 @@ namespace SLF
             // EA Şarj Modülü tabına tıklanmışsa
             if (selectedTabText == "EA Şarj Modülü")
             {
-                if (dataGridView1.DataSource == null)
+                if (dataGridView_girdi.DataSource == null)
                 {
                     MessageBox.Show("Lütfen önce verileri yükleyin.");
                     return;
@@ -5485,7 +5485,7 @@ namespace SLF
             else if (selectedTabText == "DEK Modülü")
             {
                 Console.WriteLine("DEK Modülü");
-                if (dataGridView1.DataSource == null)
+                if (dataGridView_girdi.DataSource == null)
                 {
                     MessageBox.Show("Lütfen önce verileri yükleyin.");
                     return;
@@ -5516,7 +5516,7 @@ namespace SLF
             }
 
             // Use dataGridView1.DataSource as the DataTable instead of eaDataTable
-            DataTable dataTable = dataGridView1.DataSource as DataTable;
+            DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
             if (dataTable == null || dataTable.Rows.Count == 0)
             {
                 MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
@@ -5595,7 +5595,7 @@ namespace SLF
             }
         }
 
-       
+
 
         private async void gelecekSimilasyonGoruntule(object sender, EventArgs e)
         {
@@ -5605,22 +5605,37 @@ namespace SLF
             checkBox24.Visible = true;
             checkBox25.Visible = true;
 
-            // Şehir seçimine göre dosya yolunu ayarla
+            // Şehir ve hız seçimine göre dosya yolunu ayarla
             string filePath = "";
 
-            if (SelectedCity == "İzmir")
+            if (SelectedCity == "İzmir" && SelectedSpeed == "Hızlı")
             {
-                Console.WriteLine("path burda");
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\Arşiv\evcs_monte_carlo_distribution_2025_2030_5.xlsx";
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Yüksek.xlsx";
             }
-            else if (SelectedCity == "Eskişehir")
+            else if (SelectedCity == "İzmir" && SelectedSpeed == "Yavaş")
             {
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\Arşiv\evcs_monte_carlo_distribution_updated_esk.xlsx";
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Düşük.xlsx";
+            }
+            else if (SelectedCity == "İzmir" && SelectedSpeed == "varsayılan")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\dek_distribution_2024_2030_3_İzmir_baz.xlsx";
+            }
+            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Hızlı")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Yüksek.xlsx";
+            }
+            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Yavaş")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Düşük.xlsx";
+            }
+            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "varsayılan")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\dek_distribution_2024_2030_esk_baz.xlsx";
             }
             else
             {
-                MessageBox.Show("Lütfen geçerli bir şehir seçiniz.");
-                return; // Geçerli bir şehir seçilmediyse işlemi sonlandır
+                MessageBox.Show("Lütfen geçerli bir şehir ve hız seçiniz.");
+                return; // Geçerli bir şehir veya hız seçilmediyse işlemi sonlandır
             }
 
             try
@@ -5654,7 +5669,7 @@ namespace SLF
 
             // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
             HesaplaMerkezNoktaVeEkle(veriMonteCarlo);
-            
+
             await HaritaUzerindeSimulasyonGosterimi(veriMonteCarlo);
 
             // Önceki popupForm varsa kapatın
@@ -5908,23 +5923,38 @@ namespace SLF
         private async void dekSimulasyonGoruntule(object sender, EventArgs e)
         {
             // Checkbox'ları görünür hale getir
-            
 
-            // Şehir seçimine göre dosya yolunu ayarla
+            // Şehir ve hız seçimine göre dosya yolunu ayarla
             string filePath = "";
 
-            if (SelectedCity == "İzmir")
+            if (SelectedCity == "İzmir" && SelectedSpeed == "Hızlı")
             {
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\arda-dek-ea\dek_distribution_2024_2030_3_İzmir_3K.xlsx";
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\İzmir\dek_distribution_2024_2030_İzmir_yüksek.xlsx";
             }
-            else if (SelectedCity == "Eskişehir")
+            else if (SelectedCity == "İzmir" && SelectedSpeed == "Yavaş")
             {
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\arda-dek-ea\dek_distribution_2024_2030_esk1_3K.xlsx";
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\İzmir\dek_distribution_2024_2030_İzmir_düşük.xlsx";
+            }
+            else if (SelectedCity == "İzmir" && SelectedSpeed == "varsayılan")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\İzmir\dek_distribution_2024_2030_3_İzmir_baz.xlsx";
+            }
+            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Hızlı")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_yüksek.xlsx";
+            }
+            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Yavaş")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_düşük.xlsx";
+            }
+            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "varsayılan")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_baz.xlsx";
             }
             else
             {
-                MessageBox.Show("Lütfen geçerli bir şehir seçiniz.");
-                return; // Geçerli bir şehir seçilmediyse işlemi sonlandır
+                MessageBox.Show("Lütfen geçerli bir şehir ve hız seçiniz.");
+                return; // Geçerli bir şehir veya hız seçilmediyse işlemi sonlandır
             }
 
             DataTable dek_veri;
@@ -5962,8 +5992,7 @@ namespace SLF
             };
 
             // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
-           
-            
+
             await HaritaUzerindeDEKSimulasyonGosterimi(dek_veri);
             //await HaritaUzerindeDekSimulasyonGosterimi(dek_veri);
 
@@ -5985,6 +6014,7 @@ namespace SLF
             popupForm.Controls.Add(dataGridView);
             popupForm.Show(); // Yeni pencereyi göster
         }
+
 
         private Task HaritaUzerindeDEKSimulasyonGosterimi(DataTable veriTablosu)
         {
@@ -6099,6 +6129,61 @@ namespace SLF
         }
 
         
+
+        private void EaSimMaxBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (EaSimMaxBtn.Checked)
+            {
+                
+                SelectedSpeed = "Hızlı";
+            }
+        }
+
+        private void dekSimMinBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (dekSimMinBtn.Checked)
+            {
+                
+                SelectedSpeed = "Yavaş";
+            }
+        }
+
+        private void dekSimMaxBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (dekSimMaxBtn.Checked)
+            {
+                
+                SelectedSpeed = "Hızlı";
+            }
+        }
+
+        private void EaSimMinBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (EaSimMinBtn.Checked)
+            {
+                
+                SelectedSpeed = "Yavaş";
+            }
+        }
+
+        private void dekSimDefBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            {
+                if (dekSimDefBtn.Checked)
+                {
+                    
+                    SelectedSpeed = "varsayılan";
+                }
+            }
+        }
+
+        private void EaSimDefBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (EaSimMinBtn.Checked)
+            {
+                SelectedSpeed = "varsayılan";
+            }
+        }
 
         private void Dek_Grid_Oluştur_Click(object sender, EventArgs e)
         {
