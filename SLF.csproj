@@ -787,6 +787,15 @@
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Pictures\OEDAS_Logo-.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Pictures\oedas-yeni-binasinda-hizmet-vermeye-basliyor-1613029537595.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Pictures\home.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

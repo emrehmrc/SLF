@@ -1059,7 +1059,7 @@ namespace SLF
         /// </summary>
         /// 
         private void HomePageButton_Click(object sender, EventArgs e)
-        {
+        {   
             // Show the confirmation dialog for navigating to the home page
             DialogResult result = MessageBox.Show(
                 "Ana sayfaya dönmek istediğinize emin misiniz? Kaydedilmeyen veriler kaybolacaktır!",
@@ -5732,11 +5732,11 @@ namespace SLF
             if (SelectedCity == "İzmir")
             {
                 Console.WriteLine("path burda");
-                filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\ea_evcs_monte_carlo_distribution_2025_2030_5.xlsx";
+                filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\arda-dek-ea\ea_evcs_monte_carlo_distribution_2025_2030_5.xlsx";
             }
             else if (SelectedCity == "Eskişehir")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\ea_montecarlo-deneme-Eskisehir.xlsx";
+                filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\arda-dek-ea\ea_montecarlo-deneme-Eskisehir.xlsx";
             }
             else
             {

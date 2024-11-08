@@ -36,9 +36,9 @@
             this.label1 = new System.Windows.Forms.Label();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.panel2 = new System.Windows.Forms.Panel();
             this.roundButton1 = new RoundButton();
             this.roundButton2 = new RoundButton();
+            this.panel2 = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
@@ -84,7 +84,7 @@
             this.label2.Location = new System.Drawing.Point(12, 9);
             this.label2.MaximumSize = new System.Drawing.Size(1362, 1810);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(457, 45);
+            this.label2.Size = new System.Drawing.Size(363, 35);
             this.label2.TabIndex = 3;
             this.label2.Text = "Jeo-Uzamsal Yük Tahmini";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -114,7 +114,7 @@
             this.label1.Location = new System.Drawing.Point(291, 57);
             this.label1.MaximumSize = new System.Drawing.Size(1362, 1810);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(244, 45);
+            this.label1.Size = new System.Drawing.Size(193, 35);
             this.label1.TabIndex = 9;
             this.label1.Text = "Ar-GE Projesi";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -146,19 +146,6 @@
             this.panel1.Size = new System.Drawing.Size(1197, 110);
             this.panel1.TabIndex = 11;
             // 
-            // panel2
-            // 
-            this.panel2.BackColor = System.Drawing.Color.Transparent;
-            this.panel2.Controls.Add(this.pictureBox1);
-            this.panel2.Controls.Add(this.pictureBox2);
-            this.panel2.Controls.Add(this.StartButton);
-            this.panel2.Controls.Add(this.pictureBox3);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel2.Location = new System.Drawing.Point(0, 547);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1197, 83);
-            this.panel2.TabIndex = 12;
-            // 
             // roundButton1
             // 
             this.roundButton1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -189,9 +176,22 @@
             this.roundButton2.UseVisualStyleBackColor = false;
             this.roundButton2.Click += new System.EventHandler(this.roundButton2_Click);
             // 
+            // panel2
+            // 
+            this.panel2.BackColor = System.Drawing.Color.Transparent;
+            this.panel2.Controls.Add(this.pictureBox1);
+            this.panel2.Controls.Add(this.pictureBox2);
+            this.panel2.Controls.Add(this.StartButton);
+            this.panel2.Controls.Add(this.pictureBox3);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panel2.Location = new System.Drawing.Point(0, 547);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(1197, 83);
+            this.panel2.TabIndex = 12;
+            // 
             // HomePageForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Snow;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
