@@ -806,6 +806,7 @@
     <None Include="Pictures\Exterior1.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Pictures\Done.png" />
     <Content Include="Pictures\Home3.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

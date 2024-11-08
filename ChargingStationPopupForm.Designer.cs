@@ -39,14 +39,14 @@
             this.ISTASYON_GUCU = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.EA_X_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.EA_Y_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.panel2 = new System.Windows.Forms.Panel();
+            this.ChargingStationpanel1 = new System.Windows.Forms.Panel();
+            this.ChargingStationpanel2 = new System.Windows.Forms.Panel();
             this.CancelButton = new Guna.UI2.WinForms.Guna2Button();
             this.TamamButton = new Guna.UI2.WinForms.Guna2Button();
             this.guna2AnimateWindow1 = new Guna.UI2.WinForms.Guna2AnimateWindow(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.ChargingStationDataGridView)).BeginInit();
-            this.panel1.SuspendLayout();
-            this.panel2.SuspendLayout();
+            this.ChargingStationpanel1.SuspendLayout();
+            this.ChargingStationpanel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // ChargingStationDataGridView
@@ -147,28 +147,28 @@
             this.EA_Y_KOORDINAT.Name = "EA_Y_KOORDINAT";
             this.EA_Y_KOORDINAT.ReadOnly = true;
             // 
-            // panel1
+            // ChargingStationpanel1
             // 
-            this.panel1.BackColor = System.Drawing.Color.DarkSeaGreen;
-            this.panel1.Controls.Add(this.ChargingStationDataGridView);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(800, 450);
-            this.panel1.TabIndex = 1;
+            this.ChargingStationpanel1.BackColor = System.Drawing.Color.LightGreen;
+            this.ChargingStationpanel1.Controls.Add(this.ChargingStationDataGridView);
+            this.ChargingStationpanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ChargingStationpanel1.Location = new System.Drawing.Point(0, 0);
+            this.ChargingStationpanel1.Name = "ChargingStationpanel1";
+            this.ChargingStationpanel1.Size = new System.Drawing.Size(800, 450);
+            this.ChargingStationpanel1.TabIndex = 1;
             // 
-            // panel2
+            // ChargingStationpanel2
             // 
-            this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.ChargingStationpanel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel2.BackColor = System.Drawing.Color.DarkSeaGreen;
-            this.panel2.Controls.Add(this.CancelButton);
-            this.panel2.Controls.Add(this.TamamButton);
-            this.panel2.Location = new System.Drawing.Point(0, 393);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(800, 57);
-            this.panel2.TabIndex = 2;
+            this.ChargingStationpanel2.BackColor = System.Drawing.Color.LightGreen;
+            this.ChargingStationpanel2.Controls.Add(this.CancelButton);
+            this.ChargingStationpanel2.Controls.Add(this.TamamButton);
+            this.ChargingStationpanel2.Location = new System.Drawing.Point(0, 393);
+            this.ChargingStationpanel2.Name = "ChargingStationpanel2";
+            this.ChargingStationpanel2.Size = new System.Drawing.Size(800, 57);
+            this.ChargingStationpanel2.TabIndex = 2;
             // 
             // CancelButton
             // 
@@ -209,15 +209,15 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.panel2);
-            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.ChargingStationpanel2);
+            this.Controls.Add(this.ChargingStationpanel1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ChargingStationPopupForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Şarj İstasyonu Bilgileri";
             ((System.ComponentModel.ISupportInitialize)(this.ChargingStationDataGridView)).EndInit();
-            this.panel1.ResumeLayout(false);
-            this.panel2.ResumeLayout(false);
+            this.ChargingStationpanel1.ResumeLayout(false);
+            this.ChargingStationpanel2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -225,8 +225,8 @@
         #endregion
 
         private Guna.UI2.WinForms.Guna2DataGridView ChargingStationDataGridView;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Panel ChargingStationpanel1;
+        private System.Windows.Forms.Panel ChargingStationpanel2;
         private Guna.UI2.WinForms.Guna2Button CancelButton;
         private Guna.UI2.WinForms.Guna2Button TamamButton;
         private Guna.UI2.WinForms.Guna2AnimateWindow guna2AnimateWindow1;

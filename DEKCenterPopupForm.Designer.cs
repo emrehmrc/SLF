@@ -41,14 +41,14 @@
             this.DEK_Y_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DEK_TM_ADI = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DEK_KURULUM_YERI = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.panel2 = new System.Windows.Forms.Panel();
+            this.DEKCenterpanel2 = new System.Windows.Forms.Panel();
             this.DEKCancelButton = new Guna.UI2.WinForms.Guna2Button();
             this.DEKTamamButton = new Guna.UI2.WinForms.Guna2Button();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.DEKCenterpanel1 = new System.Windows.Forms.Panel();
             this.guna2AnimateWindow1 = new Guna.UI2.WinForms.Guna2AnimateWindow(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.DEKCenterDataGridView)).BeginInit();
-            this.panel2.SuspendLayout();
-            this.panel1.SuspendLayout();
+            this.DEKCenterpanel2.SuspendLayout();
+            this.DEKCenterpanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // DEKCenterDataGridView
@@ -86,11 +86,11 @@
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.DEKCenterDataGridView.DefaultCellStyle = dataGridViewCellStyle3;
             this.DEKCenterDataGridView.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255)))));
-            this.DEKCenterDataGridView.Location = new System.Drawing.Point(12, 12);
+            this.DEKCenterDataGridView.Location = new System.Drawing.Point(26, 24);
             this.DEKCenterDataGridView.Name = "DEKCenterDataGridView";
             this.DEKCenterDataGridView.RowHeadersVisible = false;
             this.DEKCenterDataGridView.RowHeadersWidth = 18;
-            this.DEKCenterDataGridView.Size = new System.Drawing.Size(1005, 368);
+            this.DEKCenterDataGridView.Size = new System.Drawing.Size(972, 356);
             this.DEKCenterDataGridView.TabIndex = 0;
             this.DEKCenterDataGridView.ThemeStyle.AlternatingRowsStyle.BackColor = System.Drawing.Color.White;
             this.DEKCenterDataGridView.ThemeStyle.AlternatingRowsStyle.Font = null;
@@ -165,16 +165,16 @@
             this.DEK_KURULUM_YERI.HeaderText = "DEK_KURULUM_YERI";
             this.DEK_KURULUM_YERI.Name = "DEK_KURULUM_YERI";
             // 
-            // panel2
+            // DEKCenterpanel2
             // 
-            this.panel2.BackColor = System.Drawing.Color.NavajoWhite;
-            this.panel2.Controls.Add(this.DEKCancelButton);
-            this.panel2.Controls.Add(this.DEKTamamButton);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel2.Location = new System.Drawing.Point(0, 393);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1029, 62);
-            this.panel2.TabIndex = 4;
+            this.DEKCenterpanel2.BackColor = System.Drawing.Color.NavajoWhite;
+            this.DEKCenterpanel2.Controls.Add(this.DEKCancelButton);
+            this.DEKCenterpanel2.Controls.Add(this.DEKTamamButton);
+            this.DEKCenterpanel2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.DEKCenterpanel2.Location = new System.Drawing.Point(0, 393);
+            this.DEKCenterpanel2.Name = "DEKCenterpanel2";
+            this.DEKCenterpanel2.Size = new System.Drawing.Size(1029, 62);
+            this.DEKCenterpanel2.TabIndex = 4;
             // 
             // DEKCancelButton
             // 
@@ -208,29 +208,29 @@
             this.DEKTamamButton.TabIndex = 2;
             this.DEKTamamButton.Text = "TAMAM";
             // 
-            // panel1
+            // DEKCenterpanel1
             // 
-            this.panel1.BackColor = System.Drawing.Color.NavajoWhite;
-            this.panel1.Controls.Add(this.DEKCenterDataGridView);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1029, 455);
-            this.panel1.TabIndex = 3;
+            this.DEKCenterpanel1.BackColor = System.Drawing.Color.NavajoWhite;
+            this.DEKCenterpanel1.Controls.Add(this.DEKCenterDataGridView);
+            this.DEKCenterpanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.DEKCenterpanel1.Location = new System.Drawing.Point(0, 0);
+            this.DEKCenterpanel1.Name = "DEKCenterpanel1";
+            this.DEKCenterpanel1.Size = new System.Drawing.Size(1029, 455);
+            this.DEKCenterpanel1.TabIndex = 3;
             // 
             // DEKCenterPopupForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1029, 455);
-            this.Controls.Add(this.panel2);
-            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.DEKCenterpanel2);
+            this.Controls.Add(this.DEKCenterpanel1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "DEKCenterPopupForm";
             this.Text = "DEK Merkezi Bilgileri";
             ((System.ComponentModel.ISupportInitialize)(this.DEKCenterDataGridView)).EndInit();
-            this.panel2.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
+            this.DEKCenterpanel2.ResumeLayout(false);
+            this.DEKCenterpanel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -238,10 +238,10 @@
         #endregion
 
         private Guna.UI2.WinForms.Guna2DataGridView DEKCenterDataGridView;
-        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Panel DEKCenterpanel2;
         private Guna.UI2.WinForms.Guna2Button DEKCancelButton;
         private Guna.UI2.WinForms.Guna2Button DEKTamamButton;
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel DEKCenterpanel1;
         private Guna.UI2.WinForms.Guna2AnimateWindow guna2AnimateWindow1;
         private System.Windows.Forms.DataGridViewTextBoxColumn ILCE_ADI;
         private System.Windows.Forms.DataGridViewComboBoxColumn KAYNAK_TIPI;
