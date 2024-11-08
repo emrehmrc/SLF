@@ -280,7 +280,7 @@ namespace SLF
             InitializeGMap(gMapControl_stokastik);
             InitializeGMap(gMapControl_EA);
             InitializeGMap(gMapControl_Dek);
-           // InitializeGMap(gMapControl_optimal_dtr);
+            InitializeGMap(gMapControl_optimal_dtr);
             SortTabPagesAlphabetically(Modül_Tabları, true);
             // Enable double buffering for the form to reduce flickering
             this.DoubleBuffered = true;
