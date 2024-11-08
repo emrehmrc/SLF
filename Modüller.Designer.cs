@@ -165,6 +165,8 @@ namespace SLF
             this.tab_imar = new System.Windows.Forms.TabPage();
             this.button6 = new System.Windows.Forms.Button();
             this.tab_optDTR = new System.Windows.Forms.TabPage();
+
+            this.gMapControl_optimal_dtr = new GMap.NET.WindowsForms.GMapControl();
             this.tab_senaryo = new System.Windows.Forms.TabPage();
             this.SenaryoModulePanel = new System.Windows.Forms.Panel();
             this.SenaryoModuleTabControl = new Guna.UI2.WinForms.Guna2TabControl();
@@ -273,7 +275,6 @@ namespace SLF
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
             this.checkBox26 = new System.Windows.Forms.CheckBox();
             this.checkBox27 = new System.Windows.Forms.CheckBox();
-            this.gMapControl_optimal_dtr = new GMap.NET.WindowsForms.GMapControl();
             this.menuStrip1.SuspendLayout();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
@@ -869,7 +870,7 @@ namespace SLF
             // DEKCenterAddButton
             // 
             this.DEKCenterAddButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.DEKCenterAddButton.Location = new System.Drawing.Point(1149, 47);
+            this.DEKCenterAddButton.Location = new System.Drawing.Point(1128, 47);
             this.DEKCenterAddButton.Margin = new System.Windows.Forms.Padding(2);
             this.DEKCenterAddButton.Name = "DEKCenterAddButton";
             this.DEKCenterAddButton.Size = new System.Drawing.Size(142, 44);
@@ -1150,7 +1151,7 @@ namespace SLF
             this.gMapControl_Dek.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_Dek.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_Dek.ShowTileGridLines = false;
-            this.gMapControl_Dek.Size = new System.Drawing.Size(855, 425);
+            this.gMapControl_Dek.Size = new System.Drawing.Size(839, 430);
             this.gMapControl_Dek.TabIndex = 18;
             this.gMapControl_Dek.Zoom = 0D;
             this.gMapControl_Dek.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_Dek_OnMapClick);
@@ -1659,6 +1660,7 @@ namespace SLF
             this.gMapControl_EA.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_EA_OnMapClick);
             this.gMapControl_EA.OnMapDoubleClick += new GMap.NET.WindowsForms.MapDoubleClick(this.gMapControl_EA_OnMapDoubleClick);
             this.gMapControl_EA.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(this.gMapControl_EA_OnMarkerClick);
+            this.gMapControl_EA.Load += new System.EventHandler(this.Form1_Load);
             this.gMapControl_EA.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_EA_MouseDown);
             this.gMapControl_EA.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_EA_MouseMove);
             // 
@@ -1990,6 +1992,55 @@ namespace SLF
             this.tab_optDTR.TabIndex = 7;
             this.tab_optDTR.Text = "Optimal DTR Konumlandırma";
             this.tab_optDTR.UseVisualStyleBackColor = true;
+            // 
+            // checkBox27
+            // 
+            this.checkBox27.AutoSize = true;
+            this.checkBox27.Location = new System.Drawing.Point(1181, 109);
+            this.checkBox27.Name = "checkBox27";
+            this.checkBox27.Size = new System.Drawing.Size(79, 21);
+            this.checkBox27.TabIndex = 22;
+            this.checkBox27.Text = "Eskişehir";
+            this.checkBox27.UseVisualStyleBackColor = true;
+            // 
+            // checkBox26
+            // 
+            this.checkBox26.AutoSize = true;
+            this.checkBox26.Location = new System.Drawing.Point(1181, 82);
+            this.checkBox26.Name = "checkBox26";
+            this.checkBox26.Size = new System.Drawing.Size(57, 21);
+            this.checkBox26.TabIndex = 21;
+            this.checkBox26.Text = "İzmir";
+            this.checkBox26.UseVisualStyleBackColor = true;
+
+            this.gMapControl_optimal_dtr.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gMapControl_optimal_dtr.Bearing = 0F;
+            this.gMapControl_optimal_dtr.CanDragMap = true;
+            this.gMapControl_optimal_dtr.Cursor = System.Windows.Forms.Cursors.Default;
+            this.gMapControl_optimal_dtr.EmptyTileColor = System.Drawing.Color.Navy;
+            this.gMapControl_optimal_dtr.GrayScaleMode = false;
+            this.gMapControl_optimal_dtr.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
+            this.gMapControl_optimal_dtr.LevelsKeepInMemory = 5;
+            this.gMapControl_optimal_dtr.Location = new System.Drawing.Point(251, 61);
+            this.gMapControl_optimal_dtr.Margin = new System.Windows.Forms.Padding(2);
+            this.gMapControl_optimal_dtr.MarkersEnabled = true;
+            this.gMapControl_optimal_dtr.MaxZoom = 2;
+            this.gMapControl_optimal_dtr.MinZoom = 2;
+            this.gMapControl_optimal_dtr.MouseWheelZoomEnabled = true;
+            this.gMapControl_optimal_dtr.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
+            this.gMapControl_optimal_dtr.Name = "gMapControl_optimal_dtr";
+            this.gMapControl_optimal_dtr.NegativeMode = false;
+            this.gMapControl_optimal_dtr.PolygonsEnabled = true;
+            this.gMapControl_optimal_dtr.RetryLoadTile = 0;
+            this.gMapControl_optimal_dtr.RoutesEnabled = true;
+            this.gMapControl_optimal_dtr.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
+            this.gMapControl_optimal_dtr.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
+            this.gMapControl_optimal_dtr.ShowTileGridLines = false;
+            this.gMapControl_optimal_dtr.Size = new System.Drawing.Size(782, 438);
+            this.gMapControl_optimal_dtr.TabIndex = 19;
+            this.gMapControl_optimal_dtr.Zoom = 0D;
             // 
             // tab_senaryo
             // 
@@ -3335,25 +3386,6 @@ namespace SLF
             this.HomePageButton.TabIndex = 0;
             this.HomePageButton.Click += new System.EventHandler(this.HomePageButton_Click);
             // 
-            // checkBox26
-            // 
-            this.checkBox26.AutoSize = true;
-            this.checkBox26.Location = new System.Drawing.Point(8, 122);
-            this.checkBox26.Name = "checkBox26";
-            this.checkBox26.Size = new System.Drawing.Size(57, 21);
-            this.checkBox26.TabIndex = 0;
-            this.checkBox26.Text = "İzmir";
-            this.checkBox26.UseVisualStyleBackColor = true;
-            // 
-            // checkBox27
-            // 
-            this.checkBox27.AutoSize = true;
-            this.checkBox27.Location = new System.Drawing.Point(8, 149);
-            this.checkBox27.Name = "checkBox27";
-            this.checkBox27.Size = new System.Drawing.Size(79, 21);
-            this.checkBox27.TabIndex = 1;
-            this.checkBox27.Text = "Eskişehir";
-            this.checkBox27.UseVisualStyleBackColor = true;
             // 
             // gMapControl_optimal_dtr
             // 
