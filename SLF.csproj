@@ -307,6 +307,7 @@
       <HintPath>packages\Polylines.1.0.0\lib\Polylines.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="RBush, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\RBush.3.2.0\lib\netstandard1.2\RBush.dll</HintPath>
     </Reference>

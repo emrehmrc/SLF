@@ -1,5 +1,4 @@
 ﻿using GMap.NET;
-using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
 using MapWinGIS;
 using NetTopologySuite.IO;
@@ -14,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GMap.NET.WindowsForms.Markers;
 
 namespace SLF
 {
@@ -43,12 +43,8 @@ namespace SLF
         public PointLatLng ending_point;
         // ------------------------------------//
 
-        public List<PointLatLng> polygonPoints_ea;
         public List<PointLatLng> polygonPoints_stokastik;
-
-
         private GMapPolygon selectedPolygon;
-
 
         public Dictionary<NetTopologySuite.Geometries.Polygon, DataRow> polygonAttributes_grid; // for polygons of grids
         public List<NetTopologySuite.Geometries.Polygon> entire_grid;
@@ -76,17 +72,82 @@ namespace SLF
             polygonAttributes = new Dictionary<GMapPolygon, DataRow>();
             polygonAttributes_grid = new Dictionary<NetTopologySuite.Geometries.Polygon, DataRow>();
 
-            polygonPoints_ea = new List<PointLatLng>();
             polygonPoints_stokastik = new List<PointLatLng>();
         }
 
+
+        //---------------------------- CBS TOOLBOX METHODLARI ----------------------------------//
+
+        public void CBS_sec(GMapOverlay markerOverlay, GMapRoute rulerRoute, 
+            GMapControl gMapControl, 
+            System.Windows.Forms.Label mesafe_calculated,
+            System.Windows.Forms.Label mesafe_label)
+        {
+
+            // cetveli ve cetvele ait noktaları/markerları sil
+            if (markerOverlay != null)
+            {
+                markerOverlay.Markers.Clear();
+            }
+
+            if (rulerRoute != null)
+            {
+                rulerRoute.Dispose();
+            }
+
+            gMapControl.CanDragMap = false;
+            modülFormu.isRulerEnabled = false;
+            modülFormu.isSelecting_polygon = true;
+            gMapControl.Cursor = Cursors.Arrow;
+            mesafe_calculated.Visible = false;
+            mesafe_calculated.Text = "";
+            mesafe_label.Visible = false;
+
+        }
+
+        public void CBS_kaydır(GMapOverlay markerOverlay, GMapRoute rulerRoute,
+                GMapControl gMapControl,
+                System.Windows.Forms.Label mesafe_calculated,
+                System.Windows.Forms.Label mesafe_label)
+        {
+
+            if (markerOverlay != null)
+            {
+                markerOverlay.Markers.Clear();
+            }
+
+            if (rulerRoute != null)
+            {
+                rulerRoute.Dispose();
+            }
+
+            gMapControl.CanDragMap = true;
+            modülFormu.isRulerEnabled = false;
+            modülFormu.isSelecting_polygon = false;
+            gMapControl.Cursor = Cursors.Hand;
+            mesafe_calculated.Visible = false;
+            mesafe_calculated.Text = "";
+            mesafe_label.Visible = false;
+
+        }
+
+        public void CBS_ölç(System.Windows.Forms.Label mesafe_calculated,
+            System.Windows.Forms.Label mesafe_label)
+        {
+            mesafe_label.Text = "Mesafe: ";
+            modülFormu.isRulerEnabled = true;
+            mesafe_label.Visible = true;
+            mesafe_label.BringToFront();
+            mesafe_calculated.Visible = true;
+            mesafe_calculated.BringToFront();
+
+        }
 
 
         //-----------------------------------------------------------------------------//
 
 
-        public async Task cbs_dosya_secimi(TabControl tabs, TabPage tab, GMapControl gmapcontrol, 
-            Form callingForm, DataGridView dataGridView)
+        public async Task cbs_dosya_secimi(GMapControl gmapcontrol, Form callingForm, DataGridView dataGridView)
         {
             // Find the first available slot in the array that holds shapefile overlay layers
             layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
@@ -115,72 +176,143 @@ namespace SLF
                 if (extension == "shp")
                 {
                     // create a new layer to be added onto the map
-                    GMapOverlay shapeFileOverlay = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}");
+                    GMapOverlay shapeFileOverlay_imar = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_imar");
+                    GMapOverlay shapeFileOverlay_yuk = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_yuk");
+                    GMapOverlay shapeFileOverlay_stokastik = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_stokastik");
 
-                    // add the layer to the specified map
-                    if (tabs.SelectedTab == tab)
-                    {
-                        gmapcontrol.Overlays.Add(shapeFileOverlay);
-                    }
+                    modülFormu.gMapControl_imar.Overlays.Add(shapeFileOverlay_imar);
+                    modülFormu.gMapControl_yuk.Overlays.Add(shapeFileOverlay_yuk);
+                    modülFormu.gMapControl_stokastik.Overlays.Add(shapeFileOverlay_stokastik);
 
                     // create a new datatable to be added to the tüm_katmanlar_datatable array
                     DataTable shapefile_datatable = new DataTable();
 
                     // run the import method
                     callingForm.Cursor = Cursors.WaitCursor;
-                    //await LoadShapefile(filepath, shapeFileOverlay, shapefile_datatable);
-                    await LoadShapefile(filepath, shapeFileOverlay, shapefile_datatable, 
-                        dataGridView, gmapcontrol);
+                    await LoadShapefile(filepath, shapeFileOverlay_imar, shapefile_datatable, dataGridView);
                     callingForm.Cursor = Cursors.Default;
 
-                    // add the layer and its name to the specified arrays
-                    tüm_katmanlar_array[layer_index] = shapeFileOverlay;
-                    tüm_katmanlar_array_names[layer_index] = filename;
+                    // Duplicate the polygons and routes from shapeFileOverlay_imar into each new overlay
+                    CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_yuk);
+                    CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_stokastik);
 
-                    // add the datatable to the array so that it can be summoned later
+
+                    // add the layer and its name to the specified arrays
+                    tüm_katmanlar_array[layer_index] = shapeFileOverlay_imar;
+                    tüm_katmanlar_array_names[layer_index] = filename;
                     tüm_katmanlar_datatable[layer_index] = shapefile_datatable;
 
-                    System.Windows.Forms.CheckBox associatedCheckBox = modülFormu.GetCheckBoxByIndex(layer_index);
-                    if (associatedCheckBox != null)
+                    // Get the list of associated checkboxes for the given layer_index
+                    List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
+
+                    if (associatedCheckBoxes != null)
                     {
-                        associatedCheckBox.Checked = true;
-                        associatedCheckBox.Visible = true;
-                        associatedCheckBox.Text = tüm_katmanlar_array_names[layer_index];
+                        // Loop through each checkbox in the list and apply the required settings
+                        foreach (var checkBox in associatedCheckBoxes)
+                        {
+                            checkBox.Checked = true;
+                            checkBox.Visible = true;
+                            checkBox.Text = tüm_katmanlar_array_names[layer_index];
+                        }
                     }
                 }
                 else if (extension == "kml")
                 {
-                    GMapOverlay kmlOverlay = new GMapOverlay($"kmlOverlay_{layer_index + 1}");
-                    gmapcontrol.Overlays.Add(kmlOverlay);
+                    GMapOverlay kmlOverlay_imar = new GMapOverlay($"kmlOverlay_{layer_index + 1}_imar");
+                    GMapOverlay kmlOverlay_yuk = new GMapOverlay($"kmlOverlay_{layer_index + 1}_yuk");
+                    GMapOverlay kmlOverlay_stokastik = new GMapOverlay($"kmlOverlay_{layer_index + 1}_stokastik");
+
+                    modülFormu.gMapControl_imar.Overlays.Add(kmlOverlay_imar);
+                    modülFormu.gMapControl_yuk.Overlays.Add(kmlOverlay_yuk);
+                    modülFormu.gMapControl_stokastik.Overlays.Add(kmlOverlay_stokastik);
 
                     DataTable kml_datatable = new DataTable();
                     callingForm.Cursor = Cursors.WaitCursor;
-                    await LoadKmlFile(filepath, kmlOverlay, kml_datatable, gmapcontrol);
+                    await LoadKmlFile(filepath, kmlOverlay_imar, kml_datatable, gmapcontrol);
 
-                    tüm_katmanlar_array[layer_index] = kmlOverlay;
+                    tüm_katmanlar_array[layer_index] = kmlOverlay_imar;
                     tüm_katmanlar_array_names[layer_index] = filename;
                     tüm_katmanlar_datatable[layer_index] = kml_datatable;
 
                     // convert .kml overlay into a MapWinGIS.Shapefile object
                     polygonAttributes_kml = new Dictionary<GMapPolygon, DataRow>();
                     routeAttributes_kml = new Dictionary<GMapRoute, DataRow>();
-                    MapWinGIS.Shapefile shapefile = ConvertKmlToShapefile(kmlOverlay);
+                    MapWinGIS.Shapefile shapefile = ConvertKmlToShapefile(kmlOverlay_imar);
                     shapeFileArray_MapWinGIS[layer_index] = shapefile;
+
+                    // Duplicate the polygons and routes from shapeFileOverlay_imar into each new overlay
+                    CopyOverlayContents(kmlOverlay_imar, kmlOverlay_yuk);
+                    CopyOverlayContents(kmlOverlay_imar, kmlOverlay_stokastik);
 
                     callingForm.Cursor = Cursors.Default;
 
-                    System.Windows.Forms.CheckBox associatedCheckBox = modülFormu.GetCheckBoxByIndex(layer_index);
-                    if (associatedCheckBox != null)
+                    // Get the list of associated checkboxes for the given layer_index
+                    List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
+
+                    if (associatedCheckBoxes != null)
                     {
-                        associatedCheckBox.Checked = true;
-                        associatedCheckBox.Visible = true;
-                        associatedCheckBox.Text = tüm_katmanlar_array_names[layer_index];
+                        // Loop through each checkbox in the list and apply the required settings
+                        foreach (var checkBox in associatedCheckBoxes)
+                        {
+                            checkBox.Checked = true;
+                            checkBox.Visible = true;
+                            checkBox.Text = tüm_katmanlar_array_names[layer_index];
+                        }
                     }
                 }
             }
-
+            gmapcontrol.Refresh();
+            gmapcontrol.ReloadMap();
 
         }
+
+        private void CopyOverlayContents(GMapOverlay sourceOverlay, GMapOverlay targetOverlay)
+        {
+            foreach (var polygon in sourceOverlay.Polygons)
+            {
+                var newPolygon = new GMapPolygon(polygon.Points, polygon.Name)
+                {
+                    Stroke = polygon.Stroke,
+                    Fill = polygon.Fill
+                };
+                targetOverlay.Polygons.Add(newPolygon);
+            }
+
+            foreach (var route in sourceOverlay.Routes)
+            {
+                var newRoute = new GMapRoute(route.Points, route.Name)
+                {
+                    Stroke = route.Stroke
+                };
+                targetOverlay.Routes.Add(newRoute);
+            }
+
+            foreach (var marker in sourceOverlay.Markers)
+            {
+                GMapMarker newMarker;
+
+                if (marker is GMarkerGoogle googleMarker)
+                {
+                    // Create a GMarkerGoogle with the same type as the original
+                    newMarker = new GMarkerGoogle(marker.Position, googleMarker.Type)
+                    {
+                        ToolTipText = marker.ToolTipText
+                    };
+                }
+                else
+                {
+                    // Use a GMarkerGoogle with a default type for non-GMarkerGoogle markers
+                    newMarker = new GMarkerGoogle(marker.Position, GMarkerGoogleType.red)
+                    {
+                        ToolTipText = marker.ToolTipText
+                    };
+                }
+
+                targetOverlay.Markers.Add(newMarker);
+            }
+        }
+
+
 
         // define default colors for each overlay object
         public (Color BorderColor, Color FillColor)[] overlayColors = new (Color, Color)[]
@@ -221,7 +353,7 @@ namespace SLF
         }
 
         public void AddPolygonToOverlay(NetTopologySuite.Geometries.Polygon polygon,
-    GMapOverlay overlay, string gMapPolygonId, DataRow attributes)
+                GMapOverlay overlay, string gMapPolygonId, DataRow attributes)
         {
             // oluşturulmuş poligona ait noktaların ekleneceği bir liste oluştur
             List<PointLatLng> points_list = new List<PointLatLng>();
@@ -798,8 +930,7 @@ namespace SLF
 
         // method that loads a shapefile object to the specified GMapOverlay map object
         public async Task LoadShapefile(string filepath, GMapOverlay shapeFileOverlay,
-                            DataTable shapefile_datatable, DataGridView dataGridView,
-                            GMapControl gMapControl)
+                            DataTable shapefile_datatable, DataGridView dataGridView)
         {
 
             // eğer dosya bulunamadıysa uyarı ver
@@ -875,8 +1006,6 @@ namespace SLF
             // Convert GMapOverlay to MapWinGIS.Shapefile
             MapWinGIS.Shapefile myShapefile = ConvertOverlayToShapefile(shapeFileOverlay);
             shapeFileArray_MapWinGIS[layer_index] = myShapefile;
-
-            gMapControl.Refresh();
 
         }
 
@@ -1024,12 +1153,18 @@ namespace SLF
             MapWinGIS.Shapefile myShapefile = ConvertOverlayToShapefile(gridOverlay);
             shapeFileArray_MapWinGIS[layer_index] = myShapefile;
 
-            System.Windows.Forms.CheckBox associatedCheckBox = modülFormu.GetCheckBoxByIndex(layer_index);
-            if (associatedCheckBox != null)
+            // Get the list of associated checkboxes for the given layer_index
+            List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
+
+            if (associatedCheckBoxes != null)
             {
-                associatedCheckBox.Checked = true;
-                associatedCheckBox.Visible = true;
-                associatedCheckBox.Text = tüm_katmanlar_array_names[layer_index];
+                // Loop through each checkbox in the list and apply the required settings
+                foreach (var checkBox in associatedCheckBoxes)
+                {
+                    checkBox.Checked = true;
+                    checkBox.Visible = true;
+                    checkBox.Text = tüm_katmanlar_array_names[layer_index];
+                }
             }
         }
 
@@ -1055,6 +1190,22 @@ namespace SLF
             return null;
         }
 
+        public Microsoft.Web.WebView2.WinForms.WebView2 GetActiveWebView()
+        {
+            TabPage selectedTab = modülFormu.Modül_Tabları.SelectedTab;
+
+            if (selectedTab != null)
+            {
+                foreach (Control control in selectedTab.Controls)
+                {
+                    if (control is Microsoft.Web.WebView2.WinForms.WebView2 webView)
+                    {
+                        return webView;
+                    }
+                }
+            }
+            return null;
+        }
 
 
         //method to check whether the point that is double clicked on the map is in a polygon
@@ -1097,6 +1248,8 @@ namespace SLF
                 polygon.Stroke = new Pen(Color.LawnGreen, 3);
                 polygon.Fill = new SolidBrush(Color.FromArgb(50, Color.LawnGreen));
 
+
+
                 gMapControl.Refresh();
             }
             else
@@ -1116,19 +1269,6 @@ namespace SLF
                 gMapControl.Refresh();
             }
 
-        }
-
-
-        // cetvel ile seçilen2 nokta arasındaki mesafeyi metre cinsinden göster
-        public void CalculateDistance(GMapControl gmap, System.Windows.Forms.Label mesafe_metre,
-            List<PointLatLng> rulerPoints)
-        {
-            if (rulerPoints.Count == 2)
-            {
-                double meter_distance = Math.Round(gmap.MapProvider.Projection.GetDistance(rulerPoints[0],
-                    rulerPoints[1]) * 1000, 3);
-                mesafe_metre.Text = meter_distance.ToString() + " metre";
-            }
         }
 
 
@@ -1194,14 +1334,82 @@ namespace SLF
         }
 
 
-        // -----------------------------------------------------------------//////////////////////
+        // ------------------------------- HARİTA EVENTLERİ ----------------------------------/////////////////////
 
+        public void ManuelGridSecimi(GMapControl gMapControl)
+        {
+            gMapControl.CanDragMap = false;
+            bounding_box_overlay = new GMapOverlay("bounding_box_overlay");
 
+            // seçilen alanı kullanıcıya gösterecek olan poligonu oluşturmaya başla
+            bounding_box_polygon = new GMapPolygon(new List<PointLatLng>(), "bounding_box_polygon")
+            {
+                Stroke = new Pen(Color.White, 3),
+                Fill = new SolidBrush(Color.FromArgb(50, Color.White))
+            };
 
+            bounding_box_overlay.Polygons.Add(bounding_box_polygon);
+            gMapControl.Overlays.Add(bounding_box_overlay);
+        }
+
+        // cetvel ile seçilen2 nokta arasındaki mesafeyi metre cinsinden göster
+        public void CalculateDistance(GMapControl gmap, System.Windows.Forms.Label mesafe_metre,
+            List<PointLatLng> rulerPoints)
+        {
+            if (rulerPoints.Count == 2)
+            {
+                double meter_distance = Math.Round(gmap.MapProvider.Projection.GetDistance(rulerPoints[0],
+                    rulerPoints[1]) * 1000, 3);
+                mesafe_metre.Text = meter_distance.ToString() + " metre";
+            }
+        }
+
+        public void DrawRuler(GMapOverlay rulerOverlay,
+        List<PointLatLng> rulerPoints,
+        ref GMapRoute rulerRoute)
+        {
+            if (rulerRoute != null)
+            {
+                rulerOverlay.Routes.Remove(rulerRoute);
+            }
+            rulerRoute = new GMapRoute(rulerPoints, "ruler_Route");
+            rulerRoute.Stroke = new Pen(Color.Red, 3);
+            rulerOverlay.Routes.Add(rulerRoute);
+
+            GetActiveGMapControl().Refresh();
+        }
+
+        public void CetvelSecimi(GMapControl gMapControl, 
+            System.Windows.Forms.Label mesafe_metre,
+            List<PointLatLng> rulerPoints,
+            GMapOverlay markerOverlay,
+            GMapOverlay rulerOverlay, 
+            ref GMapRoute rulerRoute)
+        {
+            // sol tuşa basıldığında nokta seçmeye başla ve cetveli aktif hale getir
+            modülFormu.isRulerActive = true;
+
+            // 2 adet nokta seçildiği anda aralarındaki mesafeyi hesapla ve noktaların
+            // tutulduğu listeyi temizle
+            if (rulerPoints.Count == 2)
+            {
+                markerOverlay.Markers.Clear();
+
+                foreach (var rulerPoint in rulerPoints)
+                {
+                    GMapMarker marker_1 = new GMarkerGoogle(rulerPoint, GMarkerGoogleType.orange_dot);
+                    markerOverlay.Markers.Add(marker_1);
+                }
+
+                rulerRoute.Dispose();                
+                DrawRuler(rulerOverlay, rulerPoints, ref rulerRoute);
+                CalculateDistance(gMapControl, mesafe_metre, rulerPoints);
+                rulerPoints.Clear();
+                modülFormu.isRulerActive = false;
+            }
+        }
 
         // --------------------------------------- FONKSİYONLAR ----------------------------------------//
-
-
 
 
         //  method to extract data from polygons
@@ -1565,13 +1773,18 @@ namespace SLF
             // add the datatable to the array so that it can be summoned later
             tüm_katmanlar_datatable[layer_index] = joined_data_table;
 
-            // checkbox on/off control
-            System.Windows.Forms.CheckBox associatedCheckBox = modülFormu.GetCheckBoxByIndex(layer_index);
-            if (associatedCheckBox != null)
+            // Get the list of associated checkboxes for the given layer_index
+            List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
+
+            if (associatedCheckBoxes != null)
             {
-                associatedCheckBox.Checked = true;
-                associatedCheckBox.Visible = true;
-                associatedCheckBox.Text = tüm_katmanlar_array_names[layer_index];
+                // Loop through each checkbox in the list and apply the required settings
+                foreach (var checkBox in associatedCheckBoxes)
+                {
+                    checkBox.Checked = true;
+                    checkBox.Visible = true;
+                    checkBox.Text = tüm_katmanlar_array_names[layer_index];
+                }
             }
 
             gMapControl.Overlays.Add(resultingOverlay);
@@ -1698,13 +1911,18 @@ namespace SLF
             // add the datatable to the array so that it can be summoned later
             tüm_katmanlar_datatable[layer_index] = joined_data_table;
 
-            // checkbox on/off control
-            System.Windows.Forms.CheckBox associatedCheckBox = modülFormu.GetCheckBoxByIndex(layer_index);
-            if (associatedCheckBox != null)
+            // Get the list of associated checkboxes for the given layer_index
+            List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
+
+            if (associatedCheckBoxes != null)
             {
-                associatedCheckBox.Checked = true;
-                associatedCheckBox.Visible = true;
-                associatedCheckBox.Text = tüm_katmanlar_array_names[layer_index];
+                // Loop through each checkbox in the list and apply the required settings
+                foreach (var checkBox in associatedCheckBoxes)
+                {
+                    checkBox.Checked = true;
+                    checkBox.Visible = true;
+                    checkBox.Text = tüm_katmanlar_array_names[layer_index];
+                }
             }
 
             gMapControl.Overlays.Add(resultingOverlay);

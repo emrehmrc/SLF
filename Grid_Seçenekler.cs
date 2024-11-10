@@ -60,24 +60,9 @@ namespace SLF
             modül.Show();
             this.Close();
 
-            // Stokastik Modül mü yoksa EA Şarj Modülü mü aktif?
-            if (modül.Modül_Tabları.SelectedTab == modül.tab_stokastik)
-            {
-                // Stokastik modül için grid oluştur
-                modül.cbs.isSelecting_grid = true;
-                modül.gMapControl_stokastik.Cursor = Cursors.Arrow;
-            }
-            else if (modül.Modül_Tabları.SelectedTab == modül.tab_ea)
-            {
-                // EA Şarj Modülü için grid oluştur
-                modül.cbs.isSelecting_grid = true;
-                modül.gMapControl_EA.Cursor = Cursors.Arrow;
-                Console.WriteLine("buradayım");
-            }
-            else
-            {
-                MessageBox.Show("Geçerli bir modül seçmediniz.");
-            }
+            modül.cbs.isSelecting_grid = true;
+            modül.cbs.GetActiveGMapControl().Cursor = Cursors.Arrow;
+
         }
 
     }
