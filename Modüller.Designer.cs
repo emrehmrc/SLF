@@ -232,6 +232,11 @@ namespace SLF
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.Stokastik_Fonksiyonlar = new System.Windows.Forms.ToolStripButton();
             this.tab_yükHaritası = new System.Windows.Forms.TabPage();
+            this.checkBox28 = new System.Windows.Forms.CheckBox();
+            this.checkBox27 = new System.Windows.Forms.CheckBox();
+            this.yuk_yıl_deger = new System.Windows.Forms.Label();
+            this.yuk_yıl_text = new System.Windows.Forms.Label();
+            this.trackBar_Yıllar = new System.Windows.Forms.TrackBar();
             this.Mesafe_yuk = new System.Windows.Forms.Label();
             this.mesafe_metre_yuk = new System.Windows.Forms.Label();
             this.Toolbox_Yuk = new System.Windows.Forms.ToolStrip();
@@ -262,6 +267,7 @@ namespace SLF
             this.ModuleTabPanel = new System.Windows.Forms.Panel();
             this.HeaderPanel = new System.Windows.Forms.Panel();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.legendPanel = new System.Windows.Forms.Panel();
             this.menuStrip1.SuspendLayout();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
@@ -320,6 +326,7 @@ namespace SLF
             ((System.ComponentModel.ISupportInitialize)(this.webView_stokastik)).BeginInit();
             this.Toolbox_Stokastik.SuspendLayout();
             this.tab_yükHaritası.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_Yıllar)).BeginInit();
             this.Toolbox_Yuk.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.webView_yuk)).BeginInit();
             this.ContextMenuStrip_Nokta.SuspendLayout();
@@ -3032,6 +3039,12 @@ namespace SLF
             // 
             // tab_yükHaritası
             // 
+            this.tab_yükHaritası.Controls.Add(this.legendPanel);
+            this.tab_yükHaritası.Controls.Add(this.checkBox28);
+            this.tab_yükHaritası.Controls.Add(this.checkBox27);
+            this.tab_yükHaritası.Controls.Add(this.yuk_yıl_deger);
+            this.tab_yükHaritası.Controls.Add(this.yuk_yıl_text);
+            this.tab_yükHaritası.Controls.Add(this.trackBar_Yıllar);
             this.tab_yükHaritası.Controls.Add(this.Mesafe_yuk);
             this.tab_yükHaritası.Controls.Add(this.mesafe_metre_yuk);
             this.tab_yükHaritası.Controls.Add(this.Toolbox_Yuk);
@@ -3045,6 +3058,55 @@ namespace SLF
             this.tab_yükHaritası.TabIndex = 9;
             this.tab_yükHaritası.Text = "Yük Haritası Modülü";
             this.tab_yükHaritası.UseVisualStyleBackColor = true;
+            // 
+            // checkBox28
+            // 
+            this.checkBox28.AutoSize = true;
+            this.checkBox28.Location = new System.Drawing.Point(12, 171);
+            this.checkBox28.Name = "checkBox28";
+            this.checkBox28.Size = new System.Drawing.Size(210, 27);
+            this.checkBox28.TabIndex = 43;
+            this.checkBox28.Text = "Yük Yoğunluğu Haritası";
+            this.checkBox28.UseVisualStyleBackColor = true;
+            // 
+            // checkBox27
+            // 
+            this.checkBox27.AutoSize = true;
+            this.checkBox27.Location = new System.Drawing.Point(12, 125);
+            this.checkBox27.Name = "checkBox27";
+            this.checkBox27.Size = new System.Drawing.Size(226, 27);
+            this.checkBox27.TabIndex = 42;
+            this.checkBox27.Text = "Yerleşik Alan Yoğunlukları";
+            this.checkBox27.UseVisualStyleBackColor = true;
+            // 
+            // yuk_yıl_deger
+            // 
+            this.yuk_yıl_deger.AutoSize = true;
+            this.yuk_yıl_deger.Location = new System.Drawing.Point(35, 23);
+            this.yuk_yıl_deger.Name = "yuk_yıl_deger";
+            this.yuk_yıl_deger.Size = new System.Drawing.Size(47, 23);
+            this.yuk_yıl_deger.TabIndex = 41;
+            this.yuk_yıl_deger.Text = "2024";
+            // 
+            // yuk_yıl_text
+            // 
+            this.yuk_yıl_text.AutoSize = true;
+            this.yuk_yıl_text.Location = new System.Drawing.Point(8, 23);
+            this.yuk_yıl_text.Name = "yuk_yıl_text";
+            this.yuk_yıl_text.Size = new System.Drawing.Size(32, 23);
+            this.yuk_yıl_text.TabIndex = 40;
+            this.yuk_yıl_text.Text = "Yıl:";
+            // 
+            // trackBar_Yıllar
+            // 
+            this.trackBar_Yıllar.Location = new System.Drawing.Point(8, 49);
+            this.trackBar_Yıllar.Maximum = 2030;
+            this.trackBar_Yıllar.Minimum = 2024;
+            this.trackBar_Yıllar.Name = "trackBar_Yıllar";
+            this.trackBar_Yıllar.Size = new System.Drawing.Size(217, 56);
+            this.trackBar_Yıllar.TabIndex = 39;
+            this.trackBar_Yıllar.Value = 2024;
+            this.trackBar_Yıllar.ValueChanged += new System.EventHandler(this.trackBar_Yıllar_ValueChanged);
             // 
             // Mesafe_yuk
             // 
@@ -3197,7 +3259,7 @@ namespace SLF
             this.gMapControl_yuk.GrayScaleMode = false;
             this.gMapControl_yuk.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
             this.gMapControl_yuk.LevelsKeepInMemory = 5;
-            this.gMapControl_yuk.Location = new System.Drawing.Point(231, 110);
+            this.gMapControl_yuk.Location = new System.Drawing.Point(253, 34);
             this.gMapControl_yuk.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.gMapControl_yuk.MarkersEnabled = true;
             this.gMapControl_yuk.MaxZoom = 2;
@@ -3215,6 +3277,10 @@ namespace SLF
             this.gMapControl_yuk.Size = new System.Drawing.Size(1051, 584);
             this.gMapControl_yuk.TabIndex = 34;
             this.gMapControl_yuk.Zoom = 0D;
+            this.gMapControl_yuk.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_yuk_OnMapClick);
+            this.gMapControl_yuk.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_yuk_MouseDown);
+            this.gMapControl_yuk.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_yuk_MouseMove);
+            this.gMapControl_yuk.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gMapControl_yuk_MouseUp);
             // 
             // webView_yuk
             // 
@@ -3225,7 +3291,7 @@ namespace SLF
             this.webView_yuk.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.webView_yuk.CreationProperties = null;
             this.webView_yuk.DefaultBackgroundColor = System.Drawing.Color.White;
-            this.webView_yuk.Location = new System.Drawing.Point(231, 108);
+            this.webView_yuk.Location = new System.Drawing.Point(253, 32);
             this.webView_yuk.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.webView_yuk.Name = "webView_yuk";
             this.webView_yuk.Size = new System.Drawing.Size(1051, 586);
@@ -3393,6 +3459,14 @@ namespace SLF
             this.HeaderPanel.Size = new System.Drawing.Size(1776, 42);
             this.HeaderPanel.TabIndex = 3;
             // 
+            // legendPanel
+            // 
+            this.legendPanel.AutoSize = true;
+            this.legendPanel.Location = new System.Drawing.Point(15, 218);
+            this.legendPanel.Name = "legendPanel";
+            this.legendPanel.Size = new System.Drawing.Size(209, 362);
+            this.legendPanel.TabIndex = 44;
+            // 
             // ModülFormu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -3486,6 +3560,7 @@ namespace SLF
             this.Toolbox_Stokastik.PerformLayout();
             this.tab_yükHaritası.ResumeLayout(false);
             this.tab_yükHaritası.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_Yıllar)).EndInit();
             this.Toolbox_Yuk.ResumeLayout(false);
             this.Toolbox_Yuk.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.webView_yuk)).EndInit();
@@ -3740,5 +3815,11 @@ namespace SLF
         private Button imar_dosya_seçimi;
         private Label Mesafe_imar;
         private Label mesafe_metre_imar;
+        private TrackBar trackBar_Yıllar;
+        private Label yuk_yıl_deger;
+        private Label yuk_yıl_text;
+        private CheckBox checkBox28;
+        private CheckBox checkBox27;
+        public Panel legendPanel;
     }
 }

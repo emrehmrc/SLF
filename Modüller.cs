@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using ClosedXML.Excel;
 using OfficeOpenXml;
 using DrawingImage = System.Drawing.Image;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace SLF
 {
@@ -1101,8 +1102,8 @@ namespace SLF
                     StartPosition = FormStartPosition.CenterScreen
                 };
                 System.Windows.Forms.Label textLabel = new System.Windows.Forms.Label() { Left = 50, Top = 20, Text = text };
-                TextBox textBox = new TextBox() { Left = 50, Top = 50, Width = 170 , Height = 70};
-                Button confirmation = new Button() { Text = "Tamam", Left = 170, Width = 100, Top = 85, DialogResult = DialogResult.OK };
+                System.Windows.Forms.TextBox textBox = new System.Windows.Forms.TextBox() { Left = 50, Top = 50, Width = 170 , Height = 70};
+                System.Windows.Forms.Button confirmation = new System.Windows.Forms.Button() { Text = "Tamam", Left = 170, Width = 100, Top = 85, DialogResult = DialogResult.OK };
                 confirmation.Click += (sender, e) => { prompt.Close(); };
                 prompt.Controls.Add(textBox);
                 prompt.Controls.Add(confirmation);
@@ -1223,7 +1224,6 @@ namespace SLF
 
             if (cbs.GetActiveGMapControl() == gMapControl_imar)
             {
-                polygonPoints_imar.Clear();
                 mesafe_metre_imar.Text = string.Empty;
                 Mesafe_imar.Visible = false;
                 markerOverlay_imar?.Clear();
@@ -1234,7 +1234,6 @@ namespace SLF
             }
             else if (cbs.GetActiveGMapControl() == gMapControl_stokastik)
             {
-                polygonPoints_stokastik.Clear();
                 mesafe_metre_stokastik.Text = string.Empty;
                 Mesafe_stokastik.Visible = false;
                 markerOverlay_stokastik?.Clear();
@@ -1456,6 +1455,13 @@ namespace SLF
                 polygonPoints_imar, polygonOverlay_imar);
         }
 
+        private void gMapControl_yuk_MouseDown(object sender, MouseEventArgs e)
+        {
+            MouseDownEvent(sender, e, gMapControl_yuk, Mesafe_yuk, mesafe_metre_yuk,
+                rulerPoints_yuk, markerOverlay_yuk, rulerOverlay_yuk, ref rulerRoute_yuk,
+                polygonPoints_yuk, polygonOverlay_yuk);
+        }
+
         private void gMapControl_stokastik_MouseMove(object sender, MouseEventArgs e)
         {
 
@@ -1524,6 +1530,40 @@ namespace SLF
             }
         }
 
+
+        private void gMapControl_yuk_MouseMove(object sender, MouseEventArgs e)
+        {
+            // Get the current position of the center of the map
+            PointLatLng centerPosition = gMapControl_yuk.Position;
+
+            // Update the strings with the center position coordinates
+            centerX = centerPosition.Lng.ToString();
+            centerY = centerPosition.Lat.ToString();
+
+            // boolean controlu ile grid oluşturulacak alan seçimine başlanması
+            if (e.Button == MouseButtons.Left && cbs.isSelecting_grid == true)
+            {
+                cbs.ending_point = gMapControl_yuk.FromLocalToLatLng(e.X, e.Y);
+                cbs.UpdateSelectionPolygon(gMapControl_yuk);
+            }
+
+            // eğer sadece 1 adet nokta seçilmişse, ve ikinci nokta dinamik olarak farklı yerlere
+            // tıklanarak seçiliyorsa, mesafeyi de buna göre güncelle.
+            if (isRulerActive && rulerPoints_yuk.Count == 1 && isRulerEnabled == true)
+            {
+
+                var point = gMapControl_yuk.FromLocalToLatLng(e.X, e.Y);
+                if (rulerRoute_yuk != null)
+                {
+                    rulerOverlay_yuk.Routes.Remove(rulerRoute_yuk);
+                }
+                rulerRoute_yuk = new GMapRoute(new List<PointLatLng> { rulerPoints_yuk[0], point }, "rulerRoute_yuk");
+                rulerRoute_yuk.Stroke = new Pen(Color.Red, 3);
+                rulerOverlay_yuk.Routes.Add(rulerRoute_yuk);
+                gMapControl_yuk.Refresh();
+            }
+        }
+
         private void gMapControl_stokastik_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left && cbs.isSelecting_grid)
@@ -1539,6 +1579,23 @@ namespace SLF
                 gMapControl_stokastik.Refresh();
             }
         }
+
+        private void gMapControl_yuk_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && cbs.isSelecting_grid)
+            {
+                // grid oluşturmak için seçilen alan (bounding box) ın son noktası
+                cbs.ending_point = gMapControl_yuk.FromLocalToLatLng(e.X, e.Y);
+                cbs.isSelecting_grid = false;
+                gMapControl_yuk.CanDragMap = true;
+
+                // Clear the selection polygon and refresh the map
+                gMapControl_yuk.Overlays.Remove(cbs.bounding_box_overlay);
+                cbs.AddGridToMap(gMapControl_yuk);
+                gMapControl_yuk.Refresh();
+            }
+        }
+
 
         // open up the Fonksiyonlar formu and populate its comboboxes with the specified array values
         private void katman_birleştir_Click(object sender, EventArgs e)
@@ -1586,9 +1643,9 @@ namespace SLF
             }
         }
 
-
+        
         public void OnMapClickEventi(PointLatLng pointClick, MouseEventArgs e, GMapOverlay markerOverlay,
-    List<PointLatLng> polygonPoints, ref GMapOverlay polygonOverlay,
+    ref List<PointLatLng> polygonPoints, ref GMapOverlay polygonOverlay,
     Label mesafe, Label mesafe_metre)
         {
             if (e.Button == MouseButtons.Left)
@@ -1623,10 +1680,15 @@ namespace SLF
 
                     layer_index = Array.FindIndex(cbs.tüm_katmanlar_array, s => s == null);
 
+                    if (layer_index == -1)
+                    {
+                        MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
+                        return;
+                    }
+
                     polygonOverlay = new GMapOverlay("polygonOverlay_" + layer_index.ToString());
 
                     cbs.GetActiveGMapControl().Overlays.Add(polygonOverlay);
-                    cbs.GetActiveGMapControl().Refresh();
 
                     // eğer gmapControl_OnMapClick event'i ile 2 den fazla nokta seçilirse,
                     // bu noktalar arasında bir poligon çiz
@@ -1640,33 +1702,38 @@ namespace SLF
                         mesafe.Text = "Seçili Alan: " + Math.Round(area, 0).ToString() + " m²";
                     }
                 }
+                cbs.GetActiveGMapControl().Refresh();
             }
-
 
         }
 
         private void gMapControl_imar_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
-            OnMapClickEventi(pointClick, e, markerOverlay_imar, polygonPoints_imar, ref polygonOverlay_imar,
-                Mesafe_imar, mesafe_metre_imar);
+            OnMapClickEventi(pointClick, e, markerOverlay_imar, ref polygonPoints_imar,
+                    ref polygonOverlay_imar, Mesafe_imar, mesafe_metre_imar);
         }
 
         private void gMapControl_stokastik_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
-            OnMapClickEventi(pointClick, e, markerOverlay_stokastik, polygonPoints_stokastik, 
+            OnMapClickEventi(pointClick, e, markerOverlay_stokastik, ref polygonPoints_stokastik, 
                 ref polygonOverlay_stokastik, Mesafe_stokastik, mesafe_metre_stokastik);
         }
 
-
-        private void Poligon_Kaydet_Click(object sender, EventArgs e)
+        private void gMapControl_yuk_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
+            OnMapClickEventi(pointClick, e, markerOverlay_yuk, ref polygonPoints_yuk,
+        ref polygonOverlay_yuk, Mesafe_yuk, mesafe_metre_yuk);
+        }
 
-            if (polygonOverlay_stokastik != null && polygonOverlay_stokastik.Polygons.Count != 0)
+        public void PoligonKaydetEventi(object sender, EventArgs e, GMapOverlay polygonOverlay,
+            GMapOverlay markerOverlay, List<PointLatLng> polygonPoints, Label mesafe, Label mesafe_metre)
+        {
+            if (polygonOverlay != null && polygonOverlay.Polygons.Count != 0)
             {
-                markerOverlay_stokastik.Markers.Clear();
+                markerOverlay.Markers.Clear();
 
                 layer_index = Array.FindIndex(cbs.tüm_katmanlar_array, s => s == null);
-                GMapOverlay overlay_to_be_saved = polygonOverlay_stokastik;
+                GMapOverlay overlay_to_be_saved = polygonOverlay;
                 cbs.tüm_katmanlar_array[layer_index] = overlay_to_be_saved;
                 cbs.tüm_katmanlar_array_names[layer_index] = "Polygon_" + "_" + (layer_index + 1).ToString();
 
@@ -1676,7 +1743,7 @@ namespace SLF
                 cbs.shapeFileArray_MapWinGIS[layer_index] = myShapefile;
 
                 // Create DataTable and store it
-                DataTable polygonDataTable = cbs.CreatePolygonDataTable(polygonPoints_stokastik, layer_index);
+                DataTable polygonDataTable = cbs.CreatePolygonDataTable(polygonPoints, layer_index);
                 cbs.tüm_katmanlar_datatable[layer_index] = polygonDataTable;
 
                 // Get the list of associated checkboxes for the given layer_index
@@ -1693,27 +1760,36 @@ namespace SLF
                     }
                 }
 
-                /*System.Windows.Forms.CheckBox associatedCheckBox = GetCheckBoxesByIndex(layer_index);
-                if (associatedCheckBox != null)
-                {
-                    associatedCheckBox.Checked = true;
-                    associatedCheckBox.Visible = true;
-                    associatedCheckBox.Text = cbs.tüm_katmanlar_array_names[layer_index];
-                }*/
-
                 MessageBox.Show("Poligon kaydedildi.");
-                Mesafe_stokastik.Visible = false;
-                mesafe_metre_stokastik.Visible = false;
+                mesafe.Visible = false;
+                mesafe_metre.Visible = false;
                 isSelecting_polygon = false;
 
                 // Prepare a new overlay for future use
-                polygonOverlay_stokastik = null;
-                polygonPoints_stokastik.Clear();
+                polygonOverlay = null;
+                polygonPoints.Clear();
             }
             else
             {
                 MessageBox.Show("Herhangi bir poligon çizilmemiştir. Lütfen öncelikle bir poligon çiziniz.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
+        }
+
+
+        private void Poligon_Kaydet_Click(object sender, EventArgs e)
+        {
+            if(cbs.GetActiveGMapControl() == gMapControl_imar)
+            {
+                PoligonKaydetEventi(sender, e, polygonOverlay_imar, markerOverlay_imar,
+                    polygonPoints_imar, Mesafe_imar, mesafe_metre_imar);
+
+            } else if (cbs.GetActiveGMapControl() == gMapControl_stokastik)
+
+            {
+                PoligonKaydetEventi(sender, e, polygonOverlay_stokastik, markerOverlay_stokastik,
+                    polygonPoints_stokastik, Mesafe_stokastik, mesafe_metre_stokastik);
+            }
+
         }
 
 
@@ -1989,10 +2065,22 @@ namespace SLF
 
         private void Poligon_Sil_Click(object sender, EventArgs e)
         {
-            if (polygonOverlay_stokastik == null || polygonOverlay_stokastik.Polygons.Count == 0)
+            if(cbs.GetActiveGMapControl() == gMapControl_imar)
             {
-                MessageBox.Show("Herhangi bir poligon çizilmemiştir. Lütfen öncelikle bir poligon çiziniz.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                if (polygonOverlay_imar == null || polygonOverlay_imar.Polygons.Count == 0)
+                {
+                    MessageBox.Show("Herhangi bir poligon çizilmemiştir. Lütfen öncelikle bir poligon çiziniz.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
             }
+
+            else if (cbs.GetActiveGMapControl() == gMapControl_stokastik)
+            {
+                if (polygonOverlay_stokastik == null || polygonOverlay_stokastik.Polygons.Count == 0)
+                {
+                    MessageBox.Show("Herhangi bir poligon çizilmemiştir. Lütfen öncelikle bir poligon çiziniz.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
+            }
+
         }
 
         private void veri_listesi_seçimi_SelectedIndexChanged(object sender, EventArgs e)
@@ -2504,6 +2592,75 @@ namespace SLF
                 gMapControl_imar.Refresh();
             }
         }
+
+        private void trackBar_Yıllar_ValueChanged(object sender, EventArgs e)
+        {
+            int selectedYear = trackBar_Yıllar.Value;
+            yuk_yıl_deger.Text = $"{selectedYear}";
+
+            // Construct the column name based on the selected year
+            string columnName = $"{selectedYear}";
+
+            // Call a method to update the heatmap using the selected year's data
+            UpdateHeatmapForYear(columnName);
+        }
+        /*
+        private void UpdateHeatmapForYear(string columnName)
+        {
+            // Clear the existing overlay and add the shapefile overlay back
+            gMapControl_yuk.Overlays.Clear();
+            gMapControl_yuk.Overlays.Add(cbs.tüm_katmanlar_array[0]);
+
+            // Apply heatmap
+            cbs.CreateHeatmap(cbs.tüm_katmanlar_array[0], cbs.tüm_katmanlar_datatable[0], columnName);
+            // Get min and max values from your data column
+            double min = // calculate the min for columnName;
+            double max = // calculate the max for columnName;
+
+            cbs.CreateHeatmapLegend(min, max);
+            gMapControl_yuk.Refresh();
+        }*/
+
+        private void UpdateHeatmapForYear(string columnName)
+        {
+            // Clear the existing overlay for a fresh heatmap
+            cbs.GetActiveGMapControl().Overlays.Clear();
+            gMapControl_yuk.Overlays.Clear();
+            gMapControl_yuk.Overlays.Add(cbs.tüm_katmanlar_array[0]);
+
+            // Create a new overlay for the heatmap
+            GMapOverlay heatmapOverlay = new GMapOverlay("Heatmap");
+
+            // Assuming your data is stored in a DataTable called yourDataTable
+            DataTable dataTable = cbs.tüm_katmanlar_datatable[0];
+
+            // Initialize min and max values
+            double min = double.MaxValue;
+            double max = double.MinValue;
+
+            // Calculate min and max values for the specified column
+            foreach (DataRow row in dataTable.Rows)
+            {
+                if (row[columnName] != DBNull.Value && double.TryParse(row[columnName].ToString(), out double value))
+                {
+                    if (value < min) min = value;
+                    if (value > max) max = value;
+                }
+            }
+
+            // Display heatmap based on the column data
+            cbs.CreateHeatmap(cbs.tüm_katmanlar_array[0], cbs.tüm_katmanlar_datatable[0], columnName);
+            cbs.CreateHeatmapLegend(min, max);
+
+            // Add the overlay to the GMap control
+            cbs.GetActiveGMapControl().Overlays.Add(heatmapOverlay);
+            cbs.GetActiveGMapControl().Refresh();
+
+
+        }
+
+
+
 
         private void İmar_Poligon_MouseDown(object sender, MouseEventArgs e)
         {

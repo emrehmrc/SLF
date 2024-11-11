@@ -14,6 +14,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GMap.NET.WindowsForms.Markers;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace SLF
 {
@@ -23,7 +25,7 @@ namespace SLF
         public GMapOverlay[] tüm_katmanlar_array;
         public string[] tüm_katmanlar_array_names;
         public MapWinGIS.Shapefile[] shapeFileArray_MapWinGIS;
-        public DataTable[] tüm_katmanlar_datatable;
+        public System.Data.DataTable[] tüm_katmanlar_datatable;
 
         // see the attributes of a polygon when clicked on it on the map 
         public Dictionary<GMapPolygon, DataRow> polygonAttributes; // for polygons other than grids
@@ -65,7 +67,7 @@ namespace SLF
             tüm_katmanlar_array_names = new string[13];
             tüm_katmanlar_array = new GMapOverlay[13];
             shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[13];
-            tüm_katmanlar_datatable = new DataTable[13];
+            tüm_katmanlar_datatable = new System.Data.DataTable[13];
 
             targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
 
@@ -185,7 +187,7 @@ namespace SLF
                     modülFormu.gMapControl_stokastik.Overlays.Add(shapeFileOverlay_stokastik);
 
                     // create a new datatable to be added to the tüm_katmanlar_datatable array
-                    DataTable shapefile_datatable = new DataTable();
+                    System.Data.DataTable shapefile_datatable = new System.Data.DataTable();
 
                     // run the import method
                     callingForm.Cursor = Cursors.WaitCursor;
@@ -215,6 +217,7 @@ namespace SLF
                             checkBox.Text = tüm_katmanlar_array_names[layer_index];
                         }
                     }
+                    //LoadShapefileIntoOverlay(shapeFileOverlay_imar, tüm_katmanlar_datatable[0]);
                 }
                 else if (extension == "kml")
                 {
@@ -226,7 +229,7 @@ namespace SLF
                     modülFormu.gMapControl_yuk.Overlays.Add(kmlOverlay_yuk);
                     modülFormu.gMapControl_stokastik.Overlays.Add(kmlOverlay_stokastik);
 
-                    DataTable kml_datatable = new DataTable();
+                    System.Data.DataTable kml_datatable = new System.Data.DataTable();
                     callingForm.Cursor = Cursors.WaitCursor;
                     await LoadKmlFile(filepath, kmlOverlay_imar, kml_datatable, gmapcontrol);
 
@@ -315,25 +318,25 @@ namespace SLF
 
 
         // define default colors for each overlay object
-        public (Color BorderColor, Color FillColor)[] overlayColors = new (Color, Color)[]
+        public (System.Drawing.Color BorderColor, System.Drawing.Color FillColor)[] overlayColors = new (System.Drawing.Color, System.Drawing.Color)[]
         {
-            (Color.Red, Color.FromArgb(50, Color.Red)),
-            (Color.Blue, Color.FromArgb(50, Color.Blue)),
-            (Color.Green, Color.FromArgb(50, Color.Green)),
-            (Color.DarkGoldenrod, Color.FromArgb(50, Color.DarkGoldenrod)),
-            (Color.Purple, Color.FromArgb(50, Color.Purple)),
-            (Color.Orange, Color.FromArgb(50, Color.Orange)),
-            (Color.Pink, Color.FromArgb(50, Color.Pink)),
-            (Color.Brown, Color.FromArgb(50, Color.Brown)),
-            (Color.Gray, Color.FromArgb(50, Color.Gray)),
-            (Color.Cyan, Color.FromArgb(50, Color.Cyan)),
-            (Color.DarkTurquoise, Color.FromArgb(50, Color.DarkTurquoise)),
-            (Color.Black, Color.FromArgb(50, Color.Black)),
-            (Color.Violet, Color.FromArgb(50, Color.Violet))
+            (System.Drawing.Color.Red, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Red)),
+            (System.Drawing.Color.Blue, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Blue)),
+            (System.Drawing.Color.Green, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Green)),
+            (System.Drawing.Color.DarkGoldenrod, System.Drawing.Color.FromArgb(50, System.Drawing.Color.DarkGoldenrod)),
+            (System.Drawing.Color.Purple, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Purple)),
+            (System.Drawing.Color.Orange, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Orange)),
+            (System.Drawing.Color.Pink, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Pink)),
+            (System.Drawing.Color.Brown, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Brown)),
+            (System.Drawing.Color.Gray, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Gray)),
+            (System.Drawing.Color.Cyan, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Cyan)),
+            (System.Drawing.Color.DarkTurquoise, System.Drawing.Color.FromArgb(50, System.Drawing.Color.DarkTurquoise)),
+            (System.Drawing.Color.Black, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Black)),
+            (System.Drawing.Color.Violet, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Violet))
         };
 
-        private DataTable LoadAttributeTable(DataRow row, DataGridView dataGridView,
-        ShapefileDataReader shapefile_reader, DataTable data_table, int row_cnt)
+        private System.Data.DataTable LoadAttributeTable(DataRow row, DataGridView dataGridView,
+        ShapefileDataReader shapefile_reader, System.Data.DataTable data_table, int row_cnt)
         {
 
             // populate the new row by using the .GetValue method 
@@ -644,7 +647,8 @@ namespace SLF
             return shapefile;
         }
 
-        public async Task LoadKmlFile(string filepath, GMapOverlay kmlOverlay, DataTable data_table,
+        public async Task LoadKmlFile(string filepath, GMapOverlay kmlOverlay, 
+            System.Data.DataTable data_table,
             GMapControl gMapControl)
         {
 
@@ -930,7 +934,7 @@ namespace SLF
 
         // method that loads a shapefile object to the specified GMapOverlay map object
         public async Task LoadShapefile(string filepath, GMapOverlay shapeFileOverlay,
-                            DataTable shapefile_datatable, DataGridView dataGridView)
+                            System.Data.DataTable shapefile_datatable, DataGridView dataGridView)
         {
 
             // eğer dosya bulunamadıysa uyarı ver
@@ -1053,7 +1057,7 @@ namespace SLF
 
         // grid oluşturma metodu
         public List<NetTopologySuite.Geometries.Polygon> CreateGrid(double xMin, double yMin, double xMax,
-                double yMax, double cellSizeLat, double cellSizeLon, out DataTable gridTable,
+                double yMax, double cellSizeLat, double cellSizeLon, out System.Data.DataTable gridTable,
                 Dictionary<NetTopologySuite.Geometries.Polygon, DataRow> polygonAttributes_grid)
         {
             // NTS libraries to create polygons
@@ -1063,7 +1067,7 @@ namespace SLF
             int cell_no = 1;
 
             // Create a DataTable to hold the grid coordinates
-            gridTable = new DataTable();
+            gridTable = new System.Data.DataTable();
             gridTable.Columns.Add("Cell_No");
             gridTable.Columns.Add("xMin", typeof(double));
             gridTable.Columns.Add("xMax", typeof(double));
@@ -1128,7 +1132,7 @@ namespace SLF
                 gMapControl.Position.Lat);
 
             // Create grid and DataTable
-            DataTable gridTable;
+            System.Data.DataTable gridTable;
             var polygonAttributes_grid = new Dictionary<NetTopologySuite.Geometries.Polygon, DataRow>();
             var grid = CreateGrid(xMin, yMin, xMax, yMax, cellSizeDegreesLat, cellSizeDegreesLon,
                 out gridTable, polygonAttributes_grid);
@@ -1245,8 +1249,8 @@ namespace SLF
                 }
 
                 // Highlight new selected polygon
-                polygon.Stroke = new Pen(Color.LawnGreen, 3);
-                polygon.Fill = new SolidBrush(Color.FromArgb(50, Color.LawnGreen));
+                polygon.Stroke = new Pen(System.Drawing.Color.LawnGreen, 3);
+                polygon.Fill = new SolidBrush(System.Drawing.Color.FromArgb(50, System.Drawing.Color.LawnGreen));
 
 
 
@@ -1263,8 +1267,8 @@ namespace SLF
 
                 // Highlight new selected polygon with a different border and fill color
                 selectedPolygon = polygon;
-                selectedPolygon.Stroke = new Pen(Color.LawnGreen, 3);
-                selectedPolygon.Fill = new SolidBrush(Color.FromArgb(50, Color.LawnGreen));
+                selectedPolygon.Stroke = new Pen(System.Drawing.Color.LawnGreen, 3);
+                selectedPolygon.Fill = new SolidBrush(System.Drawing.Color.FromArgb(50, System.Drawing.Color.LawnGreen));
 
                 gMapControl.Refresh();
             }
@@ -1279,7 +1283,7 @@ namespace SLF
             string poligonIsim = $"Poligon_{polygonOverlay.Polygons.Count + 1}";
             GMapPolygon polygon = new GMapPolygon(polygonPoints, poligonIsim)
             {
-                Stroke = new Pen(Color.DarkBlue, 3)
+                Stroke = new Pen(System.Drawing.Color.DarkBlue, 3)
             };
 
             polygonOverlay.Polygons.Clear();
@@ -1288,9 +1292,9 @@ namespace SLF
         }
 
 
-        public DataTable CreatePolygonDataTable(List<PointLatLng> polygonPoints, int polygonId)
+        public System.Data.DataTable CreatePolygonDataTable(List<PointLatLng> polygonPoints, int polygonId)
         {
-            DataTable dt = new DataTable();
+            System.Data.DataTable dt = new System.Data.DataTable();
             dt.Columns.Add("PolygonID", typeof(int));
             dt.Columns.Add("Coordinates", typeof(string));
             dt.Columns.Add("Area_Size(m2)", typeof(string));
@@ -1298,7 +1302,7 @@ namespace SLF
             // Create a string representation of the coordinates
             string coordinates = string.Join(", ", polygonPoints.Select(p => $"({p.Lat}, {p.Lng})"));
 
-            double area = CalculatePolygonArea(polygonPoints_stokastik);
+            double area = CalculatePolygonArea(polygonPoints);
 
             // Create a new row
             DataRow row = dt.NewRow();
@@ -1334,6 +1338,106 @@ namespace SLF
         }
 
 
+        public System.Drawing.Color GetHeatmapColor(double value, double min, double max)
+        {
+            double ratio = (value - min) / (max - min);
+            int red = (int)(255 * ratio);
+            int blue = (int)(255 * (1 - ratio));
+            return System.Drawing.Color.FromArgb(100, red, 0, blue); // Semi-transparent color
+        }
+
+
+        public void CreateHeatmap(GMapOverlay overlay, System.Data.DataTable dataTable, string columnName)
+        {
+            // Step 1: Find the min and max values for normalization
+            double min = double.MaxValue;
+            double max = double.MinValue;
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                if (row[columnName] != DBNull.Value && double.TryParse(row[columnName].ToString(), 
+                    out double value))
+                {
+                    if (value < min) min = value;
+                    if (value > max) max = value;
+                }
+            }
+
+            // Step 2: Apply heatmap color to each polygon based on the column value
+            foreach (GMapPolygon polygon in overlay.Polygons)
+            {
+                // Get the corresponding DataRow for the polygon
+                if (polygonAttributes.TryGetValue(polygon, out DataRow attributes))
+                {
+
+                    if (attributes[columnName] != DBNull.Value && double.TryParse(attributes[columnName].ToString(), 
+                        out double value))
+                    {
+
+                        System.Drawing.Color heatColor = GetHeatmapColor(value, min, max);
+                        polygon.Stroke = new Pen(heatColor, 1);
+                        polygon.Fill = new SolidBrush(heatColor);
+                    }
+                }
+            }
+
+            // Refresh the map control to show updated colors
+            modülFormu.gMapControl_yuk.Refresh();
+        }
+
+        public void CreateHeatmapLegend(double min, double max)
+        {
+            // Clear previous legend if it exists
+            if (modülFormu.Controls.ContainsKey("heatmapLegend"))
+            {
+                modülFormu.Controls.RemoveByKey("heatmapLegend");
+            }
+
+            // Divide the range into 10 equal brackets
+            double range = max - min;
+            double bracketSize = range / 10;
+
+            // Generate labels and color boxes for each bracket
+            for (int i = 0; i < 10; i++)
+            {
+                double bracketMin = min + (i * bracketSize);
+                double bracketMax = bracketMin + bracketSize;
+
+                // Calculate color gradient from blue to red
+                System.Drawing.Color color = GetHeatmapColor(i / 9.0); // Pass a normalized value (0 to 1)
+
+                // Create a color box
+                Panel colorBox = new Panel
+                {
+                    Size = new System.Drawing.Size(20, 20),
+                    Location = new System.Drawing.Point(10, i * 20 + 10),
+                    BackColor = color
+                };
+
+                modülFormu.legendPanel.Controls.Add(colorBox);
+
+                // Create a label for the bracket range
+                System.Windows.Forms.Label rangeLabel = new System.Windows.Forms.Label
+                {
+                    Text = $"{bracketMin:F2} - {bracketMax:F2}",
+                    Location = new System.Drawing.Point(35, i * 20 + 10),
+                    AutoSize = true,
+                    Font = new Font("Arial", 8)
+                };
+
+                modülFormu.legendPanel.Controls.Add(rangeLabel);
+            }
+        }
+
+        // Color gradient method for blue to red
+        private System.Drawing.Color GetHeatmapColor(double ratio)
+        {
+            int red = (int)(255 * ratio);
+            int blue = (int)(255 * (1 - ratio));
+            return System.Drawing.Color.FromArgb(255, red, 0, blue); // Opaque colors
+        }
+
+
         // ------------------------------- HARİTA EVENTLERİ ----------------------------------/////////////////////
 
         public void ManuelGridSecimi(GMapControl gMapControl)
@@ -1344,8 +1448,8 @@ namespace SLF
             // seçilen alanı kullanıcıya gösterecek olan poligonu oluşturmaya başla
             bounding_box_polygon = new GMapPolygon(new List<PointLatLng>(), "bounding_box_polygon")
             {
-                Stroke = new Pen(Color.White, 3),
-                Fill = new SolidBrush(Color.FromArgb(50, Color.White))
+                Stroke = new Pen(System.Drawing.Color.White, 3),
+                Fill = new SolidBrush(System.Drawing.Color.FromArgb(50, System.Drawing.Color.White))
             };
 
             bounding_box_overlay.Polygons.Add(bounding_box_polygon);
@@ -1373,7 +1477,7 @@ namespace SLF
                 rulerOverlay.Routes.Remove(rulerRoute);
             }
             rulerRoute = new GMapRoute(rulerPoints, "ruler_Route");
-            rulerRoute.Stroke = new Pen(Color.Red, 3);
+            rulerRoute.Stroke = new Pen(System.Drawing.Color.Red, 3);
             rulerOverlay.Routes.Add(rulerRoute);
 
             GetActiveGMapControl().Refresh();
@@ -1414,7 +1518,7 @@ namespace SLF
 
         //  method to extract data from polygons
         private List<(GMapPolygon Polygon, DataRow Attributes)> 
-            ExtractPolygonsAndAttributes(GMapOverlay overlay, DataTable dataTable)
+            ExtractPolygonsAndAttributes(GMapOverlay overlay, System.Data.DataTable dataTable)
         {
             List<(GMapPolygon Polygon, DataRow Attributes)> polygonData = new List<(GMapPolygon, DataRow)>();
 
@@ -1458,7 +1562,7 @@ namespace SLF
         private DataRow CombineAttributes(DataRow leftRow, DataRow rightRow)
         {
             // initialize the combined data table
-            DataTable combinedTable = new DataTable();
+            System.Data.DataTable combinedTable = new System.Data.DataTable();
 
             // Add columns from leftRow
             foreach (DataColumn column in leftRow.Table.Columns)
@@ -1500,7 +1604,7 @@ namespace SLF
             List<string> selectedColumns)
         {
             // initialize the data table that will hold the combination of the two tables
-            DataTable combinedTable = new DataTable();
+            System.Data.DataTable combinedTable = new System.Data.DataTable();
 
             // Add columns from leftRow to the combinedTable
             foreach (DataColumn column in leftRow.Table.Columns)
@@ -1634,8 +1738,8 @@ namespace SLF
                 resultingOverlay.Polygons.Add(resultingPolygon);
                 polygonAttributes[resultingPolygon] = resultingAttributes;
 
-                resultingPolygon.Stroke = new Pen(Color.LightSeaGreen, 3);
-                resultingPolygon.Fill = new SolidBrush(Color.FromArgb(50, Color.Transparent));
+                resultingPolygon.Stroke = new Pen(System.Drawing.Color.LightSeaGreen, 3);
+                resultingPolygon.Fill = new SolidBrush(System.Drawing.Color.FromArgb(50, System.Drawing.Color.Transparent));
             }
 
             return resultingOverlay;
@@ -1690,8 +1794,8 @@ namespace SLF
                 resultingOverlay.Polygons.Add(resultingPolygon);
                 polygonAttributes[resultingPolygon] = resultingAttributes;
 
-                resultingPolygon.Stroke = new Pen(Color.LightSeaGreen, 5);
-                resultingPolygon.Fill = new SolidBrush(Color.FromArgb(50, Color.Transparent));
+                resultingPolygon.Stroke = new Pen(System.Drawing.Color.LightSeaGreen, 5);
+                resultingPolygon.Fill = new SolidBrush(System.Drawing.Color.FromArgb(50, System.Drawing.Color.Transparent));
 
             }
 
@@ -1744,7 +1848,7 @@ namespace SLF
             tüm_katmanlar_array_names[layer_index] = "Birleştirilmiş_Katman_" + layer_index.ToString();
 
             // create a data table object and fill it with the information from the joinedData object
-            DataTable joined_data_table = new DataTable();
+            System.Data.DataTable joined_data_table = new System.Data.DataTable();
 
             if (joinedData.Count > 0)
             {
@@ -1835,7 +1939,7 @@ namespace SLF
             tüm_katmanlar_array_names[layer_index] = "Birleştirilmiş_Katman_" + layer_index.ToString();
 
             // create a data table object and fill it with the information from the joinedData object
-            DataTable joined_data_table = new DataTable();
+            System.Data.DataTable joined_data_table = new System.Data.DataTable();
 
             if (joinedData.Count > 0)
             {
