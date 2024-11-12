@@ -14,7 +14,7 @@ namespace SLF
         public bool OperationCancelled => isOperationCancelled;
 
         private readonly List<string> acPowers = new List<string> { "3,7 kW", "7,4 kW", "11 kW", "22 kW" };
-        private readonly List<string> dcPowers = new List<string> { "50 kW", "100 kW", "150 kW", "350 kW" };
+        private readonly List<string> dcPowers = new List<string> { "50 kW", "100 kW", "150 kW"};
 
         public ChargingStationPopupForm(DataTable existingDataTable, NoktaVeri veri)
         {

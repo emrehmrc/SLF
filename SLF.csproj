@@ -579,6 +579,12 @@
       <DependentUpon>ChargingStationPopupForm.cs</DependentUpon>
     </Compile>
     <Compile Include="CsvHandler.cs" />
+    <Compile Include="DEKCenterPopupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DEKCenterPopupForm.Designer.cs">
+      <DependentUpon>DEKCenterPopupForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ExcelExporter.cs" />
     <Compile Include="MethodForm.cs">
       <SubType>Form</SubType>
@@ -683,6 +689,9 @@
     <EmbeddedResource Include="ChargingStationPopupForm.resx">
       <DependentUpon>ChargingStationPopupForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="DEKCenterPopupForm.resx">
+      <DependentUpon>DEKCenterPopupForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Fonksiyon Oluştur.resx">
       <DependentUpon>Fonksiyon Oluştur.cs</DependentUpon>
     </EmbeddedResource>
@@ -777,6 +786,15 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Pictures\OEDAS_Logo-.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Pictures\oedas-yeni-binasinda-hizmet-vermeye-basliyor-1613029537595.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Pictures\home.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
