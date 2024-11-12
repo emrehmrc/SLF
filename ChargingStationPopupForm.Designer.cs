@@ -39,13 +39,13 @@
             this.ISTASYON_GUCU = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.EA_X_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.EA_Y_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ChargingStationpanel1 = new System.Windows.Forms.Panel();
+            this.ChargingStationpanel = new System.Windows.Forms.Panel();
             this.ChargingStationpanel2 = new System.Windows.Forms.Panel();
             this.CancelButton = new Guna.UI2.WinForms.Guna2Button();
             this.TamamButton = new Guna.UI2.WinForms.Guna2Button();
             this.guna2AnimateWindow1 = new Guna.UI2.WinForms.Guna2AnimateWindow(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.ChargingStationDataGridView)).BeginInit();
-            this.ChargingStationpanel1.SuspendLayout();
+            this.ChargingStationpanel.SuspendLayout();
             this.ChargingStationpanel2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -58,7 +58,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(130)))), ((int)(((byte)(197)))), ((int)(((byte)(84)))));
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
             dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             dataGridViewCellStyle2.ForeColor = System.Drawing.Color.White;
             dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
@@ -96,7 +96,7 @@
             this.ChargingStationDataGridView.ThemeStyle.AlternatingRowsStyle.SelectionForeColor = System.Drawing.Color.Empty;
             this.ChargingStationDataGridView.ThemeStyle.BackColor = System.Drawing.Color.White;
             this.ChargingStationDataGridView.ThemeStyle.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(182)))), ((int)(((byte)(224)))), ((int)(((byte)(216)))));
-            this.ChargingStationDataGridView.ThemeStyle.HeaderStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(130)))), ((int)(((byte)(197)))), ((int)(((byte)(84)))));
+            this.ChargingStationDataGridView.ThemeStyle.HeaderStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
             this.ChargingStationDataGridView.ThemeStyle.HeaderStyle.BorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             this.ChargingStationDataGridView.ThemeStyle.HeaderStyle.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.ChargingStationDataGridView.ThemeStyle.HeaderStyle.ForeColor = System.Drawing.Color.White;
@@ -147,22 +147,22 @@
             this.EA_Y_KOORDINAT.Name = "EA_Y_KOORDINAT";
             this.EA_Y_KOORDINAT.ReadOnly = true;
             // 
-            // ChargingStationpanel1
+            // ChargingStationpanel
             // 
-            this.ChargingStationpanel1.BackColor = System.Drawing.Color.LightGreen;
-            this.ChargingStationpanel1.Controls.Add(this.ChargingStationDataGridView);
-            this.ChargingStationpanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ChargingStationpanel1.Location = new System.Drawing.Point(0, 0);
-            this.ChargingStationpanel1.Name = "ChargingStationpanel1";
-            this.ChargingStationpanel1.Size = new System.Drawing.Size(800, 450);
-            this.ChargingStationpanel1.TabIndex = 1;
+            this.ChargingStationpanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(223)))), ((int)(((byte)(156)))));
+            this.ChargingStationpanel.Controls.Add(this.ChargingStationDataGridView);
+            this.ChargingStationpanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ChargingStationpanel.Location = new System.Drawing.Point(0, 0);
+            this.ChargingStationpanel.Name = "ChargingStationpanel";
+            this.ChargingStationpanel.Size = new System.Drawing.Size(800, 450);
+            this.ChargingStationpanel.TabIndex = 1;
             // 
             // ChargingStationpanel2
             // 
             this.ChargingStationpanel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.ChargingStationpanel2.BackColor = System.Drawing.Color.LightGreen;
+            this.ChargingStationpanel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(223)))), ((int)(((byte)(156)))));
             this.ChargingStationpanel2.Controls.Add(this.CancelButton);
             this.ChargingStationpanel2.Controls.Add(this.TamamButton);
             this.ChargingStationpanel2.Location = new System.Drawing.Point(0, 393);
@@ -178,7 +178,7 @@
             this.CancelButton.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.CancelButton.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
             this.CancelButton.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
-            this.CancelButton.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(130)))), ((int)(((byte)(197)))), ((int)(((byte)(84)))));
+            this.CancelButton.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
             this.CancelButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.CancelButton.ForeColor = System.Drawing.Color.White;
             this.CancelButton.Location = new System.Drawing.Point(431, 5);
@@ -195,7 +195,7 @@
             this.TamamButton.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.TamamButton.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
             this.TamamButton.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
-            this.TamamButton.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(130)))), ((int)(((byte)(197)))), ((int)(((byte)(84)))));
+            this.TamamButton.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
             this.TamamButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.TamamButton.ForeColor = System.Drawing.Color.White;
             this.TamamButton.Location = new System.Drawing.Point(617, 5);
@@ -210,13 +210,13 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.ChargingStationpanel2);
-            this.Controls.Add(this.ChargingStationpanel1);
+            this.Controls.Add(this.ChargingStationpanel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ChargingStationPopupForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Şarj İstasyonu Bilgileri";
             ((System.ComponentModel.ISupportInitialize)(this.ChargingStationDataGridView)).EndInit();
-            this.ChargingStationpanel1.ResumeLayout(false);
+            this.ChargingStationpanel.ResumeLayout(false);
             this.ChargingStationpanel2.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -225,7 +225,7 @@
         #endregion
 
         private Guna.UI2.WinForms.Guna2DataGridView ChargingStationDataGridView;
-        private System.Windows.Forms.Panel ChargingStationpanel1;
+        private System.Windows.Forms.Panel ChargingStationpanel;
         private System.Windows.Forms.Panel ChargingStationpanel2;
         private Guna.UI2.WinForms.Guna2Button CancelButton;
         private Guna.UI2.WinForms.Guna2Button TamamButton;

@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Önizleme));
             this.Onizleme_Tablar = new System.Windows.Forms.TabControl();
             this.Onizleme_Onizleme = new System.Windows.Forms.TabPage();
@@ -99,7 +101,23 @@
             this.Onizleme_dataGrid1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
             this.Onizleme_dataGrid1.BackgroundColor = System.Drawing.Color.Snow;
             this.Onizleme_dataGrid1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.Onizleme_dataGrid1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.Onizleme_dataGrid1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.Onizleme_dataGrid1.DefaultCellStyle = dataGridViewCellStyle2;
             this.Onizleme_dataGrid1.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.Onizleme_dataGrid1.Location = new System.Drawing.Point(2, 2);
             this.Onizleme_dataGrid1.Margin = new System.Windows.Forms.Padding(2);
@@ -131,6 +149,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Onizleme_dataGrid2.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.Onizleme_dataGrid2.BackgroundColor = System.Drawing.Color.Snow;
+            this.Onizleme_dataGrid2.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.Onizleme_dataGrid2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.Onizleme_dataGrid2.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.Onizleme_dataGrid2.Location = new System.Drawing.Point(2, 0);
@@ -168,7 +187,7 @@
             this.Onizleme_dataGrid3.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_dataGrid3.Name = "Onizleme_dataGrid3";
             this.Onizleme_dataGrid3.ReadOnly = true;
-            this.Onizleme_dataGrid3.RowHeadersWidth = 51;
+            this.Onizleme_dataGrid3.RowHeadersWidth = 18;
             this.Onizleme_dataGrid3.RowTemplate.Height = 24;
             this.Onizleme_dataGrid3.Size = new System.Drawing.Size(963, 429);
             this.Onizleme_dataGrid3.TabIndex = 0;

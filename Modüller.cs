@@ -645,11 +645,11 @@ namespace SLF
                     }
                 });
 
-                MessageBox.Show("User changes saved to the modified Excel file.");
+                MessageBox.Show("Kullanıcı değişiklikleri excel dosyasına kaydedildi.");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error updating Excel file: {ex.Message}");
+                MessageBox.Show($"Dosya güncelleme hatası: {ex.Message}");
             }
         }
         private async void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e)
@@ -700,7 +700,7 @@ namespace SLF
                 }
                 else
                 {
-                    LogOutput("R script executed successfully.");
+                    LogOutput("Algoritma başarıyla çalıştırıldı.");
                 }
             }
             catch (Exception ex)
@@ -1010,7 +1010,7 @@ namespace SLF
         private void LoadImagesIntoPictureBoxes()
         {
             // Path to the folder where the images are saved
-            string imageFolderPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Grafik Outputs\";
+            string imageFolderPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\Grafik Outputs\";
 
             // Load images into PictureBox controls with checks
             LoadImageIntoPictureBox(pictureBox1, Path.Combine(imageFolderPath, "bolge_aydınlatma_projections.png"));
@@ -2656,7 +2656,7 @@ namespace SLF
                 // Priority check for adding a charging station
                 if (isAddingChargingStation)
                 {
-                    // Bitmap SunMarkerIcon = new Bitmap("C:/Users/begum.orhan/source/repos/SLF/Pictures/Sun.png");
+                    //Bitmap SunMarkerIcon = new Bitmap("C:/Users/begum.orhan/source/repos/SLF/Pictures/Sun.png");
                     //GMapMarker marker = new GMarkerGoogle(pointClick, SunMarkerIcon);
                     // Add the yellow marker for charging station
                     GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow);
@@ -3017,6 +3017,9 @@ namespace SLF
                 // Check for adding a DEK point
                 if (isAddingDekPoint)
                 {
+
+                    //Bitmap SunMarkerIcon = new Bitmap("C:/Users/begum.orhan/source/repos/SLF/Pictures/Sun.png");
+                    //GMapMarker marker = new GMarkerGoogle(pointClick, SunMarkerIcon);
                     // Add the green marker for DEK point
                     GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
                     marker.ToolTipText = "Yeni DEK Merkezi";
@@ -4346,6 +4349,8 @@ namespace SLF
             }
 
             girdiModülü = girdiModülleri[seçilenVeriTipi];
+            Console.WriteLine(girdiModülü);
+
             girdiModülü.SlfStartYear = slfStartYear;
             girdiModülü.SlfEndYear = slfEndYear;
 
@@ -5367,12 +5372,13 @@ namespace SLF
                         {
                             if (!eaData.Columns.Contains("EA_X_KOORDINAT") ||
                                 !eaData.Columns.Contains("EA_Y_KOORDINAT") ||
-                                !eaData.Columns.Contains("ISTASYON_GUCU"))
+                                !eaData.Columns.Contains("ISTASYON_GUCU") ||
+                                !GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
                             {
                                 MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
                                 return;
                             }
-
+                            //Console.WriteLine(GirdiModülü.dataTablesByType);
                             if (!girdiModülü.IsNullLike(row["EA_X_KOORDINAT"]) &&
                                 !girdiModülü.IsNullLike(row["EA_Y_KOORDINAT"]))
                             {
