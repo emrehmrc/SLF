@@ -58,7 +58,7 @@ namespace SLF
             this.panel9 = new System.Windows.Forms.Panel();
             this.label17 = new System.Windows.Forms.Label();
             this.raporGoruntuleButonu = new System.Windows.Forms.Button();
-            this.dataGridView_girdi = new System.Windows.Forms.DataGridView();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.panel8 = new System.Windows.Forms.Panel();
             this.label18 = new System.Windows.Forms.Label();
             this.ExcelDownloadButton = new System.Windows.Forms.Button();
@@ -73,7 +73,7 @@ namespace SLF
             this.label2 = new System.Windows.Forms.Label();
             this.SelectFolderButton = new System.Windows.Forms.Button();
             this.tab_dek = new System.Windows.Forms.TabPage();
-            this.panel3 = new System.Windows.Forms.Panel();
+            this.DEKSimButton = new System.Windows.Forms.Panel();
             this.dekSimDefBtn = new System.Windows.Forms.RadioButton();
             this.dekSimMaxBtn = new System.Windows.Forms.RadioButton();
             this.dekSimMinBtn = new System.Windows.Forms.RadioButton();
@@ -105,12 +105,12 @@ namespace SLF
             this.checkBox24 = new System.Windows.Forms.CheckBox();
             this.checkBox23 = new System.Windows.Forms.CheckBox();
             this.checkBox22 = new System.Windows.Forms.CheckBox();
-            this.panel2 = new System.Windows.Forms.Panel();
+            this.GelecekSimPanel = new System.Windows.Forms.Panel();
             this.EaSimDefBtn = new System.Windows.Forms.RadioButton();
             this.EaSimMaxBtn = new System.Windows.Forms.RadioButton();
             this.EaSimMinBtn = new System.Windows.Forms.RadioButton();
             this.label10 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.GelecekSimButton = new System.Windows.Forms.Button();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.EAStationAddButton = new System.Windows.Forms.Button();
@@ -275,15 +275,15 @@ namespace SLF
             this.tab_girdi.SuspendLayout();
             this.OpenModuleButtonPanel.SuspendLayout();
             this.panel9.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_girdi)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel8.SuspendLayout();
             this.panel6.SuspendLayout();
             this.panel7.SuspendLayout();
             this.tab_dek.SuspendLayout();
-            this.panel3.SuspendLayout();
+            this.DEKSimButton.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.tab_ea.SuspendLayout();
-            this.panel2.SuspendLayout();
+            this.GelecekSimPanel.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.harita_katmanları_right_click.SuspendLayout();
             this.tab_ekonometrik.SuspendLayout();
@@ -413,7 +413,7 @@ namespace SLF
             this.tab_girdi.Controls.Add(this.label3);
             this.tab_girdi.Controls.Add(this.OpenModuleButtonPanel);
             this.tab_girdi.Controls.Add(this.panel9);
-            this.tab_girdi.Controls.Add(this.dataGridView_girdi);
+            this.tab_girdi.Controls.Add(this.dataGridView1);
             this.tab_girdi.Controls.Add(this.panel8);
             this.tab_girdi.Controls.Add(this.panel6);
             this.tab_girdi.Controls.Add(this.panel7);
@@ -504,17 +504,17 @@ namespace SLF
             this.raporGoruntuleButonu.UseVisualStyleBackColor = false;
             this.raporGoruntuleButonu.Click += new System.EventHandler(this.raporGoruntuleButonu_Click);
             // 
-            // dataGridView_girdi
+            // dataGridView1
             // 
-            this.dataGridView_girdi.AllowUserToAddRows = false;
-            this.dataGridView_girdi.AllowUserToDeleteRows = false;
-            this.dataGridView_girdi.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.dataGridView1.AllowUserToAddRows = false;
+            this.dataGridView1.AllowUserToDeleteRows = false;
+            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridView_girdi.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-            this.dataGridView_girdi.BackgroundColor = System.Drawing.Color.Snow;
-            this.dataGridView_girdi.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.dataGridView_girdi.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.dataGridView1.BackgroundColor = System.Drawing.Color.Snow;
+            this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
             dataGridViewCellStyle1.Font = new System.Drawing.Font("Maiandra GD", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -522,18 +522,18 @@ namespace SLF
             dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridView_girdi.DefaultCellStyle = dataGridViewCellStyle1;
-            this.dataGridView_girdi.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.dataGridView_girdi.Location = new System.Drawing.Point(7, 96);
-            this.dataGridView_girdi.Margin = new System.Windows.Forms.Padding(2);
-            this.dataGridView_girdi.Name = "dataGridView_girdi";
-            this.dataGridView_girdi.ReadOnly = true;
-            this.dataGridView_girdi.RowHeadersWidth = 18;
+            this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle1;
+            this.dataGridView1.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.dataGridView1.Location = new System.Drawing.Point(7, 96);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(2);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.ReadOnly = true;
+            this.dataGridView1.RowHeadersWidth = 18;
             dataGridViewCellStyle2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            this.dataGridView_girdi.RowsDefaultCellStyle = dataGridViewCellStyle2;
-            this.dataGridView_girdi.RowTemplate.Height = 24;
-            this.dataGridView_girdi.Size = new System.Drawing.Size(1290, 350);
-            this.dataGridView_girdi.TabIndex = 4;
+            this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            this.dataGridView1.RowTemplate.Height = 24;
+            this.dataGridView1.Size = new System.Drawing.Size(1290, 350);
+            this.dataGridView1.TabIndex = 4;
             // 
             // panel8
             // 
@@ -711,7 +711,7 @@ namespace SLF
             // 
             // tab_dek
             // 
-            this.tab_dek.Controls.Add(this.panel3);
+            this.tab_dek.Controls.Add(this.DEKSimButton);
             this.tab_dek.Controls.Add(this.DEKCenterAddButton);
             this.tab_dek.Controls.Add(this.toolStrip1);
             this.tab_dek.Controls.Add(this.gMapControl_Dek);
@@ -723,20 +723,20 @@ namespace SLF
             this.tab_dek.Text = "DEK Modülü";
             this.tab_dek.UseVisualStyleBackColor = true;
             // 
-            // panel3
+            // DEKSimButton
             // 
-            this.panel3.BackColor = System.Drawing.Color.LightGray;
-            this.panel3.Controls.Add(this.dekSimDefBtn);
-            this.panel3.Controls.Add(this.dekSimMaxBtn);
-            this.panel3.Controls.Add(this.dekSimMinBtn);
-            this.panel3.Controls.Add(this.button2);
-            this.panel3.Controls.Add(this.comboBox4);
-            this.panel3.Controls.Add(this.comboBox3);
-            this.panel3.Controls.Add(this.label11);
-            this.panel3.Location = new System.Drawing.Point(1112, 133);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(196, 264);
-            this.panel3.TabIndex = 39;
+            this.DEKSimButton.BackColor = System.Drawing.Color.LightGray;
+            this.DEKSimButton.Controls.Add(this.dekSimDefBtn);
+            this.DEKSimButton.Controls.Add(this.dekSimMaxBtn);
+            this.DEKSimButton.Controls.Add(this.dekSimMinBtn);
+            this.DEKSimButton.Controls.Add(this.button2);
+            this.DEKSimButton.Controls.Add(this.comboBox4);
+            this.DEKSimButton.Controls.Add(this.comboBox3);
+            this.DEKSimButton.Controls.Add(this.label11);
+            this.DEKSimButton.Location = new System.Drawing.Point(1112, 133);
+            this.DEKSimButton.Name = "DEKSimButton";
+            this.DEKSimButton.Size = new System.Drawing.Size(196, 264);
+            this.DEKSimButton.TabIndex = 39;
             // 
             // dekSimDefBtn
             // 
@@ -1114,7 +1114,7 @@ namespace SLF
             this.tab_ea.Controls.Add(this.checkBox24);
             this.tab_ea.Controls.Add(this.checkBox23);
             this.tab_ea.Controls.Add(this.checkBox22);
-            this.tab_ea.Controls.Add(this.panel2);
+            this.tab_ea.Controls.Add(this.GelecekSimPanel);
             this.tab_ea.Controls.Add(this.EAStationAddButton);
             this.tab_ea.Controls.Add(this.mesafe_metre_ea);
             this.tab_ea.Controls.Add(this.Mesafe_ea);
@@ -1178,22 +1178,22 @@ namespace SLF
             this.checkBox22.UseVisualStyleBackColor = true;
             this.checkBox22.CheckedChanged += new System.EventHandler(this.checkBox_Ac_Home);
             // 
-            // panel2
+            // GelecekSimPanel
             // 
-            this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel2.BackColor = System.Drawing.Color.LightGray;
-            this.panel2.Controls.Add(this.EaSimDefBtn);
-            this.panel2.Controls.Add(this.EaSimMaxBtn);
-            this.panel2.Controls.Add(this.EaSimMinBtn);
-            this.panel2.Controls.Add(this.label10);
-            this.panel2.Controls.Add(this.button1);
-            this.panel2.Controls.Add(this.comboBox2);
-            this.panel2.Controls.Add(this.comboBox1);
-            this.panel2.Location = new System.Drawing.Point(1126, 124);
-            this.panel2.Margin = new System.Windows.Forms.Padding(2);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(185, 271);
-            this.panel2.TabIndex = 38;
+            this.GelecekSimPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.GelecekSimPanel.BackColor = System.Drawing.Color.LightGray;
+            this.GelecekSimPanel.Controls.Add(this.EaSimDefBtn);
+            this.GelecekSimPanel.Controls.Add(this.EaSimMaxBtn);
+            this.GelecekSimPanel.Controls.Add(this.EaSimMinBtn);
+            this.GelecekSimPanel.Controls.Add(this.label10);
+            this.GelecekSimPanel.Controls.Add(this.GelecekSimButton);
+            this.GelecekSimPanel.Controls.Add(this.comboBox2);
+            this.GelecekSimPanel.Controls.Add(this.comboBox1);
+            this.GelecekSimPanel.Location = new System.Drawing.Point(1126, 124);
+            this.GelecekSimPanel.Margin = new System.Windows.Forms.Padding(2);
+            this.GelecekSimPanel.Name = "GelecekSimPanel";
+            this.GelecekSimPanel.Size = new System.Drawing.Size(185, 271);
+            this.GelecekSimPanel.TabIndex = 38;
             // 
             // EaSimDefBtn
             // 
@@ -1243,15 +1243,15 @@ namespace SLF
             this.label10.TabIndex = 2;
             this.label10.Text = "Similasyon Ekranı";
             // 
-            // button1
+            // GelecekSimButton
             // 
-            this.button1.Location = new System.Drawing.Point(13, 196);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(160, 46);
-            this.button1.TabIndex = 37;
-            this.button1.Text = "Gelecek Ea Şarj Noktalarını Konumlandır";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.gelecekSimilasyonGoruntule);
+            this.GelecekSimButton.Location = new System.Drawing.Point(13, 196);
+            this.GelecekSimButton.Name = "GelecekSimButton";
+            this.GelecekSimButton.Size = new System.Drawing.Size(160, 46);
+            this.GelecekSimButton.TabIndex = 37;
+            this.GelecekSimButton.Text = "Gelecek Ea Şarj Noktalarını Konumlandır";
+            this.GelecekSimButton.UseVisualStyleBackColor = true;
+            this.GelecekSimButton.Click += new System.EventHandler(this.gelecekSimilasyonGoruntule);
             // 
             // comboBox2
             // 
@@ -1762,7 +1762,7 @@ namespace SLF
             this.ELFLowResultsTable.Location = new System.Drawing.Point(3, 0);
             this.ELFLowResultsTable.Name = "ELFLowResultsTable";
             this.ELFLowResultsTable.RowHeadersWidth = 51;
-            this.ELFLowResultsTable.Size = new System.Drawing.Size(1106, 528);
+            this.ELFLowResultsTable.Size = new System.Drawing.Size(1106, 532);
             this.ELFLowResultsTable.TabIndex = 1;
             // 
             // ELFBaseResultsTabPage
@@ -1788,7 +1788,7 @@ namespace SLF
             this.ELFBaseResultsTable.Location = new System.Drawing.Point(6, 3);
             this.ELFBaseResultsTable.Name = "ELFBaseResultsTable";
             this.ELFBaseResultsTable.RowHeadersWidth = 51;
-            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1106, 528);
+            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1106, 532);
             this.ELFBaseResultsTable.TabIndex = 1;
             // 
             // ELFHighResultsTabPage
@@ -1814,7 +1814,7 @@ namespace SLF
             this.ELFHighResultsTable.Location = new System.Drawing.Point(6, 0);
             this.ELFHighResultsTable.Name = "ELFHighResultsTable";
             this.ELFHighResultsTable.RowHeadersWidth = 51;
-            this.ELFHighResultsTable.Size = new System.Drawing.Size(1100, 528);
+            this.ELFHighResultsTable.Size = new System.Drawing.Size(1100, 532);
             this.ELFHighResultsTable.TabIndex = 1;
             // 
             // ELFMaxResultsTabPage
@@ -1841,7 +1841,7 @@ namespace SLF
             this.ELFMaxResultsTable.Location = new System.Drawing.Point(0, 3);
             this.ELFMaxResultsTable.Name = "ELFMaxResultsTable";
             this.ELFMaxResultsTable.RowHeadersWidth = 51;
-            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1112, 531);
+            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1112, 535);
             this.ELFMaxResultsTable.TabIndex = 1;
             // 
             // ELFTablePanel
@@ -2154,7 +2154,7 @@ namespace SLF
             this.ELFLowSenaryoTable.Location = new System.Drawing.Point(6, -1);
             this.ELFLowSenaryoTable.Name = "ELFLowSenaryoTable";
             this.ELFLowSenaryoTable.RowHeadersWidth = 18;
-            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(906, 502);
+            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(906, 506);
             this.ELFLowSenaryoTable.TabIndex = 1;
             // 
             // tabPage4
@@ -3353,7 +3353,7 @@ namespace SLF
             this.OpenModuleButtonPanel.ResumeLayout(false);
             this.panel9.ResumeLayout(false);
             this.panel9.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_girdi)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.panel8.ResumeLayout(false);
             this.panel8.PerformLayout();
             this.panel6.ResumeLayout(false);
@@ -3361,14 +3361,14 @@ namespace SLF
             this.panel7.PerformLayout();
             this.tab_dek.ResumeLayout(false);
             this.tab_dek.PerformLayout();
-            this.panel3.ResumeLayout(false);
-            this.panel3.PerformLayout();
+            this.DEKSimButton.ResumeLayout(false);
+            this.DEKSimButton.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.tab_ea.ResumeLayout(false);
             this.tab_ea.PerformLayout();
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
+            this.GelecekSimPanel.ResumeLayout(false);
+            this.GelecekSimPanel.PerformLayout();
             this.toolStrip2.ResumeLayout(false);
             this.toolStrip2.PerformLayout();
             this.harita_katmanları_right_click.ResumeLayout(false);
@@ -3456,7 +3456,7 @@ namespace SLF
         private System.Windows.Forms.TabPage tab_yükHaritası;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox veri_listesi_seçimi;
-        private System.Windows.Forms.DataGridView dataGridView_girdi;
+        private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button SelectFolderButton;
         private Microsoft.Web.WebView2.WinForms.WebView2 webView21;
@@ -3643,8 +3643,8 @@ namespace SLF
         private Button DEKCenterAddButton;
         private Guna.UI2.WinForms.Guna2Button HomePageButton;
         private System.ComponentModel.BackgroundWorker backgroundWorker2;
-        private Button button1;
-        private Panel panel2;
+        private Button GelecekSimButton;
+        private Panel GelecekSimPanel;
         private Label label10;
         private ComboBox comboBox2;
         private ComboBox comboBox1;
@@ -3654,7 +3654,7 @@ namespace SLF
         private CheckBox checkBox22;
         private Button button4;
         private Button button3;
-        private Panel panel3;
+        private Panel DEKSimButton;
         private ComboBox comboBox3;
         private Label label11;
         private Button button2;

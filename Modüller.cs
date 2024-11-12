@@ -138,7 +138,7 @@ namespace SLF
         private void Form1_Load(object sender, EventArgs e)
         {
             // Başlangıçta butonu devre dışı bırak
-            button1.Enabled = false;
+            GelecekSimButton.Enabled = false;
 
             // Checkbox'ları başlangıçta görünmez yap
             checkBox22.Visible = false;
@@ -2646,7 +2646,7 @@ namespace SLF
                         Boylam = Math.Round(pointClick.Lng, 4)
                     };
 
-                    using (ChargingStationPopupForm popupForm = new ChargingStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+                    using (ChargingStationPopupForm popupForm = new ChargingStationPopupForm(dataGridView1.DataSource as DataTable, noktaVeri_marker))
                     {
                         if (popupForm.ShowDialog() == DialogResult.OK)
                         {
@@ -3213,7 +3213,7 @@ namespace SLF
                 }
 
                 // Yeni satır oluşturup DataGridView1'e ekleyeceğiz
-                DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
+                DataTable dataTable = dataGridView1.DataSource as DataTable;
                 if (dataTable == null)
                 {
                     dataTable = new DataTable();
@@ -3225,7 +3225,7 @@ namespace SLF
                     dataTable.Columns.Add("DEK_TM_ADI", typeof(string));
                     dataTable.Columns.Add("DEK_KURULUM_YERI", typeof(string));
                     dataTable.Columns.Add("DEK_BAGLANDIGI_TRAFO_KODU", typeof(string));
-                    dataGridView_girdi.DataSource = dataTable;
+                    dataGridView1.DataSource = dataTable;
                 }
 
                 DataRow newRow = dataTable.NewRow();
@@ -4231,6 +4231,7 @@ namespace SLF
             }
 
             girdiModülü = girdiModülleri[seçilenVeriTipi];
+ 
             girdiModülü.SlfStartYear = slfStartYear;
             girdiModülü.SlfEndYear = slfEndYear;
 
@@ -4246,7 +4247,7 @@ namespace SLF
                 modulescheck.Add(seçilenVeriTipi);
                 veri_listesi_seçimi.Refresh();
                 Console.WriteLine(modulescheck.Count);
-                dataGridView_girdi.DataSource = girdiModülü.CurrentDataTable;
+                dataGridView1.DataSource = girdiModülü.CurrentDataTable;
                 
 
 
@@ -4769,7 +4770,7 @@ namespace SLF
         {
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
             girdiModülü = girdiModülleri[seçilenVeriTipi];
-            dataGridView_girdi.DataSource = girdiModülü.importedDataTable;
+            dataGridView1.DataSource = girdiModülü.importedDataTable;
             
         }
 
@@ -5125,7 +5126,7 @@ namespace SLF
                     //girdiModülü.importedDataTable?.Clear(); // Clear the DataTable if it is not null
                     girdiModülü.importedDataTable = new DataTable();
                 }
-                dataGridView_girdi.DataSource = null;
+                dataGridView1.DataSource = null;
             }
             else
             {
@@ -5234,7 +5235,7 @@ namespace SLF
             {
                 GMapOverlay eaOverlay = new GMapOverlay("EA Layer");
 
-                if (dataGridView_girdi.DataSource == null)
+                if (dataGridView1.DataSource == null)
                 {
                     MessageBox.Show("Veri kaynağı bulunamadı. Lütfen verileri kontrol edin.");
                     return;
@@ -5245,7 +5246,8 @@ namespace SLF
                     gMapControl_EA.Overlays.Remove(eaOverlay);
                 }
 
-                DataTable eaData = await Task.Run(() => DataGridViewToDataTable(dataGridView_girdi));
+                
+                DataTable eaData = await Task.Run(() => GirdiModülü.dataTablesByType["EA Şarj Verileri"]);
 
                 if (eaData != null && eaData.Rows.Count > 0)
                 {
@@ -5258,7 +5260,8 @@ namespace SLF
                         {
                             if (!eaData.Columns.Contains("EA_X_KOORDINAT") ||
                                 !eaData.Columns.Contains("EA_Y_KOORDINAT") ||
-                                !eaData.Columns.Contains("ISTASYON_GUCU"))
+                                !eaData.Columns.Contains("ISTASYON_GUCU")&&
+                                !GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri")) 
                             {
                                 MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
                                 return;
@@ -5321,7 +5324,7 @@ namespace SLF
             {
                 GMapOverlay dekOverlay = new GMapOverlay("Dek Layer");
 
-                if (dataGridView_girdi.DataSource == null)
+                if (dataGridView1.DataSource == null)
                 {
                     MessageBox.Show("Veri kaynağı bulunamadı. Lütfen verileri kontrol edin.");
                     return;
@@ -5332,8 +5335,8 @@ namespace SLF
                     gMapControl_Dek.Overlays.Remove(dekOverlay);
                 }
 
-                DataTable dekData = await Task.Run(() => DataGridViewToDataTable(dataGridView_girdi));
-
+                
+                DataTable dekData = await Task.Run(() => GirdiModülü.dataTablesByType["DEK Verileri"]);
                 if (dekData != null && dekData.Rows.Count > 0)
                 {
                     Invoke(new Action(() =>
@@ -5342,7 +5345,8 @@ namespace SLF
                         {
                             if (!dekData.Columns.Contains("DEK_X_KOORDINAT") ||
                                 !dekData.Columns.Contains("DEK_Y_KOORDINAT") ||
-                                !dekData.Columns.Contains("KAYNAK_TIPI"))
+                                !dekData.Columns.Contains("KAYNAK_TIPI")|| 
+                                !GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
                             {
                                 MessageBox.Show("Lütfen DEK modülü verilerinizi yükleyin.");
                                 return;
@@ -5471,29 +5475,41 @@ namespace SLF
             // EA Şarj Modülü tabına tıklanmışsa
             if (selectedTabText == "EA Şarj Modülü")
             {
-                if (dataGridView_girdi.DataSource == null)
+                if ((!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri")))
                 {
-                    MessageBox.Show("Lütfen önce verileri yükleyin.");
+                    MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
+                    Modül_Tabları.SelectedTab = tab_girdi;
                     return;
+                }
+                else
+                {
+                    InitializeComboBoxes();
+                    await eaHaritayaVeriYukleAsync();
                 }
 
                 // Harita işlemini başlat
-                InitializeComboBoxes();
-                await eaHaritayaVeriYukleAsync();
+                
+
+
+                
             }
             // DEK Modülü tabına tıklanmışsa
             else if (selectedTabText == "DEK Modülü")
             {
                 Console.WriteLine("DEK Modülü");
-                if (dataGridView_girdi.DataSource == null)
+                if (!GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
                 {
-                    MessageBox.Show("Lütfen önce verileri yükleyin.");
+                    MessageBox.Show("Lütfen DEK modülü verilerinizi yükleyin.");
+                    Modül_Tabları.SelectedTab = tab_girdi;
                     return;
+                }
+                else
+                {
+                    await dekHaritayaVeriYukleAsync();
                 }
 
                 // Harita işlemini başlat
-                await dekHaritayaVeriYukleAsync();
-            }
+                            }
         }
 
 
@@ -5512,11 +5528,12 @@ namespace SLF
             if (!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
             {
                 MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
+                Console.WriteLine("batu");
                 return;
             }
 
             // Use dataGridView1.DataSource as the DataTable instead of eaDataTable
-            DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
+            DataTable dataTable = dataGridView1.DataSource as DataTable;
             if (dataTable == null || dataTable.Rows.Count == 0)
             {
                 MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
@@ -5694,7 +5711,7 @@ namespace SLF
         private void CheckSelections()
         {
             // Seçimlerin yapıldığını kontrol ederek butonu etkinleştir
-            button1.Enabled = SelectedYear != -1 && SelectedCity != null;
+            GelecekSimButton.Enabled = SelectedYear != -1 && SelectedCity != null;
         }
 
         // Yıl seçimi yapıldığında çağrılan metot
