@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Önizleme));
             this.Onizleme_Tablar = new System.Windows.Forms.TabControl();
             this.Onizleme_Onizleme = new System.Windows.Forms.TabPage();
@@ -87,7 +88,7 @@
             this.Onizleme_Onizleme.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_Onizleme.Name = "Onizleme_Onizleme";
             this.Onizleme_Onizleme.Padding = new System.Windows.Forms.Padding(2);
-            this.Onizleme_Onizleme.Size = new System.Drawing.Size(965, 432);
+            this.Onizleme_Onizleme.Size = new System.Drawing.Size(965, 436);
             this.Onizleme_Onizleme.TabIndex = 0;
             this.Onizleme_Onizleme.Text = "Önizleme";
             this.Onizleme_Onizleme.UseVisualStyleBackColor = true;
@@ -100,15 +101,23 @@
             this.Onizleme_dataGrid1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
             this.Onizleme_dataGrid1.BackgroundColor = System.Drawing.Color.Snow;
             this.Onizleme_dataGrid1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.Onizleme_dataGrid1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
             dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.Onizleme_dataGrid1.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.Onizleme_dataGrid1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.Onizleme_dataGrid1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.Onizleme_dataGrid1.DefaultCellStyle = dataGridViewCellStyle2;
             this.Onizleme_dataGrid1.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.Onizleme_dataGrid1.Location = new System.Drawing.Point(2, 2);
             this.Onizleme_dataGrid1.Margin = new System.Windows.Forms.Padding(2);
@@ -140,6 +149,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Onizleme_dataGrid2.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.Onizleme_dataGrid2.BackgroundColor = System.Drawing.Color.Snow;
+            this.Onizleme_dataGrid2.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.Onizleme_dataGrid2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.Onizleme_dataGrid2.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.Onizleme_dataGrid2.Location = new System.Drawing.Point(2, 0);
@@ -158,7 +168,7 @@
             this.Onizleme_Warning.Location = new System.Drawing.Point(4, 26);
             this.Onizleme_Warning.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_Warning.Name = "Onizleme_Warning";
-            this.Onizleme_Warning.Size = new System.Drawing.Size(965, 432);
+            this.Onizleme_Warning.Size = new System.Drawing.Size(965, 436);
             this.Onizleme_Warning.TabIndex = 2;
             this.Onizleme_Warning.Text = "Düzeltilecekler";
             this.Onizleme_Warning.UseVisualStyleBackColor = true;
@@ -177,7 +187,7 @@
             this.Onizleme_dataGrid3.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_dataGrid3.Name = "Onizleme_dataGrid3";
             this.Onizleme_dataGrid3.ReadOnly = true;
-            this.Onizleme_dataGrid3.RowHeadersWidth = 51;
+            this.Onizleme_dataGrid3.RowHeadersWidth = 18;
             this.Onizleme_dataGrid3.RowTemplate.Height = 24;
             this.Onizleme_dataGrid3.Size = new System.Drawing.Size(963, 429);
             this.Onizleme_dataGrid3.TabIndex = 0;
@@ -189,7 +199,7 @@
             this.Onizleme_Information.Location = new System.Drawing.Point(4, 26);
             this.Onizleme_Information.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_Information.Name = "Onizleme_Information";
-            this.Onizleme_Information.Size = new System.Drawing.Size(965, 432);
+            this.Onizleme_Information.Size = new System.Drawing.Size(965, 436);
             this.Onizleme_Information.TabIndex = 3;
             this.Onizleme_Information.Text = "Silinecekler";
             this.Onizleme_Information.UseVisualStyleBackColor = true;
@@ -220,7 +230,7 @@
             this.Onizleme_Statistics.Location = new System.Drawing.Point(4, 26);
             this.Onizleme_Statistics.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_Statistics.Name = "Onizleme_Statistics";
-            this.Onizleme_Statistics.Size = new System.Drawing.Size(965, 432);
+            this.Onizleme_Statistics.Size = new System.Drawing.Size(965, 436);
             this.Onizleme_Statistics.TabIndex = 4;
             this.Onizleme_Statistics.Text = "Bilgiler";
             this.Onizleme_Statistics.UseVisualStyleBackColor = true;

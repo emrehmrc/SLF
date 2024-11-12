@@ -47,7 +47,7 @@
             this.MethodPanel.Controls.Add(this.MethodComboBox);
             this.MethodPanel.Location = new System.Drawing.Point(44, 53);
             this.MethodPanel.Name = "MethodPanel";
-            this.MethodPanel.Size = new System.Drawing.Size(299, 352);
+            this.MethodPanel.Size = new System.Drawing.Size(295, 348);
             this.MethodPanel.TabIndex = 0;
             this.MethodPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.MethodPanel_Paint);
             // 
@@ -55,8 +55,8 @@
             // 
             this.ForwardButton.Cursor = System.Windows.Forms.Cursors.Default;
             this.ForwardButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.LightGreen;
-            this.ForwardButton.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.ForwardButton.ForeColor = System.Drawing.Color.Orange;
+            this.ForwardButton.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.ForwardButton.ForeColor = System.Drawing.Color.DarkOrange;
             this.ForwardButton.Location = new System.Drawing.Point(104, 238);
             this.ForwardButton.Name = "ForwardButton";
             this.ForwardButton.Size = new System.Drawing.Size(99, 28);
@@ -69,11 +69,11 @@
             // 
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
-            this.label1.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label1.ForeColor = System.Drawing.Color.Coral;
-            this.label1.Location = new System.Drawing.Point(13, 101);
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.label1.ForeColor = System.Drawing.Color.DarkOrange;
+            this.label1.Location = new System.Drawing.Point(3, 107);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(101, 19);
+            this.label1.Size = new System.Drawing.Size(115, 21);
             this.label1.TabIndex = 2;
             this.label1.Text = "Metot Seçimi:";
             // 
@@ -82,8 +82,9 @@
             this.MethodComboBox.BackColor = System.Drawing.Color.Snow;
             this.MethodComboBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.MethodComboBox.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.MethodComboBox.ForeColor = System.Drawing.Color.Orange;
+            this.MethodComboBox.ForeColor = System.Drawing.Color.DarkOrange;
             this.MethodComboBox.FormattingEnabled = true;
+            this.MethodComboBox.ItemHeight = 17;
             this.MethodComboBox.Items.AddRange(new object[] {
             "SLF (Jeo-Uzamsal)",
             "ELF (Ekonometrik)"});
@@ -91,7 +92,7 @@
             this.MethodComboBox.Name = "MethodComboBox";
             this.MethodComboBox.Size = new System.Drawing.Size(253, 25);
             this.MethodComboBox.TabIndex = 1;
-            this.MethodComboBox.Text = "Başlangıç metodu seçiniz.";
+            this.MethodComboBox.Text = "Lütfen ilerlemek için metot seçiniz.";
             // 
             // MethodForm
             // 
@@ -101,13 +102,16 @@
             this.ClientSize = new System.Drawing.Size(384, 461);
             this.Controls.Add(this.MethodPanel);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.ForeColor = System.Drawing.Color.DarkOrange;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
+            this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(400, 500);
             this.MinimumSize = new System.Drawing.Size(400, 500);
             this.Name = "MethodForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Metot Seçimi";
+            this.Text = "METOT SEÇİM EKRANI";
             this.MethodPanel.ResumeLayout(false);
             this.MethodPanel.PerformLayout();
             this.ResumeLayout(false);

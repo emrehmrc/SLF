@@ -25,7 +25,7 @@ namespace SLF
 
         private void StartButton_Click(object sender, EventArgs e)
         {
-            MethodForm optionForm = new MethodForm();
+            MethodForm optionForm = new MethodForm(this);
             //this.Hide();
             optionForm.ShowDialog();
             this.Show();

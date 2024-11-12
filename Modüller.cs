@@ -134,6 +134,13 @@ namespace SLF
         public Dictionary<GMapPolygon, DataRow> polygonAttributes_kml;
         public Dictionary<GMapRoute, DataRow> routeAttributes_kml;
         private bool isDtrLoaded = false;
+        private Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
+{
+    { "İzmir", new PointLatLng(38.4192, 27.1287) }, // Example coordinates for İzmir
+    { "Eskişehir", new PointLatLng(39.7768, 30.5206) }, // Example coordinates for Eskişehir
+    // Add more cities and their coordinates as needed
+};
+
         private void Form1_Load(object sender, EventArgs e)
         {
             // Başlangıçta butonu devre dışı bırak
@@ -638,11 +645,11 @@ namespace SLF
                     }
                 });
 
-                MessageBox.Show("User changes saved to the modified Excel file.");
+                MessageBox.Show("Kullanıcı değişiklikleri excel dosyasına kaydedildi.");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error updating Excel file: {ex.Message}");
+                MessageBox.Show($"Dosya güncelleme hatası: {ex.Message}");
             }
         }
         private async void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e)
@@ -693,7 +700,7 @@ namespace SLF
                 }
                 else
                 {
-                    LogOutput("R script executed successfully.");
+                    LogOutput("Algoritma başarıyla çalıştırıldı.");
                 }
             }
             catch (Exception ex)
@@ -1003,7 +1010,7 @@ namespace SLF
         private void LoadImagesIntoPictureBoxes()
         {
             // Path to the folder where the images are saved
-            string imageFolderPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Grafik Outputs\";
+            string imageFolderPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\Grafik Outputs\";
 
             // Load images into PictureBox controls with checks
             LoadImageIntoPictureBox(pictureBox1, Path.Combine(imageFolderPath, "bolge_aydınlatma_projections.png"));
@@ -1061,7 +1068,9 @@ namespace SLF
         /// </summary>
         /// 
         private void HomePageButton_Click(object sender, EventArgs e)
-        {   
+        {
+            // Show the confirmation dialog for navigating to the home page
+     
             // Show the confirmation dialog for navigating to the home page
             DialogResult result = MessageBox.Show(
                 "Ana sayfaya dönmek istediğinize emin misiniz? Kaydedilmeyen veriler kaybolacaktır!",
@@ -2282,12 +2291,12 @@ namespace SLF
             veri_listesi_seçimi.Enabled = false;
         }*/
 
-        private void button8_Click(object sender, EventArgs e)
+/*        private void button8_Click(object sender, EventArgs e) //DEK Ekranı Dosya Seç Butonu Kaldırıldı
         {
             Modül_Tabları.SelectTab(tab_girdi);
             veri_listesi_seçimi.Text = "DEK Verileri";
             veri_listesi_seçimi.Enabled = false;
-        }
+        }*/
 
         private void button6_Click(object sender, EventArgs e)
         {
@@ -2647,7 +2656,9 @@ namespace SLF
                 // Priority check for adding a charging station
                 if (isAddingChargingStation)
                 {
-                    // Add the red marker for charging station
+                    //Bitmap SunMarkerIcon = new Bitmap("C:/Users/begum.orhan/source/repos/SLF/Pictures/Sun.png");
+                    //GMapMarker marker = new GMarkerGoogle(pointClick, SunMarkerIcon);
+                    // Add the yellow marker for charging station
                     GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow);
                     marker.ToolTipText = "Yeni Şarj İstasyonu";
                     markerOverlay_ea.Markers.Add(marker);
@@ -3006,8 +3017,12 @@ namespace SLF
                 // Check for adding a DEK point
                 if (isAddingDekPoint)
                 {
+
+                    //Bitmap SunMarkerIcon = new Bitmap("C:/Users/begum.orhan/source/repos/SLF/Pictures/Sun.png");
+                    //GMapMarker marker = new GMarkerGoogle(pointClick, SunMarkerIcon);
                     // Add the green marker for DEK point
                     GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
+                    marker.ToolTipText = "Yeni DEK Merkezi";
                     markerOverlay_Dek.Markers.Add(marker);
 
                     // Create the coordinate object for the popup form
@@ -5269,7 +5284,7 @@ namespace SLF
             istasyonAdetLabel.AutoSize = true;  // Otomatik boyutlandırma
 
             // Yazı tipi ve stil ayarları
-            istasyonAdetLabel.Font = new System.Drawing.Font("Arial", 16, System.Drawing.FontStyle.Bold);
+            istasyonAdetLabel.Font = new System.Drawing.Font("Arial", 12, System.Drawing.FontStyle.Bold);
             istasyonAdetLabel.ForeColor = System.Drawing.Color.White;  // Yazı rengini beyaz yapıyoruz
             istasyonAdetLabel.BackColor = System.Drawing.Color.Transparent;  // Arka planı şeffaf yapıyoruz
 
@@ -5363,7 +5378,7 @@ namespace SLF
                                 MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
                                 return;
                             }
-
+                            //Console.WriteLine(GirdiModülü.dataTablesByType);
                             if (!girdiModülü.IsNullLike(row["EA_X_KOORDINAT"]) &&
                                 !girdiModülü.IsNullLike(row["EA_Y_KOORDINAT"]))
                             {
@@ -5770,11 +5785,27 @@ namespace SLF
             {
                 MessageBox.Show("Lütfen harita üzerinde DEK noktası koordinatlarınızı belirleyiniz.");
                 isAddingDekPoint = true; // Set flag for DEK point marking
+                return;
             }
             else
             {
                 Console.WriteLine("Bilinmeyen tıklama türü");
             }
+            var pointClick = gMapControl_Dek.FromLocalToLatLng(MousePosition.X, MousePosition.Y);
+
+            //// Create or get the overlay for charging station markers
+            //GMapOverlay chargingStationOverlay = gMapControl_EA.Overlays.FirstOrDefault(o => o.Id == "ChargingStationLayer");
+            //if (chargingStationOverlay == null)
+            //{
+            //    chargingStationOverlay = new GMapOverlay("ChargingStationLayer");
+            //    gMapControl_EA.Overlays.Add(chargingStationOverlay);
+            //}
+
+            // Refresh the map to show the new marker
+            gMapControl_Dek.Refresh();
+
+            // Reset the flag after adding the station
+            isAddingDekPoint = false;
         }
 
         /*        private void DEKCenterAddButton_Click(object sender, EventArgs e)
@@ -5840,7 +5871,7 @@ namespace SLF
             }
             else
             {
-                MessageBox.Show("Lütfen geçerli bir şehir ve hız seçiniz.");
+                MessageBox.Show("Lütfen geçerli bir şehir ve senaryo seçiniz.");
                 return; // Geçerli bir şehir veya hız seçilmediyse işlemi sonlandır
             }
 
@@ -5913,7 +5944,6 @@ namespace SLF
                 CheckSelections();  // Seçim durumunu kontrol et
             }
         }
-
         // Şehir seçimi yapıldığında çağrılan metot
         private void ilSecimiMonteCarlo(object sender, EventArgs e)
         {
@@ -5921,8 +5951,42 @@ namespace SLF
             {
                 SelectedCity = comboBox2.SelectedItem.ToString();  // Şehir adını ayarla
                 CheckSelections();  // Seçim durumunu kontrol et
+
+                // Set map position based on selected city
+                if (cityCoordinates.TryGetValue(SelectedCity, out PointLatLng coordinates))
+                {
+                    gMapControl_EA.Position = coordinates; // Set the map's position
+                    gMapControl_EA.Zoom = 12; // Adjust the zoom level as needed
+                }
             }
         }
+
+        // DEK şehri seçildiğinde çağrılan metot
+        private void dek_city_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox4.SelectedItem != null)  // Geçerli bir seçim yapıldığında
+            {
+                SelectedCity = comboBox4.SelectedItem.ToString();  // Şehir adını ayarla
+                CheckSelections();  // Seçim durumunu kontrol et
+
+                // Set map position based on selected city
+                if (cityCoordinates.TryGetValue(SelectedCity, out PointLatLng coordinates))
+                {
+                    gMapControl_Dek.Position = coordinates; // Set the map's position
+                    gMapControl_Dek.Zoom = 12; // Adjust the zoom level as needed
+                }
+            }
+        }
+
+        /*        // Şehir seçimi yapıldığında çağrılan metot
+                private void ilSecimiMonteCarlo(object sender, EventArgs e)
+                {
+                    if (comboBox2.SelectedItem != null)  // Geçerli bir seçim yapıldığında
+                    {
+                        SelectedCity = comboBox2.SelectedItem.ToString();  // Şehir adını ayarla
+                        CheckSelections();  // Seçim durumunu kontrol et
+                    }
+                }*/
         private void HesaplaMerkezNoktaVeEkle(DataTable dataTable)
         {
             // Eğer "MerkezEnlem" ve "MerkezBoylam" sütunları yoksa bu sütunları ekle
@@ -6202,14 +6266,14 @@ namespace SLF
             }
         }
 
-        private void dek_city_SelectedIndexChanged(object sender, EventArgs e)
+/*        private void dek_city_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBox4.SelectedItem != null)  // Geçerli bir seçim yapıldığında
             {
                 SelectedCity = comboBox4.SelectedItem.ToString();  // Şehir adını ayarla
                 CheckSelections();  // Seçim durumunu kontrol et
             }
-        }
+        }*/
         private async void dekSimulasyonGoruntule(object sender, EventArgs e)
         {
             // Checkbox'ları görünür hale getir
@@ -6219,11 +6283,11 @@ namespace SLF
 
             if (SelectedCity == "İzmir" && SelectedSpeed == "Hızlı")
             {
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\İzmir\dek_distribution_2024_2030_İzmir_yüksek.xlsx";
+                filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\İzmir\dek_distribution_2024_2030_İzmir_yüksek.xlsx";
             }
             else if (SelectedCity == "İzmir" && SelectedSpeed == "Yavaş")
             {
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\İzmir\dek_distribution_2024_2030_İzmir_düşük.xlsx";
+                filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\İzmir\dek_distribution_2024_2030_İzmir_düşük.xlsx";
             }
             else if (SelectedCity == "İzmir" && SelectedSpeed == "varsayılan")
             {
@@ -6243,7 +6307,7 @@ namespace SLF
             }
             else
             {
-                MessageBox.Show("Lütfen geçerli bir şehir ve hız seçiniz.");
+                MessageBox.Show("Lütfen geçerli bir şehir ve senaryo seçiniz.");
                 return; // Geçerli bir şehir veya hız seçilmediyse işlemi sonlandır
             }
 
@@ -6304,42 +6368,95 @@ namespace SLF
             popupForm.Controls.Add(dataGridView);
             popupForm.Show(); // Yeni pencereyi göster
         }
-
-
         private Task HaritaUzerindeDEKSimulasyonGosterimi(DataTable veriTablosu)
         {
-            // DEK için özel bir GMap overlay katmanı oluştur
+            // Create or get the overlay for DEK simulation markers
             GMapOverlay dekOverlay = new GMapOverlay("DEK_Simulasyon_Layer");
 
+            // Remove existing overlay if it exists
+            if (gMapControl_Dek.Overlays.Contains(dekOverlay))
+            {
+                gMapControl_Dek.Overlays.Remove(dekOverlay);
+                Console.WriteLine("Existing overlay removed.");
+            }
+
+            // Add a new overlay for DEK simulation markers
+            gMapControl_Dek.Overlays.Add(dekOverlay);
+
+            // Dictionary to hold markers based on their coordinates and types
+            Dictionary<(double, double, string), GMarkerGoogle> markerDictionary = new Dictionary<(double, double, string), GMarkerGoogle>();
+
+            // Process the rows in the DataTable
             foreach (DataRow row in veriTablosu.Rows)
             {
-                // Sadece DEK_distributed değeri 0'dan büyük olan satırları işleme al
+                // Debug output for each row
+                Console.WriteLine($"Processing row with DEK_distributed: {row["DEK_distributed"]}");
+
+                // Only process rows where DEK_distributed value is greater than 0
                 if (row["DEK_distributed"] != DBNull.Value && Convert.ToDouble(row["DEK_distributed"]) > 0)
                 {
-                    // Enlem ve Boylam değerlerini al
+                    // Get latitude and longitude values
                     double enlem = Convert.ToDouble(row["Enlem"]);
                     double boylam = Convert.ToDouble(row["Boylam"]);
 
-                    // ID ve DEK_distributed değerlerini al
+                    // Get ID and DEK_distributed values
                     string id = row["id"].ToString();
                     double dekValue = Convert.ToDouble(row["DEK_distributed"]);
 
-                    // Yeni bir marker oluştur ve haritada göster
+                    // Create a new marker and display it on the map
                     var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.blue);
                     marker.ToolTipText = $"ID: {id}\nDEK: {dekValue}";
 
-                    // Marker'ı overlay'e ekle
+                    // Add the marker to the overlay
                     dekOverlay.Markers.Add(marker);
+                    Console.WriteLine($"Marker added at ({enlem}, {boylam}) with ID: {id}");
                 }
             }
 
-            // DEK overlay'ini haritada göster
-            gMapControl_Dek.Overlays.Clear();
-            gMapControl_Dek.Overlays.Add(dekOverlay);
-            gMapControl_Dek.Refresh(); // Haritayı güncelle
+            // Refresh the map control to show the new markers
+            Invoke(new Action(() =>
+            {
+                gMapControl_Dek.Refresh(); // Update the map
+                Console.WriteLine("Map refreshed.");
+            }));
 
             return Task.CompletedTask;
         }
+
+        /*        private Task HaritaUzerindeDEKSimulasyonGosterimi(DataTable veriTablosu)
+                {
+                    // DEK için özel bir GMap overlay katmanı oluştur
+                    GMapOverlay dekOverlay = new GMapOverlay("DEK_Simulasyon_Layer");
+
+                    foreach (DataRow row in veriTablosu.Rows)
+                    {
+                        // Sadece DEK_distributed değeri 0'dan büyük olan satırları işleme al
+                        if (row["DEK_distributed"] != DBNull.Value && Convert.ToDouble(row["DEK_distributed"]) > 0)
+                        {
+                            // Enlem ve Boylam değerlerini al
+                            double enlem = Convert.ToDouble(row["Enlem"]);
+                            double boylam = Convert.ToDouble(row["Boylam"]);
+
+                            // ID ve DEK_distributed değerlerini al
+                            string id = row["id"].ToString();
+                            double dekValue = Convert.ToDouble(row["DEK_distributed"]);
+
+                            // Yeni bir marker oluştur ve haritada göster
+                            var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.blue);
+                            marker.ToolTipText = $"ID: {id}\nDEK: {dekValue}";
+
+                            // Marker'ı overlay'e ekle
+                            dekOverlay.Markers.Add(marker);
+                        }
+                    }
+
+                    // DEK overlay'ini haritada göster
+                    gMapControl_Dek.Overlays.Clear();
+                    gMapControl_Dek.Overlays.Add(dekOverlay);
+                    gMapControl_Dek.Refresh(); // Haritayı güncelle
+
+                    return Task.CompletedTask;
+                }*/
         private DataTable FormatDEKTableForDisplay(DataTable originalDEKTable)
         {
             // Yeni bir DataTable oluşturun

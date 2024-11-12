@@ -799,8 +799,8 @@ namespace SLF
             // 
             // dekSimMaxBtn
             // 
-            this.dekSimMaxBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.dekSimMaxBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dekSimMaxBtn.AutoSize = true;
             this.dekSimMaxBtn.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
@@ -3528,7 +3528,7 @@ namespace SLF
             this.HomePageButton.CheckedState.ImageSize = new System.Drawing.Size(64, 64);
             this.HomePageButton.Dock = System.Windows.Forms.DockStyle.Right;
             this.HomePageButton.HoverState.ImageSize = new System.Drawing.Size(40, 40);
-            //this.HomePageButton.Image = global::SLF.Properties.Resources.Exterior1;
+            this.HomePageButton.Image = global::SLF.Properties.Resources.Exterior1;
             this.HomePageButton.ImageOffset = new System.Drawing.Point(0, 0);
             this.HomePageButton.ImageRotate = 0F;
             this.HomePageButton.ImageSize = new System.Drawing.Size(40, 40);
