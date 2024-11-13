@@ -1141,7 +1141,6 @@ namespace SLF
             foreach (var polygon in grid)
             {
                 AddPolygonToOverlay(polygon, gridOverlay, "gridPolygon", polygonAttributes_grid[polygon]);
-                //AddPolygonToOverlay(polygon, gridOverlay, "gridPolygon", polygonAttributes_grid[polygon]);
             }
 
             gMapControl.Refresh();

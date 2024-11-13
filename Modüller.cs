@@ -18,7 +18,6 @@ using System.Threading.Tasks;
 using ClosedXML.Excel;
 using OfficeOpenXml;
 using DrawingImage = System.Drawing.Image;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace SLF
 {
@@ -207,7 +206,7 @@ namespace SLF
             // Add overlays to the maps
             gMapControl_stokastik.Overlays.Add(rulerOverlay_stokastik);
             gMapControl_stokastik.Overlays.Add(markerOverlay_stokastik);
-            gMapControl_stokastik.Overlays.Add(cbs.gridOverlay);
+
             checkboxes_init();
 
             gMapControl_EA.Overlays.Add(rulerOverlay_ea);
@@ -221,6 +220,7 @@ namespace SLF
             gMapControl_imar.Overlays.Add(rulerOverlay_imar);
             gMapControl_imar.Overlays.Add(markerOverlay_imar);
             gMapControl_imar.Overlays.Add(polygonOverlay_imar);
+            gMapControl_imar.Overlays.Add(cbs.gridOverlay);
 
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
 
@@ -1579,6 +1579,7 @@ namespace SLF
                 gMapControl_stokastik.Refresh();
             }
         }
+
 
         private void gMapControl_yuk_MouseUp(object sender, MouseEventArgs e)
         {
