@@ -612,11 +612,11 @@
     <Compile Include="Fonksiyon Oluştur.Designer.cs">
       <DependentUpon>Fonksiyon Oluştur.cs</DependentUpon>
     </Compile>
-    <Compile Include="Form2.cs">
+    <Compile Include="FormOznitelik.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form2.Designer.cs">
-      <DependentUpon>Form2.cs</DependentUpon>
+    <Compile Include="FormOznitelik.Designer.cs">
+      <DependentUpon>FormOznitelik.cs</DependentUpon>
     </Compile>
     <Compile Include="Attribute_Table.cs">
       <SubType>Form</SubType>
@@ -699,8 +699,8 @@
     <EmbeddedResource Include="Hakkında.resx">
       <DependentUpon>Hakkında.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form2.resx">
-      <DependentUpon>Form2.cs</DependentUpon>
+    <EmbeddedResource Include="FormOznitelik.resx">
+      <DependentUpon>FormOznitelik.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Modüller.resx">
       <DependentUpon>Modüller.cs</DependentUpon>

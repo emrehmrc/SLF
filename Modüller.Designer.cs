@@ -427,7 +427,6 @@ namespace SLF
             this.label_girdi_veri_onizleme.Size = new System.Drawing.Size(118, 20);
             this.label_girdi_veri_onizleme.TabIndex = 5;
             this.label_girdi_veri_onizleme.Text = "Veri Önizleme:";
-            this.label_girdi_veri_onizleme.UseWaitCursor = true;
             // 
             // panel_girdi_rapor_olustur
             // 
@@ -449,7 +448,6 @@ namespace SLF
             this.label_girdi_rapor.Size = new System.Drawing.Size(120, 23);
             this.label_girdi_rapor.TabIndex = 7;
             this.label_girdi_rapor.Text = "Rapor Oluştur:";
-            this.label_girdi_rapor.UseWaitCursor = true;
             // 
             // raporGoruntuleButonu
             // 
@@ -486,7 +484,7 @@ namespace SLF
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dataGridView_girdi.DefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView_girdi.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.dataGridView_girdi.Location = new System.Drawing.Point(7, 96);
+            this.dataGridView_girdi.Location = new System.Drawing.Point(7, 111);
             this.dataGridView_girdi.Margin = new System.Windows.Forms.Padding(2);
             this.dataGridView_girdi.Name = "dataGridView_girdi";
             this.dataGridView_girdi.ReadOnly = true;
@@ -494,7 +492,7 @@ namespace SLF
             dataGridViewCellStyle2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
             this.dataGridView_girdi.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView_girdi.RowTemplate.Height = 24;
-            this.dataGridView_girdi.Size = new System.Drawing.Size(1290, 471);
+            this.dataGridView_girdi.Size = new System.Drawing.Size(1290, 456);
             this.dataGridView_girdi.TabIndex = 4;
             // 
             // panel_girdi_dısa_aktar
@@ -518,7 +516,6 @@ namespace SLF
             this.label_dısa_aktar.Size = new System.Drawing.Size(91, 23);
             this.label_dısa_aktar.TabIndex = 16;
             this.label_dısa_aktar.Text = "Dışa Aktar:";
-            this.label_dısa_aktar.UseWaitCursor = true;
             // 
             // ExcelDownloadButton
             // 
@@ -643,7 +640,6 @@ namespace SLF
             this.label_girdi_veri_tipi_secimi.Size = new System.Drawing.Size(180, 23);
             this.label_girdi_veri_tipi_secimi.TabIndex = 1;
             this.label_girdi_veri_tipi_secimi.Text = "Dosya Veri Tipi Seçimi:";
-            this.label_girdi_veri_tipi_secimi.UseWaitCursor = true;
             // 
             // label_girdi_dosya_secimi
             // 
@@ -1241,7 +1237,7 @@ namespace SLF
             this.ELFLowResultsTable.Location = new System.Drawing.Point(3, 0);
             this.ELFLowResultsTable.Name = "ELFLowResultsTable";
             this.ELFLowResultsTable.RowHeadersWidth = 51;
-            this.ELFLowResultsTable.Size = new System.Drawing.Size(1045, 675);
+            this.ELFLowResultsTable.Size = new System.Drawing.Size(1045, 680);
             this.ELFLowResultsTable.TabIndex = 1;
             // 
             // ELFBaseResultsTabPage
@@ -1267,7 +1263,7 @@ namespace SLF
             this.ELFBaseResultsTable.Location = new System.Drawing.Point(6, 3);
             this.ELFBaseResultsTable.Name = "ELFBaseResultsTable";
             this.ELFBaseResultsTable.RowHeadersWidth = 51;
-            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1044, 675);
+            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1044, 680);
             this.ELFBaseResultsTable.TabIndex = 1;
             // 
             // ELFHighResultsTabPage
@@ -1293,7 +1289,7 @@ namespace SLF
             this.ELFHighResultsTable.Location = new System.Drawing.Point(6, 0);
             this.ELFHighResultsTable.Name = "ELFHighResultsTable";
             this.ELFHighResultsTable.RowHeadersWidth = 51;
-            this.ELFHighResultsTable.Size = new System.Drawing.Size(1039, 675);
+            this.ELFHighResultsTable.Size = new System.Drawing.Size(1039, 680);
             this.ELFHighResultsTable.TabIndex = 1;
             // 
             // ELFMaxResultsTabPage
@@ -1320,7 +1316,7 @@ namespace SLF
             this.ELFMaxResultsTable.Location = new System.Drawing.Point(0, 3);
             this.ELFMaxResultsTable.Name = "ELFMaxResultsTable";
             this.ELFMaxResultsTable.RowHeadersWidth = 51;
-            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1049, 679);
+            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1049, 684);
             this.ELFMaxResultsTable.TabIndex = 1;
             // 
             // ELFGraphicOutputsTabPage
@@ -1336,13 +1332,15 @@ namespace SLF
             // 
             // panel_ELF_Grafikler
             // 
+            this.panel_ELF_Grafikler.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panel_ELF_Grafikler.BackColor = System.Drawing.Color.NavajoWhite;
             this.panel_ELF_Grafikler.Controls.Add(this.pictureBox_ELF_5);
             this.panel_ELF_Grafikler.Controls.Add(this.pictureBox_ELF_4);
             this.panel_ELF_Grafikler.Controls.Add(this.pictureBox_ELF_3);
             this.panel_ELF_Grafikler.Controls.Add(this.pictureBox_ELF_2);
             this.panel_ELF_Grafikler.Controls.Add(this.pictureBox_ELF_1);
-            this.panel_ELF_Grafikler.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel_ELF_Grafikler.Location = new System.Drawing.Point(3, 3);
             this.panel_ELF_Grafikler.Margin = new System.Windows.Forms.Padding(4);
             this.panel_ELF_Grafikler.Name = "panel_ELF_Grafikler";
@@ -1354,6 +1352,7 @@ namespace SLF
             this.pictureBox_ELF_5.Location = new System.Drawing.Point(699, 135);
             this.pictureBox_ELF_5.Name = "pictureBox_ELF_5";
             this.pictureBox_ELF_5.Size = new System.Drawing.Size(342, 282);
+            this.pictureBox_ELF_5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox_ELF_5.TabIndex = 4;
             this.pictureBox_ELF_5.TabStop = false;
             // 
@@ -1362,6 +1361,7 @@ namespace SLF
             this.pictureBox_ELF_4.Location = new System.Drawing.Point(351, 291);
             this.pictureBox_ELF_4.Name = "pictureBox_ELF_4";
             this.pictureBox_ELF_4.Size = new System.Drawing.Size(342, 282);
+            this.pictureBox_ELF_4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox_ELF_4.TabIndex = 3;
             this.pictureBox_ELF_4.TabStop = false;
             // 
@@ -1370,6 +1370,7 @@ namespace SLF
             this.pictureBox_ELF_3.Location = new System.Drawing.Point(351, 3);
             this.pictureBox_ELF_3.Name = "pictureBox_ELF_3";
             this.pictureBox_ELF_3.Size = new System.Drawing.Size(342, 282);
+            this.pictureBox_ELF_3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox_ELF_3.TabIndex = 2;
             this.pictureBox_ELF_3.TabStop = false;
             // 
@@ -1378,6 +1379,7 @@ namespace SLF
             this.pictureBox_ELF_2.Location = new System.Drawing.Point(3, 291);
             this.pictureBox_ELF_2.Name = "pictureBox_ELF_2";
             this.pictureBox_ELF_2.Size = new System.Drawing.Size(342, 282);
+            this.pictureBox_ELF_2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox_ELF_2.TabIndex = 1;
             this.pictureBox_ELF_2.TabStop = false;
             // 
@@ -1386,6 +1388,7 @@ namespace SLF
             this.pictureBox_ELF_1.Location = new System.Drawing.Point(3, 3);
             this.pictureBox_ELF_1.Name = "pictureBox_ELF_1";
             this.pictureBox_ELF_1.Size = new System.Drawing.Size(342, 282);
+            this.pictureBox_ELF_1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox_ELF_1.TabIndex = 0;
             this.pictureBox_ELF_1.TabStop = false;
             // 
