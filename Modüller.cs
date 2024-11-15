@@ -2467,7 +2467,7 @@ namespace SLF
         }
 
         // Modül tabları veri importu mantıgında refer ediliyor. Silinmesin.
-        /*
+        
         private async Task dekHaritayaVeriYukleAsync()
         {
             try
@@ -2551,7 +2551,7 @@ namespace SLF
             {
                 MessageBox.Show($"Bir hata oluştu: {ex.Message}");
             }
-        }*/
+        }
 
 
         /*---------------------------------------------------------------------------------------------- */
@@ -3099,7 +3099,7 @@ namespace SLF
             }
         }
 
-        /* BURASI SONRADAN AÇILACAK, SIMDILIK BOYLE KALSIN.
+        // BURASI SONRADAN AÇILACAK, SIMDILIK BOYLE KALSIN.
         private async void Modül_Tabları_SelectedIndexChanged(object sender, EventArgs e)
         {
             // Gerekli kontrolleri yapmak için seçilen sekmeyi ve modülleri kontrol et
@@ -3169,7 +3169,7 @@ namespace SLF
                 }
 
             }
-        }*/
+        }
 
         private void buton_stokastik_harita_katmanlar_MouseClick(object sender, MouseEventArgs e)
         {
