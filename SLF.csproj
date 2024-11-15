@@ -586,6 +586,12 @@
       <DependentUpon>DEKCenterPopupForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ExcelExporter.cs" />
+    <Compile Include="FileSelectionPopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FileSelectionPopup.Designer.cs">
+      <DependentUpon>FileSelectionPopup.cs</DependentUpon>
+    </Compile>
     <Compile Include="MethodForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -691,6 +697,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DEKCenterPopupForm.resx">
       <DependentUpon>DEKCenterPopupForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FileSelectionPopup.resx">
+      <DependentUpon>FileSelectionPopup.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Fonksiyon Oluştur.resx">
       <DependentUpon>Fonksiyon Oluştur.cs</DependentUpon>
