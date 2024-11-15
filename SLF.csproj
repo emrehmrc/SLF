@@ -307,7 +307,6 @@
       <HintPath>packages\Polylines.1.0.0\lib\Polylines.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
     <Reference Include="RBush, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\RBush.3.2.0\lib\netstandard1.2\RBush.dll</HintPath>
     </Reference>
@@ -574,7 +573,19 @@
       <DependentUpon>Ana_Menü.cs</DependentUpon>
     </Compile>
     <Compile Include="CBS.cs" />
+    <Compile Include="ChargingStationPopupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChargingStationPopupForm.Designer.cs">
+      <DependentUpon>ChargingStationPopupForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="CsvHandler.cs" />
+    <Compile Include="DEKCenterPopupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DEKCenterPopupForm.Designer.cs">
+      <DependentUpon>DEKCenterPopupForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ExcelExporter.cs" />
     <Compile Include="MethodForm.cs">
       <SubType>Form</SubType>
@@ -670,6 +681,12 @@
     <EmbeddedResource Include="Attribute_Table.resx">
       <DependentUpon>Attribute_Table.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ChargingStationPopupForm.resx">
+      <DependentUpon>ChargingStationPopupForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DEKCenterPopupForm.resx">
+      <DependentUpon>DEKCenterPopupForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Fonksiyon Oluştur.resx">
       <DependentUpon>Fonksiyon Oluştur.cs</DependentUpon>
     </EmbeddedResource>
@@ -755,6 +772,34 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Pictures\download_folder_file_icon_219533.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Pictures\epdk-logo.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Pictures\OEDAS_Logo-.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Pictures\oedas-yeni-binasinda-hizmet-vermeye-basliyor-1613029537595.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Pictures\home.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Pictures\Exterior.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Pictures\Home2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Pictures\Exterior1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Pictures\Done.png" />
+    <Content Include="Pictures\Home3.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -12,12 +12,13 @@ using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
 using System.Xml;
-using NetTopologySuite.IO;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Threading.Tasks;
 using ClosedXML.Excel;
 using OfficeOpenXml;
 using DrawingImage = System.Drawing.Image;
+using MapWinGIS;
+
 
 namespace SLF
 {
@@ -27,6 +28,26 @@ namespace SLF
         private readonly double startX = 0;
         private readonly double startY = 0;
         public int slfStartYear = 0, slfEndYear = 0;
+
+        TextBox logTextBox; // Declare logTextBox here --------------
+        private ExcelService _excelService;
+        private ExcelService excelService = new ExcelService();
+        private string SelectedSpeed = "";
+        public bool isAddingChargingStation = false; // Sadece şarj istasyonu eklenirken true olacak.
+        private bool isAddingDekPoint = false; // Sadece dek noktası eklenirken  true olacak.
+        private int _selectedYear = -1;
+        private string _selectedCity = null;
+        private Form popupForm; // easim ekran popup 
+        private DataTable veriMonteCarlo;
+        List<string> modulescheck = new List<string>();
+        private bool isDtrLoaded = false;
+        private Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
+        {
+            { "İzmir", new PointLatLng(38.4192, 27.1287) }, // Example coordinates for İzmir
+            { "Eskişehir", new PointLatLng(39.7768, 30.5206) }, // Example coordinates for Eskişehir
+            // Add more cities and their coordinates as needed
+        };
+
 
         // form objeleri
         public HomePageForm gir1;
@@ -52,16 +73,19 @@ namespace SLF
         public List<PointLatLng> rulerPoints_ea = new List<PointLatLng>();
         public List<PointLatLng> rulerPoints_yuk = new List<PointLatLng>();
         public List<PointLatLng> rulerPoints_imar = new List<PointLatLng>();
+        public List<PointLatLng> rulerPoints_DEK = new List<PointLatLng>();
 
         public GMapOverlay rulerOverlay_stokastik = new GMapOverlay("rulerOverlay_stokastik");
         public GMapOverlay rulerOverlay_ea = new GMapOverlay("rulerOverlay_ea");
         public GMapOverlay rulerOverlay_yuk = new GMapOverlay("rulerOverlay_yuk");
         public GMapOverlay rulerOverlay_imar = new GMapOverlay("rulerOverlay_imar");
+        public GMapOverlay rulerOverlay_DEK = new GMapOverlay("rulerOverlay_DEK");
 
         public GMapRoute rulerRoute_stokastik;
         public GMapRoute rulerRoute_ea;
         public GMapRoute rulerRoute_yuk;
         public GMapRoute rulerRoute_imar;
+        public GMapRoute rulerRoute_DEK;
 
         public bool isRulerEnabled = false;
         public bool isRulerActive = false; // enable the drawing of a ruler
@@ -71,17 +95,19 @@ namespace SLF
         public GMapOverlay markerOverlay_ea = new GMapOverlay("markerOverlay_ea");
         public GMapOverlay markerOverlay_yuk = new GMapOverlay("markerOverlay_yuk");
         public GMapOverlay markerOverlay_imar = new GMapOverlay("markerOverlay_imar");
+        public GMapOverlay markerOverlay_DEK = new GMapOverlay("markerOverlay_DEK");
 
         private List<PointLatLng> polygonPoints_ea = new List<PointLatLng>();
         private List<PointLatLng> polygonPoints_stokastik = new List<PointLatLng>();
         private List<PointLatLng> polygonPoints_imar = new List<PointLatLng>();
         private List<PointLatLng> polygonPoints_yuk = new List<PointLatLng>();
+        private List<PointLatLng> polygonPoints_DEK = new List<PointLatLng>();
 
         private GMapOverlay polygonOverlay_ea = new GMapOverlay("polygonOverlay_ea");
         public GMapOverlay polygonOverlay_stokastik = new GMapOverlay("polygonOverlay_stokastik");
         public GMapOverlay polygonOverlay_imar = new GMapOverlay("polygonOverlay_imar");
         public GMapOverlay polygonOverlay_yuk = new GMapOverlay("polygonOverlay_yuk");
-
+        public GMapOverlay polygonOverlay_DEK = new GMapOverlay("polygonOverlay_DEK");
 
         private DTRModulu dtrmod = new DTRModulu();
 
@@ -116,8 +142,8 @@ namespace SLF
             public double Boylam { get; set; }
             public double Bina_Demandi { get; set; }
             public int Abone_Sayısı { get; set; }
-            
-            
+
+
         }
         public enum FileType
         {
@@ -137,6 +163,92 @@ namespace SLF
             public List<NoktaVeri> Noktalar { get; set; }
         }
 
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            // Başlangıçta butonu devre dışı bırak
+            GelecekSimButton.Enabled = false;
+
+            // Checkbox'ları başlangıçta görünmez yap
+            checkBox_imar_9.Visible = false;
+            checkBox_imar_10.Visible = false;
+            checkBox_imar_11.Visible = false;
+            checkBox_imar_12.Visible = false;
+
+
+
+            // Checkbox'ları başlangıçta işaretli yap
+            checkBox_imar_9.Checked = true;
+            checkBox_imar_10.Checked = true;
+            checkBox_imar_11.Checked = true;
+            checkBox_imar_12.Checked = true;
+
+            // Checkbox olaylarını bağla
+            checkBox_imar_9.CheckedChanged += checkBox_Ac_Home;
+            checkBox_imar_10.CheckedChanged += checkBox_Ac_Work;
+            checkBox_imar_11.CheckedChanged += checkBox_Ac_Public;
+            checkBox_imar_12.CheckedChanged += checkBox_Dc_Fast;
+
+            // ComboBox olaylarını bağla
+            comboBox_ea_yıl_secimi.SelectedIndexChanged += yilSecimiMonteCarlo;
+            comboBox_ea_il_secimi.SelectedIndexChanged += ilSecimiMonteCarlo;
+
+            // İlk durumda tüm marker'ları göster
+            ToggleMarkers("AC-HOME", checkBox_imar_9.Checked);
+            ToggleMarkers("AC-WORK", checkBox_imar_10.Checked);
+            ToggleMarkers("AC-PUBLIC", checkBox_imar_11.Checked);
+            ToggleMarkers("Fast-DC", checkBox_imar_12.Checked);
+        }
+        private void ToggleMarkers(string markerType, bool isVisible)
+        {
+            // gMapControl_EA üzerindeki tüm overlay'leri dolaşarak marker'ları kontrol ediyoruz
+            foreach (var overlay in gMapControl_EA.Overlays)
+            {
+                foreach (var marker in overlay.Markers)
+                {
+                    // Marker, GMarkerGoogle türündeyse ve ToolTipText ile belirtilen türle eşleşiyorsa
+                    if (marker is GMarkerGoogle googleMarker && googleMarker.ToolTipText == markerType)
+                    {
+                        // Marker'ın görünürlük durumunu güncelle
+                        googleMarker.IsVisible = isVisible;
+                    }
+                }
+            }
+
+            // Harita güncellenmesi için refresh yapıyoruz
+            gMapControl_EA.Refresh();
+        }
+
+
+        // Nokta veri yapısı
+        public int SelectedYear
+        {
+            get => _selectedYear;
+            set
+            {
+                _selectedYear = value;
+                CheckSelections();
+            }
+        }
+
+        private void CheckSelections()
+        {
+            // Seçimlerin yapıldığını kontrol ederek butonu etkinleştir
+            GelecekSimButton.Enabled = SelectedYear != -1 && SelectedCity != null;
+        }
+
+        public string SelectedCity
+        {
+            get => _selectedCity;
+            set
+            {
+                _selectedCity = value;
+                CheckSelections();
+            }
+        }
+
+
+
         private void InitializeGMap(GMap.NET.WindowsForms.GMapControl gmap)
         {
             gmap.MapProvider = GMapProviders.GoogleSatelliteMap;
@@ -147,9 +259,9 @@ namespace SLF
             gmap.MaxZoom = 20;
             gmap.Zoom = 13;
             gmap.DragButton = MouseButtons.Left;
-           
+
         }
-        
+
 
         private string selectedMethod;  // Store the method
         public List<TabPage> hiddenTabs = new List<TabPage>();  // To store hidden tabs
@@ -159,11 +271,16 @@ namespace SLF
         {
             // initialize the Modul Formu
             InitializeComponent();
-            
+
+            _excelService = new ExcelService();
+            InitializeLogTextBox(); // Initialize logTextBox
+            this.DoubleBuffered = true;
+            this.selectedMethod = selectedMethod;  // Store the method
+            InitializeComboBoxes();
+
             // initialize the instance of a CBS form
             cbs = new CBS(this);
 
-            this.DoubleBuffered = true;
             this.selectedMethod = selectedMethod;  // Store the method
             // Initialize the maps and other UI components
             InitializeFormComponents();
@@ -180,6 +297,31 @@ namespace SLF
 
         }
 
+
+        public ModülFormu() : this("", "")
+        {
+        }
+
+        // Initialize all form components (called in the constructors)
+        private void InitializeComboBoxes()
+        {
+            // Yıl aralığını ComboBox1'e ekleyin
+            var yearList = new List<int>();
+            for (int year = slfStartYear; year <= slfEndYear; year++)
+            {
+                yearList.Add(year);
+            }
+            comboBox_ea_yıl_secimi.DataSource = yearList; // Yıl seçimi için ComboBox1
+            comboBox_DEK_Yıl.DataSource = yearList; // DEK yılı seçimi için ComboBox3
+                                             // Şehir isimlerini ComboBox2'ye ekleyin
+            comboBox_DEK_il.Items.Clear(); // dek
+            comboBox_ea_il_secimi.Items.Clear();   // ea 
+            comboBox_ea_il_secimi.Items.Add("İzmir");
+            comboBox_ea_il_secimi.Items.Add("Eskişehir");
+            comboBox_DEK_il.Items.Add("İzmir");
+            comboBox_DEK_il.Items.Add("Eskişehir");
+        }
+
         // Initialize all form components (called in the constructors)
         private void InitializeFormComponents()
         {
@@ -188,6 +330,7 @@ namespace SLF
             InitializeGMap(gMapControl_yuk);
             InitializeGMap(gMapControl_imar);
             InitializeGMap(gMapControl_optimalDTR);
+            InitializeGMap(gMapControl_DEK);
 
             SortTabPagesAlphabetically(Modül_Tabları, true);
             // Enable double buffering for the form to reduce flickering
@@ -230,6 +373,37 @@ namespace SLF
             // Initialize the tablo_formu instance
             tablo_formu = new Tablo_Formu();
         }
+
+        //VISUAL CHANGES
+        private void ModuleTabPanel_Paint(object sender, PaintEventArgs e)
+        {
+        }
+
+        // Initialize specific tabs and hide others
+        // Method to hide a specific item from the ComboBox
+        private void HideComboBoxItem(string itemToHide)
+        {
+            // Create a new list excluding the item you want to hide
+            var filteredItems = new List<string>();
+            foreach (var item in veri_listesi_seçimi.Items)
+            {
+                if (item.ToString() != itemToHide) // Check if the item is not the one to hide
+                {
+                    filteredItems.Add(item.ToString());
+                }
+            }
+
+            // Clear existing items and add the filtered list
+            veri_listesi_seçimi.Items.Clear();
+            veri_listesi_seçimi.Items.AddRange(filteredItems.ToArray());
+
+            // Set the default selection, if applicable
+            if (filteredItems.Count > 0)
+            {
+                veri_listesi_seçimi.SelectedIndex = 2; // Select the first item or another index as needed
+            }
+        }
+
 
 
         private void InitializeTabs(params string[] tabsToSelect)
@@ -298,9 +472,25 @@ namespace SLF
             }
             else if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
+                // Hide the specific item you want to remove
+                HideComboBoxItem("Ekonometrik Yük Tahmini Verileri"); // Replace with the actual item you want to hide
                 // For SLF, do not hide any tabs. Add logic here if needed.
-            }
+                // List of tab names to hide
+                string[] tabsToHide = { "EkonometrikSenaryoTabPage", "tab_ekonometrik" };
 
+                // Loop through each tab name and remove it if it exists
+                foreach (string tabName in tabsToHide)
+                {
+                    if (SenaryoModuleTabControl.TabPages.ContainsKey(tabName))
+                    {
+                        SenaryoModuleTabControl.TabPages.RemoveByKey(tabName);
+                    }
+                    if (Modül_Tabları.TabPages.ContainsKey(tabName))
+                    {
+                        Modül_Tabları.TabPages.RemoveByKey(tabName);
+                    }
+                }
+            }
         }
 
         // Restore hidden tabs
@@ -327,142 +517,176 @@ namespace SLF
             hiddenTabs.Clear();  // Clear the list after restoring
         }
 
-        private void OpenModuleButton_Click(object sender, EventArgs e)
+
+
+
+        public class ExcelService
         {
-            string filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
-
-            // Load the Excel package
-            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            // Load the worksheet into a DataTable for displaying in DataGridView
+            public DataTable LoadWorksheetIntoDataTable(ExcelWorksheet worksheet)
             {
-                // Clear previous data
-                ELFMinSenaryoTable.DataSource = null;
-                ELFLowSenaryoTable.DataSource = null;
-                ELFBaseSenaryoTable.DataSource = null;
-                ELFHighSenaryoTable.DataSource = null;
-                ELFMaxSenaryoTable.DataSource = null;
+                DataTable dt = new DataTable();
 
-                // Load only sheets 2 to 6 (indices 1 to 5)
-                for (int i = 0; i <= 5; i++) // i = 1 corresponds to sheet 2, i = 5 corresponds to sheet 6
+                // Load header
+                for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
                 {
-                    var worksheet = package.Workbook.Worksheets[i + 1]; // Worksheets are 1-indexed, so i + 1 is used here
-                    DataTable dt = new DataTable();
+                    dt.Columns.Add(worksheet.Cells[1, col].Text);
+                }
 
-                    // Load header
+                // Load data
+                for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+                {
+                    var newRow = dt.NewRow();
                     for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
                     {
-                        dt.Columns.Add(worksheet.Cells[1, col].Text);
+                        newRow[col - 1] = worksheet.Cells[row, col].Text;
                     }
-
-                    // Load data
-                    for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
-                    {
-                        var newRow = dt.NewRow();
-                        for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
-                        {
-                            newRow[col - 1] = worksheet.Cells[row, col].Text;
-                        }
-                        dt.Rows.Add(newRow);
-                    }
-
-                    // Set the data source for the corresponding DataGridView
-                    if (i < 5) // Adjust to match the DataGridView indices
-                    {
-                        var dataGrids = new[] { ELFMinSenaryoTable, ELFLowSenaryoTable, ELFBaseSenaryoTable, ELFHighSenaryoTable, ELFMaxSenaryoTable };
-                        dataGrids[i].DataSource = dt;
-                    }
+                    dt.Rows.Add(newRow);
                 }
+
+                return dt;
             }
 
-            // Optionally set the selected tab to tab_senaryo
-            Modül_Tabları.SelectedTab = tab_senaryo;
-        }
-
-
-        /// <summary>
-        /// ELF METHOD Model RScript Run RELATED CHANGES & UPDATES
-        /// </summary>
-
-        private void ELFScenerioSaveGunaButton_Click(object sender, EventArgs e)
-        {
-            string originalFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
-            string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
-
-            // Dictionary to store original formulas
-            var originalFormulas = new Dictionary<string, string>();
-
-            // Load the original Excel file and read formulas
-            try
+            // Update the worksheet from DataGridView based on user's changes
+            public void UpdateWorksheetFromDataGridView(ExcelWorksheet worksheet, DataGridView dgv)
             {
-                using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
+                for (int row = 0; row < dgv.Rows.Count; row++)
                 {
-                    // Loop through each worksheet and store formulas
-                    foreach (var worksheet in package.Workbook.Worksheets)
+                    for (int col = 0; col < dgv.Columns.Count; col++)
                     {
-                        for (int row = 1; row <= worksheet.Dimension.Rows; row++)
-                        {
-                            for (int col = 1; col <= worksheet.Dimension.Columns; col++)
-                            {
-                                var cell = worksheet.Cells[row, col];
+                        var cell = worksheet.Cells[row + 2, col + 1]; // Start at row 2 in Excel (headers are in row 1)
+                        var cellDisplayedValue = dgv.Rows[row].Cells[col].Value; // Get displayed value from DataGridView
 
-                                // Store formulas in the dictionary
-                                if (!string.IsNullOrEmpty(cell.Formula))
+                        // Update the cell value in Excel
+                        if (cellDisplayedValue != null)
+                        {
+                            // If the displayed value is numeric (including percentages), update the Excel cell
+                            if (double.TryParse(cellDisplayedValue.ToString().Replace("%", ""), out double updatedValue))
+                            {
+                                if (cellDisplayedValue.ToString().Contains("%"))
                                 {
-                                    // Generate a unique key for the cell based on its address
-                                    originalFormulas[$"{worksheet.Name}!{cell.Address}"] = cell.Formula;
+                                    // Convert percentage back to a decimal before updating (e.g., 5.2% -> 0.052)
+                                    cell.Value = updatedValue / 100;
                                 }
+                                else
+                                {
+                                    // Otherwise, use the updated value directly
+                                    cell.Value = updatedValue;
+                                }
+                            }
+                            else
+                            {
+                                // If not numeric, update as text
+                                cell.Value = cellDisplayedValue;
                             }
                         }
                     }
                 }
             }
-            catch (Exception ex)
+        }
+
+
+
+        private async void OpenModuleButton_Click(object sender, EventArgs e)
+        {
+            // Disable the button initially
+            OpenModuleButton.Enabled = false;
+
+            string filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+
+            // Load the data table for the selected type
+            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
+
+            // Check if the data table has any rows
+            if (dataTable == null || dataTable.Rows.Count == 0)
             {
-                MessageBox.Show($"Error reading original Excel file: {ex.Message}");
+                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından modüle gidilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                OpenModuleButton.Enabled = true; // Re-enable the button before returning
                 return;
             }
 
-            // Load the original file again to allow modifications
-            try
+            // Asynchronous task to load the Excel package
+            await Task.Run(() =>
             {
-                using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
+                using (var package = new ExcelPackage(new FileInfo(filePath)))
                 {
-                    // Access the first worksheet for any required operations (preserving formulas)
-                    ExcelWorksheet firstWorksheet = package.Workbook.Worksheets[0];
-
-                    // Update worksheets with data from DataGridViews
-                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[1], ELFMinSenaryoTable);
-                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[2], ELFLowSenaryoTable);
-                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[3], ELFBaseSenaryoTable);
-                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[4], ELFHighSenaryoTable);
-                    UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[5], ELFMaxSenaryoTable);
-
-                    // Restore original formulas
-                    foreach (var kvp in originalFormulas)
+                    Invoke(new Action(() =>
                     {
-                        var parts = kvp.Key.Split('!');
-                        var sheetName = parts[0];
-                        var cellAddress = parts[1];
+                        // Clear previous data
+                        ELFMinSenaryoTable.DataSource = null;
+                        ELFLowSenaryoTable.DataSource = null;
+                        ELFBaseSenaryoTable.DataSource = null;
+                        ELFHighSenaryoTable.DataSource = null;
+                        ELFMaxSenaryoTable.DataSource = null;
+                    }));
 
-                        var worksheet = package.Workbook.Worksheets[sheetName];
-                        var cell = worksheet.Cells[cellAddress];
+                    // Load sheets 2 to 6 into respective DataGridViews
+                    for (int i = 1; i <= 5; i++)
+                    {
+                        var worksheet = package.Workbook.Worksheets[i];
+                        DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
 
-                        // Apply the original formula
-                        cell.Formula = kvp.Value;
+                        Invoke(new Action(() =>
+                        {
+                            var dataGrids = new[] { ELFMinSenaryoTable, ELFLowSenaryoTable, ELFBaseSenaryoTable, ELFHighSenaryoTable, ELFMaxSenaryoTable };
+                            dataGrids[i - 1].DataSource = dt;
+                        }));
                     }
-
-                    // Save the modified Excel file
-                    package.SaveAs(new FileInfo(modifiedFilePath));
                 }
+            });
 
-                // Inform the user that the changes were saved successfully
-                MessageBox.Show("User changes saved to the modified Excel file.");
-            }
-            catch (Exception ex)
+            // After loading the data, enable the button
+            OpenModuleButton.Enabled = true;
+
+            if (veri_listesi_seçimi.Text == "Ekonometrik Yük Tahmini Verileri")
             {
-                MessageBox.Show($"Error updating Excel file: {ex.Message}");
+                Modül_Tabları.SelectedTab = tab_senaryo; // Move this line here to ensure it only executes after loading data
+            }
+            if (veri_listesi_seçimi.Text == "EA Şarj Verileri")
+            {
+                Modül_Tabları.SelectedTab = tab_ea;
+            }
+            if (veri_listesi_seçimi.Text == "DEK Verileri")
+            {
+                Modül_Tabları.SelectedTab = tab_dek;
             }
         }
 
+
+
+        // Save button logic to update Excel file with changes from DataGridViews
+        private async void ELFScenerioSaveGunaButton_Click(object sender, EventArgs e)
+        {
+            string originalFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+            string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+
+            try
+            {
+                await Task.Run(() =>
+                {
+                    using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
+                    {
+                        // Update worksheets with data from DataGridViews
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[0], ELFMinSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[1], ELFLowSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[2], ELFBaseSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[3], ELFHighSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[4], ELFMaxSenaryoTable);
+
+                        // Save the modified Excel file
+                        package.SaveAs(new FileInfo(modifiedFilePath));
+                    }
+                });
+
+                MessageBox.Show("Kullanıcı değişiklikleri excel dosyasına kaydedildi.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Dosya güncelleme hatası: {ex.Message}");
+            }
+        }
+        
         // Load the original Excel file into DataGridView for display
         private void LoadDataIntoDataGridView(ExcelWorksheet worksheet, DataGridView dgv)
         {
@@ -506,25 +730,202 @@ namespace SLF
             }
         }
 
-        /// <summary>
-        /// ELF METHOD Model RScript Run RELATED CHANGES & UPDATES
-        /// </summary>
-        private void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e)
+
+        private async void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e)
         {
-            string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+            // Set cursor to wait
+            Cursor.Current = Cursors.WaitCursor;
 
-            // Check if the modified file exists
-            if (!File.Exists(modifiedFilePath))
+            // Define paths for the R script and modified input file
+            string rScriptPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\begum_model_deneme.R";
+            string modifiedInputFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+            string logFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\script_output_log2.txt";
+
+            try
             {
-                MessageBox.Show("The modified Excel file does not exist. Please save the scenario first.");
-                return;
+                // Check if the modified input file exists
+                if (!File.Exists(modifiedInputFilePath))
+                {
+                    LogOutput("The specified modified input file does not exist.");
+                    return;
+                }
+
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "Rscript.exe", // Ensure Rscript.exe is accessible in your PATH
+                        Arguments = $"\"{rScriptPath}\" \"{modifiedInputFilePath}\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+
+                process.Start();
+
+                string output = await process.StandardOutput.ReadToEndAsync();
+                string error = await process.StandardError.ReadToEndAsync();
+
+                process.WaitForExit();
+
+                // Log the output and error
+                File.AppendAllText(logFilePath, $"Output:\n{output}\nError:\n{error}\n\n");
+
+                if (process.ExitCode != 0)
+                {
+                    LogOutput($"R script encountered an error. Check the log file for details: {logFilePath}");
+                }
+                else
+                {
+                    LogOutput("Algoritma başarıyla çalıştırıldı.");
+                }
             }
+            catch (Exception ex)
+            {
+                LogOutput($"An error occurred while running the R script: {ex.Message}");
+            }
+            finally
+            {
+                // Restore cursor to default
+                Cursor.Current = Cursors.Default;
+            }
+        }
 
-            // Run the R script
-            string resultsFilePath = RunModelRScript(modifiedFilePath);
+        // Helper method for logging output to logTextBox
+        private void LogOutput(string message)
+        {
+            if (logTextBox != null)
+            {
+                if (logTextBox.InvokeRequired)
+                {
+                    logTextBox.Invoke(new Action<string>(LogOutput), message);
+                }
+                else
+                {
+                    logTextBox.AppendText(message + Environment.NewLine);
+                }
+            }
+        }
 
-            // Load results into tab_ekonometrik
-            LoadResultsToTabEkonometrik(resultsFilePath);
+        private void InitializeLogTextBox()
+        {
+            logTextBox = new TextBox
+            {
+                Multiline = true,
+                Dock = DockStyle.Bottom, // Dock it at the bottom of the form
+                Height = 100, // Adjust height as necessary
+                ScrollBars = ScrollBars.Vertical // Enable vertical scroll
+            };
+            this.Controls.Add(logTextBox); // Add to the form controls
+        }
+
+
+        private async void ShowResults_Click(object sender, EventArgs e)
+        {
+            // Path to the Excel file
+            string filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\ELF_Tahmin_Sonuçları_2024-10-21 16_59_43.xlsx";
+
+            // Asynchronous task to load the Excel package
+            await Task.Run(() =>
+            {
+                using (var package = new ExcelPackage(new FileInfo(filePath)))
+                {
+                    // Clear previous data in the DataGridViews
+                    Invoke(new Action(() =>
+                    {
+                        // Set DataSources to null to clear previous data
+                        ELFMinResultsTable.DataSource = null;
+                        ELFLowResultsTable.DataSource = null;
+                        ELFBaseResultsTable.DataSource = null;
+                        ELFHighResultsTable.DataSource = null;
+                        ELFMaxResultsTable.DataSource = null;
+                    }));
+
+                    // Load sheets into their respective DataGridViews
+                    var worksheets = new[] { "Bagımlı_Degisken_Tahminleri_1", "Bagımlı_Degisken_Tahminleri_2", "Bagımlı_Degisken_Tahminleri_3", "Bagımlı_Degisken_Tahminleri_4", "Bagımlı_Degisken_Tahminleri_5" }; // Replace with actual sheet names if needed
+                    var dataGrids = new[] { ELFMinResultsTable, ELFLowResultsTable, ELFBaseResultsTable, ELFHighResultsTable, ELFMaxResultsTable };
+
+                    for (int i = 0; i < worksheets.Length; i++)
+                    {
+                        var worksheet = package.Workbook.Worksheets[worksheets[i]];
+                        if (worksheet != null)
+                        {
+                            DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
+
+                            Invoke(new Action(() =>
+                            {
+                                dataGrids[i].DataSource = dt; // Set DataGridView's DataSource
+                            }));
+                        }
+                    }
+                }
+            });
+
+            // Load images into PictureBox controls after loading the results
+            LoadImagesIntoPictureBoxes();
+
+            // Optionally, switch to the results tab
+            Modül_Tabları.SelectedTab = tab_ekonometrik;
+        }
+
+        private void LoadImagesIntoPictureBoxes()
+        {
+            // Path to the folder where the images are saved
+            string imageFolderPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\Grafik Outputs\";
+
+            // Load images into PictureBox controls with checks
+            LoadImageIntoPictureBox(pictureBox_ELF_1, Path.Combine(imageFolderPath, "bolge_aydınlatma_projections.png"));
+            LoadImageIntoPictureBox(pictureBox_ELF_2, Path.Combine(imageFolderPath, "bolge_mesken_projections.png"));
+            LoadImageIntoPictureBox(pictureBox_ELF_3, Path.Combine(imageFolderPath, "bolge_sanayi_projections.png"));
+            LoadImageIntoPictureBox(pictureBox_ELF_4, Path.Combine(imageFolderPath, "bolge_sulama_projections.png"));
+            LoadImageIntoPictureBox(pictureBox_ELF_5, Path.Combine(imageFolderPath, "bolge_ticarethane_projections.png"));
+            // Add more PictureBox assignments as needed
+        }
+
+        // DEK şehri seçildiğinde çağrılan metot
+        private void dek_city_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox_DEK_il.SelectedItem != null)  // Geçerli bir seçim yapıldığında
+            {
+                SelectedCity = comboBox_DEK_il.SelectedItem.ToString();  // Şehir adını ayarla
+                CheckSelections();  // Seçim durumunu kontrol et
+
+                // Set map position based on selected city
+                if (cityCoordinates.TryGetValue(SelectedCity, out PointLatLng coordinates))
+                {
+                    gMapControl_DEK.Position = coordinates; // Set the map's position
+                    gMapControl_DEK.Zoom = 12; // Adjust the zoom level as needed
+                }
+            }
+        }
+
+        // Şehir seçimi yapıldığında çağrılan metot
+        private void ilSecimiMonteCarlo(object sender, EventArgs e)
+        {
+            if (comboBox_ea_il_secimi.SelectedItem != null)  // Geçerli bir seçim yapıldığında
+            {
+                SelectedCity = comboBox_ea_il_secimi.SelectedItem.ToString();  // Şehir adını ayarla
+                CheckSelections();  // Seçim durumunu kontrol et
+
+                // Set map position based on selected city
+                if (cityCoordinates.TryGetValue(SelectedCity, out PointLatLng coordinates))
+                {
+                    gMapControl_EA.Position = coordinates; // Set the map's position
+                    gMapControl_EA.Zoom = 12; // Adjust the zoom level as needed
+                }
+            }
+        }
+
+        // Yıl seçimi yapıldığında çağrılan metot
+        private void yilSecimiMonteCarlo(object sender, EventArgs e)
+        {
+            if (comboBox_ea_yıl_secimi.SelectedIndex != -1)  // Geçerli bir seçim yapıldığında
+            {
+                SelectedYear = comboBox_ea_yıl_secimi.SelectedIndex;  // Yıl indeksini ayarla
+                CheckSelections();  // Seçim durumunu kontrol et
+            }
         }
 
         // Method to run the R script
@@ -712,31 +1113,31 @@ namespace SLF
             switch (index)
             {
                 case 0:
-                    return new List<CheckBox> { checkBox9, checkBox1 };
+                    return new List<CheckBox> { checkBox_stokastik_1, checkBox_imar_1 };
                 case 1:
-                    return new List<CheckBox> { checkBox10, checkBox2 };
+                    return new List<CheckBox> { checkBox_stokastik_2, checkBox_imar_2 };
                 case 2:
-                    return new List<CheckBox> { checkBox11, checkBox3 };
+                    return new List<CheckBox> { checkBox_stokastik_3, checkBox_imar_3 };
                 case 3:
-                    return new List<CheckBox> { checkBox12, checkBox4 };
+                    return new List<CheckBox> { checkBox_stokastik_4, checkBox_imar_4 };
                 case 4:
-                    return new List<CheckBox> { checkBox13, checkBox5 };
+                    return new List<CheckBox> { checkBox_stokastik_5, checkBox_imar_5 };
                 case 5:
-                    return new List<CheckBox> { checkBox14, checkBox6 };
+                    return new List<CheckBox> { checkBox_stokastik_6, checkBox_imar_6 };
                 case 6:
-                    return new List<CheckBox> { checkBox15, checkBox7 };
+                    return new List<CheckBox> { checkBox_stokastik_7, checkBox_imar_7 };
                 case 7:
-                    return new List<CheckBox> { checkBox16, checkBox8 };
+                    return new List<CheckBox> { checkBox_stokastik_8, checkBox_imar_8 };
                 case 8:
-                    return new List<CheckBox> { checkBox17, checkBox22 };
+                    return new List<CheckBox> { checkBox_stokastik_9, checkBox_imar_9 };
                 case 9:
-                    return new List<CheckBox> { checkBox18, checkBox23 };
+                    return new List<CheckBox> { checkBox_stokastik_10, checkBox_imar_10 };
                 case 10:
-                    return new List<CheckBox> { checkBox19, checkBox24 };
+                    return new List<CheckBox> { checkBox_stokastik_11, checkBox_imar_11 };
                 case 11:
-                    return new List<CheckBox> { checkBox20, checkBox25 };
+                    return new List<CheckBox> { checkBox_stokastik_12, checkBox_imar_12 };
                 case 12:
-                    return new List<CheckBox> { checkBox21, checkBox26 };
+                    return new List<CheckBox> { checkBox_stokastik_13, checkBox_imar_13 };
 
                 // Add more cases as needed
                 default:
@@ -748,116 +1149,116 @@ namespace SLF
         private void checkboxes_init()
         {
 
-            checkBox1.Tag = 1;
-            checkBox2.Tag = 2;
-            checkBox3.Tag = 3;
-            checkBox4.Tag = 4;
-            checkBox5.Tag = 5;
-            checkBox6.Tag = 6;
-            checkBox7.Tag = 7;
-            checkBox8.Tag = 8;
-            checkBox22.Tag = 9;
-            checkBox23.Tag = 10;
-            checkBox24.Tag = 11;
-            checkBox25.Tag = 12;
-            checkBox26.Tag = 13;
+            checkBox_imar_1.Tag = 1;
+            checkBox_imar_2.Tag = 2;
+            checkBox_imar_3.Tag = 3;
+            checkBox_imar_4.Tag = 4;
+            checkBox_imar_5.Tag = 5;
+            checkBox_imar_6.Tag = 6;
+            checkBox_imar_7.Tag = 7;
+            checkBox_imar_8.Tag = 8;
+            checkBox_imar_9.Tag = 9;
+            checkBox_imar_10.Tag = 10;
+            checkBox_imar_11.Tag = 11;
+            checkBox_imar_12.Tag = 12;
+            checkBox_imar_13.Tag = 13;
 
             // shapefile_array de kullanılmak üzere oluşturulan checkbox etiketleri
-            checkBox9.Tag = 1;
-            checkBox10.Tag = 2;
-            checkBox11.Tag = 3;
-            checkBox12.Tag = 4;
-            checkBox13.Tag = 5;
-            checkBox14.Tag = 6;
-            checkBox15.Tag = 7;
-            checkBox16.Tag = 8;
-            checkBox17.Tag = 9;
-            checkBox18.Tag = 10;
-            checkBox19.Tag = 11;
-            checkBox20.Tag = 12;
-            checkBox21.Tag = 13;
+            checkBox_stokastik_1.Tag = 1;
+            checkBox_stokastik_2.Tag = 2;
+            checkBox_stokastik_3.Tag = 3;
+            checkBox_stokastik_4.Tag = 4;
+            checkBox_stokastik_5.Tag = 5;
+            checkBox_stokastik_6.Tag = 6;
+            checkBox_stokastik_7.Tag = 7;
+            checkBox_stokastik_8.Tag = 8;
+            checkBox_stokastik_9.Tag = 9;
+            checkBox_stokastik_10.Tag = 10;
+            checkBox_stokastik_11.Tag = 11;
+            checkBox_stokastik_12.Tag = 12;
+            checkBox_stokastik_13.Tag = 13;
 
             // checkboxlara event atama
-            checkBox1.CheckedChanged += checkBox_CheckedChanged;
-            checkBox2.CheckedChanged += checkBox_CheckedChanged;
-            checkBox3.CheckedChanged += checkBox_CheckedChanged;
-            checkBox4.CheckedChanged += checkBox_CheckedChanged;
-            checkBox5.CheckedChanged += checkBox_CheckedChanged;
-            checkBox6.CheckedChanged += checkBox_CheckedChanged;
-            checkBox7.CheckedChanged += checkBox_CheckedChanged;
-            checkBox8.CheckedChanged += checkBox_CheckedChanged;
-            checkBox9.CheckedChanged += checkBox_CheckedChanged;
-            checkBox10.CheckedChanged += checkBox_CheckedChanged;
-            checkBox11.CheckedChanged += checkBox_CheckedChanged;
-            checkBox12.CheckedChanged += checkBox_CheckedChanged;
-            checkBox13.CheckedChanged += checkBox_CheckedChanged;
-            checkBox14.CheckedChanged += checkBox_CheckedChanged;
-            checkBox15.CheckedChanged += checkBox_CheckedChanged;
-            checkBox16.CheckedChanged += checkBox_CheckedChanged;
-            checkBox17.CheckedChanged += checkBox_CheckedChanged;
-            checkBox18.CheckedChanged += checkBox_CheckedChanged;
-            checkBox19.CheckedChanged += checkBox_CheckedChanged;
-            checkBox20.CheckedChanged += checkBox_CheckedChanged;
-            checkBox21.CheckedChanged += checkBox_CheckedChanged;
-            checkBox22.CheckedChanged += checkBox_CheckedChanged;
-            checkBox23.CheckedChanged += checkBox_CheckedChanged;
-            checkBox24.CheckedChanged += checkBox_CheckedChanged;
-            checkBox25.CheckedChanged += checkBox_CheckedChanged;
-            checkBox26.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_imar_1.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_imar_2.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_imar_3.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_imar_4.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_imar_5.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_imar_6.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_imar_7.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_imar_8.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_stokastik_1.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_stokastik_2.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_stokastik_3.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_stokastik_4.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_stokastik_5.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_stokastik_6.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_stokastik_7.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_stokastik_8.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_stokastik_9.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_stokastik_10.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_stokastik_11.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_stokastik_12.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_stokastik_13.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_imar_9.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_imar_10.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_imar_11.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_imar_12.CheckedChanged += checkBox_CheckedChanged;
+            checkBox_imar_13.CheckedChanged += checkBox_CheckedChanged;
 
-            checkBox1.MouseDown += checkBox_MouseDown;
-            checkBox2.MouseDown += checkBox_MouseDown;
-            checkBox3.MouseDown += checkBox_MouseDown;
-            checkBox4.MouseDown += checkBox_MouseDown;
-            checkBox5.MouseDown += checkBox_MouseDown;
-            checkBox6.MouseDown += checkBox_MouseDown;
-            checkBox7.MouseDown += checkBox_MouseDown;
-            checkBox8.MouseDown += checkBox_MouseDown;
-            checkBox9.MouseDown += checkBox_MouseDown;
-            checkBox10.MouseDown += checkBox_MouseDown;
-            checkBox11.MouseDown += checkBox_MouseDown;
-            checkBox12.MouseDown += checkBox_MouseDown;
-            checkBox13.MouseDown += checkBox_MouseDown;
-            checkBox14.MouseDown += checkBox_MouseDown;
-            checkBox15.MouseDown += checkBox_MouseDown;
-            checkBox16.MouseDown += checkBox_MouseDown;
-            checkBox17.MouseDown += checkBox_MouseDown;
-            checkBox18.MouseDown += checkBox_MouseDown;
-            checkBox19.MouseDown += checkBox_MouseDown;
-            checkBox20.MouseDown += checkBox_MouseDown;
-            checkBox21.MouseDown += checkBox_MouseDown;
-            checkBox22.MouseDown += checkBox_MouseDown;
-            checkBox23.MouseDown += checkBox_MouseDown;
-            checkBox24.MouseDown += checkBox_MouseDown;
-            checkBox25.MouseDown += checkBox_MouseDown;
-            checkBox26.MouseDown += checkBox_MouseDown;
+            checkBox_imar_1.MouseDown += checkBox_MouseDown;
+            checkBox_imar_2.MouseDown += checkBox_MouseDown;
+            checkBox_imar_3.MouseDown += checkBox_MouseDown;
+            checkBox_imar_4.MouseDown += checkBox_MouseDown;
+            checkBox_imar_5.MouseDown += checkBox_MouseDown;
+            checkBox_imar_6.MouseDown += checkBox_MouseDown;
+            checkBox_imar_7.MouseDown += checkBox_MouseDown;
+            checkBox_imar_8.MouseDown += checkBox_MouseDown;
+            checkBox_stokastik_1.MouseDown += checkBox_MouseDown;
+            checkBox_stokastik_2.MouseDown += checkBox_MouseDown;
+            checkBox_stokastik_3.MouseDown += checkBox_MouseDown;
+            checkBox_stokastik_4.MouseDown += checkBox_MouseDown;
+            checkBox_stokastik_5.MouseDown += checkBox_MouseDown;
+            checkBox_stokastik_6.MouseDown += checkBox_MouseDown;
+            checkBox_stokastik_7.MouseDown += checkBox_MouseDown;
+            checkBox_stokastik_8.MouseDown += checkBox_MouseDown;
+            checkBox_stokastik_9.MouseDown += checkBox_MouseDown;
+            checkBox_stokastik_10.MouseDown += checkBox_MouseDown;
+            checkBox_stokastik_11.MouseDown += checkBox_MouseDown;
+            checkBox_stokastik_12.MouseDown += checkBox_MouseDown;
+            checkBox_stokastik_13.MouseDown += checkBox_MouseDown;
+            checkBox_imar_9.MouseDown += checkBox_MouseDown;
+            checkBox_imar_10.MouseDown += checkBox_MouseDown;
+            checkBox_imar_11.MouseDown += checkBox_MouseDown;
+            checkBox_imar_12.MouseDown += checkBox_MouseDown;
+            checkBox_imar_13.MouseDown += checkBox_MouseDown;
 
-            checkBox1.ForeColor = cbs.overlayColors[0].BorderColor;
-            checkBox2.ForeColor = cbs.overlayColors[1].BorderColor;
-            checkBox3.ForeColor = cbs.overlayColors[2].BorderColor;
-            checkBox4.ForeColor = cbs.overlayColors[3].BorderColor;
-            checkBox5.ForeColor = cbs.overlayColors[4].BorderColor;
-            checkBox6.ForeColor = cbs.overlayColors[5].BorderColor;
-            checkBox7.ForeColor = cbs.overlayColors[6].BorderColor;
-            checkBox8.ForeColor = cbs.overlayColors[7].BorderColor;
-            checkBox9.ForeColor = cbs.overlayColors[0].BorderColor;
-            checkBox10.ForeColor = cbs.overlayColors[1].BorderColor;
-            checkBox11.ForeColor = cbs.overlayColors[2].BorderColor;
-            checkBox12.ForeColor = cbs.overlayColors[3].BorderColor;
-            checkBox13.ForeColor = cbs.overlayColors[4].BorderColor;
-            checkBox14.ForeColor = cbs.overlayColors[5].BorderColor;
-            checkBox15.ForeColor = cbs.overlayColors[6].BorderColor;
-            checkBox16.ForeColor = cbs.overlayColors[7].BorderColor;
-            checkBox17.ForeColor = cbs.overlayColors[8].BorderColor;
-            checkBox18.ForeColor = cbs.overlayColors[9].BorderColor;
-            checkBox19.ForeColor = cbs.overlayColors[10].BorderColor;
-            checkBox20.ForeColor = cbs.overlayColors[11].BorderColor;
-            checkBox21.ForeColor = cbs.overlayColors[12].BorderColor;
-            checkBox22.ForeColor = cbs.overlayColors[8].BorderColor;
-            checkBox23.ForeColor = cbs.overlayColors[9].BorderColor;
-            checkBox24.ForeColor = cbs.overlayColors[10].BorderColor;
-            checkBox25.ForeColor = cbs.overlayColors[11].BorderColor;
-            checkBox26.ForeColor = cbs.overlayColors[12].BorderColor;
+            checkBox_imar_1.ForeColor = cbs.overlayColors[0].BorderColor;
+            checkBox_imar_2.ForeColor = cbs.overlayColors[1].BorderColor;
+            checkBox_imar_3.ForeColor = cbs.overlayColors[2].BorderColor;
+            checkBox_imar_4.ForeColor = cbs.overlayColors[3].BorderColor;
+            checkBox_imar_5.ForeColor = cbs.overlayColors[4].BorderColor;
+            checkBox_imar_6.ForeColor = cbs.overlayColors[5].BorderColor;
+            checkBox_imar_7.ForeColor = cbs.overlayColors[6].BorderColor;
+            checkBox_imar_8.ForeColor = cbs.overlayColors[7].BorderColor;
+            checkBox_stokastik_1.ForeColor = cbs.overlayColors[0].BorderColor;
+            checkBox_stokastik_2.ForeColor = cbs.overlayColors[1].BorderColor;
+            checkBox_stokastik_3.ForeColor = cbs.overlayColors[2].BorderColor;
+            checkBox_stokastik_4.ForeColor = cbs.overlayColors[3].BorderColor;
+            checkBox_stokastik_5.ForeColor = cbs.overlayColors[4].BorderColor;
+            checkBox_stokastik_6.ForeColor = cbs.overlayColors[5].BorderColor;
+            checkBox_stokastik_7.ForeColor = cbs.overlayColors[6].BorderColor;
+            checkBox_stokastik_8.ForeColor = cbs.overlayColors[7].BorderColor;
+            checkBox_stokastik_9.ForeColor = cbs.overlayColors[8].BorderColor;
+            checkBox_stokastik_10.ForeColor = cbs.overlayColors[9].BorderColor;
+            checkBox_stokastik_11.ForeColor = cbs.overlayColors[10].BorderColor;
+            checkBox_stokastik_12.ForeColor = cbs.overlayColors[11].BorderColor;
+            checkBox_stokastik_13.ForeColor = cbs.overlayColors[12].BorderColor;
+            checkBox_imar_9.ForeColor = cbs.overlayColors[8].BorderColor;
+            checkBox_imar_10.ForeColor = cbs.overlayColors[9].BorderColor;
+            checkBox_imar_11.ForeColor = cbs.overlayColors[10].BorderColor;
+            checkBox_imar_12.ForeColor = cbs.overlayColors[11].BorderColor;
+            checkBox_imar_13.ForeColor = cbs.overlayColors[12].BorderColor;
 
         }
 
@@ -1102,7 +1503,7 @@ namespace SLF
                     StartPosition = FormStartPosition.CenterScreen
                 };
                 System.Windows.Forms.Label textLabel = new System.Windows.Forms.Label() { Left = 50, Top = 20, Text = text };
-                System.Windows.Forms.TextBox textBox = new System.Windows.Forms.TextBox() { Left = 50, Top = 50, Width = 170 , Height = 70};
+                System.Windows.Forms.TextBox textBox = new System.Windows.Forms.TextBox() { Left = 50, Top = 50, Width = 170, Height = 70 };
                 System.Windows.Forms.Button confirmation = new System.Windows.Forms.Button() { Text = "Tamam", Left = 170, Width = 100, Top = 85, DialogResult = DialogResult.OK };
                 confirmation.Click += (sender, e) => { prompt.Close(); };
                 prompt.Controls.Add(textBox);
@@ -1131,6 +1532,13 @@ namespace SLF
         /* ------------------------------------------------------------------------------------*/
 
         //////////////// --------------- BUTTON EVENTS  ------------------------////////////////
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            Modül_Tabları.SelectTab(tab_girdi);
+            veri_listesi_seçimi.Text = "İmar Verileri";
+            veri_listesi_seçimi.Enabled = false;
+        }
 
 
         // haritalardaki arazi katmanı
@@ -1300,11 +1708,6 @@ namespace SLF
                 mesafe_metre_stokastik, Mesafe_stokastik);
         }
 
-        private void EA_Seç_Click(object sender, EventArgs e)
-        {
-            cbs.CBS_sec(markerOverlay_ea, rulerRoute_ea, gMapControl_EA,
-                mesafe_metre_ea, Mesafe_ea);
-        }
 
         private void Yuk_Seç_Click(object sender, EventArgs e)
         {
@@ -1328,16 +1731,6 @@ namespace SLF
             cbs.CBS_ölç(mesafe_metre_stokastik, Mesafe_stokastik);
         }
 
-        private void EA_Mesafe_Ölç_Click(object sender, EventArgs e)
-        {
-            isRulerActive = true;
-            isRulerEnabled = true;
-            polygonPoints_ea?.Clear();
-            polygonOverlay_ea?.Clear();
-
-            cbs.CBS_ölç(mesafe_metre_ea, Mesafe_ea);
-        }
-
         private void Yuk_Mesafe_Ölç_Click(object sender, EventArgs e)
         {
             isRulerActive = true;
@@ -1354,7 +1747,7 @@ namespace SLF
             isRulerEnabled = true;
             polygonPoints_imar?.Clear();
             polygonOverlay_imar?.Clear();
-            
+
             cbs.CBS_ölç(mesafe_metre_imar, Mesafe_imar);
         }
 
@@ -1399,8 +1792,8 @@ namespace SLF
         }
 
         private void MouseDownEvent(object sender, MouseEventArgs e, GMapControl gMapControl,
-            Label mesafe, Label mesafe_metre, List<PointLatLng> rulerPoints, 
-            GMapOverlay markerOverlay, GMapOverlay rulerOverlay,
+            System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre,
+            List<PointLatLng> rulerPoints, GMapOverlay markerOverlay, GMapOverlay rulerOverlay,
             ref GMapRoute rulerRoute, List<PointLatLng> polygonPoints, GMapOverlay polygonOverlay)
         {
             // grid eventi
@@ -1422,7 +1815,7 @@ namespace SLF
 
                 // seçilen noktaları bir listeye koy
                 rulerPoints.Add(point);
-                cbs.CetvelSecimi(gMapControl, mesafe_metre, rulerPoints, markerOverlay, 
+                cbs.CetvelSecimi(gMapControl, mesafe_metre, rulerPoints, markerOverlay,
                     rulerOverlay, ref rulerRoute);
             }
 
@@ -1440,11 +1833,11 @@ namespace SLF
             }
 
         }
-        
+
         private void gMapControl_stokastik_MouseDown(object sender, MouseEventArgs e)
         {
             MouseDownEvent(sender, e, gMapControl_stokastik, Mesafe_stokastik, mesafe_metre_stokastik,
-                rulerPoints_stokastik,markerOverlay_stokastik,rulerOverlay_stokastik,ref rulerRoute_stokastik,
+                rulerPoints_stokastik, markerOverlay_stokastik, rulerOverlay_stokastik, ref rulerRoute_stokastik,
                 polygonPoints_stokastik, polygonOverlay_stokastik);
         }
 
@@ -1522,7 +1915,7 @@ namespace SLF
                 {
                     rulerOverlay_imar.Routes.Remove(rulerRoute_imar);
                 }
-                rulerRoute_imar = new GMapRoute(new List<PointLatLng> { rulerPoints_imar[0], point }, 
+                rulerRoute_imar = new GMapRoute(new List<PointLatLng> { rulerPoints_imar[0], point },
                     "rulerRoute_imar");
                 rulerRoute_imar.Stroke = new Pen(Color.Red, 3);
                 rulerOverlay_imar.Routes.Add(rulerRoute_imar);
@@ -1580,7 +1973,6 @@ namespace SLF
             }
         }
 
-
         private void gMapControl_yuk_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left && cbs.isSelecting_grid)
@@ -1627,10 +2019,10 @@ namespace SLF
                 foreach (var columns in example_row.Table.Columns)
                 {
                     SuspendLayout();
-                    fonksiyonFormu.tum_sutunlar.Items.Add(columns.ToString());
+                    fonksiyonFormu.tum_sutunlar_fonksiyonForm.Items.Add(columns.ToString());
                     ResumeLayout();
                 }
-                
+
                 fonksiyonFormu.activeGMapControl = cbs.GetActiveGMapControl();
 
                 fonksiyonFormu.Show();
@@ -1644,10 +2036,10 @@ namespace SLF
             }
         }
 
-        
+
         public void OnMapClickEventi(PointLatLng pointClick, MouseEventArgs e, GMapOverlay markerOverlay,
-    ref List<PointLatLng> polygonPoints, ref GMapOverlay polygonOverlay,
-    Label mesafe, Label mesafe_metre)
+                ref List<PointLatLng> polygonPoints, ref GMapOverlay polygonOverlay,
+                System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
         {
             if (e.Button == MouseButtons.Left)
             {
@@ -1716,7 +2108,7 @@ namespace SLF
 
         private void gMapControl_stokastik_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
-            OnMapClickEventi(pointClick, e, markerOverlay_stokastik, ref polygonPoints_stokastik, 
+            OnMapClickEventi(pointClick, e, markerOverlay_stokastik, ref polygonPoints_stokastik,
                 ref polygonOverlay_stokastik, Mesafe_stokastik, mesafe_metre_stokastik);
         }
 
@@ -1727,7 +2119,8 @@ namespace SLF
         }
 
         public void PoligonKaydetEventi(object sender, EventArgs e, GMapOverlay polygonOverlay,
-            GMapOverlay markerOverlay, List<PointLatLng> polygonPoints, Label mesafe, Label mesafe_metre)
+            GMapOverlay markerOverlay, List<PointLatLng> polygonPoints,
+            System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
         {
             if (polygonOverlay != null && polygonOverlay.Polygons.Count != 0)
             {
@@ -1779,12 +2172,13 @@ namespace SLF
 
         private void Poligon_Kaydet_Click(object sender, EventArgs e)
         {
-            if(cbs.GetActiveGMapControl() == gMapControl_imar)
+            if (cbs.GetActiveGMapControl() == gMapControl_imar)
             {
                 PoligonKaydetEventi(sender, e, polygonOverlay_imar, markerOverlay_imar,
                     polygonPoints_imar, Mesafe_imar, mesafe_metre_imar);
 
-            } else if (cbs.GetActiveGMapControl() == gMapControl_stokastik)
+            }
+            else if (cbs.GetActiveGMapControl() == gMapControl_stokastik)
 
             {
                 PoligonKaydetEventi(sender, e, polygonOverlay_stokastik, markerOverlay_stokastik,
@@ -1904,10 +2298,13 @@ namespace SLF
 
         private void NoktaBilgileriniGoster(NoktaVeri nokta)
         {
-            MessageBox.Show($"Enlem: {nokta.Enlem}\nBoylam: {nokta.Boylam}\nBina Dem: " +
+            // Nokta bilgilerini göster
+            MessageBox.Show($"Enlem: {nokta.Enlem}\nBoylam: {nokta.Boylam}\nBina Demandi: " +
                 $"{nokta.Bina_Demandi}\nAbone Sayısı: {nokta.Abone_Sayısı}");
-        }
 
+            // Noktayı silmek için enlem ve boylamdan PointLatLng oluşturuyoruz
+            PointLatLng point = new PointLatLng(nokta.Enlem, nokta.Boylam);
+        }
         private void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
         {
             if (item.Tag != null && item.Tag is NoktaVeri && Modül_Tabları.SelectedTab == tab_ea)
@@ -1916,23 +2313,6 @@ namespace SLF
                 NoktaBilgileriniGoster(seçili_nokta);
             }
         }
-
-
-        private void gMapControl_stokastik_OnMarkerClick(GMapMarker item, MouseEventArgs e)
-        {
-            if (item.Tag != null && item.Tag is NoktaVeri && Modül_Tabları.SelectedTab == tab_stokastik)
-            {
-                NoktaVeri seçili_nokta = item.Tag as NoktaVeri;
-                NoktaBilgileriniGoster(seçili_nokta);
-            }
-        }
-
-        /*---------------------------------------------------------------------------------------------- */
-        /*----------------------------------     CUSTOM METHODS & CLASSES     -------------------------- */
-
-
-
-
 
         private void SelectFolderButton_Click(object sender, EventArgs e)
         {
@@ -1963,12 +2343,12 @@ namespace SLF
             if (selectedMethod == "ELF (Ekonometrik)")
             {
                 // Logic for ELF selection
-               // MessageBox.Show("ELF method selected, skipping prerequisites.");
+                // MessageBox.Show("ELF method selected, skipping prerequisites.");
             }
             else if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
                 // Logic for SLF selection
-               // MessageBox.Show("SLF method selected, prerequisites are required.");
+                // MessageBox.Show("SLF method selected, prerequisites are required.");
             }
             else
             {
@@ -1977,20 +2357,206 @@ namespace SLF
             }
 
             girdiModülü = girdiModülleri[seçilenVeriTipi];
+
             girdiModülü.SlfStartYear = slfStartYear;
             girdiModülü.SlfEndYear = slfEndYear;
 
+            InitializeComboBoxes(); // yılların guncellenmesi 
             // Check if "ELF" is selected to skip prerequisites
             bool skipPrerequisites = (selectedMethod == "ELF (Ekonometrik)");
 
             // Call VEERProcess with skipPrerequisites flag
             var isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
+
             if (isImported)
             {
+                modulescheck.Add(seçilenVeriTipi);
                 veri_listesi_seçimi.Refresh();
+                Console.WriteLine(modulescheck.Count);
                 dataGridView_girdi.DataSource = girdiModülü.CurrentDataTable;
+
+
+
             }
         }
+
+        private async void gMapControl_EA_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                // Priority check for adding a charging station
+                if (isAddingChargingStation)
+                {
+                    //Bitmap SunMarkerIcon = new Bitmap("C:/Users/begum.orhan/source/repos/SLF/Pictures/Sun.png");
+                    //GMapMarker marker = new GMarkerGoogle(pointClick, SunMarkerIcon);
+                    // Add the yellow marker for charging station
+                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow);
+                    marker.ToolTipText = "Yeni Şarj İstasyonu";
+                    markerOverlay_ea.Markers.Add(marker);
+
+                    // Create the coordinate object for the popup form
+                    NoktaVeri noktaVeri_marker = new NoktaVeri
+                    {
+                        Enlem = Math.Round(pointClick.Lat, 4),
+                        Boylam = Math.Round(pointClick.Lng, 4)
+                    };
+
+                    using (ChargingStationPopupForm popupForm = new ChargingStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+                    {
+                        if (popupForm.ShowDialog() == DialogResult.OK)
+                        {
+                            // On success, update the map with the new station details
+                            await eaHaritayaVeriYukleAsync();
+                        }
+                        else if (popupForm.OperationCancelled)
+                        {
+                            // If canceled, remove the added marker
+                            markerOverlay_ea.Markers.Remove(marker);
+                        }
+                    }
+
+                    // Reset the flag after handling the form
+                    isAddingChargingStation = false;
+                    return; // Exit to ensure other actions aren’t triggered
+                }
+
+                // Marker selection check (only if not adding a charging station)
+                if (isSelecting_marker)
+                {
+                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
+                    markerOverlay_ea.Markers.Add(marker);
+
+                    NoktaVeri noktaVeri_marker = new NoktaVeri
+                    {
+                        Enlem = Math.Round(pointClick.Lat, 4),
+                        Boylam = Math.Round(pointClick.Lng, 4)
+                    };
+
+                    marker.Tag = noktaVeri_marker;
+                    NoktaVeri veri = (NoktaVeri)marker.Tag;
+                    Console.WriteLine($"Enlem: {veri.Enlem}, Boylam: {veri.Boylam}");
+                }
+            }
+        }
+        private void gMapControl_EA_MouseMove(object sender, MouseEventArgs e)
+        {
+            // eğer sadece 1 adet nokta seçilmişse, ve ikinci nokta dinamik olarak farklı yerlere
+            // tıklanarak seçiliyorsa, mesafeyi de buna göre güncelle.
+            if (isRulerActive && rulerPoints_ea.Count == 1 && isRulerEnabled == true)
+            {
+                var point = gMapControl_EA.FromLocalToLatLng(e.X, e.Y);
+                if (rulerRoute_ea != null)
+                {
+                    rulerOverlay_ea.Routes.Remove(rulerRoute_ea);
+                }
+                rulerRoute_ea = new GMapRoute(new List<PointLatLng> { rulerPoints_ea[0], point }, "rulerRoute_ea");
+                rulerRoute_ea.Stroke = new Pen(Color.Red, 3);
+                rulerOverlay_ea.Routes.Add(rulerRoute_ea);
+                gMapControl_EA.Refresh();
+            }
+        }
+
+
+        private void gMapControl_stokastik_OnMarkerClick(GMapMarker item, MouseEventArgs e)
+        {
+            if (item.Tag != null && item.Tag is NoktaVeri && Modül_Tabları.SelectedTab == tab_stokastik)
+            {
+                NoktaVeri seçili_nokta = item.Tag as NoktaVeri;
+                NoktaBilgileriniGoster(seçili_nokta);
+            }
+        }
+
+        // Modül tabları veri importu mantıgında refer ediliyor. Silinmesin.
+        /*
+        private async Task dekHaritayaVeriYukleAsync()
+        {
+            try
+            {
+                GMapOverlay dekOverlay = new GMapOverlay("Dek Layer");
+
+                if (dataGridView_girdi.DataSource == null)
+                {
+                    MessageBox.Show("Veri kaynağı bulunamadı. Lütfen verileri kontrol edin.");
+                    return;
+                }
+
+                if (gMapControl_DEK.Overlays.Contains(dekOverlay))
+                {
+                    gMapControl_DEK.Overlays.Remove(dekOverlay);
+                }
+
+
+                DataTable dekData = await Task.Run(() => GirdiModülü.dataTablesByType["DEK Verileri"]);
+                if (dekData != null && dekData.Rows.Count > 0)
+                {
+                    Invoke(new Action(() =>
+                    {
+                        foreach (DataRow row in dekData.Rows)
+                        {
+                            if (!dekData.Columns.Contains("DEK_X_KOORDINAT") ||
+                                !dekData.Columns.Contains("DEK_Y_KOORDINAT") ||
+                                !dekData.Columns.Contains("KAYNAK_TIPI") ||
+                                !GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
+                            {
+                                MessageBox.Show("Lütfen DEK modülü verilerinizi yükleyin.");
+                                return;
+                            }
+
+                            if (!girdiModülü.IsNullLike(row["DEK_X_KOORDINAT"]) &&
+                                !girdiModülü.IsNullLike(row["DEK_Y_KOORDINAT"]))
+                            {
+                                if (double.TryParse(row["DEK_X_KOORDINAT"].ToString(), out double x) &&
+                                    double.TryParse(row["DEK_Y_KOORDINAT"].ToString(), out double y))
+                                {
+                                    string kaynakTipi = row["KAYNAK_TIPI"].ToString().ToLower();
+                                    GMarkerGoogle marker;
+
+                                    // Kaynak tipine göre marker rengini belirle
+                                    if (kaynakTipi.Contains("güneş"))
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.yellow);
+                                    }
+                                    else if (kaynakTipi.Contains("rüzgar"))
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.blue);
+                                    }
+                                    else if (kaynakTipi.Contains("hidroelektrik"))
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.gray_small);
+                                    }
+                                    else if (kaynakTipi.Contains("biokütle"))
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.green);
+                                    }
+                                    else
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.red);
+                                    }
+
+                                    dekOverlay.Markers.Add(marker);
+                                }
+                            }
+                        }
+
+                        gMapControl_DEK.Overlays.Add(dekOverlay);
+                        gMapControl_DEK.Refresh();
+                    }));
+                }
+                else
+                {
+                    Invoke(new Action(() => MessageBox.Show("Lütfen Dek noktalarını görebilmek için verilerinizi yükleyiniz.")));
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Bir hata oluştu: {ex.Message}");
+            }
+        }*/
+
+
+        /*---------------------------------------------------------------------------------------------- */
+        /*----------------------------------     CUSTOM METHODS & CLASSES     -------------------------- */
+
 
 
         // show information about polygons when double-clicking on the map
@@ -2046,6 +2612,26 @@ namespace SLF
             ShowAttributeTable(singleRowTable);
         }
 
+        // show information about polygons when double-clicking on the map
+        private void gMapControl_EA_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                foreach (var polygon in cbs.tüm_katmanlar_array[layer_index].Polygons)
+                {
+                    if (cbs.IsPointInPolygon(pointClick, polygon))
+                    {
+                        cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
+
+                        if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
+                        {
+                            ShowAttributeRow(row);
+                            tablo_formu.Show();
+                        }
+                    }
+                }
+            }
+        }
 
         // ------------------------------------------------------------------------------------- //
 
@@ -2066,7 +2652,7 @@ namespace SLF
 
         private void Poligon_Sil_Click(object sender, EventArgs e)
         {
-            if(cbs.GetActiveGMapControl() == gMapControl_imar)
+            if (cbs.GetActiveGMapControl() == gMapControl_imar)
             {
                 if (polygonOverlay_imar == null || polygonOverlay_imar.Polygons.Count == 0)
                 {
@@ -2232,10 +2818,7 @@ namespace SLF
                 MessageBox.Show("Dosya seçilmedi.");
             }
         }
-        private void veri_listesi_seçimi_MouseDown(object sender, MouseEventArgs e)
-        {
 
-        }
 
         /* -------------------------------------------------------------------------------------------*/
 
@@ -2265,7 +2848,7 @@ namespace SLF
             startYearComboBox.Enabled = true;
             endYearComboBox.Enabled = false;
             yearApproveButton.Enabled = false;
-           // veri_listesi_seçimi.Enabled = false;
+            // veri_listesi_seçimi.Enabled = false;
         }
         private void ModülFormu_Load(object sender, EventArgs e)
         {
@@ -2306,9 +2889,27 @@ namespace SLF
 
         private void HomePageButton_Click(object sender, EventArgs e)
         {
-            HomePageForm homePageForm = new HomePageForm();
-            homePageForm.Show();
-            this.Hide();
+            // Show the confirmation dialog for navigating to the home page
+
+            // Show the confirmation dialog for navigating to the home page
+            DialogResult result = MessageBox.Show(
+                "Ana sayfaya dönmek istediğinize emin misiniz? Kaydedilmeyen veriler kaybolacaktır!",
+                "Ana Sayfaya Dön",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                // Unsubscribe from the FormClosing event to prevent the warning dialog
+                this.FormClosing -= ModülFormu_FormClosing;
+
+                // Proceed to open the home page
+                HomePageForm homePageForm = new HomePageForm();
+                homePageForm.Show();
+                this.Hide(); // Hide the current form
+            }
+            // If the user clicks 'No', do nothing and stay on the current form
         }
 
         private void yearApproveButton_Click(object sender, EventArgs e)
@@ -2376,12 +2977,11 @@ namespace SLF
                 Console.WriteLine("Label kaldırıldı");
             }
 
-
             // Yeni bir label oluşturuyoruz
             System.Windows.Forms.Label istasyonAdetLabel = new System.Windows.Forms.Label();
 
-            // İstasyon sayılarını eksiltmeden gösteriyoruz
-            istasyonAdetLabel.Text = $"AC istasyonlar: {greenAc - 1}, DC istasyonlar: {redDc - 1}";
+            // İstasyon sayılarını doğru gösteriyoruz
+            istasyonAdetLabel.Text = $"AC istasyonlar: {greenAc}, DC istasyonlar: {redDc}";
 
             // Debug için konsola yazdır (log)
             Console.WriteLine($"AC Sayısı: {greenAc}, DC Sayısı: {redDc}");
@@ -2391,7 +2991,7 @@ namespace SLF
             istasyonAdetLabel.AutoSize = true;  // Otomatik boyutlandırma
 
             // Yazı tipi ve stil ayarları
-            istasyonAdetLabel.Font = new System.Drawing.Font("Arial", 16, System.Drawing.FontStyle.Bold);
+            istasyonAdetLabel.Font = new System.Drawing.Font("Arial", 12, System.Drawing.FontStyle.Bold);
             istasyonAdetLabel.ForeColor = System.Drawing.Color.White;  // Yazı rengini beyaz yapıyoruz
             istasyonAdetLabel.BackColor = System.Drawing.Color.Transparent;  // Arka planı şeffaf yapıyoruz
 
@@ -2405,7 +3005,6 @@ namespace SLF
             // Haritayı yeniden çiziyoruz
             gMapControl_EA.Refresh();
         }
-
 
         private async Task eaHaritayaVeriYukleAsync()
         {
@@ -2422,58 +3021,71 @@ namespace SLF
                     return;
                 }
 
-                gMapControl_EA.Overlays.Clear();
+                if (gMapControl_EA.Overlays.Contains(eaOverlay))
+                {
+                    gMapControl_EA.Overlays.Remove(eaOverlay);
+                }
 
-                DataTable eaData = await Task.Run(() => DataGridViewToDataTable(dataGridView_girdi));
+
+                DataTable eaData = await Task.Run(() => GirdiModülü.dataTablesByType["EA Şarj Verileri"]);
 
                 if (eaData != null && eaData.Rows.Count > 0)
                 {
-                    greenAc = 0;  // Ensure counters are reset
+                    greenAc = 0;  // Sayaçları sıfırla
                     redDc = 0;
 
                     Invoke(new Action(() =>
                     {
                         foreach (DataRow row in eaData.Rows)
                         {
-                            if (!girdiModülü.IsNullLike(row["EA_X_KOORDINAT"]) && !girdiModülü.IsNullLike(row["EA_Y_KOORDINAT"]))
+                            if (!eaData.Columns.Contains("EA_X_KOORDINAT") ||
+                                !eaData.Columns.Contains("EA_Y_KOORDINAT") ||
+                                !eaData.Columns.Contains("ISTASYON_GUCU") &&
+                                !GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
                             {
-                                double x = Convert.ToDouble(row["EA_X_KOORDINAT"]);
-                                double y = Convert.ToDouble(row["EA_Y_KOORDINAT"]);
-
-                                if (int.TryParse(row["ISTASYON_GUCU"].ToString(), out int istasyonGucu))
+                                MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
+                                return;
+                            }
+                            //Console.WriteLine(GirdiModülü.dataTablesByType);
+                            if (!girdiModülü.IsNullLike(row["EA_X_KOORDINAT"]) &&
+                                !girdiModülü.IsNullLike(row["EA_Y_KOORDINAT"]))
+                            {
+                                if (double.TryParse(row["EA_X_KOORDINAT"].ToString(), out double x) &&
+                                    double.TryParse(row["EA_Y_KOORDINAT"].ToString(), out double y))
                                 {
-                                    GMarkerGoogle marker;
-
-                                    if (istasyonGucu <= 22)
+                                    if (int.TryParse(row["ISTASYON_GUCU"].ToString(), out int istasyonGucu))
                                     {
-                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.green);
-                                        greenAc++;
-                                    }
-                                    else
-                                    {
-                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.red);
-                                        redDc++;
-                                    }
+                                        GMarkerGoogle marker;
 
-                                    eaOverlay.Markers.Add(marker);
+                                        if (istasyonGucu <= 22)
+                                        {
+                                            marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.green);
+                                            greenAc++;
+                                        }
+                                        else
+                                        {
+                                            marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.red);
+                                            redDc++;
+                                        }
+
+                                        if (eaData.Columns.Contains("ISTASYON_ADI") &&
+                                            !girdiModülü.IsNullLike(row["ISTASYON_ADI"]))
+                                        {
+                                            string istasyonAdi = row["ISTASYON_ADI"].ToString();
+                                            marker.ToolTipText = istasyonAdi;
+                                        }
+
+                                        eaOverlay.Markers.Add(marker);
+                                    }
                                 }
                             }
                         }
 
-                        // Log counters for debugging purposes
-
-                        // Call the function and catch any potential errors
-                        try
-                        {
-                            calculateChargeStation(greenAc, redDc);
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Bir hata ile karşılaştı: {ex.Message}");
-                        }
-
                         gMapControl_EA.Overlays.Add(eaOverlay);
                         gMapControl_EA.Refresh();
+
+                        // Sayaç değerlerini sağ üst köşede göster
+                        calculateChargeStation(greenAc, redDc);
                     }));
                 }
                 else
@@ -2487,65 +3099,85 @@ namespace SLF
             }
         }
 
-
-        public DataTable DataGridViewToDataTable(DataGridView dataGridView) // datagridview verilerinin datatable donusumu 
+        /* BURASI SONRADAN AÇILACAK, SIMDILIK BOYLE KALSIN.
+        private async void Modül_Tabları_SelectedIndexChanged(object sender, EventArgs e)
         {
-            DataTable dataTable = new DataTable();
+            // Gerekli kontrolleri yapmak için seçilen sekmeyi ve modülleri kontrol et
+            string selectedTabText = Modül_Tabları.SelectedTab.Text;
 
-            // Sütunları ekleyin
-            foreach (DataGridViewColumn column in dataGridView.Columns)
+            // Modüllerin yüklü olup olmadığını kontrol et
+            if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
-                // DataTable'e sütunları ekleyin
-                dataTable.Columns.Add(column.Name, column.ValueType);
-            }
-
-            // Satırları ekleyin
-            foreach (DataGridViewRow row in dataGridView.Rows)
-            {
-                // Eğer satır doluysa veri ekleyin (son satır boş olabilir)
-                if (!row.IsNewRow)
+                if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Haritası Modülü") && !modulescheck.Contains("DTR Verileri"))
                 {
-                    DataRow dataRow = dataTable.NewRow();
-
-                    foreach (DataGridViewCell cell in row.Cells)
-                    {
-                        dataRow[cell.ColumnIndex] = cell.Value ?? DBNull.Value; // Hücre dolu değilse DBNull olarak ayarlayın
-                    }
-
-                    dataTable.Rows.Add(dataRow);
-                }
-            }
-
-            return dataTable;
-        }
-
-        private async void Modül_Tabları_SelectedIndexChanged(object sender, EventArgs e) // ea sarj modulu butonu tıklandgında baslayan event fonksiyonu
-        {
-            /*// Sadece "EA Şarj Modülü" tabına tıklandığında işlem yapalım
-            if (Modül_Tabları.SelectedTab.Text == "EA Şarj Modülü")
-            {
-                if (dataGridView_girdi.DataSource == null)
-                {
-                    MessageBox.Show("Lütfen önce verileri yükleyin.");
+                    // Sekme geçişini tamamen iptal et
+                    MessageBox.Show("DTR verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
+                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
                     return;
                 }
-
-                // Harita işlemini başlat
-                await eaHaritayaVeriYukleAsync();
-            }*/
-            if (cbs.GetActiveGMapControl() != null)
-            {
-                cbs.GetActiveGMapControl().Refresh();
+                else if (selectedTabText == "İmar Analizleri" && !modulescheck.Contains("İmar Planı"))
+                {
+                    // Sekme geçişini tamamen iptal et
+                    MessageBox.Show("İmar planı verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
+                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
+                    return;
+                }
+                else if (selectedTabText == "Optimal DTR Konumlandırma" && (!modulescheck.Contains("DTR Verileri") || !modulescheck.Contains("İmar Planı")))
+                {
+                    // Sekme geçişini tamamen iptal et
+                    MessageBox.Show("DTR verileri ve İmar planı yüklenmeden bu sekmeye geçiş yapılamaz.");
+                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
+                    return;
+                }
             }
 
-        }
+            // EA Şarj Modülü tabına tıklanmışsa
+            if (selectedTabText == "EA Şarj Modülü")
+            {
+                if ((!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri")))
+                {
+                    MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    return;
+                }
+                else
+                {
+                    InitializeComboBoxes();
+                    await eaHaritayaVeriYukleAsync();
+                }
+
+            }
+            // DEK Modülü tabına tıklanmışsa
+            else if (selectedTabText == "DEK Modülü")
+            {
+                Console.WriteLine("DEK Modülü");
+                if (!GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
+                {
+                    MessageBox.Show("Lütfen DEK modülü verilerinizi yükleyin.");
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    return;
+                }
+                else
+                {
+                    await dekHaritayaVeriYukleAsync();
+                }
+
+            }
+        }*/
 
         private void buton_stokastik_harita_katmanlar_MouseClick(object sender, MouseEventArgs e)
         {
-            if(e.Button == MouseButtons.Right)
+            if (e.Button == MouseButtons.Right)
             {
                 harita_katmanları_right_click.Show();
-            } else
+            }
+            else
             {
                 harita_katmanları_right_click.Hide();
             }
@@ -2578,6 +3210,659 @@ namespace SLF
             }
         }
 
+        private void EAStationAddButton_Click(object sender, EventArgs e)
+        {
+            // Check if the "EA Şarj Verileri" key exists in the dataTablesByType dictionary
+            if (!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
+            {
+                MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
+                Console.WriteLine("batu");
+                return;
+            }
+
+            // Use dataGridView1.DataSource as the DataTable instead of eaDataTable
+            DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
+            if (dataTable == null || dataTable.Rows.Count == 0)
+            {
+                MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
+                return;
+            }
+
+            // Check if we are in the process of adding a charging station
+            if (!isAddingChargingStation)
+            {
+                MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
+                isAddingChargingStation = true;
+                return; // Exit to wait for the user to click on the map
+            }
+
+            // Get the clicked point on the map
+            var pointClick = gMapControl_EA.FromLocalToLatLng(MousePosition.X, MousePosition.Y);
+
+            // Refresh the map to show the new marker
+            gMapControl_EA.Refresh();
+
+            // Reset the flag after adding the station
+            isAddingChargingStation = false;
+        }
+
+        private void DEKCenterAddButton_Click(object sender, EventArgs e)
+        {
+            // Check if the "DTR Verileri" key exists in the dataTablesByType dictionary
+            if (!GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
+            {
+                MessageBox.Show("Lütfen Dağıtık Üretim verilerinizi ekleyin.");
+                return;
+            }
+
+            // Check if "DTR Verileri" has data
+            DataTable dtrDataTable = GirdiModülü.dataTablesByType["DTR Verileri"];
+            if (dtrDataTable == null || dtrDataTable.Rows.Count == 0)
+            {
+                MessageBox.Show("Lütfen Dağıtık Üretim verilerinizi ekleyin.");
+                return;
+            }
+
+            // Check if "DEK Verileri" key exists in the dataTablesByType dictionary
+            if (!GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
+            {
+                MessageBox.Show("Lütfen DEK verilerinizi ekleyin.");
+                return;
+            }
+
+            // Check if "DEK Verileri" has data
+            DataTable dekDataTable = GirdiModülü.dataTablesByType["DEK Verileri"];
+            if (dekDataTable == null || dekDataTable.Rows.Count == 0)
+            {
+                MessageBox.Show("Lütfen DEK verilerinizi ekleyin.");
+                return;
+            }
+
+            // Indicate that the process of marking DEK points has started
+            if (!isAddingDekPoint)
+            {
+                MessageBox.Show("Lütfen harita üzerinde DEK noktası koordinatlarınızı belirleyiniz.");
+                isAddingDekPoint = true; // Set flag for DEK point marking
+                return;
+            }
+            else
+            {
+                Console.WriteLine("Bilinmeyen tıklama türü");
+            }
+            var pointClick = gMapControl_DEK.FromLocalToLatLng(MousePosition.X, MousePosition.Y);
+
+            // Refresh the map to show the new marker
+            gMapControl_DEK.Refresh();
+
+            // Reset the flag after adding the station
+            isAddingDekPoint = false;
+        }
+
+        private async void gelecekSimilasyonGoruntule(object sender, EventArgs e)
+        {
+            // Checkbox'ları görünür hale getir
+            checkBox_imar_9.Visible = true;
+            checkBox_imar_10.Visible = true;
+            checkBox_imar_11.Visible = true;
+            checkBox_imar_12.Visible = true;
+
+            // Şehir ve hız seçimine göre dosya yolunu ayarla
+            string filePath = "";
+
+            if (SelectedCity == "İzmir" && SelectedSpeed == "Hızlı")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Yüksek.xlsx";
+            }
+            else if (SelectedCity == "İzmir" && SelectedSpeed == "Yavaş")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Düşük.xlsx";
+            }
+            else if (SelectedCity == "İzmir" && SelectedSpeed == "varsayılan")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\dek_distribution_2024_2030_3_İzmir_baz.xlsx";
+            }
+            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Hızlı")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Yüksek.xlsx";
+            }
+            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Yavaş")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Düşük.xlsx";
+            }
+            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "varsayılan")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\dek_distribution_2024_2030_esk_baz.xlsx";
+            }
+            else
+            {
+                MessageBox.Show("Lütfen geçerli bir şehir ve senaryo seçiniz.");
+                return; // Geçerli bir şehir veya hız seçilmediyse işlemi sonlandır
+            }
+
+            try
+            {
+                // Excel dosyasını aç
+                using (var package = new ExcelPackage(new FileInfo(filePath)))
+                {
+                    // Yıl seçimine göre sayfayı seç (SelectedYear değeri, sayfa indeksini temsil eder)
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
+
+                    // Veriyi DataTable'a yükle
+                    veriMonteCarlo = excelService.LoadWorksheetIntoDataTable(worksheet);
+                }
+
+                // Veri başarıyla yüklendiğinde bir bildirim gösterin
+                MessageBox.Show("Veri başarıyla yüklendi.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
+                return; // Hata durumunda işlemi sonlandır
+            }
+            DataTable cıktıPopup = FormatEATableForDisplay(veriMonteCarlo);
+            // Yeni bir DataGridView oluştur
+            DataGridView dataGridView = new DataGridView
+            {
+                DataSource = cıktıPopup,  // DataTable'ı bağla
+                Dock = DockStyle.Fill,        // Formu doldurması için konumunu ayarla
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill // Sütunları otomatik boyutlandır
+            };
+
+            // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
+            HesaplaMerkezNoktaVeEkle(veriMonteCarlo);
+
+            await HaritaUzerindeSimulasyonGosterimi(veriMonteCarlo);
+
+            // Önceki popupForm varsa kapatın
+            if (popupForm != null && !popupForm.IsDisposed)
+            {
+                popupForm.Close();
+                popupForm.Dispose();  // Eski formu serbest bırak
+            }
+
+            // Yeni popupForm'u oluşturun ve açın
+            popupForm = new Form
+            {
+                Text = "Hücre Analizi",
+                Width = 800,
+                Height = 600
+            };
+
+            popupForm.Controls.Add(dataGridView);
+            popupForm.Show(); // Yeni pencereyi göster
+        }
+
+
+        private DataTable FormatEATableForDisplay(DataTable originalEATable)
+        {
+            // Yeni bir DataTable oluşturun
+            DataTable formattedEATable = new DataTable();
+
+            // İhtiyacınız olan sütunları ekleyin
+            formattedEATable.Columns.Add("ID", typeof(string));
+            formattedEATable.Columns.Add("Ilce", typeof(string)); // İlçe isimleri Çiğli ve Karşıyaka olarak ayarlanacak
+            formattedEATable.Columns.Add("AC (Home)", typeof(int));
+            formattedEATable.Columns.Add("AC (Work)", typeof(int));
+            formattedEATable.Columns.Add("AC (Public)", typeof(int));
+            formattedEATable.Columns.Add("Fast DC", typeof(int));
+
+            // Orijinal tablodaki her bir satırı işleyin
+            foreach (DataRow row in originalEATable.Rows)
+            {
+                // Yeni bir satır oluşturun
+                DataRow newRow = formattedEATable.NewRow();
+
+                // ID değerini alın
+                newRow["ID"] = row["id"].ToString();
+
+                // İlçe değerini dönüştür (1 = Çiğli, 2 = Karşıyaka)
+                int ilceValue = Convert.ToInt32(row["ilce"]);
+                newRow["Ilce"] = ilceValue == 1 ? "Çiğli" : ilceValue == 2 ? "Karşıyaka" : "Eskişehir";
+
+                // AC ve DC istasyon sayısını alın
+                newRow["AC (Home)"] = Convert.ToInt32(row["AC (Home)_count"]);
+                newRow["AC (Work)"] = Convert.ToInt32(row["AC (Work)_count"]);
+                newRow["AC (Public)"] = Convert.ToInt32(row["AC (Public)_count"]);
+                newRow["Fast DC"] = Convert.ToInt32(row["Fast DC_count"]);
+
+                // Yeni satırı formatlanmış tabloya ekleyin
+                formattedEATable.Rows.Add(newRow);
+            }
+
+            return formattedEATable;
+        }
+
+        private void EaSimMaxBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (EaSimMaxBtn.Checked)
+            {
+
+                SelectedSpeed = "Hızlı";
+            }
+        }
+
+        private void dekSimMinBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (dekSimMinBtn.Checked)
+            {
+
+                SelectedSpeed = "Yavaş";
+            }
+        }
+
+        private void dekSimMaxBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (dekSimMaxBtn.Checked)
+            {
+
+                SelectedSpeed = "Hızlı";
+            }
+        }
+
+        private void EaSimMinBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (EaSimMinBtn.Checked)
+            {
+
+                SelectedSpeed = "Yavaş";
+            }
+        }
+
+        private void dekSimDefBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            {
+                if (dekSimDefBtn.Checked)
+                {
+
+                    SelectedSpeed = "varsayılan";
+                }
+            }
+        }
+        private void EaSimDefBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (EaSimMinBtn.Checked)
+            {
+                SelectedSpeed = "varsayılan";
+            }
+        }
+
+        private Task HaritaUzerindeSimulasyonGosterimi(DataTable veriTablosu)
+        {
+            // Create or get the overlay for simulation markers
+            GMapOverlay simulationOverlay = new GMapOverlay("Simulasyon_Layer");
+
+            // Remove existing overlay if it exists
+            if (gMapControl_EA.Overlays.Contains(simulationOverlay))
+            {
+                gMapControl_EA.Overlays.Remove(simulationOverlay);
+            }
+
+            // Add a new overlay for simulation markers
+            gMapControl_EA.Overlays.Add(simulationOverlay);
+
+            // Dictionary to hold markers based on their coordinates and types
+            Dictionary<(double, double, string), GMarkerGoogle> markerDictionary = new Dictionary<(double, double, string), GMarkerGoogle>();
+
+            // Process the rows in the DataTable
+            foreach (DataRow row in veriTablosu.Rows)
+            {
+                if (row["Enlem"] != DBNull.Value && row["Boylam"] != DBNull.Value)
+                {
+                    double enlem = Convert.ToDouble(row["Enlem"]);
+                    double boylam = Convert.ToDouble(row["Boylam"]);
+
+                    // Check the counts and add markers accordingly
+                    bool acHome = row["AC (Home)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Home)_count"]) != 0;
+                    bool acWork = row["AC (Work)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Work)_count"]) != 0;
+                    bool acPublic = row["AC (Public)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Public)_count"]) != 0;
+                    bool fastDc = row["Fast DC_count"] != DBNull.Value && Convert.ToInt32(row["Fast DC_count"]) != 0;
+
+                    // Create markers based on the conditions
+                    if (acHome)
+                    {
+                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.green);
+                        marker.ToolTipText = "AC-Home";
+                        markerDictionary[(enlem, boylam, "AC-Home")] = marker;
+                    }
+                    if (acWork)
+                    {
+                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.blue);
+                        marker.ToolTipText = "AC-Work";
+                        markerDictionary[(enlem, boylam, "AC-Work")] = marker;
+                    }
+                    if (acPublic)
+                    {
+                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.yellow);
+                        marker.ToolTipText = "AC-Public";
+                        markerDictionary[(enlem, boylam, "AC-Public")] = marker;
+                    }
+                    if (fastDc)
+                    {
+                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.red);
+                        marker.ToolTipText = "DC-Fast";
+                        markerDictionary[(enlem, boylam, "DC-Fast")] = marker;
+                    }
+                }
+            }
+
+            // Add the created markers to the simulation overlay
+            foreach (var marker in markerDictionary.Values)
+            {
+                simulationOverlay.Markers.Add(marker);
+            }
+
+            // Refresh the map control to show the new markers
+            Invoke(new Action(() =>
+            {
+                gMapControl_EA.Refresh();
+            }));
+
+            return Task.CompletedTask;
+        }
+
+
+        private void calculateChargeStationWithFilter(int acHomeCount, int acWorkCount, int acPublicCount, int fastDcCount)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(() => calculateChargeStationWithFilter(acHomeCount, acWorkCount, acPublicCount, fastDcCount)));
+                return;
+            }
+
+            // Mevcut paneli temizle
+            var existingControls = this.Controls.Find("istasyonAdetLabelPanel", true);
+            foreach (var control in existingControls)
+            {
+                this.Controls.Remove(control);
+            }
+
+            // Paneli oluştur ve ana formun üzerine ekle
+            FlowLayoutPanel panel = new FlowLayoutPanel
+            {
+                Location = new System.Drawing.Point(10, 10), // Sol üst köşeye yerleştir
+                Size = new System.Drawing.Size(200, 150),    // Sabit boyut belirle
+                Anchor = AnchorStyles.Top | AnchorStyles.Left,
+                BackColor = Color.FromArgb(200, 255, 255, 255), // Yarı saydam beyaz arka plan
+                Name = "istasyonAdetLabelPanel",
+                Padding = new Padding(5),
+                BorderStyle = BorderStyle.FixedSingle        // Çerçeve ekleyerek görünürlüğü artır
+            };
+
+
+
+            // Paneli ana forma ekleyin
+            this.Controls.Add(panel);
+            panel.BringToFront(); // Paneli öne getir
+        }
+
+        private void checkBox_Ac_Home(object sender, EventArgs e)
+        {
+            ToggleMarkers("AC-Home", checkBox_imar_9.Checked);
+        }
+
+        private void checkBox_Ac_Work(object sender, EventArgs e)
+        {
+            ToggleMarkers("AC-Work", checkBox_imar_10.Checked);
+        }
+
+        private void checkBox_Ac_Public(object sender, EventArgs e)
+        {
+            ToggleMarkers("AC-Public", checkBox_imar_11.Checked);
+
+        }
+
+        private void checkBox_Dc_Fast(object sender, EventArgs e)
+        {
+            ToggleMarkers("DC-Fast", checkBox_imar_12.Checked);
+
+        }
+
+        private async void dekSimulasyonGoruntule(object sender, EventArgs e)
+        {
+            // Checkbox'ları görünür hale getir
+
+            // Şehir ve hız seçimine göre dosya yolunu ayarla
+            string filePath = "";
+
+            if (SelectedCity == "İzmir" && SelectedSpeed == "Hızlı")
+            {
+                filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\İzmir\dek_distribution_2024_2030_İzmir_yüksek.xlsx";
+            }
+            else if (SelectedCity == "İzmir" && SelectedSpeed == "Yavaş")
+            {
+                filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\İzmir\dek_distribution_2024_2030_İzmir_düşük.xlsx";
+            }
+            else if (SelectedCity == "İzmir" && SelectedSpeed == "varsayılan")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\İzmir\dek_distribution_2024_2030_3_İzmir_baz.xlsx";
+            }
+            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Hızlı")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_yüksek.xlsx";
+            }
+            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Yavaş")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_düşük.xlsx";
+            }
+            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "varsayılan")
+            {
+                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_baz.xlsx";
+            }
+            else
+            {
+                MessageBox.Show("Lütfen geçerli bir şehir ve senaryo seçiniz.");
+                return; // Geçerli bir şehir veya hız seçilmediyse işlemi sonlandır
+            }
+
+            DataTable dek_veri;
+
+            try
+            {
+                // Excel dosyasını aç
+                using (var package = new ExcelPackage(new FileInfo(filePath)))
+                {
+                    // Yıl seçimine göre sayfayı seç (SelectedYear değeri, sayfa indeksini temsil eder)
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
+
+                    // Veriyi DataTable'a yükle
+                    dek_veri = excelService.LoadWorksheetIntoDataTable(worksheet);
+                }
+
+                // Veri başarıyla yüklendiğinde bir bildirim gösterin
+                MessageBox.Show("Veri başarıyla yüklendi.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
+                return; // Hata durumunda işlemi sonlandır
+            }
+
+            // Yeni bir DataGridView oluştur
+            HesaplaMerkezNoktaVeEkle(dek_veri);
+            DataTable dekResultPopup = FormatDEKTableForDisplay(dek_veri);
+
+            DataGridView dataGridView = new DataGridView
+            {
+                DataSource = dekResultPopup,  // DataTable'ı bağla
+                Dock = DockStyle.Fill,        // Formu doldurması için konumunu ayarla
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill // Sütunları otomatik boyutlandır
+            };
+
+            // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
+
+            await HaritaUzerindeDEKSimulasyonGosterimi(dek_veri);
+            //await HaritaUzerindeDekSimulasyonGosterimi(dek_veri);
+
+            // Önceki popupForm varsa kapatın
+            if (popupForm != null && !popupForm.IsDisposed)
+            {
+                popupForm.Close();
+                popupForm.Dispose();  // Eski formu serbest bırak
+            }
+
+            // Yeni popupForm'u oluşturun ve açın
+            popupForm = new Form
+            {
+                Text = "DEK Hücre Analizi",
+                Width = 800,
+                Height = 600
+            };
+
+            popupForm.Controls.Add(dataGridView);
+            popupForm.Show(); // Yeni pencereyi göster
+        }
+
+        private DataTable FormatDEKTableForDisplay(DataTable originalDEKTable)
+        {
+            // Yeni bir DataTable oluşturun
+            DataTable formattedDEKTable = new DataTable();
+
+            // İhtiyacınız olan sütunları ekleyin
+            formattedDEKTable.Columns.Add("ID", typeof(string));
+            formattedDEKTable.Columns.Add("Ilce", typeof(string)); // İlçe isimleri Çiğli ve Karşıyaka olarak ayarlanacak
+            formattedDEKTable.Columns.Add("DEK Değeri", typeof(double));
+
+
+            // Orijinal tablodaki her bir satırı işleyin
+            foreach (DataRow row in originalDEKTable.Rows)
+            {
+                // `DEK_distributed` değeri 0 olan satırları atla
+                if (row["DEK_distributed"] != DBNull.Value && Convert.ToDouble(row["DEK_distributed"]) != 0)
+                {
+                    // Yeni bir satır oluşturun
+                    DataRow newRow = formattedDEKTable.NewRow();
+
+                    // ID, İlçe ve diğer sütunları doldurun
+                    newRow["ID"] = row["id"].ToString();
+
+                    // İlçe değerini dönüştür (1 = Çiğli, 2 = Karşıyaka, diğerleri "Bilinmeyen")
+                    int ilceValue = Convert.ToInt32(row["ilce"]);
+                    newRow["Ilce"] = ilceValue == 1 ? "Çiğli" : ilceValue == 2 ? "Karşıyaka" : "Bilinmeyen";
+
+                    // Diğer değerler
+                    newRow["DEK Değeri"] = Convert.ToDouble(row["DEK_distributed"]);
+                    //newRow["Enlem"] = Convert.ToDouble(row["Enlem"]);
+                    //newRow["Boylam"] = Convert.ToDouble(row["Boylam"]);
+
+                    // Yeni satırı formatlanmış tabloya ekleyin
+                    formattedDEKTable.Rows.Add(newRow);
+                }
+            }
+
+            return formattedDEKTable;
+        }
+
+        private Task HaritaUzerindeDEKSimulasyonGosterimi(DataTable veriTablosu)
+        {
+            // Create or get the overlay for DEK simulation markers
+            GMapOverlay dekOverlay = new GMapOverlay("DEK_Simulasyon_Layer");
+
+            // Remove existing overlay if it exists
+            if (gMapControl_DEK.Overlays.Contains(dekOverlay))
+            {
+                gMapControl_DEK.Overlays.Remove(dekOverlay);
+                Console.WriteLine("Existing overlay removed.");
+            }
+
+            // Add a new overlay for DEK simulation markers
+            gMapControl_DEK.Overlays.Add(dekOverlay);
+
+            // Dictionary to hold markers based on their coordinates and types
+            Dictionary<(double, double, string), GMarkerGoogle> markerDictionary = new Dictionary<(double, double, string), GMarkerGoogle>();
+
+            // Process the rows in the DataTable
+            foreach (DataRow row in veriTablosu.Rows)
+            {
+                // Debug output for each row
+                Console.WriteLine($"Processing row with DEK_distributed: {row["DEK_distributed"]}");
+
+                // Only process rows where DEK_distributed value is greater than 0
+                if (row["DEK_distributed"] != DBNull.Value && Convert.ToDouble(row["DEK_distributed"]) > 0)
+                {
+                    // Get latitude and longitude values
+                    double enlem = Convert.ToDouble(row["Enlem"]);
+                    double boylam = Convert.ToDouble(row["Boylam"]);
+
+                    // Get ID and DEK_distributed values
+                    string id = row["id"].ToString();
+                    double dekValue = Convert.ToDouble(row["DEK_distributed"]);
+
+                    // Create a new marker and display it on the map
+                    var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.blue);
+                    marker.ToolTipText = $"ID: {id}\nDEK: {dekValue}";
+
+                    // Add the marker to the overlay
+                    dekOverlay.Markers.Add(marker);
+                    Console.WriteLine($"Marker added at ({enlem}, {boylam}) with ID: {id}");
+                }
+            }
+
+            // Refresh the map control to show the new markers
+            Invoke(new Action(() =>
+            {
+                gMapControl_DEK.Refresh(); // Update the map
+                Console.WriteLine("Map refreshed.");
+            }));
+
+            return Task.CompletedTask;
+        }
+
+        private void ELFShowGraphsButton_Click(object sender, EventArgs e)
+        {
+            ELFResultsTabControls.SelectedTab = ELFGraphicOutputsTabPage;
+        }
+        private void dek_list_years(object sender, EventArgs e) // 
+        {
+            if (comboBox_DEK_Yıl.SelectedIndex != -1)  // Geçerli bir seçim yapıldığında
+            {
+                SelectedYear = comboBox_DEK_Yıl.SelectedIndex;  // Yıl indeksini ayarla
+                CheckSelections();  // Seçim durumunu kontrol et
+            }
+        }
+
+        private void SenaryoNewSelectionButton_Click(object sender, EventArgs e)
+        {
+            Modül_Tabları.SelectedTab = tab_senaryo;
+        }
+
+        private void HesaplaMerkezNoktaVeEkle(DataTable dataTable)
+        {
+            // Eğer "MerkezEnlem" ve "MerkezBoylam" sütunları yoksa bu sütunları ekle
+            if (!dataTable.Columns.Contains("Enlem"))
+            {
+                dataTable.Columns.Add("Enlem", typeof(double));
+            }
+            if (!dataTable.Columns.Contains("Boylam"))
+            {
+                dataTable.Columns.Add("Boylam", typeof(double));
+            }
+
+            // DataTable'daki verileri gezmek için
+            foreach (DataRow row in dataTable.Rows)
+            {
+                // Koordinatları kontrol et ve null değilse işlemi yap
+                if (row["left"] != DBNull.Value &&
+                    row["top"] != DBNull.Value &&
+                    row["right"] != DBNull.Value &&
+                    row["bottom"] != DBNull.Value)
+                {
+                    // Sol, sağ, üst, alt koordinatları double olarak al
+                    double left = Convert.ToDouble(row["left"]);
+                    double top = Convert.ToDouble(row["top"]);
+                    double right = Convert.ToDouble(row["right"]);
+                    double bottom = Convert.ToDouble(row["bottom"]);
+
+                    // Merkez koordinatları hesapla
+                    double centerLat = (top + bottom) / 2;
+                    double centerLng = (left + right) / 2;
+
+                    // Hesaplanan merkez enlem ve boylam değerlerini ilgili satıra ekle
+                    row["Enlem"] = centerLat;
+                    row["Boylam"] = centerLng;
+                }
+            }
+        }
+
         private void gMapControl_imar_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left && cbs.isSelecting_grid)
@@ -2605,22 +3890,6 @@ namespace SLF
             // Call a method to update the heatmap using the selected year's data
             UpdateHeatmapForYear(columnName);
         }
-        /*
-        private void UpdateHeatmapForYear(string columnName)
-        {
-            // Clear the existing overlay and add the shapefile overlay back
-            gMapControl_yuk.Overlays.Clear();
-            gMapControl_yuk.Overlays.Add(cbs.tüm_katmanlar_array[0]);
-
-            // Apply heatmap
-            cbs.CreateHeatmap(cbs.tüm_katmanlar_array[0], cbs.tüm_katmanlar_datatable[0], columnName);
-            // Get min and max values from your data column
-            double min = // calculate the min for columnName;
-            double max = // calculate the max for columnName;
-
-            cbs.CreateHeatmapLegend(min, max);
-            gMapControl_yuk.Refresh();
-        }*/
 
         private void UpdateHeatmapForYear(string columnName)
         {
@@ -2660,9 +3929,6 @@ namespace SLF
 
         }
 
-
-
-
         private void İmar_Poligon_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -2675,5 +3941,3 @@ namespace SLF
 
     }
 }
-
-

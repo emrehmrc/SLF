@@ -34,7 +34,7 @@ namespace SLF
 
         private async void buton_jabl_Click(object sender, EventArgs e)
         {
-            foreach(string cols in secilen_sutunlar.Items)
+            foreach(string cols in secilen_sutunlar_fonksiyonForm.Items)
             {
                 agrege_olacak_sutunlar.Add(cols);
             }
@@ -72,9 +72,9 @@ namespace SLF
         // tum sutunlar listesi
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-            if (tum_sutunlar.SelectedItems != null && tum_sutunlar.Items.Count != 0)
+            if (tum_sutunlar_fonksiyonForm.SelectedItems != null && tum_sutunlar_fonksiyonForm.Items.Count != 0)
             {
-                foreach (var selectedItem in tum_sutunlar.SelectedItems)
+                foreach (var selectedItem in tum_sutunlar_fonksiyonForm.SelectedItems)
                 {
                     if(!tum_sutunlar_listesi.Contains(selectedItem))
                     {
@@ -84,15 +84,15 @@ namespace SLF
 
                 foreach (var item in tum_sutunlar_listesi)
                 {
-                    if (!secilen_sutunlar.Items.Contains(item))
+                    if (!secilen_sutunlar_fonksiyonForm.Items.Contains(item))
                     {
-                        secilen_sutunlar.Items.Add(item);
-                        tum_sutunlar.Items.Remove(item);
+                        secilen_sutunlar_fonksiyonForm.Items.Add(item);
+                        tum_sutunlar_fonksiyonForm.Items.Remove(item);
                     }             
                     
                 }
-                secilen_sutunlar.ClearSelected();
-                tum_sutunlar.ClearSelected();
+                secilen_sutunlar_fonksiyonForm.ClearSelected();
+                tum_sutunlar_fonksiyonForm.ClearSelected();
                 tum_sutunlar_listesi.Clear();
                 secilen_sutunlar_listesi.Clear();
             }
@@ -101,9 +101,9 @@ namespace SLF
         // secilen sutun listesi
         private void pictureBox3_Click(object sender, EventArgs e)
         {
-            if (secilen_sutunlar.SelectedItems != null && secilen_sutunlar.Items.Count != 0)
+            if (secilen_sutunlar_fonksiyonForm.SelectedItems != null && secilen_sutunlar_fonksiyonForm.Items.Count != 0)
             {
-                foreach (var selectedItem in secilen_sutunlar.SelectedItems)
+                foreach (var selectedItem in secilen_sutunlar_fonksiyonForm.SelectedItems)
                 {
                     if (!secilen_sutunlar_listesi.Contains(selectedItem))
                     {
@@ -114,16 +114,16 @@ namespace SLF
 
                 foreach (var item in secilen_sutunlar_listesi)
                 {
-                    secilen_sutunlar.Items.Remove(item);
+                    secilen_sutunlar_fonksiyonForm.Items.Remove(item);
 
-                    if (!tum_sutunlar.Items.Contains(item))
+                    if (!tum_sutunlar_fonksiyonForm.Items.Contains(item))
                     {
-                        tum_sutunlar.Items.Add(item);
+                        tum_sutunlar_fonksiyonForm.Items.Add(item);
                     }
                   
                 }
-                secilen_sutunlar.ClearSelected();
-                tum_sutunlar.ClearSelected();
+                secilen_sutunlar_fonksiyonForm.ClearSelected();
+                tum_sutunlar_fonksiyonForm.ClearSelected();
                 tum_sutunlar_listesi.Clear();
                 secilen_sutunlar_listesi.Clear();
             }
@@ -149,16 +149,16 @@ namespace SLF
             // in the list box
             DataRow example_row = mod1.cbs.tüm_katmanlar_datatable[index].NewRow();
 
-            secilen_sutunlar.ClearSelected();
-            tum_sutunlar.ClearSelected();
+            secilen_sutunlar_fonksiyonForm.ClearSelected();
+            tum_sutunlar_fonksiyonForm.ClearSelected();
             tum_sutunlar_listesi.Clear();
             secilen_sutunlar_listesi.Clear();
-            tum_sutunlar.Items.Clear();
-            secilen_sutunlar.Items.Clear();
+            tum_sutunlar_fonksiyonForm.Items.Clear();
+            secilen_sutunlar_fonksiyonForm.Items.Clear();
 
             foreach (var columns in example_row.Table.Columns)
             {
-                tum_sutunlar.Items.Add(columns.ToString());
+                tum_sutunlar_fonksiyonForm.Items.Add(columns.ToString());
             }
         }
     }

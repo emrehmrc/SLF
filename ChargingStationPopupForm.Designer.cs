@@ -1,0 +1,250 @@
+﻿namespace SLF
+{
+    partial class ChargingStationPopupForm
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ChargingStationPopupForm));
+            this.ChargingStationDataGridView = new Guna.UI2.WinForms.Guna2DataGridView();
+            this.ISTASYON_ADI_Charging_Popup = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ISTASYON_TIPI_Charging_Popup = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.ISTASYON_GUCU_Charging_Popup = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.EA_X_KOORDINAT_Charging_Popup = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.EA_Y_KOORDINAT_Charging_Popup = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ChargingStationpanel = new System.Windows.Forms.Panel();
+            this.ChargingStationpanel2 = new System.Windows.Forms.Panel();
+            this.CancelButtonCharging_Popup = new Guna.UI2.WinForms.Guna2Button();
+            this.TamamButton_Charging_Popup = new Guna.UI2.WinForms.Guna2Button();
+            this.guna2AnimateWindow1_Charging_Popup = new Guna.UI2.WinForms.Guna2AnimateWindow(this.components);
+            ((System.ComponentModel.ISupportInitialize)(this.ChargingStationDataGridView)).BeginInit();
+            this.ChargingStationpanel.SuspendLayout();
+            this.ChargingStationpanel2.SuspendLayout();
+            this.SuspendLayout();
+            // 
+            // ChargingStationDataGridView
+            // 
+            this.ChargingStationDataGridView.AllowUserToAddRows = false;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(185)))), ((int)(((byte)(226)))), ((int)(((byte)(218)))));
+            this.ChargingStationDataGridView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            this.ChargingStationDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ChargingStationDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            this.ChargingStationDataGridView.ColumnHeadersHeight = 25;
+            this.ChargingStationDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+            this.ChargingStationDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.ISTASYON_ADI_Charging_Popup,
+            this.ISTASYON_TIPI_Charging_Popup,
+            this.ISTASYON_GUCU_Charging_Popup,
+            this.EA_X_KOORDINAT_Charging_Popup,
+            this.EA_Y_KOORDINAT_Charging_Popup});
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(235)))), ((int)(((byte)(230)))));
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(99)))), ((int)(((byte)(191)))), ((int)(((byte)(173)))));
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ChargingStationDataGridView.DefaultCellStyle = dataGridViewCellStyle3;
+            this.ChargingStationDataGridView.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(182)))), ((int)(((byte)(224)))), ((int)(((byte)(216)))));
+            this.ChargingStationDataGridView.Location = new System.Drawing.Point(48, 30);
+            this.ChargingStationDataGridView.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ChargingStationDataGridView.Name = "ChargingStationDataGridView";
+            this.ChargingStationDataGridView.RowHeadersVisible = false;
+            this.ChargingStationDataGridView.RowHeadersWidth = 18;
+            this.ChargingStationDataGridView.Size = new System.Drawing.Size(969, 447);
+            this.ChargingStationDataGridView.TabIndex = 0;
+            this.ChargingStationDataGridView.Theme = Guna.UI2.WinForms.Enums.DataGridViewPresetThemes.GreenSea;
+            this.ChargingStationDataGridView.ThemeStyle.AlternatingRowsStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(185)))), ((int)(((byte)(226)))), ((int)(((byte)(218)))));
+            this.ChargingStationDataGridView.ThemeStyle.AlternatingRowsStyle.Font = null;
+            this.ChargingStationDataGridView.ThemeStyle.AlternatingRowsStyle.ForeColor = System.Drawing.Color.Empty;
+            this.ChargingStationDataGridView.ThemeStyle.AlternatingRowsStyle.SelectionBackColor = System.Drawing.Color.Empty;
+            this.ChargingStationDataGridView.ThemeStyle.AlternatingRowsStyle.SelectionForeColor = System.Drawing.Color.Empty;
+            this.ChargingStationDataGridView.ThemeStyle.BackColor = System.Drawing.Color.White;
+            this.ChargingStationDataGridView.ThemeStyle.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(182)))), ((int)(((byte)(224)))), ((int)(((byte)(216)))));
+            this.ChargingStationDataGridView.ThemeStyle.HeaderStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
+            this.ChargingStationDataGridView.ThemeStyle.HeaderStyle.BorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
+            this.ChargingStationDataGridView.ThemeStyle.HeaderStyle.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.ChargingStationDataGridView.ThemeStyle.HeaderStyle.ForeColor = System.Drawing.Color.White;
+            this.ChargingStationDataGridView.ThemeStyle.HeaderStyle.HeaightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+            this.ChargingStationDataGridView.ThemeStyle.HeaderStyle.Height = 25;
+            this.ChargingStationDataGridView.ThemeStyle.ReadOnly = false;
+            this.ChargingStationDataGridView.ThemeStyle.RowsStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(235)))), ((int)(((byte)(230)))));
+            this.ChargingStationDataGridView.ThemeStyle.RowsStyle.BorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
+            this.ChargingStationDataGridView.ThemeStyle.RowsStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.ChargingStationDataGridView.ThemeStyle.RowsStyle.ForeColor = System.Drawing.Color.Black;
+            this.ChargingStationDataGridView.ThemeStyle.RowsStyle.Height = 22;
+            this.ChargingStationDataGridView.ThemeStyle.RowsStyle.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(99)))), ((int)(((byte)(191)))), ((int)(((byte)(173)))));
+            this.ChargingStationDataGridView.ThemeStyle.RowsStyle.SelectionForeColor = System.Drawing.Color.Black;
+            // 
+            // ISTASYON_ADI_Charging_Popup
+            // 
+            this.ISTASYON_ADI_Charging_Popup.HeaderText = "ISTASYON_ADI";
+            this.ISTASYON_ADI_Charging_Popup.MinimumWidth = 6;
+            this.ISTASYON_ADI_Charging_Popup.Name = "ISTASYON_ADI_Charging_Popup";
+            this.ISTASYON_ADI_Charging_Popup.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.ISTASYON_ADI_Charging_Popup.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // ISTASYON_TIPI_Charging_Popup
+            // 
+            this.ISTASYON_TIPI_Charging_Popup.HeaderText = "ISTASYON_TIPI";
+            this.ISTASYON_TIPI_Charging_Popup.Items.AddRange(new object[] {
+            "AC",
+            "DC"});
+            this.ISTASYON_TIPI_Charging_Popup.MinimumWidth = 6;
+            this.ISTASYON_TIPI_Charging_Popup.Name = "ISTASYON_TIPI_Charging_Popup";
+            // 
+            // ISTASYON_GUCU_Charging_Popup
+            // 
+            this.ISTASYON_GUCU_Charging_Popup.HeaderText = "ISTASYON_GUCU";
+            this.ISTASYON_GUCU_Charging_Popup.Items.AddRange(new object[] {
+            "4",
+            "5",
+            "4"});
+            this.ISTASYON_GUCU_Charging_Popup.MinimumWidth = 6;
+            this.ISTASYON_GUCU_Charging_Popup.Name = "ISTASYON_GUCU_Charging_Popup";
+            // 
+            // EA_X_KOORDINAT_Charging_Popup
+            // 
+            this.EA_X_KOORDINAT_Charging_Popup.HeaderText = "EA_X_KOORDINAT";
+            this.EA_X_KOORDINAT_Charging_Popup.MinimumWidth = 6;
+            this.EA_X_KOORDINAT_Charging_Popup.Name = "EA_X_KOORDINAT_Charging_Popup";
+            this.EA_X_KOORDINAT_Charging_Popup.ReadOnly = true;
+            // 
+            // EA_Y_KOORDINAT_Charging_Popup
+            // 
+            this.EA_Y_KOORDINAT_Charging_Popup.HeaderText = "EA_Y_KOORDINAT";
+            this.EA_Y_KOORDINAT_Charging_Popup.MinimumWidth = 6;
+            this.EA_Y_KOORDINAT_Charging_Popup.Name = "EA_Y_KOORDINAT_Charging_Popup";
+            this.EA_Y_KOORDINAT_Charging_Popup.ReadOnly = true;
+            // 
+            // ChargingStationpanel
+            // 
+            this.ChargingStationpanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(223)))), ((int)(((byte)(156)))));
+            this.ChargingStationpanel.Controls.Add(this.ChargingStationDataGridView);
+            this.ChargingStationpanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ChargingStationpanel.Location = new System.Drawing.Point(0, 0);
+            this.ChargingStationpanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ChargingStationpanel.Name = "ChargingStationpanel";
+            this.ChargingStationpanel.Size = new System.Drawing.Size(1067, 554);
+            this.ChargingStationpanel.TabIndex = 1;
+            // 
+            // ChargingStationpanel2
+            // 
+            this.ChargingStationpanel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ChargingStationpanel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(223)))), ((int)(((byte)(156)))));
+            this.ChargingStationpanel2.Controls.Add(this.CancelButtonCharging_Popup);
+            this.ChargingStationpanel2.Controls.Add(this.TamamButton_Charging_Popup);
+            this.ChargingStationpanel2.Location = new System.Drawing.Point(0, 484);
+            this.ChargingStationpanel2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ChargingStationpanel2.Name = "ChargingStationpanel2";
+            this.ChargingStationpanel2.Size = new System.Drawing.Size(1067, 70);
+            this.ChargingStationpanel2.TabIndex = 2;
+            // 
+            // CancelButtonCharging_Popup
+            // 
+            this.CancelButtonCharging_Popup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.CancelButtonCharging_Popup.BackColor = System.Drawing.Color.DarkSeaGreen;
+            this.CancelButtonCharging_Popup.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.CancelButtonCharging_Popup.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.CancelButtonCharging_Popup.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.CancelButtonCharging_Popup.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.CancelButtonCharging_Popup.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
+            this.CancelButtonCharging_Popup.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.CancelButtonCharging_Popup.ForeColor = System.Drawing.Color.White;
+            this.CancelButtonCharging_Popup.Location = new System.Drawing.Point(575, 6);
+            this.CancelButtonCharging_Popup.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.CancelButtonCharging_Popup.Name = "CancelButtonCharging_Popup";
+            this.CancelButtonCharging_Popup.Size = new System.Drawing.Size(240, 55);
+            this.CancelButtonCharging_Popup.TabIndex = 1;
+            this.CancelButtonCharging_Popup.Text = "İPTAL";
+            // 
+            // TamamButton_Charging_Popup
+            // 
+            this.TamamButton_Charging_Popup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.TamamButton_Charging_Popup.BackColor = System.Drawing.Color.DarkSeaGreen;
+            this.TamamButton_Charging_Popup.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.TamamButton_Charging_Popup.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.TamamButton_Charging_Popup.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.TamamButton_Charging_Popup.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.TamamButton_Charging_Popup.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
+            this.TamamButton_Charging_Popup.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.TamamButton_Charging_Popup.ForeColor = System.Drawing.Color.White;
+            this.TamamButton_Charging_Popup.Location = new System.Drawing.Point(823, 6);
+            this.TamamButton_Charging_Popup.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TamamButton_Charging_Popup.Name = "TamamButton_Charging_Popup";
+            this.TamamButton_Charging_Popup.Size = new System.Drawing.Size(240, 55);
+            this.TamamButton_Charging_Popup.TabIndex = 2;
+            this.TamamButton_Charging_Popup.Text = "TAMAM";
+            // 
+            // ChargingStationPopupForm
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(1067, 554);
+            this.Controls.Add(this.ChargingStationpanel2);
+            this.Controls.Add(this.ChargingStationpanel);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Name = "ChargingStationPopupForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Şarj İstasyonu Bilgileri";
+            ((System.ComponentModel.ISupportInitialize)(this.ChargingStationDataGridView)).EndInit();
+            this.ChargingStationpanel.ResumeLayout(false);
+            this.ChargingStationpanel2.ResumeLayout(false);
+            this.ResumeLayout(false);
+
+        }
+
+        #endregion
+
+        private Guna.UI2.WinForms.Guna2DataGridView ChargingStationDataGridView;
+        private System.Windows.Forms.Panel ChargingStationpanel;
+        private System.Windows.Forms.Panel ChargingStationpanel2;
+        private Guna.UI2.WinForms.Guna2Button CancelButtonCharging_Popup;
+        private Guna.UI2.WinForms.Guna2Button TamamButton_Charging_Popup;
+        private Guna.UI2.WinForms.Guna2AnimateWindow guna2AnimateWindow1_Charging_Popup;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ISTASYON_ADI_Charging_Popup;
+        private System.Windows.Forms.DataGridViewComboBoxColumn ISTASYON_TIPI_Charging_Popup;
+        private System.Windows.Forms.DataGridViewComboBoxColumn ISTASYON_GUCU_Charging_Popup;
+        private System.Windows.Forms.DataGridViewTextBoxColumn EA_X_KOORDINAT_Charging_Popup;
+        private System.Windows.Forms.DataGridViewTextBoxColumn EA_Y_KOORDINAT_Charging_Popup;
+    }
+}
