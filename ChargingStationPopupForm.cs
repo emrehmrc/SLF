@@ -28,7 +28,7 @@ namespace SLF
 
         private void InitializeDataGridView(NoktaVeri veri)
         {
-            // Fill initial coordinates          
+            // Fill initial coordinates
             ChargingStationDataGridView.Rows.Add();
             ChargingStationDataGridView.Rows[0].Cells["EA_X_KOORDINAT"].Value = veri.Enlem;
             ChargingStationDataGridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value = veri.Boylam;
@@ -66,8 +66,8 @@ namespace SLF
 
         private void SetupEventHandlers()
         {
-            TamamButton_Charging_Popup.Click += TamamButton_Click;
-            CancelButtonCharging_Popup.Click += CancelButton_Click;
+            TamamButton.Click += TamamButton_Click;
+            CancelButton.Click += CancelButton_Click;
             this.FormClosing += ChargingStationPopupForm_FormClosing;
             ChargingStationDataGridView.CellValueChanged += ChargingStationDataGridView_CellValueChanged;
         }
@@ -131,6 +131,6 @@ namespace SLF
             {
                 MessageBox.Show("İşlem iptal edildi.");
             }
-        }       
+        }
     }
 }

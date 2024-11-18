@@ -8,7 +8,7 @@ using static SLF.ModülFormu;
 
 namespace SLF
 {
-    public partial class DEKCenterPopupForm_Dek_Popup : Form
+    public partial class DEKCenterPopupForm : Form
     {
         private readonly DataTable dataTable;
         private bool isOperationCancelled = true;
@@ -30,8 +30,8 @@ namespace SLF
         { "İzmir", new List<string> { "Aliağa", "Balçova", "Bayındır", "Bayraklı", "Bergama", "Beydağ", "Bornova", "Buca", "Çeşme", "Çiğli", "Dikili", "Foça", "Gaziemir", "Güzelbahçe", "Karabağlar", "Karaburun", "Karşıyaka", "Kemalpaşa", "Kınık", "Kiraz", "Konak", "Menderes", "Menemen", "Narlıdere", "Ödemiş", "Seferihisar", "Selçuk", "Tire", "Torbalı" } },
         { "Eskişehir", new List<string> { "Alpu", "Beylikova", "Çifteler", "Günyüzü", "Han", "İnönü", "Mahmudiye", "Mihalgazi", "Mihalıççık", "Odunpazarı", "Sarıcakaya", "Seyitgazi", "Sivrihisar", "Tepebaşı" } }
     };
-
-        public DEKCenterPopupForm_Dek_Popup(DataTable existingDataTable, NoktaVeri veri)
+       
+        public DEKCenterPopupForm(DataTable existingDataTable, NoktaVeri veri)
         {
             InitializeComponent();
             dataTable = existingDataTable;
@@ -44,12 +44,12 @@ namespace SLF
         private void InitializeDataGridView(NoktaVeri veri)
         {
             // Fill initial coordinates from veri object
-            DEKCenterDataGridView_Dek_Popup.Rows.Add();
-            DEKCenterDataGridView_Dek_Popup.Rows[0].Cells["DEK_X_KOORDINAT"].Value = veri.Enlem;
-            DEKCenterDataGridView_Dek_Popup.Rows[0].Cells["DEK_Y_KOORDINAT"].Value = veri.Boylam;
+            DEKCenterDataGridView.Rows.Add();
+            DEKCenterDataGridView.Rows[0].Cells["DEK_X_KOORDINAT"].Value = veri.Enlem;
+            DEKCenterDataGridView.Rows[0].Cells["DEK_Y_KOORDINAT"].Value = veri.Boylam;
 
             // Set ISTASYON_TIPI options for DEK types
-            if (DEKCenterDataGridView_Dek_Popup.Columns["KAYNAK_TIPI"] is DataGridViewComboBoxColumn typeComboBoxColumn)
+            if (DEKCenterDataGridView.Columns["KAYNAK_TIPI"] is DataGridViewComboBoxColumn typeComboBoxColumn)
             {
                 typeComboBoxColumn.DataSource = new List<string> { "GES (Güneş)", "RES (Rüzgar)", "BES (Biokütle)" };
             }
@@ -62,7 +62,7 @@ namespace SLF
                                                               .Distinct()
                                                               .ToList();
 
-                if (DEKCenterDataGridView_Dek_Popup.Columns["DEK_BAGLANDIGI_TRAFO_KODU"] is DataGridViewComboBoxColumn comboBoxColumn)
+                if (DEKCenterDataGridView.Columns["DEK_BAGLANDIGI_TRAFO_KODU"] is DataGridViewComboBoxColumn comboBoxColumn)
                 {
                     comboBoxColumn.DataSource = trafoKoduListesi;
                 }
@@ -78,7 +78,7 @@ namespace SLF
 
         private void PopulateCityComboBox()
         {
-            var comboBoxColumn = DEKCenterDataGridView_Dek_Popup.Columns["ILCE_ADI"] as DataGridViewComboBoxColumn;
+            var comboBoxColumn = DEKCenterDataGridView.Columns["ILCE_ADI"] as DataGridViewComboBoxColumn;
 
             if (comboBoxColumn != null)
             {
@@ -138,7 +138,7 @@ namespace SLF
             if (closestCity.Key != null)
             {
                 // Access the ComboBox column in the DataGridView
-                var comboBoxColumn = DEKCenterDataGridView_Dek_Popup.Columns["ILCE_ADI"] as DataGridViewComboBoxColumn;
+                var comboBoxColumn = DEKCenterDataGridView.Columns["ILCE_ADI"] as DataGridViewComboBoxColumn;
 
                 if (comboBoxColumn != null)
                 {
@@ -157,7 +157,7 @@ namespace SLF
                 }
 
                 // Optionally, select the first district in the ComboBox
-                var comboBoxCell = DEKCenterDataGridView_Dek_Popup.Rows[0].Cells["ILCE_ADI"] as DataGridViewComboBoxCell;
+                var comboBoxCell = DEKCenterDataGridView.Rows[0].Cells["ILCE_ADI"] as DataGridViewComboBoxCell;
                 if (comboBoxCell != null && comboBoxCell.Items.Count > 0)
                 {
                     comboBoxCell.Value = comboBoxCell.Items[0];  // Set the first district as the default
@@ -168,16 +168,16 @@ namespace SLF
 
         private void SetupEventHandlers()
         {
-            DEKTamamButton_Dek_Popup.Click += DEKTamamButton_Click;
-            DEKCancelButton_Dek_Popup.Click += DEKCancelButton_Click;
+            DEKTamamButton.Click += DEKTamamButton_Click;
+            DEKCancelButton.Click += DEKCancelButton_Click;
             this.FormClosing += DEKCenterPopupForm_FormClosing;
-            DEKCenterDataGridView_Dek_Popup.CellValueChanged += DEKCenterDataGridView_CellValueChanged;
+            DEKCenterDataGridView.CellValueChanged += DEKCenterDataGridView_CellValueChanged;
         }
 
         private void DEKTamamButton_Click(object sender, EventArgs e)
         {
             // Validate the input
-            foreach (DataGridViewCell cell in DEKCenterDataGridView_Dek_Popup.Rows[0].Cells)
+            foreach (DataGridViewCell cell in DEKCenterDataGridView.Rows[0].Cells)
             {
                 if (cell.Value == null || string.IsNullOrWhiteSpace(cell.Value.ToString()))
                 {
@@ -188,13 +188,13 @@ namespace SLF
 
             // Add new row to the existing DataTable
             DataRow newRow = dataTable.NewRow();
-            newRow["ILCE_ADI"] = DEKCenterDataGridView_Dek_Popup.Rows[0].Cells["ILCE_ADI"].Value.ToString();
-            newRow["KAYNAK_TIPI"] = DEKCenterDataGridView_Dek_Popup.Rows[0].Cells["KAYNAK_TIPI"].Value.ToString();
-            newRow["DEK_KURULU_GUCU"] = Convert.ToDouble(DEKCenterDataGridView_Dek_Popup.Rows[0].Cells["DEK_KURULU_GUCU"].Value);
-            newRow["DEK_X_KOORDINAT"] = Convert.ToDouble(DEKCenterDataGridView_Dek_Popup.Rows[0].Cells["DEK_X_KOORDINAT"].Value);
-            newRow["DEK_Y_KOORDINAT"] = Convert.ToDouble(DEKCenterDataGridView_Dek_Popup.Rows[0].Cells["DEK_Y_KOORDINAT"].Value);
-            newRow["DEK_TM_ADI"] = DEKCenterDataGridView_Dek_Popup.Rows[0].Cells["DEK_TM_ADI"].Value.ToString();
-            newRow["DEK_KURULUM_YERI"] = DEKCenterDataGridView_Dek_Popup.Rows[0].Cells["DEK_KURULUM_YERI"].Value.ToString();
+            newRow["ILCE_ADI"] = DEKCenterDataGridView.Rows[0].Cells["ILCE_ADI"].Value.ToString();
+            newRow["KAYNAK_TIPI"] = DEKCenterDataGridView.Rows[0].Cells["KAYNAK_TIPI"].Value.ToString();
+            newRow["DEK_KURULU_GUCU"] = Convert.ToDouble(DEKCenterDataGridView.Rows[0].Cells["DEK_KURULU_GUCU"].Value);
+            newRow["DEK_X_KOORDINAT"] = Convert.ToDouble(DEKCenterDataGridView.Rows[0].Cells["DEK_X_KOORDINAT"].Value);
+            newRow["DEK_Y_KOORDINAT"] = Convert.ToDouble(DEKCenterDataGridView.Rows[0].Cells["DEK_Y_KOORDINAT"].Value);
+            newRow["DEK_TM_ADI"] = DEKCenterDataGridView.Rows[0].Cells["DEK_TM_ADI"].Value.ToString();
+            newRow["DEK_KURULUM_YERI"] = DEKCenterDataGridView.Rows[0].Cells["DEK_KURULUM_YERI"].Value.ToString();
             //newRow["DEK_BAGLANDIGI_TRAFO_KODU"] = DEKCenterDataGridView.Rows[0].Cells["DEK_BAGLANDIGI_TRAFO_KODU"].Value.ToString();
 
             dataTable.Rows.Add(newRow);
@@ -221,4 +221,3 @@ namespace SLF
     }
 
 }
-

@@ -21,17 +21,17 @@ namespace SLF
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ModülFormu));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
             this.Modül_Tabları = new System.Windows.Forms.TabControl();
             this.tab_girdi = new System.Windows.Forms.TabPage();
             this.OpenModuleButton = new Guna.UI2.WinForms.Guna2Button();
@@ -56,7 +56,6 @@ namespace SLF
             this.tab_dek = new System.Windows.Forms.TabPage();
             this.gMapControl_DEK = new GMap.NET.WindowsForms.GMapControl();
             this.panel_DEK = new System.Windows.Forms.Panel();
-            this.label_DEK_grafikler = new System.Windows.Forms.Label();
             this.DEKCenterAddButton = new Guna.UI2.WinForms.Guna2Button();
             this.DEKSimButton = new Guna.UI2.WinForms.Guna2Button();
             this.dekSimMaxBtn = new Guna.UI2.WinForms.Guna2RadioButton();
@@ -406,7 +405,7 @@ namespace SLF
             this.OpenModuleButton.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
             this.OpenModuleButton.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.OpenModuleButton.ForeColor = System.Drawing.Color.White;
-            this.OpenModuleButton.Location = new System.Drawing.Point(1123, 572);
+            this.OpenModuleButton.Location = new System.Drawing.Point(1107, 444);
             this.OpenModuleButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.OpenModuleButton.Name = "OpenModuleButton";
             this.OpenModuleButton.Size = new System.Drawing.Size(191, 47);
@@ -474,22 +473,22 @@ namespace SLF
             this.dataGridView_girdi.BackgroundColor = System.Drawing.Color.Snow;
             this.dataGridView_girdi.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridView_girdi.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Maiandra GD", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.DarkOrange;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridView_girdi.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle12.Font = new System.Drawing.Font("Maiandra GD", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle12.ForeColor = System.Drawing.Color.DarkOrange;
+            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridView_girdi.DefaultCellStyle = dataGridViewCellStyle12;
             this.dataGridView_girdi.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.dataGridView_girdi.Location = new System.Drawing.Point(7, 111);
             this.dataGridView_girdi.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.dataGridView_girdi.Name = "dataGridView_girdi";
             this.dataGridView_girdi.ReadOnly = true;
             this.dataGridView_girdi.RowHeadersWidth = 18;
-            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            this.dataGridView_girdi.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle13.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            this.dataGridView_girdi.RowsDefaultCellStyle = dataGridViewCellStyle13;
             this.dataGridView_girdi.RowTemplate.Height = 24;
             this.dataGridView_girdi.Size = new System.Drawing.Size(1291, 455);
             this.dataGridView_girdi.TabIndex = 4;
@@ -710,11 +709,16 @@ namespace SLF
             this.gMapControl_DEK.Size = new System.Drawing.Size(1019, 639);
             this.gMapControl_DEK.TabIndex = 38;
             this.gMapControl_DEK.Zoom = 0D;
+            this.gMapControl_DEK.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_Dek_OnMapClick);
+            this.gMapControl_DEK.OnMapDoubleClick += new GMap.NET.WindowsForms.MapDoubleClick(this.gMapControl_Dek_OnMapDoubleClick);
+            this.gMapControl_DEK.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(this.gMapControl_Dek_OnMarkerClick);
+            this.gMapControl_DEK.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_Dek_MouseDown);
+            this.gMapControl_DEK.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_Dek_MouseMove);
+            this.gMapControl_DEK.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gMapControl_Dek_MouseUp);
             // 
             // panel_DEK
             // 
             this.panel_DEK.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            this.panel_DEK.Controls.Add(this.label_DEK_grafikler);
             this.panel_DEK.Controls.Add(this.DEKCenterAddButton);
             this.panel_DEK.Controls.Add(this.DEKSimButton);
             this.panel_DEK.Controls.Add(this.dekSimMaxBtn);
@@ -729,15 +733,6 @@ namespace SLF
             this.panel_DEK.Name = "panel_DEK";
             this.panel_DEK.Size = new System.Drawing.Size(248, 500);
             this.panel_DEK.TabIndex = 37;
-            // 
-            // label_DEK_grafikler
-            // 
-            this.label_DEK_grafikler.AutoSize = true;
-            this.label_DEK_grafikler.Location = new System.Drawing.Point(73, 297);
-            this.label_DEK_grafikler.Name = "label_DEK_grafikler";
-            this.label_DEK_grafikler.Size = new System.Drawing.Size(80, 23);
-            this.label_DEK_grafikler.TabIndex = 8;
-            this.label_DEK_grafikler.Text = "Grafikler:";
             // 
             // DEKCenterAddButton
             // 
@@ -1216,14 +1211,14 @@ namespace SLF
             this.ELFMinResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
             this.ELFMinResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFMinResultsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.Snow;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFMinResultsTable.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle14.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle14.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle14.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFMinResultsTable.DefaultCellStyle = dataGridViewCellStyle14;
             this.ELFMinResultsTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFMinResultsTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFMinResultsTable.Location = new System.Drawing.Point(3, 2);
@@ -1240,7 +1235,7 @@ namespace SLF
             this.ELFLowResultsTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFLowResultsTabPage.Name = "ELFLowResultsTabPage";
             this.ELFLowResultsTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFLowResultsTabPage.Size = new System.Drawing.Size(1049, 611);
+            this.ELFLowResultsTabPage.Size = new System.Drawing.Size(1059, 462);
             this.ELFLowResultsTabPage.TabIndex = 1;
             this.ELFLowResultsTabPage.Text = "Düşük Sonuçlar";
             this.ELFLowResultsTabPage.UseVisualStyleBackColor = true;
@@ -1258,7 +1253,7 @@ namespace SLF
             this.ELFLowResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFLowResultsTable.Name = "ELFLowResultsTable";
             this.ELFLowResultsTable.RowHeadersWidth = 51;
-            this.ELFLowResultsTable.Size = new System.Drawing.Size(1043, 699);
+            this.ELFLowResultsTable.Size = new System.Drawing.Size(1053, 555);
             this.ELFLowResultsTable.TabIndex = 1;
             // 
             // ELFBaseResultsTabPage
@@ -1268,7 +1263,7 @@ namespace SLF
             this.ELFBaseResultsTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFBaseResultsTabPage.Name = "ELFBaseResultsTabPage";
             this.ELFBaseResultsTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFBaseResultsTabPage.Size = new System.Drawing.Size(1049, 611);
+            this.ELFBaseResultsTabPage.Size = new System.Drawing.Size(1059, 462);
             this.ELFBaseResultsTabPage.TabIndex = 2;
             this.ELFBaseResultsTabPage.Text = "Baz Sonuçlar";
             this.ELFBaseResultsTabPage.UseVisualStyleBackColor = true;
@@ -1286,7 +1281,7 @@ namespace SLF
             this.ELFBaseResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFBaseResultsTable.Name = "ELFBaseResultsTable";
             this.ELFBaseResultsTable.RowHeadersWidth = 51;
-            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1042, 699);
+            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1052, 555);
             this.ELFBaseResultsTable.TabIndex = 1;
             // 
             // ELFHighResultsTabPage
@@ -1296,7 +1291,7 @@ namespace SLF
             this.ELFHighResultsTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFHighResultsTabPage.Name = "ELFHighResultsTabPage";
             this.ELFHighResultsTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFHighResultsTabPage.Size = new System.Drawing.Size(1049, 611);
+            this.ELFHighResultsTabPage.Size = new System.Drawing.Size(1059, 462);
             this.ELFHighResultsTabPage.TabIndex = 3;
             this.ELFHighResultsTabPage.Text = "Yüksek Sonuçlar";
             this.ELFHighResultsTabPage.UseVisualStyleBackColor = true;
@@ -1314,7 +1309,7 @@ namespace SLF
             this.ELFHighResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFHighResultsTable.Name = "ELFHighResultsTable";
             this.ELFHighResultsTable.RowHeadersWidth = 51;
-            this.ELFHighResultsTable.Size = new System.Drawing.Size(1037, 699);
+            this.ELFHighResultsTable.Size = new System.Drawing.Size(1047, 555);
             this.ELFHighResultsTable.TabIndex = 1;
             // 
             // ELFMaxResultsTabPage
@@ -1324,7 +1319,7 @@ namespace SLF
             this.ELFMaxResultsTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFMaxResultsTabPage.Name = "ELFMaxResultsTabPage";
             this.ELFMaxResultsTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFMaxResultsTabPage.Size = new System.Drawing.Size(1049, 611);
+            this.ELFMaxResultsTabPage.Size = new System.Drawing.Size(1059, 462);
             this.ELFMaxResultsTabPage.TabIndex = 4;
             this.ELFMaxResultsTabPage.Text = "Maksimum Sonuçlar";
             this.ELFMaxResultsTabPage.UseVisualStyleBackColor = true;
@@ -1343,7 +1338,7 @@ namespace SLF
             this.ELFMaxResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFMaxResultsTable.Name = "ELFMaxResultsTable";
             this.ELFMaxResultsTable.RowHeadersWidth = 51;
-            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1047, 703);
+            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1057, 559);
             this.ELFMaxResultsTable.TabIndex = 1;
             // 
             // ELFGraphicOutputsTabPage
@@ -1353,7 +1348,7 @@ namespace SLF
             this.ELFGraphicOutputsTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFGraphicOutputsTabPage.Name = "ELFGraphicOutputsTabPage";
             this.ELFGraphicOutputsTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFGraphicOutputsTabPage.Size = new System.Drawing.Size(1049, 611);
+            this.ELFGraphicOutputsTabPage.Size = new System.Drawing.Size(1059, 462);
             this.ELFGraphicOutputsTabPage.TabIndex = 5;
             this.ELFGraphicOutputsTabPage.Text = "Projeksiyon Grafik Sonuçları";
             this.ELFGraphicOutputsTabPage.UseVisualStyleBackColor = true;
@@ -1372,7 +1367,7 @@ namespace SLF
             this.panel_ELF_Grafikler.Location = new System.Drawing.Point(3, 2);
             this.panel_ELF_Grafikler.Margin = new System.Windows.Forms.Padding(4);
             this.panel_ELF_Grafikler.Name = "panel_ELF_Grafikler";
-            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1042, 624);
+            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1052, 480);
             this.panel_ELF_Grafikler.TabIndex = 6;
             // 
             // pictureBox_ELF_5
@@ -2377,33 +2372,33 @@ namespace SLF
             // 
             // ELFMinSenaryoTable
             // 
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.Navy;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.Snow;
-            this.ELFMinSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.Color.Navy;
+            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFMinSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle15;
             this.ELFMinSenaryoTable.BackgroundColor = System.Drawing.Color.Snow;
             this.ELFMinSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFMinSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.Color.Snow;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFMinSenaryoTable.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle16.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle16.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle16.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle16.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle16.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFMinSenaryoTable.DefaultCellStyle = dataGridViewCellStyle16;
             this.ELFMinSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFMinSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFMinSenaryoTable.Location = new System.Drawing.Point(3, 2);
             this.ELFMinSenaryoTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFMinSenaryoTable.Name = "ELFMinSenaryoTable";
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.ELFMinSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle17.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle17.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle17.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ELFMinSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle17;
             this.ELFMinSenaryoTable.RowHeadersWidth = 18;
             this.ELFMinSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
             this.ELFMinSenaryoTable.Size = new System.Drawing.Size(866, 474);
@@ -2417,16 +2412,16 @@ namespace SLF
             this.tabPage_dusuk_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_dusuk_senaryo.Name = "tabPage_dusuk_senaryo";
             this.tabPage_dusuk_senaryo.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_dusuk_senaryo.Size = new System.Drawing.Size(862, 627);
+            this.tabPage_dusuk_senaryo.Size = new System.Drawing.Size(872, 478);
             this.tabPage_dusuk_senaryo.TabIndex = 1;
             this.tabPage_dusuk_senaryo.Text = "Düşük Senaryo";
             this.tabPage_dusuk_senaryo.UseVisualStyleBackColor = true;
             // 
             // ELFLowSenaryoTable
             // 
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.Color.Navy;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.Color.Snow;
-            this.ELFLowSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle18.SelectionBackColor = System.Drawing.Color.Navy;
+            dataGridViewCellStyle18.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFLowSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle18;
             this.ELFLowSenaryoTable.BackgroundColor = System.Drawing.Color.Snow;
             this.ELFLowSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFLowSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -2437,7 +2432,7 @@ namespace SLF
             this.ELFLowSenaryoTable.Name = "ELFLowSenaryoTable";
             this.ELFLowSenaryoTable.RowHeadersWidth = 18;
             this.ELFLowSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(856, 623);
+            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(866, 474);
             this.ELFLowSenaryoTable.TabIndex = 1;
             // 
             // tabPage_baz_senaryo
@@ -2448,27 +2443,27 @@ namespace SLF
             this.tabPage_baz_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_baz_senaryo.Name = "tabPage_baz_senaryo";
             this.tabPage_baz_senaryo.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_baz_senaryo.Size = new System.Drawing.Size(862, 627);
+            this.tabPage_baz_senaryo.Size = new System.Drawing.Size(872, 478);
             this.tabPage_baz_senaryo.TabIndex = 2;
             this.tabPage_baz_senaryo.Text = "Baz Senaryo";
             this.tabPage_baz_senaryo.UseVisualStyleBackColor = true;
             // 
             // ELFBaseSenaryoTable
             // 
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.Color.Snow;
-            this.ELFBaseSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle19.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle19.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFBaseSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle19;
             this.ELFBaseSenaryoTable.BackgroundColor = System.Drawing.Color.Snow;
             this.ELFBaseSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFBaseSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle9.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle9.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.Color.MidnightBlue;
-            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.Color.Snow;
-            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFBaseSenaryoTable.DefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle20.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle20.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle20.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle20.SelectionBackColor = System.Drawing.Color.MidnightBlue;
+            dataGridViewCellStyle20.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle20.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFBaseSenaryoTable.DefaultCellStyle = dataGridViewCellStyle20;
             this.ELFBaseSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFBaseSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFBaseSenaryoTable.Location = new System.Drawing.Point(3, 2);
@@ -2476,7 +2471,7 @@ namespace SLF
             this.ELFBaseSenaryoTable.Name = "ELFBaseSenaryoTable";
             this.ELFBaseSenaryoTable.RowHeadersWidth = 18;
             this.ELFBaseSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(856, 623);
+            this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(866, 474);
             this.ELFBaseSenaryoTable.TabIndex = 1;
             // 
             // tabPage_yuksek_senaryo
@@ -2487,27 +2482,27 @@ namespace SLF
             this.tabPage_yuksek_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_yuksek_senaryo.Name = "tabPage_yuksek_senaryo";
             this.tabPage_yuksek_senaryo.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_yuksek_senaryo.Size = new System.Drawing.Size(862, 627);
+            this.tabPage_yuksek_senaryo.Size = new System.Drawing.Size(872, 478);
             this.tabPage_yuksek_senaryo.TabIndex = 3;
             this.tabPage_yuksek_senaryo.Text = "Yüksek Senaryo";
             this.tabPage_yuksek_senaryo.UseVisualStyleBackColor = true;
             // 
             // ELFHighSenaryoTable
             // 
-            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.Color.Snow;
-            this.ELFHighSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle21.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle21.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFHighSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle21;
             this.ELFHighSenaryoTable.BackgroundColor = System.Drawing.Color.Snow;
             this.ELFHighSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFHighSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle11.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle11.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.Color.Snow;
-            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFHighSenaryoTable.DefaultCellStyle = dataGridViewCellStyle11;
+            dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle22.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle22.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle22.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle22.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle22.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle22.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFHighSenaryoTable.DefaultCellStyle = dataGridViewCellStyle22;
             this.ELFHighSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFHighSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFHighSenaryoTable.Location = new System.Drawing.Point(3, 2);
@@ -2515,7 +2510,7 @@ namespace SLF
             this.ELFHighSenaryoTable.Name = "ELFHighSenaryoTable";
             this.ELFHighSenaryoTable.RowHeadersWidth = 51;
             this.ELFHighSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFHighSenaryoTable.Size = new System.Drawing.Size(856, 623);
+            this.ELFHighSenaryoTable.Size = new System.Drawing.Size(866, 474);
             this.ELFHighSenaryoTable.TabIndex = 1;
             // 
             // tabPage_maks_senaryo
@@ -2526,7 +2521,7 @@ namespace SLF
             this.tabPage_maks_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_maks_senaryo.Name = "tabPage_maks_senaryo";
             this.tabPage_maks_senaryo.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_maks_senaryo.Size = new System.Drawing.Size(862, 627);
+            this.tabPage_maks_senaryo.Size = new System.Drawing.Size(872, 478);
             this.tabPage_maks_senaryo.TabIndex = 4;
             this.tabPage_maks_senaryo.Text = "Maksimum Senaryo";
             this.tabPage_maks_senaryo.UseVisualStyleBackColor = true;
@@ -2543,7 +2538,7 @@ namespace SLF
             this.ELFMaxSenaryoTable.Name = "ELFMaxSenaryoTable";
             this.ELFMaxSenaryoTable.RowHeadersWidth = 51;
             this.ELFMaxSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(856, 623);
+            this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(866, 474);
             this.ELFMaxSenaryoTable.TabIndex = 1;
             // 
             // EkonometrikSenaryoElementsPanel
@@ -2632,7 +2627,7 @@ namespace SLF
             this.StokastikSenaryoTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.StokastikSenaryoTabPage.Name = "StokastikSenaryoTabPage";
             this.StokastikSenaryoTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.StokastikSenaryoTabPage.Size = new System.Drawing.Size(1084, 641);
+            this.StokastikSenaryoTabPage.Size = new System.Drawing.Size(1094, 492);
             this.StokastikSenaryoTabPage.TabIndex = 1;
             this.StokastikSenaryoTabPage.Text = "Stokastik Senaryolar";
             this.StokastikSenaryoTabPage.UseVisualStyleBackColor = true;
@@ -2643,7 +2638,7 @@ namespace SLF
             this.EASarjSenaryoTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.EASarjSenaryoTabPage.Name = "EASarjSenaryoTabPage";
             this.EASarjSenaryoTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.EASarjSenaryoTabPage.Size = new System.Drawing.Size(1084, 641);
+            this.EASarjSenaryoTabPage.Size = new System.Drawing.Size(1094, 492);
             this.EASarjSenaryoTabPage.TabIndex = 2;
             this.EASarjSenaryoTabPage.Text = "EA Şarj Senaryoları";
             this.EASarjSenaryoTabPage.UseVisualStyleBackColor = true;
@@ -2654,7 +2649,7 @@ namespace SLF
             this.DEKSenaryoTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.DEKSenaryoTabPage.Name = "DEKSenaryoTabPage";
             this.DEKSenaryoTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.DEKSenaryoTabPage.Size = new System.Drawing.Size(1084, 641);
+            this.DEKSenaryoTabPage.Size = new System.Drawing.Size(1094, 492);
             this.DEKSenaryoTabPage.TabIndex = 3;
             this.DEKSenaryoTabPage.Text = "DEK Senaryoları";
             this.DEKSenaryoTabPage.UseVisualStyleBackColor = true;
@@ -2665,7 +2660,7 @@ namespace SLF
             this.YeniGenislemeSenaryoTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.YeniGenislemeSenaryoTabPage.Name = "YeniGenislemeSenaryoTabPage";
             this.YeniGenislemeSenaryoTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.YeniGenislemeSenaryoTabPage.Size = new System.Drawing.Size(1084, 641);
+            this.YeniGenislemeSenaryoTabPage.Size = new System.Drawing.Size(1094, 492);
             this.YeniGenislemeSenaryoTabPage.TabIndex = 4;
             this.YeniGenislemeSenaryoTabPage.Text = "Yeni Genişleme Alanları ";
             this.YeniGenislemeSenaryoTabPage.UseVisualStyleBackColor = true;
@@ -2965,6 +2960,7 @@ namespace SLF
             // 
             // toolStrip_stokastik
             // 
+            this.toolStrip_stokastik.Dock = System.Windows.Forms.DockStyle.None;
             this.toolStrip_stokastik.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.toolStrip_stokastik.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.Stokastik_Seç,
@@ -2980,9 +2976,9 @@ namespace SLF
             this.Stokastik_Grid_Oluştur,
             this.toolStripSeparator6,
             this.Stokastik_Fonksiyonlar});
-            this.toolStrip_stokastik.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip_stokastik.Location = new System.Drawing.Point(10, 0);
             this.toolStrip_stokastik.Name = "toolStrip_stokastik";
-            this.toolStrip_stokastik.Size = new System.Drawing.Size(1322, 32);
+            this.toolStrip_stokastik.Size = new System.Drawing.Size(1259, 32);
             this.toolStrip_stokastik.TabIndex = 1;
             this.toolStrip_stokastik.Text = "toolStrip1";
             // 
@@ -4060,7 +4056,6 @@ namespace SLF
         private Label label_dısa_aktar;
         private Label label_girdi_veri_onizleme;
         private Panel ELFGraphicsPanel;
-        private Label label_DEK_grafikler;
         private Guna.UI2.WinForms.Guna2TabControl SenaryoModuleTabControl;
         private TabPage EkonometrikSenaryoTabPage;
         private TabPage StokastikSenaryoTabPage;
