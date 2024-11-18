@@ -653,13 +653,11 @@ namespace SLF
                 MessageBox.Show($"Dosya güncelleme hatası: {ex.Message}");
             }
         }
-        private async void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e)
+        private void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e)
         {
             // Set cursor to wait
             Cursor.Current = Cursors.WaitCursor;
 
-            // Define paths
-            string rScriptPath = @"C:/Users/begum.orhan/MRC/İletişim sitesi - 1.1.3_T&SI/MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı/09_Alinan Veriler/GDZ/Ekonometrik Yük Tahmini Verileri/Program/Model/begum_model_deneme.R";
             string modifiedInputFilePath = @"C:/Users/begum.orhan/MRC/İletişim sitesi - 1.1.3_T&SI/MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı/09_Alinan Veriler/GDZ/Ekonometrik Yük Tahmini Verileri/Arşiv/Modified_INPUT_FILE.xlsx";
             string logFilePath = @"C:/Users/begum.orhan/MRC/İletişim sitesi - 1.1.3_T&SI/MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı/09_Alinan Veriler/GDZ/Ekonometrik Yük Tahmini Verileri/Program/SONUÇLAR/script_output_log2.txt";
 
@@ -669,55 +667,49 @@ namespace SLF
                 if (!File.Exists(modifiedInputFilePath))
                 {
                     MessageBox.Show("The modified Excel file does not exist. Please save the scenario first.", "File Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    LogOutput("The specified modified input file does not exist.");
                     return;
                 }
 
-                // Run the R script
-                var process = new Process
+                // Log the start of script execution
+                LogOutput("Starting R script execution...");
+
+                // Call the R script execution method
+                string resultsFilePath = RunModelRScript(modifiedInputFilePath);
+
+                if (string.IsNullOrEmpty(resultsFilePath))
                 {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "Rscript.exe", // Ensure Rscript.exe is accessible in your PATH
-                        Arguments = $"\"{rScriptPath}\" \"{modifiedInputFilePath}\"",
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    }
-                };
-
-                process.Start();
-
-                string output = await process.StandardOutput.ReadToEndAsync();
-                string error = await process.StandardError.ReadToEndAsync();
-
-                process.WaitForExit();
-
-                // Log the output and error
-                File.AppendAllText(logFilePath, $"Output:\n{output}\nError:\n{error}\n\n");
-
-                if (process.ExitCode != 0)
-                {
-                    MessageBox.Show($"R script encountered an error. Check the log file for details: {logFilePath}", "Script Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // Log failure
+                    LogOutput($"R script execution failed or returned no results. Check the log file for details: {logFilePath}");
+                    MessageBox.Show("R script execution failed or returned no results.", "Execution Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
-                else
-                {
-                    MessageBox.Show("Algoritma başarıyla çalıştırıldı.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    // Optionally load results into UI if necessary
-                    LoadResultsToTabEkonometrik(modifiedInputFilePath);
-                }
+                // Log success
+                LogOutput("R script executed successfully. Loading results...");
+
+                // Load results into the econometric tab
+                LoadResultsToTabEkonometrik(resultsFilePath);
+
+                // Notify user
+                MessageBox.Show("Algorithm executed successfully and results have been loaded.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
+                // Log the exception
+                LogOutput($"An error occurred while running the R script: {ex.Message}");
                 MessageBox.Show($"An error occurred while running the R script: {ex.Message}", "Execution Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
                 // Restore cursor to default
                 Cursor.Current = Cursors.Default;
+
+                // Log end of operation
+                LogOutput("R script execution process completed.");
             }
         }
+
 
 
         // Helper method for logging output to logTextBox
