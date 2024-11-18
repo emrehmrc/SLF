@@ -660,12 +660,33 @@ namespace SLF
                         }*/
         }
 
+        private void LoadImagesIntoPictureBoxes()
+        {
+            // Path to the folder where the images are saved
+            string imageFolderPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\Grafik Outputs\";
+
+            // Load images into PictureBox controls with checks
+            LoadImageIntoPictureBox(pictureBox_ELF_1, Path.Combine(imageFolderPath, "bolge_aydınlatma_projections.png"));
+            LoadImageIntoPictureBox(pictureBox_ELF_2, Path.Combine(imageFolderPath, "bolge_mesken_projections.png"));
+            LoadImageIntoPictureBox(pictureBox_ELF_3, Path.Combine(imageFolderPath, "bolge_sanayi_projections.png"));
+            LoadImageIntoPictureBox(pictureBox_ELF_4, Path.Combine(imageFolderPath, "bolge_sulama_projections.png"));
+            LoadImageIntoPictureBox(pictureBox_ELF_5, Path.Combine(imageFolderPath, "bolge_ticarethane_projections.png"));
+            // Add more PictureBox assignments as needed
+        }
+
+
+
+        // Save button logic to update Excel file with changes from DataGridViews
+
+        /// <summary>
+        /// ELF METHOD Model RScript Run RELATED CHANGES & UPDATES
+        /// </summary>
 
         // Save button logic to update Excel file with changes from DataGridViews
         private async void ELFScenerioSaveGunaButton_Click(object sender, EventArgs e)
         {
-            string originalFilePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\ekonometrik_INPUT_FILE.xlsx";
-            string modifiedFilePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\ekonometrik_INPUT_FILE.xlsx";
+            string originalFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+            string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
 
             try
             {
@@ -692,90 +713,85 @@ namespace SLF
                 MessageBox.Show($"Dosya güncelleme hatası: {ex.Message}");
             }
         }
-        
-        // Load the original Excel file into DataGridView for display
-        private void LoadDataIntoDataGridView(ExcelWorksheet worksheet, DataGridView dgv)
+        private void LoadResultsToTabEkonometrik(string resultsFilePath)
         {
-            dgv.Rows.Clear(); // Clear existing rows
-
-            for (int row = 1; row <= worksheet.Dimension.Rows; row++)
+            if (!File.Exists(resultsFilePath))
             {
-                int rowIndex = dgv.Rows.Add(); // Add a new row to the DataGridView
-
-                for (int col = 1; col <= worksheet.Dimension.Columns; col++)
-                {
-                    var cell = worksheet.Cells[row, col];
-
-                    // Store the original value in the cell's tag for later use
-                    dgv.Rows[rowIndex].Cells[col - 1].Value = Math.Round(cell.GetValue<double>(), 1); // Display as 4.9%
-                    dgv.Rows[rowIndex].Cells[col - 1].Tag = cell.Value; // Preserve full value
-                }
+                MessageBox.Show("The results file does not exist.");
+                return;
             }
+
+            using (var package = new ExcelPackage(new FileInfo(resultsFilePath)))
+            {
+                // Load the corresponding results into each DataGridView
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[1], ELFMinResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[2], ELFLowResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[3], ELFBaseResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[4], ELFHighResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[5], ELFMaxResultsTable);
+            }
+
+            // Switch to the results tab after loading all the data
+            Modül_Tabları.SelectedTab = tab_ekonometrik;
         }
-        
-
-
-        private async void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e)
+        private void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e)
         {
             // Set cursor to wait
             Cursor.Current = Cursors.WaitCursor;
 
-            // Define paths for the R script and modified input file
-            string rScriptPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\begum_model_deneme.R";
-            string modifiedInputFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
-            string logFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\script_output_log2.txt";
+            string modifiedInputFilePath = @"C:/Users/begum.orhan/MRC/İletişim sitesi - 1.1.3_T&SI/MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı/09_Alinan Veriler/GDZ/Ekonometrik Yük Tahmini Verileri/Arşiv/Modified_INPUT_FILE.xlsx";
+            string logFilePath = @"C:/Users/begum.orhan/MRC/İletişim sitesi - 1.1.3_T&SI/MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı/09_Alinan Veriler/GDZ/Ekonometrik Yük Tahmini Verileri/Program/SONUÇLAR/script_output_log2.txt";
 
             try
             {
-                // Check if the modified input file exists
+                // Check if the modified file exists
                 if (!File.Exists(modifiedInputFilePath))
                 {
+                    MessageBox.Show("The modified Excel file does not exist. Please save the scenario first.", "File Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     LogOutput("The specified modified input file does not exist.");
                     return;
                 }
 
-                var process = new Process
+                // Log the start of script execution
+                LogOutput("Starting R script execution...");
+
+                // Call the R script execution method
+                string resultsFilePath = RunModelRScript(modifiedInputFilePath);
+
+                if (string.IsNullOrEmpty(resultsFilePath))
                 {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "Rscript.exe", // Ensure Rscript.exe is accessible in your PATH
-                        Arguments = $"\"{rScriptPath}\" \"{modifiedInputFilePath}\"",
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    }
-                };
-
-                process.Start();
-
-                string output = await process.StandardOutput.ReadToEndAsync();
-                string error = await process.StandardError.ReadToEndAsync();
-
-                process.WaitForExit();
-
-                // Log the output and error
-                File.AppendAllText(logFilePath, $"Output:\n{output}\nError:\n{error}\n\n");
-
-                if (process.ExitCode != 0)
-                {
-                    LogOutput($"R script encountered an error. Check the log file for details: {logFilePath}");
+                    // Log failure
+                    LogOutput($"R script execution failed or returned no results. Check the log file for details: {logFilePath}");
+                    MessageBox.Show("R script execution failed or returned no results.", "Execution Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
-                else
-                {
-                    LogOutput("Algoritma başarıyla çalıştırıldı.");
-                }
+
+                // Log success
+                LogOutput("R script executed successfully. Loading results...");
+
+                // Load results into the econometric tab
+                LoadResultsToTabEkonometrik(resultsFilePath);
+
+                // Notify user
+                MessageBox.Show("Algorithm executed successfully and results have been loaded.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
+                // Log the exception
                 LogOutput($"An error occurred while running the R script: {ex.Message}");
+                MessageBox.Show($"An error occurred while running the R script: {ex.Message}", "Execution Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
                 // Restore cursor to default
                 Cursor.Current = Cursors.Default;
+
+                // Log end of operation
+                LogOutput("R script execution process completed.");
             }
         }
+
+
 
         // Helper method for logging output to logTextBox
         private void LogOutput(string message)
@@ -804,7 +820,6 @@ namespace SLF
             };
             this.Controls.Add(logTextBox); // Add to the form controls
         }
-
 
         private async void ShowResults_Click(object sender, EventArgs e)
         {
@@ -854,18 +869,119 @@ namespace SLF
             Modül_Tabları.SelectedTab = tab_ekonometrik;
         }
 
-        private void LoadImagesIntoPictureBoxes()
-        {
-            // Path to the folder where the images are saved
-            string imageFolderPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\Grafik Outputs\";
 
-            // Load images into PictureBox controls with checks
-            LoadImageIntoPictureBox(pictureBox_ELF_1, Path.Combine(imageFolderPath, "bolge_aydınlatma_projections.png"));
-            LoadImageIntoPictureBox(pictureBox_ELF_2, Path.Combine(imageFolderPath, "bolge_mesken_projections.png"));
-            LoadImageIntoPictureBox(pictureBox_ELF_3, Path.Combine(imageFolderPath, "bolge_sanayi_projections.png"));
-            LoadImageIntoPictureBox(pictureBox_ELF_4, Path.Combine(imageFolderPath, "bolge_sulama_projections.png"));
-            LoadImageIntoPictureBox(pictureBox_ELF_5, Path.Combine(imageFolderPath, "bolge_ticarethane_projections.png"));
-            // Add more PictureBox assignments as needed
+
+
+
+
+        /*        private void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e)
+                {
+                    try
+                    {
+                        // Set cursor to wait while running the operations
+                        Cursor.Current = Cursors.WaitCursor;
+
+                        string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+
+                        // Check if the modified file exists
+                        if (!File.Exists(modifiedFilePath))
+                        {
+                            MessageBox.Show("The modified Excel file does not exist. Please save the scena" +
+                                "rio first.");
+                            return;
+                        }
+
+                        // Run the R script
+                        string resultsFilePath = RunModelRScript(modifiedFilePath);
+
+                        if (resultsFilePath == null)
+                        {
+                            // If R script failed or no results path was returned, stop further execution
+                            return;
+                        }
+
+                        // Load results into tab_ekonometrik
+                        LoadResultsToTabEkonometrik(resultsFilePath);
+                    }
+                    finally
+                    {
+                        // Restore cursor to default
+                        Cursor.Current = Cursors.Default;
+                    }
+                }*/
+
+        // Method to run the R script
+        private string RunModelRScript(string modifiedFilePath)
+        {
+            string rScriptPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\begum_model_deneme.R";
+            string resultsFilePath = "";
+
+            // Set up process info
+            var processInfo = new ProcessStartInfo()
+            {
+                FileName = "Rscript.exe",
+                Arguments = $"\"{rScriptPath}\" \"{modifiedFilePath}\"",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            // Start the process
+            using (var process = Process.Start(processInfo))
+            {
+                process.OutputDataReceived += (sender, args) =>
+                {
+                    if (!string.IsNullOrEmpty(args.Data))
+                    {
+                        Console.WriteLine(args.Data);
+                        resultsFilePath = args.Data;  // Capture the file path
+                    }
+                };
+
+                process.ErrorDataReceived += (sender, args) => Console.WriteLine("ERROR: " + args.Data);
+
+                process.BeginOutputReadLine();
+                process.WaitForExit();
+            }
+
+            if (string.IsNullOrEmpty(resultsFilePath))
+            {
+                MessageBox.Show("Error: No results file path was generated by the R script.");
+                return null;
+            }
+
+            MessageBox.Show("R script executed successfully. Results saved in: " + resultsFilePath);
+            return resultsFilePath;  // Return the results file path
+        }
+
+        // Method to load results into tab_ekonometrik
+        
+
+        // Helper method to load data from an Excel worksheet into a DataGridView
+        private void LoadWorksheetToDataGridView(ExcelWorksheet worksheet, DataGridView dataGridView)
+        {
+            DataTable dt = new DataTable();
+
+            // Load headers from the first row
+            for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+            {
+                dt.Columns.Add(worksheet.Cells[1, col].Text);
+            }
+
+            // Load data from the worksheet into the DataTable (starting from row 2)
+            for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+            {
+                var newRow = dt.NewRow();
+                for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+                {
+                    newRow[col - 1] = worksheet.Cells[row, col].Text;
+                }
+                dt.Rows.Add(newRow);
+            }
+
+            // Assign the DataTable as the DataSource of the DataGridView
+            dataGridView.DataSource = dt;
         }
 
         // DEK şehri seçildiğinde çağrılan metot
@@ -913,99 +1029,17 @@ namespace SLF
         }
 
         // Method to run the R script
-        private string RunModelRScript(string modifiedFilePath)
-        {
-            string rScriptPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\model.R";
-            string resultsFilePath = "";
-
-            // Set up process info
-            var processInfo = new ProcessStartInfo()
-            {
-                FileName = "Rscript.exe",
-                Arguments = $"\"{rScriptPath}\" \"{modifiedFilePath}\"",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            // Start the process
-            using (var process = Process.Start(processInfo))
-            {
-                // Capture output from the R script
-                process.OutputDataReceived += (sender, args) => {
-                    if (!string.IsNullOrEmpty(args.Data))
-                    {
-                        Console.WriteLine(args.Data);
-                        resultsFilePath = args.Data;  // Capture the file path
-                    }
-                };
-
-                process.ErrorDataReceived += (sender, args) => Console.WriteLine("ERROR: " + args.Data);
-
-                process.BeginOutputReadLine();
-                process.WaitForExit();
-            }
-
-            if (string.IsNullOrEmpty(resultsFilePath))
-            {
-                MessageBox.Show("Error: No results file path was generated by the R script.");
-                return null;
-            }
-
-            MessageBox.Show("R script executed successfully. Results saved in: " + resultsFilePath);
-            return resultsFilePath;  // Return the results file path
-        }
+      
 
         // Method to load results into tab_ekonometrik
-        private void LoadResultsToTabEkonometrik(string resultsFilePath)
-        {
-            if (!File.Exists(resultsFilePath))
-            {
-                MessageBox.Show("The results file does not exist.");
-                return;
-            }
-
-            using (var package = new ExcelPackage(new FileInfo(resultsFilePath)))
-            {
-                // Load the corresponding results into each DataGridView
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[1], ELFMinResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[2], ELFLowResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[3], ELFBaseResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[4], ELFHighResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[5], ELFMaxResultsTable);
-            }
+       
 
             // Switch to the results tab after loading all the data
-            Modül_Tabları.SelectedTab = tab_ekonometrik;
-        }
+        
 
 
         // Helper method to load data from an Excel worksheet into a DataGridView
-        private void LoadWorksheetToDataGridView(ExcelWorksheet worksheet, DataGridView dataGridView)
-        {
-            DataTable dt = new DataTable();
-
-            // Load headers from the first row
-            for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
-            {
-                dt.Columns.Add(worksheet.Cells[1, col].Text);
-            }
-
-            // Load data from the worksheet into the DataTable (starting from row 2)
-            for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
-            {
-                var newRow = dt.NewRow();
-                for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
-                {
-                    newRow[col - 1] = worksheet.Cells[row, col].Text;
-                }
-                dt.Rows.Add(newRow);
-            }
-
-            // Assign the DataTable as the DataSource of the DataGridView
-            dataGridView.DataSource = dt;
-        }
+       
         private async void gMapControl_Dek_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
 
         {
@@ -3382,6 +3416,8 @@ namespace SLF
 
         private async Task eaHaritayaVeriYukleAsync()
         {
+            gMapControl_EA.Overlays.Clear();
+            gMapControl_EA.Refresh();
             int redDc = 0;
             int greenAc = 0;
 
@@ -3482,7 +3518,7 @@ namespace SLF
             // Modüllerin yüklü olup olmadığını kontrol et
             if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
-                if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Haritası Modülü") && !modulescheck.Contains("DTR Verileri"))
+                if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Haritası Modülü") && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
                 {
                     // Sekme geçişini tamamen iptal et
                     MessageBox.Show("DTR verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
@@ -3491,7 +3527,7 @@ namespace SLF
                     Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
                     return;
                 }
-                else if (selectedTabText == "İmar Analizleri" && !modulescheck.Contains("İmar Planı"))
+                else if (selectedTabText == "İmar Analizleri" && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")))
                 {
                     // Sekme geçişini tamamen iptal et
                     MessageBox.Show("İmar planı verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
@@ -3500,7 +3536,9 @@ namespace SLF
                     Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
                     return;
                 }
-                else if (selectedTabText == "Optimal DTR Konumlandırma" && (!modulescheck.Contains("DTR Verileri") || !modulescheck.Contains("İmar Planı")))
+                else if (selectedTabText == "Optimal DTR Konumlandırma"
+       && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")
+       && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri")))
                 {
                     // Sekme geçişini tamamen iptal et
                     MessageBox.Show("DTR verileri ve İmar planı yüklenmeden bu sekmeye geçiş yapılamaz.");
@@ -3526,6 +3564,11 @@ namespace SLF
                     await eaHaritayaVeriYukleAsync();
                 }
 
+                // Harita işlemini başlat
+
+
+
+
             }
             // DEK Modülü tabına tıklanmışsa
             else if (selectedTabText == "DEK Modülü")
@@ -3541,11 +3584,9 @@ namespace SLF
                 {
                     await dekHaritayaVeriYukleAsync();
                 }
-
             }
         }
-
-        private void buton_stokastik_harita_katmanlar_MouseClick(object sender, MouseEventArgs e)
+                private void buton_stokastik_harita_katmanlar_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
             {
@@ -3624,6 +3665,8 @@ namespace SLF
         private async void gelecekSimilasyonGoruntule(object sender, EventArgs e)
         {
             // Checkbox'ları görünür hale getir
+            gMapControl_EA.Overlays.Clear();
+            gMapControl_EA.Refresh();
             checkBox_imar_9.Visible = true;
             checkBox_imar_10.Visible = true;
             checkBox_imar_11.Visible = true;
