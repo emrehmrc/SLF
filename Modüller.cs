@@ -168,7 +168,7 @@ namespace SLF
         {
             // Başlangıçta butonu devre dışı bırak
             GelecekSimButton.Enabled = false;
-
+            
             // Checkbox'ları başlangıçta görünmez yap
             checkBox_imar_9.Visible = false;
             checkBox_imar_10.Visible = false;
@@ -192,7 +192,7 @@ namespace SLF
             // ComboBox olaylarını bağla
             comboBox_ea_yıl_secimi.SelectedIndexChanged += yilSecimiMonteCarlo;
             comboBox_ea_il_secimi.SelectedIndexChanged += ilSecimiMonteCarlo;
-
+            
             // İlk durumda tüm marker'ları göster
             ToggleMarkers("AC-HOME", checkBox_imar_9.Checked);
             ToggleMarkers("AC-WORK", checkBox_imar_10.Checked);
@@ -2107,7 +2107,7 @@ namespace SLF
         }
 
         private void gMapControl_stokastik_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
-        {
+        {       
             OnMapClickEventi(pointClick, e, markerOverlay_stokastik, ref polygonPoints_stokastik,
                 ref polygonOverlay_stokastik, Mesafe_stokastik, mesafe_metre_stokastik);
         }
@@ -2562,15 +2562,15 @@ namespace SLF
         // show information about polygons when double-clicking on the map
         private void gMapControl_stokastik_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left && lastClickedCheckbox != null)
+            if (e.Button == MouseButtons.Left || lastClickedCheckbox != null)
             {
-                int checkbox_index = int.Parse(lastClickedCheckbox.Tag.ToString()) - 1;
 
-                foreach (var polygon in cbs.tüm_katmanlar_array[checkbox_index].Polygons)
+                //int checkbox_index = int.Parse(lastClickedCheckbox.Tag.ToString());
+                foreach (var polygon in cbs.tüm_katmanlar_array[layer_index].Polygons)
                 {
                     if (cbs.IsPointInPolygon(pointClick, polygon))
                     {
-                        cbs.HighlightPolygon(polygon, checkbox_index, cbs.GetActiveGMapControl());
+                        cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
 
                         if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
                         {
@@ -2583,7 +2583,7 @@ namespace SLF
         }
 
         private void gMapControl_imar_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
-        {
+        {            
             if (e.Button == MouseButtons.Left && lastClickedCheckbox != null)
             {
                 int checkbox_index = int.Parse(lastClickedCheckbox.Tag.ToString()) - 1;
