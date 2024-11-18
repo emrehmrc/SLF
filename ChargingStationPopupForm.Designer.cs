@@ -34,16 +34,16 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ChargingStationPopupForm));
             this.ChargingStationDataGridView = new Guna.UI2.WinForms.Guna2DataGridView();
-            this.ISTASYON_ADI_Charging_Popup = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ISTASYON_TIPI_Charging_Popup = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.ISTASYON_GUCU_Charging_Popup = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.EA_X_KOORDINAT_Charging_Popup = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.EA_Y_KOORDINAT_Charging_Popup = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ChargingStationpanel = new System.Windows.Forms.Panel();
             this.ChargingStationpanel2 = new System.Windows.Forms.Panel();
             this.CancelButtonCharging_Popup = new Guna.UI2.WinForms.Guna2Button();
             this.TamamButton_Charging_Popup = new Guna.UI2.WinForms.Guna2Button();
             this.guna2AnimateWindow1_Charging_Popup = new Guna.UI2.WinForms.Guna2AnimateWindow(this.components);
+            this.ISTASYON_ADI = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ISTASYON_TIPI = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.ISTASYON_GUCU = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.EA_X_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.EA_Y_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.ChargingStationDataGridView)).BeginInit();
             this.ChargingStationpanel.SuspendLayout();
             this.ChargingStationpanel2.SuspendLayout();
@@ -68,11 +68,11 @@
             this.ChargingStationDataGridView.ColumnHeadersHeight = 25;
             this.ChargingStationDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
             this.ChargingStationDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.ISTASYON_ADI_Charging_Popup,
-            this.ISTASYON_TIPI_Charging_Popup,
-            this.ISTASYON_GUCU_Charging_Popup,
-            this.EA_X_KOORDINAT_Charging_Popup,
-            this.EA_Y_KOORDINAT_Charging_Popup});
+            this.ISTASYON_ADI,
+            this.ISTASYON_TIPI,
+            this.ISTASYON_GUCU,
+            this.EA_X_KOORDINAT,
+            this.EA_Y_KOORDINAT});
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(235)))), ((int)(((byte)(230)))));
             dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
@@ -83,7 +83,7 @@
             this.ChargingStationDataGridView.DefaultCellStyle = dataGridViewCellStyle3;
             this.ChargingStationDataGridView.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(182)))), ((int)(((byte)(224)))), ((int)(((byte)(216)))));
             this.ChargingStationDataGridView.Location = new System.Drawing.Point(48, 30);
-            this.ChargingStationDataGridView.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ChargingStationDataGridView.Margin = new System.Windows.Forms.Padding(4);
             this.ChargingStationDataGridView.Name = "ChargingStationDataGridView";
             this.ChargingStationDataGridView.RowHeadersVisible = false;
             this.ChargingStationDataGridView.RowHeadersWidth = 18;
@@ -112,54 +112,13 @@
             this.ChargingStationDataGridView.ThemeStyle.RowsStyle.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(99)))), ((int)(((byte)(191)))), ((int)(((byte)(173)))));
             this.ChargingStationDataGridView.ThemeStyle.RowsStyle.SelectionForeColor = System.Drawing.Color.Black;
             // 
-            // ISTASYON_ADI_Charging_Popup
-            // 
-            this.ISTASYON_ADI_Charging_Popup.HeaderText = "ISTASYON_ADI";
-            this.ISTASYON_ADI_Charging_Popup.MinimumWidth = 6;
-            this.ISTASYON_ADI_Charging_Popup.Name = "ISTASYON_ADI_Charging_Popup";
-            this.ISTASYON_ADI_Charging_Popup.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.ISTASYON_ADI_Charging_Popup.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // ISTASYON_TIPI_Charging_Popup
-            // 
-            this.ISTASYON_TIPI_Charging_Popup.HeaderText = "ISTASYON_TIPI";
-            this.ISTASYON_TIPI_Charging_Popup.Items.AddRange(new object[] {
-            "AC",
-            "DC"});
-            this.ISTASYON_TIPI_Charging_Popup.MinimumWidth = 6;
-            this.ISTASYON_TIPI_Charging_Popup.Name = "ISTASYON_TIPI_Charging_Popup";
-            // 
-            // ISTASYON_GUCU_Charging_Popup
-            // 
-            this.ISTASYON_GUCU_Charging_Popup.HeaderText = "ISTASYON_GUCU";
-            this.ISTASYON_GUCU_Charging_Popup.Items.AddRange(new object[] {
-            "4",
-            "5",
-            "4"});
-            this.ISTASYON_GUCU_Charging_Popup.MinimumWidth = 6;
-            this.ISTASYON_GUCU_Charging_Popup.Name = "ISTASYON_GUCU_Charging_Popup";
-            // 
-            // EA_X_KOORDINAT_Charging_Popup
-            // 
-            this.EA_X_KOORDINAT_Charging_Popup.HeaderText = "EA_X_KOORDINAT";
-            this.EA_X_KOORDINAT_Charging_Popup.MinimumWidth = 6;
-            this.EA_X_KOORDINAT_Charging_Popup.Name = "EA_X_KOORDINAT_Charging_Popup";
-            this.EA_X_KOORDINAT_Charging_Popup.ReadOnly = true;
-            // 
-            // EA_Y_KOORDINAT_Charging_Popup
-            // 
-            this.EA_Y_KOORDINAT_Charging_Popup.HeaderText = "EA_Y_KOORDINAT";
-            this.EA_Y_KOORDINAT_Charging_Popup.MinimumWidth = 6;
-            this.EA_Y_KOORDINAT_Charging_Popup.Name = "EA_Y_KOORDINAT_Charging_Popup";
-            this.EA_Y_KOORDINAT_Charging_Popup.ReadOnly = true;
-            // 
             // ChargingStationpanel
             // 
             this.ChargingStationpanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(223)))), ((int)(((byte)(156)))));
             this.ChargingStationpanel.Controls.Add(this.ChargingStationDataGridView);
             this.ChargingStationpanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ChargingStationpanel.Location = new System.Drawing.Point(0, 0);
-            this.ChargingStationpanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ChargingStationpanel.Margin = new System.Windows.Forms.Padding(4);
             this.ChargingStationpanel.Name = "ChargingStationpanel";
             this.ChargingStationpanel.Size = new System.Drawing.Size(1067, 554);
             this.ChargingStationpanel.TabIndex = 1;
@@ -173,7 +132,7 @@
             this.ChargingStationpanel2.Controls.Add(this.CancelButtonCharging_Popup);
             this.ChargingStationpanel2.Controls.Add(this.TamamButton_Charging_Popup);
             this.ChargingStationpanel2.Location = new System.Drawing.Point(0, 484);
-            this.ChargingStationpanel2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ChargingStationpanel2.Margin = new System.Windows.Forms.Padding(4);
             this.ChargingStationpanel2.Name = "ChargingStationpanel2";
             this.ChargingStationpanel2.Size = new System.Drawing.Size(1067, 70);
             this.ChargingStationpanel2.TabIndex = 2;
@@ -190,7 +149,7 @@
             this.CancelButtonCharging_Popup.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.CancelButtonCharging_Popup.ForeColor = System.Drawing.Color.White;
             this.CancelButtonCharging_Popup.Location = new System.Drawing.Point(575, 6);
-            this.CancelButtonCharging_Popup.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.CancelButtonCharging_Popup.Margin = new System.Windows.Forms.Padding(4);
             this.CancelButtonCharging_Popup.Name = "CancelButtonCharging_Popup";
             this.CancelButtonCharging_Popup.Size = new System.Drawing.Size(240, 55);
             this.CancelButtonCharging_Popup.TabIndex = 1;
@@ -208,11 +167,52 @@
             this.TamamButton_Charging_Popup.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.TamamButton_Charging_Popup.ForeColor = System.Drawing.Color.White;
             this.TamamButton_Charging_Popup.Location = new System.Drawing.Point(823, 6);
-            this.TamamButton_Charging_Popup.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TamamButton_Charging_Popup.Margin = new System.Windows.Forms.Padding(4);
             this.TamamButton_Charging_Popup.Name = "TamamButton_Charging_Popup";
             this.TamamButton_Charging_Popup.Size = new System.Drawing.Size(240, 55);
             this.TamamButton_Charging_Popup.TabIndex = 2;
             this.TamamButton_Charging_Popup.Text = "TAMAM";
+            // 
+            // ISTASYON_ADI
+            // 
+            this.ISTASYON_ADI.HeaderText = "ISTASYON_ADI";
+            this.ISTASYON_ADI.MinimumWidth = 6;
+            this.ISTASYON_ADI.Name = "ISTASYON_ADI";
+            this.ISTASYON_ADI.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.ISTASYON_ADI.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // ISTASYON_TIPI
+            // 
+            this.ISTASYON_TIPI.HeaderText = "ISTASYON_TIPI";
+            this.ISTASYON_TIPI.Items.AddRange(new object[] {
+            "AC",
+            "DC"});
+            this.ISTASYON_TIPI.MinimumWidth = 6;
+            this.ISTASYON_TIPI.Name = "ISTASYON_TIPI";
+            // 
+            // ISTASYON_GUCU
+            // 
+            this.ISTASYON_GUCU.HeaderText = "ISTASYON_GUCU";
+            this.ISTASYON_GUCU.Items.AddRange(new object[] {
+            "4",
+            "5",
+            "4"});
+            this.ISTASYON_GUCU.MinimumWidth = 6;
+            this.ISTASYON_GUCU.Name = "ISTASYON_GUCU";
+            // 
+            // EA_X_KOORDINAT
+            // 
+            this.EA_X_KOORDINAT.HeaderText = "EA_X_KOORDINAT";
+            this.EA_X_KOORDINAT.MinimumWidth = 6;
+            this.EA_X_KOORDINAT.Name = "EA_X_KOORDINAT";
+            this.EA_X_KOORDINAT.ReadOnly = true;
+            // 
+            // EA_Y_KOORDINAT
+            // 
+            this.EA_Y_KOORDINAT.HeaderText = "EA_Y_KOORDINAT";
+            this.EA_Y_KOORDINAT.MinimumWidth = 6;
+            this.EA_Y_KOORDINAT.Name = "EA_Y_KOORDINAT";
+            this.EA_Y_KOORDINAT.ReadOnly = true;
             // 
             // ChargingStationPopupForm
             // 
@@ -222,7 +222,7 @@
             this.Controls.Add(this.ChargingStationpanel2);
             this.Controls.Add(this.ChargingStationpanel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ChargingStationPopupForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Şarj İstasyonu Bilgileri";
@@ -241,10 +241,10 @@
         private Guna.UI2.WinForms.Guna2Button CancelButtonCharging_Popup;
         private Guna.UI2.WinForms.Guna2Button TamamButton_Charging_Popup;
         private Guna.UI2.WinForms.Guna2AnimateWindow guna2AnimateWindow1_Charging_Popup;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ISTASYON_ADI_Charging_Popup;
-        private System.Windows.Forms.DataGridViewComboBoxColumn ISTASYON_TIPI_Charging_Popup;
-        private System.Windows.Forms.DataGridViewComboBoxColumn ISTASYON_GUCU_Charging_Popup;
-        private System.Windows.Forms.DataGridViewTextBoxColumn EA_X_KOORDINAT_Charging_Popup;
-        private System.Windows.Forms.DataGridViewTextBoxColumn EA_Y_KOORDINAT_Charging_Popup;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ISTASYON_ADI;
+        private System.Windows.Forms.DataGridViewComboBoxColumn ISTASYON_TIPI;
+        private System.Windows.Forms.DataGridViewComboBoxColumn ISTASYON_GUCU;
+        private System.Windows.Forms.DataGridViewTextBoxColumn EA_X_KOORDINAT;
+        private System.Windows.Forms.DataGridViewTextBoxColumn EA_Y_KOORDINAT;
     }
 }

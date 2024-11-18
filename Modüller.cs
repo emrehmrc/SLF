@@ -2562,7 +2562,7 @@ namespace SLF
         // show information about polygons when double-clicking on the map
         private void gMapControl_stokastik_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left || lastClickedCheckbox != null)
+            if (e.Button == MouseButtons.Left)
             {
 
                 //int checkbox_index = int.Parse(lastClickedCheckbox.Tag.ToString());

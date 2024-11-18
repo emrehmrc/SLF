@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
+using OSGeo.OGR;
 using static SLF.ModülFormu;
 
 namespace SLF
@@ -27,7 +28,7 @@ namespace SLF
 
         private void InitializeDataGridView(NoktaVeri veri)
         {
-            // Fill initial coordinates
+            // Fill initial coordinates          
             ChargingStationDataGridView.Rows.Add();
             ChargingStationDataGridView.Rows[0].Cells["EA_X_KOORDINAT"].Value = veri.Enlem;
             ChargingStationDataGridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value = veri.Boylam;
@@ -130,6 +131,6 @@ namespace SLF
             {
                 MessageBox.Show("İşlem iptal edildi.");
             }
-        }
+        }       
     }
 }
