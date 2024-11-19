@@ -167,10 +167,10 @@ namespace SLF
         private void Form1_Load()
         {
             // Başlangıçta butonu devre dışı bırak
-
-            GelecekSimButton.Enabled = false;
-            DEKSimButton.Enabled = false;
-
+            
+                GelecekSimButton.Enabled = false;
+                DEKSimButton.Enabled = false;
+            
             // Checkbox'ları başlangıçta görünmez yap
             checkBox_AC_Public.Visible = false;
             checkBox_AC_Work.Visible = false;
@@ -188,7 +188,7 @@ namespace SLF
             // ComboBox olaylarını bağla
             comboBox_ea_yıl_secimi.SelectedIndexChanged += yilSecimiMonteCarlo;
             comboBox_ea_il_secimi.SelectedIndexChanged += ilSecimiMonteCarlo;
-
+            
             // İlk durumda tüm marker'ları göster
             ToggleMarkers("AC-HOME", checkBox_imar_9.Checked);
             ToggleMarkers("AC-WORK", checkBox_imar_10.Checked);
@@ -310,7 +310,7 @@ namespace SLF
             }
             comboBox_ea_yıl_secimi.DataSource = yearList; // Yıl seçimi için ComboBox1
             comboBox_DEK_Yıl.DataSource = yearList; // DEK yılı seçimi için ComboBox3
-                                                    // Şehir isimlerini ComboBox2'ye ekleyin
+                                             // Şehir isimlerini ComboBox2'ye ekleyin
             comboBox_DEK_il.Items.Clear(); // dek
             comboBox_ea_il_secimi.Items.Clear();   // ea 
             comboBox_ea_il_secimi.Items.Add("İzmir");
@@ -346,7 +346,7 @@ namespace SLF
             // Add overlays to the maps
             gMapControl_stokastik.Overlays.Add(rulerOverlay_stokastik);
             gMapControl_stokastik.Overlays.Add(markerOverlay_stokastik);
-
+            
             checkboxes_init();
             gMapControl_DEK.Overlays.Add(rulerOverlay_DEK);
             gMapControl_DEK.Overlays.Add(markerOverlay_DEK);
@@ -356,8 +356,8 @@ namespace SLF
             gMapControl_EA.Overlays.Add(rulerOverlay_ea);
             gMapControl_EA.Overlays.Add(markerOverlay_ea);
             gMapControl_EA.Overlays.Add(polygonOverlay_ea);
-
-
+            
+            
 
             gMapControl_yuk.Overlays.Add(rulerOverlay_yuk);
             gMapControl_yuk.Overlays.Add(markerOverlay_yuk);
@@ -625,7 +625,7 @@ namespace SLF
                     // Load sheets 2 to 6 into respective DataGridViews
                     for (int i = 1; i <= 5; i++)
                     {
-
+                        
                         var worksheet = package.Workbook.Worksheets[i];
                         DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
 
@@ -955,7 +955,7 @@ namespace SLF
         }
 
         // Method to load results into tab_ekonometrik
-
+        
 
         // Helper method to load data from an Excel worksheet into a DataGridView
         private void LoadWorksheetToDataGridView(ExcelWorksheet worksheet, DataGridView dataGridView)
@@ -1268,7 +1268,7 @@ namespace SLF
 
         }
 
-
+       
 
 
         private void gMapControl_Dek_OnMarkerClick(GMapMarker item, MouseEventArgs e)
@@ -2371,10 +2371,10 @@ namespace SLF
         }
 
         private void gMapControl_stokastik_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
-        {
+        {       
             OnMapClickEventi(pointClick, e, markerOverlay_stokastik, ref polygonPoints_stokastik,
                 ref polygonOverlay_stokastik, Mesafe_stokastik, mesafe_metre_stokastik);
-
+            
         }
 
         private void gMapControl_yuk_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
@@ -2390,10 +2390,10 @@ namespace SLF
 
             OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
                 ref polygonOverlay_ea, Mesafe_yuk, mesafe_metre_yuk);
-
+            
             if (isAddingChargingStation)
             {
-
+                
 
                 // Marker Overlay'in haritaya eklenip eklenmediğini kontrol et
                 if (!gMapControl_EA.Overlays.Contains(markerOverlay_ea))
@@ -2846,7 +2846,7 @@ namespace SLF
             // Reset the flag after adding the station
             isAddingDekPoint = false;
         }
-
+        
 
         /*---------------------------------------------------------------------------------------------- */
         /*----------------------------------     CUSTOM METHODS & CLASSES     -------------------------- */
@@ -2859,10 +2859,10 @@ namespace SLF
             if (e.Button == MouseButtons.Left)
             {
 
-
+                
                 if (cbs.tüm_katmanlar_array[layer_index] != null)
-                {
-
+                {   
+                    
                     foreach (var polygon in cbs.tüm_katmanlar_array[layer_index].Polygons)
                     {
                         if (cbs.IsPointInPolygon(pointClick, polygon))
@@ -2881,7 +2881,7 @@ namespace SLF
         }
 
         private void gMapControl_imar_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
-        {
+        {            
             if (e.Button == MouseButtons.Left && lastClickedCheckbox != null)
             {
                 int checkbox_index = int.Parse(lastClickedCheckbox.Tag.ToString()) - 1;
@@ -3479,7 +3479,7 @@ namespace SLF
                 }
             }
         }
-        private void buton_stokastik_harita_katmanlar_MouseClick(object sender, MouseEventArgs e)
+                private void buton_stokastik_harita_katmanlar_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
             {
@@ -3554,11 +3554,11 @@ namespace SLF
             isAddingChargingStation = false;
         }
 
-
+      
         private async void gelecekSimilasyonGoruntule(object sender, EventArgs e)
         {
             // Checkbox'ları görünür hale getir
-
+            
             gMapControl_EA.Overlays.Clear();
             gMapControl_EA.Refresh();
             checkBox_AC_Home.Visible = true;
@@ -4192,7 +4192,7 @@ namespace SLF
 
         }
 
-
+       
 
         private void İmar_Poligon_MouseDown(object sender, MouseEventArgs e)
         {

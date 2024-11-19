@@ -398,8 +398,11 @@ namespace SLF
                 }
             }
         }
-
-
+        /*        protected void ImportProcessedData()
+                {
+                    importedDataTable = currentDataTable.Copy();
+                    dataTablesByType[seçilenVeriTipi] = importedDataTable;
+                }*/
         public void ImportProcessedData()
         {
             try

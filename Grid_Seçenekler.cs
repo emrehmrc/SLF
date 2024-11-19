@@ -42,42 +42,27 @@ namespace SLF
             // Seçilen grid boyutunu ayarlıyoruz
             if (combobox_grid_sizes.SelectedIndex == 0)
             {
-                modül.grid_size = 100;
+                modül.cbs.grid_size = 100;
             }
             else if (combobox_grid_sizes.SelectedIndex == 1)
             {
-                modül.grid_size = 250;
+                modül.cbs.grid_size = 250;
             }
             else if (combobox_grid_sizes.SelectedIndex == 2)
             {
-                modül.grid_size = 400;
+                modül.cbs.grid_size = 400;
             }
             else
             {
-                modül.grid_size = 1000;
+                modül.cbs.grid_size = 1000;
             }
 
             modül.Show();
             this.Close();
 
-            // Stokastik Modül mü yoksa EA Şarj Modülü mü aktif?
-            if (modül.Modül_Tabları.SelectedTab == modül.tab_stokastik)
-            {
-                // Stokastik modül için grid oluştur
-                modül.isSelecting_grid = true;
-                modül.gMapControl_stokastik.Cursor = Cursors.Arrow;
-            }
-            else if (modül.Modül_Tabları.SelectedTab == modül.tab_ea)
-            {
-                // EA Şarj Modülü için grid oluştur
-                modül.isSelecting_grid = true;
-                modül.gMapControl_EA.Cursor = Cursors.Arrow;
-                Console.WriteLine("buradayım");
-            }
-            else
-            {
-                MessageBox.Show("Geçerli bir modül seçmediniz.");
-            }
+            modül.cbs.isSelecting_grid = true;
+            modül.cbs.GetActiveGMapControl().Cursor = Cursors.Arrow;
+
         }
 
     }
