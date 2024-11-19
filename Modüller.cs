@@ -2714,13 +2714,30 @@ namespace SLF
             // Perform file selection based on the selected data type
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
 
+            if (seçilenVeriTipi == "İmar Verileri")
+            {
+                using (imarFileSelectionPopup fileSelectionPopup = new imarFileSelectionPopup())
+                {
+                    if (fileSelectionPopup.ShowDialog() == DialogResult.OK)
+                    {
+                        // Get file paths from the popup
+                        string csvFilePath = fileSelectionPopup.CsvFilePath;
+                        string kmlFilePath = fileSelectionPopup.KmlFilePath;
+
+                        if (!File.Exists(csvFilePath) || !File.Exists(kmlFilePath))
+                        {
+                            MessageBox.Show("Geçerli dosyalar seçilmedi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                    }
+                }
+            }
             // Ensure girdiModülü is properly initialized
             if (!girdiModülleri.ContainsKey(seçilenVeriTipi))
             {
                 MessageBox.Show("Geçersiz veri tipi seçildi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return; // Exit if the selected data type is not valid
             }
-
             // Use the selectedMethod here
             if (selectedMethod == "ELF (Ekonometrik)")
             {
@@ -2744,7 +2761,7 @@ namespace SLF
             girdiModülü.SlfEndYear = slfEndYear;
 
             InitializeComboBoxes(); // yılların guncellenmesi 
-            // Check if "ELF" is selected to skip prerequisites
+                                    // Check if "ELF" is selected to skip prerequisites
             bool skipPrerequisites = (selectedMethod == "ELF (Ekonometrik)");
 
             // Call VEERProcess with skipPrerequisites flag
@@ -2758,13 +2775,8 @@ namespace SLF
                 dataGridView_girdi.DataSource = girdiModülü.CurrentDataTable;
 
 
-
             }
         }
-
-      
-
-
         private void gMapControl_stokastik_OnMarkerClick(GMapMarker item, MouseEventArgs e)
         {
             if (item.Tag != null && item.Tag is NoktaVeri && Modül_Tabları.SelectedTab == tab_stokastik)
