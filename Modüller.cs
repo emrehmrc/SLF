@@ -2668,7 +2668,7 @@ namespace SLF
                         Boylam = Math.Round(pointClick.Lng, 4)
                     };
 
-                    using (ChargingStationPopupForm popupForm = new ChargingStationPopupForm(dataGridView1.DataSource as DataTable, noktaVeri_marker))
+                    using (EAChargingStationPopupForm popupForm = new EAChargingStationPopupForm(dataGridView1.DataSource as DataTable, noktaVeri_marker))
                     {
                         if (popupForm.ShowDialog() == DialogResult.OK)
                         {
@@ -4323,7 +4323,7 @@ namespace SLF
 
             if (seçilenVeriTipi == "İmar Verileri")
             {
-                using (FileSelectionPopup fileSelectionPopup = new FileSelectionPopup())
+                using (imarFileSelectionPopup fileSelectionPopup = new imarFileSelectionPopup())
                 {
                     if (fileSelectionPopup.ShowDialog() == DialogResult.OK)
                     {

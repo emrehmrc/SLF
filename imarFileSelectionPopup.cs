@@ -6,12 +6,12 @@ using System.Windows.Forms;
 
 namespace SLF
 {
-    public partial class FileSelectionPopup : Form
+    public partial class imarFileSelectionPopup : Form
     {
         public string CsvFilePath { get; private set; }
         public string KmlFilePath { get; private set; }
 
-        public FileSelectionPopup()
+        public imarFileSelectionPopup()
         {
             InitializeComponent();
         }

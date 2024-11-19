@@ -572,11 +572,11 @@
     <Compile Include="Ana_Menü.Designer.cs">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
     </Compile>
-    <Compile Include="ChargingStationPopupForm.cs">
+    <Compile Include="EAChargingStationPopupForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ChargingStationPopupForm.Designer.cs">
-      <DependentUpon>ChargingStationPopupForm.cs</DependentUpon>
+    <Compile Include="EAChargingStationPopupForm.Designer.cs">
+      <DependentUpon>EAChargingStationPopupForm.cs</DependentUpon>
     </Compile>
     <Compile Include="CsvHandler.cs" />
     <Compile Include="DEKCenterPopupForm.cs">
@@ -586,11 +586,11 @@
       <DependentUpon>DEKCenterPopupForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ExcelExporter.cs" />
-    <Compile Include="FileSelectionPopup.cs">
+    <Compile Include="imarFileSelectionPopup.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FileSelectionPopup.Designer.cs">
-      <DependentUpon>FileSelectionPopup.cs</DependentUpon>
+    <Compile Include="imarFileSelectionPopup.Designer.cs">
+      <DependentUpon>imarFileSelectionPopup.cs</DependentUpon>
     </Compile>
     <Compile Include="MethodForm.cs">
       <SubType>Form</SubType>
@@ -692,14 +692,14 @@
     <EmbeddedResource Include="Attribute_Table.resx">
       <DependentUpon>Attribute_Table.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ChargingStationPopupForm.resx">
-      <DependentUpon>ChargingStationPopupForm.cs</DependentUpon>
+    <EmbeddedResource Include="EAChargingStationPopupForm.resx">
+      <DependentUpon>EAChargingStationPopupForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DEKCenterPopupForm.resx">
       <DependentUpon>DEKCenterPopupForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FileSelectionPopup.resx">
-      <DependentUpon>FileSelectionPopup.cs</DependentUpon>
+    <EmbeddedResource Include="imarFileSelectionPopup.resx">
+      <DependentUpon>imarFileSelectionPopup.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Fonksiyon Oluştur.resx">
       <DependentUpon>Fonksiyon Oluştur.cs</DependentUpon>

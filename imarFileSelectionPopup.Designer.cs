@@ -1,6 +1,6 @@
 ﻿namespace SLF
 {
-    partial class FileSelectionPopup
+    partial class imarFileSelectionPopup
     {
         /// <summary>
         /// Required designer variable.
