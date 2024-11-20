@@ -871,9 +871,6 @@ namespace SLF
 
 
 
-
-
-
         /*        private void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e) 
                 {
                     try
