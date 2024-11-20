@@ -8,7 +8,7 @@ using static SLF.ModülFormu;
 
 namespace SLF
 {
-    public partial class ChargingStationPopupForm : Form
+    public partial class EAChargingStationPopupForm : Form
     {
         private readonly DataTable dataTable;
         private bool isOperationCancelled = true;
@@ -17,7 +17,7 @@ namespace SLF
         private readonly List<string> acPowers = new List<string> { "3,7 kW", "7,4 kW", "11 kW", "22 kW" };
         private readonly List<string> dcPowers = new List<string> { "50 kW", "100 kW", "150 kW"};
 
-        public ChargingStationPopupForm(DataTable existingDataTable, NoktaVeri veri)
+        public EAChargingStationPopupForm(DataTable existingDataTable, NoktaVeri veri)
         {
             InitializeComponent();
             dataTable = existingDataTable;

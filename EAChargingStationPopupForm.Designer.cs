@@ -1,6 +1,6 @@
 ﻿namespace SLF
 {
-    partial class ChargingStationPopupForm
+    partial class EAChargingStationPopupForm
     {
         /// <summary>
         /// Required designer variable.
@@ -32,7 +32,7 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ChargingStationPopupForm));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EAChargingStationPopupForm));
             this.ChargingStationDataGridView = new Guna.UI2.WinForms.Guna2DataGridView();
             this.ChargingStationpanel = new System.Windows.Forms.Panel();
             this.ChargingStationpanel2 = new System.Windows.Forms.Panel();
