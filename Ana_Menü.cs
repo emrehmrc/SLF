@@ -20,29 +20,54 @@ namespace SLF
         {
             InitializeComponent();
             this.DoubleBuffered = true;
+
+            // Set the Enter key to trigger the StartButton click event
+            this.AcceptButton = StartButton;
+
+            // Ensure StartButton has focus when the form is shown
+            this.Shown += HomePageForm_Shown;
         }
 
+        private void HomePageForm_Shown(object sender, EventArgs e)
+        {
+            StartButton.Focus();
+        }
 
         private void StartButton_Click(object sender, EventArgs e)
         {
-            MethodForm optionForm = new MethodForm();
-            //this.Hide();
+            Console.WriteLine("StartButton clicked");
+            MethodForm optionForm = new MethodForm(this);
             optionForm.ShowDialog();
             this.Show();
-
         }
+
         private void roundButton2_Click(object sender, EventArgs e)
         {
+            Console.WriteLine("roundButton2 clicked");
             Yardım yardım_formu = new Yardım();
             yardım_formu.Show();
         }
 
         private void roundButton1_Click(object sender, EventArgs e)
         {
+            Console.WriteLine("roundButton1 clicked");
             mod2 = new Hakkında();
             mod2.Tag = this;
             mod2.Show();
             this.Hide();
         }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            // Check if Enter key is pressed
+            if (keyData == Keys.Enter)
+            {
+                // Trigger StartButton's Click event
+                StartButton.PerformClick();
+                return true; // Mark the key as handled
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
     }
+
 }

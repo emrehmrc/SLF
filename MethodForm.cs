@@ -15,11 +15,13 @@ namespace SLF
     {
         public ModülFormu mod1;
         public string selectedMethod { get; private set; }
+        private HomePageForm homePageForm; // Reference to HomePageForm
 
-        public MethodForm()
+        public MethodForm(HomePageForm homePageForm)
         {
             InitializeComponent();
             this.DoubleBuffered = true;
+            this.homePageForm = homePageForm; // Store the reference
         }
 
         private void ForwardButton_Click(object sender, EventArgs e)
@@ -38,11 +40,17 @@ namespace SLF
         private void OpenModülFormuBasedOnSelection(string method)
         {
             mod1 = new ModülFormu(method);  // Pass selectedMethod to ModülFormu
-            this.Hide();  // Hide current form
-            mod1.ShowDialog();  // Show the new form as a dialog
-            this.Show();  // Show current form again after new form is closed
-        }
 
+            // Hide both forms
+            this.Hide();  // Hide MethodForm
+            homePageForm.Hide();  // Hide HomePageForm
+
+            mod1.ShowDialog();  // Show the new form as a dialog
+
+            // Optionally, you can show both forms again if needed
+            this.Show();  // Show MethodForm again after ModülFormu is closed
+            homePageForm.Show(); // Show HomePageForm again if it needs to be visible
+        }
 
         private void MethodPanel_Paint(object sender, PaintEventArgs e)
         {
@@ -50,5 +58,45 @@ namespace SLF
             this.DoubleBuffered = true;
         }
     }
-}
 
+    /*    public partial class MethodForm : Form
+        {
+            public ModülFormu mod1;
+            public string selectedMethod { get; private set; }
+
+            public MethodForm()
+            {
+                InitializeComponent();
+                this.DoubleBuffered = true;
+            }
+
+            private void ForwardButton_Click(object sender, EventArgs e)
+            {
+                if (MethodComboBox.SelectedItem != null)
+                {
+                    selectedMethod = MethodComboBox.SelectedItem.ToString();
+                    OpenModülFormuBasedOnSelection(selectedMethod);
+
+                }
+                else
+                {
+                    MessageBox.Show("Please select an option from the ComboBox.");
+                }
+            }
+
+            private void OpenModülFormuBasedOnSelection(string method)
+            {
+                mod1 = new ModülFormu(method);  // Pass selectedMethod to ModülFormu
+                this.Hide();  // Hide current form
+                mod1.ShowDialog();  // Show the new form as a dialog
+                this.Show();  // Show current form again after new form is closed
+            }
+
+
+            private void MethodPanel_Paint(object sender, PaintEventArgs e)
+            {
+                MethodPanel.BackColor = Color.FromArgb(100, 0, 0, 0);
+                this.DoubleBuffered = true;
+            }
+        }*/
+}

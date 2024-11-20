@@ -580,6 +580,9 @@
       <DependentUpon>ChargingStationPopupForm.cs</DependentUpon>
     </Compile>
     <Compile Include="CsvHandler.cs" />
+    <Compile Include="CustomButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DEKCenterPopupForm.cs">
       <SubType>Form</SubType>
     </Compile>

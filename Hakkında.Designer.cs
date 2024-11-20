@@ -35,9 +35,10 @@
             // button2
             // 
             this.button2.BackColor = System.Drawing.Color.White;
-            this.button2.Location = new System.Drawing.Point(12, 3);
+            this.button2.Location = new System.Drawing.Point(9, 2);
+            this.button2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(113, 47);
+            this.button2.Size = new System.Drawing.Size(85, 38);
             this.button2.TabIndex = 5;
             this.button2.Text = "Ana Sayfa";
             this.button2.UseVisualStyleBackColor = false;
@@ -45,16 +46,18 @@
             // 
             // Hakkında
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.ClientSize = new System.Drawing.Size(1052, 616);
+            this.ClientSize = new System.Drawing.Size(789, 500);
             this.ControlBox = false;
             this.Controls.Add(this.button2);
             this.DoubleBuffered = true;
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "Hakkında";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Hakkında";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Hakkında_FormClosed);
             this.ResumeLayout(false);
