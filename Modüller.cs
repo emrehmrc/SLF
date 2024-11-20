@@ -2302,67 +2302,48 @@ namespace SLF
 
 
         public void OnMapClickEventi(PointLatLng pointClick, MouseEventArgs e, GMapOverlay markerOverlay,
-                ref List<PointLatLng> polygonPoints, ref GMapOverlay polygonOverlay,
-                System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
+         ref List<PointLatLng> polygonPoints, ref GMapOverlay polygonOverlay,
+        System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
         {
-            if (e.Button == MouseButtons.Left)
+            if (e.Button == MouseButtons.Left && isSelecting_polygon)
             {
-                // boolean control for marker selection when clicking on the map
-                if (isSelecting_marker)
-                {
-                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
-                    markerOverlay.Markers.Add(marker);
+                // Yeni bir nokta ekle
+                polygonPoints.Add(pointClick);
 
-                    NoktaVeri noktaVeri_marker = new NoktaVeri
+                // Mevcut markerları temizle ve yeniden çiz
+                markerOverlay.Markers.Clear();
+
+                // Sadece kullanıcının eklediği noktaları göster
+                foreach (var point in polygonPoints)
+                {
+                    GMarkerGoogle marker = new GMarkerGoogle(point, GMarkerGoogleType.blue);
+                    markerOverlay.Markers.Add(marker);
+                }
+
+                // En az 3 nokta varsa poligon çiz
+                if (polygonPoints.Count >= 3)
+                {
+                    polygonOverlay.Polygons.Clear();
+
+                    GMapPolygon polygon = new GMapPolygon(polygonPoints, "Polygon")
                     {
-                        Enlem = Math.Round(pointClick.Lat, 4),
-                        Boylam = Math.Round(pointClick.Lng, 4)
+                        Fill = new SolidBrush(Color.FromArgb(50, Color.Red)),
+                        Stroke = new Pen(Color.Red, 2),
+                        IsVisible = true
                     };
 
-                    marker.Tag = noktaVeri_marker;
+                    polygonOverlay.Polygons.Add(polygon);
 
+                    // Alan hesapla
+                    double area = cbs.CalculatePolygonArea(polygonPoints);
+                    mesafe.Visible = true;
+                    mesafe.Text = "Seçili Alan: " + Math.Round(area, 0).ToString() + " m²";
                 }
-
-                // boolean control for polygon selection when clicking on the map
-                if (isSelecting_polygon)
-                {
-                    polygonPoints.Add(pointClick);
-                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
-                    markerOverlay.Markers.Add(marker);
-
-                    if (polygonOverlay != null)
-                    {
-                        cbs.GetActiveGMapControl().Overlays.Remove(polygonOverlay);
-                    }
-
-                    layer_index = Array.FindIndex(cbs.tüm_katmanlar_array, s => s == null);
-
-                    if (layer_index == -1)
-                    {
-                        MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
-                        return;
-                    }
-
-                    polygonOverlay = new GMapOverlay("polygonOverlay_" + layer_index.ToString());
-
-                    cbs.GetActiveGMapControl().Overlays.Add(polygonOverlay);
-
-                    // eğer gmapControl_OnMapClick event'i ile 2 den fazla nokta seçilirse,
-                    // bu noktalar arasında bir poligon çiz
-                    if (polygonPoints.Count >= 3)
-                    {
-                        cbs.Draw_Polygon(polygonPoints, polygonOverlay, cbs.GetActiveGMapControl());
-                        double area = cbs.CalculatePolygonArea(polygonPoints);
-
-                        mesafe_metre.Visible = false;
-                        mesafe.Visible = true;
-                        mesafe.Text = "Seçili Alan: " + Math.Round(area, 0).ToString() + " m²";
-                    }
-                }
-                cbs.GetActiveGMapControl().Refresh();
             }
-
         }
+
+        // Kaydet butonuna tıklandığında çağrılacak metod
+
 
         private void gMapControl_imar_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
@@ -2501,57 +2482,95 @@ namespace SLF
         }
 
         public void PoligonKaydetEventi(object sender, EventArgs e, GMapOverlay polygonOverlay,
-            GMapOverlay markerOverlay, List<PointLatLng> polygonPoints,
-            System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
+    GMapOverlay markerOverlay, List<PointLatLng> polygonPoints,
+    System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
         {
-            if (polygonOverlay != null && polygonOverlay.Polygons.Count != 0)
+            if (polygonPoints.Count >= 3)
             {
-                markerOverlay.Markers.Clear();
-
-                layer_index = Array.FindIndex(cbs.tüm_katmanlar_array, s => s == null);
-                GMapOverlay overlay_to_be_saved = polygonOverlay;
-                cbs.tüm_katmanlar_array[layer_index] = overlay_to_be_saved;
-                cbs.tüm_katmanlar_array_names[layer_index] = "Polygon_" + "_" + (layer_index + 1).ToString();
-
-                // Convert gridOverlay to MapWinGIS.Shapefile so that it could be exported by the MapWinGIS
-                // built-in function SaveAsEx
-                MapWinGIS.Shapefile myShapefile = cbs.ConvertOverlayToShapefile(overlay_to_be_saved);
-                cbs.shapeFileArray_MapWinGIS[layer_index] = myShapefile;
-
-                // Create DataTable and store it
-                DataTable polygonDataTable = cbs.CreatePolygonDataTable(polygonPoints, layer_index);
-                cbs.tüm_katmanlar_datatable[layer_index] = polygonDataTable;
-
-                // Get the list of associated checkboxes for the given layer_index
-                List<System.Windows.Forms.CheckBox> associatedCheckBoxes = GetCheckBoxesByIndex(layer_index);
-
-                if (associatedCheckBoxes != null)
+                try
                 {
-                    // Loop through each checkbox in the list and apply the required settings
-                    foreach (var checkBox in associatedCheckBoxes)
+                    layer_index = Array.FindIndex(cbs.tüm_katmanlar_array, s => s == null);
+
+                    if (layer_index == -1)
                     {
-                        checkBox.Checked = true;
-                        checkBox.Visible = true;
-                        checkBox.Text = cbs.tüm_katmanlar_array_names[layer_index];
+                        MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
+                        return;
                     }
+
+                    // Yeni overlay oluştur
+                    GMapOverlay newOverlay = new GMapOverlay($"Polygon_{layer_index + 1}");
+
+                    // Önce markerları ekle
+                    foreach (var point in polygonPoints)
+                    {
+                        GMarkerGoogle marker = new GMarkerGoogle(point, GMarkerGoogleType.blue);
+                        newOverlay.Markers.Add(marker);
+                    }
+
+                    // Sonra poligonu ekle
+                    GMapPolygon polygon = new GMapPolygon(new List<PointLatLng>(polygonPoints), $"Polygon_{layer_index + 1}")
+                    {
+                        Fill = new SolidBrush(Color.FromArgb(50, Color.Red)),
+                        Stroke = new Pen(Color.Red, 2)
+                    };
+
+                    newOverlay.Polygons.Add(polygon);
+
+                    // Haritaya ekle
+                    cbs.GetActiveGMapControl().Overlays.Add(newOverlay);
+                    cbs.tüm_katmanlar_array[layer_index] = newOverlay;
+                    cbs.tüm_katmanlar_array_names[layer_index] = "Polygon_" + (layer_index + 1).ToString();
+
+                    // Shapefile işlemleri
+                    MapWinGIS.Shapefile myShapefile = cbs.ConvertOverlayToShapefile(newOverlay);
+                    cbs.shapeFileArray_MapWinGIS[layer_index] = myShapefile;
+
+                    // DataTable işlemleri
+                    DataTable polygonDataTable = cbs.CreatePolygonDataTable(polygonPoints, layer_index);
+                    cbs.tüm_katmanlar_datatable[layer_index] = polygonDataTable;
+
+                    // Checkbox güncelleme
+                    UpdateCheckboxes(layer_index);
+
+                    // Temizlik
+                    polygonOverlay.Polygons.Clear();
+                    markerOverlay.Markers.Clear();
+                    polygonPoints.Clear();
+
+                    mesafe.Visible = false;
+                    mesafe_metre.Visible = false;
+                    isSelecting_polygon = false;
+
+                    // Haritayı yenile
+                    cbs.GetActiveGMapControl().Zoom = cbs.GetActiveGMapControl().Zoom;
+                    cbs.GetActiveGMapControl().Invalidate();
+
+                    MessageBox.Show("Poligon kaydedildi.");
                 }
-
-                MessageBox.Show("Poligon kaydedildi.");
-                mesafe.Visible = false;
-                mesafe_metre.Visible = false;
-                isSelecting_polygon = false;
-
-                // Prepare a new overlay for future use
-                polygonOverlay = null;
-                polygonPoints.Clear();
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Poligon kaydedilirken hata oluştu: {ex.Message}");
+                }
             }
             else
             {
-                MessageBox.Show("Herhangi bir poligon çizilmemiştir. Lütfen öncelikle bir poligon çiziniz.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show("Geçerli bir poligon çizilmemiştir. En az 3 nokta gereklidir.");
             }
         }
 
-
+        private void UpdateCheckboxes(int layerIndex)
+        {
+            List<System.Windows.Forms.CheckBox> associatedCheckBoxes = GetCheckBoxesByIndex(layerIndex);
+            if (associatedCheckBoxes != null)
+            {
+                foreach (var checkBox in associatedCheckBoxes)
+                {
+                    checkBox.Checked = true;
+                    checkBox.Visible = true;
+                    checkBox.Text = cbs.tüm_katmanlar_array_names[layerIndex];
+                }
+            }
+        }
         private void Poligon_Kaydet_Click(object sender, EventArgs e)
         {
             if (cbs.GetActiveGMapControl() == gMapControl_imar)
@@ -4192,8 +4211,7 @@ namespace SLF
 
         }
 
-       
-
+        
         private void İmar_Poligon_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
