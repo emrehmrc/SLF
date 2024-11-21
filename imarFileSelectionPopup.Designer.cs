@@ -138,6 +138,7 @@
             // 
             // OkButton
             // 
+
             this.OkButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.OkButton.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.OkButton.BorderColor = System.Drawing.Color.PaleVioletRed;
@@ -184,7 +185,7 @@
         private System.Windows.Forms.Button SelectCsvButton;
         private System.Windows.Forms.Button SelectKmlButton;
         private System.Windows.Forms.Panel imarFileSelectionPanel;
-        private CustomButton OkButton;
+        private SLF.CustomButton OkButton;
         private System.Windows.Forms.ComboBox imarMethodSelectionComboBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel imarCitySelectionPanel;

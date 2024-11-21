@@ -346,8 +346,8 @@
         private System.Windows.Forms.TabPage Onizleme_Statistics;
         private System.Windows.Forms.DataGridView Onizleme_dataGrid5;
         private System.Windows.Forms.ImageList imageList1;
-        private CustomButton buton_ÇIK;
-        private CustomButton buton_İlerle;
-        private CustomButton buton_YUKLE;
+        private SLF.CustomButton buton_ÇIK;
+        private SLF.CustomButton buton_İlerle;
+        private SLF.CustomButton buton_YUKLE;
     }
 }
