@@ -810,7 +810,11 @@
     <None Include="Pictures\Exterior1.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Pictures\KML2.ico" />
+    <None Include="Pictures\KML2.png" />
     <None Include="Pictures\Done.png" />
+    <None Include="Pictures\CSV2.png" />
+    <None Include="Pictures\CSV2.ico" />
     <Content Include="Pictures\Home3.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
