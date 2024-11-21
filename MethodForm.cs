@@ -22,6 +22,17 @@ namespace SLF
             InitializeComponent();
             this.DoubleBuffered = true;
             this.homePageForm = homePageForm; // Store the reference
+
+            // Set the Enter key to trigger the ForwardButton click event
+            this.AcceptButton = ForwardButton;
+
+            // Ensure ForwardButton has focus when the form is shown
+            this.Shown += MethodForm_Shown;
+        }
+
+        private void MethodForm_Shown(object sender, EventArgs e)
+        {
+            ForwardButton.Focus();
         }
 
         private void ForwardButton_Click(object sender, EventArgs e)
@@ -33,7 +44,7 @@ namespace SLF
             }
             else
             {
-                MessageBox.Show("Please select an option from the ComboBox.");
+                MessageBox.Show("İlerlemek için bir metot seçiniz");
             }
         }
 
@@ -57,46 +68,17 @@ namespace SLF
             MethodPanel.BackColor = Color.FromArgb(100, 0, 0, 0);
             this.DoubleBuffered = true;
         }
-    }
 
-    /*    public partial class MethodForm : Form
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            public ModülFormu mod1;
-            public string selectedMethod { get; private set; }
-
-            public MethodForm()
+            // Check if Enter key is pressed
+            if (keyData == Keys.Enter)
             {
-                InitializeComponent();
-                this.DoubleBuffered = true;
+                // Trigger ForwardButton's Click event
+                ForwardButton.PerformClick();
+                return true; // Mark the key as handled
             }
-
-            private void ForwardButton_Click(object sender, EventArgs e)
-            {
-                if (MethodComboBox.SelectedItem != null)
-                {
-                    selectedMethod = MethodComboBox.SelectedItem.ToString();
-                    OpenModülFormuBasedOnSelection(selectedMethod);
-
-                }
-                else
-                {
-                    MessageBox.Show("Please select an option from the ComboBox.");
-                }
-            }
-
-            private void OpenModülFormuBasedOnSelection(string method)
-            {
-                mod1 = new ModülFormu(method);  // Pass selectedMethod to ModülFormu
-                this.Hide();  // Hide current form
-                mod1.ShowDialog();  // Show the new form as a dialog
-                this.Show();  // Show current form again after new form is closed
-            }
-
-
-            private void MethodPanel_Paint(object sender, PaintEventArgs e)
-            {
-                MethodPanel.BackColor = Color.FromArgb(100, 0, 0, 0);
-                this.DoubleBuffered = true;
-            }
-        }*/
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+    }
 }
