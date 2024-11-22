@@ -47,7 +47,9 @@ namespace SLF
             { "Eskişehir", new PointLatLng(39.7768, 30.5206) }, // Example coordinates for Eskişehir
             // Add more cities and their coordinates as needed
         };
-
+        private bool aboneVerisiYuklendi = false;
+        private bool dtrVerisiYuklendi = false;
+        private bool eaVerisiYuklendi = false;
 
         // form objeleri
         public HomePageForm gir1;
@@ -167,10 +169,10 @@ namespace SLF
         private void Form1_Load()
         {
             // Başlangıçta butonu devre dışı bırak
-            
-                GelecekSimButton.Enabled = false;
-                DEKSimButton.Enabled = false;
-            
+
+            GelecekSimButton.Enabled = false;
+            DEKSimButton.Enabled = false;
+
             // Checkbox'ları başlangıçta görünmez yap
             checkBox_AC_Public.Visible = false;
             checkBox_AC_Work.Visible = false;
@@ -188,7 +190,7 @@ namespace SLF
             // ComboBox olaylarını bağla
             comboBox_ea_yıl_secimi.SelectedIndexChanged += yilSecimiMonteCarlo;
             comboBox_ea_il_secimi.SelectedIndexChanged += ilSecimiMonteCarlo;
-            
+
             // İlk durumda tüm marker'ları göster
             ToggleMarkers("AC-HOME", checkBox_imar_9.Checked);
             ToggleMarkers("AC-WORK", checkBox_imar_10.Checked);
@@ -310,7 +312,7 @@ namespace SLF
             }
             comboBox_ea_yıl_secimi.DataSource = yearList; // Yıl seçimi için ComboBox1
             comboBox_DEK_Yıl.DataSource = yearList; // DEK yılı seçimi için ComboBox3
-                                             // Şehir isimlerini ComboBox2'ye ekleyin
+                                                    // Şehir isimlerini ComboBox2'ye ekleyin
             comboBox_DEK_il.Items.Clear(); // dek
             comboBox_ea_il_secimi.Items.Clear();   // ea 
             comboBox_ea_il_secimi.Items.Add("İzmir");
@@ -346,7 +348,7 @@ namespace SLF
             // Add overlays to the maps
             gMapControl_stokastik.Overlays.Add(rulerOverlay_stokastik);
             gMapControl_stokastik.Overlays.Add(markerOverlay_stokastik);
-            
+
             checkboxes_init();
             gMapControl_DEK.Overlays.Add(rulerOverlay_DEK);
             gMapControl_DEK.Overlays.Add(markerOverlay_DEK);
@@ -356,8 +358,8 @@ namespace SLF
             gMapControl_EA.Overlays.Add(rulerOverlay_ea);
             gMapControl_EA.Overlays.Add(markerOverlay_ea);
             gMapControl_EA.Overlays.Add(polygonOverlay_ea);
-            
-            
+
+
 
             gMapControl_yuk.Overlays.Add(rulerOverlay_yuk);
             gMapControl_yuk.Overlays.Add(markerOverlay_yuk);
@@ -625,7 +627,7 @@ namespace SLF
                     // Load sheets 2 to 6 into respective DataGridViews
                     for (int i = 1; i <= 5; i++)
                     {
-                        
+
                         var worksheet = package.Workbook.Worksheets[i];
                         DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
 
@@ -955,7 +957,7 @@ namespace SLF
         }
 
         // Method to load results into tab_ekonometrik
-        
+
 
         // Helper method to load data from an Excel worksheet into a DataGridView
         private void LoadWorksheetToDataGridView(ExcelWorksheet worksheet, DataGridView dataGridView)
@@ -1268,7 +1270,7 @@ namespace SLF
 
         }
 
-       
+
 
 
         private void gMapControl_Dek_OnMarkerClick(GMapMarker item, MouseEventArgs e)
@@ -1661,35 +1663,137 @@ namespace SLF
 
         private void temizleToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
-            ToolStripMenuItem delete_menu_item = sender as ToolStripMenuItem;
-
-            if (delete_menu_item != null)
+            try
             {
-                System.Windows.Forms.CheckBox checkBox = delete_menu_item.Tag as System.Windows.Forms.CheckBox;
-                int checkbox_index = int.Parse(checkBox.Tag.ToString()) - 1;
+                var delete_menu_item = sender as ToolStripMenuItem;
+                if (delete_menu_item?.Tag == null) return;
 
+                var checkBox = delete_menu_item.Tag as System.Windows.Forms.CheckBox;
+                if (checkBox?.Tag == null) return;
+
+                if (!int.TryParse(checkBox.Tag.ToString(), out int checkbox_index))
+                {
+                    MessageBox.Show("Geçersiz katman indeksi.");
+                    return;
+                }
+
+                checkbox_index -= 1;
+
+                if (checkbox_index < 0 || checkbox_index >= cbs.tüm_katmanlar_array.Length)
+                {
+                    MessageBox.Show("Katman indeksi sınırlar dışında.");
+                    return;
+                }
+
+                var katman = cbs.tüm_katmanlar_array[checkbox_index];
+                if (katman == null) return;
+
+                string katman_ismi = cbs.tüm_katmanlar_array_names[checkbox_index] ?? "Bilinmeyen";
+
+                var temizle_result = MessageBox.Show(
+                    $"{katman_ismi} isimli katman silinecektir. Emin misiniz?",
+                    "Katman Silme",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (temizle_result != DialogResult.Yes) return;
+
+                var mapControl = cbs.GetActiveGMapControl();
+                if (mapControl == null)
+                {
+                    MessageBox.Show("Harita kontrolü bulunamadı.");
+                    return;
+                }
+
+                if (mapControl.InvokeRequired)
+                {
+                    mapControl.Invoke(new Action(() => KatmanıTemizle(mapControl, checkbox_index, checkBox)));
+                    Console.WriteLine("temizle-fonk");
+                }
+                else
+                {
+                    KatmanıTemizle(mapControl, checkbox_index, checkBox);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Katman silinirken hata oluştu: {ex.Message}");
+            }
+        }
+
+        private void KatmanıTemizle(GMapControl mapControl, int checkbox_index, CheckBox checkBox)
+        {
+            try
+            {
                 if (cbs.tüm_katmanlar_array[checkbox_index] != null)
                 {
-                    string katman_ismi = cbs.tüm_katmanlar_array_names[checkbox_index];
+                    var overlay = cbs.tüm_katmanlar_array[checkbox_index];
 
-                    DialogResult temizle_result = MessageBox.Show(katman_ismi + " isimli katman " +
-                        "silinecektir. Emin misiniz?", "", MessageBoxButtons.YesNo);
-
-                    if (temizle_result == DialogResult.Yes)
+                    // Önce overlay'i Overlays koleksiyonundan güvenli bir şekilde kaldır
+                    if (mapControl.Overlays.Contains(overlay))
                     {
-                        cbs.GetActiveGMapControl().Overlays.Remove(cbs.tüm_katmanlar_array[checkbox_index]);
-                        cbs.GetActiveGMapControl().Refresh();
-
-                        cbs.tüm_katmanlar_array[checkbox_index].Dispose();
-                        cbs.tüm_katmanlar_array[checkbox_index] = null;
-                        cbs.tüm_katmanlar_array_names[checkbox_index] = null;
-                        cbs.tüm_katmanlar_datatable[checkbox_index] = null;
-                        checkBox.Checked = false;
-                        checkBox.Visible = false;
-
+                        mapControl.Overlays.Remove(overlay);
                     }
+
+                    // Kaynakları temizle
+                    using (overlay)
+                    {
+                        // Overlay içindeki tüm markerları temizle
+                        if (overlay.Markers != null)
+                        {
+                            foreach (var marker in overlay.Markers.ToList())
+                            {
+                                marker.Dispose();
+                            }
+                            overlay.Markers.Clear();
+                        }
+
+                        // Overlay içindeki tüm routes'ları temizle
+                        if (overlay.Routes != null)
+                        {
+                            foreach (var route in overlay.Routes.ToList())
+                            {
+                                route.Dispose();
+                            }
+                            overlay.Routes.Clear();
+                        }
+
+                        // Overlay içindeki tüm polygonları temizle
+                        if (overlay.Polygons != null)
+                        {
+                            foreach (var polygon in overlay.Polygons.ToList())
+                            {
+                                polygon.Dispose();
+                            }
+                            overlay.Polygons.Clear();
+                        }
+                    }
+
+                    // Arrays'i temizle
+                    cbs.tüm_katmanlar_array[checkbox_index] = null;
+                    cbs.tüm_katmanlar_array_names[checkbox_index] = null;
+
+                    if (cbs.tüm_katmanlar_datatable[checkbox_index] != null)
+                    {
+                        cbs.tüm_katmanlar_datatable[checkbox_index].Dispose();
+                        cbs.tüm_katmanlar_datatable[checkbox_index] = null;
+                    }
+
+                    // UI elemanlarını güncelle
+                    checkBox.Checked = false;
+                    checkBox.Visible = false;
+
+                    // Haritayı yenile
+                    mapControl.Refresh();
+
+                    // Belleği temizle
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Katman temizlenirken hata oluştu: {ex.Message}");
             }
         }
 
@@ -2352,10 +2456,10 @@ namespace SLF
         }
 
         private void gMapControl_stokastik_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
-        {       
+        {
             OnMapClickEventi(pointClick, e, markerOverlay_stokastik, ref polygonPoints_stokastik,
                 ref polygonOverlay_stokastik, Mesafe_stokastik, mesafe_metre_stokastik);
-            
+
         }
 
         private void gMapControl_yuk_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
@@ -2371,10 +2475,10 @@ namespace SLF
 
             OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
                 ref polygonOverlay_ea, Mesafe_yuk, mesafe_metre_yuk);
-            
+
             if (isAddingChargingStation)
             {
-                
+
 
                 // Marker Overlay'in haritaya eklenip eklenmediğini kontrol et
                 if (!gMapControl_EA.Overlays.Contains(markerOverlay_ea))
@@ -2788,9 +2892,9 @@ namespace SLF
 
             if (isImported)
             {
-                modulescheck.Add(seçilenVeriTipi);
+               
                 veri_listesi_seçimi.Refresh();
-                Console.WriteLine(modulescheck.Count);
+                
                 dataGridView_girdi.DataSource = girdiModülü.CurrentDataTable;
 
 
@@ -2865,7 +2969,7 @@ namespace SLF
             // Reset the flag after adding the station
             isAddingDekPoint = false;
         }
-        
+
 
         /*---------------------------------------------------------------------------------------------- */
         /*----------------------------------     CUSTOM METHODS & CLASSES     -------------------------- */
@@ -2878,10 +2982,10 @@ namespace SLF
             if (e.Button == MouseButtons.Left)
             {
 
-                
+
                 if (cbs.tüm_katmanlar_array[layer_index] != null)
-                {   
-                    
+                {
+
                     foreach (var polygon in cbs.tüm_katmanlar_array[layer_index].Polygons)
                     {
                         if (cbs.IsPointInPolygon(pointClick, polygon))
@@ -2898,9 +3002,9 @@ namespace SLF
                 }
             }
         }
-
+ 
         private void gMapControl_imar_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
-        {            
+        {
             if (e.Button == MouseButtons.Left && lastClickedCheckbox != null)
             {
                 int checkbox_index = int.Parse(lastClickedCheckbox.Tag.ToString()) - 1;
@@ -3328,14 +3432,12 @@ namespace SLF
 
         private async Task eaHaritayaVeriYukleAsync()
         {
-            gMapControl_EA.Overlays.Clear();
-            gMapControl_EA.Refresh();
             int redDc = 0;
             int greenAc = 0;
 
             try
             {
-                GMapOverlay eaOverlay = new GMapOverlay("EA Layer");
+                GMapOverlay eaOverlay = new GMapOverlay("EA_Sarj_Katmanı");
 
                 if (dataGridView_girdi.DataSource == null)
                 {
@@ -3343,76 +3445,95 @@ namespace SLF
                     return;
                 }
 
-                if (gMapControl_EA.Overlays.Contains(eaOverlay))
-                {
-                    gMapControl_EA.Overlays.Remove(eaOverlay);
-                }
-
+                // Clear existing overlays
+                gMapControl_EA.Overlays.Clear();
+                gMapControl_EA.Refresh();
 
                 DataTable eaData = await Task.Run(() => GirdiModülü.dataTablesByType["EA Şarj Verileri"]);
 
                 if (eaData != null && eaData.Rows.Count > 0)
                 {
-                    greenAc = 0;  // Sayaçları sıfırla
-                    redDc = 0;
-
-                    Invoke(new Action(() =>
+                    if (!eaData.Columns.Contains("EA_X_KOORDINAT") ||
+                        !eaData.Columns.Contains("EA_Y_KOORDINAT") ||
+                        !eaData.Columns.Contains("ISTASYON_GUCU") ||
+                        !GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
                     {
-                        foreach (DataRow row in eaData.Rows)
+                        MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
+                        return;
+                    }
+
+                    foreach (DataRow row in eaData.Rows)
+                    {
+                        if (!girdiModülü.IsNullLike(row["EA_X_KOORDINAT"]) &&
+                            !girdiModülü.IsNullLike(row["EA_Y_KOORDINAT"]))
                         {
-                            if (!eaData.Columns.Contains("EA_X_KOORDINAT") ||
-                                !eaData.Columns.Contains("EA_Y_KOORDINAT") ||
-                                !eaData.Columns.Contains("ISTASYON_GUCU") &&
-                                !GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
+                            if (double.TryParse(row["EA_X_KOORDINAT"].ToString(), out double x) &&
+                                double.TryParse(row["EA_Y_KOORDINAT"].ToString(), out double y))
                             {
-                                MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
-                                return;
-                            }
-                            //Console.WriteLine(GirdiModülü.dataTablesByType);
-                            if (!girdiModülü.IsNullLike(row["EA_X_KOORDINAT"]) &&
-                                !girdiModülü.IsNullLike(row["EA_Y_KOORDINAT"]))
-                            {
-                                if (double.TryParse(row["EA_X_KOORDINAT"].ToString(), out double x) &&
-                                    double.TryParse(row["EA_Y_KOORDINAT"].ToString(), out double y))
+                                if (int.TryParse(row["ISTASYON_GUCU"].ToString(), out int istasyonGucu))
                                 {
-                                    if (int.TryParse(row["ISTASYON_GUCU"].ToString(), out int istasyonGucu))
+                                    GMarkerGoogle marker;
+
+                                    if (istasyonGucu <= 22)
                                     {
-                                        GMarkerGoogle marker;
-
-                                        if (istasyonGucu <= 22)
-                                        {
-                                            marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.green);
-                                            greenAc++;
-                                        }
-                                        else
-                                        {
-                                            marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.red);
-                                            redDc++;
-                                        }
-
-                                        if (eaData.Columns.Contains("ISTASYON_ADI") &&
-                                            !girdiModülü.IsNullLike(row["ISTASYON_ADI"]))
-                                        {
-                                            string istasyonAdi = row["ISTASYON_ADI"].ToString();
-                                            marker.ToolTipText = istasyonAdi;
-                                        }
-
-                                        eaOverlay.Markers.Add(marker);
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.green);
+                                        greenAc++;
                                     }
+                                    else
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.red);
+                                        redDc++;
+                                    }
+
+                                    if (eaData.Columns.Contains("ISTASYON_ADI") &&
+                                        !girdiModülü.IsNullLike(row["ISTASYON_ADI"]))
+                                    {
+                                        string istasyonAdi = row["ISTASYON_ADI"].ToString();
+                                        marker.ToolTipText = istasyonAdi;
+                                    }
+
+                                    eaOverlay.Markers.Add(marker);
                                 }
                             }
                         }
+                    }
 
+                    if (eaOverlay.Markers.Count > 0)
+                    {
+                        // EA haritasına ekle
                         gMapControl_EA.Overlays.Add(eaOverlay);
                         gMapControl_EA.Refresh();
 
-                        // Sayaç değerlerini sağ üst köşede göster
+                        // Ana haritaya ekle
+                        var mapControl = cbs.GetActiveGMapControl();
+                        if (mapControl != null)
+                        {
+                            // Mevcut EA katmanını kaldır
+                            for (int i = mapControl.Overlays.Count - 1; i >= 0; i--)
+                            {
+                                if (mapControl.Overlays[i].Id == "EA_Sarj_Katmanı")
+                                {
+                                    mapControl.Overlays.RemoveAt(i);
+                                }
+                            }
+
+                            GMapOverlay eaOverlayCopy = new GMapOverlay("EA_Sarj_Katmanı");
+                            foreach (var marker in eaOverlay.Markers)
+                            {
+                                var markerCopy = new GMarkerGoogle(marker.Position, ((GMarkerGoogle)marker).Type);
+                                markerCopy.ToolTipText = marker.ToolTipText;
+                                eaOverlayCopy.Markers.Add(markerCopy);
+                            }
+                            mapControl.Overlays.Add(eaOverlayCopy);
+                            mapControl.Refresh();
+                        }
+
                         calculateChargeStation(greenAc, redDc);
-                    }));
-                }
-                else
-                {
-                    MessageBox.Show("Lütfen Ea şarj noktalarını görebilmek için verilerinizi yükleyiniz.");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Lütfen EA şarj noktalarını görebilmek için verilerinizi yükleyiniz.");
+                    }
                 }
             }
             catch (Exception ex)
@@ -3424,81 +3545,98 @@ namespace SLF
         // BURASI SONRADAN AÇILACAK, SIMDILIK BOYLE KALSIN.
         private async void Modül_Tabları_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // Gerekli kontrolleri yapmak için seçilen sekmeyi ve modülleri kontrol et
             string selectedTabText = Modül_Tabları.SelectedTab.Text;
+            var mapControl = cbs.GetActiveGMapControl();
 
-            // Modüllerin yüklü olup olmadığını kontrol et
             if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
                 if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Haritası Modülü") && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
                 {
-                    // Sekme geçişini tamamen iptal et
                     MessageBox.Show("DTR verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
                     Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
                     Modül_Tabları.SelectedTab = tab_girdi;
                     Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
                     return;
                 }
-                else if (selectedTabText == "İmar Analizleri" && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")))
+            }
+
+            if (selectedTabText == "İmar Analizleri")
+            {
+                if (GirdiModülü.dataTablesByType.ContainsKey("Abone Verileri") && !aboneVerisiYuklendi)
                 {
-                    // Sekme geçişini tamamen iptal et
-                    MessageBox.Show("İmar planı verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
-                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
-                    Modül_Tabları.SelectedTab = tab_girdi;
-                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
-                    return;
+                    await aboneHaritayaVeriYukleAsync();
+                    aboneVerisiYuklendi = true;
                 }
-                else if (selectedTabText == "Optimal DTR Konumlandırma"
-       && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")
-       && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri")))
+
+                if (GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri") && !dtrVerisiYuklendi)
                 {
-                    // Sekme geçişini tamamen iptal et
-                    MessageBox.Show("DTR verileri ve İmar planı yüklenmeden bu sekmeye geçiş yapılamaz.");
-                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
-                    Modül_Tabları.SelectedTab = tab_girdi;
-                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
-                    return;
+                    await dtrHaritayaVeriYukleAsync();
+                    dtrVerisiYuklendi = true;
+                }
+
+                if (GirdiModülü.dataTablesByType.ContainsKey("EA Verileri") && !eaVerisiYuklendi)
+                {
+                    await eaHaritayaVeriYukleAsync();
+                    eaVerisiYuklendi = true;
                 }
             }
 
-            // EA Şarj Modülü tabına tıklanmışsa
             if (selectedTabText == "EA Şarj Modülü")
             {
-                if ((!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri")))
+                if (!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
                 {
                     MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
                     Modül_Tabları.SelectedTab = tab_girdi;
                     return;
                 }
-                else
+
+                bool eaSarjVerisiYuklu = false;
+                foreach (var overlay in mapControl.Overlays)
+                {
+                    if (overlay.Id == "EA_Sarj_Katmanı")
+                    {
+                        eaSarjVerisiYuklu = true;
+                        break;
+                    }
+                }
+
+                if (!eaSarjVerisiYuklu)
                 {
                     InitializeComboBoxes();
                     await eaHaritayaVeriYukleAsync();
                 }
-
-                // Harita işlemini başlat
-
-
-
-
+                else
+                {
+                    InitializeComboBoxes();
+                }
             }
-            // DEK Modülü tabına tıklanmışsa
+
             else if (selectedTabText == "DEK Modülü")
             {
-                Console.WriteLine("DEK Modülü");
                 if (!GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
                 {
                     MessageBox.Show("Lütfen DEK modülü verilerinizi yükleyin.");
                     Modül_Tabları.SelectedTab = tab_girdi;
                     return;
                 }
-                else
+
+                bool dekVerisiYuklu = false;
+                foreach (var overlay in mapControl.Overlays)
+                {
+                    if (overlay.Id == "DEK_Katmanı")
+                    {
+                        dekVerisiYuklu = true;
+                        break;
+                    }
+                }
+
+                if (!dekVerisiYuklu)
                 {
                     await dekHaritayaVeriYukleAsync();
                 }
             }
         }
-                private void buton_stokastik_harita_katmanlar_MouseClick(object sender, MouseEventArgs e)
+        private void buton_stokastik_harita_katmanlar_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
             {
@@ -3543,7 +3681,7 @@ namespace SLF
             if (!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
             {
                 MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
-                Console.WriteLine("batu");
+                
                 return;
             }
 
@@ -3573,7 +3711,138 @@ namespace SLF
             isAddingChargingStation = false;
         }
 
-      
+        private async Task aboneHaritayaVeriYukleAsync()
+        {
+            await Task.Run(() =>
+            {
+                try
+                {
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        int layerIndex = Array.FindIndex(cbs.tüm_katmanlar_array, s => s == null);
+
+                        if (layerIndex == -1)
+                        {
+                            MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
+                            return;
+                        }
+
+                        AboneVerileriniMarkerOlustur(layerIndex);
+                        UpdateCheckboxes(layerIndex);
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Abone verileri yüklenirken hata oluştu: {ex.Message}");
+                }
+            });
+        }
+        private async Task dtrHaritayaVeriYukleAsync()
+        {
+            await Task.Run(() =>
+            {
+                try
+                {
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        int layerIndex = Array.FindIndex(cbs.tüm_katmanlar_array, s => s == null);
+
+                        if (layerIndex == -1)
+                        {
+                            MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
+                            return;
+                        }
+
+                        DtrVerileriniMarkerOlustur(layerIndex);
+                        UpdateCheckboxes(layerIndex);
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"DTR verileri yüklenirken hata oluştu: {ex.Message}");
+                }
+            });
+        }
+        public void DtrVerileriniMarkerOlustur(int targetLayerIndex)
+        {
+            try
+            {
+                if (!GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
+                {
+                    MessageBox.Show("DTR Verileri bulunamadı.");
+                    return;
+                }
+
+                DataTable sourceData = GirdiModülü.dataTablesByType["DTR Verileri"];
+                GMapOverlay newOverlay = new GMapOverlay("DTR_Katmanı");
+
+                foreach (DataRow row in sourceData.Rows)
+                {
+                    try
+                    {
+                        if (!girdiModülü.IsNullLike(row["TRAFO_X_KOORDINAT"]) &&
+                            !girdiModülü.IsNullLike(row["TRAFO_Y_KOORDINAT"]))
+                        {
+                            if (double.TryParse(row["TRAFO_X_KOORDINAT"].ToString(), out double x) &&
+                                double.TryParse(row["TRAFO_Y_KOORDINAT"].ToString(), out double y))
+                            {
+                                GMarkerGoogle marker = new GMarkerGoogle(
+                                    new PointLatLng(y, x),
+                                    GMarkerGoogleType.red_dot  // DTR için farklı renk kullanıyoruz
+                                );
+
+                                if (sourceData.Columns.Contains("TRAFO_ID") &&
+                                    !girdiModülü.IsNullLike(row["TRAFO_ID"]))
+                                {
+                                    string dtrNo = row["TRAFO_ID"].ToString();
+                                    marker.ToolTipText = dtrNo;
+                                }
+
+                                newOverlay.Markers.Add(marker);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Nokta oluşturma hatası: {ex.Message}");
+                        continue;
+                    }
+                }
+
+                if (newOverlay.Markers.Count > 0)
+                {
+                    var mapControl = cbs.GetActiveGMapControl();
+                    mapControl.Overlays.Clear();
+                    mapControl.Overlays.Add(newOverlay);
+                    mapControl.MinZoom = 5;
+                    mapControl.MaxZoom = 20;
+                    mapControl.Zoom = 12;
+
+                    if (newOverlay.Markers.Count > 0)
+                    {
+                        var firstMarker = newOverlay.Markers[0];
+                        mapControl.Position = firstMarker.Position;
+                    }
+
+                    mapControl.Refresh();
+
+                    cbs.tüm_katmanlar_array[targetLayerIndex] = newOverlay;
+                    cbs.tüm_katmanlar_array_names[targetLayerIndex] = "DTR_" + (targetLayerIndex + 1).ToString();
+                    cbs.tüm_katmanlar_datatable[targetLayerIndex] = sourceData.Copy();
+
+                    MessageBox.Show($"Toplam {newOverlay.Markers.Count} adet DTR noktası eklendi.");
+                }
+                else
+                {
+                    MessageBox.Show("Geçerli DTR koordinat verisi bulunamadı.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"DTR verileri işlenirken hata: {ex.Message}");
+            }
+        }
+
         private async void gelecekSimilasyonGoruntule(object sender, EventArgs e)
         {
             // Checkbox'ları görünür hale getir
@@ -3842,7 +4111,101 @@ namespace SLF
             return Task.CompletedTask;
         }
 
+        public void AboneVerileriniMarkerOlustur(int targetLayerIndex)
+        {
+            try
+            {
+                if (!GirdiModülü.dataTablesByType.ContainsKey("Abone Verileri"))
+                {
+                    MessageBox.Show("Abone Verileri bulunamadı.");
+                    return;
+                }
 
+                DataTable sourceData = GirdiModülü.dataTablesByType["Abone Verileri"];
+                GMapOverlay newOverlay = new GMapOverlay("Abone Katmanı");
+
+                foreach (DataRow row in sourceData.Rows)
+                {
+                    try
+                    {
+                        if (!girdiModülü.IsNullLike(row["ABONE_X_KOORDINAT"]) &&
+                            !girdiModülü.IsNullLike(row["ABONE_Y_KOORDINAT"]))
+                        {
+                            if (double.TryParse(row["ABONE_X_KOORDINAT"].ToString(), out double x) &&
+                                double.TryParse(row["ABONE_Y_KOORDINAT"].ToString(), out double y))
+                            {
+                                GMarkerGoogle marker = new GMarkerGoogle(
+                                    new PointLatLng(y, x),
+                                    GMarkerGoogleType.blue_dot
+                                );
+
+                                if (sourceData.Columns.Contains("ABONE_NO") &&
+                                    !girdiModülü.IsNullLike(row["ABONE_NO"]))
+                                {
+                                    string aboneNo = row["ABONE_NO"].ToString();
+                                    marker.ToolTipText = aboneNo;
+                                }
+
+                                newOverlay.Markers.Add(marker);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Nokta oluşturma hatası: {ex.Message}");
+                        continue;
+                    }
+                }
+
+                if (newOverlay.Markers.Count > 0)
+                {
+                    var mapControl = cbs.GetActiveGMapControl();
+
+                    // Mevcut abone katmanını kaldır
+                    for (int i = mapControl.Overlays.Count - 1; i >= 0; i--)
+                    {
+                        if (mapControl.Overlays[i].Id == "Abone Katmanı")
+                        {
+                            mapControl.Overlays.RemoveAt(i);
+                        }
+                    }
+
+                    // Yeni abone katmanını ekle
+                    mapControl.Overlays.Add(newOverlay);
+
+                    mapControl.MinZoom = 5;
+                    mapControl.MaxZoom = 20;
+
+                    if (mapControl.Zoom < 12)
+                    {
+                        mapControl.Zoom = 12;
+                    }
+
+                    if (newOverlay.Markers.Count > 0)
+                    {
+                        var firstMarker = newOverlay.Markers[0];
+                        mapControl.Position = firstMarker.Position;
+                    }
+
+                    mapControl.Refresh();
+
+                    // CBS kontrol sınıfı için katman bilgilerini güncelle
+                    cbs.tüm_katmanlar_array[targetLayerIndex] = newOverlay;
+                    cbs.tüm_katmanlar_array_names[targetLayerIndex] = "Abone_" + (targetLayerIndex + 1).ToString();
+                    cbs.tüm_katmanlar_datatable[targetLayerIndex] = sourceData.Copy();
+
+                    MessageBox.Show($"Toplam {newOverlay.Markers.Count} adet nokta eklendi.");
+                }
+                else
+                {
+                    MessageBox.Show("Geçerli koordinat verisi bulunamadı.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Abone verileri işlenirken hata: {ex.Message}");
+            }
+        }
         private void calculateChargeStationWithFilter(int acHomeCount, int acWorkCount, int acPublicCount, int fastDcCount)
         {
             if (this.InvokeRequired)

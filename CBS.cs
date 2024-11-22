@@ -21,6 +21,7 @@ namespace SLF
     {
         public int layer_index;
         public GMapOverlay[] tüm_katmanlar_array;
+        public List<PointLatLng> abone_listesi;  //b------------------------------------------
         public string[] tüm_katmanlar_array_names;
         public MapWinGIS.Shapefile[] shapeFileArray_MapWinGIS;
         public System.Data.DataTable[] tüm_katmanlar_datatable;
@@ -1536,9 +1537,11 @@ namespace SLF
         {
             // Convert GMapPolygon to NTS Polygon
             var geometryFactory = new NetTopologySuite.Geometries.GeometryFactory();
+            
 
             var coordinates1 = polygon1.Points.Select(p => new NetTopologySuite.Geometries.Coordinate(p.Lng, p.Lat)).ToArray();
             var coordinates2 = polygon2.Points.Select(p => new NetTopologySuite.Geometries.Coordinate(p.Lng, p.Lat)).ToArray();
+            //abone_listesi.points;
 
             var ntsPolygon1 = geometryFactory.CreatePolygon(coordinates1);
             var ntsPolygon2 = geometryFactory.CreatePolygon(coordinates2);
