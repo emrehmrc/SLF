@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Önizleme));
             this.Onizleme_Tablar = new System.Windows.Forms.TabControl();
             this.Onizleme_Onizleme = new System.Windows.Forms.TabPage();
@@ -42,9 +44,9 @@
             this.Onizleme_Statistics = new System.Windows.Forms.TabPage();
             this.Onizleme_dataGrid5 = new System.Windows.Forms.DataGridView();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
-            this.buton_ÇIK = new SLF.CustomButton();
-            this.buton_İlerle = new SLF.CustomButton();
             this.buton_YUKLE = new SLF.CustomButton();
+            this.buton_İlerle = new SLF.CustomButton();
+            this.buton_ÇIK = new SLF.CustomButton();
             this.Onizleme_Tablar.SuspendLayout();
             this.Onizleme_Onizleme.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Onizleme_dataGrid1)).BeginInit();
@@ -98,13 +100,30 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Onizleme_dataGrid1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
             this.Onizleme_dataGrid1.BackgroundColor = System.Drawing.Color.Snow;
+            this.Onizleme_dataGrid1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.Onizleme_dataGrid1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.Onizleme_dataGrid1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.Onizleme_dataGrid1.DefaultCellStyle = dataGridViewCellStyle2;
             this.Onizleme_dataGrid1.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.Onizleme_dataGrid1.Location = new System.Drawing.Point(6, 4);
             this.Onizleme_dataGrid1.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_dataGrid1.Name = "Onizleme_dataGrid1";
             this.Onizleme_dataGrid1.ReadOnly = true;
-            this.Onizleme_dataGrid1.RowHeadersWidth = 51;
+            this.Onizleme_dataGrid1.RowHeadersWidth = 18;
             this.Onizleme_dataGrid1.RowTemplate.Height = 24;
             this.Onizleme_dataGrid1.Size = new System.Drawing.Size(876, 433);
             this.Onizleme_dataGrid1.TabIndex = 0;
@@ -130,13 +149,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Onizleme_dataGrid2.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.Onizleme_dataGrid2.BackgroundColor = System.Drawing.Color.Snow;
+            this.Onizleme_dataGrid2.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.Onizleme_dataGrid2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.Onizleme_dataGrid2.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.Onizleme_dataGrid2.Location = new System.Drawing.Point(2, 2);
             this.Onizleme_dataGrid2.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_dataGrid2.Name = "Onizleme_dataGrid2";
             this.Onizleme_dataGrid2.ReadOnly = true;
-            this.Onizleme_dataGrid2.RowHeadersWidth = 51;
+            this.Onizleme_dataGrid2.RowHeadersWidth = 18;
             this.Onizleme_dataGrid2.RowTemplate.Height = 24;
             this.Onizleme_dataGrid2.Size = new System.Drawing.Size(874, 427);
             this.Onizleme_dataGrid2.TabIndex = 0;
@@ -160,13 +180,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Onizleme_dataGrid3.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.Onizleme_dataGrid3.BackgroundColor = System.Drawing.Color.Snow;
+            this.Onizleme_dataGrid3.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.Onizleme_dataGrid3.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.Onizleme_dataGrid3.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.Onizleme_dataGrid3.Location = new System.Drawing.Point(2, 2);
             this.Onizleme_dataGrid3.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_dataGrid3.Name = "Onizleme_dataGrid3";
             this.Onizleme_dataGrid3.ReadOnly = true;
-            this.Onizleme_dataGrid3.RowHeadersWidth = 51;
+            this.Onizleme_dataGrid3.RowHeadersWidth = 18;
             this.Onizleme_dataGrid3.RowTemplate.Height = 24;
             this.Onizleme_dataGrid3.Size = new System.Drawing.Size(876, 429);
             this.Onizleme_dataGrid3.TabIndex = 0;
@@ -190,13 +211,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Onizleme_dataGrid4.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.Onizleme_dataGrid4.BackgroundColor = System.Drawing.Color.Snow;
+            this.Onizleme_dataGrid4.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.Onizleme_dataGrid4.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.Onizleme_dataGrid4.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.Onizleme_dataGrid4.Location = new System.Drawing.Point(2, 2);
             this.Onizleme_dataGrid4.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_dataGrid4.Name = "Onizleme_dataGrid4";
             this.Onizleme_dataGrid4.ReadOnly = true;
-            this.Onizleme_dataGrid4.RowHeadersWidth = 51;
+            this.Onizleme_dataGrid4.RowHeadersWidth = 18;
             this.Onizleme_dataGrid4.RowTemplate.Height = 24;
             this.Onizleme_dataGrid4.Size = new System.Drawing.Size(876, 429);
             this.Onizleme_dataGrid4.TabIndex = 0;
@@ -219,12 +241,15 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Onizleme_dataGrid5.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.Onizleme_dataGrid5.BackgroundColor = System.Drawing.Color.Snow;
+            this.Onizleme_dataGrid5.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.Onizleme_dataGrid5.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.Onizleme_dataGrid5.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.Onizleme_dataGrid5.Location = new System.Drawing.Point(4, 2);
             this.Onizleme_dataGrid5.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_dataGrid5.Name = "Onizleme_dataGrid5";
             this.Onizleme_dataGrid5.ReadOnly = true;
-            this.Onizleme_dataGrid5.RowHeadersWidth = 51;
+            this.Onizleme_dataGrid5.RowHeadersWidth = 18;
             this.Onizleme_dataGrid5.RowTemplate.Height = 24;
             this.Onizleme_dataGrid5.Size = new System.Drawing.Size(874, 429);
             this.Onizleme_dataGrid5.TabIndex = 0;
@@ -239,26 +264,26 @@
             this.imageList1.Images.SetKeyName(3, "info");
             this.imageList1.Images.SetKeyName(4, "applicationtable_103629.ico");
             // 
-            // buton_ÇIK
+            // buton_YUKLE
             // 
-            this.buton_ÇIK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buton_ÇIK.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.buton_ÇIK.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.buton_ÇIK.BorderColor = System.Drawing.Color.PaleVioletRed;
-            this.buton_ÇIK.BorderRadius = 0;
-            this.buton_ÇIK.BorderSize = 0;
-            this.buton_ÇIK.FlatAppearance.BorderSize = 0;
-            this.buton_ÇIK.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buton_ÇIK.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.buton_ÇIK.ForeColor = System.Drawing.Color.White;
-            this.buton_ÇIK.Location = new System.Drawing.Point(460, 475);
-            this.buton_ÇIK.Name = "buton_ÇIK";
-            this.buton_ÇIK.Size = new System.Drawing.Size(143, 35);
-            this.buton_ÇIK.TabIndex = 1;
-            this.buton_ÇIK.Text = "İptal";
-            this.buton_ÇIK.TextColor = System.Drawing.Color.White;
-            this.buton_ÇIK.UseVisualStyleBackColor = false;
-            this.buton_ÇIK.Click += new System.EventHandler(this.buton_ÇIK_Click);
+            this.buton_YUKLE.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buton_YUKLE.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.buton_YUKLE.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.buton_YUKLE.BorderColor = System.Drawing.Color.PaleVioletRed;
+            this.buton_YUKLE.BorderRadius = 0;
+            this.buton_YUKLE.BorderSize = 0;
+            this.buton_YUKLE.FlatAppearance.BorderSize = 0;
+            this.buton_YUKLE.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buton_YUKLE.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.buton_YUKLE.ForeColor = System.Drawing.Color.White;
+            this.buton_YUKLE.Location = new System.Drawing.Point(758, 475);
+            this.buton_YUKLE.Name = "buton_YUKLE";
+            this.buton_YUKLE.Size = new System.Drawing.Size(143, 35);
+            this.buton_YUKLE.TabIndex = 5;
+            this.buton_YUKLE.Text = "İçeri Aktar";
+            this.buton_YUKLE.TextColor = System.Drawing.Color.White;
+            this.buton_YUKLE.UseVisualStyleBackColor = false;
+            this.buton_YUKLE.Click += new System.EventHandler(this.buton_YUKLE_Click);
             // 
             // buton_İlerle
             // 
@@ -281,26 +306,26 @@
             this.buton_İlerle.UseVisualStyleBackColor = false;
             this.buton_İlerle.Click += new System.EventHandler(this.buton_İlerle_Click);
             // 
-            // buton_YUKLE
+            // buton_ÇIK
             // 
-            this.buton_YUKLE.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buton_YUKLE.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.buton_YUKLE.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.buton_YUKLE.BorderColor = System.Drawing.Color.PaleVioletRed;
-            this.buton_YUKLE.BorderRadius = 0;
-            this.buton_YUKLE.BorderSize = 0;
-            this.buton_YUKLE.FlatAppearance.BorderSize = 0;
-            this.buton_YUKLE.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buton_YUKLE.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.buton_YUKLE.ForeColor = System.Drawing.Color.White;
-            this.buton_YUKLE.Location = new System.Drawing.Point(758, 475);
-            this.buton_YUKLE.Name = "buton_YUKLE";
-            this.buton_YUKLE.Size = new System.Drawing.Size(143, 35);
-            this.buton_YUKLE.TabIndex = 5;
-            this.buton_YUKLE.Text = "İçeri Aktar";
-            this.buton_YUKLE.TextColor = System.Drawing.Color.White;
-            this.buton_YUKLE.UseVisualStyleBackColor = false;
-            this.buton_YUKLE.Click += new System.EventHandler(this.buton_YUKLE_Click);
+            this.buton_ÇIK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buton_ÇIK.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.buton_ÇIK.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.buton_ÇIK.BorderColor = System.Drawing.Color.PaleVioletRed;
+            this.buton_ÇIK.BorderRadius = 0;
+            this.buton_ÇIK.BorderSize = 0;
+            this.buton_ÇIK.FlatAppearance.BorderSize = 0;
+            this.buton_ÇIK.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buton_ÇIK.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.buton_ÇIK.ForeColor = System.Drawing.Color.White;
+            this.buton_ÇIK.Location = new System.Drawing.Point(460, 475);
+            this.buton_ÇIK.Name = "buton_ÇIK";
+            this.buton_ÇIK.Size = new System.Drawing.Size(143, 35);
+            this.buton_ÇIK.TabIndex = 1;
+            this.buton_ÇIK.Text = "İptal";
+            this.buton_ÇIK.TextColor = System.Drawing.Color.White;
+            this.buton_ÇIK.UseVisualStyleBackColor = false;
+            this.buton_ÇIK.Click += new System.EventHandler(this.buton_ÇIK_Click);
             // 
             // Önizleme
             // 
