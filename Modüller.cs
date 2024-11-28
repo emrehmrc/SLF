@@ -1023,90 +1023,7 @@ namespace SLF
                 CheckSelections();  // Seçim durumunu kontrol et
             }
         }
-        private async Task dekHaritayaVeriYukleAsync()
-        {
-            try
-            {
-                GMapOverlay dekOverlay = new GMapOverlay("Dek Layer");
 
-                if (dataGridView_girdi.DataSource == null)
-                {
-                    MessageBox.Show("Veri kaynağı bulunamadı. Lütfen verileri kontrol edin.");
-                    return;
-                }
-
-                if (gMapControl_DEK.Overlays.Contains(dekOverlay))
-                {
-                    gMapControl_DEK.Overlays.Remove(dekOverlay);
-                }
-
-
-                DataTable dekData = await Task.Run(() => GirdiModülü.dataTablesByType["DEK Verileri"]);
-                if (dekData != null && dekData.Rows.Count > 0)
-                {
-                    Invoke(new Action(() =>
-                    {
-                        foreach (DataRow row in dekData.Rows)
-                        {
-                            if (!dekData.Columns.Contains("DEK_X_KOORDINAT") ||
-                                !dekData.Columns.Contains("DEK_Y_KOORDINAT") ||
-                                !dekData.Columns.Contains("KAYNAK_TIPI") ||
-                                !GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
-                            {
-                                MessageBox.Show("Lütfen DEK modülü verilerinizi yükleyin.");
-                                return;
-                            }
-
-                            if (!girdiModülü.IsNullLike(row["DEK_X_KOORDINAT"]) &&
-                                !girdiModülü.IsNullLike(row["DEK_Y_KOORDINAT"]))
-                            {
-                                if (double.TryParse(row["DEK_X_KOORDINAT"].ToString(), out double x) &&
-                                    double.TryParse(row["DEK_Y_KOORDINAT"].ToString(), out double y))
-                                {
-                                    string kaynakTipi = row["KAYNAK_TIPI"].ToString().ToLower();
-                                    GMarkerGoogle marker;
-
-                                    // Kaynak tipine göre marker rengini belirle
-                                    if (kaynakTipi.Contains("güneş"))
-                                    {
-                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.yellow);
-                                    }
-                                    else if (kaynakTipi.Contains("rüzgar"))
-                                    {
-                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.blue);
-                                    }
-                                    else if (kaynakTipi.Contains("hidroelektrik"))
-                                    {
-                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.gray_small);
-                                    }
-                                    else if (kaynakTipi.Contains("biokütle"))
-                                    {
-                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.green);
-                                    }
-                                    else
-                                    {
-                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.red);
-                                    }
-
-                                    dekOverlay.Markers.Add(marker);
-                                }
-                            }
-                        }
-
-                        gMapControl_DEK.Overlays.Add(dekOverlay);
-                        gMapControl_DEK.Refresh();
-                    }));
-                }
-                else
-                {
-                    Invoke(new Action(() => MessageBox.Show("Lütfen Dek noktalarını görebilmek için verilerinizi yükleyiniz.")));
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Bir hata oluştu: {ex.Message}");
-            }
-        }
         private void gMapControl_Dek_MouseUp(object sender, MouseEventArgs e)
 
         {
@@ -2379,123 +2296,8 @@ namespace SLF
             OnMapClickEventi(pointClick, e, markerOverlay_yuk, ref polygonPoints_yuk,
         ref polygonOverlay_yuk, Mesafe_yuk, mesafe_metre_yuk);
         }
-        private async void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
-        {
-            // Marker ve nokta veri tanımları
-            GMapMarker marker = null;
-            NoktaVeri noktaVeri_marker = null;
-
-            OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
-                ref polygonOverlay_ea, Mesafe_yuk, mesafe_metre_yuk);
-            
-            if (isAddingChargingStation)
-            {
-                
-
-                // Marker Overlay'in haritaya eklenip eklenmediğini kontrol et
-                if (!gMapControl_EA.Overlays.Contains(markerOverlay_ea))
-                {
-                    Console.WriteLine("markerOverlay_ea haritaya eklenmemiş, ekleniyor...");
-                    gMapControl_EA.Overlays.Add(markerOverlay_ea);
-                }
-                else
-                {
-                    Console.WriteLine("markerOverlay_ea zaten haritaya eklenmiş.");
-                }
-
-                // Yeni marker oluştur
-                marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow)
-                {
-                    ToolTipText = "Yeni Şarj İstasyonu"
-                };
-                markerOverlay_ea.Markers.Add(marker);
-
-                // Nokta verisini oluştur
-                noktaVeri_marker = new NoktaVeri
-                {
-                    Enlem = Math.Round(pointClick.Lat, 4),
-                    Boylam = Math.Round(pointClick.Lng, 4)
-                };
-
-                // Popup formu göster
-                using (EAChargingStationPopupForm popupForm = new EAChargingStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
-                {
-                    if (popupForm.ShowDialog() == DialogResult.OK)
-                    {
-                        // Başarılı olduğunda harita verilerini yükle
-                        await eaHaritayaVeriYukleAsync();
-                    }
-                    else if (popupForm.OperationCancelled)
-                    {
-                        // İşlem iptal edilirse marker'ı kaldır
-                        markerOverlay_ea.Markers.Remove(marker);
-                    }
-                }
-
-                // İşaretleme işlemini sıfırla
-                isAddingChargingStation = false;
-                return;
-            }
-        }
 
 
-        private async void gMapControl_DEK_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
-        {
-            // Marker ve nokta veri tanımları
-            GMapMarker marker = null;
-            NoktaVeri noktaVeri_marker = null;
-
-            // DEK modülü için OnMapClickEventi çağrısı
-            OnMapClickEventi(pointClick, e, markerOverlay_DEK, ref polygonPoints_DEK,
-                ref polygonOverlay_DEK, Mesafe_Dek, mesafe_metre_DeK);
-
-            if (isAddingDekPoint)
-            {
-                // Marker Overlay'in haritaya eklenip eklenmediğini kontrol et
-                if (!gMapControl_DEK.Overlays.Contains(markerOverlay_DEK))
-                {
-                    Console.WriteLine("markerOverlay_DEK haritaya eklenmemiş, ekleniyor...");
-                    gMapControl_DEK.Overlays.Add(markerOverlay_DEK);
-                }
-                else
-                {
-                    Console.WriteLine("markerOverlay_DEK zaten haritaya eklenmiş.");
-                }
-
-                // Yeni marker oluştur
-                marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green)
-                {
-                    ToolTipText = "Yeni DEK Noktası"
-                };
-                markerOverlay_DEK.Markers.Add(marker);
-
-                // Nokta verisini oluştur
-                noktaVeri_marker = new NoktaVeri
-                {
-                    Enlem = Math.Round(pointClick.Lat, 4),
-                    Boylam = Math.Round(pointClick.Lng, 4)
-                };
-
-                // Popup formu göster
-                using (DEKCenterPopupForm popupForm = new DEKCenterPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
-                {
-                    if (popupForm.ShowDialog() == DialogResult.OK)
-                    {
-                        // Başarılı olduğunda harita verilerini yükle
-                        await dekHaritayaVeriYukleAsync();
-                    }
-                    else if (popupForm.OperationCancelled)
-                    {
-                        // İşlem iptal edilirse marker'ı kaldır
-                        markerOverlay_DEK.Markers.Remove(marker);
-                    }
-                }
-
-                // İşaretleme işlemini sıfırla
-                isAddingDekPoint = false;
-                return;
-            }
-        }
 
         public void PoligonKaydetEventi(object sender, EventArgs e, GMapOverlay polygonOverlay,
             GMapOverlay markerOverlay, List<PointLatLng> polygonPoints,
@@ -2783,66 +2585,7 @@ namespace SLF
             }
         }
 
-        // Modül tabları veri importu mantıgında refer ediliyor. Silinmesin.
-        private void DEKCenterAddButton_Click(object sender, EventArgs e)
-        {
-            // Check if the "DTR Verileri" key exists in the dataTablesByType dictionary
-            if (!GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
-            {
-                MessageBox.Show("Lütfen Dağıtık Üretim verilerinizi ekleyin.");
-                return;
-            }
 
-            // Check if "DTR Verileri" has data
-            DataTable dtrDataTable = GirdiModülü.dataTablesByType["DTR Verileri"];
-            if (dtrDataTable == null || dtrDataTable.Rows.Count == 0)
-            {
-                MessageBox.Show("Lütfen Dağıtık Üretim verilerinizi ekleyin.");
-                return;
-            }
-
-            // Check if "DEK Verileri" key exists in the dataTablesByType dictionary
-            if (!GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
-            {
-                MessageBox.Show("Lütfen DEK verilerinizi ekleyin.");
-                return;
-            }
-
-            // Check if "DEK Verileri" has data
-            DataTable dekDataTable = GirdiModülü.dataTablesByType["DEK Verileri"];
-            if (dekDataTable == null || dekDataTable.Rows.Count == 0)
-            {
-                MessageBox.Show("Lütfen DEK verilerinizi ekleyin.");
-                return;
-            }
-
-            // Indicate that the process of marking DEK points has started
-            if (!isAddingDekPoint)
-            {
-                MessageBox.Show("Lütfen harita üzerinde DEK noktası koordinatlarınızı belirleyiniz.");
-                isAddingDekPoint = true; // Set flag for DEK point marking
-                return;
-            }
-            else
-            {
-                Console.WriteLine("Bilinmeyen tıklama türü");
-            }
-            var pointClick = gMapControl_DEK.FromLocalToLatLng(MousePosition.X, MousePosition.Y);
-
-            //// Create or get the overlay for charging station markers
-            //GMapOverlay chargingStationOverlay = gMapControl_EA.Overlays.FirstOrDefault(o => o.Id == "ChargingStationLayer");
-            //if (chargingStationOverlay == null)
-            //{
-            //    chargingStationOverlay = new GMapOverlay("ChargingStationLayer");
-            //    gMapControl_EA.Overlays.Add(chargingStationOverlay);
-            //}
-
-            // Refresh the map to show the new marker
-            gMapControl_DEK.Refresh();
-
-            // Reset the flag after adding the station
-            isAddingDekPoint = false;
-        }
         
 
         /*---------------------------------------------------------------------------------------------- */
@@ -3304,10 +3047,195 @@ namespace SLF
             gMapControl_EA.Refresh();
         }
 
+
+        // BURASI SONRADAN AÇILACAK, SIMDILIK BOYLE KALSIN.
+        private async void Modül_Tabları_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Gerekli kontrolleri yapmak için seçilen sekmeyi ve modülleri kontrol et
+            string selectedTabText = Modül_Tabları.SelectedTab.Text;
+
+            // Modüllerin yüklü olup olmadığını kontrol et
+            if (selectedMethod == "SLF (Jeo-Uzamsal)")
+            {
+                if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Haritası Modülü") && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
+                {
+                    // Sekme geçişini tamamen iptal et
+                    MessageBox.Show("DTR verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
+                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
+                    return;
+                }
+                else if (selectedTabText == "İmar Analizleri" && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")))
+                {
+                    // Sekme geçişini tamamen iptal et
+                    MessageBox.Show("İmar planı verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
+                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
+                    return;
+                }
+                else if (selectedTabText == "Optimal DTR Konumlandırma"
+       && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")
+       && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri")))
+                {
+                    // Sekme geçişini tamamen iptal et
+                    MessageBox.Show("DTR verileri ve İmar planı yüklenmeden bu sekmeye geçiş yapılamaz.");
+                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
+                    return;
+                }
+            }
+
+            // EA Şarj Modülü tabına tıklanmışsa
+            if (selectedTabText == "EA Şarj Modülü")
+            {
+                if ((!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri")))
+                {
+                    MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    return;
+                }
+                else
+                {
+                    InitializeComboBoxes();
+                    await eaHaritayaVeriYukleAsync();
+                }
+
+                // Harita işlemini başlat
+            }
+            // DEK Modülü tabına tıklanmışsa
+            else if (selectedTabText == "DEK Modülü")
+            {
+                Console.WriteLine("DEK Modülü");
+                if (!GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
+                {
+                    MessageBox.Show("Lütfen DEK modülü verilerinizi yükleyin.");
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    return;
+                }
+                else
+                {
+                    await dekHaritayaVeriYukleAsync();
+                }
+            }
+        }
+                private void buton_stokastik_harita_katmanlar_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                harita_katmanları_right_click.Show();
+            }
+            else
+            {
+                harita_katmanları_right_click.Hide();
+            }
+        }
+
+        private void Sokak_Görünümü_Click(object sender, EventArgs e)
+        {
+            cbs.GetActiveGMapControl().Visible = false;
+            cbs.GetActiveWebView().Visible = true;
+
+            string url = "https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu";
+            cbs.GetActiveWebView().CoreWebView2.Navigate(url);
+        }
+
+        private void İmar_Grid_Oluştur_Click(object sender, EventArgs e)
+        {
+            Grid_Seçenekler grid_formu = new Grid_Seçenekler();
+            grid_formu.Tag = this;
+            grid_formu.Owner = this;
+            grid_formu.Show();
+            grid_formu.Activate();
+            grid_formu.StartPosition = FormStartPosition.CenterParent;
+        }
+
+        private void İmar_Fonksiyonlar_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                ContextMenuStrip_Fonksiyon.Show(Cursor.Position);
+            }
+        }
+        private void EAStationAddButton_Click(object sender, EventArgs e)
+        {
+            // Check if the "EA Şarj Verileri" key exists in the dataTablesByType dictionary
+            if (!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
+            {
+                MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
+                return;
+            }
+
+            // Use dataGridView1.DataSource as the DataTable instead of eaDataTable
+            DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
+            if (dataTable == null || dataTable.Rows.Count == 0)
+            {
+                MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
+                return;
+            }
+
+            // Check if we are in the process of adding a charging station
+            if (!isAddingChargingStation)
+            {
+                MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
+                isAddingChargingStation = true;
+                return; // Exit to wait for the user to click on the map
+            }
+
+            // Get the clicked point on the map
+            var pointClick = gMapControl_EA.FromLocalToLatLng(MousePosition.X, MousePosition.Y);
+            // Refresh the map to show the new marker
+            gMapControl_EA.Refresh();
+
+            // Reset the flag after adding the station
+            isAddingChargingStation = false;
+        }
+        private async void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        {
+
+            if (isAddingChargingStation)
+            {
+                // Yeni marker oluştur
+                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow)
+                {
+                    ToolTipText = "Yeni Şarj İstasyonu"
+                };
+                markerOverlay_ea.Markers.Add(marker);
+
+                // Nokta verisini oluştur
+                NoktaVeri noktaVeri_marker = new NoktaVeri
+                {
+                    Enlem = Math.Round(pointClick.Lat, 4),
+                    Boylam = Math.Round(pointClick.Lng, 4)
+                };
+
+                // Popup formu göster
+                using (EAChargingStationPopupForm popupForm = new EAChargingStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+                {
+                    if (popupForm.ShowDialog() == DialogResult.OK)
+                    {
+                        // Başarılı olduğunda harita verilerini yükle
+                        await eaHaritayaVeriYukleAsync();
+                    }
+                    else if (popupForm.OperationCancelled)
+                    {
+                        // İşlem iptal edilirse marker'ı kaldır
+                        markerOverlay_ea.Markers.Remove(marker);
+                    }
+                }
+
+                // İşaretleme işlemini sıfırla
+                isAddingChargingStation = false;
+                return;
+            }
+            OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
+    ref polygonOverlay_ea, Mesafe_yuk, mesafe_metre_yuk);
+
+        }
         private async Task eaHaritayaVeriYukleAsync()
         {
-            gMapControl_EA.Overlays.Clear();
-            gMapControl_EA.Refresh();
             int redDc = 0;
             int greenAc = 0;
 
@@ -3399,165 +3327,9 @@ namespace SLF
             }
         }
 
-        // BURASI SONRADAN AÇILACAK, SIMDILIK BOYLE KALSIN.
-        private async void Modül_Tabları_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            // Gerekli kontrolleri yapmak için seçilen sekmeyi ve modülleri kontrol et
-            string selectedTabText = Modül_Tabları.SelectedTab.Text;
-
-            // Modüllerin yüklü olup olmadığını kontrol et
-            if (selectedMethod == "SLF (Jeo-Uzamsal)")
-            {
-                if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Haritası Modülü") && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
-                {
-                    // Sekme geçişini tamamen iptal et
-                    MessageBox.Show("DTR verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
-                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
-                    Modül_Tabları.SelectedTab = tab_girdi;
-                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
-                    return;
-                }
-                else if (selectedTabText == "İmar Analizleri" && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")))
-                {
-                    // Sekme geçişini tamamen iptal et
-                    MessageBox.Show("İmar planı verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
-                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
-                    Modül_Tabları.SelectedTab = tab_girdi;
-                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
-                    return;
-                }
-                else if (selectedTabText == "Optimal DTR Konumlandırma"
-       && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")
-       && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri")))
-                {
-                    // Sekme geçişini tamamen iptal et
-                    MessageBox.Show("DTR verileri ve İmar planı yüklenmeden bu sekmeye geçiş yapılamaz.");
-                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
-                    Modül_Tabları.SelectedTab = tab_girdi;
-                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
-                    return;
-                }
-            }
-
-            // EA Şarj Modülü tabına tıklanmışsa
-            if (selectedTabText == "EA Şarj Modülü")
-            {
-                if ((!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri")))
-                {
-                    MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
-                    Modül_Tabları.SelectedTab = tab_girdi;
-                    return;
-                }
-                else
-                {
-                    InitializeComboBoxes();
-                    await eaHaritayaVeriYukleAsync();
-                }
-
-                // Harita işlemini başlat
-
-
-
-
-            }
-            // DEK Modülü tabına tıklanmışsa
-            else if (selectedTabText == "DEK Modülü")
-            {
-                Console.WriteLine("DEK Modülü");
-                if (!GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
-                {
-                    MessageBox.Show("Lütfen DEK modülü verilerinizi yükleyin.");
-                    Modül_Tabları.SelectedTab = tab_girdi;
-                    return;
-                }
-                else
-                {
-                    await dekHaritayaVeriYukleAsync();
-                }
-            }
-        }
-                private void buton_stokastik_harita_katmanlar_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
-            {
-                harita_katmanları_right_click.Show();
-            }
-            else
-            {
-                harita_katmanları_right_click.Hide();
-            }
-        }
-
-        private void Sokak_Görünümü_Click(object sender, EventArgs e)
-        {
-            cbs.GetActiveGMapControl().Visible = false;
-            cbs.GetActiveWebView().Visible = true;
-
-            string url = "https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu";
-            cbs.GetActiveWebView().CoreWebView2.Navigate(url);
-        }
-
-        private void İmar_Grid_Oluştur_Click(object sender, EventArgs e)
-        {
-            Grid_Seçenekler grid_formu = new Grid_Seçenekler();
-            grid_formu.Tag = this;
-            grid_formu.Owner = this;
-            grid_formu.Show();
-            grid_formu.Activate();
-            grid_formu.StartPosition = FormStartPosition.CenterParent;
-        }
-
-        private void İmar_Fonksiyonlar_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                ContextMenuStrip_Fonksiyon.Show(Cursor.Position);
-            }
-        }
-
-        private void EAStationAddButton_Click(object sender, EventArgs e)
-        {
-            // Check if the "EA Şarj Verileri" key exists in the dataTablesByType dictionary
-            if (!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
-            {
-                MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
-                Console.WriteLine("batu");
-                return;
-            }
-
-            // Use dataGridView1.DataSource as the DataTable instead of eaDataTable
-            DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
-            if (dataTable == null || dataTable.Rows.Count == 0)
-            {
-                MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
-                return;
-            }
-
-            // Check if we are in the process of adding a charging station
-            if (!isAddingChargingStation)
-            {
-                MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
-                isAddingChargingStation = true;
-                return; // Exit to wait for the user to click on the map
-            }
-
-            // Get the clicked point on the map
-            var pointClick = gMapControl_EA.FromLocalToLatLng(MousePosition.X, MousePosition.Y);
-
-            // Refresh the map to show the new marker
-            gMapControl_EA.Refresh();
-
-            // Reset the flag after adding the station
-            isAddingChargingStation = false;
-        }
-
-      
         private async void gelecekSimilasyonGoruntule(object sender, EventArgs e)
         {
-            // Checkbox'ları görünür hale getir
-            
-            gMapControl_EA.Overlays.Clear();
-            gMapControl_EA.Refresh();
+
             checkBox_AC_Home.Visible = true;
             checkBox_AC_Public.Visible = true;
             checkBox_AC_Work.Visible = true;
@@ -3566,32 +3338,38 @@ namespace SLF
             checkBox_AC_Work.Checked = true;
             checkBox_AC_Home.Checked = true;
             checkBox_DC_Fast.Checked = true;
+
+            // Checkbox'ları görünür hale getir
+
+            gMapControl_EA.Overlays.Clear();
+            gMapControl_EA.Refresh();
+
             // Şehir ve hız seçimine göre dosya yolunu ayarla
             string filePath = "";
 
             if (SelectedCity == "İzmir" && SelectedSpeed == "Hızlı")
             {
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Yüksek.xlsx";
+                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Yüksek.xlsx";
             }
             else if (SelectedCity == "İzmir" && SelectedSpeed == "Yavaş")
             {
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Düşük.xlsx";
+                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Düşük.xlsx";
             }
             else if (SelectedCity == "İzmir" && SelectedSpeed == "varsayılan")
             {
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\dek_distribution_2024_2030_3_İzmir_baz.xlsx";
+                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_baz.xlsx";
             }
             else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Hızlı")
             {
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Yüksek.xlsx";
+                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Yüksek.xlsx";
             }
             else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Yavaş")
             {
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Düşük.xlsx";
+                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Düşük.xlsx";
             }
             else if (SelectedCity == "Eskişehir" && SelectedSpeed == "varsayılan")
             {
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\dek_distribution_2024_2030_esk_baz.xlsx";
+                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_esk_baz.xlsx";
             }
             else
             {
@@ -3651,113 +3429,13 @@ namespace SLF
             popupForm.Controls.Add(dataGridView);
             popupForm.Show(); // Yeni pencereyi göster
         }
-
-
-        private DataTable FormatEATableForDisplay(DataTable originalEATable)
-        {
-            // Yeni bir DataTable oluşturun
-            DataTable formattedEATable = new DataTable();
-
-            // İhtiyacınız olan sütunları ekleyin
-            formattedEATable.Columns.Add("ID", typeof(string));
-            formattedEATable.Columns.Add("Ilce", typeof(string)); // İlçe isimleri Çiğli ve Karşıyaka olarak ayarlanacak
-            formattedEATable.Columns.Add("AC (Home)", typeof(int));
-            formattedEATable.Columns.Add("AC (Work)", typeof(int));
-            formattedEATable.Columns.Add("AC (Public)", typeof(int));
-            formattedEATable.Columns.Add("Fast DC", typeof(int));
-
-            // Orijinal tablodaki her bir satırı işleyin
-            foreach (DataRow row in originalEATable.Rows)
-            {
-                // Yeni bir satır oluşturun
-                DataRow newRow = formattedEATable.NewRow();
-
-                // ID değerini alın
-                newRow["ID"] = row["id"].ToString();
-
-                // İlçe değerini dönüştür (1 = Çiğli, 2 = Karşıyaka)
-                int ilceValue = Convert.ToInt32(row["ilce"]);
-                newRow["Ilce"] = ilceValue == 1 ? "Çiğli" : ilceValue == 2 ? "Karşıyaka" : "Eskişehir";
-
-                // AC ve DC istasyon sayısını alın
-                newRow["AC (Home)"] = Convert.ToInt32(row["AC (Home)_count"]);
-                newRow["AC (Work)"] = Convert.ToInt32(row["AC (Work)_count"]);
-                newRow["AC (Public)"] = Convert.ToInt32(row["AC (Public)_count"]);
-                newRow["Fast DC"] = Convert.ToInt32(row["Fast DC_count"]);
-
-                // Yeni satırı formatlanmış tabloya ekleyin
-                formattedEATable.Rows.Add(newRow);
-            }
-
-            return formattedEATable;
-        }
-
-        private void EaSimMaxBtn_CheckedChanged(object sender, EventArgs e)
-        {
-            if (EaSimMaxBtn.Checked)
-            {
-
-                SelectedSpeed = "Hızlı";
-            }
-        }
-
-        private void dekSimMinBtn_CheckedChanged(object sender, EventArgs e)
-        {
-            if (dekSimMinBtn.Checked)
-            {
-
-                SelectedSpeed = "Yavaş";
-            }
-        }
-
-        private void dekSimMaxBtn_CheckedChanged(object sender, EventArgs e)
-        {
-            if (dekSimMaxBtn.Checked)
-            {
-
-                SelectedSpeed = "Hızlı";
-            }
-        }
-
-        private void EaSimMinBtn_CheckedChanged(object sender, EventArgs e)
-        {
-            if (EaSimMinBtn.Checked)
-            {
-
-                SelectedSpeed = "Yavaş";
-            }
-        }
-
-        private void dekSimDefBtn_CheckedChanged(object sender, EventArgs e)
-        {
-            {
-                if (dekSimDefBtn.Checked)
-                {
-
-                    SelectedSpeed = "varsayılan";
-                }
-            }
-        }
-        private void EaSimDefBtn_CheckedChanged(object sender, EventArgs e)
-        {
-            if (EaSimMinBtn.Checked)
-            {
-                SelectedSpeed = "varsayılan";
-            }
-        }
-
         private Task HaritaUzerindeSimulasyonGosterimi(DataTable veriTablosu)
         {
-            // Create or get the overlay for simulation markers
+            // Create a new overlay for simulation markers
             GMapOverlay simulationOverlay = new GMapOverlay("Simulasyon_Layer");
 
-            // Remove existing overlay if it exists
-            if (gMapControl_EA.Overlays.Contains(simulationOverlay))
-            {
-                gMapControl_EA.Overlays.Remove(simulationOverlay);
-            }
-
-            // Add a new overlay for simulation markers
+            // Add a new overlay for simulation markers (No need to remove it if it's new)
+            gMapControl_EA.Overlays.Clear(); // Optionally clear the previous overlays, if needed
             gMapControl_EA.Overlays.Add(simulationOverlay);
 
             // Dictionary to hold markers based on their coordinates and types
@@ -3820,63 +3498,193 @@ namespace SLF
             return Task.CompletedTask;
         }
 
-
-        private void calculateChargeStationWithFilter(int acHomeCount, int acWorkCount, int acPublicCount, int fastDcCount)
+        // Modül tabları veri importu mantıgında refer ediliyor. Silinmesin.
+        private void DEKCenterAddButton_Click(object sender, EventArgs e)
         {
-            if (this.InvokeRequired)
+            // Check if the "DTR Verileri" key exists in the dataTablesByType dictionary
+            if (!GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
             {
-                this.Invoke(new Action(() => calculateChargeStationWithFilter(acHomeCount, acWorkCount, acPublicCount, fastDcCount)));
+                MessageBox.Show("Lütfen Dağıtık Üretim verilerinizi ekleyin.");
                 return;
             }
 
-            // Mevcut paneli temizle
-            var existingControls = this.Controls.Find("istasyonAdetLabelPanel", true);
-            foreach (var control in existingControls)
+            // Check if "DTR Verileri" has data
+            DataTable dtrDataTable = GirdiModülü.dataTablesByType["DTR Verileri"];
+            if (dtrDataTable == null || dtrDataTable.Rows.Count == 0)
             {
-                this.Controls.Remove(control);
+                MessageBox.Show("Lütfen Dağıtık Üretim verilerinizi ekleyin.");
+                return;
             }
 
-            // Paneli oluştur ve ana formun üzerine ekle
-            FlowLayoutPanel panel = new FlowLayoutPanel
+            // Check if "DEK Verileri" key exists in the dataTablesByType dictionary
+            if (!GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
             {
-                Location = new System.Drawing.Point(10, 10), // Sol üst köşeye yerleştir
-                Size = new System.Drawing.Size(200, 150),    // Sabit boyut belirle
-                Anchor = AnchorStyles.Top | AnchorStyles.Left,
-                BackColor = Color.FromArgb(200, 255, 255, 255), // Yarı saydam beyaz arka plan
-                Name = "istasyonAdetLabelPanel",
-                Padding = new Padding(5),
-                BorderStyle = BorderStyle.FixedSingle        // Çerçeve ekleyerek görünürlüğü artır
-            };
+                MessageBox.Show("Lütfen DEK verilerinizi ekleyin.");
+                return;
+            }
 
+            // Check if "DEK Verileri" has data
+            DataTable dekDataTable = GirdiModülü.dataTablesByType["DEK Verileri"];
+            if (dekDataTable == null || dekDataTable.Rows.Count == 0)
+            {
+                MessageBox.Show("Lütfen DEK verilerinizi ekleyin.");
+                return;
+            }
 
+            // Indicate that the process of marking DEK points has started
+            if (!isAddingDekPoint)
+            {
+                MessageBox.Show("Lütfen harita üzerinde DEK noktası koordinatlarınızı belirleyiniz.");
+                isAddingDekPoint = true; // Set flag for DEK point marking
+                return;
+            }
+            else
+            {
+                Console.WriteLine("Bilinmeyen tıklama türü");
+            }
+            var pointClick = gMapControl_DEK.FromLocalToLatLng(MousePosition.X, MousePosition.Y);
 
-            // Paneli ana forma ekleyin
-            this.Controls.Add(panel);
-            panel.BringToFront(); // Paneli öne getir
+            //// Create or get the overlay for charging station markers
+            //GMapOverlay chargingStationOverlay = gMapControl_EA.Overlays.FirstOrDefault(o => o.Id == "ChargingStationLayer");
+            //if (chargingStationOverlay == null)
+            //{
+            //    chargingStationOverlay = new GMapOverlay("ChargingStationLayer");
+            //    gMapControl_EA.Overlays.Add(chargingStationOverlay);
+            //}
+
+            // Refresh the map to show the new marker
+            gMapControl_DEK.Refresh();
+
+            // Reset the flag after adding the station
+            isAddingDekPoint = false;
         }
 
-        private void checkBox_Ac_Home(object sender, EventArgs e)
+        private async void gMapControl_DEK_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
-            ToggleMarkers("AC-Home", checkBox_AC_Home.Checked);
-        }
+            // DEK modülü için OnMapClickEventi çağrısı
+            OnMapClickEventi(pointClick, e, markerOverlay_DEK, ref polygonPoints_DEK,
+                ref polygonOverlay_DEK, Mesafe_Dek, mesafe_metre_DeK);
 
-        private void checkBox_Ac_Work(object sender, EventArgs e)
+            if (isAddingDekPoint)
+            {
+                // Yeni marker oluştur
+                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green)
+                {
+                    ToolTipText = "Yeni DEK Noktası"
+                };
+                markerOverlay_DEK.Markers.Add(marker);
+
+                // Nokta verisini oluştur
+                NoktaVeri noktaVeri_marker = new NoktaVeri
+                {
+                    Enlem = Math.Round(pointClick.Lat, 4),
+                    Boylam = Math.Round(pointClick.Lng, 4)
+                };
+
+                // Popup formu göster
+                using (DEKCenterPopupForm popupForm = new DEKCenterPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+                {
+                    if (popupForm.ShowDialog() == DialogResult.OK)
+                    {
+                        // Başarılı olduğunda harita verilerini yükle
+                        await dekHaritayaVeriYukleAsync();
+                    }
+                    else if (popupForm.OperationCancelled)
+                    {
+                        // İşlem iptal edilirse marker'ı kaldır
+                        markerOverlay_DEK.Markers.Remove(marker);
+                    }
+                }
+
+                // İşaretleme işlemini sıfırla
+                isAddingDekPoint = false;
+                return;
+            }
+        }
+        private async Task dekHaritayaVeriYukleAsync()
         {
-            ToggleMarkers("AC-Work", checkBox_AC_Work.Checked);
+            try
+            {
+                GMapOverlay dekOverlay = new GMapOverlay("Dek Layer");
+
+                if (dataGridView_girdi.DataSource == null)
+                {
+                    MessageBox.Show("Veri kaynağı bulunamadı. Lütfen verileri kontrol edin.");
+                    return;
+                }
+
+                if (gMapControl_DEK.Overlays.Contains(dekOverlay))
+                {
+                    gMapControl_DEK.Overlays.Remove(dekOverlay);
+                }
+
+
+                DataTable dekData = await Task.Run(() => GirdiModülü.dataTablesByType["DEK Verileri"]);
+                if (dekData != null && dekData.Rows.Count > 0)
+                {
+                    Invoke(new Action(() =>
+                    {
+                        foreach (DataRow row in dekData.Rows)
+                        {
+                            if (!dekData.Columns.Contains("DEK_X_KOORDINAT") ||
+                                !dekData.Columns.Contains("DEK_Y_KOORDINAT") ||
+                                !dekData.Columns.Contains("KAYNAK_TIPI") ||
+                                !GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
+                            {
+                                MessageBox.Show("Lütfen DEK modülü verilerinizi yükleyin.");
+                                return;
+                            }
+
+                            if (!girdiModülü.IsNullLike(row["DEK_X_KOORDINAT"]) &&
+                                !girdiModülü.IsNullLike(row["DEK_Y_KOORDINAT"]))
+                            {
+                                if (double.TryParse(row["DEK_X_KOORDINAT"].ToString(), out double x) &&
+                                    double.TryParse(row["DEK_Y_KOORDINAT"].ToString(), out double y))
+                                {
+                                    string kaynakTipi = row["KAYNAK_TIPI"].ToString().ToLower();
+                                    GMarkerGoogle marker;
+
+                                    // Kaynak tipine göre marker rengini belirle
+                                    if (kaynakTipi.Contains("güneş"))
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.yellow);
+                                    }
+                                    else if (kaynakTipi.Contains("rüzgar"))
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.blue);
+                                    }
+                                    else if (kaynakTipi.Contains("hidroelektrik"))
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.gray_small);
+                                    }
+                                    else if (kaynakTipi.Contains("biokütle"))
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.green);
+                                    }
+                                    else
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.red);
+                                    }
+
+                                    dekOverlay.Markers.Add(marker);
+                                }
+                            }
+                        }
+
+                        gMapControl_DEK.Overlays.Add(dekOverlay);
+                        gMapControl_DEK.Refresh();
+                    }));
+                }
+                else
+                {
+                    Invoke(new Action(() => MessageBox.Show("Lütfen Dek noktalarını görebilmek için verilerinizi yükleyiniz.")));
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Bir hata oluştu: {ex.Message}");
+            }
         }
-
-        private void checkBox_Ac_Public(object sender, EventArgs e)
-        {
-            ToggleMarkers("AC-Public", checkBox_AC_Public.Checked);
-
-        }
-
-        private void checkBox_Dc_Fast(object sender, EventArgs e)
-        {
-            ToggleMarkers("DC-Fast", checkBox_DC_Fast.Checked);
-
-        }
-
         private async void dekSimulasyonGoruntule(object sender, EventArgs e)
         {
             // Checkbox'ları görünür hale getir
@@ -3971,6 +3779,158 @@ namespace SLF
             popupForm.Controls.Add(dataGridView);
             popupForm.Show(); // Yeni pencereyi göster
         }
+
+        private DataTable FormatEATableForDisplay(DataTable originalEATable)
+        {
+            // Yeni bir DataTable oluşturun
+            DataTable formattedEATable = new DataTable();
+
+            // İhtiyacınız olan sütunları ekleyin
+            formattedEATable.Columns.Add("ID", typeof(string));
+            formattedEATable.Columns.Add("Ilce", typeof(string)); // İlçe isimleri Çiğli ve Karşıyaka olarak ayarlanacak
+            formattedEATable.Columns.Add("AC (Home)", typeof(int));
+            formattedEATable.Columns.Add("AC (Work)", typeof(int));
+            formattedEATable.Columns.Add("AC (Public)", typeof(int));
+            formattedEATable.Columns.Add("Fast DC", typeof(int));
+
+            // Orijinal tablodaki her bir satırı işleyin
+            foreach (DataRow row in originalEATable.Rows)
+            {
+                // Yeni bir satır oluşturun
+                DataRow newRow = formattedEATable.NewRow();
+
+                // ID değerini alın
+                newRow["ID"] = row["id"].ToString();
+
+                // İlçe değerini dönüştür (1 = Çiğli, 2 = Karşıyaka)
+                int ilceValue = Convert.ToInt32(row["ilce"]);
+                newRow["Ilce"] = ilceValue == 1 ? "Çiğli" : ilceValue == 2 ? "Karşıyaka" : "Eskişehir";
+
+                // AC ve DC istasyon sayısını alın
+                newRow["AC (Home)"] = Convert.ToInt32(row["AC (Home)_count"]);
+                newRow["AC (Work)"] = Convert.ToInt32(row["AC (Work)_count"]);
+                newRow["AC (Public)"] = Convert.ToInt32(row["AC (Public)_count"]);
+                newRow["Fast DC"] = Convert.ToInt32(row["Fast DC_count"]);
+
+                // Yeni satırı formatlanmış tabloya ekleyin
+                formattedEATable.Rows.Add(newRow);
+            }
+
+            return formattedEATable;
+        }
+
+        private void EaSimMaxBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (EaSimMaxBtn.Checked)
+            {
+
+                SelectedSpeed = "Hızlı";
+            }
+        }
+
+        private void dekSimMinBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (dekSimMinBtn.Checked)
+            {
+
+                SelectedSpeed = "Yavaş";
+            }
+        }
+
+        private void dekSimMaxBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (dekSimMaxBtn.Checked)
+            {
+
+                SelectedSpeed = "Hızlı";
+            }
+        }
+
+        private void EaSimMinBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (EaSimMinBtn.Checked)
+            {
+
+                SelectedSpeed = "Yavaş";
+            }
+        }
+
+        private void dekSimDefBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            {
+                if (dekSimDefBtn.Checked)
+                {
+
+                    SelectedSpeed = "varsayılan";
+                }
+            }
+        }
+        private void EaSimDefBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (EaSimMinBtn.Checked)
+            {
+                SelectedSpeed = "varsayılan";
+            }
+        }
+
+
+
+        private void calculateChargeStationWithFilter(int acHomeCount, int acWorkCount, int acPublicCount, int fastDcCount)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(() => calculateChargeStationWithFilter(acHomeCount, acWorkCount, acPublicCount, fastDcCount)));
+                return;
+            }
+
+            // Mevcut paneli temizle
+            var existingControls = this.Controls.Find("istasyonAdetLabelPanel", true);
+            foreach (var control in existingControls)
+            {
+                this.Controls.Remove(control);
+            }
+
+            // Paneli oluştur ve ana formun üzerine ekle
+            FlowLayoutPanel panel = new FlowLayoutPanel
+            {
+                Location = new System.Drawing.Point(10, 10), // Sol üst köşeye yerleştir
+                Size = new System.Drawing.Size(200, 150),    // Sabit boyut belirle
+                Anchor = AnchorStyles.Top | AnchorStyles.Left,
+                BackColor = Color.FromArgb(200, 255, 255, 255), // Yarı saydam beyaz arka plan
+                Name = "istasyonAdetLabelPanel",
+                Padding = new Padding(5),
+                BorderStyle = BorderStyle.FixedSingle        // Çerçeve ekleyerek görünürlüğü artır
+            };
+
+
+
+            // Paneli ana forma ekleyin
+            this.Controls.Add(panel);
+            panel.BringToFront(); // Paneli öne getir
+        }
+
+        private void checkBox_Ac_Home(object sender, EventArgs e)
+        {
+            ToggleMarkers("AC-Home", checkBox_AC_Home.Checked);
+        }
+
+        private void checkBox_Ac_Work(object sender, EventArgs e)
+        {
+            ToggleMarkers("AC-Work", checkBox_AC_Work.Checked);
+        }
+
+        private void checkBox_Ac_Public(object sender, EventArgs e)
+        {
+            ToggleMarkers("AC-Public", checkBox_AC_Public.Checked);
+
+        }
+
+        private void checkBox_Dc_Fast(object sender, EventArgs e)
+        {
+            ToggleMarkers("DC-Fast", checkBox_DC_Fast.Checked);
+
+        }
+
 
         private DataTable FormatDEKTableForDisplay(DataTable originalDEKTable)
         {
