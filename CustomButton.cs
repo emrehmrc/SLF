@@ -8,11 +8,9 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.ComponentModel;
 
-
-
 namespace SLF
 {
-    public class CustomButton : Button
+    class CustomButton : Button
     {
         //Fields
         private int borderSize = 0;
@@ -20,7 +18,7 @@ namespace SLF
         private Color borderColor = Color.PaleVioletRed;
 
         //Properties
-        [Category("RJ Code Advance")]
+        [Category("Custom Settings")]
         public int BorderSize
         {
             get { return borderSize; }
@@ -31,7 +29,7 @@ namespace SLF
             }
         }
 
-        [Category("RJ Code Advance")]
+        [Category("Custom Settings")]
         public int BorderRadius
         {
             get { return borderRadius; }
@@ -42,7 +40,7 @@ namespace SLF
             }
         }
 
-        [Category("RJ Code Advance")]
+        [Category("Custom Settings")]
         public Color BorderColor
         {
             get { return borderColor; }
@@ -52,19 +50,21 @@ namespace SLF
                 this.Invalidate();
             }
         }
-        [Category("RJ Code Advance")]
+
+        [Category("Custom Settings")]
         public Color BackgroundColor
         {
             get { return this.BackColor; }
             set { this.BackColor = value; }
         }
 
-        [Category("RJ Code Advance")]
+        [Category("Custom Settings")]
         public Color TextColor
         {
             get { return this.ForeColor; }
             set { this.ForeColor = value; }
         }
+
         //Constructor
         public CustomButton()
         {
@@ -76,13 +76,8 @@ namespace SLF
             this.Resize += new EventHandler(Button_Resize);
         }
 
-        private void Button_Resize(object sender, EventArgs e)
-        {
-            if (borderRadius > this.Height)
-                borderRadius = this.Height;
-        }
         //Methods
-        private GraphicsPath GetFigurePath(Rectangle rect, float radius)
+        private GraphicsPath GetFigurePath(Rectangle rect, int radius)
         {
             GraphicsPath path = new GraphicsPath();
             float curveSize = radius * 2F;
@@ -95,9 +90,11 @@ namespace SLF
             path.CloseFigure();
             return path;
         }
+
         protected override void OnPaint(PaintEventArgs pevent)
         {
             base.OnPaint(pevent);
+
 
             Rectangle rectSurface = this.ClientRectangle;
             Rectangle rectBorder = Rectangle.Inflate(rectSurface, -borderSize, -borderSize);
@@ -149,6 +146,11 @@ namespace SLF
         private void Container_BackColorChanged(object sender, EventArgs e)
         {
             this.Invalidate();
+        }
+        private void Button_Resize(object sender, EventArgs e)
+        {
+            if (borderRadius > this.Height)
+                borderRadius = this.Height;
         }
     }
 }

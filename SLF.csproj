@@ -690,6 +690,9 @@
     <EmbeddedResource Include="Attribute_Table.resx">
       <DependentUpon>Attribute_Table.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="CustomButton.resx">
+      <DependentUpon>CustomButton.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="EAChargingStationPopupForm.resx">
       <DependentUpon>EAChargingStationPopupForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -724,6 +727,9 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="rounded_button.resx">
+      <DependentUpon>rounded_button.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Yardım.resx">
       <DependentUpon>Yardım.cs</DependentUpon>
