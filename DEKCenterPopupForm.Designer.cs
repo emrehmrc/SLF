@@ -202,6 +202,7 @@
             // DEKTamamButton
             // 
             this.DEKTamamButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.DEKTamamButton.BackColor = System.Drawing.Color.Transparent;
             this.DEKTamamButton.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
             this.DEKTamamButton.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.DEKTamamButton.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));

@@ -35,6 +35,7 @@ namespace SLF
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
             this.Modül_Tabları = new System.Windows.Forms.TabControl();
             this.tab_girdi = new System.Windows.Forms.TabPage();
+            this.OpenModuleButton = new SLF.CustomButton();
             this.label_girdi_veri_onizleme = new System.Windows.Forms.Label();
             this.panel_girdi_rapor_olustur = new System.Windows.Forms.Panel();
             this.label_girdi_rapor = new System.Windows.Forms.Label();
@@ -276,7 +277,6 @@ namespace SLF
             this.HomePageButton = new Guna.UI2.WinForms.Guna2ImageButton();
             this.buton_ea_harita_katmanlar = new System.Windows.Forms.Button();
             this.ELFMinSenaryoGraphPicBox = new System.Windows.Forms.PictureBox();
-            this.OpenModuleButton = new SLF.CustomButton();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
             this.panel_girdi_rapor_olustur.SuspendLayout();
@@ -397,6 +397,27 @@ namespace SLF
             this.tab_girdi.TabIndex = 0;
             this.tab_girdi.Text = "Girdi Modülü";
             this.tab_girdi.UseVisualStyleBackColor = true;
+            // 
+            // OpenModuleButton
+            // 
+            this.OpenModuleButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.OpenModuleButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.OpenModuleButton.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.OpenModuleButton.BorderColor = System.Drawing.Color.PaleVioletRed;
+            this.OpenModuleButton.BorderRadius = 0;
+            this.OpenModuleButton.BorderSize = 0;
+            this.OpenModuleButton.FlatAppearance.BorderSize = 0;
+            this.OpenModuleButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.OpenModuleButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.OpenModuleButton.ForeColor = System.Drawing.Color.White;
+            this.OpenModuleButton.Location = new System.Drawing.Point(1011, 493);
+            this.OpenModuleButton.Name = "OpenModuleButton";
+            this.OpenModuleButton.Size = new System.Drawing.Size(150, 40);
+            this.OpenModuleButton.TabIndex = 19;
+            this.OpenModuleButton.Text = "Modüle Git";
+            this.OpenModuleButton.TextColor = System.Drawing.Color.White;
+            this.OpenModuleButton.UseVisualStyleBackColor = false;
+            this.OpenModuleButton.Click += new System.EventHandler(this.OpenModuleButton_Click);
             // 
             // label_girdi_veri_onizleme
             // 
@@ -661,10 +682,10 @@ namespace SLF
             this.tab_dek.Controls.Add(this.gMapControl_DEK);
             this.tab_dek.Controls.Add(this.panel_DEK);
             this.tab_dek.ImageIndex = 0;
-            this.tab_dek.Location = new System.Drawing.Point(4, 48);
+            this.tab_dek.Location = new System.Drawing.Point(4, 26);
             this.tab_dek.Margin = new System.Windows.Forms.Padding(2);
             this.tab_dek.Name = "tab_dek";
-            this.tab_dek.Size = new System.Drawing.Size(1225, 542);
+            this.tab_dek.Size = new System.Drawing.Size(1225, 564);
             this.tab_dek.TabIndex = 6;
             this.tab_dek.Text = "DEK Modülü";
             this.tab_dek.UseVisualStyleBackColor = true;
@@ -865,10 +886,10 @@ namespace SLF
             this.tab_ea.Controls.Add(this.GelecekSimPanel);
             this.tab_ea.Controls.Add(this.gMapControl_EA);
             this.tab_ea.ImageIndex = 2;
-            this.tab_ea.Location = new System.Drawing.Point(4, 48);
+            this.tab_ea.Location = new System.Drawing.Point(4, 26);
             this.tab_ea.Margin = new System.Windows.Forms.Padding(2);
             this.tab_ea.Name = "tab_ea";
-            this.tab_ea.Size = new System.Drawing.Size(1225, 542);
+            this.tab_ea.Size = new System.Drawing.Size(1225, 564);
             this.tab_ea.TabIndex = 5;
             this.tab_ea.Text = "EA Şarj Modülü";
             this.tab_ea.UseVisualStyleBackColor = true;
@@ -1143,7 +1164,7 @@ namespace SLF
             this.gMapControl_EA.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_EA.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_EA.ShowTileGridLines = false;
-            this.gMapControl_EA.Size = new System.Drawing.Size(1225, 630);
+            this.gMapControl_EA.Size = new System.Drawing.Size(1225, 652);
             this.gMapControl_EA.TabIndex = 18;
             this.gMapControl_EA.Zoom = 0D;
             this.gMapControl_EA.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_Ea_OnMapClick);
@@ -1158,11 +1179,11 @@ namespace SLF
             this.tab_ekonometrik.Controls.Add(this.ELFGraphicsPanel);
             this.tab_ekonometrik.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
             this.tab_ekonometrik.ImageIndex = 4;
-            this.tab_ekonometrik.Location = new System.Drawing.Point(4, 48);
+            this.tab_ekonometrik.Location = new System.Drawing.Point(4, 26);
             this.tab_ekonometrik.Margin = new System.Windows.Forms.Padding(2);
             this.tab_ekonometrik.Name = "tab_ekonometrik";
             this.tab_ekonometrik.Padding = new System.Windows.Forms.Padding(2);
-            this.tab_ekonometrik.Size = new System.Drawing.Size(1225, 542);
+            this.tab_ekonometrik.Size = new System.Drawing.Size(1225, 564);
             this.tab_ekonometrik.TabIndex = 1;
             this.tab_ekonometrik.Text = "Ekonometrik Talep Tahmini Modülü";
             this.tab_ekonometrik.UseVisualStyleBackColor = true;
@@ -1225,7 +1246,7 @@ namespace SLF
             this.ELFLowResultsTabPage.Margin = new System.Windows.Forms.Padding(2);
             this.ELFLowResultsTabPage.Name = "ELFLowResultsTabPage";
             this.ELFLowResultsTabPage.Padding = new System.Windows.Forms.Padding(2);
-            this.ELFLowResultsTabPage.Size = new System.Drawing.Size(1026, 530);
+            this.ELFLowResultsTabPage.Size = new System.Drawing.Size(1026, 508);
             this.ELFLowResultsTabPage.TabIndex = 1;
             this.ELFLowResultsTabPage.Text = "Düşük Sonuçlar";
             this.ELFLowResultsTabPage.UseVisualStyleBackColor = true;
@@ -1243,7 +1264,7 @@ namespace SLF
             this.ELFLowResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFLowResultsTable.Name = "ELFLowResultsTable";
             this.ELFLowResultsTable.RowHeadersWidth = 51;
-            this.ELFLowResultsTable.Size = new System.Drawing.Size(1024, 642);
+            this.ELFLowResultsTable.Size = new System.Drawing.Size(1024, 624);
             this.ELFLowResultsTable.TabIndex = 1;
             // 
             // ELFBaseResultsTabPage
@@ -1253,7 +1274,7 @@ namespace SLF
             this.ELFBaseResultsTabPage.Margin = new System.Windows.Forms.Padding(2);
             this.ELFBaseResultsTabPage.Name = "ELFBaseResultsTabPage";
             this.ELFBaseResultsTabPage.Padding = new System.Windows.Forms.Padding(2);
-            this.ELFBaseResultsTabPage.Size = new System.Drawing.Size(1026, 530);
+            this.ELFBaseResultsTabPage.Size = new System.Drawing.Size(1026, 508);
             this.ELFBaseResultsTabPage.TabIndex = 2;
             this.ELFBaseResultsTabPage.Text = "Baz Sonuçlar";
             this.ELFBaseResultsTabPage.UseVisualStyleBackColor = true;
@@ -1271,7 +1292,7 @@ namespace SLF
             this.ELFBaseResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFBaseResultsTable.Name = "ELFBaseResultsTable";
             this.ELFBaseResultsTable.RowHeadersWidth = 51;
-            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1023, 642);
+            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1023, 624);
             this.ELFBaseResultsTable.TabIndex = 1;
             // 
             // ELFHighResultsTabPage
@@ -1281,7 +1302,7 @@ namespace SLF
             this.ELFHighResultsTabPage.Margin = new System.Windows.Forms.Padding(2);
             this.ELFHighResultsTabPage.Name = "ELFHighResultsTabPage";
             this.ELFHighResultsTabPage.Padding = new System.Windows.Forms.Padding(2);
-            this.ELFHighResultsTabPage.Size = new System.Drawing.Size(1026, 530);
+            this.ELFHighResultsTabPage.Size = new System.Drawing.Size(1026, 508);
             this.ELFHighResultsTabPage.TabIndex = 3;
             this.ELFHighResultsTabPage.Text = "Yüksek Sonuçlar";
             this.ELFHighResultsTabPage.UseVisualStyleBackColor = true;
@@ -1299,7 +1320,7 @@ namespace SLF
             this.ELFHighResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFHighResultsTable.Name = "ELFHighResultsTable";
             this.ELFHighResultsTable.RowHeadersWidth = 51;
-            this.ELFHighResultsTable.Size = new System.Drawing.Size(1019, 642);
+            this.ELFHighResultsTable.Size = new System.Drawing.Size(1019, 624);
             this.ELFHighResultsTable.TabIndex = 1;
             // 
             // ELFMaxResultsTabPage
@@ -1309,7 +1330,7 @@ namespace SLF
             this.ELFMaxResultsTabPage.Margin = new System.Windows.Forms.Padding(2);
             this.ELFMaxResultsTabPage.Name = "ELFMaxResultsTabPage";
             this.ELFMaxResultsTabPage.Padding = new System.Windows.Forms.Padding(2);
-            this.ELFMaxResultsTabPage.Size = new System.Drawing.Size(1026, 530);
+            this.ELFMaxResultsTabPage.Size = new System.Drawing.Size(1026, 508);
             this.ELFMaxResultsTabPage.TabIndex = 4;
             this.ELFMaxResultsTabPage.Text = "Maksimum Sonuçlar";
             this.ELFMaxResultsTabPage.UseVisualStyleBackColor = true;
@@ -1328,7 +1349,7 @@ namespace SLF
             this.ELFMaxResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFMaxResultsTable.Name = "ELFMaxResultsTable";
             this.ELFMaxResultsTable.RowHeadersWidth = 51;
-            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1027, 646);
+            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1027, 628);
             this.ELFMaxResultsTable.TabIndex = 1;
             // 
             // ELFGraphicOutputsTabPage
@@ -1338,7 +1359,7 @@ namespace SLF
             this.ELFGraphicOutputsTabPage.Margin = new System.Windows.Forms.Padding(2);
             this.ELFGraphicOutputsTabPage.Name = "ELFGraphicOutputsTabPage";
             this.ELFGraphicOutputsTabPage.Padding = new System.Windows.Forms.Padding(2);
-            this.ELFGraphicOutputsTabPage.Size = new System.Drawing.Size(1026, 530);
+            this.ELFGraphicOutputsTabPage.Size = new System.Drawing.Size(1026, 508);
             this.ELFGraphicOutputsTabPage.TabIndex = 5;
             this.ELFGraphicOutputsTabPage.Text = "Projeksiyon Grafik Sonuçları";
             this.ELFGraphicOutputsTabPage.UseVisualStyleBackColor = true;
@@ -1356,7 +1377,7 @@ namespace SLF
             this.panel_ELF_Grafikler.Controls.Add(this.pictureBox_ELF_1);
             this.panel_ELF_Grafikler.Location = new System.Drawing.Point(2, 2);
             this.panel_ELF_Grafikler.Name = "panel_ELF_Grafikler";
-            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1023, 581);
+            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1023, 563);
             this.panel_ELF_Grafikler.TabIndex = 6;
             // 
             // pictureBox_ELF_5
@@ -1417,7 +1438,7 @@ namespace SLF
             this.ELFTablePanel.Location = new System.Drawing.Point(230, 2);
             this.ELFTablePanel.Margin = new System.Windows.Forms.Padding(2);
             this.ELFTablePanel.Name = "ELFTablePanel";
-            this.ELFTablePanel.Size = new System.Drawing.Size(762, 866);
+            this.ELFTablePanel.Size = new System.Drawing.Size(762, 888);
             this.ELFTablePanel.TabIndex = 21;
             // 
             // ELFGraphicsPanel
@@ -1505,10 +1526,10 @@ namespace SLF
             this.tab_imar.Controls.Add(this.gMapControl_imar);
             this.tab_imar.Controls.Add(this.buton_imar_katmanlar);
             this.tab_imar.ImageIndex = 11;
-            this.tab_imar.Location = new System.Drawing.Point(4, 48);
+            this.tab_imar.Location = new System.Drawing.Point(4, 26);
             this.tab_imar.Margin = new System.Windows.Forms.Padding(2);
             this.tab_imar.Name = "tab_imar";
-            this.tab_imar.Size = new System.Drawing.Size(1225, 542);
+            this.tab_imar.Size = new System.Drawing.Size(1225, 564);
             this.tab_imar.TabIndex = 4;
             this.tab_imar.Text = "İmar Analizleri";
             this.tab_imar.UseVisualStyleBackColor = true;
@@ -2001,7 +2022,7 @@ namespace SLF
             this.webView_imar.Location = new System.Drawing.Point(0, 0);
             this.webView_imar.Margin = new System.Windows.Forms.Padding(2);
             this.webView_imar.Name = "webView_imar";
-            this.webView_imar.Size = new System.Drawing.Size(1225, 542);
+            this.webView_imar.Size = new System.Drawing.Size(1225, 564);
             this.webView_imar.Source = new System.Uri("https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu", System.UriKind.Absolute);
             this.webView_imar.TabIndex = 38;
             this.webView_imar.Visible = false;
@@ -2035,7 +2056,7 @@ namespace SLF
             this.gMapControl_imar.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_imar.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_imar.ShowTileGridLines = false;
-            this.gMapControl_imar.Size = new System.Drawing.Size(788, 674);
+            this.gMapControl_imar.Size = new System.Drawing.Size(788, 696);
             this.gMapControl_imar.TabIndex = 35;
             this.gMapControl_imar.Zoom = 0D;
             this.gMapControl_imar.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_imar_OnMapClick);
@@ -2052,7 +2073,7 @@ namespace SLF
             this.buton_imar_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
             this.buton_imar_katmanlar.Cursor = System.Windows.Forms.Cursors.Default;
             this.buton_imar_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_imar_katmanlar.Location = new System.Drawing.Point(190, 659);
+            this.buton_imar_katmanlar.Location = new System.Drawing.Point(190, 681);
             this.buton_imar_katmanlar.Margin = new System.Windows.Forms.Padding(2);
             this.buton_imar_katmanlar.Name = "buton_imar_katmanlar";
             this.buton_imar_katmanlar.Size = new System.Drawing.Size(44, 42);
@@ -2137,10 +2158,10 @@ namespace SLF
             this.tab_optDTR.Controls.Add(this.checkBox_optDTR_Eskişehir);
             this.tab_optDTR.Controls.Add(this.checkBox_optDTR_İzmir);
             this.tab_optDTR.Controls.Add(this.buton_optimalDTR_katmanlar);
-            this.tab_optDTR.Location = new System.Drawing.Point(4, 48);
+            this.tab_optDTR.Location = new System.Drawing.Point(4, 26);
             this.tab_optDTR.Margin = new System.Windows.Forms.Padding(2);
             this.tab_optDTR.Name = "tab_optDTR";
-            this.tab_optDTR.Size = new System.Drawing.Size(1225, 542);
+            this.tab_optDTR.Size = new System.Drawing.Size(1225, 564);
             this.tab_optDTR.TabIndex = 7;
             this.tab_optDTR.Text = "Optimal DTR Konumlandırma";
             this.tab_optDTR.UseVisualStyleBackColor = true;
@@ -2153,7 +2174,7 @@ namespace SLF
             this.buton_optDTR_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
             this.buton_optDTR_katmanlar.Cursor = System.Windows.Forms.Cursors.Default;
             this.buton_optDTR_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_optDTR_katmanlar.Location = new System.Drawing.Point(0, 659);
+            this.buton_optDTR_katmanlar.Location = new System.Drawing.Point(0, 681);
             this.buton_optDTR_katmanlar.Margin = new System.Windows.Forms.Padding(2);
             this.buton_optDTR_katmanlar.Name = "buton_optDTR_katmanlar";
             this.buton_optDTR_katmanlar.Size = new System.Drawing.Size(44, 42);
@@ -2188,7 +2209,7 @@ namespace SLF
             this.gMapControl_optimalDTR.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_optimalDTR.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_optimalDTR.ShowTileGridLines = false;
-            this.gMapControl_optimalDTR.Size = new System.Drawing.Size(868, 695);
+            this.gMapControl_optimalDTR.Size = new System.Drawing.Size(868, 717);
             this.gMapControl_optimalDTR.TabIndex = 42;
             this.gMapControl_optimalDTR.Zoom = 0D;
             // 
@@ -2204,7 +2225,7 @@ namespace SLF
             this.webView_optimalDTR.Location = new System.Drawing.Point(2, 2);
             this.webView_optimalDTR.Margin = new System.Windows.Forms.Padding(2);
             this.webView_optimalDTR.Name = "webView_optimalDTR";
-            this.webView_optimalDTR.Size = new System.Drawing.Size(868, 695);
+            this.webView_optimalDTR.Size = new System.Drawing.Size(868, 717);
             this.webView_optimalDTR.Source = new System.Uri("https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu", System.UriKind.Absolute);
             this.webView_optimalDTR.TabIndex = 40;
             this.webView_optimalDTR.Visible = false;
@@ -2240,7 +2261,7 @@ namespace SLF
             this.buton_optimalDTR_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
             this.buton_optimalDTR_katmanlar.Cursor = System.Windows.Forms.Cursors.Default;
             this.buton_optimalDTR_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_optimalDTR_katmanlar.Location = new System.Drawing.Point(113, 655);
+            this.buton_optimalDTR_katmanlar.Location = new System.Drawing.Point(113, 677);
             this.buton_optimalDTR_katmanlar.Margin = new System.Windows.Forms.Padding(2);
             this.buton_optimalDTR_katmanlar.Name = "buton_optimalDTR_katmanlar";
             this.buton_optimalDTR_katmanlar.Size = new System.Drawing.Size(44, 42);
@@ -2420,7 +2441,7 @@ namespace SLF
             this.ELFLowSenaryoTable.Name = "ELFLowSenaryoTable";
             this.ELFLowSenaryoTable.RowHeadersWidth = 18;
             this.ELFLowSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(798, 553);
+            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(798, 549);
             this.ELFLowSenaryoTable.TabIndex = 1;
             // 
             // tabPage_baz_senaryo
@@ -2459,7 +2480,7 @@ namespace SLF
             this.ELFBaseSenaryoTable.Name = "ELFBaseSenaryoTable";
             this.ELFBaseSenaryoTable.RowHeadersWidth = 18;
             this.ELFBaseSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(798, 553);
+            this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(798, 549);
             this.ELFBaseSenaryoTable.TabIndex = 1;
             // 
             // tabPage_yuksek_senaryo
@@ -2498,7 +2519,7 @@ namespace SLF
             this.ELFHighSenaryoTable.Name = "ELFHighSenaryoTable";
             this.ELFHighSenaryoTable.RowHeadersWidth = 51;
             this.ELFHighSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFHighSenaryoTable.Size = new System.Drawing.Size(798, 553);
+            this.ELFHighSenaryoTable.Size = new System.Drawing.Size(798, 549);
             this.ELFHighSenaryoTable.TabIndex = 1;
             // 
             // tabPage_maks_senaryo
@@ -2526,7 +2547,7 @@ namespace SLF
             this.ELFMaxSenaryoTable.Name = "ELFMaxSenaryoTable";
             this.ELFMaxSenaryoTable.RowHeadersWidth = 51;
             this.ELFMaxSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(798, 553);
+            this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(798, 549);
             this.ELFMaxSenaryoTable.TabIndex = 1;
             // 
             // EkonometrikSenaryoElementsPanel
@@ -3851,27 +3872,6 @@ namespace SLF
             this.ELFMinSenaryoGraphPicBox.TabIndex = 22;
             this.ELFMinSenaryoGraphPicBox.TabStop = false;
             // 
-            // OpenModuleButton
-            // 
-            this.OpenModuleButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.OpenModuleButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.OpenModuleButton.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.OpenModuleButton.BorderColor = System.Drawing.Color.PaleVioletRed;
-            this.OpenModuleButton.BorderRadius = 0;
-            this.OpenModuleButton.BorderSize = 0;
-            this.OpenModuleButton.FlatAppearance.BorderSize = 0;
-            this.OpenModuleButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.OpenModuleButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.OpenModuleButton.ForeColor = System.Drawing.Color.White;
-            this.OpenModuleButton.Location = new System.Drawing.Point(1011, 493);
-            this.OpenModuleButton.Name = "OpenModuleButton";
-            this.OpenModuleButton.Size = new System.Drawing.Size(150, 40);
-            this.OpenModuleButton.TabIndex = 19;
-            this.OpenModuleButton.Text = "Modüle Git";
-            this.OpenModuleButton.TextColor = System.Drawing.Color.White;
-            this.OpenModuleButton.UseVisualStyleBackColor = false;
-            this.OpenModuleButton.Click += new System.EventHandler(this.OpenModuleButton_Click);
-            // 
             // ModülFormu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -4236,7 +4236,7 @@ namespace SLF
         private Guna.UI2.WinForms.Guna2ImageButton HomePageButton;
         private Panel HeaderPanel;
         private TabPage YeniGenislemeSenaryoTabPage;
-        private SLF.CustomButton OpenModuleButton;
+        private CustomButton OpenModuleButton;
 
     }
 }
