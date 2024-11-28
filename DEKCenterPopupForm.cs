@@ -42,7 +42,7 @@ namespace SLF
         }
 
         private void InitializeDataGridView(NoktaVeri veri)
-        {
+        { 
             // Fill initial coordinates from veri object
             DEKCenterDataGridView.Rows.Add();
             DEKCenterDataGridView.Rows[0].Cells["DEK_X_KOORDINAT"].Value = veri.Enlem;
@@ -168,8 +168,6 @@ namespace SLF
 
         private void SetupEventHandlers()
         {
-            DEKTamamButton.Click += DEKTamamButton_Click;
-            DEKCancelButton.Click += DEKCancelButton_Click;
             this.FormClosing += DEKCenterPopupForm_FormClosing;
             DEKCenterDataGridView.CellValueChanged += DEKCenterDataGridView_CellValueChanged;
         }

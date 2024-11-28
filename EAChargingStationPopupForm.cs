@@ -66,8 +66,6 @@ namespace SLF
 
         private void SetupEventHandlers()
         {
-            TamamButton.Click += TamamButton_Click;
-            CancelButton.Click += CancelButton_Click;
             this.FormClosing += ChargingStationPopupForm_FormClosing;
             ChargingStationDataGridView.CellValueChanged += ChargingStationDataGridView_CellValueChanged;
         }
@@ -84,10 +82,12 @@ namespace SLF
             }
         }
 
-        private void TamamButton_Click(object sender, EventArgs e)
+        private void EATamamButton_Click(object sender, EventArgs e)
         {
+
             foreach (DataGridViewCell cell in ChargingStationDataGridView.Rows[0].Cells)
             {
+                Console.WriteLine("Button clicked1"); // Log the click event
                 if (cell.Value == null || string.IsNullOrWhiteSpace(cell.Value.ToString()))
                 {
                     MessageBox.Show("Lütfen tüm alanları doldurun.");
@@ -107,7 +107,7 @@ namespace SLF
                 newRow["EA_Y_KOORDINAT"] = boylam;
 
                 dataTable.Rows.Add(newRow);
-
+                Console.WriteLine("Button clickedy"); // Log the click event
                 // Show success message
                 MessageBox.Show("Şarj istasyonu başarıyla eklendi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 isOperationCancelled = false;
@@ -120,7 +120,7 @@ namespace SLF
             }
         }
 
-        private void CancelButton_Click(object sender, EventArgs e)
+        private void EACancelButton_Click(object sender, EventArgs e)
         {
             this.Close();
         }

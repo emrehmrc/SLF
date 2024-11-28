@@ -2215,68 +2215,6 @@ namespace SLF
         }
 
 
-        public void OnMapClickEventi(PointLatLng pointClick, MouseEventArgs e, GMapOverlay markerOverlay,
-                ref List<PointLatLng> polygonPoints, ref GMapOverlay polygonOverlay,
-                System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                // boolean control for marker selection when clicking on the map
-                if (isSelecting_marker)
-                {
-                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
-                    markerOverlay.Markers.Add(marker);
-
-                    NoktaVeri noktaVeri_marker = new NoktaVeri
-                    {
-                        Enlem = Math.Round(pointClick.Lat, 4),
-                        Boylam = Math.Round(pointClick.Lng, 4)
-                    };
-
-                    marker.Tag = noktaVeri_marker;
-
-                }
-
-                // boolean control for polygon selection when clicking on the map
-                if (isSelecting_polygon)
-                {
-                    polygonPoints.Add(pointClick);
-                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
-                    markerOverlay.Markers.Add(marker);
-
-                    if (polygonOverlay != null)
-                    {
-                        cbs.GetActiveGMapControl().Overlays.Remove(polygonOverlay);
-                    }
-
-                    layer_index = Array.FindIndex(cbs.tüm_katmanlar_array, s => s == null);
-
-                    if (layer_index == -1)
-                    {
-                        MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
-                        return;
-                    }
-
-                    polygonOverlay = new GMapOverlay("polygonOverlay_" + layer_index.ToString());
-
-                    cbs.GetActiveGMapControl().Overlays.Add(polygonOverlay);
-
-                    // eğer gmapControl_OnMapClick event'i ile 2 den fazla nokta seçilirse,
-                    // bu noktalar arasında bir poligon çiz
-                    if (polygonPoints.Count >= 3)
-                    {
-                        cbs.Draw_Polygon(polygonPoints, polygonOverlay, cbs.GetActiveGMapControl());
-                        double area = cbs.CalculatePolygonArea(polygonPoints);
-
-                        mesafe_metre.Visible = false;
-                        mesafe.Visible = true;
-                        mesafe.Text = "Seçili Alan: " + Math.Round(area, 0).ToString() + " m²";
-                    }
-                }
-                cbs.GetActiveGMapControl().Refresh();
-            }
-
-        }
 
         private void gMapControl_imar_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
@@ -3232,8 +3170,71 @@ namespace SLF
             }
             OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
     ref polygonOverlay_ea, Mesafe_yuk, mesafe_metre_yuk);
+        }
+
+        public void OnMapClickEventi(PointLatLng pointClick, MouseEventArgs e, GMapOverlay markerOverlay,
+        ref List<PointLatLng> polygonPoints, ref GMapOverlay polygonOverlay,
+        System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                // boolean control for marker selection when clicking on the map
+                if (isSelecting_marker)
+                {
+                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green);
+                    markerOverlay.Markers.Add(marker);
+
+                    NoktaVeri noktaVeri_marker = new NoktaVeri
+                    {
+                        Enlem = Math.Round(pointClick.Lat, 4),
+                        Boylam = Math.Round(pointClick.Lng, 4)
+                    };
+
+                    marker.Tag = noktaVeri_marker;
+
+                }
+
+                // boolean control for polygon selection when clicking on the map
+                if (isSelecting_polygon)
+                {
+                    polygonPoints.Add(pointClick);
+                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue);
+                    markerOverlay.Markers.Add(marker);
+
+                    if (polygonOverlay != null)
+                    {
+                        cbs.GetActiveGMapControl().Overlays.Remove(polygonOverlay);
+                    }
+
+                    layer_index = Array.FindIndex(cbs.tüm_katmanlar_array, s => s == null);
+
+                    if (layer_index == -1)
+                    {
+                        MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
+                        return;
+                    }
+
+                    polygonOverlay = new GMapOverlay("polygonOverlay_" + layer_index.ToString());
+
+                    cbs.GetActiveGMapControl().Overlays.Add(polygonOverlay);
+
+                    // eğer gmapControl_OnMapClick event'i ile 2 den fazla nokta seçilirse,
+                    // bu noktalar arasında bir poligon çiz
+                    if (polygonPoints.Count >= 3)
+                    {
+                        cbs.Draw_Polygon(polygonPoints, polygonOverlay, cbs.GetActiveGMapControl());
+                        double area = cbs.CalculatePolygonArea(polygonPoints);
+
+                        mesafe_metre.Visible = false;
+                        mesafe.Visible = true;
+                        mesafe.Text = "Seçili Alan: " + Math.Round(area, 0).ToString() + " m²";
+                    }
+                }
+                cbs.GetActiveGMapControl().Refresh();
+            }
 
         }
+
         private async Task eaHaritayaVeriYukleAsync()
         {
             int redDc = 0;
