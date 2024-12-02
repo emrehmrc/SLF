@@ -1182,9 +1182,6 @@ namespace SLF
 
         }
 
-       
-
-
         private void gMapControl_Dek_OnMarkerClick(GMapMarker item, MouseEventArgs e)
 
         {
@@ -2523,9 +2520,6 @@ namespace SLF
             }
         }
 
-
-        
-
         /*---------------------------------------------------------------------------------------------- */
         /*----------------------------------     CUSTOM METHODS & CLASSES     -------------------------- */
 
@@ -2628,7 +2622,6 @@ namespace SLF
                 e.Cancel = true; // Cancel the closing event
             }
         }
-
         private void Poligon_Sil_Click(object sender, EventArgs e)
         {
             if (cbs.GetActiveGMapControl() == gMapControl_imar)
@@ -2648,7 +2641,6 @@ namespace SLF
             }
 
         }
-
         private void veri_listesi_seçimi_SelectedIndexChanged(object sender, EventArgs e)
         {
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
@@ -2675,7 +2667,6 @@ namespace SLF
             tabControl.TabPages.Clear();
             tabControl.TabPages.AddRange(tabPages.ToArray());
         }
-
         private void veri_listesi_seçimi_DrawItem(object sender, DrawItemEventArgs e)
         {
 
@@ -3330,7 +3321,7 @@ namespace SLF
 
         private async void gelecekSimilasyonGoruntule(object sender, EventArgs e)
         {
-
+            // Checkbox'ları görünür hale getir
             checkBox_AC_Home.Visible = true;
             checkBox_AC_Public.Visible = true;
             checkBox_AC_Work.Visible = true;
@@ -3339,8 +3330,6 @@ namespace SLF
             checkBox_AC_Work.Checked = true;
             checkBox_AC_Home.Checked = true;
             checkBox_DC_Fast.Checked = true;
-
-            // Checkbox'ları görünür hale getir
 
             gMapControl_EA.Overlays.Clear();
             gMapControl_EA.Refresh();
@@ -3688,7 +3677,8 @@ namespace SLF
         }
         private async void dekSimulasyonGoruntule(object sender, EventArgs e)
         {
-            // Checkbox'ları görünür hale getir
+            gMapControl_DEK.Overlays.Clear();
+            gMapControl_DEK.Refresh();
 
             // Şehir ve hız seçimine göre dosya yolunu ayarla
             string filePath = "";
@@ -3703,19 +3693,19 @@ namespace SLF
             }
             else if (SelectedCity == "İzmir" && SelectedSpeed == "varsayılan")
             {
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\İzmir\dek_distribution_2024_2030_3_İzmir_baz.xlsx";
+                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\DEK\İzmir\dek_distribution_2024_2030_3_İzmir_baz.xlsx";
             }
             else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Hızlı")
             {
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_yüksek.xlsx";
+                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_baz.xlsx";
             }
             else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Yavaş")
             {
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_düşük.xlsx";
+                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_düşük.xlsx";
             }
             else if (SelectedCity == "Eskişehir" && SelectedSpeed == "varsayılan")
             {
-                filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_baz.xlsx";
+                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_yüksek.xlsx";
             }
             else
             {

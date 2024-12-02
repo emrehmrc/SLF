@@ -40,9 +40,8 @@ namespace SLF
             InitializeDataGridView(veri);
             SetupEventHandlers();
         }
-
         private void InitializeDataGridView(NoktaVeri veri)
-        { 
+        {
             // Fill initial coordinates from veri object
             DEKCenterDataGridView.Rows.Add();
             DEKCenterDataGridView.Rows[0].Cells["DEK_X_KOORDINAT"].Value = veri.Enlem;
@@ -58,9 +57,9 @@ namespace SLF
             if (GirdiModülü.dataTablesByType.TryGetValue("DTR Verileri", out DataTable trafoDataTable))
             {
                 List<string> trafoKoduListesi = trafoDataTable.AsEnumerable()
-                                                              .Select(row => row["TRAFO_KODU"].ToString())
-                                                              .Distinct()
-                                                              .ToList();
+                                                                .Select(row => row["TRAFO_KODU"].ToString())
+                                                                .Distinct()
+                                                                .ToList();
 
                 if (DEKCenterDataGridView.Columns["DEK_BAGLANDIGI_TRAFO_KODU"] is DataGridViewComboBoxColumn comboBoxColumn)
                 {
@@ -91,6 +90,63 @@ namespace SLF
                     if (cityDistricts.ContainsKey(city))
                     {
                         comboBoxColumn.Items.AddRange(cityDistricts[city].ToArray());
+                    }
+                }
+
+                // Optionally set the first item as the default if needed
+                var comboBoxCell = DEKCenterDataGridView.Rows[0].Cells["ILCE_ADI"] as DataGridViewComboBoxCell;
+                if (comboBoxCell != null && comboBoxColumn.Items.Count > 0)
+                {
+                    // Clear the selection if necessary and update it
+                    comboBoxCell.Value = null;
+                }
+            }
+        }
+
+        private void FilterCountiesBasedOnCoordinates(double selectedX, double selectedY)
+        {
+            // Get the closest city from the dictionary based on the coordinates
+            var closestCity = cityCoordinates
+                              .OrderBy(city => GetDistance(city.Value.Lat, city.Value.Lng, selectedX, selectedY))
+                              .FirstOrDefault();
+
+            // Debugging to check which city is selected
+            Console.WriteLine($"Selected Coordinates: X={selectedX}, Y={selectedY}");
+            Console.WriteLine($"Closest City: {closestCity.Key}");
+
+            if (closestCity.Key != null)
+            {
+                // Access the ComboBox column in the DataGridView
+                var comboBoxColumn = DEKCenterDataGridView.Columns["ILCE_ADI"] as DataGridViewComboBoxColumn;
+
+                if (comboBoxColumn != null)
+                {
+                    // Clear the existing items
+                    comboBoxColumn.Items.Clear();
+
+                    // Add the districts for the closest city to the ComboBox column
+                    if (cityDistricts.ContainsKey(closestCity.Key))
+                    {
+                        comboBoxColumn.Items.AddRange(cityDistricts[closestCity.Key].ToArray());
+                    }
+
+                    // Debugging to check the districts added
+                    Console.WriteLine($"Added Districts: {string.Join(", ", cityDistricts[closestCity.Key])}");
+                }
+
+                // After updating the items, retain the selection
+                var comboBoxCell = DEKCenterDataGridView.Rows[0].Cells["ILCE_ADI"] as DataGridViewComboBoxCell;
+                if (comboBoxCell != null)
+                {
+                    var currentDistrict = comboBoxCell.Value?.ToString();
+                    if (!string.IsNullOrEmpty(currentDistrict) && comboBoxColumn.Items.Contains(currentDistrict))
+                    {
+                        comboBoxCell.Value = currentDistrict; // Retain the current selection
+                    }
+                    else
+                    {
+                        // If no valid selection, set the default district
+                        comboBoxCell.Value = comboBoxColumn.Items.Count > 0 ? comboBoxColumn.Items[0] : null;
                     }
                 }
             }
@@ -124,46 +180,6 @@ namespace SLF
             return distance;
         }
 
-        private void FilterCountiesBasedOnCoordinates(double selectedX, double selectedY)
-        {
-            // Get the closest city from the dictionary based on the coordinates
-            var closestCity = cityCoordinates
-                              .OrderBy(city => GetDistance(city.Value.Lat, city.Value.Lng, selectedX, selectedY))
-                              .FirstOrDefault();
-
-            // Debugging to check which city is selected
-            Console.WriteLine($"Selected Coordinates: X={selectedX}, Y={selectedY}");
-            Console.WriteLine($"Closest City: {closestCity.Key}");
-
-            if (closestCity.Key != null)
-            {
-                // Access the ComboBox column in the DataGridView
-                var comboBoxColumn = DEKCenterDataGridView.Columns["ILCE_ADI"] as DataGridViewComboBoxColumn;
-
-                if (comboBoxColumn != null)
-                {
-                    // Clear the existing items
-                    comboBoxColumn.Items.Clear();
-
-                    // Ensure that the closest city has districts defined in the dictionary
-                    if (cityDistricts.ContainsKey(closestCity.Key))
-                    {
-                        // Add the districts for the closest city to the ComboBox column
-                        comboBoxColumn.Items.AddRange(cityDistricts[closestCity.Key].ToArray());
-                    }
-
-                    // Debugging to check the districts added
-                    Console.WriteLine($"Added Districts: {string.Join(", ", cityDistricts[closestCity.Key])}");
-                }
-
-                // Optionally, select the first district in the ComboBox
-                var comboBoxCell = DEKCenterDataGridView.Rows[0].Cells["ILCE_ADI"] as DataGridViewComboBoxCell;
-                if (comboBoxCell != null && comboBoxCell.Items.Count > 0)
-                {
-                    comboBoxCell.Value = comboBoxCell.Items[0];  // Set the first district as the default
-                }
-            }
-        }
 
 
         private void SetupEventHandlers()
