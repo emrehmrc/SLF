@@ -32,25 +32,21 @@ namespace SLF
         {
             StartButton.Focus();
         }
-
         private void StartButton_Click(object sender, EventArgs e)
         {
-            Console.WriteLine("StartButton clicked");
-            MethodForm optionForm = new MethodForm(this);
-            optionForm.ShowDialog();
+            MethodForm methodForm = new MethodForm(this);
+            methodForm.ShowDialog();
             this.Show();
         }
 
         private void roundButton2_Click(object sender, EventArgs e)
         {
-            Console.WriteLine("roundButton2 clicked");
             Yardım yardım_formu = new Yardım();
             yardım_formu.Show();
         }
 
         private void roundButton1_Click(object sender, EventArgs e)
         {
-            Console.WriteLine("roundButton1 clicked");
             mod2 = new Hakkında();
             mod2.Tag = this;
             mod2.Show();
@@ -59,8 +55,8 @@ namespace SLF
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            // Check if Enter key is pressed
-            if (keyData == Keys.Enter)
+            // Only trigger the StartButton's click event if HomePageForm is the active form
+            if (keyData == Keys.Enter && this == Form.ActiveForm)
             {
                 // Trigger StartButton's Click event
                 StartButton.PerformClick();

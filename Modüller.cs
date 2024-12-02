@@ -590,6 +590,8 @@ namespace SLF
         }
         private async void OpenModuleButton_Click(object sender, EventArgs e)
         {
+
+
             // Disable the button initially
             OpenModuleButton.Enabled = false;
 
@@ -606,7 +608,22 @@ namespace SLF
                 OpenModuleButton.Enabled = true; // Re-enable the button before returning
                 return;
             }
-
+            if (veri_listesi_seçimi.Text == "Ekonometrik Yük Tahmini Verileri")
+            {
+                Modül_Tabları.SelectedTab = tab_senaryo; // Move this line here to ensure it only executes after loading data
+            }
+            if (veri_listesi_seçimi.Text == "EA Şarj Verileri")
+            {
+                Modül_Tabları.SelectedTab = tab_ea;
+            }
+            if (veri_listesi_seçimi.Text == "DEK Verileri")
+            {
+                Modül_Tabları.SelectedTab = tab_dek;
+            }
+            /*            if (veri_listesi_seçimi.Text == "DTR Verileri")
+                        {
+                            Modül_Tabları.SelectedTab = tab_optDTR;
+                        }*/
             // Asynchronous task to load the Excel package
             await Task.Run(() =>
             {
@@ -640,23 +657,6 @@ namespace SLF
 
             // After loading the data, enable the button
             OpenModuleButton.Enabled = true;
-
-            if (veri_listesi_seçimi.Text == "Ekonometrik Yük Tahmini Verileri")
-            {
-                Modül_Tabları.SelectedTab = tab_senaryo; // Move this line here to ensure it only executes after loading data
-            }
-            if (veri_listesi_seçimi.Text == "EA Şarj Verileri")
-            {
-                Modül_Tabları.SelectedTab = tab_ea;
-            }
-            if (veri_listesi_seçimi.Text == "DEK Verileri")
-            {
-                Modül_Tabları.SelectedTab = tab_dek;
-            }
-            /*            if (veri_listesi_seçimi.Text == "DTR Verileri")
-                        {
-                            Modül_Tabları.SelectedTab = tab_optDTR;
-                        }*/
         }
 
         private void LoadImagesIntoPictureBoxes()
@@ -2856,11 +2856,8 @@ namespace SLF
         {
             yearApproveButton.Enabled = true;
         }
-
         private void HomePageButton_Click(object sender, EventArgs e)
         {
-            // Show the confirmation dialog for navigating to the home page
-
             // Show the confirmation dialog for navigating to the home page
             DialogResult result = MessageBox.Show(
                 "Ana sayfaya dönmek istediğinize emin misiniz? Kaydedilmeyen veriler kaybolacaktır!",
@@ -2871,16 +2868,37 @@ namespace SLF
 
             if (result == DialogResult.Yes)
             {
-                // Unsubscribe from the FormClosing event to prevent the warning dialog
+                // Unsubscribe from the FormClosing event only if the user clicks 'Yes'
                 this.FormClosing -= ModülFormu_FormClosing;
-
-                // Proceed to open the home page
-                HomePageForm homePageForm = new HomePageForm();
-                homePageForm.Show();
-                this.Hide(); // Hide the current form
+                this.Hide(); // Hide the current form (ModülFormu)
             }
             // If the user clicks 'No', do nothing and stay on the current form
         }
+
+        /*        private void HomePageButton_Click(object sender, EventArgs e)
+                {
+                    // Show the confirmation dialog for navigating to the home page
+
+                    // Show the confirmation dialog for navigating to the home page
+                    DialogResult result = MessageBox.Show(
+                        "Ana sayfaya dönmek istediğinize emin misiniz? Kaydedilmeyen veriler kaybolacaktır!",
+                        "Ana Sayfaya Dön",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning
+                    );
+
+                    if (result == DialogResult.Yes)
+                    {
+                        // Unsubscribe from the FormClosing event to prevent the warning dialog
+                        this.FormClosing -= ModülFormu_FormClosing;
+
+                        // Proceed to open the home page
+                        HomePageForm homePageForm = new HomePageForm();
+                        homePageForm.Show();
+                        this.Hide(); // Hide the current form
+                    }
+                    // If the user clicks 'No', do nothing and stay on the current form
+                }*/
 
         private void yearApproveButton_Click(object sender, EventArgs e)
         {

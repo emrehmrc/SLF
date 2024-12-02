@@ -28,13 +28,13 @@ namespace SLF
 
             // Ensure ForwardButton has focus when the form is shown
             this.Shown += MethodForm_Shown;
+
         }
 
         private void MethodForm_Shown(object sender, EventArgs e)
         {
             ForwardButton.Focus();
         }
-
         private void ForwardButton_Click(object sender, EventArgs e)
         {
             if (MethodComboBox.SelectedItem != null)
@@ -59,8 +59,9 @@ namespace SLF
             mod1.ShowDialog();  // Show the new form as a dialog
 
             // Optionally, you can show both forms again if needed
-            this.Show();  // Show MethodForm again after ModülFormu is closed
+
             homePageForm.Show(); // Show HomePageForm again if it needs to be visible
+            this.Show();  // Show MethodForm again after ModülFormu is closed
         }
 
         private void MethodPanel_Paint(object sender, PaintEventArgs e)
@@ -71,8 +72,8 @@ namespace SLF
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            // Check if Enter key is pressed
-            if (keyData == Keys.Enter)
+            // Only trigger the ForwardButton's click event if MethodForm is the active form
+            if (keyData == Keys.Enter && this == Form.ActiveForm)
             {
                 // Trigger ForwardButton's Click event
                 ForwardButton.PerformClick();

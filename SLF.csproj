@@ -816,6 +816,8 @@
     <None Include="Pictures\Exterior1.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Pictures\homepage %281%29.png" />
+    <None Include="Pictures\homepage.png" />
     <None Include="Pictures\HomeDepot_41088.png" />
     <None Include="Pictures\KML2.ico" />
     <None Include="Pictures\KML2.png" />
