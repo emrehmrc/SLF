@@ -30,9 +30,9 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MethodForm));
             this.MethodPanel = new System.Windows.Forms.Panel();
+            this.ForwardButton = new SLF.CustomButton();
             this.label1 = new System.Windows.Forms.Label();
             this.MethodComboBox = new System.Windows.Forms.ComboBox();
-            this.ForwardButton = new SLF.CustomButton();
             this.MethodPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -50,6 +50,26 @@
             this.MethodPanel.Size = new System.Drawing.Size(299, 352);
             this.MethodPanel.TabIndex = 0;
             this.MethodPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.MethodPanel_Paint);
+            // 
+            // ForwardButton
+            // 
+            this.ForwardButton.BackColor = System.Drawing.Color.DarkOrange;
+            this.ForwardButton.BackgroundColor = System.Drawing.Color.DarkOrange;
+            this.ForwardButton.BorderColor = System.Drawing.Color.PaleVioletRed;
+            this.ForwardButton.BorderRadius = 0;
+            this.ForwardButton.BorderSize = 0;
+            this.ForwardButton.FlatAppearance.BorderSize = 0;
+            this.ForwardButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ForwardButton.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.ForwardButton.ForeColor = System.Drawing.Color.White;
+            this.ForwardButton.Location = new System.Drawing.Point(75, 247);
+            this.ForwardButton.Name = "ForwardButton";
+            this.ForwardButton.Size = new System.Drawing.Size(150, 40);
+            this.ForwardButton.TabIndex = 3;
+            this.ForwardButton.Text = "İLERLE";
+            this.ForwardButton.TextColor = System.Drawing.Color.White;
+            this.ForwardButton.UseVisualStyleBackColor = false;
+            this.ForwardButton.Click += new System.EventHandler(this.ForwardButton_Click);
             // 
             // label1
             // 
@@ -79,26 +99,6 @@
             this.MethodComboBox.TabIndex = 1;
             this.MethodComboBox.Text = "Başlangıç metodu seçiniz.";
             // 
-            // ForwardButton
-            // 
-            this.ForwardButton.BackColor = System.Drawing.Color.DarkOrange;
-            this.ForwardButton.BackgroundColor = System.Drawing.Color.DarkOrange;
-            this.ForwardButton.BorderColor = System.Drawing.Color.PaleVioletRed;
-            this.ForwardButton.BorderRadius = 0;
-            this.ForwardButton.BorderSize = 0;
-            this.ForwardButton.FlatAppearance.BorderSize = 0;
-            this.ForwardButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.ForwardButton.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.ForwardButton.ForeColor = System.Drawing.Color.White;
-            this.ForwardButton.Location = new System.Drawing.Point(75, 247);
-            this.ForwardButton.Name = "ForwardButton";
-            this.ForwardButton.Size = new System.Drawing.Size(150, 40);
-            this.ForwardButton.TabIndex = 3;
-            this.ForwardButton.Text = "İLERLE";
-            this.ForwardButton.TextColor = System.Drawing.Color.White;
-            this.ForwardButton.UseVisualStyleBackColor = false;
-            this.ForwardButton.Click += new System.EventHandler(this.ForwardButton_Click);
-            // 
             // MethodForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
@@ -107,8 +107,10 @@
             this.ClientSize = new System.Drawing.Size(384, 461);
             this.Controls.Add(this.MethodPanel);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
+            this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(400, 500);
             this.MinimumSize = new System.Drawing.Size(400, 500);
             this.Name = "MethodForm";

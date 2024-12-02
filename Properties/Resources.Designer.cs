@@ -93,6 +93,16 @@ namespace SLF.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap epdk_logo {
+            get {
+                object obj = ResourceManager.GetObject("epdk-logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Home_Address {
             get {
                 object obj = ResourceManager.GetObject("Home Address", resourceCulture);
