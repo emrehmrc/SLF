@@ -41,9 +41,9 @@
             this.EA_Y_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ChargingStationpanel = new System.Windows.Forms.Panel();
             this.ChargingStationpanel2 = new System.Windows.Forms.Panel();
-            this.EACancelButton = new Guna.UI2.WinForms.Guna2Button();
-            this.EATamamButton = new Guna.UI2.WinForms.Guna2Button();
             this.guna2AnimateWindow1_Charging_Popup = new Guna.UI2.WinForms.Guna2AnimateWindow(this.components);
+            this.EACancelButton = new SLF.CustomButton();
+            this.EATamamButton = new SLF.CustomButton();
             ((System.ComponentModel.ISupportInitialize)(this.ChargingStationDataGridView)).BeginInit();
             this.ChargingStationpanel.SuspendLayout();
             this.ChargingStationpanel2.SuspendLayout();
@@ -168,8 +168,8 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ChargingStationpanel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(223)))), ((int)(((byte)(156)))));
-            this.ChargingStationpanel2.Controls.Add(this.EACancelButton);
             this.ChargingStationpanel2.Controls.Add(this.EATamamButton);
+            this.ChargingStationpanel2.Controls.Add(this.EACancelButton);
             this.ChargingStationpanel2.Location = new System.Drawing.Point(0, 393);
             this.ChargingStationpanel2.Name = "ChargingStationpanel2";
             this.ChargingStationpanel2.Size = new System.Drawing.Size(800, 57);
@@ -177,38 +177,42 @@
             // 
             // EACancelButton
             // 
-            this.EACancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.EACancelButton.BackColor = System.Drawing.Color.DarkSeaGreen;
-            this.EACancelButton.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
-            this.EACancelButton.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
-            this.EACancelButton.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
-            this.EACancelButton.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
-            this.EACancelButton.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
+            this.EACancelButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
+            this.EACancelButton.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
+            this.EACancelButton.BorderColor = System.Drawing.Color.PaleVioletRed;
+            this.EACancelButton.BorderRadius = 0;
+            this.EACancelButton.BorderSize = 0;
+            this.EACancelButton.FlatAppearance.BorderSize = 0;
+            this.EACancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.EACancelButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.EACancelButton.ForeColor = System.Drawing.Color.White;
             this.EACancelButton.Location = new System.Drawing.Point(431, 5);
             this.EACancelButton.Name = "EACancelButton";
             this.EACancelButton.Size = new System.Drawing.Size(180, 45);
-            this.EACancelButton.TabIndex = 1;
+            this.EACancelButton.TabIndex = 3;
             this.EACancelButton.Text = "İPTAL";
+            this.EACancelButton.TextColor = System.Drawing.Color.White;
+            this.EACancelButton.UseVisualStyleBackColor = false;
             this.EACancelButton.Click += new System.EventHandler(this.EACancelButton_Click);
             // 
             // EATamamButton
             // 
-            this.EATamamButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.EATamamButton.BackColor = System.Drawing.Color.DarkSeaGreen;
-            this.EATamamButton.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
-            this.EATamamButton.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
-            this.EATamamButton.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
-            this.EATamamButton.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
-            this.EATamamButton.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
+            this.EATamamButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
+            this.EATamamButton.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
+            this.EATamamButton.BorderColor = System.Drawing.Color.PaleVioletRed;
+            this.EATamamButton.BorderRadius = 0;
+            this.EATamamButton.BorderSize = 0;
+            this.EATamamButton.FlatAppearance.BorderSize = 0;
+            this.EATamamButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.EATamamButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.EATamamButton.ForeColor = System.Drawing.Color.White;
             this.EATamamButton.Location = new System.Drawing.Point(617, 5);
             this.EATamamButton.Name = "EATamamButton";
             this.EATamamButton.Size = new System.Drawing.Size(180, 45);
-            this.EATamamButton.TabIndex = 2;
+            this.EATamamButton.TabIndex = 4;
             this.EATamamButton.Text = "TAMAM";
+            this.EATamamButton.TextColor = System.Drawing.Color.White;
+            this.EATamamButton.UseVisualStyleBackColor = false;
             this.EATamamButton.Click += new System.EventHandler(this.EATamamButton_Click);
             // 
             // EAChargingStationPopupForm
@@ -234,13 +238,13 @@
         private Guna.UI2.WinForms.Guna2DataGridView ChargingStationDataGridView;
         private System.Windows.Forms.Panel ChargingStationpanel;
         private System.Windows.Forms.Panel ChargingStationpanel2;
-        private Guna.UI2.WinForms.Guna2Button EACancelButton;
-        private Guna.UI2.WinForms.Guna2Button EATamamButton;
         private System.Windows.Forms.DataGridViewTextBoxColumn ISTASYON_ADI;
         private System.Windows.Forms.DataGridViewComboBoxColumn ISTASYON_TIPI;
         private System.Windows.Forms.DataGridViewComboBoxColumn ISTASYON_GUCU;
         private System.Windows.Forms.DataGridViewTextBoxColumn EA_X_KOORDINAT;
         private System.Windows.Forms.DataGridViewTextBoxColumn EA_Y_KOORDINAT;
         private Guna.UI2.WinForms.Guna2AnimateWindow guna2AnimateWindow1_Charging_Popup;
+        private CustomButton EACancelButton;
+        private CustomButton EATamamButton;
     }
 }

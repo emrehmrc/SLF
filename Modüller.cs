@@ -590,12 +590,10 @@ namespace SLF
         }
         private async void OpenModuleButton_Click(object sender, EventArgs e)
         {
-
-
             // Disable the button initially
             OpenModuleButton.Enabled = false;
 
-            string filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+            string filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
 
             // Load the data table for the selected type
@@ -608,61 +606,146 @@ namespace SLF
                 OpenModuleButton.Enabled = true; // Re-enable the button before returning
                 return;
             }
-            if (veri_listesi_seçimi.Text == "Ekonometrik Yük Tahmini Verileri")
+
+            // Check if the selected data type is "Ekonometrik Yük Tahmini Verileri"
+            if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
             {
-                Modül_Tabları.SelectedTab = tab_senaryo; // Move this line here to ensure it only executes after loading data
+                // Asynchronous task to load the Excel package
+                await Task.Run(() =>
+                {
+                    using (var package = new ExcelPackage(new FileInfo(filePath)))
+                    {
+                        Invoke(new Action(() =>
+                        {
+                            // Clear previous data
+                            ELFMinSenaryoTable.DataSource = null;
+                            ELFLowSenaryoTable.DataSource = null;
+                            ELFBaseSenaryoTable.DataSource = null;
+                            ELFHighSenaryoTable.DataSource = null;
+                            ELFMaxSenaryoTable.DataSource = null;
+                        }));
+
+                        // Ensure there are at least 6 worksheets
+                        int totalSheets = package.Workbook.Worksheets.Count;
+                        for (int i = 1; i <= 5; i++)
+                        {
+                            if (i < totalSheets)
+                            {
+                                var worksheet = package.Workbook.Worksheets[i];
+                                DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
+
+                                Invoke(new Action(() =>
+                                {
+                                    var dataGrids = new[] { ELFMinSenaryoTable, ELFLowSenaryoTable, ELFBaseSenaryoTable, ELFHighSenaryoTable, ELFMaxSenaryoTable };
+                                    dataGrids[i - 1].DataSource = dt;
+                                }));
+                            }
+                            else
+                            {
+                                // If there are fewer than 6 sheets, show a message or handle as needed
+                                MessageBox.Show("Eksik sayfalar bulundu. Lütfen dosyayı kontrol edin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                break;
+                            }
+                        }
+                    }
+                });
             }
-            if (veri_listesi_seçimi.Text == "EA Şarj Verileri")
+
+            // Based on the selected data type, switch to the corresponding tab
+            if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
+            {
+                Modül_Tabları.SelectedTab = tab_senaryo;
+            }
+            else if (seçilenVeriTipi == "EA Şarj Verileri")
             {
                 Modül_Tabları.SelectedTab = tab_ea;
             }
-            if (veri_listesi_seçimi.Text == "DEK Verileri")
+            else if (seçilenVeriTipi == "DEK Verileri")
             {
                 Modül_Tabları.SelectedTab = tab_dek;
             }
-            /*            if (veri_listesi_seçimi.Text == "DTR Verileri")
-                        {
-                            Modül_Tabları.SelectedTab = tab_optDTR;
-                        }*/
-            // Asynchronous task to load the Excel package
-            await Task.Run(() =>
-            {
-                using (var package = new ExcelPackage(new FileInfo(filePath)))
-                {
-                    Invoke(new Action(() =>
-                    {
-                        // Clear previous data
-                        ELFMinSenaryoTable.DataSource = null;
-                        ELFLowSenaryoTable.DataSource = null;
-                        ELFBaseSenaryoTable.DataSource = null;
-                        ELFHighSenaryoTable.DataSource = null;
-                        ELFMaxSenaryoTable.DataSource = null;
-                    }));
-
-                    // Load sheets 2 to 6 into respective DataGridViews
-                    for (int i = 1; i <= 5; i++)
-                    {
-                        
-                        var worksheet = package.Workbook.Worksheets[i];
-                        DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
-
-                        Invoke(new Action(() =>
-                        {
-                            var dataGrids = new[] { ELFMinSenaryoTable, ELFLowSenaryoTable, ELFBaseSenaryoTable, ELFHighSenaryoTable, ELFMaxSenaryoTable };
-                            dataGrids[i - 1].DataSource = dt;
-                        }));
-                    }
-                }
-            });
 
             // After loading the data, enable the button
             OpenModuleButton.Enabled = true;
         }
 
+
+
+        /*        private async void OpenModuleButton_Click(object sender, EventArgs e)
+                {
+
+
+                    // Disable the button initially
+                    OpenModuleButton.Enabled = false;
+
+                    string filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+                    string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+
+                    // Load the data table for the selected type
+                    var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
+
+                    // Check if the data table has any rows
+                    if (dataTable == null || dataTable.Rows.Count == 0)
+                    {
+                        MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından modüle gidilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        OpenModuleButton.Enabled = true; // Re-enable the button before returning
+                        return;
+                    }
+
+                    // Asynchronous task to load the Excel package
+                    await Task.Run(() =>
+                    {
+                        using (var package = new ExcelPackage(new FileInfo(filePath)))
+                        {
+                            Invoke(new Action(() =>
+                            {
+                                // Clear previous data
+                                ELFMinSenaryoTable.DataSource = null;
+                                ELFLowSenaryoTable.DataSource = null;
+                                ELFBaseSenaryoTable.DataSource = null;
+                                ELFHighSenaryoTable.DataSource = null;
+                                ELFMaxSenaryoTable.DataSource = null;
+                            }));
+
+                            // Load sheets 2 to 6 into respective DataGridViews
+                            for (int i = 1; i <= 5; i++)
+                            {
+
+                                var worksheet = package.Workbook.Worksheets[i];
+                                DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
+
+                                Invoke(new Action(() =>
+                                {
+                                    var dataGrids = new[] { ELFMinSenaryoTable, ELFLowSenaryoTable, ELFBaseSenaryoTable, ELFHighSenaryoTable, ELFMaxSenaryoTable };
+                                    dataGrids[i - 1].DataSource = dt;
+                                }));
+                            }
+                        }
+                    });
+                    if (veri_listesi_seçimi.Text == "Ekonometrik Yük Tahmini Verileri")
+                    {
+                        Modül_Tabları.SelectedTab = tab_senaryo; // Move this line here to ensure it only executes after loading data
+                    }
+                    if (veri_listesi_seçimi.Text == "EA Şarj Verileri")
+                    {
+                        Modül_Tabları.SelectedTab = tab_ea;
+                    }
+                    if (veri_listesi_seçimi.Text == "DEK Verileri")
+                    {
+                        Modül_Tabları.SelectedTab = tab_dek;
+                    }
+                    *//*            if (veri_listesi_seçimi.Text == "DTR Verileri")
+                                {
+                                    Modül_Tabları.SelectedTab = tab_optDTR;
+                                }*//*
+                    // After loading the data, enable the button
+                    OpenModuleButton.Enabled = true;
+                }
+        */
         private void LoadImagesIntoPictureBoxes()
         {
             // Path to the folder where the images are saved
-            string imageFolderPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\Grafik Outputs\";
+            string imageFolderPath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\Grafik Outputs\";
 
             // Load images into PictureBox controls with checks
             LoadImageIntoPictureBox(pictureBox_ELF_1, Path.Combine(imageFolderPath, "bolge_aydınlatma_projections.png"));
@@ -684,8 +767,8 @@ namespace SLF
         // Save button logic to update Excel file with changes from DataGridViews
         private async void ELFScenerioSaveGunaButton_Click(object sender, EventArgs e)
         {
-            string originalFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
-            string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+            string originalFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+            string modifiedFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
 
             try
             {
@@ -738,8 +821,8 @@ namespace SLF
             // Set cursor to wait
             Cursor.Current = Cursors.WaitCursor;
 
-            string modifiedInputFilePath = @"C:/Users/begum.orhan/MRC/İletişim sitesi - 1.1.3_T&SI/MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı/09_Alinan Veriler/GDZ/Ekonometrik Yük Tahmini Verileri/Arşiv/Modified_INPUT_FILE.xlsx";
-            string logFilePath = @"C:/Users/begum.orhan/MRC/İletişim sitesi - 1.1.3_T&SI/MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı/09_Alinan Veriler/GDZ/Ekonometrik Yük Tahmini Verileri/Program/SONUÇLAR/script_output_log2.txt";
+            string modifiedInputFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+            string logFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\script_output_log2.txt";
 
             try
             {
@@ -823,7 +906,7 @@ namespace SLF
         private async void ShowResults_Click(object sender, EventArgs e)
         {
             // Path to the Excel file
-            string filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\ELF_Tahmin_Sonuçları_2024-10-21 16_59_43.xlsx";
+            string filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\ELF_Tahmin_Sonuçları_2024-11-08 22_35_57.xlsx";
 
             // Asynchronous task to load the Excel package
             await Task.Run(() =>
@@ -909,7 +992,7 @@ namespace SLF
         // Method to run the R script
         private string RunModelRScript(string modifiedFilePath)
         {
-            string rScriptPath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\begum_model_deneme.R";
+            string rScriptPath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\begum_model_deneme.R";
             string resultsFilePath = "";
 
             // Set up process info
