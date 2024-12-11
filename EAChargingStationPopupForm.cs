@@ -14,8 +14,8 @@ namespace SLF
         private bool isOperationCancelled = true;
         public bool OperationCancelled => isOperationCancelled;
 
-        private readonly List<string> acPowers = new List<string> { "3,7 kW", "7,4 kW", "11 kW", "22 kW" };
-        private readonly List<string> dcPowers = new List<string> { "50 kW", "100 kW", "150 kW"};
+        private readonly List<string> acPowers = new List<string> {"11 kW", "22 kW" };
+        private readonly List<string> dcPowers = new List<string> {"150 kW"};
 
         public EAChargingStationPopupForm(DataTable existingDataTable, NoktaVeri veri)
         {
@@ -25,7 +25,6 @@ namespace SLF
             InitializeDataGridView(veri);
             SetupEventHandlers();
         }
-
         private void InitializeDataGridView(NoktaVeri veri)
         {
             // Fill initial coordinates
@@ -36,12 +35,13 @@ namespace SLF
             // Set ISTASYON_TIPI options to AC types and DC
             if (ChargingStationDataGridView.Columns["ISTASYON_TIPI"] is DataGridViewComboBoxColumn typeComboBoxColumn)
             {
-                typeComboBoxColumn.DataSource = new List<string> { "AC (Home)", "AC (Work)", "AC (Public)", "Fast DC" };
+                typeComboBoxColumn.DataSource = new List<string> { "AC (Home)", "AC (Work)", "AC (Public)", "DC-Fast" };
             }
 
-            // Default ISTASYON_GUCU to show AC power options
+            // Set default ISTASYON_GUCU options for AC (Home), AC (Work), AC (Public), and DC-Fast
             if (ChargingStationDataGridView.Columns["ISTASYON_GUCU"] is DataGridViewComboBoxColumn powerComboBoxColumn)
             {
+                // Initialize with AC power options
                 powerComboBoxColumn.DataSource = acPowers;
             }
 
@@ -49,9 +49,9 @@ namespace SLF
             if (GirdiModülü.dataTablesByType.TryGetValue("DTR Verileri", out DataTable trafoDataTable))
             {
                 List<string> trafoKoduListesi = trafoDataTable.AsEnumerable()
-                                                              .Select(row => row["TRAFO_KODU"].ToString())
-                                                              .Distinct()
-                                                              .ToList();
+                                                                  .Select(row => row["TRAFO_KODU"].ToString())
+                                                                  .Distinct()
+                                                                  .ToList();
 
                 if (ChargingStationDataGridView.Columns["EA_TRAFO_KODU"] is DataGridViewComboBoxColumn comboBoxColumn)
                 {
@@ -64,6 +64,44 @@ namespace SLF
             }
         }
 
+        /*        private void InitializeDataGridView(NoktaVeri veri)
+                {
+                    // Fill initial coordinates
+                    ChargingStationDataGridView.Rows.Add();
+                    ChargingStationDataGridView.Rows[0].Cells["EA_X_KOORDINAT"].Value = veri.Enlem;
+                    ChargingStationDataGridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value = veri.Boylam;
+
+                    // Set ISTASYON_TIPI options to AC types and DC
+                    if (ChargingStationDataGridView.Columns["ISTASYON_TIPI"] is DataGridViewComboBoxColumn typeComboBoxColumn)
+                    {
+                        typeComboBoxColumn.DataSource = new List<string> { "AC (Home)", "AC (Work)", "AC (Public)", "Fast DC" };
+                    }
+
+                    // Default ISTASYON_GUCU to show AC power options
+                    if (ChargingStationDataGridView.Columns["ISTASYON_GUCU"] is DataGridViewComboBoxColumn powerComboBoxColumn)
+                    {
+                        powerComboBoxColumn.DataSource = acPowers;
+                    }
+
+                    // Populate transformer codes if available
+                    if (GirdiModülü.dataTablesByType.TryGetValue("DTR Verileri", out DataTable trafoDataTable))
+                    {
+                        List<string> trafoKoduListesi = trafoDataTable.AsEnumerable()
+                                                                      .Select(row => row["TRAFO_KODU"].ToString())
+                                                                      .Distinct()
+                                                                      .ToList();
+
+                        if (ChargingStationDataGridView.Columns["EA_TRAFO_KODU"] is DataGridViewComboBoxColumn comboBoxColumn)
+                        {
+                            comboBoxColumn.DataSource = trafoKoduListesi;
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("DTR Verileri bulunamadı. Lütfen kontrol edin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+        */
         private void SetupEventHandlers()
         {
             this.FormClosing += ChargingStationPopupForm_FormClosing;
@@ -75,12 +113,33 @@ namespace SLF
             if (e.ColumnIndex == ChargingStationDataGridView.Columns["ISTASYON_TIPI"].Index)
             {
                 string selectedType = ChargingStationDataGridView.Rows[e.RowIndex].Cells["ISTASYON_TIPI"].Value?.ToString();
+
+                // If the type is AC, set ISTASYON_GUCU to AC power options
                 if (ChargingStationDataGridView.Columns["ISTASYON_GUCU"] is DataGridViewComboBoxColumn powerComboBoxColumn)
                 {
-                    powerComboBoxColumn.DataSource = selectedType?.StartsWith("AC") == true ? acPowers : dcPowers;
+                    if (selectedType != null)
+                    {
+                        if (selectedType == "AC (Home)" || selectedType == "AC (Work)")
+                        {
+                            powerComboBoxColumn.DataSource = new List<string> { "11 kW" };  // Set 11 kW for AC Home and AC Work
+                        }
+                        else if (selectedType == "AC (Public)")
+                        {
+                            powerComboBoxColumn.DataSource = new List<string> { "22 kW" };  // Set 22 kW for AC Public
+                        }
+                        else if (selectedType == "DC-Fast")
+                        {
+                            powerComboBoxColumn.DataSource = new List<string> { "150 kW" };  // Set 150 kW for Fast DC
+                        }
+                        else
+                        {
+                            powerComboBoxColumn.DataSource = new List<string>();  // Clear options if none match
+                        }
+                    }
                 }
             }
         }
+
 
         private void EATamamButton_Click(object sender, EventArgs e)
         {

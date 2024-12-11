@@ -765,7 +765,7 @@ namespace SLF
         /// </summary>
 
         // Save button logic to update Excel file with changes from DataGridViews
-        private async void ELFScenerioSaveGunaButton_Click(object sender, EventArgs e)
+        private async void ELFScenerioSaveButton_Click(object sender, EventArgs e)
         {
             string originalFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
             string modifiedFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
@@ -816,7 +816,7 @@ namespace SLF
             // Switch to the results tab after loading all the data
             Modül_Tabları.SelectedTab = tab_ekonometrik;
         }
-        private void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e)
+        private void ELFPredictionShowResultsButton_Click(object sender, EventArgs e)
         {
             // Set cursor to wait
             Cursor.Current = Cursors.WaitCursor;
@@ -903,7 +903,7 @@ namespace SLF
             this.Controls.Add(logTextBox); // Add to the form controls
         }
 
-        private async void ShowResults_Click(object sender, EventArgs e)
+        private async void ShowResultsButton_Click(object sender, EventArgs e)
         {
             // Path to the Excel file
             string filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\ELF_Tahmin_Sonuçları_2024-11-08 22_35_57.xlsx";
@@ -3492,10 +3492,12 @@ namespace SLF
             // Yeni bir DataGridView oluştur
             DataGridView dataGridView = new DataGridView
             {
-                DataSource = cıktıPopup,  // DataTable'ı bağla
-                Dock = DockStyle.Fill,        // Formu doldurması için konumunu ayarla
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill // Sütunları otomatik boyutlandır
+                DataSource = cıktıPopup,  // Bind the DataTable
+                Dock = DockStyle.Fill,     // Make sure it's filling the container/form
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells // Resize columns based on content
             };
+
+
 
             // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
             HesaplaMerkezNoktaVeEkle(veriMonteCarlo);
@@ -3513,7 +3515,7 @@ namespace SLF
             popupForm = new Form
             {
                 Text = "Hücre Analizi",
-                Width = 800,
+                Width = 730,
                 Height = 600
             };
 
@@ -3872,18 +3874,60 @@ namespace SLF
             popupForm.Show(); // Yeni pencereyi göster
         }
 
+        /*        private DataTable FormatEATableForDisplay(DataTable originalEATable)
+                {
+                    // Yeni bir DataTable oluşturun
+                    DataTable formattedEATable = new DataTable();
+
+                    // İhtiyacınız olan sütunları ekleyin
+                    formattedEATable.Columns.Add("Hücre ID", typeof(string));
+                    formattedEATable.Columns.Add("Ilce", typeof(string)); // İlçe isimleri Çiğli ve Karşıyaka olarak ayarlanacak
+                    formattedEATable.Columns.Add("AC (Home)", typeof(int));
+                    formattedEATable.Columns.Add("AC (Work)", typeof(int));
+                    formattedEATable.Columns.Add("AC (Public)", typeof(int));
+                    formattedEATable.Columns.Add("Fast DC", typeof(int));
+                    formattedEATable.Columns.Add("İstasyon Gücü", typeof(int));
+                    formattedEATable.Columns.Add("Tüketim (kW/h)", typeof(int));
+
+                    // Orijinal tablodaki her bir satırı işleyin
+                    foreach (DataRow row in originalEATable.Rows)
+                    {
+                        // Yeni bir satır oluşturun
+                        DataRow newRow = formattedEATable.NewRow();
+
+                        // ID değerini alın
+                        newRow["ID"] = row["id"].ToString();
+
+                        // İlçe değerini dönüştür (1 = Çiğli, 2 = Karşıyaka)
+                        int ilceValue = Convert.ToInt32(row["ilce"]);
+                        newRow["Ilce"] = ilceValue == 1 ? "Çiğli" : ilceValue == 2 ? "Karşıyaka" : "Eskişehir";
+
+                        // AC ve DC istasyon sayısını alın
+                        newRow["AC (Home)"] = Convert.ToInt32(row["AC (Home)_count"]);
+                        newRow["AC (Work)"] = Convert.ToInt32(row["AC (Work)_count"]);
+                        newRow["AC (Public)"] = Convert.ToInt32(row["AC (Public)_count"]);
+                        newRow["Fast DC"] = Convert.ToInt32(row["Fast DC_count"]);
+
+                        // Yeni satırı formatlanmış tabloya ekleyin
+                        formattedEATable.Rows.Add(newRow);
+                    }
+
+                    return formattedEATable;
+                }*/
         private DataTable FormatEATableForDisplay(DataTable originalEATable)
         {
             // Yeni bir DataTable oluşturun
             DataTable formattedEATable = new DataTable();
 
             // İhtiyacınız olan sütunları ekleyin
-            formattedEATable.Columns.Add("ID", typeof(string));
+            formattedEATable.Columns.Add("Hücre ID", typeof(string));
             formattedEATable.Columns.Add("Ilce", typeof(string)); // İlçe isimleri Çiğli ve Karşıyaka olarak ayarlanacak
             formattedEATable.Columns.Add("AC (Home)", typeof(int));
             formattedEATable.Columns.Add("AC (Work)", typeof(int));
             formattedEATable.Columns.Add("AC (Public)", typeof(int));
             formattedEATable.Columns.Add("Fast DC", typeof(int));
+            formattedEATable.Columns.Add("İstasyon Gücü(kW)", typeof(int));
+            formattedEATable.Columns.Add("Tüketim (kW/h)", typeof(int));
 
             // Orijinal tablodaki her bir satırı işleyin
             foreach (DataRow row in originalEATable.Rows)
@@ -3892,7 +3936,7 @@ namespace SLF
                 DataRow newRow = formattedEATable.NewRow();
 
                 // ID değerini alın
-                newRow["ID"] = row["id"].ToString();
+                newRow["Hücre ID"] = row["id"].ToString();  // Change "ID" to "Hücre ID" to match the formatted table column
 
                 // İlçe değerini dönüştür (1 = Çiğli, 2 = Karşıyaka)
                 int ilceValue = Convert.ToInt32(row["ilce"]);
@@ -3910,6 +3954,7 @@ namespace SLF
 
             return formattedEATable;
         }
+
 
         private void EaSimMaxBtn_CheckedChanged(object sender, EventArgs e)
         {
