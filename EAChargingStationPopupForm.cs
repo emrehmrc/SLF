@@ -102,6 +102,17 @@ namespace SLF
                     }
                 }
         */
+/*        private void ChargingStationDataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == ChargingStationDataGridView.Columns["ISTASYON_TIPI"].Index)
+            {
+                string selectedType = ChargingStationDataGridView.Rows[e.RowIndex].Cells["ISTASYON_TIPI"].Value?.ToString();
+                if (ChargingStationDataGridView.Columns["ISTASYON_GUCU"] is DataGridViewComboBoxColumn powerComboBoxColumn)
+                {
+                    powerComboBoxColumn.DataSource = selectedType?.StartsWith("AC") == true ? acPowers : dcPowers;
+                }
+            }
+        }*/
         private void SetupEventHandlers()
         {
             this.FormClosing += ChargingStationPopupForm_FormClosing;

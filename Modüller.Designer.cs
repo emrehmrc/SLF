@@ -59,9 +59,6 @@ namespace SLF
             this.panel_DEK = new System.Windows.Forms.Panel();
             this.DEKCenterAddButton = new SLF.CustomButton();
             this.DEKSimButton = new SLF.CustomButton();
-            this.dekSimMaxBtn = new Guna.UI2.WinForms.Guna2RadioButton();
-            this.dekSimDefBtn = new Guna.UI2.WinForms.Guna2RadioButton();
-            this.dekSimMinBtn = new Guna.UI2.WinForms.Guna2RadioButton();
             this.label_DEK_Gelecek = new System.Windows.Forms.Label();
             this.comboBox_DEK_il = new System.Windows.Forms.ComboBox();
             this.comboBox_DEK_Yıl = new System.Windows.Forms.ComboBox();
@@ -80,9 +77,6 @@ namespace SLF
             this.AddStationLabel = new System.Windows.Forms.Label();
             this.EAStationAddButton = new SLF.CustomButton();
             this.GelecekSimButton = new SLF.CustomButton();
-            this.EaSimMaxBtn = new Guna.UI2.WinForms.Guna2RadioButton();
-            this.EaSimDefBtn = new Guna.UI2.WinForms.Guna2RadioButton();
-            this.EaSimMinBtn = new Guna.UI2.WinForms.Guna2RadioButton();
             this.FutureSimLabel = new System.Windows.Forms.Label();
             this.comboBox_ea_il_secimi = new System.Windows.Forms.ComboBox();
             this.comboBox_ea_yıl_secimi = new System.Windows.Forms.ComboBox();
@@ -284,6 +278,12 @@ namespace SLF
             this.ACPublicLegendLabel = new System.Windows.Forms.Label();
             this.DCFastLegendValueLabel = new System.Windows.Forms.Label();
             this.DCFastLegendLabel = new System.Windows.Forms.Label();
+            this.dekSimMinBtn = new System.Windows.Forms.RadioButton();
+            this.dekSimDefBtn = new System.Windows.Forms.RadioButton();
+            this.dekSimMaxBtn = new System.Windows.Forms.RadioButton();
+            this.EaSimMinBtn = new System.Windows.Forms.RadioButton();
+            this.EaSimDefBtn = new System.Windows.Forms.RadioButton();
+            this.EaSimMaxBtn = new System.Windows.Forms.RadioButton();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
             this.panel_girdi_rapor_olustur.SuspendLayout();
@@ -691,10 +691,10 @@ namespace SLF
             this.tab_dek.Controls.Add(this.gMapControl_DEK);
             this.tab_dek.Controls.Add(this.panel_DEK);
             this.tab_dek.ImageIndex = 0;
-            this.tab_dek.Location = new System.Drawing.Point(4, 48);
+            this.tab_dek.Location = new System.Drawing.Point(4, 26);
             this.tab_dek.Margin = new System.Windows.Forms.Padding(2);
             this.tab_dek.Name = "tab_dek";
-            this.tab_dek.Size = new System.Drawing.Size(1282, 542);
+            this.tab_dek.Size = new System.Drawing.Size(1282, 564);
             this.tab_dek.TabIndex = 6;
             this.tab_dek.Text = "DEK Modülü";
             this.tab_dek.UseVisualStyleBackColor = true;
@@ -725,7 +725,7 @@ namespace SLF
             this.gMapControl_DEK.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_DEK.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_DEK.ShowTileGridLines = false;
-            this.gMapControl_DEK.Size = new System.Drawing.Size(1096, 542);
+            this.gMapControl_DEK.Size = new System.Drawing.Size(1096, 564);
             this.gMapControl_DEK.TabIndex = 38;
             this.gMapControl_DEK.Zoom = 0D;
             this.gMapControl_DEK.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_DEK_OnMapClick);
@@ -738,11 +738,11 @@ namespace SLF
             // panel_DEK
             // 
             this.panel_DEK.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            this.panel_DEK.Controls.Add(this.DEKCenterAddButton);
-            this.panel_DEK.Controls.Add(this.DEKSimButton);
             this.panel_DEK.Controls.Add(this.dekSimMaxBtn);
             this.panel_DEK.Controls.Add(this.dekSimDefBtn);
             this.panel_DEK.Controls.Add(this.dekSimMinBtn);
+            this.panel_DEK.Controls.Add(this.DEKCenterAddButton);
+            this.panel_DEK.Controls.Add(this.DEKSimButton);
             this.panel_DEK.Controls.Add(this.label_DEK_Gelecek);
             this.panel_DEK.Controls.Add(this.comboBox_DEK_il);
             this.panel_DEK.Controls.Add(this.comboBox_DEK_Yıl);
@@ -750,7 +750,7 @@ namespace SLF
             this.panel_DEK.Location = new System.Drawing.Point(1096, 0);
             this.panel_DEK.Margin = new System.Windows.Forms.Padding(2);
             this.panel_DEK.Name = "panel_DEK";
-            this.panel_DEK.Size = new System.Drawing.Size(186, 542);
+            this.panel_DEK.Size = new System.Drawing.Size(186, 564);
             this.panel_DEK.TabIndex = 37;
             // 
             // DEKCenterAddButton
@@ -793,81 +793,18 @@ namespace SLF
             this.DEKSimButton.UseVisualStyleBackColor = false;
             this.DEKSimButton.Click += new System.EventHandler(this.dekSimulasyonGoruntule);
             // 
-            // dekSimMaxBtn
-            // 
-            this.dekSimMaxBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dekSimMaxBtn.AutoSize = true;
-            this.dekSimMaxBtn.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.dekSimMaxBtn.CheckedState.BorderThickness = 0;
-            this.dekSimMaxBtn.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.dekSimMaxBtn.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.dekSimMaxBtn.CheckedState.InnerOffset = -4;
-            this.dekSimMaxBtn.Location = new System.Drawing.Point(24, 149);
-            this.dekSimMaxBtn.Margin = new System.Windows.Forms.Padding(2);
-            this.dekSimMaxBtn.Name = "dekSimMaxBtn";
-            this.dekSimMaxBtn.Size = new System.Drawing.Size(105, 21);
-            this.dekSimMaxBtn.TabIndex = 51;
-            this.dekSimMaxBtn.Text = "Hızlı Senaryo";
-            this.dekSimMaxBtn.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
-            this.dekSimMaxBtn.UncheckedState.BorderThickness = 2;
-            this.dekSimMaxBtn.UncheckedState.FillColor = System.Drawing.Color.Transparent;
-            this.dekSimMaxBtn.UncheckedState.InnerColor = System.Drawing.Color.Transparent;
-            this.dekSimMaxBtn.CheckedChanged += new System.EventHandler(this.dekSimMaxBtn_CheckedChanged);
-            // 
-            // dekSimDefBtn
-            // 
-            this.dekSimDefBtn.AutoSize = true;
-            this.dekSimDefBtn.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.dekSimDefBtn.CheckedState.BorderThickness = 0;
-            this.dekSimDefBtn.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.dekSimDefBtn.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.dekSimDefBtn.CheckedState.InnerOffset = -4;
-            this.dekSimDefBtn.Location = new System.Drawing.Point(24, 127);
-            this.dekSimDefBtn.Margin = new System.Windows.Forms.Padding(2);
-            this.dekSimDefBtn.Name = "dekSimDefBtn";
-            this.dekSimDefBtn.Size = new System.Drawing.Size(140, 21);
-            this.dekSimDefBtn.TabIndex = 50;
-            this.dekSimDefBtn.Text = "Varsayılan Senaryo";
-            this.dekSimDefBtn.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
-            this.dekSimDefBtn.UncheckedState.BorderThickness = 2;
-            this.dekSimDefBtn.UncheckedState.FillColor = System.Drawing.Color.Transparent;
-            this.dekSimDefBtn.UncheckedState.InnerColor = System.Drawing.Color.Transparent;
-            this.dekSimDefBtn.CheckedChanged += new System.EventHandler(this.dekSimDefBtn_CheckedChanged);
-            // 
-            // dekSimMinBtn
-            // 
-            this.dekSimMinBtn.AutoSize = true;
-            this.dekSimMinBtn.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.dekSimMinBtn.CheckedState.BorderThickness = 0;
-            this.dekSimMinBtn.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.dekSimMinBtn.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.dekSimMinBtn.CheckedState.InnerOffset = -4;
-            this.dekSimMinBtn.Location = new System.Drawing.Point(24, 105);
-            this.dekSimMinBtn.Margin = new System.Windows.Forms.Padding(2);
-            this.dekSimMinBtn.Name = "dekSimMinBtn";
-            this.dekSimMinBtn.Size = new System.Drawing.Size(114, 21);
-            this.dekSimMinBtn.TabIndex = 49;
-            this.dekSimMinBtn.Text = "Yavaş Senaryo";
-            this.dekSimMinBtn.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
-            this.dekSimMinBtn.UncheckedState.BorderThickness = 2;
-            this.dekSimMinBtn.UncheckedState.FillColor = System.Drawing.Color.Transparent;
-            this.dekSimMinBtn.UncheckedState.InnerColor = System.Drawing.Color.Transparent;
-            this.dekSimMinBtn.CheckedChanged += new System.EventHandler(this.dekSimMinBtn_CheckedChanged);
-            // 
             // label_DEK_Gelecek
             // 
             this.label_DEK_Gelecek.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label_DEK_Gelecek.AutoSize = true;
-            this.label_DEK_Gelecek.Location = new System.Drawing.Point(21, 15);
+            this.label_DEK_Gelecek.Location = new System.Drawing.Point(7, 9);
             this.label_DEK_Gelecek.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label_DEK_Gelecek.Name = "label_DEK_Gelecek";
-            this.label_DEK_Gelecek.Size = new System.Drawing.Size(166, 17);
+            this.label_DEK_Gelecek.Size = new System.Drawing.Size(163, 17);
             this.label_DEK_Gelecek.TabIndex = 3;
-            this.label_DEK_Gelecek.Text = "DEK Gelecek Simülasyonu:";
+            this.label_DEK_Gelecek.Text = "DEK Gelecek Simülasyonu";
             // 
             // comboBox_DEK_il
             // 
@@ -989,10 +926,10 @@ namespace SLF
             // 
             this.GelecekSimPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.GelecekSimPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            this.GelecekSimPanel.Controls.Add(this.GelecekSimButton);
             this.GelecekSimPanel.Controls.Add(this.EaSimMaxBtn);
             this.GelecekSimPanel.Controls.Add(this.EaSimDefBtn);
             this.GelecekSimPanel.Controls.Add(this.EaSimMinBtn);
+            this.GelecekSimPanel.Controls.Add(this.GelecekSimButton);
             this.GelecekSimPanel.Controls.Add(this.FutureSimLabel);
             this.GelecekSimPanel.Controls.Add(this.comboBox_ea_il_secimi);
             this.GelecekSimPanel.Controls.Add(this.comboBox_ea_yıl_secimi);
@@ -1113,66 +1050,6 @@ namespace SLF
             this.GelecekSimButton.UseVisualStyleBackColor = false;
             this.GelecekSimButton.Click += new System.EventHandler(this.gelecekSimilasyonGoruntule);
             // 
-            // EaSimMaxBtn
-            // 
-            this.EaSimMaxBtn.AutoSize = true;
-            this.EaSimMaxBtn.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.EaSimMaxBtn.CheckedState.BorderThickness = 0;
-            this.EaSimMaxBtn.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.EaSimMaxBtn.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.EaSimMaxBtn.CheckedState.InnerOffset = -4;
-            this.EaSimMaxBtn.Location = new System.Drawing.Point(33, 152);
-            this.EaSimMaxBtn.Margin = new System.Windows.Forms.Padding(2);
-            this.EaSimMaxBtn.Name = "EaSimMaxBtn";
-            this.EaSimMaxBtn.Size = new System.Drawing.Size(105, 21);
-            this.EaSimMaxBtn.TabIndex = 48;
-            this.EaSimMaxBtn.Text = "Hızlı Senaryo";
-            this.EaSimMaxBtn.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
-            this.EaSimMaxBtn.UncheckedState.BorderThickness = 2;
-            this.EaSimMaxBtn.UncheckedState.FillColor = System.Drawing.Color.Transparent;
-            this.EaSimMaxBtn.UncheckedState.InnerColor = System.Drawing.Color.Transparent;
-            this.EaSimMaxBtn.CheckedChanged += new System.EventHandler(this.EaSimMaxBtn_CheckedChanged);
-            // 
-            // EaSimDefBtn
-            // 
-            this.EaSimDefBtn.AutoSize = true;
-            this.EaSimDefBtn.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.EaSimDefBtn.CheckedState.BorderThickness = 0;
-            this.EaSimDefBtn.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.EaSimDefBtn.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.EaSimDefBtn.CheckedState.InnerOffset = -4;
-            this.EaSimDefBtn.Location = new System.Drawing.Point(33, 125);
-            this.EaSimDefBtn.Margin = new System.Windows.Forms.Padding(2);
-            this.EaSimDefBtn.Name = "EaSimDefBtn";
-            this.EaSimDefBtn.Size = new System.Drawing.Size(140, 21);
-            this.EaSimDefBtn.TabIndex = 47;
-            this.EaSimDefBtn.Text = "Varsayılan Senaryo";
-            this.EaSimDefBtn.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
-            this.EaSimDefBtn.UncheckedState.BorderThickness = 2;
-            this.EaSimDefBtn.UncheckedState.FillColor = System.Drawing.Color.Transparent;
-            this.EaSimDefBtn.UncheckedState.InnerColor = System.Drawing.Color.Transparent;
-            this.EaSimDefBtn.CheckedChanged += new System.EventHandler(this.EaSimDefBtn_CheckedChanged);
-            // 
-            // EaSimMinBtn
-            // 
-            this.EaSimMinBtn.AutoSize = true;
-            this.EaSimMinBtn.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.EaSimMinBtn.CheckedState.BorderThickness = 0;
-            this.EaSimMinBtn.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.EaSimMinBtn.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.EaSimMinBtn.CheckedState.InnerOffset = -4;
-            this.EaSimMinBtn.Location = new System.Drawing.Point(33, 101);
-            this.EaSimMinBtn.Margin = new System.Windows.Forms.Padding(2);
-            this.EaSimMinBtn.Name = "EaSimMinBtn";
-            this.EaSimMinBtn.Size = new System.Drawing.Size(114, 21);
-            this.EaSimMinBtn.TabIndex = 46;
-            this.EaSimMinBtn.Text = "Yavaş Senaryo";
-            this.EaSimMinBtn.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
-            this.EaSimMinBtn.UncheckedState.BorderThickness = 2;
-            this.EaSimMinBtn.UncheckedState.FillColor = System.Drawing.Color.Transparent;
-            this.EaSimMinBtn.UncheckedState.InnerColor = System.Drawing.Color.Transparent;
-            this.EaSimMinBtn.CheckedChanged += new System.EventHandler(this.EaSimMinBtn_CheckedChanged);
-            // 
             // FutureSimLabel
             // 
             this.FutureSimLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1256,11 +1133,11 @@ namespace SLF
             this.tab_ekonometrik.Controls.Add(this.ELFGraphicsPanel);
             this.tab_ekonometrik.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
             this.tab_ekonometrik.ImageIndex = 4;
-            this.tab_ekonometrik.Location = new System.Drawing.Point(4, 48);
+            this.tab_ekonometrik.Location = new System.Drawing.Point(4, 26);
             this.tab_ekonometrik.Margin = new System.Windows.Forms.Padding(2);
             this.tab_ekonometrik.Name = "tab_ekonometrik";
             this.tab_ekonometrik.Padding = new System.Windows.Forms.Padding(2);
-            this.tab_ekonometrik.Size = new System.Drawing.Size(1282, 542);
+            this.tab_ekonometrik.Size = new System.Drawing.Size(1282, 564);
             this.tab_ekonometrik.TabIndex = 1;
             this.tab_ekonometrik.Text = "Ekonometrik Talep Tahmini Modülü";
             this.tab_ekonometrik.UseVisualStyleBackColor = true;
@@ -1279,7 +1156,7 @@ namespace SLF
             this.ELFResultsTabControls.Margin = new System.Windows.Forms.Padding(2);
             this.ELFResultsTabControls.Name = "ELFResultsTabControls";
             this.ELFResultsTabControls.SelectedIndex = 0;
-            this.ELFResultsTabControls.Size = new System.Drawing.Size(1091, 538);
+            this.ELFResultsTabControls.Size = new System.Drawing.Size(1091, 560);
             this.ELFResultsTabControls.TabIndex = 3;
             // 
             // ELFMinResultsTabPage
@@ -1289,7 +1166,7 @@ namespace SLF
             this.ELFMinResultsTabPage.Margin = new System.Windows.Forms.Padding(2);
             this.ELFMinResultsTabPage.Name = "ELFMinResultsTabPage";
             this.ELFMinResultsTabPage.Padding = new System.Windows.Forms.Padding(2);
-            this.ELFMinResultsTabPage.Size = new System.Drawing.Size(1083, 508);
+            this.ELFMinResultsTabPage.Size = new System.Drawing.Size(1083, 530);
             this.ELFMinResultsTabPage.TabIndex = 0;
             this.ELFMinResultsTabPage.Text = "Minimum Sonuçlar";
             this.ELFMinResultsTabPage.UseVisualStyleBackColor = true;
@@ -1313,7 +1190,7 @@ namespace SLF
             this.ELFMinResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFMinResultsTable.Name = "ELFMinResultsTable";
             this.ELFMinResultsTable.RowHeadersWidth = 51;
-            this.ELFMinResultsTable.Size = new System.Drawing.Size(1079, 504);
+            this.ELFMinResultsTable.Size = new System.Drawing.Size(1079, 526);
             this.ELFMinResultsTable.TabIndex = 0;
             // 
             // ELFLowResultsTabPage
@@ -1530,7 +1407,7 @@ namespace SLF
             this.ELFGraphicsPanel.Location = new System.Drawing.Point(2, 2);
             this.ELFGraphicsPanel.Margin = new System.Windows.Forms.Padding(2);
             this.ELFGraphicsPanel.Name = "ELFGraphicsPanel";
-            this.ELFGraphicsPanel.Size = new System.Drawing.Size(187, 538);
+            this.ELFGraphicsPanel.Size = new System.Drawing.Size(187, 560);
             this.ELFGraphicsPanel.TabIndex = 22;
             // 
             // ELFShowGraphsButton
@@ -1609,10 +1486,10 @@ namespace SLF
             this.tab_imar.Controls.Add(this.gMapControl_imar);
             this.tab_imar.Controls.Add(this.buton_imar_katmanlar);
             this.tab_imar.ImageIndex = 11;
-            this.tab_imar.Location = new System.Drawing.Point(4, 48);
+            this.tab_imar.Location = new System.Drawing.Point(4, 26);
             this.tab_imar.Margin = new System.Windows.Forms.Padding(2);
             this.tab_imar.Name = "tab_imar";
-            this.tab_imar.Size = new System.Drawing.Size(1225, 542);
+            this.tab_imar.Size = new System.Drawing.Size(1282, 564);
             this.tab_imar.TabIndex = 4;
             this.tab_imar.Text = "İmar Analizleri";
             this.tab_imar.UseVisualStyleBackColor = true;
@@ -1903,7 +1780,7 @@ namespace SLF
             this.İmar_Fonksiyonlar});
             this.toolStrip_imar.Location = new System.Drawing.Point(0, 0);
             this.toolStrip_imar.Name = "toolStrip_imar";
-            this.toolStrip_imar.Size = new System.Drawing.Size(1225, 27);
+            this.toolStrip_imar.Size = new System.Drawing.Size(1282, 27);
             this.toolStrip_imar.TabIndex = 40;
             this.toolStrip_imar.Text = "toolStrip1";
             // 
@@ -2105,7 +1982,7 @@ namespace SLF
             this.webView_imar.Location = new System.Drawing.Point(0, 0);
             this.webView_imar.Margin = new System.Windows.Forms.Padding(2);
             this.webView_imar.Name = "webView_imar";
-            this.webView_imar.Size = new System.Drawing.Size(1225, 542);
+            this.webView_imar.Size = new System.Drawing.Size(1282, 564);
             this.webView_imar.Source = new System.Uri("https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu", System.UriKind.Absolute);
             this.webView_imar.TabIndex = 38;
             this.webView_imar.Visible = false;
@@ -2241,10 +2118,10 @@ namespace SLF
             this.tab_optDTR.Controls.Add(this.checkBox_optDTR_Eskişehir);
             this.tab_optDTR.Controls.Add(this.checkBox_optDTR_İzmir);
             this.tab_optDTR.Controls.Add(this.buton_optimalDTR_katmanlar);
-            this.tab_optDTR.Location = new System.Drawing.Point(4, 48);
+            this.tab_optDTR.Location = new System.Drawing.Point(4, 26);
             this.tab_optDTR.Margin = new System.Windows.Forms.Padding(2);
             this.tab_optDTR.Name = "tab_optDTR";
-            this.tab_optDTR.Size = new System.Drawing.Size(1225, 542);
+            this.tab_optDTR.Size = new System.Drawing.Size(1282, 564);
             this.tab_optDTR.TabIndex = 7;
             this.tab_optDTR.Text = "Optimal DTR Konumlandırma";
             this.tab_optDTR.UseVisualStyleBackColor = true;
@@ -2752,7 +2629,7 @@ namespace SLF
             this.tab_stokastik.Location = new System.Drawing.Point(4, 48);
             this.tab_stokastik.Margin = new System.Windows.Forms.Padding(2);
             this.tab_stokastik.Name = "tab_stokastik";
-            this.tab_stokastik.Size = new System.Drawing.Size(1225, 542);
+            this.tab_stokastik.Size = new System.Drawing.Size(1282, 542);
             this.tab_stokastik.TabIndex = 2;
             this.tab_stokastik.Text = "Stokastik Yük Tahmini Modülü";
             this.tab_stokastik.UseVisualStyleBackColor = true;
@@ -3247,7 +3124,7 @@ namespace SLF
             this.tab_yükHaritası.Location = new System.Drawing.Point(4, 48);
             this.tab_yükHaritası.Margin = new System.Windows.Forms.Padding(2);
             this.tab_yükHaritası.Name = "tab_yükHaritası";
-            this.tab_yükHaritası.Size = new System.Drawing.Size(1225, 542);
+            this.tab_yükHaritası.Size = new System.Drawing.Size(1282, 542);
             this.tab_yükHaritası.TabIndex = 9;
             this.tab_yükHaritası.Text = "Yük Haritası Modülü";
             this.tab_yükHaritası.UseVisualStyleBackColor = true;
@@ -3325,7 +3202,7 @@ namespace SLF
             this.Yuk_Mesafe_Ölç});
             this.toolStrip_yuk.Location = new System.Drawing.Point(0, 0);
             this.toolStrip_yuk.Name = "toolStrip_yuk";
-            this.toolStrip_yuk.Size = new System.Drawing.Size(1225, 27);
+            this.toolStrip_yuk.Size = new System.Drawing.Size(1282, 27);
             this.toolStrip_yuk.TabIndex = 36;
             this.toolStrip_yuk.Text = "toolStrip1";
             // 
@@ -3478,7 +3355,7 @@ namespace SLF
             this.tab_rapor.Location = new System.Drawing.Point(4, 48);
             this.tab_rapor.Margin = new System.Windows.Forms.Padding(2);
             this.tab_rapor.Name = "tab_rapor";
-            this.tab_rapor.Size = new System.Drawing.Size(1225, 542);
+            this.tab_rapor.Size = new System.Drawing.Size(1282, 542);
             this.tab_rapor.TabIndex = 8;
             this.tab_rapor.Text = "Raporlama";
             this.tab_rapor.UseVisualStyleBackColor = true;
@@ -3488,7 +3365,7 @@ namespace SLF
             this.tab_validasyon.Location = new System.Drawing.Point(4, 48);
             this.tab_validasyon.Margin = new System.Windows.Forms.Padding(2);
             this.tab_validasyon.Name = "tab_validasyon";
-            this.tab_validasyon.Size = new System.Drawing.Size(1225, 542);
+            this.tab_validasyon.Size = new System.Drawing.Size(1282, 542);
             this.tab_validasyon.TabIndex = 10;
             this.tab_validasyon.Text = "Validasyon Modülü";
             this.tab_validasyon.UseVisualStyleBackColor = true;
@@ -3498,7 +3375,7 @@ namespace SLF
             this.yeni_genisleme.Location = new System.Drawing.Point(4, 48);
             this.yeni_genisleme.Name = "yeni_genisleme";
             this.yeni_genisleme.Padding = new System.Windows.Forms.Padding(3);
-            this.yeni_genisleme.Size = new System.Drawing.Size(1225, 542);
+            this.yeni_genisleme.Size = new System.Drawing.Size(1282, 542);
             this.yeni_genisleme.TabIndex = 11;
             this.yeni_genisleme.Text = "Yeni Genişleme Alanları";
             this.yeni_genisleme.UseVisualStyleBackColor = true;
@@ -3975,6 +3852,78 @@ namespace SLF
             this.DCFastLegendLabel.TabIndex = 56;
             this.DCFastLegendLabel.Text = "DC-Fast";
             // 
+            // dekSimMinBtn
+            // 
+            this.dekSimMinBtn.AutoSize = true;
+            this.dekSimMinBtn.Location = new System.Drawing.Point(24, 101);
+            this.dekSimMinBtn.Name = "dekSimMinBtn";
+            this.dekSimMinBtn.Size = new System.Drawing.Size(114, 21);
+            this.dekSimMinBtn.TabIndex = 57;
+            this.dekSimMinBtn.TabStop = true;
+            this.dekSimMinBtn.Text = "Yavaş Senaryo";
+            this.dekSimMinBtn.UseVisualStyleBackColor = true;
+            this.dekSimMinBtn.CheckedChanged += new System.EventHandler(this.dekSimMinBtn_CheckedChanged);
+            // 
+            // dekSimDefBtn
+            // 
+            this.dekSimDefBtn.AutoSize = true;
+            this.dekSimDefBtn.Location = new System.Drawing.Point(24, 128);
+            this.dekSimDefBtn.Name = "dekSimDefBtn";
+            this.dekSimDefBtn.Size = new System.Drawing.Size(140, 21);
+            this.dekSimDefBtn.TabIndex = 58;
+            this.dekSimDefBtn.TabStop = true;
+            this.dekSimDefBtn.Text = "Varsayılan Senaryo";
+            this.dekSimDefBtn.UseVisualStyleBackColor = true;
+            this.dekSimDefBtn.CheckedChanged += new System.EventHandler(this.dekSimDefBtn_CheckedChanged);
+            // 
+            // dekSimMaxBtn
+            // 
+            this.dekSimMaxBtn.AutoSize = true;
+            this.dekSimMaxBtn.Location = new System.Drawing.Point(24, 155);
+            this.dekSimMaxBtn.Name = "dekSimMaxBtn";
+            this.dekSimMaxBtn.Size = new System.Drawing.Size(105, 21);
+            this.dekSimMaxBtn.TabIndex = 59;
+            this.dekSimMaxBtn.TabStop = true;
+            this.dekSimMaxBtn.Text = "Hızlı Senaryo";
+            this.dekSimMaxBtn.UseVisualStyleBackColor = true;
+            this.dekSimMaxBtn.CheckedChanged += new System.EventHandler(this.dekSimMaxBtn_CheckedChanged);
+            // 
+            // EaSimMinBtn
+            // 
+            this.EaSimMinBtn.AutoSize = true;
+            this.EaSimMinBtn.Location = new System.Drawing.Point(31, 99);
+            this.EaSimMinBtn.Name = "EaSimMinBtn";
+            this.EaSimMinBtn.Size = new System.Drawing.Size(114, 21);
+            this.EaSimMinBtn.TabIndex = 51;
+            this.EaSimMinBtn.TabStop = true;
+            this.EaSimMinBtn.Text = "Yavaş Senaryo";
+            this.EaSimMinBtn.UseVisualStyleBackColor = true;
+            this.EaSimMinBtn.CheckedChanged += new System.EventHandler(this.EaSimMinBtn_CheckedChanged);
+            // 
+            // EaSimDefBtn
+            // 
+            this.EaSimDefBtn.AutoSize = true;
+            this.EaSimDefBtn.Location = new System.Drawing.Point(31, 126);
+            this.EaSimDefBtn.Name = "EaSimDefBtn";
+            this.EaSimDefBtn.Size = new System.Drawing.Size(140, 21);
+            this.EaSimDefBtn.TabIndex = 52;
+            this.EaSimDefBtn.TabStop = true;
+            this.EaSimDefBtn.Text = "Varsayılan Senaryo";
+            this.EaSimDefBtn.UseVisualStyleBackColor = true;
+            this.EaSimDefBtn.CheckedChanged += new System.EventHandler(this.EaSimDefBtn_CheckedChanged);
+            // 
+            // EaSimMaxBtn
+            // 
+            this.EaSimMaxBtn.AutoSize = true;
+            this.EaSimMaxBtn.Location = new System.Drawing.Point(32, 153);
+            this.EaSimMaxBtn.Name = "EaSimMaxBtn";
+            this.EaSimMaxBtn.Size = new System.Drawing.Size(105, 21);
+            this.EaSimMaxBtn.TabIndex = 53;
+            this.EaSimMaxBtn.TabStop = true;
+            this.EaSimMaxBtn.Text = "Hızlı Senaryo";
+            this.EaSimMaxBtn.UseVisualStyleBackColor = true;
+            this.EaSimMaxBtn.CheckedChanged += new System.EventHandler(this.EaSimMaxBtn_CheckedChanged);
+            // 
             // ModülFormu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -4303,12 +4252,6 @@ namespace SLF
         private Label label_DEK_Gelecek;
         private CheckBox checkBox27;
         public GMap.NET.WindowsForms.GMapControl gMapControl_optimal_dtr;
-        private Guna.UI2.WinForms.Guna2RadioButton EaSimMinBtn;
-        private Guna.UI2.WinForms.Guna2RadioButton EaSimMaxBtn;
-        private Guna.UI2.WinForms.Guna2RadioButton EaSimDefBtn;
-        private Guna.UI2.WinForms.Guna2RadioButton dekSimMaxBtn;
-        private Guna.UI2.WinForms.Guna2RadioButton dekSimDefBtn;
-        private Guna.UI2.WinForms.Guna2RadioButton dekSimMinBtn;
         private ImageList imageList;
         private CheckBox checkBox_optDTR_Eskişehir;
         private CheckBox checkBox_optDTR_İzmir;
@@ -4349,5 +4292,11 @@ namespace SLF
         private Label DCFastLegendLabel;
         private Label ACPublicLegendValueLabel;
         private Label ACPublicLegendLabel;
+        private RadioButton dekSimMaxBtn;
+        private RadioButton dekSimDefBtn;
+        private RadioButton dekSimMinBtn;
+        private RadioButton EaSimMaxBtn;
+        private RadioButton EaSimDefBtn;
+        private RadioButton EaSimMinBtn;
     }
 }
