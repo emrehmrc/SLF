@@ -78,8 +78,8 @@ namespace SLF
 
         //---------------------------- CBS TOOLBOX METHODLARI ----------------------------------//
 
-        public void CBS_sec(GMapOverlay markerOverlay, GMapRoute rulerRoute, 
-            GMapControl gMapControl, 
+        public void CBS_sec(GMapOverlay markerOverlay, GMapRoute rulerRoute,
+            GMapControl gMapControl,
             System.Windows.Forms.Label mesafe_calculated,
             System.Windows.Forms.Label mesafe_label)
         {
@@ -151,7 +151,7 @@ namespace SLF
         {
             // Find the first available slot in the array that holds shapefile overlay layers
             layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
-            
+
             if (layer_index == -1)
             {
                 MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
@@ -645,7 +645,7 @@ namespace SLF
             return shapefile;
         }
 
-        public async Task LoadKmlFile(string filepath, GMapOverlay kmlOverlay, 
+        public async Task LoadKmlFile(string filepath, GMapOverlay kmlOverlay,
             System.Data.DataTable data_table,
             GMapControl gMapControl)
         {
@@ -926,7 +926,7 @@ namespace SLF
                     }
                 }
             }
-            
+
             gMapControl.Refresh();
         }
 
@@ -994,7 +994,7 @@ namespace SLF
                 }
             }
 
-            
+
 
             // Find the first available slot in the array that holds shapefile overlay layers
             layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
@@ -1220,8 +1220,8 @@ namespace SLF
                 if (polygon.Points[i].Lat < point.Lat && polygon.Points[j].Lat >= point.Lat
                 || polygon.Points[j].Lat < point.Lat && polygon.Points[i].Lat >= point.Lat)
                 {
-                    if (polygon.Points[i].Lng + (point.Lat - polygon.Points[i].Lat) / 
-                        (polygon.Points[j].Lat - polygon.Points[i].Lat) * 
+                    if (polygon.Points[i].Lng + (point.Lat - polygon.Points[i].Lat) /
+                        (polygon.Points[j].Lat - polygon.Points[i].Lat) *
                         (polygon.Points[j].Lng - polygon.Points[i].Lng) < point.Lng)
                     {
                         oddNodes = !oddNodes;
@@ -1275,16 +1275,17 @@ namespace SLF
 
         public void Draw_Polygon(List<PointLatLng> polygonPoints, GMapOverlay polygonOverlay, GMapControl gmap)
         {
-            // bu noktalar arasında poligon çiz, mavi ile işaretle, ve de 
-            // polygonOverlay katmanına ekle.
+            // Bu noktalar arasında poligon çiz, mavi ile işaretle ve polygonOverlay katmanına ekle.
             string poligonIsim = $"Poligon_{polygonOverlay.Polygons.Count + 1}";
             GMapPolygon polygon = new GMapPolygon(polygonPoints, poligonIsim)
             {
                 Stroke = new Pen(System.Drawing.Color.DarkBlue, 3)
             };
 
-            polygonOverlay.Polygons.Clear();
+            // Mevcut poligonları silmeden yeni poligonu ekle
             polygonOverlay.Polygons.Add(polygon);
+
+            // Haritayı yenile
             gmap.Refresh();
         }
 
@@ -1352,7 +1353,7 @@ namespace SLF
 
             foreach (DataRow row in dataTable.Rows)
             {
-                if (row[columnName] != DBNull.Value && double.TryParse(row[columnName].ToString(), 
+                if (row[columnName] != DBNull.Value && double.TryParse(row[columnName].ToString(),
                     out double value))
                 {
                     if (value < min) min = value;
@@ -1367,7 +1368,7 @@ namespace SLF
                 if (polygonAttributes.TryGetValue(polygon, out DataRow attributes))
                 {
 
-                    if (attributes[columnName] != DBNull.Value && double.TryParse(attributes[columnName].ToString(), 
+                    if (attributes[columnName] != DBNull.Value && double.TryParse(attributes[columnName].ToString(),
                         out double value))
                     {
 
@@ -1480,11 +1481,11 @@ namespace SLF
             GetActiveGMapControl().Refresh();
         }
 
-        public void CetvelSecimi(GMapControl gMapControl, 
+        public void CetvelSecimi(GMapControl gMapControl,
             System.Windows.Forms.Label mesafe_metre,
             List<PointLatLng> rulerPoints,
             GMapOverlay markerOverlay,
-            GMapOverlay rulerOverlay, 
+            GMapOverlay rulerOverlay,
             ref GMapRoute rulerRoute)
         {
             // sol tuşa basıldığında nokta seçmeye başla ve cetveli aktif hale getir
@@ -1502,7 +1503,7 @@ namespace SLF
                     markerOverlay.Markers.Add(marker_1);
                 }
 
-                rulerRoute.Dispose();                
+                rulerRoute.Dispose();
                 DrawRuler(rulerOverlay, rulerPoints, ref rulerRoute);
                 CalculateDistance(gMapControl, mesafe_metre, rulerPoints);
                 rulerPoints.Clear();
@@ -1514,7 +1515,7 @@ namespace SLF
 
 
         //  method to extract data from polygons
-        private List<(GMapPolygon Polygon, DataRow Attributes)> 
+        private List<(GMapPolygon Polygon, DataRow Attributes)>
             ExtractPolygonsAndAttributes(GMapOverlay overlay, System.Data.DataTable dataTable)
         {
             List<(GMapPolygon Polygon, DataRow Attributes)> polygonData = new List<(GMapPolygon, DataRow)>();
