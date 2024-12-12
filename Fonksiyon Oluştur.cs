@@ -28,8 +28,6 @@ namespace SLF
         public Fonksiyon_Oluştur()
         {
             InitializeComponent();
-            Height = 240;
-            MaximumSize = new Size(height: 700, width: this.Width);
         }
 
         private async void buton_jabl_Click(object sender, EventArgs e)

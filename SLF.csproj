@@ -819,6 +819,8 @@
     <None Include="Pictures\Exterior1.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Pictures\Next page2.png" />
+    <None Include="Pictures\Next page.png" />
     <None Include="Pictures\homepage %281%29.png" />
     <None Include="Pictures\homepage.png" />
     <None Include="Pictures\HomeDepot_41088.png" />
@@ -833,6 +835,9 @@
     <None Include="Pictures\home %282%29.png" />
     <None Include="Pictures\Gears.png" />
     <None Include="Pictures\Gears4.png" />
+    <None Include="Pictures\Back To2.png" />
+    <None Include="Pictures\Double Right.png" />
+    <None Include="Pictures\Double Left.png" />
     <Content Include="Pictures\Home3.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

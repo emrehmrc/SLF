@@ -2571,11 +2571,10 @@ namespace SLF
 
             if (seçilenVeriTipi == "İmar Verileri")
             {
-                using (imarFileSelectionPopup fileSelectionPopup = new imarFileSelectionPopup())
+                using (imarFileSelectionPopup fileSelectionPopup = new imarFileSelectionPopup(dataGridView_girdi))
                 {
                     if (fileSelectionPopup.ShowDialog() == DialogResult.OK)
                     {
-                        // Get file paths from the popup
                         string csvFilePath = fileSelectionPopup.CsvFilePath;
                         string kmlFilePath = fileSelectionPopup.KmlFilePath;
 
@@ -2587,6 +2586,7 @@ namespace SLF
                     }
                 }
             }
+
             // Ensure girdiModülü is properly initialized
             if (!girdiModülleri.ContainsKey(seçilenVeriTipi))
             {

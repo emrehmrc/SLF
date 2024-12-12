@@ -63,6 +63,16 @@ namespace SLF.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Back_To2 {
+            get {
+                object obj = ResourceManager.GetObject("Back To2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap CSV2 {
             get {
                 object obj = ResourceManager.GetObject("CSV2", resourceCulture);
@@ -76,6 +86,26 @@ namespace SLF.Properties {
         internal static System.Drawing.Bitmap CSV21 {
             get {
                 object obj = ResourceManager.GetObject("CSV21", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Double_Left {
+            get {
+                object obj = ResourceManager.GetObject("Double Left", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Double_Right {
+            get {
+                object obj = ResourceManager.GetObject("Double Right", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -216,6 +246,26 @@ namespace SLF.Properties {
         internal static System.Drawing.Bitmap KML21 {
             get {
                 object obj = ResourceManager.GetObject("KML21", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Next_page {
+            get {
+                object obj = ResourceManager.GetObject("Next page", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Next_page2 {
+            get {
+                object obj = ResourceManager.GetObject("Next page2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
