@@ -40,6 +40,8 @@
             this.buton_jabl = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.FunctionFormMainPanel = new System.Windows.Forms.Panel();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.checkBoxSum = new System.Windows.Forms.CheckBox();
             this.checkBoxMin = new System.Windows.Forms.CheckBox();
             this.checkBoxMaks = new System.Windows.Forms.CheckBox();
@@ -53,8 +55,6 @@
             this.secilen_sutunlar_fonksiyonForm = new System.Windows.Forms.ListBox();
             this.tum_sutunlar_fonksiyonForm = new System.Windows.Forms.ListBox();
             this.label_agregasyon_fonksiyonForm = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             this.FunctionFormTopPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.FunctionFormRPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.FunctionFormLPicBox)).BeginInit();
@@ -162,6 +162,7 @@
             this.buton_iptal_fonksiyonForm.TabIndex = 24;
             this.buton_iptal_fonksiyonForm.Text = "İptal";
             this.buton_iptal_fonksiyonForm.UseVisualStyleBackColor = false;
+            this.buton_iptal_fonksiyonForm.Click += new System.EventHandler(this.button2_Click);
             // 
             // buton_jabl
             // 
@@ -215,6 +216,24 @@
             this.FunctionFormMainPanel.Name = "FunctionFormMainPanel";
             this.FunctionFormMainPanel.Size = new System.Drawing.Size(984, 449);
             this.FunctionFormMainPanel.TabIndex = 39;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(363, 265);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(32, 15);
+            this.label2.TabIndex = 52;
+            this.label2.Text = "çıkar";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(285, 187);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(28, 15);
+            this.label1.TabIndex = 51;
+            this.label1.Text = "ekle";
             // 
             // checkBoxSum
             // 
@@ -281,6 +300,7 @@
             this.pictureBox3_fonksiyonForm.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox3_fonksiyonForm.TabIndex = 46;
             this.pictureBox3_fonksiyonForm.TabStop = false;
+            this.pictureBox3_fonksiyonForm.Click += new System.EventHandler(this.pictureBox3_Click);
             // 
             // checkBox_cell_statistics
             // 
@@ -334,6 +354,7 @@
             this.pictureBox1_fonksiyonForm.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1_fonksiyonForm.TabIndex = 43;
             this.pictureBox1_fonksiyonForm.TabStop = false;
+            this.pictureBox1_fonksiyonForm.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
             // label_sütun_fonksiyonForm
             // 
@@ -397,24 +418,6 @@
             this.label_agregasyon_fonksiyonForm.Size = new System.Drawing.Size(241, 21);
             this.label_agregasyon_fonksiyonForm.TabIndex = 38;
             this.label_agregasyon_fonksiyonForm.Text = "Agregasyonu Yapılacak Sütünlar";
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(285, 187);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(28, 15);
-            this.label1.TabIndex = 51;
-            this.label1.Text = "ekle";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(363, 265);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(32, 15);
-            this.label2.TabIndex = 52;
-            this.label2.Text = "çıkar";
             // 
             // Fonksiyon_Oluştur
             // 
