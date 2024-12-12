@@ -830,6 +830,7 @@
     <None Include="Pictures\Home Page.png" />
     <None Include="Pictures\Home Address.png" />
     <None Include="Pictures\home %283%29.png" />
+    <None Include="Pictures\home %282%29.png" />
     <Content Include="Pictures\Home3.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
