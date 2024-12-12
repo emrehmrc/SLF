@@ -136,11 +136,17 @@
   <data name="KML21" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Pictures\KML2.ico;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="KML2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Pictures\KML2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Gears" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Pictures\Gears.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="epdk-logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Pictures\epdk-logo.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="home (2)" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Pictures\home (2).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Home2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Pictures\Home2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="download_folder_file_icon_219533" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Pictures\download_folder_file_icon_219533.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -148,8 +154,8 @@
   <data name="HomeDepot_41088" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Pictures\HomeDepot_41088.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Home2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Pictures\Home2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="KML2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Pictures\KML2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="homepage" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Pictures\homepage.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -157,7 +163,7 @@
   <data name="CSV2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Pictures\CSV2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="home (2)" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Pictures\home (2).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Gears4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Pictures\Gears4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
