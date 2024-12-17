@@ -212,12 +212,6 @@
     <Reference Include="JetBrains.Annotations, Version=4242.42.42.42, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>packages\JetBrains.Annotations.2023.3.0\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>
-    <Reference Include="LINQPad, Version=1.0.0.0, Culture=neutral, PublicKeyToken=21353812cd2a2db5, processorArchitecture=MSIL">
-      <HintPath>packages\LINQPad.5.46.0\lib\net46\LINQPad.exe</HintPath>
-    </Reference>
-    <Reference Include="lprun, Version=1.0.0.0, Culture=neutral, PublicKeyToken=21353812cd2a2db5, processorArchitecture=x86">
-      <HintPath>packages\LINQPad.5.46.0\lib\net46\lprun.exe</HintPath>
-    </Reference>
     <Reference Include="MaterialSkin, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\MaterialSkin.2.2.3.1\lib\net461\MaterialSkin.dll</HintPath>
     </Reference>
@@ -584,12 +578,6 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Tmds.DBus, Version=0.18.0.0, Culture=neutral, PublicKeyToken=9abd76e9812c1bca, processorArchitecture=MSIL">
-      <HintPath>packages\Tmds.DBus.0.18.0\lib\netstandard2.0\Tmds.DBus.dll</HintPath>
-    </Reference>
-    <Reference Include="Tmds.DBus.Protocol, Version=0.18.0.0, Culture=neutral, PublicKeyToken=9abd76e9812c1bca, processorArchitecture=MSIL">
-      <HintPath>packages\Tmds.DBus.Protocol.0.18.0\lib\netstandard2.0\Tmds.DBus.Protocol.dll</HintPath>
-    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="XLParser, Version=1.5.2.0, Culture=neutral, PublicKeyToken=63397e1e46bb91b4, processorArchitecture=MSIL">
       <HintPath>packages\XLParser.1.5.2\lib\net461\XLParser.dll</HintPath>
@@ -602,6 +590,12 @@
     </Compile>
     <Compile Include="Ana_Menü.Designer.cs">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AttributeTablePopupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AttributeTablePopupForm.Designer.cs">
+      <DependentUpon>AttributeTablePopupForm.cs</DependentUpon>
     </Compile>
     <Compile Include="CBS.cs" />
     <Compile Include="EAChargingStationPopupForm.cs">
@@ -717,6 +711,9 @@
     </Compile>
     <EmbeddedResource Include="Ana_Menü.resx">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AttributeTablePopupForm.resx">
+      <DependentUpon>AttributeTablePopupForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Attribute_Table.resx">
       <DependentUpon>Attribute_Table.cs</DependentUpon>

@@ -108,6 +108,7 @@ namespace SLF
         public GMapOverlay polygonOverlay_imar = new GMapOverlay("polygonOverlay_imar");
         public GMapOverlay polygonOverlay_yuk = new GMapOverlay("polygonOverlay_yuk");
         public GMapOverlay polygonOverlay_DEK = new GMapOverlay("polygonOverlay_DEK");
+        public GMapOverlay polygonOverlay_yga = new GMapOverlay("polygonOverlay_yga");
 
         private DTRModulu dtrmod = new DTRModulu();
 
@@ -328,6 +329,9 @@ namespace SLF
             InitializeGMap(gMapControl_imar);
             InitializeGMap(gMapControl_optimalDTR);
             InitializeGMap(gMapControl_DEK);
+            InitializeGMap(gMapControl_yga);
+
+            ///////// buraya yeni genisleme initialzie et.
 
             SortTabPagesAlphabetically(Modül_Tabları, true);
             // Enable double buffering for the form to reduce flickering
@@ -348,16 +352,18 @@ namespace SLF
             gMapControl_stokastik.Overlays.Add(markerOverlay_stokastik);
             
             checkboxes_init();
+
             gMapControl_DEK.Overlays.Add(rulerOverlay_DEK);
             gMapControl_DEK.Overlays.Add(markerOverlay_DEK);
-            gMapControl_DEK.Overlays.Add(polygonOverlay_DEK);
+            //gMapControl_DEK.Overlays.Add(polygonOverlay_DEK);
             gMapControl_DEK.Overlays.Add(cbs.gridOverlay);
 
             gMapControl_EA.Overlays.Add(rulerOverlay_ea);
             gMapControl_EA.Overlays.Add(markerOverlay_ea);
-            gMapControl_EA.Overlays.Add(polygonOverlay_ea);
-            
-            
+            //gMapControl_EA.Overlays.Add(polygonOverlay_ea);
+
+            // polygon overlay de ekelşencek --> yenigenislemealanaoı_gmapcontrol
+            gMapControl_yga.Overlays.Add(polygonOverlay_yga);
 
             gMapControl_yuk.Overlays.Add(rulerOverlay_yuk);
             gMapControl_yuk.Overlays.Add(markerOverlay_yuk);
@@ -376,11 +382,45 @@ namespace SLF
             // Initialize the tablo_formu instance
             tablo_formu = new Tablo_Formu();
         }
+        private List<PointLatLng> polygonPoints_yga = new List<PointLatLng>();
 
-        //VISUAL CHANGES
-        private void ModuleTabPanel_Paint(object sender, PaintEventArgs e)
+        private void gMapControl_yga_MouseClick(object sender, MouseEventArgs e)
         {
+            if (e.Button == MouseButtons.Left)
+            {
+                PointLatLng point = gMapControl_yga.FromLocalToLatLng(e.X, e.Y);
+                polygonPoints_yga.Add(point);
+
+                if (polygonPoints_yga.Count > 1)
+                {
+                    // Clear previous polygon and redraw it
+                    polygonOverlay_yga.Polygons.Clear();
+                    GMapPolygon polygon = new GMapPolygon(polygonPoints_yga, "polygon");
+                    polygon.Overlay = polygonOverlay_yga;
+                    polygonOverlay_yga.Polygons.Add(polygon);
+                    gMapControl_yga.Refresh();
+                }
+            }
         }
+        private void FinishPolygonButton_Click(object sender, EventArgs e)
+        {
+            if (polygonPoints_yga.Count >= 3)  // Ensure polygon is valid (at least 3 points)
+            {
+                ShowAttributeTablePopup(polygonPoints_yga);
+            }
+            else
+            {
+                MessageBox.Show("Please draw a polygon with at least 3 points.");
+            }
+        }
+
+        private void ShowAttributeTablePopup(List<PointLatLng> polygonPoints)
+        {
+            // Display the Attribute Table popup where the user can enter attributes
+            AttributeTablePopupForm popup = new AttributeTablePopupForm(polygonPoints);
+            popup.ShowDialog();
+        }
+
 
         // Initialize specific tabs and hide others
         // Method to hide a specific item from the ComboBox
@@ -4301,8 +4341,6 @@ namespace SLF
 
 
         }
-
-       
 
         private void İmar_Poligon_MouseDown(object sender, MouseEventArgs e)
         {

@@ -22,7 +22,7 @@ namespace SLF
         public int layer_index;
         public GMapOverlay[] tüm_katmanlar_array;
         public string[] tüm_katmanlar_array_names;
-        public MapWinGIS.Shapefile[] shapeFileArray_MapWinGIS;
+        public MapWinGIS.Shapefile[] shapeFileArray_MapWinGIS; // for conversions and built-in formulas only.
         public System.Data.DataTable[] tüm_katmanlar_datatable;
 
         // see the attributes of a polygon when clicked on it on the map 
