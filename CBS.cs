@@ -179,10 +179,12 @@ namespace SLF
                     GMapOverlay shapeFileOverlay_imar = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_imar");
                     GMapOverlay shapeFileOverlay_yuk = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_yuk");
                     GMapOverlay shapeFileOverlay_stokastik = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_stokastik");
+                    GMapOverlay shapeFileOverlay_yga = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_yga");
 
                     modülFormu.gMapControl_imar.Overlays.Add(shapeFileOverlay_imar);
                     modülFormu.gMapControl_yuk.Overlays.Add(shapeFileOverlay_yuk);
                     modülFormu.gMapControl_stokastik.Overlays.Add(shapeFileOverlay_stokastik);
+                    modülFormu.gMapControl_yga.Overlays.Add(shapeFileOverlay_yga);
 
                     // create a new datatable to be added to the tüm_katmanlar_datatable array
                     System.Data.DataTable shapefile_datatable = new System.Data.DataTable();
@@ -195,7 +197,7 @@ namespace SLF
                     // Duplicate the polygons and routes from shapeFileOverlay_imar into each new overlay
                     CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_yuk);
                     CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_stokastik);
-
+                    CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_yga);
 
                     // add the layer and its name to the specified arrays
                     tüm_katmanlar_array[layer_index] = shapeFileOverlay_imar;
@@ -204,6 +206,7 @@ namespace SLF
 
                     // Get the list of associated checkboxes for the given layer_index
                     List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
+
 
                     if (associatedCheckBoxes != null)
                     {
@@ -215,6 +218,9 @@ namespace SLF
                             checkBox.Text = tüm_katmanlar_array_names[layer_index];
                         }
                     }
+
+
+
                     //LoadShapefileIntoOverlay(shapeFileOverlay_imar, tüm_katmanlar_datatable[0]);
                 }
                 else if (extension == "kml")
@@ -222,10 +228,12 @@ namespace SLF
                     GMapOverlay kmlOverlay_imar = new GMapOverlay($"kmlOverlay_{layer_index + 1}_imar");
                     GMapOverlay kmlOverlay_yuk = new GMapOverlay($"kmlOverlay_{layer_index + 1}_yuk");
                     GMapOverlay kmlOverlay_stokastik = new GMapOverlay($"kmlOverlay_{layer_index + 1}_stokastik");
+                    GMapOverlay kmlOverlay_yga = new GMapOverlay($"kmlOverlay_{layer_index + 1}_yga");
 
                     modülFormu.gMapControl_imar.Overlays.Add(kmlOverlay_imar);
                     modülFormu.gMapControl_yuk.Overlays.Add(kmlOverlay_yuk);
                     modülFormu.gMapControl_stokastik.Overlays.Add(kmlOverlay_stokastik);
+                    modülFormu.gMapControl_yga.Overlays.Add(kmlOverlay_yga);
 
                     System.Data.DataTable kml_datatable = new System.Data.DataTable();
                     callingForm.Cursor = Cursors.WaitCursor;
@@ -244,6 +252,7 @@ namespace SLF
                     // Duplicate the polygons and routes from shapeFileOverlay_imar into each new overlay
                     CopyOverlayContents(kmlOverlay_imar, kmlOverlay_yuk);
                     CopyOverlayContents(kmlOverlay_imar, kmlOverlay_stokastik);
+                    CopyOverlayContents(kmlOverlay_imar, kmlOverlay_yga);
 
                     callingForm.Cursor = Cursors.Default;
 
@@ -1172,8 +1181,6 @@ namespace SLF
 
 
         // ------------------------------------ EXTRAS --------------------------------------//
-
-
         public GMapControl GetActiveGMapControl()
         {
             TabPage selectedTab = modülFormu.Modül_Tabları.SelectedTab;
@@ -1182,9 +1189,44 @@ namespace SLF
             {
                 foreach (Control control in selectedTab.Controls)
                 {
+                    // If the control is a GMapControl, return it
                     if (control is GMapControl gmapControl)
                     {
                         return gmapControl;
+                    }
+
+                    // If it's a container, recursively search for a GMapControl inside it
+                    if (control is Panel panel)
+                    {
+                        GMapControl nestedControl = FindGMapControlInContainer(panel);
+                        if (nestedControl != null)
+                        {
+                            return nestedControl;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        // Helper method to recursively search for GMapControl in nested containers
+        private GMapControl FindGMapControlInContainer(Control container)
+        {
+            foreach (Control control in container.Controls)
+            {
+                if (control is GMapControl gmapControl)
+                {
+                    return gmapControl;
+                }
+
+                // Recursively check if the control is a container (e.g., Panel)
+                if (control is Panel panel)
+                {
+                    GMapControl nestedControl = FindGMapControlInContainer(panel);
+                    if (nestedControl != null)
+                    {
+                        return nestedControl;
                     }
                 }
             }

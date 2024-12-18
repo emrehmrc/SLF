@@ -39,24 +39,27 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.vektörel_attribute_table.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.vektörel_attribute_table.Location = new System.Drawing.Point(12, 33);
+            this.vektörel_attribute_table.Location = new System.Drawing.Point(9, 27);
+            this.vektörel_attribute_table.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.vektörel_attribute_table.Name = "vektörel_attribute_table";
             this.vektörel_attribute_table.RowHeadersWidth = 51;
             this.vektörel_attribute_table.RowTemplate.Height = 24;
-            this.vektörel_attribute_table.Size = new System.Drawing.Size(1108, 528);
+            this.vektörel_attribute_table.Size = new System.Drawing.Size(831, 429);
             this.vektörel_attribute_table.TabIndex = 0;
             // 
             // Tablo_Formu
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.ClientSize = new System.Drawing.Size(1132, 573);
+            this.ClientSize = new System.Drawing.Size(850, 472);
             this.Controls.Add(this.vektörel_attribute_table);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(1150, 620);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.MinimumSize = new System.Drawing.Size(866, 511);
             this.Name = "Tablo_Formu";
             this.Text = "Tablo";
+            this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Tablo_Formu_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.vektörel_attribute_table)).EndInit();
             this.ResumeLayout(false);
