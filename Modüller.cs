@@ -289,6 +289,7 @@ namespace SLF
         // Initialize all form components (called in the constructors)
         private void InitializeFormComponents()
         {
+            // Initialize GMap Controls
             InitializeGMap(gMapControl_stokastik);
             InitializeGMap(gMapControl_EA);
             InitializeGMap(gMapControl_yuk);
@@ -297,59 +298,70 @@ namespace SLF
             InitializeGMap(gMapControl_DEK);
             InitializeGMap(gMapControl_yga);
 
-            ///////// buraya yeni genisleme initialzie et.
 
+            // Sort TabPages Alphabetically
             SortTabPagesAlphabetically(Modül_Tabları, true);
-            // Enable double buffering for the form to reduce flickering
+
+            // Enable double buffering to reduce flickering
             this.DoubleBuffered = true;
 
-            // Default selected tab
+            // Set Default Selected Tab
             Modül_Tabları.SelectedTab = tab_girdi;
 
+            // Bring certain buttons to the front
+            BringButtonsToFront();
+
+            // Add overlays to the maps
+            AddOverlaysToMaps();
+
+            // Initialize checkboxes
+            checkboxes_init();
+
+            // Set process priority to High
+            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+
+            // Set default selection for veri_listesi_seçimi
+            veri_listesi_seçimi.SelectedIndex = 2;
+
+            // Initialize the tablo_formu instance
+            tablo_formu = new Tablo_Formu();
+        }
+
+        // Helper method to bring buttons to the front
+        private void BringButtonsToFront()
+        {
             buton_yga_harita_katmanlar.BringToFront();
             buton_stokastik_harita_katmanlar.BringToFront();
             buton_ea_harita_katmanlar.BringToFront();
             buton_yuk_haritası_katmanlar.BringToFront();
             buton_imar_katmanlar.BringToFront();
             buton_optimalDTR_katmanlar.BringToFront();
-
-
-            // Add overlays to the maps
-            gMapControl_stokastik.Overlays.Add(rulerOverlay_stokastik);
-            gMapControl_stokastik.Overlays.Add(markerOverlay_stokastik);
-            
-            checkboxes_init();
-
-            gMapControl_DEK.Overlays.Add(rulerOverlay_DEK);
-            gMapControl_DEK.Overlays.Add(markerOverlay_DEK);
-            //gMapControl_DEK.Overlays.Add(polygonOverlay_DEK);
-            gMapControl_DEK.Overlays.Add(cbs.gridOverlay);
-
-            gMapControl_EA.Overlays.Add(rulerOverlay_ea);
-            gMapControl_EA.Overlays.Add(markerOverlay_ea);
-            //gMapControl_EA.Overlays.Add(polygonOverlay_ea);
-
-            // polygon overlay de ekelşencek --> yenigenislemealanaoı_gmapcontrol
-            gMapControl_yga.Overlays.Add(polygonOverlay_yga);
-            gMapControl_yga.Overlays.Add(markerOverlay_yga);
-
-            gMapControl_yuk.Overlays.Add(rulerOverlay_yuk);
-            gMapControl_yuk.Overlays.Add(markerOverlay_yuk);
-            gMapControl_yuk.Overlays.Add(polygonOverlay_yuk);
-
-            gMapControl_imar.Overlays.Add(rulerOverlay_imar);
-            gMapControl_imar.Overlays.Add(markerOverlay_imar);
-            gMapControl_imar.Overlays.Add(polygonOverlay_imar);
-            gMapControl_imar.Overlays.Add(cbs.gridOverlay);
-
-            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
-
-            // Default selection for veri_listesi_seçimi
-            veri_listesi_seçimi.SelectedIndex = 2;
-
-            // Initialize the tablo_formu instance
-            tablo_formu = new Tablo_Formu();
         }
+
+        // Helper method to add overlays to the maps
+        private void AddOverlaysToMaps()
+        {
+            // Create a dictionary of overlays for each map control
+            var overlays = new Dictionary<GMapControl, List<GMapOverlay>>()
+    {
+        { gMapControl_stokastik, new List<GMapOverlay> { polygonOverlay_stokastik, rulerOverlay_stokastik, markerOverlay_stokastik } },
+        { gMapControl_DEK, new List<GMapOverlay> { rulerOverlay_DEK, markerOverlay_DEK /*, polygonOverlay_DEK*/ } },
+        { gMapControl_EA, new List<GMapOverlay> { rulerOverlay_ea, markerOverlay_ea /*, polygonOverlay_ea*/ } },
+        { gMapControl_yga, new List<GMapOverlay> { polygonOverlay_yga, markerOverlay_yga, rulerOverlay_yga } },
+        { gMapControl_yuk, new List<GMapOverlay> { rulerOverlay_yuk, markerOverlay_yuk, polygonOverlay_yuk } },
+        { gMapControl_imar, new List<GMapOverlay> { rulerOverlay_imar, markerOverlay_imar, polygonOverlay_imar, cbs.gridOverlay } }
+    };
+
+            // Iterate through each map control and add overlays
+            foreach (var mapControl in overlays)
+            {
+                foreach (var overlay in mapControl.Value)
+                {
+                    mapControl.Key.Overlays.Add(overlay);
+                }
+            }
+        }
+
 
 
         // Initialize specific tabs and hide others
@@ -1264,9 +1276,10 @@ namespace SLF
 
             }
 
-            rulerRoute_ea = new GMapRoute(rulerPoints, "rulerRoute");
-
-            rulerRoute_ea.Stroke = new Pen(Color.Red, 3);
+            rulerRoute_ea = new GMapRoute(rulerPoints, "rulerRoute")
+            {
+                Stroke = new Pen(Color.Red, 3)
+            };
 
             rulerOverlay.Routes.Add(rulerRoute_ea);
 
@@ -1304,7 +1317,6 @@ namespace SLF
             }
 
         }
-
         private void gMapControl_Dek_OnMarkerClick(GMapMarker item, MouseEventArgs e)
 
         {
@@ -1341,221 +1353,68 @@ namespace SLF
         {
             await cbs.cbs_dosya_secimi(gMapControl_imar, this, tablo_formu.attribute_table);
         }
-
         public List<CheckBox> GetCheckBoxesByIndex(int index)
         {
-            switch (index)
+            // Define arrays for checkboxes
+            var stokastikCheckBoxes = new CheckBox[] { checkBox_stokastik_1, checkBox_stokastik_2, checkBox_stokastik_3, checkBox_stokastik_4, checkBox_stokastik_5, checkBox_stokastik_6, checkBox_stokastik_7, checkBox_stokastik_8, checkBox_stokastik_9, checkBox_stokastik_10, checkBox_stokastik_11, checkBox_stokastik_12, checkBox_stokastik_13 };
+            var imarCheckBoxes = new CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10, checkBox_imar_11, checkBox_imar_12, checkBox_imar_13 };
+            var ygaCheckBoxes = new CheckBox[] { checkBox_yga_1, checkBox_yga_2, checkBox_yga_3, checkBox_yga_4, checkBox_yga_5, checkBox_yga_6, checkBox_yga_7, checkBox_yga_8, checkBox_yga_9, checkBox_yga_10, checkBox_yga_11, checkBox_yga_12, checkBox_yga_13 };
+
+            // Ensure the index is valid before accessing arrays
+            if (index >= 0 && index < 13)
             {
-                case 0:
-                    return new List<CheckBox> { checkBox_stokastik_1, checkBox_imar_1, checkBox_yga_1 };
-                case 1:
-                    return new List<CheckBox> { checkBox_stokastik_2, checkBox_imar_2, checkBox_yga_2 };
-                case 2:
-                    return new List<CheckBox> { checkBox_stokastik_3, checkBox_imar_3, checkBox_yga_3 };
-                case 3:
-                    return new List<CheckBox> { checkBox_stokastik_4, checkBox_imar_4, checkBox_yga_4 };
-                case 4:
-                    return new List<CheckBox> { checkBox_stokastik_5, checkBox_imar_5, checkBox_yga_5 };
-                case 5:
-                    return new List<CheckBox> { checkBox_stokastik_6, checkBox_imar_6, checkBox_yga_6 };
-                case 6:
-                    return new List<CheckBox> { checkBox_stokastik_7, checkBox_imar_7, checkBox_yga_7 };
-                case 7:
-                    return new List<CheckBox> { checkBox_stokastik_8, checkBox_imar_8, checkBox_yga_8 };
-                case 8:
-                    return new List<CheckBox> { checkBox_stokastik_9, checkBox_imar_9, checkBox_yga_9 };
-                case 9:
-                    return new List<CheckBox> { checkBox_stokastik_10, checkBox_imar_10, checkBox_yga_10 };
-                case 10:
-                    return new List<CheckBox> { checkBox_stokastik_11, checkBox_imar_11, checkBox_yga_11 };
-                case 11:
-                    return new List<CheckBox> { checkBox_stokastik_12, checkBox_imar_12, checkBox_yga_12 };
-                case 12:
-                    return new List<CheckBox> { checkBox_stokastik_13, checkBox_imar_13, checkBox_yga_13 };
-
-                // Add more cases as needed
-                default:
-                    return null; // or return an empty list if preferred
+                // Return the checkboxes for the given index
+                return new List<CheckBox> { stokastikCheckBoxes[index], imarCheckBoxes[index], ygaCheckBoxes[index] };
             }
-        }
 
-        // stokastik haritasına ait checkboxların initializationları
+            // Return null or an empty list for invalid index
+            return null; // or return new List<CheckBox>();
+        }
         private void checkboxes_init()
         {
-            checkBox_yga_1.Tag = 1;
-            checkBox_yga_2.Tag = 2;
-            checkBox_yga_3.Tag = 3;
-            checkBox_yga_4.Tag = 4;
-            checkBox_yga_5.Tag = 5;
-            checkBox_yga_6.Tag = 6;
-            checkBox_yga_7.Tag = 7;
-            checkBox_yga_8.Tag = 8;
-            checkBox_yga_9.Tag = 9;
-            checkBox_yga_10.Tag = 10;
-            checkBox_yga_11.Tag = 11;
-            checkBox_yga_12.Tag = 12;
-            checkBox_yga_13.Tag = 13;
+            // Arrays of CheckBoxes for YGA, Imar, and Stokastik
+            var checkBoxes_yga = new CheckBox[] { checkBox_yga_1, checkBox_yga_2, checkBox_yga_3, checkBox_yga_4, checkBox_yga_5, checkBox_yga_6, checkBox_yga_7, checkBox_yga_8, checkBox_yga_9, checkBox_yga_10, checkBox_yga_11, checkBox_yga_12, checkBox_yga_13 };
+            var checkBoxes_imar = new CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10, checkBox_imar_11, checkBox_imar_12, checkBox_imar_13 };
+            var checkBoxes_stokastik = new CheckBox[] { checkBox_stokastik_1, checkBox_stokastik_2, checkBox_stokastik_3, checkBox_stokastik_4, checkBox_stokastik_5, checkBox_stokastik_6, checkBox_stokastik_7, checkBox_stokastik_8, checkBox_stokastik_9, checkBox_stokastik_10, checkBox_stokastik_11, checkBox_stokastik_12, checkBox_stokastik_13 };
 
-            checkBox_imar_1.Tag = 1;
-            checkBox_imar_2.Tag = 2;
-            checkBox_imar_3.Tag = 3;
-            checkBox_imar_4.Tag = 4;
-            checkBox_imar_5.Tag = 5;
-            checkBox_imar_6.Tag = 6;
-            checkBox_imar_7.Tag = 7;
-            checkBox_imar_8.Tag = 8;
-            checkBox_imar_9.Tag = 9;
-            checkBox_imar_10.Tag = 10;
-            checkBox_imar_11.Tag = 11;
-            checkBox_imar_12.Tag = 12;
-            checkBox_imar_13.Tag = 13;
+            // Common Tag values for the checkboxes (1 to 13)
+            int[] tagValuesForCheckboxes = Enumerable.Range(1, 13).ToArray();  // This generates an array [1, 2, 3, ..., 13]
 
-            // shapefile_array de kullanılmak üzere oluşturulan checkbox etiketleri
-            checkBox_stokastik_1.Tag = 1;
-            checkBox_stokastik_2.Tag = 2;
-            checkBox_stokastik_3.Tag = 3;
-            checkBox_stokastik_4.Tag = 4;
-            checkBox_stokastik_5.Tag = 5;
-            checkBox_stokastik_6.Tag = 6;
-            checkBox_stokastik_7.Tag = 7;
-            checkBox_stokastik_8.Tag = 8;
-            checkBox_stokastik_9.Tag = 9;
-            checkBox_stokastik_10.Tag = 10;
-            checkBox_stokastik_11.Tag = 11;
-            checkBox_stokastik_12.Tag = 12;
-            checkBox_stokastik_13.Tag = 13;
+            // Function to initialize CheckBoxes with a tag, event handlers, and forecolor
+            void initializeCheckBoxes(CheckBox[] checkBoxes, int[] tagValues)
+            {
+                for (int i = 0; i < checkBoxes.Length; i++)
+                {
+                    checkBoxes[i].Tag = tagValues[i];
+                    checkBoxes[i].CheckedChanged += checkBox_CheckedChanged;
+                    checkBoxes[i].MouseDown += checkBox_MouseDown;
+                    checkBoxes[i].ForeColor = cbs.overlayColors[i].BorderColor;  // Set the color from the corresponding cbs.overlayColors
+                }
+            }
 
-            // checkboxlara event atama
-            checkBox_yga_1.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_yga_2.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_yga_3.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_yga_4.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_yga_5.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_yga_6.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_yga_7.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_yga_8.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_yga_9.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_yga_10.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_yga_11.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_yga_12.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_yga_13.CheckedChanged += checkBox_CheckedChanged;
-
-            checkBox_imar_1.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_imar_2.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_imar_3.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_imar_4.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_imar_5.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_imar_6.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_imar_7.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_imar_8.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_imar_9.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_imar_10.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_imar_11.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_imar_12.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_imar_13.CheckedChanged += checkBox_CheckedChanged;
-
-            checkBox_stokastik_1.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_stokastik_2.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_stokastik_3.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_stokastik_4.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_stokastik_5.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_stokastik_6.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_stokastik_7.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_stokastik_8.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_stokastik_9.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_stokastik_10.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_stokastik_11.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_stokastik_12.CheckedChanged += checkBox_CheckedChanged;
-            checkBox_stokastik_13.CheckedChanged += checkBox_CheckedChanged;
-
-
-            checkBox_yga_1.MouseDown += checkBox_MouseDown;
-            checkBox_yga_2.MouseDown += checkBox_MouseDown;
-            checkBox_yga_3.MouseDown += checkBox_MouseDown;
-            checkBox_yga_4.MouseDown += checkBox_MouseDown;
-            checkBox_yga_5.MouseDown += checkBox_MouseDown;
-            checkBox_yga_6.MouseDown += checkBox_MouseDown;
-            checkBox_yga_7.MouseDown += checkBox_MouseDown;
-            checkBox_yga_8.MouseDown += checkBox_MouseDown;
-            checkBox_yga_9.MouseDown += checkBox_MouseDown;
-            checkBox_yga_10.MouseDown += checkBox_MouseDown;
-            checkBox_yga_11.MouseDown += checkBox_MouseDown;
-            checkBox_yga_12.MouseDown += checkBox_MouseDown;
-            checkBox_yga_13.MouseDown += checkBox_MouseDown;
-
-            checkBox_imar_1.MouseDown += checkBox_MouseDown;
-            checkBox_imar_2.MouseDown += checkBox_MouseDown;
-            checkBox_imar_3.MouseDown += checkBox_MouseDown;
-            checkBox_imar_4.MouseDown += checkBox_MouseDown;
-            checkBox_imar_5.MouseDown += checkBox_MouseDown;
-            checkBox_imar_6.MouseDown += checkBox_MouseDown;
-            checkBox_imar_7.MouseDown += checkBox_MouseDown;
-            checkBox_imar_8.MouseDown += checkBox_MouseDown;
-            checkBox_imar_9.MouseDown += checkBox_MouseDown;
-            checkBox_imar_10.MouseDown += checkBox_MouseDown;
-            checkBox_imar_11.MouseDown += checkBox_MouseDown;
-            checkBox_imar_12.MouseDown += checkBox_MouseDown;
-            checkBox_imar_13.MouseDown += checkBox_MouseDown;
-
-            checkBox_stokastik_1.MouseDown += checkBox_MouseDown;
-            checkBox_stokastik_2.MouseDown += checkBox_MouseDown;
-            checkBox_stokastik_3.MouseDown += checkBox_MouseDown;
-            checkBox_stokastik_4.MouseDown += checkBox_MouseDown;
-            checkBox_stokastik_5.MouseDown += checkBox_MouseDown;
-            checkBox_stokastik_6.MouseDown += checkBox_MouseDown;
-            checkBox_stokastik_7.MouseDown += checkBox_MouseDown;
-            checkBox_stokastik_8.MouseDown += checkBox_MouseDown;
-            checkBox_stokastik_9.MouseDown += checkBox_MouseDown;
-            checkBox_stokastik_10.MouseDown += checkBox_MouseDown;
-            checkBox_stokastik_11.MouseDown += checkBox_MouseDown;
-            checkBox_stokastik_12.MouseDown += checkBox_MouseDown;
-            checkBox_stokastik_13.MouseDown += checkBox_MouseDown;
-
-
-            checkBox_yga_1.ForeColor = cbs.overlayColors[0].BorderColor;
-            checkBox_yga_2.ForeColor = cbs.overlayColors[1].BorderColor;
-            checkBox_yga_3.ForeColor = cbs.overlayColors[2].BorderColor;
-            checkBox_yga_4.ForeColor = cbs.overlayColors[3].BorderColor;
-            checkBox_yga_5.ForeColor = cbs.overlayColors[4].BorderColor;
-            checkBox_yga_6.ForeColor = cbs.overlayColors[5].BorderColor;
-            checkBox_yga_7.ForeColor = cbs.overlayColors[6].BorderColor;
-            checkBox_yga_8.ForeColor = cbs.overlayColors[7].BorderColor;
-            checkBox_yga_9.ForeColor = cbs.overlayColors[8].BorderColor;
-            checkBox_yga_10.ForeColor = cbs.overlayColors[9].BorderColor;
-            checkBox_yga_11.ForeColor = cbs.overlayColors[10].BorderColor;
-            checkBox_yga_12.ForeColor = cbs.overlayColors[11].BorderColor;
-            checkBox_yga_13.ForeColor = cbs.overlayColors[12].BorderColor;
-
-            checkBox_imar_1.ForeColor = cbs.overlayColors[0].BorderColor;
-            checkBox_imar_2.ForeColor = cbs.overlayColors[1].BorderColor;
-            checkBox_imar_3.ForeColor = cbs.overlayColors[2].BorderColor;
-            checkBox_imar_4.ForeColor = cbs.overlayColors[3].BorderColor;
-            checkBox_imar_5.ForeColor = cbs.overlayColors[4].BorderColor;
-            checkBox_imar_6.ForeColor = cbs.overlayColors[5].BorderColor;
-            checkBox_imar_7.ForeColor = cbs.overlayColors[6].BorderColor;
-            checkBox_imar_8.ForeColor = cbs.overlayColors[7].BorderColor;
-            checkBox_imar_9.ForeColor = cbs.overlayColors[8].BorderColor;
-            checkBox_imar_10.ForeColor = cbs.overlayColors[9].BorderColor;
-            checkBox_imar_11.ForeColor = cbs.overlayColors[10].BorderColor;
-            checkBox_imar_12.ForeColor = cbs.overlayColors[11].BorderColor;
-            checkBox_imar_13.ForeColor = cbs.overlayColors[12].BorderColor;
-
-            checkBox_stokastik_1.ForeColor = cbs.overlayColors[0].BorderColor;
-            checkBox_stokastik_2.ForeColor = cbs.overlayColors[1].BorderColor;
-            checkBox_stokastik_3.ForeColor = cbs.overlayColors[2].BorderColor;
-            checkBox_stokastik_4.ForeColor = cbs.overlayColors[3].BorderColor;
-            checkBox_stokastik_5.ForeColor = cbs.overlayColors[4].BorderColor;
-            checkBox_stokastik_6.ForeColor = cbs.overlayColors[5].BorderColor;
-            checkBox_stokastik_7.ForeColor = cbs.overlayColors[6].BorderColor;
-            checkBox_stokastik_8.ForeColor = cbs.overlayColors[7].BorderColor;
-            checkBox_stokastik_9.ForeColor = cbs.overlayColors[8].BorderColor;
-            checkBox_stokastik_10.ForeColor = cbs.overlayColors[9].BorderColor;
-            checkBox_stokastik_11.ForeColor = cbs.overlayColors[10].BorderColor;
-            checkBox_stokastik_12.ForeColor = cbs.overlayColors[11].BorderColor;
-            checkBox_stokastik_13.ForeColor = cbs.overlayColors[12].BorderColor;
-
+            // Initialize all checkboxes
+            initializeCheckBoxes(checkBoxes_yga, tagValuesForCheckboxes);
+            initializeCheckBoxes(checkBoxes_imar, tagValuesForCheckboxes);
+            initializeCheckBoxes(checkBoxes_stokastik, tagValuesForCheckboxes);
         }
 
+        private void FinishPolygonButton_Click(object sender, EventArgs e)
+        {
+            if (polygonPoints_yga.Count >= 3)  // Ensure polygon is valid (at least 3 points)
+            {
+                ShowAttributeTablePopup(polygonPoints_yga);
+            }
+            else
+            {
+                MessageBox.Show("Please draw a polygon with at least 3 points.");
+            }
+        }
+        private void ShowAttributeTablePopup(List<PointLatLng> polygonPoints)
+        {
+            // Create and show the Attribute Table popup for user input
+            AttributeTablePopupForm popup = new AttributeTablePopupForm(polygonPoints);
+            popup.ShowDialog();  // Show the form as a dialog (blocking until closed)
+        }
         private void ShowAttributeTable(DataTable datatable)
         {
             tablo_formu.attribute_table.DataSource = datatable;
@@ -1635,10 +1494,7 @@ namespace SLF
 
         private void kaydetToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
-            ToolStripMenuItem kaydet_menu_item = sender as ToolStripMenuItem;
-
-            if (kaydet_menu_item != null)
+            if (sender is ToolStripMenuItem kaydet_menu_item)
             {
                 System.Windows.Forms.CheckBox checkBox = kaydet_menu_item.Tag as System.Windows.Forms.CheckBox;
                 int checkbox_index = int.Parse(checkBox.Tag.ToString()) - 1;
@@ -1913,41 +1769,77 @@ namespace SLF
         }
 
         // eğer EA tabı seçilmişe, Stokastik tabındaki polygonları sil, ya da vice versa.
+        /*        private void Poligon_Çiz_Click(object sender, EventArgs e)
+                {
+                    isSelecting_polygon = true;
+                    isRulerEnabled = false;
+                    isRulerActive = false;
+
+                    if (cbs.GetActiveGMapControl() == gMapControl_imar)
+                    {
+                        mesafe_metre_imar.Text = string.Empty;
+                        Mesafe_imar.Visible = false;
+                        markerOverlay_imar?.Clear();
+                        rulerOverlay_imar?.Clear();
+                        rulerRoute_imar?.Clear();
+                        rulerPoints_imar?.Clear();
+
+                    }
+                    if (cbs.GetActiveGMapControl() == gMapControl_yga)
+                    {
+                        mesafe_metre_yga.Text = string.Empty;
+                        Mesafe_yga.Visible = false;
+                        markerOverlay_yga?.Clear();
+                        rulerOverlay_yga?.Clear();
+                        rulerRoute_yga?.Clear();
+                        rulerPoints_yga?.Clear();
+
+                    }
+                    else if (cbs.GetActiveGMapControl() == gMapControl_stokastik)
+                    {
+                        mesafe_metre_stokastik.Text = string.Empty;
+                        Mesafe_stokastik.Visible = false;
+                        markerOverlay_stokastik?.Clear();
+                        rulerOverlay_stokastik?.Clear();
+                        rulerRoute_stokastik?.Clear();
+                        rulerPoints_stokastik?.Clear();
+                    }
+                }
+        */
         private void Poligon_Çiz_Click(object sender, EventArgs e)
         {
             isSelecting_polygon = true;
             isRulerEnabled = false;
             isRulerActive = false;
 
+            // Determine the active map control and reset accordingly
             if (cbs.GetActiveGMapControl() == gMapControl_imar)
             {
-                mesafe_metre_imar.Text = string.Empty;
-                Mesafe_imar.Visible = false;
-                markerOverlay_imar?.Clear();
-                rulerOverlay_imar?.Clear();
-                rulerRoute_imar?.Clear();
-                rulerPoints_imar?.Clear();
-
+                ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar, rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
             }
-            if (cbs.GetActiveGMapControl() == gMapControl_yga)
+            else if (cbs.GetActiveGMapControl() == gMapControl_yga)
             {
-                mesafe_metre_yga.Text = string.Empty;
-                Mesafe_yga.Visible = false;
-                markerOverlay_yga?.Clear();
-                rulerOverlay_yga?.Clear();
-                rulerRoute_yga?.Clear();
-                rulerPoints_yga?.Clear();
-
+                ResetMapControls(gMapControl_yga, mesafe_metre_yga, Mesafe_yga, markerOverlay_yga, rulerOverlay_yga, rulerRoute_yga, rulerPoints_yga);
             }
             else if (cbs.GetActiveGMapControl() == gMapControl_stokastik)
             {
-                mesafe_metre_stokastik.Text = string.Empty;
-                Mesafe_stokastik.Visible = false;
-                markerOverlay_stokastik?.Clear();
-                rulerOverlay_stokastik?.Clear();
-                rulerRoute_stokastik?.Clear();
-                rulerPoints_stokastik?.Clear();
+                ResetMapControls(gMapControl_stokastik, mesafe_metre_stokastik, Mesafe_stokastik, markerOverlay_stokastik, rulerOverlay_stokastik, rulerRoute_stokastik, rulerPoints_stokastik);
             }
+        }
+
+        // Helper method to reset map controls for a specific map
+        private void ResetMapControls(GMapControl mapControl, System.Windows.Forms.Label distanceLabel, System.Windows.Forms.Label distanceMetreLabel,
+            GMapOverlay markerOverlay, GMapOverlay rulerOverlay, GMapRoute rulerRoute, List<PointLatLng> rulerPoints)
+        {
+            // Clear the distance display and visibility
+            distanceMetreLabel.Text = string.Empty;
+            distanceLabel.Visible = false;
+
+            // Clear overlays and ruler data
+            markerOverlay?.Clear();
+            rulerOverlay?.Clear();
+            rulerRoute?.Clear();
+            rulerPoints?.Clear();
         }
 
         private void Nokta_Ekle_Click(object sender, EventArgs e)
@@ -1971,24 +1863,6 @@ namespace SLF
             {
                 ContextMenuStrip_Fonksiyon.Show(Cursor.Position);
             }
-        }
-
-        private void FinishPolygonButton_Click(object sender, EventArgs e)
-        {
-            if (polygonPoints_yga.Count >= 3)  // Ensure polygon is valid (at least 3 points)
-            {
-                ShowAttributeTablePopup(polygonPoints_yga);
-            }
-            else
-            {
-                MessageBox.Show("Please draw a polygon with at least 3 points.");
-            }
-        }
-        private void ShowAttributeTablePopup(List<PointLatLng> polygonPoints)
-        {
-            // Create and show the Attribute Table popup for user input
-            AttributeTablePopupForm popup = new AttributeTablePopupForm(polygonPoints);
-            popup.ShowDialog();  // Show the form as a dialog (blocking until closed)
         }
 
         //---------------------------- CBS TOOLBOX EVENTLERİ  ----------------------------------//
@@ -2197,6 +2071,13 @@ namespace SLF
                 rulerPoints_yuk, markerOverlay_yuk, rulerOverlay_yuk, ref rulerRoute_yuk,
                 polygonPoints_yuk, polygonOverlay_yuk);
         }
+        private void İmar_Poligon_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                ContextMenuStrip_Poligon.Show(Cursor.Position);
+            }
+        }
         private void gMapControl_yga_MouseMove(object sender, MouseEventArgs e)
         {
 
@@ -2362,6 +2243,72 @@ namespace SLF
             }
         }
 
+        private void gMapControl_imar_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && cbs.isSelecting_grid)
+            {
+                // grid oluşturmak için seçilen alan (bounding box) ın son noktası
+                cbs.ending_point = gMapControl_imar.FromLocalToLatLng(e.X, e.Y);
+                cbs.isSelecting_grid = false;
+                gMapControl_imar.CanDragMap = true;
+
+                // Clear the selection polygon and refresh the map
+                gMapControl_imar.Overlays.Remove(cbs.bounding_box_overlay);
+                cbs.AddGridToMap(gMapControl_imar);
+                gMapControl_imar.Refresh();
+            }
+        }
+
+        private void trackBar_Yıllar_ValueChanged(object sender, EventArgs e)
+        {
+            int selectedYear = trackBar_Yıllar.Value;
+            yuk_yıl_deger.Text = $"{selectedYear}";
+
+            // Construct the column name based on the selected year
+            string columnName = $"{selectedYear}";
+
+            // Call a method to update the heatmap using the selected year's data
+            UpdateHeatmapForYear(columnName);
+        }
+
+        private void UpdateHeatmapForYear(string columnName)
+        {
+            // Clear the existing overlay for a fresh heatmap
+            cbs.GetActiveGMapControl().Overlays.Clear();
+            gMapControl_yuk.Overlays.Clear();
+            gMapControl_yuk.Overlays.Add(cbs.tüm_katmanlar_array[0]);
+
+            // Create a new overlay for the heatmap
+            GMapOverlay heatmapOverlay = new GMapOverlay("Heatmap");
+
+            // Assuming your data is stored in a DataTable called yourDataTable
+            DataTable dataTable = cbs.tüm_katmanlar_datatable[0];
+
+            // Initialize min and max values
+            double min = double.MaxValue;
+            double max = double.MinValue;
+
+            // Calculate min and max values for the specified column
+            foreach (DataRow row in dataTable.Rows)
+            {
+                if (row[columnName] != DBNull.Value && double.TryParse(row[columnName].ToString(), out double value))
+                {
+                    if (value < min) min = value;
+                    if (value > max) max = value;
+                }
+            }
+
+            // Display heatmap based on the column data
+            cbs.CreateHeatmap(cbs.tüm_katmanlar_array[0], cbs.tüm_katmanlar_datatable[0], columnName);
+            cbs.CreateHeatmapLegend(min, max);
+
+            // Add the overlay to the GMap control
+            cbs.GetActiveGMapControl().Overlays.Add(heatmapOverlay);
+            cbs.GetActiveGMapControl().Refresh();
+
+
+        }
+
 
         // open up the Fonksiyonlar formu and populate its comboboxes with the specified array values
         private void katman_birleştir_Click(object sender, EventArgs e)
@@ -2432,17 +2379,18 @@ namespace SLF
             OnMapClickEventi(pointClick, e, markerOverlay_yuk, ref polygonPoints_yuk,
         ref polygonOverlay_yuk, Mesafe_yuk, mesafe_metre_yuk);
         }
-
-
-
         public void PoligonKaydetEventi(object sender, EventArgs e, GMapOverlay polygonOverlay,
-    GMapOverlay markerOverlay, List<PointLatLng> polygonPoints,
-    System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
+            GMapOverlay markerOverlay, List<PointLatLng> polygonPoints,
+            System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
         {
             if (polygonPoints.Count >= 3)
             {
                 try
                 {
+                    // Clear any existing markers and polygons before adding new ones
+                    markerOverlay.Markers.Clear();
+                    polygonOverlay.Polygons.Clear();
+
                     layer_index = Array.FindIndex(cbs.tüm_katmanlar_array, s => s == null);
 
                     if (layer_index == -1)
@@ -2451,17 +2399,17 @@ namespace SLF
                         return;
                     }
 
-                    // Yeni overlay oluştur
+                    // Create a new overlay for the current polygon
                     GMapOverlay newOverlay = new GMapOverlay($"Polygon_{layer_index + 1}");
 
-                    // Önce markerları ekle
+                    // Add markers for each point in the polygon
                     foreach (var point in polygonPoints)
                     {
                         GMarkerGoogle marker = new GMarkerGoogle(point, GMarkerGoogleType.blue);
-                        newOverlay.Markers.Add(marker);
+                        newOverlay.Markers.Add(marker);  // Add marker to newOverlay, not the global markerOverlay
                     }
 
-                    // Sonra poligonu ekle
+                    // Add the polygon to the new overlay
                     GMapPolygon polygon = new GMapPolygon(new List<PointLatLng>(polygonPoints), $"Polygon_{layer_index + 1}")
                     {
                         Fill = new SolidBrush(Color.FromArgb(50, Color.Red)),
@@ -2470,33 +2418,30 @@ namespace SLF
 
                     newOverlay.Polygons.Add(polygon);
 
-                    // Haritaya ekle
+                    // Add the new overlay to the map
                     cbs.GetActiveGMapControl().Overlays.Add(newOverlay);
                     cbs.tüm_katmanlar_array[layer_index] = newOverlay;
                     cbs.tüm_katmanlar_array_names[layer_index] = "Polygon_" + (layer_index + 1).ToString();
 
-                    // Shapefile işlemleri
+                    // Shapefile operations (ensure shapefile creation is correct)
                     MapWinGIS.Shapefile myShapefile = cbs.ConvertOverlayToShapefile(newOverlay);
                     cbs.shapeFileArray_MapWinGIS[layer_index] = myShapefile;
 
-                    // DataTable işlemleri
+                    // Create the DataTable for the polygon
                     DataTable polygonDataTable = cbs.CreatePolygonDataTable(polygonPoints, layer_index);
                     cbs.tüm_katmanlar_datatable[layer_index] = polygonDataTable;
 
-                    // Checkbox güncelleme
+                    // Update the checkboxes for the new polygon layer
                     UpdateCheckboxes(layer_index);
 
-                    // Temizlik
-                    polygonOverlay.Polygons.Clear();
-                    markerOverlay.Markers.Clear();
-                    polygonPoints.Clear();
+                    // Clean up after saving the polygon
+                    polygonPoints.Clear(); // Clear the list of points for the polygon
 
                     mesafe.Visible = false;
                     mesafe_metre.Visible = false;
                     isSelecting_polygon = false;
 
-                    // Haritayı yenile
-                    cbs.GetActiveGMapControl().Zoom = cbs.GetActiveGMapControl().Zoom;
+                    // Refresh the map to reflect the changes
                     cbs.GetActiveGMapControl().Invalidate();
 
                     MessageBox.Show("Poligon kaydedildi.");
@@ -2511,6 +2456,83 @@ namespace SLF
                 MessageBox.Show("Geçerli bir poligon çizilmemiştir. En az 3 nokta gereklidir.");
             }
         }
+
+
+        /*        public void PoligonKaydetEventi(object sender, EventArgs e, GMapOverlay polygonOverlay,
+            GMapOverlay markerOverlay, List<PointLatLng> polygonPoints,
+            System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
+                {
+                    if (polygonPoints.Count >= 3)
+                    {
+                        try
+                        {
+                            layer_index = Array.FindIndex(cbs.tüm_katmanlar_array, s => s == null);
+
+                            if (layer_index == -1)
+                            {
+                                MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
+                                return;
+                            }
+
+                            // Yeni overlay oluştur
+                            GMapOverlay newOverlay = new GMapOverlay($"Polygon_{layer_index + 1}");
+
+                            // Önce markerları ekle
+                            foreach (var point in polygonPoints)
+                            {
+                                GMarkerGoogle marker = new GMarkerGoogle(point, GMarkerGoogleType.blue);
+                                newOverlay.Markers.Add(marker);
+                            }
+
+                            // Sonra poligonu ekle
+                            GMapPolygon polygon = new GMapPolygon(new List<PointLatLng>(polygonPoints), $"Polygon_{layer_index + 1}")
+                            {
+                                Fill = new SolidBrush(Color.FromArgb(50, Color.Red)),
+                                Stroke = new Pen(Color.Red, 2)
+                            };
+
+                            newOverlay.Polygons.Add(polygon);
+
+                            // Haritaya ekle
+                            cbs.GetActiveGMapControl().Overlays.Add(newOverlay);
+                            cbs.tüm_katmanlar_array[layer_index] = newOverlay;
+                            cbs.tüm_katmanlar_array_names[layer_index] = "Polygon_" + (layer_index + 1).ToString();
+
+                            // Shapefile işlemleri
+                            MapWinGIS.Shapefile myShapefile = cbs.ConvertOverlayToShapefile(newOverlay);
+                            cbs.shapeFileArray_MapWinGIS[layer_index] = myShapefile;
+
+                            // DataTable işlemleri
+                            DataTable polygonDataTable = cbs.CreatePolygonDataTable(polygonPoints, layer_index);
+                            cbs.tüm_katmanlar_datatable[layer_index] = polygonDataTable;
+
+                            // Checkbox güncelleme
+                            UpdateCheckboxes(layer_index);
+
+                            // Temizlik
+                            polygonOverlay.Polygons.Clear();
+                            markerOverlay.Markers.Clear();
+                            polygonPoints.Clear();
+
+                            mesafe.Visible = false;
+                            mesafe_metre.Visible = false;
+                            isSelecting_polygon = false;
+
+                            // Haritayı yenile
+                            cbs.GetActiveGMapControl().Invalidate();
+
+                            MessageBox.Show("Poligon kaydedildi.");
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Poligon kaydedilirken hata oluştu: {ex.Message}");
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Geçerli bir poligon çizilmemiştir. En az 3 nokta gereklidir.");
+                    }
+                }*/
         private void UpdateCheckboxes(int layerIndex)
         {
             List<System.Windows.Forms.CheckBox> associatedCheckBoxes = GetCheckBoxesByIndex(layerIndex);
@@ -3983,46 +4005,6 @@ namespace SLF
             popupForm.Show(); // Yeni pencereyi göster
         }
 
-        /*        private DataTable FormatEATableForDisplay(DataTable originalEATable)
-                {
-                    // Yeni bir DataTable oluşturun
-                    DataTable formattedEATable = new DataTable();
-
-                    // İhtiyacınız olan sütunları ekleyin
-                    formattedEATable.Columns.Add("Hücre ID", typeof(string));
-                    formattedEATable.Columns.Add("Ilce", typeof(string)); // İlçe isimleri Çiğli ve Karşıyaka olarak ayarlanacak
-                    formattedEATable.Columns.Add("AC (Home)", typeof(int));
-                    formattedEATable.Columns.Add("AC (Work)", typeof(int));
-                    formattedEATable.Columns.Add("AC (Public)", typeof(int));
-                    formattedEATable.Columns.Add("Fast DC", typeof(int));
-                    formattedEATable.Columns.Add("İstasyon Gücü", typeof(int));
-                    formattedEATable.Columns.Add("Tüketim (kW/h)", typeof(int));
-
-                    // Orijinal tablodaki her bir satırı işleyin
-                    foreach (DataRow row in originalEATable.Rows)
-                    {
-                        // Yeni bir satır oluşturun
-                        DataRow newRow = formattedEATable.NewRow();
-
-                        // ID değerini alın
-                        newRow["ID"] = row["id"].ToString();
-
-                        // İlçe değerini dönüştür (1 = Çiğli, 2 = Karşıyaka)
-                        int ilceValue = Convert.ToInt32(row["ilce"]);
-                        newRow["Ilce"] = ilceValue == 1 ? "Çiğli" : ilceValue == 2 ? "Karşıyaka" : "Eskişehir";
-
-                        // AC ve DC istasyon sayısını alın
-                        newRow["AC (Home)"] = Convert.ToInt32(row["AC (Home)_count"]);
-                        newRow["AC (Work)"] = Convert.ToInt32(row["AC (Work)_count"]);
-                        newRow["AC (Public)"] = Convert.ToInt32(row["AC (Public)_count"]);
-                        newRow["Fast DC"] = Convert.ToInt32(row["Fast DC_count"]);
-
-                        // Yeni satırı formatlanmış tabloya ekleyin
-                        formattedEATable.Rows.Add(newRow);
-                    }
-
-                    return formattedEATable;
-                }*/
         private DataTable FormatEATableForDisplay(DataTable originalEATable)
         {
             // Yeni bir DataTable oluşturun
@@ -4329,79 +4311,7 @@ namespace SLF
             }
         }
 
-        private void gMapControl_imar_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left && cbs.isSelecting_grid)
-            {
-                // grid oluşturmak için seçilen alan (bounding box) ın son noktası
-                cbs.ending_point = gMapControl_imar.FromLocalToLatLng(e.X, e.Y);
-                cbs.isSelecting_grid = false;
-                gMapControl_imar.CanDragMap = true;
 
-                // Clear the selection polygon and refresh the map
-                gMapControl_imar.Overlays.Remove(cbs.bounding_box_overlay);
-                cbs.AddGridToMap(gMapControl_imar);
-                gMapControl_imar.Refresh();
-            }
-        }
-
-        private void trackBar_Yıllar_ValueChanged(object sender, EventArgs e)
-        {
-            int selectedYear = trackBar_Yıllar.Value;
-            yuk_yıl_deger.Text = $"{selectedYear}";
-
-            // Construct the column name based on the selected year
-            string columnName = $"{selectedYear}";
-
-            // Call a method to update the heatmap using the selected year's data
-            UpdateHeatmapForYear(columnName);
-        }
-
-        private void UpdateHeatmapForYear(string columnName)
-        {
-            // Clear the existing overlay for a fresh heatmap
-            cbs.GetActiveGMapControl().Overlays.Clear();
-            gMapControl_yuk.Overlays.Clear();
-            gMapControl_yuk.Overlays.Add(cbs.tüm_katmanlar_array[0]);
-
-            // Create a new overlay for the heatmap
-            GMapOverlay heatmapOverlay = new GMapOverlay("Heatmap");
-
-            // Assuming your data is stored in a DataTable called yourDataTable
-            DataTable dataTable = cbs.tüm_katmanlar_datatable[0];
-
-            // Initialize min and max values
-            double min = double.MaxValue;
-            double max = double.MinValue;
-
-            // Calculate min and max values for the specified column
-            foreach (DataRow row in dataTable.Rows)
-            {
-                if (row[columnName] != DBNull.Value && double.TryParse(row[columnName].ToString(), out double value))
-                {
-                    if (value < min) min = value;
-                    if (value > max) max = value;
-                }
-            }
-
-            // Display heatmap based on the column data
-            cbs.CreateHeatmap(cbs.tüm_katmanlar_array[0], cbs.tüm_katmanlar_datatable[0], columnName);
-            cbs.CreateHeatmapLegend(min, max);
-
-            // Add the overlay to the GMap control
-            cbs.GetActiveGMapControl().Overlays.Add(heatmapOverlay);
-            cbs.GetActiveGMapControl().Refresh();
-
-
-        }
-
-        private void İmar_Poligon_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                ContextMenuStrip_Poligon.Show(Cursor.Position);
-            }
-        }
 
         // -------------------------------------------------------------------------------------------------- //
 

@@ -873,7 +873,7 @@ namespace SLF
             this.EAStationsLegendPanel.Controls.Add(this.ACHomeLegendLabel);
             this.EAStationsLegendPanel.Controls.Add(this.AddStationLabel);
             this.EAStationsLegendPanel.Controls.Add(this.EAStationAddButton);
-            this.EAStationsLegendPanel.Location = new System.Drawing.Point(1081, 656);
+            this.EAStationsLegendPanel.Location = new System.Drawing.Point(1081, 678);
             this.EAStationsLegendPanel.Name = "EAStationsLegendPanel";
             this.EAStationsLegendPanel.Size = new System.Drawing.Size(201, 265);
             this.EAStationsLegendPanel.TabIndex = 51;
@@ -1437,7 +1437,7 @@ namespace SLF
             this.ELFTablePanel.Location = new System.Drawing.Point(230, 2);
             this.ELFTablePanel.Margin = new System.Windows.Forms.Padding(2);
             this.ELFTablePanel.Name = "ELFTablePanel";
-            this.ELFTablePanel.Size = new System.Drawing.Size(819, 1702);
+            this.ELFTablePanel.Size = new System.Drawing.Size(819, 1724);
             this.ELFTablePanel.TabIndex = 21;
             // 
             // ELFGraphicsPanel
@@ -2021,7 +2021,7 @@ namespace SLF
             this.gMapControl_imar.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_imar.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_imar.ShowTileGridLines = false;
-            this.gMapControl_imar.Size = new System.Drawing.Size(788, 1554);
+            this.gMapControl_imar.Size = new System.Drawing.Size(788, 1576);
             this.gMapControl_imar.TabIndex = 35;
             this.gMapControl_imar.Zoom = 0D;
             this.gMapControl_imar.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_imar_OnMapClick);
@@ -2038,7 +2038,7 @@ namespace SLF
             this.buton_imar_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
             this.buton_imar_katmanlar.Cursor = System.Windows.Forms.Cursors.Default;
             this.buton_imar_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_imar_katmanlar.Location = new System.Drawing.Point(190, 1539);
+            this.buton_imar_katmanlar.Location = new System.Drawing.Point(190, 1561);
             this.buton_imar_katmanlar.Margin = new System.Windows.Forms.Padding(2);
             this.buton_imar_katmanlar.Name = "buton_imar_katmanlar";
             this.buton_imar_katmanlar.Size = new System.Drawing.Size(44, 42);
@@ -2139,7 +2139,7 @@ namespace SLF
             this.buton_optDTR_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
             this.buton_optDTR_katmanlar.Cursor = System.Windows.Forms.Cursors.Default;
             this.buton_optDTR_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_optDTR_katmanlar.Location = new System.Drawing.Point(0, 1531);
+            this.buton_optDTR_katmanlar.Location = new System.Drawing.Point(0, 1553);
             this.buton_optDTR_katmanlar.Margin = new System.Windows.Forms.Padding(2);
             this.buton_optDTR_katmanlar.Name = "buton_optDTR_katmanlar";
             this.buton_optDTR_katmanlar.Size = new System.Drawing.Size(44, 42);
@@ -2174,7 +2174,7 @@ namespace SLF
             this.gMapControl_optimalDTR.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_optimalDTR.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_optimalDTR.ShowTileGridLines = false;
-            this.gMapControl_optimalDTR.Size = new System.Drawing.Size(870, 1567);
+            this.gMapControl_optimalDTR.Size = new System.Drawing.Size(870, 1589);
             this.gMapControl_optimalDTR.TabIndex = 42;
             this.gMapControl_optimalDTR.Zoom = 0D;
             // 
@@ -2190,7 +2190,7 @@ namespace SLF
             this.webView_optimalDTR.Location = new System.Drawing.Point(2, 2);
             this.webView_optimalDTR.Margin = new System.Windows.Forms.Padding(2);
             this.webView_optimalDTR.Name = "webView_optimalDTR";
-            this.webView_optimalDTR.Size = new System.Drawing.Size(870, 1567);
+            this.webView_optimalDTR.Size = new System.Drawing.Size(870, 1589);
             this.webView_optimalDTR.Source = new System.Uri("https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu", System.UriKind.Absolute);
             this.webView_optimalDTR.TabIndex = 40;
             this.webView_optimalDTR.Visible = false;
@@ -2226,7 +2226,7 @@ namespace SLF
             this.buton_optimalDTR_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
             this.buton_optimalDTR_katmanlar.Cursor = System.Windows.Forms.Cursors.Default;
             this.buton_optimalDTR_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_optimalDTR_katmanlar.Location = new System.Drawing.Point(113, 1527);
+            this.buton_optimalDTR_katmanlar.Location = new System.Drawing.Point(113, 1549);
             this.buton_optimalDTR_katmanlar.Margin = new System.Windows.Forms.Padding(2);
             this.buton_optimalDTR_katmanlar.Name = "buton_optimalDTR_katmanlar";
             this.buton_optimalDTR_katmanlar.Size = new System.Drawing.Size(44, 42);
@@ -3287,7 +3287,7 @@ namespace SLF
             this.buton_yuk_haritası_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
             this.buton_yuk_haritası_katmanlar.Cursor = System.Windows.Forms.Cursors.Default;
             this.buton_yuk_haritası_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_yuk_haritası_katmanlar.Location = new System.Drawing.Point(195, 477);
+            this.buton_yuk_haritası_katmanlar.Location = new System.Drawing.Point(57, 466);
             this.buton_yuk_haritası_katmanlar.Margin = new System.Windows.Forms.Padding(2);
             this.buton_yuk_haritası_katmanlar.Name = "buton_yuk_haritası_katmanlar";
             this.buton_yuk_haritası_katmanlar.Size = new System.Drawing.Size(44, 42);
