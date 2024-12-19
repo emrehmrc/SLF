@@ -599,11 +599,11 @@
       <DependentUpon>YGAPopupForm.cs</DependentUpon>
     </Compile>
     <Compile Include="CBS.cs" />
-    <Compile Include="EAChargingStationPopupForm.cs">
+    <Compile Include="EAStationPopupForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EAChargingStationPopupForm.Designer.cs">
-      <DependentUpon>EAChargingStationPopupForm.cs</DependentUpon>
+    <Compile Include="EAStationPopupForm.Designer.cs">
+      <DependentUpon>EAStationPopupForm.cs</DependentUpon>
     </Compile>
     <Compile Include="CsvHandler.cs" />
     <Compile Include="CustomButton.cs">
@@ -722,8 +722,8 @@
     <EmbeddedResource Include="CustomButton.resx">
       <DependentUpon>CustomButton.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="EAChargingStationPopupForm.resx">
-      <DependentUpon>EAChargingStationPopupForm.cs</DependentUpon>
+    <EmbeddedResource Include="EAStationPopupForm.resx">
+      <DependentUpon>EAStationPopupForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DEKCenterPopupForm.resx">
       <DependentUpon>DEKCenterPopupForm.cs</DependentUpon>

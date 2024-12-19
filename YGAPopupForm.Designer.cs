@@ -28,45 +28,133 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.SaveButton = new System.Windows.Forms.Button();
+            this.YGATablePanel = new System.Windows.Forms.Panel();
+            this.YGATBottomPanel = new System.Windows.Forms.Panel();
+            this.YGASaveButton = new System.Windows.Forms.Button();
+            this.YGACancelButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.YGATablePanel.SuspendLayout();
+            this.YGATBottomPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // dataGridView1
             // 
+            this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(22, 29);
+            this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dataGridView1.BackgroundColor = System.Drawing.Color.Snow;
+            this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dataGridView1.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
+            this.dataGridView1.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(89)))), ((int)(((byte)(13)))), ((int)(((byte)(34)))));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(164)))), ((int)(((byte)(19)))), ((int)(((byte)(60)))));
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.dataGridView1.ColumnHeadersHeight = 25;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.SeaShell;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle2;
+            this.dataGridView1.EnableHeadersVisualStyles = false;
+            this.dataGridView1.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(204)))), ((int)(((byte)(213)))));
+            this.dataGridView1.Location = new System.Drawing.Point(46, 24);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(699, 151);
+            this.dataGridView1.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            this.dataGridView1.RowHeadersWidth = 18;
+            this.dataGridView1.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
+            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridView1.Size = new System.Drawing.Size(832, 425);
             this.dataGridView1.TabIndex = 0;
             // 
-            // SaveButton
+            // YGATablePanel
             // 
-            this.SaveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.SaveButton.Location = new System.Drawing.Point(330, 200);
-            this.SaveButton.Name = "SaveButton";
-            this.SaveButton.Size = new System.Drawing.Size(75, 23);
-            this.SaveButton.TabIndex = 1;
-            this.SaveButton.Text = "SAVE";
-            this.SaveButton.UseVisualStyleBackColor = true;
-            this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
+            this.YGATablePanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(181)))), ((int)(((byte)(152)))));
+            this.YGATablePanel.Controls.Add(this.dataGridView1);
+            this.YGATablePanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.YGATablePanel.Location = new System.Drawing.Point(0, 0);
+            this.YGATablePanel.Name = "YGATablePanel";
+            this.YGATablePanel.Size = new System.Drawing.Size(920, 503);
+            this.YGATablePanel.TabIndex = 2;
+            // 
+            // YGATBottomPanel
+            // 
+            this.YGATBottomPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(181)))), ((int)(((byte)(152)))));
+            this.YGATBottomPanel.Controls.Add(this.YGASaveButton);
+            this.YGATBottomPanel.Controls.Add(this.YGACancelButton);
+            this.YGATBottomPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.YGATBottomPanel.Location = new System.Drawing.Point(0, 452);
+            this.YGATBottomPanel.Name = "YGATBottomPanel";
+            this.YGATBottomPanel.Size = new System.Drawing.Size(920, 51);
+            this.YGATBottomPanel.TabIndex = 3;
+            // 
+            // YGASaveButton
+            // 
+            this.YGASaveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.YGASaveButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(89)))), ((int)(((byte)(13)))), ((int)(((byte)(34)))));
+            this.YGASaveButton.FlatAppearance.BorderSize = 0;
+            this.YGASaveButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.YGASaveButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.YGASaveButton.ForeColor = System.Drawing.Color.Snow;
+            this.YGASaveButton.Location = new System.Drawing.Point(738, 2);
+            this.YGASaveButton.Margin = new System.Windows.Forms.Padding(2);
+            this.YGASaveButton.Name = "YGASaveButton";
+            this.YGASaveButton.Size = new System.Drawing.Size(180, 45);
+            this.YGASaveButton.TabIndex = 41;
+            this.YGASaveButton.Text = "KAYDET";
+            this.YGASaveButton.UseVisualStyleBackColor = false;
+            this.YGASaveButton.Click += new System.EventHandler(this.YGASaveButton_Click);
+            // 
+            // YGACancelButton
+            // 
+            this.YGACancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.YGACancelButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(89)))), ((int)(((byte)(13)))), ((int)(((byte)(34)))));
+            this.YGACancelButton.FlatAppearance.BorderSize = 0;
+            this.YGACancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.YGACancelButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.YGACancelButton.ForeColor = System.Drawing.Color.Snow;
+            this.YGACancelButton.Location = new System.Drawing.Point(554, 2);
+            this.YGACancelButton.Margin = new System.Windows.Forms.Padding(2);
+            this.YGACancelButton.Name = "YGACancelButton";
+            this.YGACancelButton.Size = new System.Drawing.Size(180, 45);
+            this.YGACancelButton.TabIndex = 40;
+            this.YGACancelButton.Text = "İPTAL";
+            this.YGACancelButton.UseVisualStyleBackColor = false;
             // 
             // YGAPopupForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(748, 235);
-            this.Controls.Add(this.SaveButton);
-            this.Controls.Add(this.dataGridView1);
+            this.ClientSize = new System.Drawing.Size(920, 503);
+            this.Controls.Add(this.YGATBottomPanel);
+            this.Controls.Add(this.YGATablePanel);
             this.Name = "YGAPopupForm";
-            this.Text = "YGA TABLOSU";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Yeni Genişleme Alanı Bilgileri";
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.YGATablePanel.ResumeLayout(false);
+            this.YGATBottomPanel.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -74,6 +162,9 @@
         #endregion
 
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.Button SaveButton;
+        private System.Windows.Forms.Panel YGATablePanel;
+        private System.Windows.Forms.Panel YGATBottomPanel;
+        private System.Windows.Forms.Button YGACancelButton;
+        private System.Windows.Forms.Button YGASaveButton;
     }
 }

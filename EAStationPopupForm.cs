@@ -8,7 +8,7 @@ using static SLF.ModülFormu;
 
 namespace SLF
 {
-    public partial class EAChargingStationPopupForm : Form
+    public partial class EAStationPopupForm : Form
     {
         private readonly DataTable dataTable;
         private bool isOperationCancelled = true;
@@ -17,7 +17,7 @@ namespace SLF
         private readonly List<string> acPowers = new List<string> {"11 kW", "22 kW" };
         private readonly List<string> dcPowers = new List<string> {"150 kW"};
 
-        public EAChargingStationPopupForm(DataTable existingDataTable, NoktaVeri veri)
+        public EAStationPopupForm(DataTable existingDataTable, NoktaVeri veri)
         {
             InitializeComponent();
             dataTable = existingDataTable;
@@ -157,7 +157,6 @@ namespace SLF
 
             foreach (DataGridViewCell cell in ChargingStationDataGridView.Rows[0].Cells)
             {
-                Console.WriteLine("Button clicked1"); // Log the click event
                 if (cell.Value == null || string.IsNullOrWhiteSpace(cell.Value.ToString()))
                 {
                     MessageBox.Show("Lütfen tüm alanları doldurun.");

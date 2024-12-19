@@ -3661,7 +3661,7 @@ System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
                 };
 
                 // Popup formu göster
-                using (EAChargingStationPopupForm popupForm = new EAChargingStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+                using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
                 {
                     if (popupForm.ShowDialog() == DialogResult.OK)
                     {
