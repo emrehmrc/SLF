@@ -31,9 +31,13 @@
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DEKCenterPopupForm));
-            this.DEKCenterDataGridView = new Guna.UI2.WinForms.Guna2DataGridView();
+            this.DEKCenterpanel2_Dek_Popup = new System.Windows.Forms.Panel();
+            this.DEKTamamButton = new SLF.CustomButton();
+            this.DEKCancelButton = new SLF.CustomButton();
+            this.DEKCenterpanel1_Dek_Popup = new System.Windows.Forms.Panel();
+            this.guna2AnimateWindow1_Dek_Popup = new Guna.UI2.WinForms.Guna2AnimateWindow(this.components);
+            this.DEKCenterDataGridView = new System.Windows.Forms.DataGridView();
             this.KAYNAK_TIPI = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.DEK_KURULU_GUCU = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ILCE_ADI = new System.Windows.Forms.DataGridViewComboBoxColumn();
@@ -41,135 +45,10 @@
             this.DEK_Y_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DEK_TM_ADI = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DEK_KURULUM_YERI = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.DEKCenterpanel2_Dek_Popup = new System.Windows.Forms.Panel();
-            this.DEKTamamButton = new SLF.CustomButton();
-            this.DEKCancelButton = new SLF.CustomButton();
-            this.DEKCenterpanel1_Dek_Popup = new System.Windows.Forms.Panel();
-            this.guna2AnimateWindow1_Dek_Popup = new Guna.UI2.WinForms.Guna2AnimateWindow(this.components);
-            ((System.ComponentModel.ISupportInitialize)(this.DEKCenterDataGridView)).BeginInit();
             this.DEKCenterpanel2_Dek_Popup.SuspendLayout();
             this.DEKCenterpanel1_Dek_Popup.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.DEKCenterDataGridView)).BeginInit();
             this.SuspendLayout();
-            // 
-            // DEKCenterDataGridView
-            // 
-            this.DEKCenterDataGridView.AllowUserToAddRows = false;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.White;
-            this.DEKCenterDataGridView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
-            this.DEKCenterDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.DarkOrange;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.DEKCenterDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
-            this.DEKCenterDataGridView.ColumnHeadersHeight = 25;
-            this.DEKCenterDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
-            this.DEKCenterDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.KAYNAK_TIPI,
-            this.DEK_KURULU_GUCU,
-            this.ILCE_ADI,
-            this.DEK_X_KOORDINAT,
-            this.DEK_Y_KOORDINAT,
-            this.DEK_TM_ADI,
-            this.DEK_KURULUM_YERI});
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.DEKCenterDataGridView.DefaultCellStyle = dataGridViewCellStyle3;
-            this.DEKCenterDataGridView.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255)))));
-            this.DEKCenterDataGridView.Location = new System.Drawing.Point(30, 31);
-            this.DEKCenterDataGridView.Name = "DEKCenterDataGridView";
-            this.DEKCenterDataGridView.RowHeadersVisible = false;
-            this.DEKCenterDataGridView.RowHeadersWidth = 18;
-            this.DEKCenterDataGridView.Size = new System.Drawing.Size(972, 356);
-            this.DEKCenterDataGridView.TabIndex = 0;
-            this.DEKCenterDataGridView.ThemeStyle.AlternatingRowsStyle.BackColor = System.Drawing.Color.White;
-            this.DEKCenterDataGridView.ThemeStyle.AlternatingRowsStyle.Font = null;
-            this.DEKCenterDataGridView.ThemeStyle.AlternatingRowsStyle.ForeColor = System.Drawing.Color.Empty;
-            this.DEKCenterDataGridView.ThemeStyle.AlternatingRowsStyle.SelectionBackColor = System.Drawing.Color.Empty;
-            this.DEKCenterDataGridView.ThemeStyle.AlternatingRowsStyle.SelectionForeColor = System.Drawing.Color.Empty;
-            this.DEKCenterDataGridView.ThemeStyle.BackColor = System.Drawing.Color.White;
-            this.DEKCenterDataGridView.ThemeStyle.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255)))));
-            this.DEKCenterDataGridView.ThemeStyle.HeaderStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(88)))), ((int)(((byte)(255)))));
-            this.DEKCenterDataGridView.ThemeStyle.HeaderStyle.BorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            this.DEKCenterDataGridView.ThemeStyle.HeaderStyle.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.DEKCenterDataGridView.ThemeStyle.HeaderStyle.ForeColor = System.Drawing.Color.White;
-            this.DEKCenterDataGridView.ThemeStyle.HeaderStyle.HeaightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
-            this.DEKCenterDataGridView.ThemeStyle.HeaderStyle.Height = 25;
-            this.DEKCenterDataGridView.ThemeStyle.ReadOnly = false;
-            this.DEKCenterDataGridView.ThemeStyle.RowsStyle.BackColor = System.Drawing.Color.White;
-            this.DEKCenterDataGridView.ThemeStyle.RowsStyle.BorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
-            this.DEKCenterDataGridView.ThemeStyle.RowsStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.DEKCenterDataGridView.ThemeStyle.RowsStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
-            this.DEKCenterDataGridView.ThemeStyle.RowsStyle.Height = 22;
-            this.DEKCenterDataGridView.ThemeStyle.RowsStyle.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255)))));
-            this.DEKCenterDataGridView.ThemeStyle.RowsStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
-            // 
-            // KAYNAK_TIPI
-            // 
-            this.KAYNAK_TIPI.FillWeight = 84.90324F;
-            this.KAYNAK_TIPI.HeaderText = "KAYNAK_TIPI";
-            this.KAYNAK_TIPI.MinimumWidth = 6;
-            this.KAYNAK_TIPI.Name = "KAYNAK_TIPI";
-            this.KAYNAK_TIPI.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            // 
-            // DEK_KURULU_GUCU
-            // 
-            this.DEK_KURULU_GUCU.FillWeight = 120.7607F;
-            this.DEK_KURULU_GUCU.HeaderText = "DEK_KURULU_GUCU";
-            this.DEK_KURULU_GUCU.MinimumWidth = 6;
-            this.DEK_KURULU_GUCU.Name = "DEK_KURULU_GUCU";
-            this.DEK_KURULU_GUCU.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.DEK_KURULU_GUCU.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // ILCE_ADI
-            // 
-            this.ILCE_ADI.FillWeight = 57.73196F;
-            this.ILCE_ADI.HeaderText = "ILCE_ADI";
-            this.ILCE_ADI.MinimumWidth = 6;
-            this.ILCE_ADI.Name = "ILCE_ADI";
-            this.ILCE_ADI.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            // 
-            // DEK_X_KOORDINAT
-            // 
-            this.DEK_X_KOORDINAT.FillWeight = 129.1611F;
-            this.DEK_X_KOORDINAT.HeaderText = "DEK_X_KOORDINAT";
-            this.DEK_X_KOORDINAT.MinimumWidth = 6;
-            this.DEK_X_KOORDINAT.Name = "DEK_X_KOORDINAT";
-            this.DEK_X_KOORDINAT.ReadOnly = true;
-            // 
-            // DEK_Y_KOORDINAT
-            // 
-            this.DEK_Y_KOORDINAT.FillWeight = 120.1783F;
-            this.DEK_Y_KOORDINAT.HeaderText = "DEK_Y_KOORDINAT";
-            this.DEK_Y_KOORDINAT.MinimumWidth = 6;
-            this.DEK_Y_KOORDINAT.Name = "DEK_Y_KOORDINAT";
-            this.DEK_Y_KOORDINAT.ReadOnly = true;
-            // 
-            // DEK_TM_ADI
-            // 
-            this.DEK_TM_ADI.FillWeight = 66.81672F;
-            this.DEK_TM_ADI.HeaderText = "DEK_TM_ADI";
-            this.DEK_TM_ADI.MinimumWidth = 6;
-            this.DEK_TM_ADI.Name = "DEK_TM_ADI";
-            this.DEK_TM_ADI.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.DEK_TM_ADI.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // DEK_KURULUM_YERI
-            // 
-            this.DEK_KURULUM_YERI.FillWeight = 120.448F;
-            this.DEK_KURULUM_YERI.HeaderText = "DEK_KURULUM_YERI";
-            this.DEK_KURULUM_YERI.MinimumWidth = 6;
-            this.DEK_KURULUM_YERI.Name = "DEK_KURULUM_YERI";
             // 
             // DEKCenterpanel2_Dek_Popup
             // 
@@ -234,6 +113,94 @@
             this.DEKCenterpanel1_Dek_Popup.Size = new System.Drawing.Size(1029, 455);
             this.DEKCenterpanel1_Dek_Popup.TabIndex = 3;
             // 
+            // DEKCenterDataGridView
+            // 
+            this.DEKCenterDataGridView.AllowUserToAddRows = false;
+            this.DEKCenterDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.DEKCenterDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.DEKCenterDataGridView.BackgroundColor = System.Drawing.Color.Snow;
+            this.DEKCenterDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.DEKCenterDataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
+            this.DEKCenterDataGridView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.DarkOrange;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.DEKCenterDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.DEKCenterDataGridView.ColumnHeadersHeight = 25;
+            this.DEKCenterDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.KAYNAK_TIPI,
+            this.DEK_KURULU_GUCU,
+            this.ILCE_ADI,
+            this.DEK_X_KOORDINAT,
+            this.DEK_Y_KOORDINAT,
+            this.DEK_TM_ADI,
+            this.DEK_KURULUM_YERI});
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.SeaShell;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.DEKCenterDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
+            this.DEKCenterDataGridView.EnableHeadersVisualStyles = false;
+            this.DEKCenterDataGridView.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255)))));
+            this.DEKCenterDataGridView.Location = new System.Drawing.Point(28, 31);
+            this.DEKCenterDataGridView.Name = "DEKCenterDataGridView";
+            this.DEKCenterDataGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
+            this.DEKCenterDataGridView.RowHeadersVisible = false;
+            this.DEKCenterDataGridView.RowHeadersWidth = 18;
+            this.DEKCenterDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.DEKCenterDataGridView.Size = new System.Drawing.Size(972, 356);
+            this.DEKCenterDataGridView.TabIndex = 7;
+            // 
+            // KAYNAK_TIPI
+            // 
+            this.KAYNAK_TIPI.HeaderText = "KAYNAK_TIPI";
+            this.KAYNAK_TIPI.Name = "KAYNAK_TIPI";
+            this.KAYNAK_TIPI.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.KAYNAK_TIPI.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            // 
+            // DEK_KURULU_GUCU
+            // 
+            this.DEK_KURULU_GUCU.HeaderText = "DEK_KURULU_GUCU";
+            this.DEK_KURULU_GUCU.Name = "DEK_KURULU_GUCU";
+            this.DEK_KURULU_GUCU.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.DEK_KURULU_GUCU.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // ILCE_ADI
+            // 
+            this.ILCE_ADI.HeaderText = "ILCE_ADI";
+            this.ILCE_ADI.Name = "ILCE_ADI";
+            // 
+            // DEK_X_KOORDINAT
+            // 
+            this.DEK_X_KOORDINAT.HeaderText = "DEK_X_KOORDINAT";
+            this.DEK_X_KOORDINAT.Name = "DEK_X_KOORDINAT";
+            this.DEK_X_KOORDINAT.ReadOnly = true;
+            // 
+            // DEK_Y_KOORDINAT
+            // 
+            this.DEK_Y_KOORDINAT.HeaderText = "DEK_Y_KOORDINAT";
+            this.DEK_Y_KOORDINAT.Name = "DEK_Y_KOORDINAT";
+            this.DEK_Y_KOORDINAT.ReadOnly = true;
+            // 
+            // DEK_TM_ADI
+            // 
+            this.DEK_TM_ADI.HeaderText = "DEK_TM_ADI";
+            this.DEK_TM_ADI.Name = "DEK_TM_ADI";
+            // 
+            // DEK_KURULUM_YERI
+            // 
+            this.DEK_KURULUM_YERI.HeaderText = "DEK_KURULUM_YERI";
+            this.DEK_KURULUM_YERI.Name = "DEK_KURULUM_YERI";
+            // 
             // DEKCenterPopupForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -245,19 +212,20 @@
             this.Name = "DEKCenterPopupForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "DEK Merkezi Bilgileri";
-            ((System.ComponentModel.ISupportInitialize)(this.DEKCenterDataGridView)).EndInit();
             this.DEKCenterpanel2_Dek_Popup.ResumeLayout(false);
             this.DEKCenterpanel1_Dek_Popup.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.DEKCenterDataGridView)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private Guna.UI2.WinForms.Guna2DataGridView DEKCenterDataGridView;
         private System.Windows.Forms.Panel DEKCenterpanel2_Dek_Popup;
         private System.Windows.Forms.Panel DEKCenterpanel1_Dek_Popup;
         private Guna.UI2.WinForms.Guna2AnimateWindow guna2AnimateWindow1_Dek_Popup;
+        private CustomButton DEKCancelButton;
+        private CustomButton DEKTamamButton;
+        private System.Windows.Forms.DataGridView DEKCenterDataGridView;
         private System.Windows.Forms.DataGridViewComboBoxColumn KAYNAK_TIPI;
         private System.Windows.Forms.DataGridViewTextBoxColumn DEK_KURULU_GUCU;
         private System.Windows.Forms.DataGridViewComboBoxColumn ILCE_ADI;
@@ -265,7 +233,5 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn DEK_Y_KOORDINAT;
         private System.Windows.Forms.DataGridViewTextBoxColumn DEK_TM_ADI;
         private System.Windows.Forms.DataGridViewTextBoxColumn DEK_KURULUM_YERI;
-        private CustomButton DEKCancelButton;
-        private CustomButton DEKTamamButton;
     }
 }

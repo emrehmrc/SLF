@@ -177,7 +177,6 @@ namespace SLF
                 newRow["EA_Y_KOORDINAT"] = boylam;
 
                 dataTable.Rows.Add(newRow);
-                Console.WriteLine("Button clickedy"); // Log the click event
                 // Show success message
                 MessageBox.Show("Şarj istasyonu başarıyla eklendi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 isOperationCancelled = false;

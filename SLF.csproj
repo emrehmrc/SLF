@@ -592,11 +592,11 @@
     <Compile Include="Ana_Menü.Designer.cs">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
     </Compile>
-    <Compile Include="AttributeTablePopupForm.cs">
+    <Compile Include="YGAPopupForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AttributeTablePopupForm.Designer.cs">
-      <DependentUpon>AttributeTablePopupForm.cs</DependentUpon>
+    <Compile Include="YGAPopupForm.Designer.cs">
+      <DependentUpon>YGAPopupForm.cs</DependentUpon>
     </Compile>
     <Compile Include="CBS.cs" />
     <Compile Include="EAChargingStationPopupForm.cs">
@@ -713,8 +713,8 @@
     <EmbeddedResource Include="Ana_Menü.resx">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="AttributeTablePopupForm.resx">
-      <DependentUpon>AttributeTablePopupForm.cs</DependentUpon>
+    <EmbeddedResource Include="YGAPopupForm.resx">
+      <DependentUpon>YGAPopupForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Attribute_Table.resx">
       <DependentUpon>Attribute_Table.cs</DependentUpon>

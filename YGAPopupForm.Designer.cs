@@ -1,6 +1,6 @@
 ﻿namespace SLF
 {
-    partial class AttributeTablePopupForm
+    partial class YGAPopupForm
     {
         /// <summary>
         /// Required designer variable.
@@ -35,15 +35,21 @@
             // 
             // dataGridView1
             // 
+            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(71, 43);
+            this.dataGridView1.Location = new System.Drawing.Point(22, 29);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(621, 323);
+            this.dataGridView1.Size = new System.Drawing.Size(699, 151);
             this.dataGridView1.TabIndex = 0;
             // 
             // SaveButton
             // 
-            this.SaveButton.Location = new System.Drawing.Point(330, 402);
+            this.SaveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.SaveButton.Location = new System.Drawing.Point(330, 200);
             this.SaveButton.Name = "SaveButton";
             this.SaveButton.Size = new System.Drawing.Size(75, 23);
             this.SaveButton.TabIndex = 1;
@@ -51,15 +57,15 @@
             this.SaveButton.UseVisualStyleBackColor = true;
             this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
             // 
-            // AttributeTablePopupForm
+            // YGAPopupForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(748, 235);
             this.Controls.Add(this.SaveButton);
             this.Controls.Add(this.dataGridView1);
-            this.Name = "AttributeTablePopupForm";
-            this.Text = "AttributeTablePopupForm";
+            this.Name = "YGAPopupForm";
+            this.Text = "YGA TABLOSU";
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
 
