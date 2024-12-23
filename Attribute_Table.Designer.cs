@@ -104,6 +104,6 @@
 
         #endregion
 
-        private System.Windows.Forms.DataGridView vektörel_attribute_table;
+        public System.Windows.Forms.DataGridView vektörel_attribute_table;
     }
 }
