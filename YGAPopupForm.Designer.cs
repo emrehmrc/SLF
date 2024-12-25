@@ -171,7 +171,7 @@
             this.YGACancelButton.TabIndex = 40;
             this.YGACancelButton.Text = "İPTAL";
             this.YGACancelButton.UseVisualStyleBackColor = false;
-            this.YGACancelButton.Click += new System.EventHandler(this.YGACancelButton_Click);
+            //this.YGACancelButton.Click += new System.EventHandler(this.YGACancelButton_Click);
             // 
             // yasakli_alan_percentage
             // 

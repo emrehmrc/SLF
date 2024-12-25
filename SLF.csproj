@@ -866,6 +866,8 @@
     <None Include="Pictures\Back To2.png" />
     <None Include="Pictures\Double Right.png" />
     <None Include="Pictures\Double Left.png" />
+    <None Include="Pictures\Folder2.png" />
+    <None Include="Pictures\Folder.png" />
     <Content Include="Pictures\Home3.png" />
   </ItemGroup>
   <ItemGroup>

@@ -90,7 +90,7 @@ namespace SLF
             }
             if (!userEnteredTable.Columns.Contains("IsDevelopmentArea"))
             {
-                userEnteredTable.Columns.Add("IsDevelopmentArea", typeof(bool));
+                userEnteredTable.Columns.Add("IsDevelopmentArea", typeof(double));
             }
             if (!userEnteredTable.Columns.Contains("lat"))
             {
@@ -127,7 +127,7 @@ namespace SLF
                     newRow["ilce"] = row.Cells["ilce"].Value.ToString();
                     newRow["left"] = Convert.ToDouble(row.Cells["left"].Value);
                     newRow["right"] = Convert.ToDouble(row.Cells["right"].Value);
-                    newRow["IsDevelopmentArea"] = Convert.ToBoolean(row.Cells["IsDevelopmentArea"].Value);
+                    newRow["IsDevelopmentArea"] = Convert.ToDouble(row.Cells["IsDevelopmentArea"].Value);
                     newRow["lat"] = Convert.ToDouble(row.Cells["lat"].Value);
                     newRow["lon"] = Convert.ToDouble(row.Cells["lon"].Value);
                     newRow["imar_tipi"] = row.Cells["imar_tipi"].Value.ToString();
