@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace SLF
 {
@@ -112,6 +113,306 @@ namespace SLF
                 }
             }
         }
+        private void RemoveDuplicateRows()
+        {
+            // Step 1: Create a HashSet to track unique values of ENERJI_MUSAADE_NO
+            HashSet<string> uniqueEnerjiMusaadeNos = new HashSet<string>();
+
+            // Step 2: Prepare a list to track rows to remove
+            List<int> rowsToRemove = new List<int>();
+            int duplicateCount = 0;
+
+            // Step 3: Iterate through each row in currentDataTable
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                string enerjiMusaadeNo = row["ENERJI_MUSAADE_NO"]?.ToString();
+
+                if (!string.IsNullOrEmpty(enerjiMusaadeNo))
+                {
+                    // If the ENERJI_MUSAADE_NO is already in the HashSet, mark the row for removal
+                    if (!uniqueEnerjiMusaadeNos.Add(enerjiMusaadeNo))
+                    {
+                        rowsToRemove.Add(currentDataTable.Rows.IndexOf(row));
+                        duplicateCount++;
+                    }
+                }
+            }
+
+            // Log the counts of duplicates
+            Console.WriteLine($"Total Duplicate Rows Found: {duplicateCount}");
+
+            // Step 4: Remove duplicate rows
+            int initialRowCount = currentDataTable.Rows.Count;
+            RemoveCombinedRows(rowsToRemove);
+            int remainingRowCount = currentDataTable.Rows.Count;
+
+            // Log the removal results
+            Console.WriteLine($"Total Rows Removed: {rowsToRemove.Count}");
+            Console.WriteLine($"Remaining Rows After Removal: {remainingRowCount}");
+        }
+
+
+        /*        private void ConvertAndValidateBaglantiGucu()
+                {
+                    // Step 1: Convert ENERJI_MUSAADE_BAGLANTI_GUCU from Watt to Kilowatt
+                    foreach (DataRow row in currentDataTable.Rows)
+                    {
+                        if (!IsNullLike(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]))
+                        {
+                            double baglantiGucuWatt = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
+                            row["ENERJI_MUSAADE_BAGLANTI_GUCU"] = baglantiGucuWatt / 1000; // Convert to kW
+                        }
+                    }
+
+                    // Step 2: Cross-check with "DTR Verileri" TRAFO_KAPASITESI
+                    DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+                    List<int> rowsToRemove = new List<int>();
+
+                    foreach (DataRow row in currentDataTable.Rows)
+                    {
+                        // Co-condition: Check if ENERJI_MUSAADE_GERILIM_SEVIYESI is "AG"
+                        if (IsNullLike(row["ENERJI_MUSAADE_GERILIM_SEVIYESI"]) || row["ENERJI_MUSAADE_GERILIM_SEVIYESI"].ToString() != "AG")
+                            continue;
+
+                        // Get the transformer ID
+                        string trafoID = row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"].ToString();
+
+                        // Skip if transformer ID is null or invalid
+                        if (IsNullLike(trafoID))
+                            continue;
+
+                        // Find the corresponding transformer in "DTR Verileri"
+                        var matchingTrafo = trafoDataTable.AsEnumerable()
+                                                          .FirstOrDefault(t => t["TRAFO_KODU"].ToString() == trafoID);
+
+                        if (matchingTrafo != null)
+                        {
+                            // Get TRAFO_KAPASITESI and ENERJI_MUSAADE_BAGLANTI_GUCU
+                            double trafoKapasitesi = Convert.ToDouble(matchingTrafo["TRAFO_KAPASITESI"]);
+                            double baglantiGucuKW = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
+
+                            // Check if ENERJI_MUSAADE_BAGLANTI_GUCU exceeds 60% of TRAFO_KAPASITESI
+                            if (baglantiGucuKW > trafoKapasitesi * 0.6)
+                            {
+                                rowsToRemove.Add(currentDataTable.Rows.IndexOf(row)); // Mark row for removal
+                            }
+                        }
+                    }
+
+                    // Step 3: Remove invalid rows
+                    RemoveCombinedRows(rowsToRemove);
+                }
+        */
+
+        /*        private void ConvertAndValidateBaglantiGucu()
+                {
+                    // Step 1: Convert ENERJI_MUSAADE_BAGLANTI_GUCU from Watt to Kilowatt
+                    foreach (DataRow row in currentDataTable.Rows)
+                    {
+                        if (!IsNullLike(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]))
+                        {
+                            double baglantiGucuWatt = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
+                            row["ENERJI_MUSAADE_BAGLANTI_GUCU"] = baglantiGucuWatt / 1000; // Convert to kW
+                        }
+                    }
+
+                    // Step 2: Cross-check with "DTR Verileri" TRAFO_KAPASITESI
+                    DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+                    List<int> rowsToRemove = new List<int>();
+                    List<string> removedRowsDetails = new List<string>();
+
+                    foreach (DataRow row in currentDataTable.Rows)
+                    {
+                        // Co-condition: Check if ENERJI_MUSAADE_GERILIM_SEVIYESI is "AG"
+                        if (IsNullLike(row["ENERJI_MUSAADE_GERILIM_SEVIYESI"]) || row["ENERJI_MUSAADE_GERILIM_SEVIYESI"].ToString() != "AG")
+                            continue;
+
+                        // Check if ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID exists and is valid
+                        string trafoID = row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"]?.ToString();
+                        string enerjiMusaadeNo = row["ENERJI_MUSAADE_NO"]?.ToString();
+
+                        if (IsNullLike(trafoID))
+                        {
+                            removedRowsDetails.Add($"Row Skipped -> ENERJI_MUSAADE_NO: {enerjiMusaadeNo}, ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID is missing");
+                            continue;
+                        }
+
+                        // Find the corresponding transformer in "DTR Verileri"
+                        var matchingTrafo = trafoDataTable.AsEnumerable()
+                                                          .FirstOrDefault(t => t["TRAFO_KODU"].ToString() == trafoID);
+
+                        if (matchingTrafo != null)
+                        {
+                            // Get TRAFO_KAPASITESI and ENERJI_MUSAADE_BAGLANTI_GUCU
+                            double trafoKapasitesi = Convert.ToDouble(matchingTrafo["TRAFO_KAPASITESI"]);
+                            double baglantiGucuKW = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
+
+                            // Check if ENERJI_MUSAADE_BAGLANTI_GUCU exceeds 60% of TRAFO_KAPASITESI
+                            if (baglantiGucuKW > trafoKapasitesi * 0.6)
+                            {
+                                rowsToRemove.Add(currentDataTable.Rows.IndexOf(row));
+
+                                // Calculate percentage and add details to removed rows list
+                                double percentage = (baglantiGucuKW / trafoKapasitesi) * 100;
+                                removedRowsDetails.Add($"Removed Row -> ENERJI_MUSAADE_NO: {enerjiMusaadeNo}, ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID: {trafoID}, BaglantiGucuKW: {baglantiGucuKW:F2}, Percentage of Capacity: {percentage:F2}%");
+                            }
+                        }
+                        else
+                        {
+                           // removedRowsDetails.Add($"Row Skipped -> ENERJI_MUSAADE_NO: {enerjiMusaadeNo}, ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID: {trafoID} not found in DTR Verileri");
+                        }
+                    }
+
+                    // Log removed rows details
+                    Console.WriteLine($"Rows Removed or Skipped Due to Condition (baglantiGucuKW > 60% of TRAFO_KAPASITESI):");
+                    foreach (var detail in removedRowsDetails)
+                    {
+                        Console.WriteLine(detail);
+                    }
+
+                    // Step 3: Remove invalid rows
+                    RemoveCombinedRows(rowsToRemove);
+
+                    // Log summary
+                    Console.WriteLine($"Total Rows Removed: {rowsToRemove.Count}");
+                    Console.WriteLine($"Remaining Rows After Removal: {currentDataTable.Rows.Count}");
+                }*/
+
+        private void ConvertAndValidateBaglantiGucu()
+        {
+            // Step 1: Convert ENERJI_MUSAADE_BAGLANTI_GUCU from Watt to Kilowatt
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                if (!IsNullLike(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]))
+                {
+                    double baglantiGucuWatt = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
+                    row["ENERJI_MUSAADE_BAGLANTI_GUCU"] = baglantiGucuWatt / 1000; // Convert to kW
+                }
+            }
+
+            // Step 2: Cross-check with "DTR Verileri" TRAFO_KAPASITESI
+            DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+            List<int> rowsToRemove = new List<int>();
+            List<string> removedRowsDetails = new List<string>();
+
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                // Co-condition: Check if ENERJI_MUSAADE_GERILIM_SEVIYESI is "AG"
+                if (IsNullLike(row["ENERJI_MUSAADE_GERILIM_SEVIYESI"]) || row["ENERJI_MUSAADE_GERILIM_SEVIYESI"].ToString() != "AG")
+                    continue;
+
+                // Check if ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID exists and is valid
+                string trafoID = row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"]?.ToString();
+                string enerjiMusaadeNo = row["ENERJI_MUSAADE_NO"]?.ToString();
+
+                if (IsNullLike(trafoID))
+                    continue;
+
+                // Find the corresponding transformer in "DTR Verileri"
+                var matchingTrafo = trafoDataTable.AsEnumerable()
+                                                  .FirstOrDefault(t => t["TRAFO_KODU"].ToString() == trafoID);
+
+                if (matchingTrafo != null)
+                {
+                    // Get TRAFO_KAPASITESI and ENERJI_MUSAADE_BAGLANTI_GUCU
+                    double trafoKapasitesi = Convert.ToDouble(matchingTrafo["TRAFO_KAPASITESI"]);
+                    double baglantiGucuKW = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
+
+                    // Check if ENERJI_MUSAADE_BAGLANTI_GUCU exceeds 60% of TRAFO_KAPASITESI
+                    if (baglantiGucuKW > trafoKapasitesi * 0.6)
+                    {
+                        rowsToRemove.Add(currentDataTable.Rows.IndexOf(row));
+
+                        // Calculate percentage and add details to removed rows list
+                        double percentage = (baglantiGucuKW / trafoKapasitesi) * 100;
+                        string detail = $"Removed Row -> ENERJI_MUSAADE_NO: {enerjiMusaadeNo}, ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID: {trafoID}, BaglantiGucuKW: {baglantiGucuKW:F2}, Percentage of Capacity: {percentage:F2}%";
+
+                        // Add to log and print to output window
+                        removedRowsDetails.Add(detail);
+                        Console.WriteLine(detail); // Print to Visual Studio Output Window
+                    }
+                }
+            }
+
+            // Step 3: Log removed rows details to the specified static path
+            string logFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\RemovedRowsLog.txt";
+            File.WriteAllLines(logFilePath, removedRowsDetails);
+
+            // Output log location to console
+            Console.WriteLine($"Removed rows have been logged to: {logFilePath}");
+
+            // Step 4: Remove invalid rows
+            RemoveCombinedRows(rowsToRemove);
+
+            // Log summary
+            Console.WriteLine($"Total Rows Removed: {rowsToRemove.Count}");
+            Console.WriteLine($"Remaining Rows After Removal: {currentDataTable.Rows.Count}");
+        }
+        private void ReportRemovedRows()
+        {
+            // Step 1: Convert ENERJI_MUSAADE_BAGLANTI_GUCU from Watt to Kilowatt
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                if (!IsNullLike(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]))
+                {
+                    double baglantiGucuWatt = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
+                    row["ENERJI_MUSAADE_BAGLANTI_GUCU"] = baglantiGucuWatt / 1000; // Convert to kW
+                }
+            }
+
+            // Step 2: Cross-check with "DTR Verileri" TRAFO_KAPASITESI
+            DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+            List<string> removedRowsDetails = new List<string>();
+
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                // Co-condition: Check if ENERJI_MUSAADE_GERILIM_SEVIYESI is "AG"
+                if (IsNullLike(row["ENERJI_MUSAADE_GERILIM_SEVIYESI"]) || row["ENERJI_MUSAADE_GERILIM_SEVIYESI"].ToString() != "AG")
+                    continue;
+
+                // Check if ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID exists and is valid
+                string trafoID = row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"]?.ToString();
+                string enerjiMusaadeNo = row["ENERJI_MUSAADE_NO"]?.ToString();
+
+                if (IsNullLike(trafoID))
+                    continue;
+
+                // Find the corresponding transformer in "DTR Verileri"
+                var matchingTrafo = trafoDataTable.AsEnumerable()
+                                                  .FirstOrDefault(t => t["TRAFO_KODU"].ToString() == trafoID);
+
+                if (matchingTrafo != null)
+                {
+                    // Get TRAFO_KAPASITESI and ENERJI_MUSAADE_BAGLANTI_GUCU
+                    double trafoKapasitesi = Convert.ToDouble(matchingTrafo["TRAFO_KAPASITESI"]);
+                    double baglantiGucuKW = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
+
+                    // Check if ENERJI_MUSAADE_BAGLANTI_GUCU exceeds 60% of TRAFO_KAPASITESI
+                    if (baglantiGucuKW > trafoKapasitesi * 0.6)
+                    {
+                        // Calculate percentage and add details to removed rows list
+                        double percentage = (baglantiGucuKW / trafoKapasitesi) * 100;
+                        string detail = $"ENERJI_MUSAADE_NO: {enerjiMusaadeNo}, TRAFO_ID: {trafoID}, BaglantiGucuKW: {baglantiGucuKW:F2}, Percentage of Capacity: {percentage:F2}%";
+
+                        // Add removed row details to infoDataTable
+                        infoDataTable.Rows.Add(new object[]
+                        {
+                    enerjiMusaadeNo,
+                    "Removed Rows Report",
+                    detail,
+                    "BaglantiGucuKW exceeds 60% of TRAFO_KAPASITESI"
+                        });
+
+                        // Add to log and print to console
+                        removedRowsDetails.Add(detail);
+                        Console.WriteLine($"Row removed: {detail}");
+                    }
+                }
+            }
+            Console.WriteLine($"Total Rows Removed Due to Percentage Validation: {removedRowsDetails.Count}");
+        }
+
+
         private void ReportOGBaglanacagiTrafo()
         {
             int invalidCount = 0;
@@ -220,9 +521,15 @@ namespace SLF
         {
             base.Validate();
 
+            RemoveDuplicateRows();
+
+            ReportRemovedRows();
+
             ReportNullCounts();
 
             ReportOGBaglanacagiTrafo();
+
+            ConvertAndValidateBaglantiGucu();
         }
         public override void Impute()
         {
