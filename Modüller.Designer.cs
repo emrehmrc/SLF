@@ -153,7 +153,7 @@ namespace SLF
             this.İmar_Grid_Oluştur = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator14 = new System.Windows.Forms.ToolStripSeparator();
             this.İmar_Fonksiyonlar = new System.Windows.Forms.ToolStripButton();
-            this.webView_imar = new Microsoft.Web.WebView2.WinForms.WebView2();
+            //this.webView_imar = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.gMapControl_imar = new GMap.NET.WindowsForms.GMapControl();
             this.buton_imar_katmanlar = new System.Windows.Forms.Button();
             this.harita_katmanları_right_click = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -349,7 +349,7 @@ namespace SLF
             this.tab_imar.SuspendLayout();
             this.katmanlar_right_click.SuspendLayout();
             this.toolStrip_imar.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.webView_imar)).BeginInit();
+            //((System.ComponentModel.ISupportInitialize)(this.webView_imar)).BeginInit();
             this.harita_katmanları_right_click.SuspendLayout();
             this.tab_optDTR.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.webView_optimalDTR)).BeginInit();
@@ -1627,7 +1627,7 @@ namespace SLF
             this.tab_imar.Controls.Add(this.label_imar_katmanlar);
             this.tab_imar.Controls.Add(this.imar_dosya_seçimi);
             this.tab_imar.Controls.Add(this.toolStrip_imar);
-            this.tab_imar.Controls.Add(this.webView_imar);
+            //this.tab_imar.Controls.Add(this.webView_imar);
             this.tab_imar.Controls.Add(this.gMapControl_imar);
             this.tab_imar.Controls.Add(this.buton_imar_katmanlar);
             this.tab_imar.ImageIndex = 11;
@@ -2107,21 +2107,21 @@ namespace SLF
             // 
             // webView_imar
             // 
-            this.webView_imar.AllowExternalDrop = true;
-            this.webView_imar.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.webView_imar.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.webView_imar.CreationProperties = null;
-            this.webView_imar.DefaultBackgroundColor = System.Drawing.Color.White;
-            this.webView_imar.Location = new System.Drawing.Point(198, 35);
-            this.webView_imar.Margin = new System.Windows.Forms.Padding(2);
-            this.webView_imar.Name = "webView_imar";
-            this.webView_imar.Size = new System.Drawing.Size(1058, 469);
-            this.webView_imar.Source = new System.Uri("https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu", System.UriKind.Absolute);
-            this.webView_imar.TabIndex = 38;
-            this.webView_imar.Visible = false;
-            this.webView_imar.ZoomFactor = 1D;
+            //this.webView_imar.AllowExternalDrop = true;
+            //this.webView_imar.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            //| System.Windows.Forms.AnchorStyles.Left) 
+            //| System.Windows.Forms.AnchorStyles.Right)));
+            //this.webView_imar.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            //this.webView_imar.CreationProperties = null;
+            //this.webView_imar.DefaultBackgroundColor = System.Drawing.Color.White;
+            //this.webView_imar.Location = new System.Drawing.Point(198, 35);
+            //this.webView_imar.Margin = new System.Windows.Forms.Padding(2);
+            //this.webView_imar.Name = "webView_imar";
+            //this.webView_imar.Size = new System.Drawing.Size(1058, 469);
+            //this.webView_imar.Source = new System.Uri("https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu", System.UriKind.Absolute);
+            //this.webView_imar.TabIndex = 38;
+            //this.webView_imar.Visible = false;
+            //this.webView_imar.ZoomFactor = 1D;
             // 
             // gMapControl_imar
             // 
@@ -4376,7 +4376,7 @@ namespace SLF
             this.HomePageButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.HomePageButton.BackColor = System.Drawing.Color.NavajoWhite;
             this.HomePageButton.BackgroundColor = System.Drawing.Color.NavajoWhite;
-            this.HomePageButton.BackgroundImage = global::SLF.Properties.Resources.homepage__1_;
+            //this.HomePageButton.BackgroundImage = global::SLF.Properties.Resources.homepage__1_;
             this.HomePageButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.HomePageButton.BorderColor = System.Drawing.Color.PaleVioletRed;
             this.HomePageButton.BorderRadius = 0;
@@ -4483,7 +4483,7 @@ namespace SLF
             this.katmanlar_right_click.ResumeLayout(false);
             this.toolStrip_imar.ResumeLayout(false);
             this.toolStrip_imar.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.webView_imar)).EndInit();
+            //((System.ComponentModel.ISupportInitialize)(this.webView_imar)).EndInit();
             this.harita_katmanları_right_click.ResumeLayout(false);
             this.tab_optDTR.ResumeLayout(false);
             this.tab_optDTR.PerformLayout();

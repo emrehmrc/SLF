@@ -62,8 +62,8 @@
             // 
             // Onizleme_Tablar
             // 
-            this.Onizleme_Tablar.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.Onizleme_Tablar.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Onizleme_Tablar.Controls.Add(this.Onizleme_Onizleme);
             this.Onizleme_Tablar.Controls.Add(this.Onizleme_Hata);
@@ -76,7 +76,7 @@
             this.Onizleme_Tablar.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_Tablar.Name = "Onizleme_Tablar";
             this.Onizleme_Tablar.SelectedIndex = 0;
-            this.Onizleme_Tablar.Size = new System.Drawing.Size(973, 466);
+            this.Onizleme_Tablar.Size = new System.Drawing.Size(886, 462);
             this.Onizleme_Tablar.TabIndex = 0;
             // 
             // Onizleme_Onizleme
@@ -88,15 +88,15 @@
             this.Onizleme_Onizleme.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_Onizleme.Name = "Onizleme_Onizleme";
             this.Onizleme_Onizleme.Padding = new System.Windows.Forms.Padding(2);
-            this.Onizleme_Onizleme.Size = new System.Drawing.Size(965, 436);
+            this.Onizleme_Onizleme.Size = new System.Drawing.Size(878, 432);
             this.Onizleme_Onizleme.TabIndex = 0;
             this.Onizleme_Onizleme.Text = "Önizleme";
             this.Onizleme_Onizleme.UseVisualStyleBackColor = true;
             // 
             // Onizleme_dataGrid1
             // 
-            this.Onizleme_dataGrid1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.Onizleme_dataGrid1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Onizleme_dataGrid1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
             this.Onizleme_dataGrid1.BackgroundColor = System.Drawing.Color.Snow;
@@ -125,7 +125,7 @@
             this.Onizleme_dataGrid1.ReadOnly = true;
             this.Onizleme_dataGrid1.RowHeadersWidth = 18;
             this.Onizleme_dataGrid1.RowTemplate.Height = 24;
-            this.Onizleme_dataGrid1.Size = new System.Drawing.Size(961, 428);
+            this.Onizleme_dataGrid1.Size = new System.Drawing.Size(876, 433);
             this.Onizleme_dataGrid1.TabIndex = 0;
             // 
             // Onizleme_Hata
@@ -144,8 +144,8 @@
             // 
             // Onizleme_dataGrid2
             // 
-            this.Onizleme_dataGrid2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.Onizleme_dataGrid2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Onizleme_dataGrid2.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.Onizleme_dataGrid2.BackgroundColor = System.Drawing.Color.Snow;
@@ -158,7 +158,7 @@
             this.Onizleme_dataGrid2.ReadOnly = true;
             this.Onizleme_dataGrid2.RowHeadersWidth = 18;
             this.Onizleme_dataGrid2.RowTemplate.Height = 24;
-            this.Onizleme_dataGrid2.Size = new System.Drawing.Size(967, 436);
+            this.Onizleme_dataGrid2.Size = new System.Drawing.Size(874, 427);
             this.Onizleme_dataGrid2.TabIndex = 0;
             // 
             // Onizleme_Warning
@@ -175,8 +175,8 @@
             // 
             // Onizleme_dataGrid3
             // 
-            this.Onizleme_dataGrid3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.Onizleme_dataGrid3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Onizleme_dataGrid3.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.Onizleme_dataGrid3.BackgroundColor = System.Drawing.Color.Snow;
@@ -189,7 +189,7 @@
             this.Onizleme_dataGrid3.ReadOnly = true;
             this.Onizleme_dataGrid3.RowHeadersWidth = 18;
             this.Onizleme_dataGrid3.RowTemplate.Height = 24;
-            this.Onizleme_dataGrid3.Size = new System.Drawing.Size(963, 429);
+            this.Onizleme_dataGrid3.Size = new System.Drawing.Size(876, 429);
             this.Onizleme_dataGrid3.TabIndex = 0;
             // 
             // Onizleme_Information
@@ -206,8 +206,8 @@
             // 
             // Onizleme_dataGrid4
             // 
-            this.Onizleme_dataGrid4.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.Onizleme_dataGrid4.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Onizleme_dataGrid4.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.Onizleme_dataGrid4.BackgroundColor = System.Drawing.Color.Snow;
@@ -220,7 +220,7 @@
             this.Onizleme_dataGrid4.ReadOnly = true;
             this.Onizleme_dataGrid4.RowHeadersWidth = 18;
             this.Onizleme_dataGrid4.RowTemplate.Height = 24;
-            this.Onizleme_dataGrid4.Size = new System.Drawing.Size(961, 429);
+            this.Onizleme_dataGrid4.Size = new System.Drawing.Size(876, 429);
             this.Onizleme_dataGrid4.TabIndex = 0;
             // 
             // Onizleme_Statistics
@@ -237,8 +237,8 @@
             // 
             // Onizleme_dataGrid5
             // 
-            this.Onizleme_dataGrid5.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.Onizleme_dataGrid5.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Onizleme_dataGrid5.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.Onizleme_dataGrid5.BackgroundColor = System.Drawing.Color.Snow;
@@ -251,7 +251,7 @@
             this.Onizleme_dataGrid5.ReadOnly = true;
             this.Onizleme_dataGrid5.RowHeadersWidth = 18;
             this.Onizleme_dataGrid5.RowTemplate.Height = 24;
-            this.Onizleme_dataGrid5.Size = new System.Drawing.Size(959, 429);
+            this.Onizleme_dataGrid5.Size = new System.Drawing.Size(874, 429);
             this.Onizleme_dataGrid5.TabIndex = 0;
             // 
             // imageList1
@@ -336,7 +336,6 @@
             this.Controls.Add(this.buton_İlerle);
             this.Controls.Add(this.buton_ÇIK);
             this.Controls.Add(this.Onizleme_Tablar);
-            this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Önizleme";
