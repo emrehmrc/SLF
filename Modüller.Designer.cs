@@ -153,7 +153,6 @@ namespace SLF
             this.İmar_Grid_Oluştur = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator14 = new System.Windows.Forms.ToolStripSeparator();
             this.İmar_Fonksiyonlar = new System.Windows.Forms.ToolStripButton();
-            //this.webView_imar = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.gMapControl_imar = new GMap.NET.WindowsForms.GMapControl();
             this.buton_imar_katmanlar = new System.Windows.Forms.Button();
             this.harita_katmanları_right_click = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -310,6 +309,7 @@ namespace SLF
             this.Seç_Stokastik = new System.Windows.Forms.ToolStrip();
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
             this.HeaderPanel = new System.Windows.Forms.Panel();
+            this.button1 = new System.Windows.Forms.Button();
             this.HomePageButton = new SLF.CustomButton();
             this.buton_ea_harita_katmanlar = new System.Windows.Forms.Button();
             this.ELFMinSenaryoGraphPicBox = new System.Windows.Forms.PictureBox();
@@ -349,7 +349,6 @@ namespace SLF
             this.tab_imar.SuspendLayout();
             this.katmanlar_right_click.SuspendLayout();
             this.toolStrip_imar.SuspendLayout();
-            //((System.ComponentModel.ISupportInitialize)(this.webView_imar)).BeginInit();
             this.harita_katmanları_right_click.SuspendLayout();
             this.tab_optDTR.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.webView_optimalDTR)).BeginInit();
@@ -1363,7 +1362,7 @@ namespace SLF
             this.ELFLowResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFLowResultsTable.Name = "ELFLowResultsTable";
             this.ELFLowResultsTable.RowHeadersWidth = 51;
-            this.ELFLowResultsTable.Size = new System.Drawing.Size(1081, 543);
+            this.ELFLowResultsTable.Size = new System.Drawing.Size(1081, 551);
             this.ELFLowResultsTable.TabIndex = 1;
             // 
             // ELFBaseResultsTabPage
@@ -1391,7 +1390,7 @@ namespace SLF
             this.ELFBaseResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFBaseResultsTable.Name = "ELFBaseResultsTable";
             this.ELFBaseResultsTable.RowHeadersWidth = 51;
-            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1080, 543);
+            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1080, 551);
             this.ELFBaseResultsTable.TabIndex = 1;
             // 
             // ELFHighResultsTabPage
@@ -1419,7 +1418,7 @@ namespace SLF
             this.ELFHighResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFHighResultsTable.Name = "ELFHighResultsTable";
             this.ELFHighResultsTable.RowHeadersWidth = 51;
-            this.ELFHighResultsTable.Size = new System.Drawing.Size(1076, 543);
+            this.ELFHighResultsTable.Size = new System.Drawing.Size(1076, 551);
             this.ELFHighResultsTable.TabIndex = 1;
             // 
             // ELFMaxResultsTabPage
@@ -1448,7 +1447,7 @@ namespace SLF
             this.ELFMaxResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFMaxResultsTable.Name = "ELFMaxResultsTable";
             this.ELFMaxResultsTable.RowHeadersWidth = 51;
-            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1084, 547);
+            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1084, 555);
             this.ELFMaxResultsTable.TabIndex = 1;
             // 
             // ELFGraphicOutputsTabPage
@@ -1476,7 +1475,7 @@ namespace SLF
             this.panel_ELF_Grafikler.Controls.Add(this.pictureBox_ELF_1);
             this.panel_ELF_Grafikler.Location = new System.Drawing.Point(2, 2);
             this.panel_ELF_Grafikler.Name = "panel_ELF_Grafikler";
-            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1080, 482);
+            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1080, 490);
             this.panel_ELF_Grafikler.TabIndex = 6;
             // 
             // pictureBox_ELF_5
@@ -1627,7 +1626,6 @@ namespace SLF
             this.tab_imar.Controls.Add(this.label_imar_katmanlar);
             this.tab_imar.Controls.Add(this.imar_dosya_seçimi);
             this.tab_imar.Controls.Add(this.toolStrip_imar);
-            //this.tab_imar.Controls.Add(this.webView_imar);
             this.tab_imar.Controls.Add(this.gMapControl_imar);
             this.tab_imar.Controls.Add(this.buton_imar_katmanlar);
             this.tab_imar.ImageIndex = 11;
@@ -1683,42 +1681,42 @@ namespace SLF
             this.yenidenAdlandırToolStripMenuItem,
             this.kaydetToolStripMenuItem});
             this.katmanlar_right_click.Name = "katmanlar_right_click";
-            this.katmanlar_right_click.Size = new System.Drawing.Size(169, 134);
+            this.katmanlar_right_click.Size = new System.Drawing.Size(165, 114);
             this.katmanlar_right_click.Opening += new System.ComponentModel.CancelEventHandler(this.katmanlar_right_click_Opening);
             // 
             // tabloyuGörToolStripMenuItem
             // 
             this.tabloyuGörToolStripMenuItem.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.tabloyuGörToolStripMenuItem.Name = "tabloyuGörToolStripMenuItem";
-            this.tabloyuGörToolStripMenuItem.Size = new System.Drawing.Size(168, 26);
+            this.tabloyuGörToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
             this.tabloyuGörToolStripMenuItem.Text = "Tabloyu Gör";
             this.tabloyuGörToolStripMenuItem.Click += new System.EventHandler(this.tabloyuGörToolStripMenuItem_Click);
             // 
             // rengiDeğiştirToolStripMenuItem
             // 
             this.rengiDeğiştirToolStripMenuItem.Name = "rengiDeğiştirToolStripMenuItem";
-            this.rengiDeğiştirToolStripMenuItem.Size = new System.Drawing.Size(168, 26);
+            this.rengiDeğiştirToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
             this.rengiDeğiştirToolStripMenuItem.Text = "Rengi Değiştir";
             this.rengiDeğiştirToolStripMenuItem.Click += new System.EventHandler(this.rengiDeğiştirToolStripMenuItem_Click);
             // 
             // temizleToolStripMenuItem
             // 
             this.temizleToolStripMenuItem.Name = "temizleToolStripMenuItem";
-            this.temizleToolStripMenuItem.Size = new System.Drawing.Size(168, 26);
+            this.temizleToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
             this.temizleToolStripMenuItem.Text = "Temizle";
             this.temizleToolStripMenuItem.Click += new System.EventHandler(this.temizleToolStripMenuItem_Click);
             // 
             // yenidenAdlandırToolStripMenuItem
             // 
             this.yenidenAdlandırToolStripMenuItem.Name = "yenidenAdlandırToolStripMenuItem";
-            this.yenidenAdlandırToolStripMenuItem.Size = new System.Drawing.Size(168, 26);
+            this.yenidenAdlandırToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
             this.yenidenAdlandırToolStripMenuItem.Text = "Yeniden Adlandır";
             this.yenidenAdlandırToolStripMenuItem.Click += new System.EventHandler(this.yenidenAdlandırToolStripMenuItem_Click);
             // 
             // kaydetToolStripMenuItem
             // 
             this.kaydetToolStripMenuItem.Name = "kaydetToolStripMenuItem";
-            this.kaydetToolStripMenuItem.Size = new System.Drawing.Size(168, 26);
+            this.kaydetToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
             this.kaydetToolStripMenuItem.Text = "Kaydet";
             this.kaydetToolStripMenuItem.Click += new System.EventHandler(this.kaydetToolStripMenuItem_Click);
             // 
@@ -1949,7 +1947,7 @@ namespace SLF
             this.toolStripSeparator9.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator9.Name = "toolStripSeparator9";
             this.toolStripSeparator9.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator9.Size = new System.Drawing.Size(6, 22);
+            this.toolStripSeparator9.Size = new System.Drawing.Size(6, 27);
             // 
             // İmar_Kaydır
             // 
@@ -1976,7 +1974,7 @@ namespace SLF
             this.toolStripSeparator10.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator10.Name = "toolStripSeparator10";
             this.toolStripSeparator10.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator10.Size = new System.Drawing.Size(6, 22);
+            this.toolStripSeparator10.Size = new System.Drawing.Size(6, 27);
             // 
             // İmar_Mesafe_Ölç
             // 
@@ -2003,7 +2001,7 @@ namespace SLF
             this.toolStripSeparator11.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator11.Name = "toolStripSeparator11";
             this.toolStripSeparator11.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator11.Size = new System.Drawing.Size(6, 22);
+            this.toolStripSeparator11.Size = new System.Drawing.Size(6, 27);
             // 
             // İmar_Poligon
             // 
@@ -2030,7 +2028,7 @@ namespace SLF
             this.toolStripSeparator12.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator12.Name = "toolStripSeparator12";
             this.toolStripSeparator12.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
-            this.toolStripSeparator12.Size = new System.Drawing.Size(6, 22);
+            this.toolStripSeparator12.Size = new System.Drawing.Size(6, 27);
             // 
             // İmar_Nokta
             // 
@@ -2104,24 +2102,6 @@ namespace SLF
             this.İmar_Fonksiyonlar.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
             this.İmar_Fonksiyonlar.ToolTipText = "Çeşitli vektörel veya tabular algoritmaları içerir.";
             this.İmar_Fonksiyonlar.MouseDown += new System.Windows.Forms.MouseEventHandler(this.İmar_Fonksiyonlar_MouseDown);
-            // 
-            // webView_imar
-            // 
-            //this.webView_imar.AllowExternalDrop = true;
-            //this.webView_imar.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            //| System.Windows.Forms.AnchorStyles.Left) 
-            //| System.Windows.Forms.AnchorStyles.Right)));
-            //this.webView_imar.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            //this.webView_imar.CreationProperties = null;
-            //this.webView_imar.DefaultBackgroundColor = System.Drawing.Color.White;
-            //this.webView_imar.Location = new System.Drawing.Point(198, 35);
-            //this.webView_imar.Margin = new System.Windows.Forms.Padding(2);
-            //this.webView_imar.Name = "webView_imar";
-            //this.webView_imar.Size = new System.Drawing.Size(1058, 469);
-            //this.webView_imar.Source = new System.Uri("https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu", System.UriKind.Absolute);
-            //this.webView_imar.TabIndex = 38;
-            //this.webView_imar.Visible = false;
-            //this.webView_imar.ZoomFactor = 1D;
             // 
             // gMapControl_imar
             // 
@@ -3361,7 +3341,7 @@ namespace SLF
             // 
             this.toolStripSeparator7.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(6, 22);
+            this.toolStripSeparator7.Size = new System.Drawing.Size(6, 27);
             // 
             // Yuk_Kaydır
             // 
@@ -4364,6 +4344,7 @@ namespace SLF
             // HeaderPanel
             // 
             this.HeaderPanel.BackColor = System.Drawing.Color.NavajoWhite;
+            this.HeaderPanel.Controls.Add(this.button1);
             this.HeaderPanel.Controls.Add(this.HomePageButton);
             this.HeaderPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.HeaderPanel.Location = new System.Drawing.Point(0, 0);
@@ -4371,12 +4352,21 @@ namespace SLF
             this.HeaderPanel.Size = new System.Drawing.Size(1290, 31);
             this.HeaderPanel.TabIndex = 6;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(12, 6);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(116, 23);
+            this.button1.TabIndex = 6;
+            this.button1.Text = "Database Giris";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // HomePageButton
             // 
             this.HomePageButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.HomePageButton.BackColor = System.Drawing.Color.NavajoWhite;
             this.HomePageButton.BackgroundColor = System.Drawing.Color.NavajoWhite;
-            //this.HomePageButton.BackgroundImage = global::SLF.Properties.Resources.homepage__1_;
             this.HomePageButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.HomePageButton.BorderColor = System.Drawing.Color.PaleVioletRed;
             this.HomePageButton.BorderRadius = 0;
@@ -4483,7 +4473,6 @@ namespace SLF
             this.katmanlar_right_click.ResumeLayout(false);
             this.toolStrip_imar.ResumeLayout(false);
             this.toolStrip_imar.PerformLayout();
-            //((System.ComponentModel.ISupportInitialize)(this.webView_imar)).EndInit();
             this.harita_katmanları_right_click.ResumeLayout(false);
             this.tab_optDTR.ResumeLayout(false);
             this.tab_optDTR.PerformLayout();
@@ -4825,5 +4814,6 @@ namespace SLF
         public GMap.NET.WindowsForms.GMapControl gMapControl_yga;
         private ToolStripSeparator toolStripSeparator19;
         private ToolStripButton Yga_Fonksiyonlar;
+        private Button button1;
     }
 }

@@ -592,6 +592,19 @@
     <Compile Include="Ana_Menü.Designer.cs">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
     </Compile>
+    <Compile Include="DatabaseListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DatabaseListForm.Designer.cs">
+      <DependentUpon>DatabaseListForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LoginForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LoginForm.Designer.cs">
+      <DependentUpon>LoginForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="services\DatabaseManager .cs" />
     <Compile Include="YGAPopupForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -719,6 +732,12 @@
     <EmbeddedResource Include="Ana_Menü.resx">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="DatabaseListForm.resx">
+      <DependentUpon>DatabaseListForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LoginForm.resx">
+      <DependentUpon>LoginForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="YGAPopupForm.resx">
       <DependentUpon>YGAPopupForm.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -779,6 +798,31 @@
     <EmbeddedResource Include="Önizleme.resx">
       <DependentUpon>Önizleme.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="CBS\SLF\ABONE.DAT" />
+    <None Include="CBS\SLF\ABONE.ID" />
+    <None Include="CBS\SLF\ABONE.MAP" />
+    <None Include="CBS\SLF\ABONE.TAB" />
+    <None Include="CBS\SLF\BINA.DAT" />
+    <None Include="CBS\SLF\BINA.ID" />
+    <None Include="CBS\SLF\BINA.MAP" />
+    <None Include="CBS\SLF\BINA.TAB" />
+    <None Include="CBS\SLF\OGAGTRF.DAT" />
+    <None Include="CBS\SLF\OGAGTRF.ID" />
+    <None Include="CBS\SLF\OGAGTRF.MAP" />
+    <None Include="CBS\SLF\OGAGTRF.TAB" />
+    <None Include="CBS\SLF\OGHAT.DAT" />
+    <None Include="CBS\SLF\OGHAT.ID" />
+    <None Include="CBS\SLF\OGHAT.MAP" />
+    <None Include="CBS\SLF\OGHAT.TAB" />
+    <None Include="CBS\SLF\TRAFOBINATIP.DAT" />
+    <None Include="CBS\SLF\TRAFOBINATIP.ID" />
+    <None Include="CBS\SLF\TRAFOBINATIP.MAP" />
+    <None Include="CBS\SLF\TRAFOBINATIP.TAB" />
+    <None Include="CBS\SLF\ÇİĞLİ KARŞIYAKA REKORTMAN VERİSİ\REKORTMAN.DAT" />
+    <None Include="CBS\SLF\ÇİĞLİ KARŞIYAKA REKORTMAN VERİSİ\REKORTMAN.ID" />
+    <None Include="CBS\SLF\ÇİĞLİ KARŞIYAKA REKORTMAN VERİSİ\REKORTMAN.MAP" />
+    <None Include="CBS\SLF\ÇİĞLİ KARŞIYAKA REKORTMAN VERİSİ\REKORTMAN.TAB" />
+    <None Include="CBS\SLF\ÇİĞLİ KARŞIYAKA REKORTMAN VERİSİ\REKORTMAN_kars_cigli.csv" />
     <None Include="docs\VEER.md" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
@@ -875,6 +919,7 @@
     <None Include="Pictures\Back To2.png" />
     <None Include="Pictures\Double Right.png" />
     <None Include="Pictures\Double Left.png" />
+    <None Include="Pictures\gdz.jpg" />
     <Content Include="Pictures\Home3.png" />
   </ItemGroup>
   <ItemGroup>

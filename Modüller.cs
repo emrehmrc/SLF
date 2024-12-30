@@ -19,6 +19,7 @@ using OfficeOpenXml;
 using DrawingImage = System.Drawing.Image;
 using MapWinGIS;
 using System.Text;
+using SLF.services;
 
 
 namespace SLF
@@ -583,16 +584,29 @@ namespace SLF
         }
         private void ModülFormu_FormClosing(object sender, FormClosingEventArgs e)
         {
+            // Kapanış onayı al
             DialogResult result = MessageBox.Show(
-                    "Programı kapatmak istediğinize emin misiniz? Kaydedilmeyen veriler kaybolacaktır!",
-                    "Çıkış",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning
-                );
+                "Programı kapatmak istediğinize emin misiniz? Kaydedilmeyen veriler kaybolacaktır!",
+                "Çıkış",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
 
             if (result == DialogResult.No)
             {
-                e.Cancel = true; // Cancel the closing event
+                e.Cancel = true; // Kapanış iptal edilir
+                return;
+            }
+
+            try
+            {
+                // Veritabanı bağlantısını kapat
+                DatabaseManager.GetInstance("").CloseConnection();
+                MessageBox.Show("Veritabanı bağlantısı kapatıldı.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Bağlantı kapatma sırasında hata: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         public class ExcelService
@@ -4325,6 +4339,32 @@ namespace SLF
                                 ShowAttributeRow(row);
                                 tablo_formu.Show();
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (DatabaseManager.GetInstance().IsConnected())
+            {
+                // Zaten bağlantı açık, DatabaseListForm'u göster
+                using (var databaseListForm = new DatabaseListForm())
+                {
+                    databaseListForm.ShowDialog();
+                }
+            }
+            else
+            {
+                // Giriş yapılmamışsa veya bağlantı yoksa LoginForm'u göster
+                using (var loginForm = new LoginForm())
+                {
+                    if (loginForm.ShowDialog() == DialogResult.OK)
+                    {
+                        using (var databaseListForm = new DatabaseListForm())
+                        {
+                            databaseListForm.ShowDialog();
                         }
                     }
                 }
