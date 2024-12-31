@@ -35,8 +35,8 @@
             this.YGADataGridView = new System.Windows.Forms.DataGridView();
             this.YGATablePanel = new System.Windows.Forms.Panel();
             this.YGATBottomPanel = new System.Windows.Forms.Panel();
-            this.YGASaveButton = new System.Windows.Forms.Button();
-            this.YGACancelButton = new System.Windows.Forms.Button();
+            this.YGATableSaveButton = new System.Windows.Forms.Button();
+            this.YGATableCancelButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.YGADataGridView)).BeginInit();
             this.YGATablePanel.SuspendLayout();
             this.YGATBottomPanel.SuspendLayout();
@@ -102,46 +102,47 @@
             // YGATBottomPanel
             // 
             this.YGATBottomPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(181)))), ((int)(((byte)(152)))));
-            this.YGATBottomPanel.Controls.Add(this.YGASaveButton);
-            this.YGATBottomPanel.Controls.Add(this.YGACancelButton);
+            this.YGATBottomPanel.Controls.Add(this.YGATableSaveButton);
+            this.YGATBottomPanel.Controls.Add(this.YGATableCancelButton);
             this.YGATBottomPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.YGATBottomPanel.Location = new System.Drawing.Point(0, 414);
             this.YGATBottomPanel.Name = "YGATBottomPanel";
             this.YGATBottomPanel.Size = new System.Drawing.Size(1078, 51);
             this.YGATBottomPanel.TabIndex = 3;
             // 
-            // YGASaveButton
+            // YGATableSaveButton
             // 
-            this.YGASaveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.YGASaveButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(89)))), ((int)(((byte)(13)))), ((int)(((byte)(34)))));
-            this.YGASaveButton.FlatAppearance.BorderSize = 0;
-            this.YGASaveButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.YGASaveButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.YGASaveButton.ForeColor = System.Drawing.Color.Snow;
-            this.YGASaveButton.Location = new System.Drawing.Point(896, 2);
-            this.YGASaveButton.Margin = new System.Windows.Forms.Padding(2);
-            this.YGASaveButton.Name = "YGASaveButton";
-            this.YGASaveButton.Size = new System.Drawing.Size(180, 45);
-            this.YGASaveButton.TabIndex = 41;
-            this.YGASaveButton.Text = "KAYDET";
-            this.YGASaveButton.UseVisualStyleBackColor = false;
-            this.YGASaveButton.Click += new System.EventHandler(this.YGASaveButton_Click);
+            this.YGATableSaveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.YGATableSaveButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(89)))), ((int)(((byte)(13)))), ((int)(((byte)(34)))));
+            this.YGATableSaveButton.FlatAppearance.BorderSize = 0;
+            this.YGATableSaveButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.YGATableSaveButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.YGATableSaveButton.ForeColor = System.Drawing.Color.Snow;
+            this.YGATableSaveButton.Location = new System.Drawing.Point(896, 2);
+            this.YGATableSaveButton.Margin = new System.Windows.Forms.Padding(2);
+            this.YGATableSaveButton.Name = "YGATableSaveButton";
+            this.YGATableSaveButton.Size = new System.Drawing.Size(180, 45);
+            this.YGATableSaveButton.TabIndex = 41;
+            this.YGATableSaveButton.Text = "KAYDET";
+            this.YGATableSaveButton.UseVisualStyleBackColor = false;
+            this.YGATableSaveButton.Click += new System.EventHandler(this.YGATableSaveButton_Click);
             // 
-            // YGACancelButton
+            // YGATableCancelButton
             // 
-            this.YGACancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.YGACancelButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(89)))), ((int)(((byte)(13)))), ((int)(((byte)(34)))));
-            this.YGACancelButton.FlatAppearance.BorderSize = 0;
-            this.YGACancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.YGACancelButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.YGACancelButton.ForeColor = System.Drawing.Color.Snow;
-            this.YGACancelButton.Location = new System.Drawing.Point(712, 2);
-            this.YGACancelButton.Margin = new System.Windows.Forms.Padding(2);
-            this.YGACancelButton.Name = "YGACancelButton";
-            this.YGACancelButton.Size = new System.Drawing.Size(180, 45);
-            this.YGACancelButton.TabIndex = 40;
-            this.YGACancelButton.Text = "İPTAL";
-            this.YGACancelButton.UseVisualStyleBackColor = false;
+            this.YGATableCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.YGATableCancelButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(89)))), ((int)(((byte)(13)))), ((int)(((byte)(34)))));
+            this.YGATableCancelButton.FlatAppearance.BorderSize = 0;
+            this.YGATableCancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.YGATableCancelButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.YGATableCancelButton.ForeColor = System.Drawing.Color.Snow;
+            this.YGATableCancelButton.Location = new System.Drawing.Point(712, 2);
+            this.YGATableCancelButton.Margin = new System.Windows.Forms.Padding(2);
+            this.YGATableCancelButton.Name = "YGATableCancelButton";
+            this.YGATableCancelButton.Size = new System.Drawing.Size(180, 45);
+            this.YGATableCancelButton.TabIndex = 40;
+            this.YGATableCancelButton.Text = "İPTAL";
+            this.YGATableCancelButton.UseVisualStyleBackColor = false;
+            this.YGATableCancelButton.Click += new System.EventHandler(this.YGATableCancelButton_Click);
             // 
             // YGAPopupForm
             // 
@@ -166,7 +167,7 @@
         private System.Windows.Forms.DataGridView YGADataGridView;
         private System.Windows.Forms.Panel YGATablePanel;
         private System.Windows.Forms.Panel YGATBottomPanel;
-        private System.Windows.Forms.Button YGACancelButton;
-        private System.Windows.Forms.Button YGASaveButton;
+        private System.Windows.Forms.Button YGATableCancelButton;
+        private System.Windows.Forms.Button YGATableSaveButton;
     }
 }

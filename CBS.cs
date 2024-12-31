@@ -1768,7 +1768,7 @@ namespace SLF
             // Haritayı yenile
             gmap.Refresh();
         }
-        public DataTable CreatePolygonDataTable(List<PointLatLng> polygonPoints, int polygonId)
+        public DataTable YGACreatePolygonDataTable(List<PointLatLng> polygonPoints, int polygonId)
         {
             DataTable dt = new DataTable();
             dt.Columns.Add("PolygonID", typeof(int));
@@ -1803,27 +1803,27 @@ namespace SLF
 
             return dt;
         }
-        /*        public System.Data.DataTable CreatePolygonDataTable(List<PointLatLng> polygonPoints, int polygonId)
-                {
-                    System.Data.DataTable dt = new System.Data.DataTable();
-                    dt.Columns.Add("PolygonID", typeof(int));
-                    dt.Columns.Add("Coordinates", typeof(string));
-                    dt.Columns.Add("Area_Size(m2)", typeof(string));
+        public System.Data.DataTable CreatePolygonDataTable(List<PointLatLng> polygonPoints, int polygonId)
+        {
+            System.Data.DataTable dt = new System.Data.DataTable();
+            dt.Columns.Add("PolygonID", typeof(int));
+            dt.Columns.Add("Coordinates", typeof(string));
+            dt.Columns.Add("Area_Size(m2)", typeof(string));
 
-                    // Create a string representation of the coordinates
-                    string coordinates = string.Join(", ", polygonPoints.Select(p => $"({p.Lat}, {p.Lng})"));
+            // Create a string representation of the coordinates
+            string coordinates = string.Join(", ", polygonPoints.Select(p => $"({p.Lat}, {p.Lng})"));
 
-                    double area = CalculatePolygonArea(polygonPoints);
+            double area = CalculatePolygonArea(polygonPoints);
 
-                    // Create a new row
-                    DataRow row = dt.NewRow();
-                    row["PolygonID"] = polygonId;
-                    row["Coordinates"] = coordinates;
-                    row["Area_Size(m2)"] = Math.Round(area, 0).ToString();
-                    dt.Rows.Add(row);
+            // Create a new row
+            DataRow row = dt.NewRow();
+            row["PolygonID"] = polygonId;
+            row["Coordinates"] = coordinates;
+            row["Area_Size(m2)"] = Math.Round(area, 0).ToString();
+            dt.Rows.Add(row);
 
-                    return dt;
-                }*/
+            return dt;
+        }
 
         public double CalculatePolygonArea(List<PointLatLng> points)
         {
