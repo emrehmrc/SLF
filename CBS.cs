@@ -1768,13 +1768,19 @@ namespace SLF
             // Haritayı yenile
             gmap.Refresh();
         }
-
-        public System.Data.DataTable CreatePolygonDataTable(List<PointLatLng> polygonPoints, int polygonId)
+        public DataTable CreatePolygonDataTable(List<PointLatLng> polygonPoints, int polygonId)
         {
-            System.Data.DataTable dt = new System.Data.DataTable();
+            DataTable dt = new DataTable();
             dt.Columns.Add("PolygonID", typeof(int));
             dt.Columns.Add("Coordinates", typeof(string));
             dt.Columns.Add("Area_Size(m2)", typeof(string));
+            dt.Columns.Add("baslangic_yili", typeof(string)); // Add custom fields
+            dt.Columns.Add("ilce", typeof(string));          // Add custom fields
+            dt.Columns.Add("imar_tipi", typeof(string));     // Add custom fields
+            dt.Columns.Add("IsDevelopmentArea", typeof(string)); // Add custom fields
+            dt.Columns.Add("yasakli_alan_percentage", typeof(string)); // Add custom fields
+            dt.Columns.Add("agirlik_hiz", typeof(string));   // Add custom fields
+            dt.Columns.Add("taks", typeof(string));          // Add custom fields
 
             // Create a string representation of the coordinates
             string coordinates = string.Join(", ", polygonPoints.Select(p => $"({p.Lat}, {p.Lng})"));
@@ -1786,10 +1792,38 @@ namespace SLF
             row["PolygonID"] = polygonId;
             row["Coordinates"] = coordinates;
             row["Area_Size(m2)"] = Math.Round(area, 0).ToString();
+            row["baslangic_yili"] = ""; // Default empty value
+            row["ilce"] = ""; // Default empty value
+            row["imar_tipi"] = ""; // Default empty value
+            row["IsDevelopmentArea"] = ""; // Default empty value
+            row["yasakli_alan_percentage"] = ""; // Default empty value
+            row["agirlik_hiz"] = ""; // Default empty value
+            row["taks"] = ""; // Default empty value
             dt.Rows.Add(row);
 
             return dt;
         }
+        /*        public System.Data.DataTable CreatePolygonDataTable(List<PointLatLng> polygonPoints, int polygonId)
+                {
+                    System.Data.DataTable dt = new System.Data.DataTable();
+                    dt.Columns.Add("PolygonID", typeof(int));
+                    dt.Columns.Add("Coordinates", typeof(string));
+                    dt.Columns.Add("Area_Size(m2)", typeof(string));
+
+                    // Create a string representation of the coordinates
+                    string coordinates = string.Join(", ", polygonPoints.Select(p => $"({p.Lat}, {p.Lng})"));
+
+                    double area = CalculatePolygonArea(polygonPoints);
+
+                    // Create a new row
+                    DataRow row = dt.NewRow();
+                    row["PolygonID"] = polygonId;
+                    row["Coordinates"] = coordinates;
+                    row["Area_Size(m2)"] = Math.Round(area, 0).ToString();
+                    dt.Rows.Add(row);
+
+                    return dt;
+                }*/
 
         public double CalculatePolygonArea(List<PointLatLng> points)
         {

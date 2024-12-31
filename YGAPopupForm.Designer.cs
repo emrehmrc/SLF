@@ -37,20 +37,6 @@
             this.YGATBottomPanel = new System.Windows.Forms.Panel();
             this.YGASaveButton = new System.Windows.Forms.Button();
             this.YGACancelButton = new System.Windows.Forms.Button();
-            this.yasakli_alan_percentage = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.id = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.left = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.right = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.top = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.bottom = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.IsDevelopmentArea = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.lat = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.lon = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.imar_tipi = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.ilce = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.taks = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.agirlik_hiz = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.baslangic_yili = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.YGADataGridView)).BeginInit();
             this.YGATablePanel.SuspendLayout();
             this.YGATBottomPanel.SuspendLayout();
@@ -76,21 +62,6 @@
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.YGADataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.YGADataGridView.ColumnHeadersHeight = 25;
-            this.YGADataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.yasakli_alan_percentage,
-            this.id,
-            this.left,
-            this.right,
-            this.top,
-            this.bottom,
-            this.IsDevelopmentArea,
-            this.lat,
-            this.lon,
-            this.imar_tipi,
-            this.ilce,
-            this.taks,
-            this.agirlik_hiz,
-            this.baslangic_yili});
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
             dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
@@ -171,92 +142,6 @@
             this.YGACancelButton.TabIndex = 40;
             this.YGACancelButton.Text = "İPTAL";
             this.YGACancelButton.UseVisualStyleBackColor = false;
-            //this.YGACancelButton.Click += new System.EventHandler(this.YGACancelButton_Click);
-            // 
-            // yasakli_alan_percentage
-            // 
-            this.yasakli_alan_percentage.HeaderText = "yasakli_alan_percentage";
-            this.yasakli_alan_percentage.Name = "yasakli_alan_percentage";
-            this.yasakli_alan_percentage.Width = 156;
-            // 
-            // id
-            // 
-            this.id.HeaderText = "id";
-            this.id.Name = "id";
-            this.id.Width = 40;
-            // 
-            // left
-            // 
-            this.left.HeaderText = "left";
-            this.left.Name = "left";
-            this.left.Width = 47;
-            // 
-            // right
-            // 
-            this.right.HeaderText = "right";
-            this.right.Name = "right";
-            this.right.Width = 55;
-            // 
-            // top
-            // 
-            this.top.HeaderText = "top";
-            this.top.Name = "top";
-            this.top.Width = 48;
-            // 
-            // bottom
-            // 
-            this.bottom.HeaderText = "bottom";
-            this.bottom.Name = "bottom";
-            this.bottom.Width = 70;
-            // 
-            // IsDevelopmentArea
-            // 
-            this.IsDevelopmentArea.HeaderText = "IsDevelopmentArea";
-            this.IsDevelopmentArea.Name = "IsDevelopmentArea";
-            this.IsDevelopmentArea.Width = 135;
-            // 
-            // lat
-            // 
-            this.lat.HeaderText = "lat";
-            this.lat.Name = "lat";
-            this.lat.Width = 43;
-            // 
-            // lon
-            // 
-            this.lon.HeaderText = "lon";
-            this.lon.Name = "lon";
-            this.lon.Width = 47;
-            // 
-            // imar_tipi
-            // 
-            this.imar_tipi.HeaderText = "imar_tipi";
-            this.imar_tipi.Name = "imar_tipi";
-            this.imar_tipi.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.imar_tipi.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.imar_tipi.Width = 76;
-            // 
-            // ilce
-            // 
-            this.ilce.HeaderText = "ilce";
-            this.ilce.Name = "ilce";
-            this.ilce.Width = 48;
-            // 
-            // taks
-            // 
-            this.taks.HeaderText = "taks";
-            this.taks.Name = "taks";
-            this.taks.Width = 51;
-            // 
-            // agirlik_hiz
-            // 
-            this.agirlik_hiz.HeaderText = "agirlik_hiz";
-            this.agirlik_hiz.Name = "agirlik_hiz";
-            this.agirlik_hiz.Width = 83;
-            // 
-            // baslangic_yili
-            // 
-            this.baslangic_yili.HeaderText = "baslangic_yili";
-            this.baslangic_yili.Name = "baslangic_yili";
             // 
             // YGAPopupForm
             // 
@@ -283,19 +168,5 @@
         private System.Windows.Forms.Panel YGATBottomPanel;
         private System.Windows.Forms.Button YGACancelButton;
         private System.Windows.Forms.Button YGASaveButton;
-        private System.Windows.Forms.DataGridViewTextBoxColumn yasakli_alan_percentage;
-        private System.Windows.Forms.DataGridViewTextBoxColumn id;
-        private System.Windows.Forms.DataGridViewTextBoxColumn left;
-        private System.Windows.Forms.DataGridViewTextBoxColumn right;
-        private System.Windows.Forms.DataGridViewTextBoxColumn top;
-        private System.Windows.Forms.DataGridViewTextBoxColumn bottom;
-        private System.Windows.Forms.DataGridViewTextBoxColumn IsDevelopmentArea;
-        private System.Windows.Forms.DataGridViewTextBoxColumn lat;
-        private System.Windows.Forms.DataGridViewTextBoxColumn lon;
-        private System.Windows.Forms.DataGridViewComboBoxColumn imar_tipi;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ilce;
-        private System.Windows.Forms.DataGridViewTextBoxColumn taks;
-        private System.Windows.Forms.DataGridViewTextBoxColumn agirlik_hiz;
-        private System.Windows.Forms.DataGridViewTextBoxColumn baslangic_yili;
     }
 }

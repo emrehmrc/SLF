@@ -813,7 +813,7 @@ namespace SLF
             // Switch to the results tab after loading all the data
             Modül_Tabları.SelectedTab = tab_ekonometrik;
         }
-        private void ELFPredictionShowResultsButton_Click(object sender, EventArgs e)
+/*        private void ELFPredictionShowResultsButton_Click(object sender, EventArgs e)
         {
             // Set cursor to wait
             Cursor.Current = Cursors.WaitCursor;
@@ -870,7 +870,7 @@ namespace SLF
             }
         }
 
-
+*/
 
         // Helper method for logging output to logTextBox
         private void LogOutput(string message)
@@ -950,47 +950,47 @@ namespace SLF
 
 
 
-        /*        private void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e) 
+        private void ELFPredictionShowResultsButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Set cursor to wait while running the operations
+                Cursor.Current = Cursors.WaitCursor;
+
+                string modifiedFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+
+                // Check if the modified file exists
+                if (!File.Exists(modifiedFilePath))
                 {
-                    try
-                    {
-                        // Set cursor to wait while running the operations
-                        Cursor.Current = Cursors.WaitCursor;
+                    MessageBox.Show("The modified Excel file does not exist. Please save the scena" +
+                        "rio first.");
+                    return;
+                }
 
-                        string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+                // Run the R script
+                string resultsFilePath = RunModelRScript(modifiedFilePath);
 
-                        // Check if the modified file exists
-                        if (!File.Exists(modifiedFilePath))
-                        {
-                            MessageBox.Show("The modified Excel file does not exist. Please save the scena" +
-                                "rio first.");
-                            return;
-                        }
+                if (resultsFilePath == null)
+                {
+                    // If R script failed or no results path was returned, stop further execution
+                    return;
+                }
 
-                        // Run the R script
-                        string resultsFilePath = RunModelRScript(modifiedFilePath);
-
-                        if (resultsFilePath == null)
-                        {
-                            // If R script failed or no results path was returned, stop further execution
-                            return;
-                        }
-
-                        // Load results into tab_ekonometrik
-                        LoadResultsToTabEkonometrik(resultsFilePath);
-                    }
-                    finally
-                    {
-                        // Restore cursor to default
-                        Cursor.Current = Cursors.Default;
-                    }
-                }*/
+                // Load results into tab_ekonometrik
+                LoadResultsToTabEkonometrik(resultsFilePath);
+            }
+            finally
+            {
+                // Restore cursor to default
+                Cursor.Current = Cursors.Default;
+            }
+        }
 
         // Method to run the R script
         private string RunModelRScript(string modifiedFilePath)
         {
             string rScriptPath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\begum_model_deneme.R";
-            string resultsFilePath = "";
+            string resultsFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\";
 
             // Set up process info
             var processInfo = new ProcessStartInfo()
@@ -2572,8 +2572,7 @@ namespace SLF
             initializeCheckBoxes(checkBoxes_stokastik, tagValuesForCheckboxes);
         }
 
-
-        private void FinishPolygonButton_Click(object sender, EventArgs e)
+        private void YGASaveButton_Click(object sender, EventArgs e)
         {
             if (polygonPoints_yga.Count >= 3)  // Ensure polygon is valid (at least 3 points)
             {
@@ -2581,18 +2580,30 @@ namespace SLF
                 DataTable polygonDataTable = cbs.CreatePolygonDataTable(polygonPoints_yga, layer_index);
 
                 // Call PoligonKaydetEventi to save the polygon and handle other operations
-                // For now, pass in the necessary overlays and labels (replace null if needed)
                 PoligonKaydetEventi(sender, e, polygonOverlay_yga, markerOverlay_yga, polygonPoints_yga, Mesafe_yga, mesafe_metre_yga);
+
                 // Clean up after saving the polygon
                 polygonPoints_yga.Clear(); // Clear the list of points for the polygon
+
                 // Show the YGA-specific attribute table popup
                 ShowAttributeTable(polygonDataTable, true);  // `true` indicates it's for YGA
-
-
             }
             else
             {
                 MessageBox.Show("Please draw a polygon with at least 3 points.");
+            }
+        }
+
+        private void ShowAttributeTable(DataTable datatable, bool isYga = false)
+        {
+            // Always update the DataGridView with the DataTable
+            tablo_formu.attribute_table.DataSource = datatable;
+
+            // If it's for YGA, trigger the popup for additional input
+            if (isYga)
+            {
+                // Display the YGA popup form and pass the polygonDataTable
+                ShowYGAPopupForm(datatable);
             }
         }
 
@@ -2610,19 +2621,56 @@ namespace SLF
             }
         }
 
-        public void ShowAttributeTable(DataTable datatable, bool isYga = false)
-        {
-            // Always update the DataGridView with the DataTable
-            tablo_formu.attribute_table.DataSource = datatable;
+        /*        private void YGASaveButton_Click(object sender, EventArgs e)
+                {
+                    if (polygonPoints_yga.Count >= 3)  // Ensure polygon is valid (at least 3 points)
+                    {
+                        // Create a DataTable with polygon data (latitude, longitude, and parameters)
+                        DataTable polygonDataTable = cbs.CreatePolygonDataTable(polygonPoints_yga, layer_index);
 
-            // If it's for YGA, trigger the popup for additional input
-            if (isYga)
-            {
-                // Remove this line from ShowAttributeTable to prevent recursion
-                ShowYGAPopupForm(datatable);  // Display the YGA popup form
-            }
-        }
+                        // Call PoligonKaydetEventi to save the polygon and handle other operations
+                        // For now, pass in the necessary overlays and labels (replace null if needed)
+                        PoligonKaydetEventi(sender, e, polygonOverlay_yga, markerOverlay_yga, polygonPoints_yga, Mesafe_yga, mesafe_metre_yga);
+                        // Clean up after saving the polygon
+                        polygonPoints_yga.Clear(); // Clear the list of points for the polygon
+                        // Show the YGA-specific attribute table popup
+                        ShowAttributeTable(polygonDataTable, true);  // `true` indicates it's for YGA
 
+
+                    }
+                    else
+                    {
+                        MessageBox.Show("Please draw a polygon with at least 3 points.");
+                    }
+                }
+
+                private void ShowYGAPopupForm(DataTable datatable)
+                {
+                    // Create the YGA-specific popup and pass the DataTable for context
+                    YGAPopupForm popup = new YGAPopupForm(datatable);
+
+                    // Show the form as a dialog (blocking until it's closed)
+                    if (popup.ShowDialog() == DialogResult.OK)
+                    {
+                        // After user input, get the updated DataTable from the popup
+                        DataTable updatedData = popup.GetUpdatedData();  // Get the updated table
+                        ShowAttributeTable(updatedData, true);  // Update the UI with the new data for YGA
+                    }
+                }
+
+                public void ShowAttributeTable(DataTable datatable, bool isYga = false)
+                {
+                    // Always update the DataGridView with the DataTable
+                    tablo_formu.attribute_table.DataSource = datatable;
+
+                    // If it's for YGA, trigger the popup for additional input
+                    if (isYga)
+                    {
+                        // Remove this line from ShowAttributeTable to prevent recursion
+                        ShowYGAPopupForm(datatable);  // Display the YGA popup form
+                    }
+                }
+        */
 
         // mouse down event of the checkboxes which displays the related data table with the corresponding
         // checkbox/layer
