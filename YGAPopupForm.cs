@@ -101,8 +101,6 @@ namespace SLF
                 MessageBox.Show("Operation cancelled.");
             }
         }
-
-        // Save as shapefile method
         private void SaveAsShapefile(DataTable dataTable, string filePath)
         {
             try
@@ -115,15 +113,20 @@ namespace SLF
                     return;
                 }
 
-                // Add fields for the attributes
+                // Add fields for the attributes with dynamic field types based on DataColumn data type
                 foreach (DataColumn column in dataTable.Columns)
                 {
+                    FieldType fieldType = column.DataType == typeof(int) || column.DataType == typeof(long) ? FieldType.INTEGER_FIELD :
+                                          column.DataType == typeof(double) || column.DataType == typeof(float) ? FieldType.DOUBLE_FIELD :
+                                          FieldType.STRING_FIELD;
+
                     Field field = new Field
                     {
                         Name = column.ColumnName,
-                        Type = FieldType.STRING_FIELD,
+                        Type = fieldType,
                         Width = 50
                     };
+
                     shapefile.EditInsertField(field, shapefile.NumFields);
                 }
 
@@ -133,14 +136,23 @@ namespace SLF
                     var shape = new MapWinGIS.Shape();
                     shape.Create(ShpfileType.SHP_POLYGON);
 
-                    // Here, assuming that the coordinates are stored as "Coordinates" column in WKT format
-                    string[] coordinateStrings = row["Coordinates"].ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    // Ensure coordinates are correctly formatted as WKT (Well-Known Text)
+                    string coordinatesString = row["Coordinates"].ToString();
+                    coordinatesString = coordinatesString.Replace("Polygon ((", "").Replace("))", ""); // Remove POLYGON (()) part
+                    string[] coordinateStrings = coordinatesString.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
                     foreach (var coordinateString in coordinateStrings)
                     {
-                        var coordinates = coordinateString.Trim('(', ')').Split(' ');
+                        string[] coordinates = coordinateString.Trim().Split(' '); // Split by space to get lat, lon
+
                         if (coordinates.Length == 2 && double.TryParse(coordinates[0], out double lat) && double.TryParse(coordinates[1], out double lon))
                         {
                             shape.InsertPoint(new MapWinGIS.Point { x = lon, y = lat }, shape.numPoints);
+                        }
+                        else
+                        {
+                            MessageBox.Show($"Invalid coordinates format: {coordinateString}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            continue; // Skip invalid coordinates
                         }
                     }
 
@@ -152,7 +164,7 @@ namespace SLF
                         continue;
                     }
 
-                    // Insert attributes
+                    // Insert attribute data into the shapefile
                     int shapeIndex = shapefile.NumShapes - 1;
                     for (int i = 0; i < dataTable.Columns.Count; i++)
                     {
@@ -171,6 +183,86 @@ namespace SLF
                 MessageBox.Show($"Error saving shapefile: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+
+        // Save as shapefile method
+        /*        private void SaveAsShapefile(DataTable dataTable, string filePath)
+                {
+                    try
+                    {
+                        // Create a new Shapefile object
+                        Shapefile shapefile = new Shapefile();
+                        if (!shapefile.CreateNew(filePath, ShpfileType.SHP_POLYGON))
+                        {
+                            MessageBox.Show($"Failed to create shapefile: {shapefile.ErrorMsg[shapefile.LastErrorCode]}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        // Add fields for the attributes
+                        foreach (DataColumn column in dataTable.Columns)
+                        {
+                            Field field = new Field
+                            {
+                                Name = column.ColumnName,
+                                Type = FieldType.STRING_FIELD,
+                                Width = 50
+                            };
+                            shapefile.EditInsertField(field, shapefile.NumFields);
+                        }
+
+                        // Add polygons and attribute data
+                        foreach (DataRow row in dataTable.Rows)
+                        {
+                            var shape = new MapWinGIS.Shape();
+                            shape.Create(ShpfileType.SHP_POLYGON);
+
+                            // Ensure coordinates are correctly formatted as lat, lon pairs
+                            string coordinatesString = row["Coordinates"].ToString();
+                            string[] coordinateStrings = coordinatesString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                            for (int i = 0; i < coordinateStrings.Length; i += 2)  // Step by 2 since lat/lon are pairs
+                            {
+                                string latString = coordinateStrings[i];
+                                string lonString = coordinateStrings[i + 1];
+
+                                if (double.TryParse(latString, out double lat) && double.TryParse(lonString, out double lon))
+                                {
+                                    shape.InsertPoint(new MapWinGIS.Point { x = lon, y = lat }, shape.numPoints);
+                                }
+                                else
+                                {
+                                    MessageBox.Show($"Invalid coordinates format: {coordinateStrings[i]} {coordinateStrings[i + 1]}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    continue; // Skip invalid coordinates
+                                }
+                            }
+
+                            // Insert the shape into the shapefile
+                            bool shapeInserted = shapefile.EditInsertShape(shape, shapefile.NumShapes);
+                            if (!shapeInserted)
+                            {
+                                MessageBox.Show($"Failed to insert shape: {shapefile.ErrorMsg[shapefile.LastErrorCode]}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                continue;
+                            }
+
+                            // Insert attributes
+                            int shapeIndex = shapefile.NumShapes - 1;
+                            for (int i = 0; i < dataTable.Columns.Count; i++)
+                            {
+                                shapefile.EditCellValue(i, shapeIndex, row[i]?.ToString());
+                            }
+                        }
+
+                        // Save the shapefile
+                        shapefile.SaveAs(filePath);
+                        shapefile.Close();
+
+                        MessageBox.Show($"Shapefile saved successfully at: {filePath}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error saving shapefile: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }*/
         // Get the updated DataTable from the form
         public DataTable GetUpdatedData()
         {

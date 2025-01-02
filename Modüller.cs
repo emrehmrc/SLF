@@ -2577,16 +2577,17 @@ namespace SLF
             if (polygonPoints_yga.Count >= 3)  // Ensure polygon is valid (at least 3 points)
             {
                 // Create a DataTable with polygon data (latitude, longitude, and parameters)
-                DataTable polygonDataTable = cbs.YGACreatePolygonDataTable(polygonPoints_yga, layer_index);
+                DataTable polygonDataTable = cbs.CreatePolygonDataTable(polygonPoints_yga, layer_index);
 
-                // Call PoligonKaydetEventi to save the polygon and handle other operations
-                PoligonKaydetEventi(sender, e, polygonOverlay_yga, markerOverlay_yga, polygonPoints_yga, Mesafe_yga, mesafe_metre_yga);
+
 
                 // Clean up after saving the polygon
                 polygonPoints_yga.Clear(); // Clear the list of points for the polygon
 
                 // Show the YGA-specific attribute table popup
                 ShowAttributeTable(polygonDataTable, true);  // `true` indicates it's for YGA
+                                                             // Call PoligonKaydetEventi to save the polygon and handle other operations
+                PoligonKaydetEventi(sender, e, polygonOverlay_yga, markerOverlay_yga, polygonPoints_yga, Mesafe_yga, mesafe_metre_yga);
             }
             else
             {
@@ -2744,40 +2745,98 @@ namespace SLF
                 }
             }
         }
-
         private void temizleToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
             ToolStripMenuItem delete_menu_item = sender as ToolStripMenuItem;
 
             if (delete_menu_item != null)
             {
                 System.Windows.Forms.CheckBox checkBox = delete_menu_item.Tag as System.Windows.Forms.CheckBox;
-                int checkbox_index = int.Parse(checkBox.Tag.ToString()) - 1;
 
-                if (cbs.tüm_katmanlar_array[checkbox_index] != null)
+                // Ensure the Tag is set and is a valid number
+                if (checkBox != null && checkBox.Tag != null)
                 {
-                    string katman_ismi = cbs.tüm_katmanlar_array_names[checkbox_index];
-
-                    DialogResult temizle_result = MessageBox.Show(katman_ismi + " isimli katman " +
-                        "silinecektir. Emin misiniz?", "", MessageBoxButtons.YesNo);
-
-                    if (temizle_result == DialogResult.Yes)
+                    int checkbox_index;
+                    if (int.TryParse(checkBox.Tag.ToString(), out checkbox_index))
                     {
-                        cbs.GetActiveGMapControl().Overlays.Remove(cbs.tüm_katmanlar_array[checkbox_index]);
-                        cbs.GetActiveGMapControl().Refresh();
+                        checkbox_index -= 1;  // Adjust for 0-based indexing
 
-                        cbs.tüm_katmanlar_array[checkbox_index].Dispose();
-                        cbs.tüm_katmanlar_array[checkbox_index] = null;
-                        cbs.tüm_katmanlar_array_names[checkbox_index] = null;
-                        cbs.tüm_katmanlar_datatable[checkbox_index] = null;
-                        checkBox.Checked = false;
-                        checkBox.Visible = false;
+                        // Ensure the index is within bounds of the array and the item exists
+                        if (checkbox_index >= 0 && checkbox_index < cbs.tüm_katmanlar_array.Length &&
+                            cbs.tüm_katmanlar_array[checkbox_index] != null)
+                        {
+                            string katman_ismi = cbs.tüm_katmanlar_array_names[checkbox_index];
 
+                            DialogResult temizle_result = MessageBox.Show(katman_ismi + " isimli katman " +
+                                "silinecektir. Emin misiniz?", "", MessageBoxButtons.YesNo);
+
+                            if (temizle_result == DialogResult.Yes)
+                            {
+                                // Safe removal from overlays
+                                if (cbs.tüm_katmanlar_array[checkbox_index] != null)
+                                {
+                                    cbs.GetActiveGMapControl().Overlays.Remove(cbs.tüm_katmanlar_array[checkbox_index]);
+                                    cbs.GetActiveGMapControl().Refresh();
+                                }
+
+                                // Dispose and nullify references
+                                cbs.tüm_katmanlar_array[checkbox_index]?.Dispose();
+                                cbs.tüm_katmanlar_array[checkbox_index] = null;
+                                cbs.tüm_katmanlar_array_names[checkbox_index] = null;
+                                cbs.tüm_katmanlar_datatable[checkbox_index] = null;
+
+                                // Hide and uncheck the checkbox
+                                checkBox.Checked = false;
+                                checkBox.Visible = false;
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("Invalid index or layer not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Invalid checkbox tag.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
         }
+
+
+        /*        private void temizleToolStripMenuItem_Click(object sender, EventArgs e)
+                {
+
+                    ToolStripMenuItem delete_menu_item = sender as ToolStripMenuItem;
+
+                    if (delete_menu_item != null)
+                    {
+                        System.Windows.Forms.CheckBox checkBox = delete_menu_item.Tag as System.Windows.Forms.CheckBox;
+                        int checkbox_index = int.Parse(checkBox.Tag.ToString()) - 1;
+
+                        if (cbs.tüm_katmanlar_array[checkbox_index] != null)
+                        {
+                            string katman_ismi = cbs.tüm_katmanlar_array_names[checkbox_index];
+
+                            DialogResult temizle_result = MessageBox.Show(katman_ismi + " isimli katman " +
+                                "silinecektir. Emin misiniz?", "", MessageBoxButtons.YesNo);
+
+                            if (temizle_result == DialogResult.Yes)
+                            {
+                                cbs.GetActiveGMapControl().Overlays.Remove(cbs.tüm_katmanlar_array[checkbox_index]);
+                                cbs.GetActiveGMapControl().Refresh();
+
+                                cbs.tüm_katmanlar_array[checkbox_index].Dispose();
+                                cbs.tüm_katmanlar_array[checkbox_index] = null;
+                                cbs.tüm_katmanlar_array_names[checkbox_index] = null;
+                                cbs.tüm_katmanlar_datatable[checkbox_index] = null;
+                                checkBox.Checked = false;
+                                checkBox.Visible = false;
+
+                            }
+                        }
+                    }
+                }*/
 
         private void rengiDeğiştirToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -4097,7 +4156,6 @@ namespace SLF
         {
             if (e.Button == MouseButtons.Left)
             {
-
 
                 if (cbs.tüm_katmanlar_array[layer_index] != null)
                 {

@@ -403,11 +403,69 @@ namespace SLF
             // add the resulting row to the datatable
             data_table.Rows.Add(row);
 
-            // Bind the DataTable to the DataGridView
-            dataGridView.DataSource = data_table;
+            // Check if Invoke is needed for cross-thread operations
+            if (dataGridView.InvokeRequired)
+            {
+                // If we are on a background thread, invoke the operation on the UI thread
+                dataGridView.Invoke(new Action(() =>
+                {
+                    dataGridView.DataSource = data_table;
+                }));
+            }
+            else
+            {
+                // If we are on the UI thread, directly set the DataSource
+                dataGridView.DataSource = data_table;
+            }
 
-            return (data_table);
+            return data_table;
         }
+        /*private System.Data.DataTable LoadAttributeTable(DataRow row, DataGridView dataGridView,
+            ShapefileDataReader shapefile_reader, System.Data.DataTable data_table, int row_cnt)
+        {
+            // Ensure the DataTable has the same number of columns as the shapefile fields
+            if (data_table.Columns.Count == 0)  // Check if columns are not already added
+            {
+                // Add "Row_No" column to the DataTable
+                data_table.Columns.Add("Row_No", typeof(int));
+
+                // Add columns for each shapefile field dynamically based on the shapefile's header
+                for (int i = 0; i < shapefile_reader.DbaseHeader.NumFields; i++)
+                {
+                    string fieldName = shapefile_reader.DbaseHeader.Fields[i].Name; // Correctly access the field name
+                    data_table.Columns.Add(fieldName, typeof(string)); // Assuming string type for all fields
+                }
+            }
+
+            // Populate the new row using the .GetValue method
+            row["Row_No"] = row_cnt;  // Set the row number
+
+            for (int i = 0; i < shapefile_reader.DbaseHeader.NumFields; i++)  // Start from 0 for valid indexing
+            {
+                row[shapefile_reader.DbaseHeader.Fields[i].Name] = shapefile_reader.GetValue(i); // Use field names to insert values
+            }
+
+            // Add the resulting row to the DataTable
+            data_table.Rows.Add(row);
+
+            // Check if Invoke is needed for cross-thread operations
+            if (dataGridView.InvokeRequired)
+            {
+                // If we are on a background thread, invoke the operation on the UI thread
+                dataGridView.Invoke(new Action(() =>
+                {
+                    dataGridView.DataSource = data_table;
+                }));
+            }
+            else
+            {
+                // If we are on the UI thread, directly set the DataSource
+                dataGridView.DataSource = data_table;
+            }
+
+            return data_table;
+        }
+*/
 
         public void AddPolygonToOverlay(NetTopologySuite.Geometries.Polygon polygon,
                 GMapOverlay overlay, string gMapPolygonId, DataRow attributes)
@@ -465,6 +523,65 @@ namespace SLF
             overlay.Polygons.Add(polygon);
             polygonAttributes[polygon] = attributes;
         }
+
+        /*        public MapWinGIS.Shapefile ConvertOverlayToShapefile(GMapOverlay overlay)
+                {
+                    var shapefile = new MapWinGIS.Shapefile();
+                    shapefile.CreateNewWithShapeID("", ShpfileType.SHP_POLYGON);
+
+                    // Ensure attributes are added as fields
+                    if (polygonAttributes.Count > 0)
+                    {
+                        var firstPolygon = polygonAttributes.Keys.First();
+                        var firstRow = polygonAttributes[firstPolygon];
+
+                        // Dynamically handle different field types based on DataColumn data type
+                        foreach (DataColumn column in firstRow.Table.Columns)
+                        {
+                            FieldType fieldType = column.DataType == typeof(int) || column.DataType == typeof(long) ? FieldType.INTEGER_FIELD :
+                                                  column.DataType == typeof(double) || column.DataType == typeof(float) ? FieldType.DOUBLE_FIELD :
+                                                  FieldType.STRING_FIELD;
+
+                            shapefile.EditAddField(column.ColumnName, fieldType, 50, 10);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("No attributes found for polygons.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+
+                    foreach (var gMapPolygon in overlay.Polygons)
+                    {
+                        var shape = new MapWinGIS.Shape();
+                        shape.Create(ShpfileType.SHP_POLYGON);
+
+                        // Add points to shape from polygon
+                        for (int i = 0; i < gMapPolygon.Points.Count; i++)
+                        {
+                            var point = new MapWinGIS.Point
+                            {
+                                x = gMapPolygon.Points[i].Lng,
+                                y = gMapPolygon.Points[i].Lat
+                            };
+                            shape.InsertPoint(point, ref i);
+                        }
+
+                        int shapeIndex = shapefile.NumShapes;
+                        shapefile.EditInsertShape(shape, ref shapeIndex);
+
+                        // Add attributes to the shape
+                        if (polygonAttributes.TryGetValue(gMapPolygon, out DataRow row))
+                        {
+                            for (int i = 0; i < row.Table.Columns.Count; i++)
+                            {
+                                // Add attribute value from the DataRow to the shapefile
+                                shapefile.EditCellValue(i, shapeIndex, row[i]?.ToString());
+                            }
+                        }
+                    }
+
+                    return shapefile;
+                }*/
 
 
         public MapWinGIS.Shapefile ConvertOverlayToShapefile(GMapOverlay overlay)
@@ -1759,7 +1876,7 @@ namespace SLF
             string poligonIsim = $"Poligon_{polygonOverlay.Polygons.Count + 1}";
             GMapPolygon polygon = new GMapPolygon(polygonPoints, poligonIsim)
             {
-                Stroke = new Pen(System.Drawing.Color.DarkBlue, 3)
+                Stroke = new Pen(System.Drawing.Color.Purple, 2)
             };
 
             // Mevcut poligonları silmeden yeni poligonu ekle
@@ -1771,6 +1888,7 @@ namespace SLF
         public DataTable YGACreatePolygonDataTable(List<PointLatLng> polygonPoints, int polygonId)
         {
             DataTable dt = new DataTable();
+            dt.Columns.Add("Row_No", typeof(int));
             dt.Columns.Add("PolygonID", typeof(int));
             dt.Columns.Add("Coordinates", typeof(string));
             dt.Columns.Add("Area_Size(m2)", typeof(string));
@@ -1789,6 +1907,7 @@ namespace SLF
 
             // Create a new row
             DataRow row = dt.NewRow();
+            row["Row_No"] = "";
             row["PolygonID"] = polygonId;
             row["Coordinates"] = coordinates;
             row["Area_Size(m2)"] = Math.Round(area, 0).ToString();
@@ -1809,21 +1928,92 @@ namespace SLF
             dt.Columns.Add("PolygonID", typeof(int));
             dt.Columns.Add("Coordinates", typeof(string));
             dt.Columns.Add("Area_Size(m2)", typeof(string));
+            dt.Columns.Add("baslangic_yili", typeof(string)); // Add custom fields
+            dt.Columns.Add("ilce", typeof(string));          // Add custom fields
+            dt.Columns.Add("imar_tipi", typeof(string));     // Add custom fields
+            dt.Columns.Add("IsDevelopmentArea", typeof(string)); // Add custom fields
+            dt.Columns.Add("yasakli_alan_percentage", typeof(string)); // Add custom fields
+            dt.Columns.Add("agirlik_hiz", typeof(string));   // Add custom fields
+            dt.Columns.Add("taks", typeof(string));          // Add custom fields
 
-            // Create a string representation of the coordinates
-            string coordinates = string.Join(", ", polygonPoints.Select(p => $"({p.Lat}, {p.Lng})"));
+            // Create a string representation of the coordinates in WKT format
+            string coordinates = $"Polygon (({string.Join(", ", polygonPoints.Select(p => $"{p.Lat} {p.Lng}"))}))";
 
             double area = CalculatePolygonArea(polygonPoints);
 
             // Create a new row
             DataRow row = dt.NewRow();
             row["PolygonID"] = polygonId;
-            row["Coordinates"] = coordinates;
+            row["Coordinates"] = coordinates;  // Store as WKT format
             row["Area_Size(m2)"] = Math.Round(area, 0).ToString();
+            row["baslangic_yili"] = ""; // Default empty value
+            row["ilce"] = ""; // Default empty value
+            row["imar_tipi"] = ""; // Default empty value
+            row["IsDevelopmentArea"] = ""; // Default empty value
+            row["yasakli_alan_percentage"] = ""; // Default empty value
+            row["agirlik_hiz"] = ""; // Default empty value
+            row["taks"] = ""; // Default empty value
             dt.Rows.Add(row);
 
             return dt;
         }
+        /*        public System.Data.DataTable CreatePolygonDataTable(List<PointLatLng> polygonPoints, int polygonId)
+                {
+                    System.Data.DataTable dt = new System.Data.DataTable();
+                    dt.Columns.Add("PolygonID", typeof(int));
+                    dt.Columns.Add("Coordinates", typeof(string));
+                    dt.Columns.Add("Area_Size(m2)", typeof(string));
+                    dt.Columns.Add("baslangic_yili", typeof(string)); // Add custom fields
+                    dt.Columns.Add("ilce", typeof(string));          // Add custom fields
+                    dt.Columns.Add("imar_tipi", typeof(string));     // Add custom fields
+                    dt.Columns.Add("IsDevelopmentArea", typeof(string)); // Add custom fields
+                    dt.Columns.Add("yasakli_alan_percentage", typeof(string)); // Add custom fields
+                    dt.Columns.Add("agirlik_hiz", typeof(string));   // Add custom fields
+                    dt.Columns.Add("taks", typeof(string));          // Add custom fields
+
+                    // Create a string representation of the coordinates in a space-separated format
+                    string coordinates = string.Join(" ", polygonPoints.Select(p => $"{p.Lat} {p.Lng}"));
+
+                    double area = CalculatePolygonArea(polygonPoints);
+
+                    // Create a new row
+                    DataRow row = dt.NewRow();
+                    row["PolygonID"] = polygonId;
+                    row["Coordinates"] = coordinates;  // Store as space-separated "lat lon" instead of "(lat, lon)"
+                    row["Area_Size(m2)"] = Math.Round(area, 0).ToString();
+                    row["baslangic_yili"] = ""; // Default empty value
+                    row["ilce"] = ""; // Default empty value
+                    row["imar_tipi"] = ""; // Default empty value
+                    row["IsDevelopmentArea"] = ""; // Default empty value
+                    row["yasakli_alan_percentage"] = ""; // Default empty value
+                    row["agirlik_hiz"] = ""; // Default empty value
+                    row["taks"] = ""; // Default empty value
+                    dt.Rows.Add(row);
+
+                    return dt;
+                }*/
+
+        /*        public System.Data.DataTable CreatePolygonDataTable(List<PointLatLng> polygonPoints, int polygonId)
+                {
+                    System.Data.DataTable dt = new System.Data.DataTable();
+                    dt.Columns.Add("PolygonID", typeof(int));
+                    dt.Columns.Add("Coordinates", typeof(string));
+                    dt.Columns.Add("Area_Size(m2)", typeof(string));
+
+                    // Create a string representation of the coordinates
+                    string coordinates = string.Join(", ", polygonPoints.Select(p => $"({p.Lat}, {p.Lng})"));
+
+                    double area = CalculatePolygonArea(polygonPoints);
+
+                    // Create a new row
+                    DataRow row = dt.NewRow();
+                    row["PolygonID"] = polygonId;
+                    row["Coordinates"] = coordinates;
+                    row["Area_Size(m2)"] = Math.Round(area, 0).ToString();
+                    dt.Rows.Add(row);
+
+                    return dt;
+                }*/
 
         public double CalculatePolygonArea(List<PointLatLng> points)
         {
