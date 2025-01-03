@@ -4201,6 +4201,115 @@ namespace SLF
                 }
             }
         }
+        /*        private void gMapControl_imar_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
+                {
+                    // Check if the left mouse button was clicked and if lastClickedCheckbox is valid
+                    if (e.Button == MouseButtons.Left && lastClickedCheckbox != null)
+                    {
+                        // Ensure the Tag property of lastClickedCheckbox is a valid integer
+                        if (int.TryParse(lastClickedCheckbox.Tag.ToString(), out int checkboxIndex))
+                        {
+                            checkboxIndex--; // Adjust index since Tag is assumed to be 1-based
+
+                            // Check if the index is within range of the available layers
+                            if (checkboxIndex >= 0 && checkboxIndex < cbs.tüm_katmanlar_array.Length)
+                            {
+                                var layer = cbs.tüm_katmanlar_array[checkboxIndex];
+
+                                // Iterate through polygons in the selected layer
+                                foreach (var polygon in layer.Polygons)
+                                {
+                                    // Check if the clicked point is inside the polygon
+                                    if (cbs.IsPointInPolygon(pointClick, polygon))
+                                    {
+                                        // Highlight the polygon on the map
+                                        cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
+
+                                        // Update the layer index and show the attributes for the clicked polygon
+                                        layer_index = checkboxIndex;
+
+                                        // Retrieve the polygon's attributes from the dictionary
+                                        if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
+                                        {
+                                            ShowAttributeRow(row);
+                                            tablo_formu.Show();
+                                        }
+                                        else
+                                        {
+                                            // Optionally, log or show a message if the polygon has no attributes
+                                            Console.WriteLine("No attributes found for this polygon.");
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // Optionally, log or show a message if the checkbox index is out of range
+                                Console.WriteLine("Invalid checkbox index.");
+                            }
+                        }
+                        else
+                        {
+                            // Optionally, log or show a message if the Tag value is invalid
+                            Console.WriteLine("Invalid checkbox Tag value.");
+                        }
+                    }
+                    else
+                    {
+                        // Optionally, log or show a message if the left mouse button was not clicked or lastClickedCheckbox is null
+                        Console.WriteLine("Left mouse button not clicked or lastClickedCheckbox is null.");
+                    }
+                }
+
+                // Show a single row corresponding to the clicked polygon
+                private void ShowAttributeRow(DataRow row)
+                {
+                    if (row != null)
+                    {
+                        DataTable singleRowTable = row.Table.Clone(); // Clone the structure of the original table
+                        singleRowTable.ImportRow(row); // Import the specific row into the new table
+                        ShowAttributeTable(singleRowTable);  // Pass the second argument (false as default)
+                    }
+                    else
+                    {
+                        // Optionally, log or show a message if the row is null
+                        Console.WriteLine("The row is null.");
+                    }
+                }
+
+
+                private void ShowAttributeTable(DataTable datatable, bool isYga = false)
+                {
+                    // Check if the DataTable is not null and ensure the DataGridView exists and is initialized
+                    if (datatable != null)
+                    {
+                        if (tablo_formu != null && tablo_formu.attribute_table != null)
+                        {
+                            // Update the DataGridView with the DataTable
+                            tablo_formu.attribute_table.DataSource = datatable;
+
+                            // Optionally, log to ensure the DataTable is correctly set
+                            Console.WriteLine("DataTable has been set to DataGridView.");
+
+                            // If it's for YGA, trigger the YGA popup form for additional input
+                            if (isYga)
+                            {
+                                ShowYGAPopupForm(datatable);
+                            }
+                        }
+                        else
+                        {
+                            // Log if tablo_formu or attribute_table is null
+                            Console.WriteLine("tablo_formu or tablo_formu.attribute_table is null.");
+                        }
+                    }
+                    else
+                    {
+                        // Log if the DataTable is null
+                        Console.WriteLine("The DataTable is null.");
+                    }
+                }*/
+
 
         private void gMapControl_imar_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
         {
