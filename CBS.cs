@@ -148,7 +148,6 @@ namespace SLF
 
         //-----------------------------------------------------------------------------//
 
-
         public async Task cbs_dosya_secimi(GMapControl gmapcontrol, Form callingForm, DataGridView dataGridView)
         {
             // Find the first available slot in the array that holds shapefile overlay layers
@@ -160,168 +159,273 @@ namespace SLF
                 return;
             }
 
-            // file dialog to select a file to import
-            OpenFileDialog vektorel_veri_seçimi = new OpenFileDialog();
-
-            string targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
-            vektorel_veri_seçimi.Filter = "Shapefile|*.shp|Google Earth File|*.kml|CSV File|*.csv";
-            vektorel_veri_seçimi.InitialDirectory = targetDirectory;
-
-            DialogResult result = vektorel_veri_seçimi.ShowDialog();
-
-            if (result == DialogResult.OK)
+            // File dialog to select a file to import
+            using (OpenFileDialog fileDialog = new OpenFileDialog())
             {
-                string filepath = vektorel_veri_seçimi.FileName;
-                string filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
-                string extension = filename.Substring(filename.Length - 3);
+                string targetDirectory = Path.Combine(userProfilePath, "Desktop");
+                fileDialog.Filter = "Shapefile|*.shp|Google Earth File|*.kml|CSV File|*.csv";
+                fileDialog.InitialDirectory = targetDirectory;
 
-                if (extension == "shp")
+                if (fileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    // create a new layer to be added onto the map
-                    GMapOverlay shapeFileOverlay_imar = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_imar");
-                    GMapOverlay shapeFileOverlay_yuk = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_yuk");
-                    GMapOverlay shapeFileOverlay_stokastik = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_stokastik");
-                    GMapOverlay shapeFileOverlay_yga = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_yga");
+                    string filepath = fileDialog.FileName;
+                    string filename = Path.GetFileName(filepath);
+                    string extension = Path.GetExtension(filename)?.ToLower();
 
-                    modülFormu.gMapControl_imar.Overlays.Add(shapeFileOverlay_imar);
-                    modülFormu.gMapControl_yuk.Overlays.Add(shapeFileOverlay_yuk);
-                    modülFormu.gMapControl_stokastik.Overlays.Add(shapeFileOverlay_stokastik);
-                    modülFormu.gMapControl_yga.Overlays.Add(shapeFileOverlay_yga);
-
-                    // create a new datatable to be added to the tüm_katmanlar_datatable array
-                    System.Data.DataTable shapefile_datatable = new System.Data.DataTable();
-
-                    // run the import method
-                    callingForm.Cursor = Cursors.WaitCursor;
-                    await LoadShapefile(filepath, shapeFileOverlay_imar, shapefile_datatable, dataGridView);
-                    callingForm.Cursor = Cursors.Default;
-
-                    // Duplicate the polygons and routes from shapeFileOverlay_imar into each new overlay
-                    CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_yuk);
-                    CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_stokastik);
-                    CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_yga);
-                    // Assign the appropriate overlay based on the layer index
-                    // Assuming you have a mapping between layer indices and overlays
-/*                    tüm_katmanlar_array[layer_index] = shapeFileOverlay_imar;
-                    tüm_katmanlar_array_names[layer_index] = filename;
-                    tüm_katmanlar_datatable[layer_index] = shapefile_datatable;
-
-                    // Get the list of associated checkboxes for the given layer_index
-                    List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
-
-                    if (associatedCheckBoxes != null)
+                    switch (extension)
                     {
-                        // Loop through each checkbox in the list and apply the required settings
-                        foreach (var checkBox in associatedCheckBoxes)
-                        {
-                            checkBox.Checked = true;
-                            checkBox.Visible = true;
-                            checkBox.Text = tüm_katmanlar_array_names[layer_index];
-                        }
-                    }*/
-                    // add the layer and its name to the specified arrays
+                        case ".shp":
+                            await ProcessShapefile(filepath, filename, callingForm, dataGridView);
+                            break;
 
-                    if (layer_index >= 0 && layer_index < tüm_katmanlar_array.Length)
-                    {
-                        // Create an array of overlays to assign
-                        GMapOverlay[] overlays = { shapeFileOverlay_imar, shapeFileOverlay_stokastik, shapeFileOverlay_yga };
+                        case ".kml":
+                            await ProcessKml(filepath, filename, callingForm, gmapcontrol);
+                            break;
 
-                        // Loop through overlays and assign them to the array
-                        for (int i = 0; i < overlays.Length; i++)
-                        {
-                            tüm_katmanlar_array[layer_index] = overlays[i];
-                            System.Diagnostics.Debug.WriteLine($"Assigned overlay {overlays[i].Id} to layer index: {layer_index}");
-                        }
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine($"Invalid layer index: {layer_index}");
-                    }
-
-                    tüm_katmanlar_array_names[layer_index] = filename;
-                    tüm_katmanlar_datatable[layer_index] = shapefile_datatable;
-                    List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
-
-                    if (associatedCheckBoxes != null)
-                    {
-                        foreach (var checkBox in associatedCheckBoxes)
-                        {
-                            checkBox.Text =  tüm_katmanlar_array_names[layer_index];
-                            Console.WriteLine(checkBox.Text);
-                            // Apply common settings for checkboxes
-                            checkBox.Checked = true;
-                            checkBox.Visible = true;
-                        }
-                    }
-
-                    /*                    // Get the list of associated checkboxes for the given layer_index
-                                        List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
-
-                                        if (associatedCheckBoxes != null)
-                                        {
-                                            // Loop through each checkbox in the list and apply the required settings
-                                            foreach (var checkBox in associatedCheckBoxes)
-                                            {
-                                                checkBox.Checked = true;
-                                                checkBox.Visible = true;
-                                                checkBox.Text = tüm_katmanlar_array_names[layer_index];
-                                            }
-                                        }*/
-
-                    //LoadShapefileIntoOverlay(shapeFileOverlay_imar, tüm_katmanlar_datatable[0]);
-                }
-                else if (extension == "kml")
-                {
-                    GMapOverlay kmlOverlay_imar = new GMapOverlay($"kmlOverlay_{layer_index + 1}_imar");
-                    GMapOverlay kmlOverlay_yuk = new GMapOverlay($"kmlOverlay_{layer_index + 1}_yuk");
-                    GMapOverlay kmlOverlay_stokastik = new GMapOverlay($"kmlOverlay_{layer_index + 1}_stokastik");
-                    GMapOverlay kmlOverlay_yga = new GMapOverlay($"kmlOverlay_{layer_index + 1}_yga");
-
-                    modülFormu.gMapControl_imar.Overlays.Add(kmlOverlay_imar);
-                    modülFormu.gMapControl_yuk.Overlays.Add(kmlOverlay_yuk);
-                    modülFormu.gMapControl_stokastik.Overlays.Add(kmlOverlay_stokastik);
-                    modülFormu.gMapControl_yga.Overlays.Add(kmlOverlay_yga);
-
-                    System.Data.DataTable kml_datatable = new System.Data.DataTable();
-                    callingForm.Cursor = Cursors.WaitCursor;
-                    await LoadKmlFile(filepath, kmlOverlay_imar, kml_datatable, gmapcontrol);
-
-                    tüm_katmanlar_array[layer_index] = kmlOverlay_imar;
-                    tüm_katmanlar_array_names[layer_index] = filename;
-                    tüm_katmanlar_datatable[layer_index] = kml_datatable;
-
-                    // convert .kml overlay into a MapWinGIS.Shapefile object
-                    polygonAttributes_kml = new Dictionary<GMapPolygon, DataRow>();
-                    routeAttributes_kml = new Dictionary<GMapRoute, DataRow>();
-                    MapWinGIS.Shapefile shapefile = ConvertKmlToShapefile(kmlOverlay_imar);
-                    shapeFileArray_MapWinGIS[layer_index] = shapefile;
-
-                    // Duplicate the polygons and routes from shapeFileOverlay_imar into each new overlay
-                    CopyOverlayContents(kmlOverlay_imar, kmlOverlay_yuk);
-                    CopyOverlayContents(kmlOverlay_imar, kmlOverlay_stokastik);
-                    CopyOverlayContents(kmlOverlay_imar, kmlOverlay_yga);
-
-                    callingForm.Cursor = Cursors.Default;
-
-                    // Get the list of associated checkboxes for the given layer_index
-                    List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
-
-                    if (associatedCheckBoxes != null)
-                    {
-                        // Loop through each checkbox in the list and apply the required settings
-                        foreach (var checkBox in associatedCheckBoxes)
-                        {
-                            checkBox.Checked = true;
-                            checkBox.Visible = true;
-                            checkBox.Text = tüm_katmanlar_array_names[layer_index];
-                        }
+                        default:
+                            MessageBox.Show("Geçersiz dosya formatı.");
+                            break;
                     }
                 }
             }
+
             gmapcontrol.Refresh();
             gmapcontrol.ReloadMap();
-
         }
+
+        private async Task ProcessShapefile(string filepath, string filename, Form callingForm, DataGridView dataGridView)
+        {
+            GMapOverlay[] overlays = CreateOverlays("shp");
+            foreach (var overlay in overlays)
+            {
+                modülFormu.gMapControl_imar.Overlays.Add(overlay);
+                modülFormu.gMapControl_yuk.Overlays.Add(overlay);
+                modülFormu.gMapControl_stokastik.Overlays.Add(overlay);
+                modülFormu.gMapControl_yga.Overlays.Add(overlay);
+
+            }
+
+            System.Data.DataTable shapefileDatatable = new System.Data.DataTable();
+            callingForm.Cursor = Cursors.WaitCursor;
+            await LoadShapefile(filepath, overlays[0], shapefileDatatable, dataGridView);
+            callingForm.Cursor = Cursors.Default;
+
+            AddLayerToArrays(overlays[0], filename, shapefileDatatable);
+            HandleCheckBoxes(layer_index, filename);
+        }
+
+        private async Task ProcessKml(string filepath, string filename, Form callingForm, GMapControl gmapcontrol)
+        {
+            GMapOverlay[] overlays = CreateOverlays("kml");
+            foreach (var overlay in overlays)
+            {
+                modülFormu.gMapControl_imar.Overlays.Add(overlay);
+                modülFormu.gMapControl_yuk.Overlays.Add(overlay);
+                modülFormu.gMapControl_stokastik.Overlays.Add(overlay);
+                modülFormu.gMapControl_yga.Overlays.Add(overlay);
+            }
+
+            System.Data.DataTable kmlDatatable = new System.Data.DataTable();
+            callingForm.Cursor = Cursors.WaitCursor;
+            await LoadKmlFile(filepath, overlays[0], kmlDatatable, gmapcontrol);
+            callingForm.Cursor = Cursors.Default;
+
+            AddLayerToArrays(overlays[0], filename, kmlDatatable);
+            HandleCheckBoxes(layer_index, filename);
+        }
+
+        private GMapOverlay[] CreateOverlays(string type)
+        {
+            string baseName = $"{type}Overlay_{layer_index + 1}";
+            return new[]
+            {
+        new GMapOverlay($"{baseName}_imar"),
+        new GMapOverlay($"{baseName}_yuk"),
+        new GMapOverlay($"{baseName}_stokastik"),
+        new GMapOverlay($"{baseName}_yga")
+
+    };
+        }
+
+        private void AddLayerToArrays(GMapOverlay overlay, string filename, System.Data.DataTable datatable)
+        {
+            tüm_katmanlar_array[layer_index] = overlay;
+            tüm_katmanlar_array_names[layer_index] = filename;
+            tüm_katmanlar_datatable[layer_index] = datatable;
+        }
+
+        private void HandleCheckBoxes(int layerIndex, string filename)
+        {
+            var associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layerIndex);
+
+            if (associatedCheckBoxes != null)
+            {
+                foreach (var checkBox in associatedCheckBoxes)
+                {
+                    checkBox.Checked = true;
+                    checkBox.Visible = true;
+                    checkBox.Text = filename;
+                }
+            }
+        }
+
+        /*        public async Task cbs_dosya_secimi(GMapControl gmapcontrol, Form callingForm, DataGridView dataGridView)
+                {
+                    // Find the first available slot in the array that holds shapefile overlay layers
+                    layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
+
+                    if (layer_index == -1)
+                    {
+                        MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
+                        return;
+                    }
+
+                    // file dialog to select a file to import
+                    OpenFileDialog vektorel_veri_seçimi = new OpenFileDialog();
+
+                    string targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
+                    vektorel_veri_seçimi.Filter = "Shapefile|*.shp|Google Earth File|*.kml|CSV File|*.csv";
+                    vektorel_veri_seçimi.InitialDirectory = targetDirectory;
+
+                    DialogResult result = vektorel_veri_seçimi.ShowDialog();
+
+                    if (result == DialogResult.OK)
+                    {
+                        string filepath = vektorel_veri_seçimi.FileName;
+                        string filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
+                        string extension = filename.Substring(filename.Length - 3);
+
+                        if (extension == "shp")
+                        {
+                            // create a new layer to be added onto the map
+                            GMapOverlay shapeFileOverlay_imar = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_imar");
+                            GMapOverlay shapeFileOverlay_yuk = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_yuk");
+                            GMapOverlay shapeFileOverlay_stokastik = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_stokastik");
+                            GMapOverlay shapeFileOverlay_yga = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_yga");
+
+                            modülFormu.gMapControl_imar.Overlays.Add(shapeFileOverlay_imar);
+                            modülFormu.gMapControl_yuk.Overlays.Add(shapeFileOverlay_yuk);
+                            modülFormu.gMapControl_stokastik.Overlays.Add(shapeFileOverlay_stokastik);
+                            modülFormu.gMapControl_yga.Overlays.Add(shapeFileOverlay_yga);
+
+                            // create a new datatable to be added to the tüm_katmanlar_datatable array
+                            System.Data.DataTable shapefile_datatable = new System.Data.DataTable();
+
+                            // run the import method
+                            callingForm.Cursor = Cursors.WaitCursor;
+                            await LoadShapefile(filepath, shapeFileOverlay_imar, shapefile_datatable, dataGridView);
+                            callingForm.Cursor = Cursors.Default;
+
+                            // Duplicate the polygons and routes from shapeFileOverlay_imar into each new overlay
+                            CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_yuk);
+                            CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_stokastik);
+                            CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_yga);
+                            // Assign the appropriate overlay based on the layer index
+                            // Assuming you have a mapping between layer indices and overlays
+        *//*                    tüm_katmanlar_array[layer_index] = shapeFileOverlay_imar;
+                            tüm_katmanlar_array_names[layer_index] = filename;
+                            tüm_katmanlar_datatable[layer_index] = shapefile_datatable;
+
+                            // Get the list of associated checkboxes for the given layer_index
+                            List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
+
+                            if (associatedCheckBoxes != null)
+                            {
+                                // Loop through each checkbox in the list and apply the required settings
+                                foreach (var checkBox in associatedCheckBoxes)
+                                {
+                                    checkBox.Checked = true;
+                                    checkBox.Visible = true;
+                                    checkBox.Text = tüm_katmanlar_array_names[layer_index];
+                                }
+                            }*//*
+                            // add the layer and its name to the specified arrays
+
+                            if (layer_index >= 0 && layer_index < tüm_katmanlar_array.Length)
+                            {
+                                // Create an array of overlays to assign
+                                GMapOverlay[] overlays = { shapeFileOverlay_imar, shapeFileOverlay_stokastik, shapeFileOverlay_yga };
+
+                                // Loop through overlays and assign them to the array
+                                for (int i = 0; i < overlays.Length; i++)
+                                {
+                                    tüm_katmanlar_array[layer_index] = overlays[i];
+                                    System.Diagnostics.Debug.WriteLine($"Assigned overlay {overlays[i].Id} to layer index: {layer_index}");
+                                }
+                            }
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine($"Invalid layer index: {layer_index}");
+                            }
+
+                            tüm_katmanlar_array_names[layer_index] = filename;
+                            tüm_katmanlar_datatable[layer_index] = shapefile_datatable;
+                            List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
+
+                            if (associatedCheckBoxes != null)
+                            {
+                                foreach (var checkBox in associatedCheckBoxes)
+                                {
+                                    checkBox.Text =  tüm_katmanlar_array_names[layer_index];
+                                    Console.WriteLine(checkBox.Text);
+                                    // Apply common settings for checkboxes
+                                    checkBox.Checked = true;
+                                    checkBox.Visible = true;
+                                }
+                            }
+                        }
+                        else if (extension == "kml")
+                        {
+                            GMapOverlay kmlOverlay_imar = new GMapOverlay($"kmlOverlay_{layer_index + 1}_imar");
+                            GMapOverlay kmlOverlay_yuk = new GMapOverlay($"kmlOverlay_{layer_index + 1}_yuk");
+                            GMapOverlay kmlOverlay_stokastik = new GMapOverlay($"kmlOverlay_{layer_index + 1}_stokastik");
+                            GMapOverlay kmlOverlay_yga = new GMapOverlay($"kmlOverlay_{layer_index + 1}_yga");
+
+                            modülFormu.gMapControl_imar.Overlays.Add(kmlOverlay_imar);
+                            modülFormu.gMapControl_yuk.Overlays.Add(kmlOverlay_yuk);
+                            modülFormu.gMapControl_stokastik.Overlays.Add(kmlOverlay_stokastik);
+                            modülFormu.gMapControl_yga.Overlays.Add(kmlOverlay_yga);
+
+                            System.Data.DataTable kml_datatable = new System.Data.DataTable();
+                            callingForm.Cursor = Cursors.WaitCursor;
+                            await LoadKmlFile(filepath, kmlOverlay_imar, kml_datatable, gmapcontrol);
+
+                            tüm_katmanlar_array[layer_index] = kmlOverlay_imar;
+                            tüm_katmanlar_array_names[layer_index] = filename;
+                            tüm_katmanlar_datatable[layer_index] = kml_datatable;
+
+                            // convert .kml overlay into a MapWinGIS.Shapefile object
+                            polygonAttributes_kml = new Dictionary<GMapPolygon, DataRow>();
+                            routeAttributes_kml = new Dictionary<GMapRoute, DataRow>();
+                            MapWinGIS.Shapefile shapefile = ConvertKmlToShapefile(kmlOverlay_imar);
+                            shapeFileArray_MapWinGIS[layer_index] = shapefile;
+
+                            // Duplicate the polygons and routes from shapeFileOverlay_imar into each new overlay
+                            CopyOverlayContents(kmlOverlay_imar, kmlOverlay_yuk);
+                            CopyOverlayContents(kmlOverlay_imar, kmlOverlay_stokastik);
+                            CopyOverlayContents(kmlOverlay_imar, kmlOverlay_yga);
+
+                            callingForm.Cursor = Cursors.Default;
+
+                            // Get the list of associated checkboxes for the given layer_index
+                            List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
+
+                            if (associatedCheckBoxes != null)
+                            {
+                                // Loop through each checkbox in the list and apply the required settings
+                                foreach (var checkBox in associatedCheckBoxes)
+                                {
+                                    checkBox.Checked = true;
+                                    checkBox.Visible = true;
+                                    checkBox.Text = tüm_katmanlar_array_names[layer_index];
+                                }
+                            }
+                        }
+                    }
+                    gmapcontrol.Refresh();
+                    gmapcontrol.ReloadMap();
+
+                }*/
 
         private void CopyOverlayContents(GMapOverlay sourceOverlay, GMapOverlay targetOverlay)
         {
