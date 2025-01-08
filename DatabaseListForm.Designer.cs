@@ -157,6 +157,7 @@
             this.listBoxCbsFiles.Name = "listBoxCbsFiles";
             this.listBoxCbsFiles.Size = new System.Drawing.Size(254, 420);
             this.listBoxCbsFiles.TabIndex = 11;
+            this.listBoxCbsFiles.SelectedIndexChanged += new System.EventHandler(this.listBoxCbsFiles_SelectedIndexChanged);
             // 
             // DatabaseListForm
             // 

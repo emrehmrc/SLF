@@ -1,22 +1,188 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using NetTopologySuite.IO;
+using NetTopologySuite.IO.ShapeFile.Extended;
 using Npgsql;
 using SLF.services;
 
 namespace SLF
 {
     public partial class DatabaseListForm : Form
+
     {
+        private readonly Dictionary<string, List<string>> requiredColumns = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
+
+
+{
+    { "OGAGTRF.TAB", new List<string> {
+        "ID",
+        "KODU",
+        "X_KOORDINAT",
+        "Y_KOORDINAT",
+        "PRIMER_GERILIM",
+        "GUCU",
+
+    }},
+    { "dtr_aril_verileri", new List<string> {
+        "Tanım Numarası",
+        "CBS KODU",
+        "Çarpan",
+        "Aktif Çekiş",
+        "Demand Çekiş",
+        "Demand Çekiş Tarihi"
+    }},
+    { "TRAFOBINATIP.TAB", new List<string> {
+        "TM_ID",
+        "TM_FIDER_ID",
+        "ADR_ILCE_ID"
+    }},
+     { "EA Şarj Verileri", new List<string> { "istasyon_adi", "istasyon_tipi", "istasyon_gucu", "ea_trafo_kodu", "ea_x_koordinat", "ea_y_koordinat" } },
+     { "DTR Verileri", new List<string> { "TRAFO_ID", "TRAFO_KODU", "TRAFO_ILCE_ADI", "TRAFO_KAPASITESI" } }
+};
+
+
         public DatabaseListForm()
         {
             InitializeComponent();
         }
 
+        private List<(string ColumnName, string ColumnType)> ExtractColumnsFromTabFile(string filePath)
+        {
+            var columns = new List<(string ColumnName, string ColumnType)>();
+            bool isDefinitionTable = false;
+            bool isFields = false;
+
+            try
+            {
+                var lines = File.ReadAllLines(filePath);
+                foreach (var line in lines)
+                {
+                    var trimmedLine = line.Trim();
+
+                    // Definition Table başlangıcını bul
+                    if (trimmedLine.Equals("Definition Table", StringComparison.OrdinalIgnoreCase))
+                    {
+                        isDefinitionTable = true;
+                        continue;
+                    }
+
+                    // Fields satırını bul
+                    if (isDefinitionTable && trimmedLine.StartsWith("Fields", StringComparison.OrdinalIgnoreCase))
+                    {
+                        isFields = true;
+                        continue;
+                    }
+
+
+                    // begin_metadata'ya ulaştıysak bitir
+                    if (trimmedLine.StartsWith("begin_metadata", StringComparison.OrdinalIgnoreCase))
+                    {
+                        break;
+                    }
+
+                    // Kolon tanımlarını işle
+                    if (isFields && !string.IsNullOrWhiteSpace(trimmedLine))
+                    {
+                        if (!trimmedLine.StartsWith("Type") && trimmedLine.Contains(" "))
+                        {
+                            string[] parts = trimmedLine.Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                            if (parts.Length >= 1)
+                            {
+                                string columnName = parts[0].Trim();
+                                string columnType = parts.Length > 1 ? parts[1].Trim(';', ' ') : "";
+                                columns.Add((columnName, columnType));
+                            }
+                        }
+                    }
+                }
+
+                // Debug için bulunan kolonları göster
+                if (columns.Count > 0)
+                {
+                    string columnList = string.Join("\n", columns.Select(c => c.ColumnName));
+                    //MessageBox.Show($"Bulunan kolonlar:\n{columnList}", "Kolon Listesi");
+                }
+                else
+                {
+                    MessageBox.Show("Hiç kolon bulunamadı!", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Tab dosyası kolonları okunurken hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            return columns;
+        }
+
+        public DataTable LoadCsvFile(string filePath)
+        {
+            DataTable dataTable = new DataTable();
+
+            using (StreamReader sr = new StreamReader(filePath))
+            {
+                string[] headers = sr.ReadLine().Split(',');
+                foreach (string header in headers)
+                {
+                    dataTable.Columns.Add(header);
+                }
+
+                while (!sr.EndOfStream)
+                {
+                    string[] rows = sr.ReadLine().Split(',');
+                    DataRow dr = dataTable.NewRow();
+                    for (int i = 0; i < headers.Length; i++)
+                    {
+                        dr[i] = rows[i];
+                    }
+                    dataTable.Rows.Add(dr);
+                }
+            }
+
+            return dataTable;
+        }
+        private bool ValidateTabColumns(string filePath, List<string> expectedColumns)
+        {
+            var extractedColumns = ExtractColumnsFromTabFile(filePath);
+
+            var missingColumns = expectedColumns.Except(extractedColumns.Select(c => c.ColumnName)).ToList();
+
+            if (missingColumns.Count > 0)
+            {
+                MessageBox.Show($"Eksik Kolonlar: {string.Join(", ", missingColumns)}",
+                    "Eksik Kolonlar",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return false;
+            }
+
+            return true;
+        }
+        // Veritabanından tabloyu yükle
+        public DataTable LoadDatabaseTable(string tableName)
+        {
+            DataTable dataTable = new DataTable();
+            var connection = DatabaseManager.GetInstance().GetConnection();
+
+            string query = $"SELECT * FROM \"{tableName}\"";
+            using (var cmd = new NpgsqlCommand(query, connection))
+            using (var adapter = new NpgsqlDataAdapter(cmd))
+            {
+                adapter.Fill(dataTable);
+            }
+
+            return dataTable;
+        }
         private void DatabaseListForm_Load(object sender, EventArgs e)
         {
+            listBoxCbsFiles.SelectionMode = SelectionMode.MultiExtended;
+            listBoxTables.SelectionMode = SelectionMode.MultiExtended;
+
             try
             {
                 // Veritabanı tablolarını yükle
@@ -40,9 +206,10 @@ namespace SLF
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Hata: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         private void LoadCbsFiles()
         {
             try
@@ -82,28 +249,52 @@ namespace SLF
         private DataTable LoadTabFile(string filePath)
         {
             DataTable dataTable = new DataTable();
+            bool isDataSection = false;
 
             try
             {
-                // Dosya satırlarını oku
-                var lines = File.ReadAllLines(filePath);
-
-                if (lines.Length > 0)
+                // Önce kolonları al
+                var columns = ExtractColumnsFromTabFile(filePath);
+                foreach (var col in columns)
                 {
-                    // İlk satır başlıklar
-                    var headers = lines[0].Split('\t');
-                    foreach (var header in headers)
+                    dataTable.Columns.Add(col.ColumnName);
+                }
+
+                // Veriyi oku
+                var lines = File.ReadAllLines(filePath);
+                foreach (var line in lines)
+                {
+                    string trimmedLine = line.Trim();
+
+                    // Data Section başlangıcını bul
+                    if (trimmedLine.Equals("Data Section", StringComparison.OrdinalIgnoreCase))
                     {
-                        dataTable.Columns.Add(header);
+                        isDataSection = true;
+                        continue;
                     }
 
-                    // Diğer satırlar veri
-                    for (int i = 1; i < lines.Length; i++)
+                    // Veri bölümünde ve geçerli bir satır ise
+                    if (isDataSection && !string.IsNullOrWhiteSpace(trimmedLine) &&
+                        !trimmedLine.StartsWith("\"") && !trimmedLine.StartsWith("!"))
                     {
-                        var row = lines[i].Split('\t');
-                        dataTable.Rows.Add(row);
+                        // Virgülle ayrılmış değerleri al
+                        var values = trimmedLine.Split(',')
+                            .Select(v => v.Trim())
+                            .ToArray();
+
+                        if (values.Length >= dataTable.Columns.Count)
+                        {
+                            var row = dataTable.NewRow();
+                            for (int i = 0; i < dataTable.Columns.Count; i++)
+                            {
+                                row[i] = values[i];
+                            }
+                            dataTable.Rows.Add(row);
+                        }
                     }
                 }
+
+                
             }
             catch (Exception ex)
             {
@@ -111,6 +302,47 @@ namespace SLF
             }
 
             return dataTable;
+        }
+
+        public void HandleData(string source, string dataType, bool isDatabaseTable = false)
+        {
+            try
+            {
+                DataTable dataTable;
+
+                if (isDatabaseTable)
+                {
+                    // Veritabanı tablosunu yükle
+                    dataTable = LoadDatabaseTable(source);
+                }
+                else
+                {
+                    // CSV dosyasını yükle
+                    dataTable = LoadCsvFile(source);
+                }
+
+                // Gerekli kolonları doğrula
+                ValidateRequiredColumns(dataTable, dataType);
+
+                // Girdi Modülü ile işleme devam et
+                GirdiModülü module = new GirdiModülü
+                {
+                    importedDataTable = dataTable
+                };
+
+                if (module.VEERProcess(dataType))
+                {
+                    MessageBox.Show($"{dataType} başarıyla işlendi ve Girdi Modülü'ne aktarıldı.", "Başarılı!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show($"{dataType} işleme sırasında hata oluştu.", "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Veri işleme hatası: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
         private void listBoxCbsFiles_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -125,21 +357,28 @@ namespace SLF
                 string baseDir = AppDomain.CurrentDomain.BaseDirectory;
                 string cbsFolderPath = Path.Combine(Directory.GetParent(baseDir).Parent.Parent.FullName, "CBS", "SLF");
                 string filePath = Path.Combine(cbsFolderPath, selectedFile);
-
-                // Dosyanın varlığını kontrol et
-                if (File.Exists(filePath))
-                {
-                    // Dosyayı DataTable'a yükle
-                    DataTable dataTable = LoadTabFile(filePath);
-
-                    // Veriyi DataGridView'de göster
-                    dataGridViewTableData.DataSource = dataTable;
-                }
-                else
-                {
-                    MessageBox.Show($"Seçilen dosya bulunamadı: {filePath}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
             }
+
+            // Dosyanın varlığını kontrol et
+            //    if (File.Exists(filePath))
+            //    {
+            //        MessageBox.Show($"Dosya bulundu: {filePath}", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            //        // Dosyayı DataTable'a yükle
+            //        DataTable dataTable = LoadTabFile(filePath);
+
+            //        // DataTable kontrolü
+
+
+            //        // Veriyi DataGridView'de göster
+            //        dataGridViewTableData.DataSource = dataTable;
+            //        MessageBox.Show("Tablo başarıyla yüklendi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //    }
+            //    else
+            //    {
+            //        MessageBox.Show($"Seçilen dosya bulunamadı: {filePath}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //    }
+            //}
             catch (Exception ex)
             {
                 MessageBox.Show($"Hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -240,7 +479,7 @@ namespace SLF
             }
         }
 
-       
+
         //private void buttonCreateTable_Click(object sender, EventArgs e)
         //{
         //    try
@@ -273,15 +512,234 @@ namespace SLF
         //        MessageBox.Show($"Hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
         //    }
         //}
+        private bool ValidateColumns(string fileNameOrTableName, DataTable table)
+        {
+            if (!requiredColumns.TryGetValue(fileNameOrTableName, out var expectedColumns))
+            {
+                MessageBox.Show($"'{fileNameOrTableName}' için sütun kontrolü tanımlı değil.", "Eksik Tanım", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            // Mevcut kolonları göster
+            string existingColumns = string.Join(", ", table.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
+            //MessageBox.Show($"Mevcut kolonlar: {existingColumns}", "Mevcut Kolonlar");
+
+            // Beklenen kolonları göster
+            string expectedColumnsList = string.Join(", ", expectedColumns);
+            //MessageBox.Show($"Beklenen kolonlar: {expectedColumnsList}", "Beklenen Kolonlar");
+
+            var missingColumns = expectedColumns.Where(column =>
+                !table.Columns.Cast<DataColumn>()
+                    .Any(c => c.ColumnName.Equals(column, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+
+            if (missingColumns.Any())
+            {
+                string missingMessage = $"'{fileNameOrTableName}' dosyasında/tabloda aşağıdaki sütunlar eksik:\n{string.Join("\n", missingColumns)}";
+                MessageBox.Show(missingMessage, "Eksik Sütunlar", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            return true;
+        }
+        public void ValidateRequiredColumns(DataTable dataTable, string dataType)
+        {
+            if (!requiredColumns.TryGetValue(dataType, out var expectedColumns))
+            {
+                throw new Exception($"'{dataType}' için gerekli kolonlar tanımlı değil.");
+            }
+
+            var missingColumns = expectedColumns.Except(dataTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName)).ToList();
+            if (missingColumns.Any())
+            {
+                throw new Exception($"Eksik sütunlar: {string.Join(", ", missingColumns)}");
+            }
+        }
+
+        // Tüm gerekli sütunlar mevcutsa
+        private void RunPythonScript(string scriptPath, List<string> arguments)
+        {
+            try
+            {
+                string pythonPath = "python";
+
+                ProcessStartInfo start = new ProcessStartInfo
+                {
+                    FileName = pythonPath,
+                    Arguments = $"\"{scriptPath}\" {string.Join(" ", arguments)}",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+
+                using (Process process = Process.Start(start))
+                {
+                    string output = process.StandardOutput.ReadToEnd();
+                    string error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
+
+                    if (!string.IsNullOrEmpty(error))
+                    {
+                        MessageBox.Show($"Python script hatası:\n{error}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    if (process.ExitCode != 0)
+                    {
+                        MessageBox.Show($"Python script beklenmeyen bir hatayla çıktı (Çıkış Kodu: {process.ExitCode}).",
+                                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    MessageBox.Show($"Python script çıktısı:\n{output}", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Script çalıştırma hatası: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         private void dtrVerileriTabloOlustur(object sender, EventArgs e)
         {
+            if (listBoxCbsFiles.SelectedItems.Count < 2 || listBoxTables.SelectedItems.Count < 1)
+            {
+                MessageBox.Show("Lütfen OGAGTRF.tab ve TRAFOBINATIP.tab dosyalarını, ayrıca DTR_ARIL_VERILERI tablosunu seçin.", "Eksik Veri", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            
+            //string scriptPath = Path.Combine(Directory.GetParent(baseDir).Parent.Parent.FullName, "CBS", "PythonScript", "dtr_v4.py");
+            // Dosya ve Tablo Seçimi
+            string selectedTabFile1 = listBoxCbsFiles.SelectedItems.Cast<string>()
+                .FirstOrDefault(file => file.Equals("OGAGTRF.tab", StringComparison.OrdinalIgnoreCase));
+            string selectedTabFile2 = listBoxCbsFiles.SelectedItems.Cast<string>()
+                .FirstOrDefault(file => file.Equals("TRAFOBINATIP.tab", StringComparison.OrdinalIgnoreCase));
+            string selectedDatabaseTable = listBoxTables.SelectedItems.Cast<string>()
+                .FirstOrDefault(table => table.Equals("dtr_aril_verileri", StringComparison.OrdinalIgnoreCase));
 
+            if (string.IsNullOrEmpty(selectedTabFile1) || string.IsNullOrEmpty(selectedTabFile2) || string.IsNullOrEmpty(selectedDatabaseTable))
+            {
+                MessageBox.Show("Gerekli dosya veya tablo seçilmedi! Lütfen OGAGTRF.tab, TRAFOBINATIP.tab dosyalarını ve dtr_aril_verileri tablosunu seçin.",
+                    "Eksik Veri", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+           
+            // Dosya yolları
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            //string scriptPath = Path.Combine(baseDir,"cbs", "PythonScript", "dtr_v4.py");
+            string scriptPath = Path.Combine(
+            Directory.GetParent(baseDir).Parent.Parent.FullName,  // Proje kök dizinine git
+                   "cbs", "PythonScripts", "dtr_v4.py"
+                );
+
+            //string scriptPath = @"C:\\Users\\batuhan.yetis\\source\\repos\\SLF\\cbs\\PythonScripts\\dtr_v4.py";
+            string cbsFolderPath = Path.Combine(Directory.GetParent(baseDir).Parent.Parent.FullName, "CBS", "SLF");
+
+            string tabFilePath1 = Path.Combine(cbsFolderPath, selectedTabFile1);
+            string tabFilePath2 = Path.Combine(cbsFolderPath, selectedTabFile2);
+
+            if (!File.Exists(tabFilePath1) || !File.Exists(tabFilePath2))
+            {
+                MessageBox.Show("Gerekli dosyalardan biri bulunamadı!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Kolon Kontrolü
+            DataTable tabFileTable1 = LoadTabFile(tabFilePath1);
+            if (!ValidateColumns(selectedTabFile1, tabFileTable1)) return;
+
+            DataTable tabFileTable2 = LoadTabFile(tabFilePath2);
+            if (!ValidateColumns(selectedTabFile2, tabFileTable2)) return;
+
+            // Veritabanı sütunlarını kontrol et
+            DataTable databaseTable = new DataTable();
+            try
+            {
+                var connection = DatabaseManager.GetInstance("").GetConnection();
+                string query = $"SELECT * FROM \"{selectedDatabaseTable}\" LIMIT 1";
+                using (var cmd = new NpgsqlCommand(query, connection))
+                using (var adapter = new NpgsqlDataAdapter(cmd))
+                {
+                    adapter.Fill(databaseTable);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Veritabanı tablosu yüklenirken hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (!ValidateColumns(selectedDatabaseTable, databaseTable)) return;
+
+            // Python Script Argümanları
+            if (!File.Exists(scriptPath))
+            {
+                scriptPath = Path.Combine(
+                    Directory.GetParent(baseDir).Parent.Parent.FullName,
+                    "CBS",
+                    "PythonScript",
+                    "dtr_v4.py"
+                );
+            }
+
+            List<string> arguments = new List<string>
+            {
+                tabFilePath1,   // OGAGTRF.tab dosyasının yolu
+                tabFilePath2,   // TRAFOBINATIP.tab dosyasının yolu
+                "gdz" // Veritabanı tablosu
+            };
+
+            // Python Script'i Çalıştır
+            RunPythonScript(scriptPath, arguments);
         }
+
 
         private void EaSarjTablosuOlustur_Click(object sender, EventArgs e)
         {
+            try
+            {
+                string tableName = "EA_GDZ";
+                DataTable rawDataTable = LoadDatabaseTable(tableName);
 
+                var requiredColumnsMap = new Dictionary<string, string>
+        {
+            { "istasyon_adi", "ISTASYON_ADI" },
+            { "istasyon_tipi", "ISTASYON_TIPI" },
+            { "istasyon_gucu", "ISTASYON_GUCU" },
+            { "ea_trafo_kodu", "EA_TRAFO_KODU" },
+            { "ea_x_koordinat", "EA_X_KOORDINAT" },
+            { "ea_y_koordinat", "EA_Y_KOORDINAT" }
+        };
+
+                // Kolon adlarını eşleştir
+                foreach (var column in requiredColumnsMap)
+                {
+                    if (rawDataTable.Columns.Contains(column.Key))
+                    {
+                        rawDataTable.Columns[column.Key].ColumnName = column.Value;
+                    }
+                }
+
+                // EA Şarj Modülü'nü çalıştır
+                var eaSarjModulu = new EASarjModulu
+                {
+                    //currentDataTable = rawDataTable
+                };
+
+                if (eaSarjModulu.VEERProcess(tableName))
+                {
+                    MessageBox.Show($"{tableName} başarıyla işlendi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show($"{tableName} işlenirken hata oluştu.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void dekTablosuOlustur_Click(object sender, EventArgs e)
@@ -298,7 +756,7 @@ namespace SLF
         {
 
         }
-
+        
         private void enerjiMüsaadeleriTablosuOlustur_Click(object sender, EventArgs e)
         {
 
@@ -315,3 +773,5 @@ namespace SLF
         }
     }
     }
+// Initialize the DataTable columns
+// LoadShapefile metoduna eklenecek debug kodu
