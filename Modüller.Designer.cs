@@ -1365,7 +1365,7 @@ namespace SLF
             this.ELFLowResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFLowResultsTable.Name = "ELFLowResultsTable";
             this.ELFLowResultsTable.RowHeadersWidth = 51;
-            this.ELFLowResultsTable.Size = new System.Drawing.Size(1081, 483);
+            this.ELFLowResultsTable.Size = new System.Drawing.Size(1081, 487);
             this.ELFLowResultsTable.TabIndex = 1;
             // 
             // ELFBaseResultsTabPage
@@ -1393,7 +1393,7 @@ namespace SLF
             this.ELFBaseResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFBaseResultsTable.Name = "ELFBaseResultsTable";
             this.ELFBaseResultsTable.RowHeadersWidth = 51;
-            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1080, 483);
+            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1080, 487);
             this.ELFBaseResultsTable.TabIndex = 1;
             // 
             // ELFHighResultsTabPage
@@ -1421,7 +1421,7 @@ namespace SLF
             this.ELFHighResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFHighResultsTable.Name = "ELFHighResultsTable";
             this.ELFHighResultsTable.RowHeadersWidth = 51;
-            this.ELFHighResultsTable.Size = new System.Drawing.Size(1076, 483);
+            this.ELFHighResultsTable.Size = new System.Drawing.Size(1076, 487);
             this.ELFHighResultsTable.TabIndex = 1;
             // 
             // ELFMaxResultsTabPage
@@ -1450,7 +1450,7 @@ namespace SLF
             this.ELFMaxResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFMaxResultsTable.Name = "ELFMaxResultsTable";
             this.ELFMaxResultsTable.RowHeadersWidth = 51;
-            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1084, 487);
+            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1084, 491);
             this.ELFMaxResultsTable.TabIndex = 1;
             // 
             // ELFGraphicOutputsTabPage
@@ -1478,7 +1478,7 @@ namespace SLF
             this.panel_ELF_Grafikler.Controls.Add(this.pictureBox_ELF_1);
             this.panel_ELF_Grafikler.Location = new System.Drawing.Point(2, 2);
             this.panel_ELF_Grafikler.Name = "panel_ELF_Grafikler";
-            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1080, 422);
+            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1080, 426);
             this.panel_ELF_Grafikler.TabIndex = 6;
             // 
             // pictureBox_ELF_5
@@ -3631,9 +3631,9 @@ namespace SLF
             this.checkBox_yga_13.Location = new System.Drawing.Point(8, 377);
             this.checkBox_yga_13.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox_yga_13.Name = "checkBox_yga_13";
-            this.checkBox_yga_13.Size = new System.Drawing.Size(89, 21);
+            this.checkBox_yga_13.Size = new System.Drawing.Size(128, 21);
             this.checkBox_yga_13.TabIndex = 55;
-            this.checkBox_yga_13.Text = "checkBox1";
+            this.checkBox_yga_13.Text = "checkBox_yga_13";
             this.checkBox_yga_13.UseVisualStyleBackColor = true;
             this.checkBox_yga_13.Visible = false;
             // 
@@ -3645,9 +3645,9 @@ namespace SLF
             this.checkBox_yga_12.Location = new System.Drawing.Point(8, 349);
             this.checkBox_yga_12.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox_yga_12.Name = "checkBox_yga_12";
-            this.checkBox_yga_12.Size = new System.Drawing.Size(91, 21);
+            this.checkBox_yga_12.Size = new System.Drawing.Size(128, 21);
             this.checkBox_yga_12.TabIndex = 54;
-            this.checkBox_yga_12.Text = "checkBox2";
+            this.checkBox_yga_12.Text = "checkBox_yga_12";
             this.checkBox_yga_12.UseVisualStyleBackColor = true;
             this.checkBox_yga_12.Visible = false;
             // 
@@ -3659,9 +3659,9 @@ namespace SLF
             this.checkBox_yga_11.Location = new System.Drawing.Point(9, 321);
             this.checkBox_yga_11.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox_yga_11.Name = "checkBox_yga_11";
-            this.checkBox_yga_11.Size = new System.Drawing.Size(91, 21);
+            this.checkBox_yga_11.Size = new System.Drawing.Size(126, 21);
             this.checkBox_yga_11.TabIndex = 53;
-            this.checkBox_yga_11.Text = "checkBox3";
+            this.checkBox_yga_11.Text = "checkBox_yga_11";
             this.checkBox_yga_11.UseVisualStyleBackColor = true;
             this.checkBox_yga_11.Visible = false;
             // 
@@ -3673,9 +3673,9 @@ namespace SLF
             this.checkBox_yga_10.Location = new System.Drawing.Point(8, 294);
             this.checkBox_yga_10.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox_yga_10.Name = "checkBox_yga_10";
-            this.checkBox_yga_10.Size = new System.Drawing.Size(91, 21);
+            this.checkBox_yga_10.Size = new System.Drawing.Size(128, 21);
             this.checkBox_yga_10.TabIndex = 52;
-            this.checkBox_yga_10.Text = "checkBox4";
+            this.checkBox_yga_10.Text = "checkBox_yga_10";
             this.checkBox_yga_10.UseVisualStyleBackColor = true;
             this.checkBox_yga_10.Visible = false;
             // 
@@ -3702,9 +3702,9 @@ namespace SLF
             this.checkBox_yga_9.Location = new System.Drawing.Point(8, 266);
             this.checkBox_yga_9.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox_yga_9.Name = "checkBox_yga_9";
-            this.checkBox_yga_9.Size = new System.Drawing.Size(91, 21);
+            this.checkBox_yga_9.Size = new System.Drawing.Size(123, 21);
             this.checkBox_yga_9.TabIndex = 51;
-            this.checkBox_yga_9.Text = "checkBox5";
+            this.checkBox_yga_9.Text = "checkBox_yga_9";
             this.checkBox_yga_9.UseVisualStyleBackColor = true;
             this.checkBox_yga_9.Visible = false;
             // 
@@ -3716,9 +3716,9 @@ namespace SLF
             this.checkBox_yga_8.Location = new System.Drawing.Point(8, 239);
             this.checkBox_yga_8.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox_yga_8.Name = "checkBox_yga_8";
-            this.checkBox_yga_8.Size = new System.Drawing.Size(91, 21);
+            this.checkBox_yga_8.Size = new System.Drawing.Size(123, 21);
             this.checkBox_yga_8.TabIndex = 50;
-            this.checkBox_yga_8.Text = "checkBox6";
+            this.checkBox_yga_8.Text = "checkBox_yga_8";
             this.checkBox_yga_8.UseVisualStyleBackColor = true;
             this.checkBox_yga_8.Visible = false;
             // 
@@ -3730,9 +3730,9 @@ namespace SLF
             this.checkBox_yga_7.Location = new System.Drawing.Point(8, 211);
             this.checkBox_yga_7.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox_yga_7.Name = "checkBox_yga_7";
-            this.checkBox_yga_7.Size = new System.Drawing.Size(91, 21);
+            this.checkBox_yga_7.Size = new System.Drawing.Size(123, 21);
             this.checkBox_yga_7.TabIndex = 49;
-            this.checkBox_yga_7.Text = "checkBox7";
+            this.checkBox_yga_7.Text = "checkBox_yga_7";
             this.checkBox_yga_7.UseVisualStyleBackColor = true;
             this.checkBox_yga_7.Visible = false;
             // 
@@ -3744,9 +3744,9 @@ namespace SLF
             this.checkBox_yga_6.Location = new System.Drawing.Point(8, 183);
             this.checkBox_yga_6.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox_yga_6.Name = "checkBox_yga_6";
-            this.checkBox_yga_6.Size = new System.Drawing.Size(91, 21);
+            this.checkBox_yga_6.Size = new System.Drawing.Size(123, 21);
             this.checkBox_yga_6.TabIndex = 48;
-            this.checkBox_yga_6.Text = "checkBox8";
+            this.checkBox_yga_6.Text = "checkBox_yga_6";
             this.checkBox_yga_6.UseVisualStyleBackColor = true;
             this.checkBox_yga_6.Visible = false;
             // 
@@ -3758,9 +3758,9 @@ namespace SLF
             this.checkBox_yga_5.Location = new System.Drawing.Point(8, 156);
             this.checkBox_yga_5.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox_yga_5.Name = "checkBox_yga_5";
-            this.checkBox_yga_5.Size = new System.Drawing.Size(91, 21);
+            this.checkBox_yga_5.Size = new System.Drawing.Size(123, 21);
             this.checkBox_yga_5.TabIndex = 47;
-            this.checkBox_yga_5.Text = "checkBox9";
+            this.checkBox_yga_5.Text = "checkBox_yga_5";
             this.checkBox_yga_5.UseVisualStyleBackColor = true;
             this.checkBox_yga_5.Visible = false;
             // 
@@ -3772,9 +3772,9 @@ namespace SLF
             this.checkBox_yga_4.Location = new System.Drawing.Point(8, 128);
             this.checkBox_yga_4.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox_yga_4.Name = "checkBox_yga_4";
-            this.checkBox_yga_4.Size = new System.Drawing.Size(96, 21);
+            this.checkBox_yga_4.Size = new System.Drawing.Size(123, 21);
             this.checkBox_yga_4.TabIndex = 46;
-            this.checkBox_yga_4.Text = "checkBox10";
+            this.checkBox_yga_4.Text = "checkBox_yga_4";
             this.checkBox_yga_4.UseVisualStyleBackColor = true;
             this.checkBox_yga_4.Visible = false;
             // 
@@ -3786,9 +3786,9 @@ namespace SLF
             this.checkBox_yga_3.Location = new System.Drawing.Point(8, 100);
             this.checkBox_yga_3.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox_yga_3.Name = "checkBox_yga_3";
-            this.checkBox_yga_3.Size = new System.Drawing.Size(94, 21);
+            this.checkBox_yga_3.Size = new System.Drawing.Size(123, 21);
             this.checkBox_yga_3.TabIndex = 45;
-            this.checkBox_yga_3.Text = "checkBox11";
+            this.checkBox_yga_3.Text = "checkBox_yga_3";
             this.checkBox_yga_3.UseVisualStyleBackColor = true;
             this.checkBox_yga_3.Visible = false;
             // 
@@ -3800,9 +3800,9 @@ namespace SLF
             this.checkBox_yga_2.Location = new System.Drawing.Point(8, 73);
             this.checkBox_yga_2.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox_yga_2.Name = "checkBox_yga_2";
-            this.checkBox_yga_2.Size = new System.Drawing.Size(96, 21);
+            this.checkBox_yga_2.Size = new System.Drawing.Size(123, 21);
             this.checkBox_yga_2.TabIndex = 44;
-            this.checkBox_yga_2.Text = "checkBox12";
+            this.checkBox_yga_2.Text = "checkBox_yga_2";
             this.checkBox_yga_2.UseVisualStyleBackColor = true;
             this.checkBox_yga_2.Visible = false;
             // 
@@ -3815,9 +3815,9 @@ namespace SLF
             this.checkBox_yga_1.Location = new System.Drawing.Point(8, 45);
             this.checkBox_yga_1.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox_yga_1.Name = "checkBox_yga_1";
-            this.checkBox_yga_1.Size = new System.Drawing.Size(96, 21);
+            this.checkBox_yga_1.Size = new System.Drawing.Size(121, 21);
             this.checkBox_yga_1.TabIndex = 43;
-            this.checkBox_yga_1.Text = "checkBox13";
+            this.checkBox_yga_1.Text = "checkBox_yga_1";
             this.checkBox_yga_1.UseVisualStyleBackColor = false;
             this.checkBox_yga_1.Visible = false;
             // 
