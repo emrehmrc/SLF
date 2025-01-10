@@ -64,8 +64,8 @@ namespace SLF
             this.modülFormu = mainform;
 
             // Initialize the arrays and other components
-            tüm_katmanlar_array_names = new string[13];
-            tüm_katmanlar_array = new GMapOverlay[13];
+            tüm_katmanlar_array_names = new string[20];
+            tüm_katmanlar_array = new GMapOverlay[20];
             shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[13];
             tüm_katmanlar_datatable = new System.Data.DataTable[13];
 

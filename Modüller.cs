@@ -349,8 +349,8 @@ namespace SLF
         { gMapControl_DEK, new List<GMapOverlay> { rulerOverlay_DEK, markerOverlay_DEK /*, polygonOverlay_DEK*/ } },
         { gMapControl_EA, new List<GMapOverlay> { rulerOverlay_ea, markerOverlay_ea /*, polygonOverlay_ea*/ } },
         { gMapControl_yga, new List<GMapOverlay> { polygonOverlay_yga, markerOverlay_yga, rulerOverlay_yga } },
-        { gMapControl_yuk, new List<GMapOverlay> { rulerOverlay_yuk, markerOverlay_yuk, polygonOverlay_yuk } },
-        { gMapControl_imar, new List<GMapOverlay> { rulerOverlay_imar, markerOverlay_imar, polygonOverlay_imar, cbs.gridOverlay } }
+        { gMapControl_yuk, new List<GMapOverlay> { polygonOverlay_yuk, rulerOverlay_yuk, markerOverlay_yuk } },
+        { gMapControl_imar, new List<GMapOverlay> { polygonOverlay_imar, rulerOverlay_imar, markerOverlay_imar,  /*cbs.gridOverlay*/ } }
     };
 
             // Iterate through each map control and add overlays
@@ -3463,11 +3463,15 @@ namespace SLF
                         double area = cbs.CalculatePolygonArea(polygonPoints);
                         mesafe.Visible = true;
                         mesafe.Text = "Seçili Alan: " + Math.Round(area, 0).ToString() + " m²";
+
+                       // polygonOverlay.Markers.Clear();
                     }
                     else
                     {
                         mesafe.Visible = false; // Hide label if polygon is incomplete
+
                     }
+
                 }
             }
         }
@@ -4142,11 +4146,8 @@ namespace SLF
 
 
         */
-        // Dictionary to link overlays with their checkboxes for all maps
-        // Dictionary to link overlays with their checkboxes for all maps
         private Dictionary<int, GMapOverlay> overlaysByLayerIndex = new Dictionary<int, GMapOverlay>();
         private Dictionary<int, CheckBox[]> checkboxesByLayerIndex = new Dictionary<int, CheckBox[]>();
-        // Dictionary to store overlays with their corresponding names
         private Dictionary<string, GMapOverlay> overlaysByName = new Dictionary<string, GMapOverlay>();
 
         public void PoligonKaydetEventi(object sender, EventArgs e, GMapOverlay polygonOverlay,
@@ -4157,21 +4158,22 @@ namespace SLF
             {
                 markerOverlay.Markers.Clear();
 
+                // Find the first available layer index for saving the polygon
                 int layer_index = Array.FindIndex(cbs.tüm_katmanlar_array, s => s == null);
 
                 if (layer_index == -1)
                 {
-                    // Expand the array if needed
+                    // If no available index found, expand the array
                     layer_index = cbs.tüm_katmanlar_array.Length;
                     Array.Resize(ref cbs.tüm_katmanlar_array, layer_index + 1);
                 }
 
+                // Set the overlay for the active map
                 GMapOverlay overlay_to_be_saved = polygonOverlay;
                 cbs.tüm_katmanlar_array[layer_index] = overlay_to_be_saved;
-
                 cbs.tüm_katmanlar_array_names[layer_index] = "Polygon_" + (layer_index + 1).ToString();
 
-                // Add the overlay to the dictionary
+                                // Add the overlay to the dictionary
                 AddOverlayToDictionary(layer_index, overlay_to_be_saved);
 
                 // Convert the overlay to a shapefile (for saving or further processing)
@@ -4184,10 +4186,6 @@ namespace SLF
 
                 // Add the polygon to overlays of all relevant maps (Imar, YGA, Stokastik)
                 AddPolygonToAllMaps(overlay_to_be_saved);
-
-
-                // Update checkboxes for all maps
-              //  UpdateCheckboxesForAllMaps(layer_index);
 
                 // Show success message
                 MessageBox.Show("Poligon kaydedildi.");
@@ -4222,94 +4220,37 @@ namespace SLF
             // For debugging: log the overlay being added
             Console.WriteLine($"Added overlay with name: {overlayName}");
         }
-        /*
-                private void AddPolygonToAllMaps(GMapOverlay overlay_to_be_saved, CheckBox[] checkBoxes_yga, CheckBox[] checkBoxes_imar, CheckBox[] checkBoxes_stokastik)
-                {
-                    // Track overlay counts for each map separately
-                    int ygaOverlayCount = gMapControl_yga.Overlays.Count;
-                    int imarOverlayCount = gMapControl_imar.Overlays.Count;
-                    int stokastikOverlayCount = gMapControl_stokastik.Overlays.Count;
-
-                    // Create unique names for each map's overlay
-                    string overlayName_yga = "Polygon_" + (ygaOverlayCount + 1) + "_yga";
-                    string overlayName_imar = "Polygon_" + (imarOverlayCount + 1) + "_imar";
-                    string overlayName_stokastik = "Polygon_" + (stokastikOverlayCount + 1) + "_stokastik";
-
-                    // Add to Imar map
-                    if (gMapControl_imar != null)
-                    {
-                        GMapOverlay newOverlay_imar = new GMapOverlay(overlayName_imar);
-                        CopyPolygons(overlay_to_be_saved, newOverlay_imar);  // Copy polygons from the source overlay
-                        gMapControl_imar.Overlays.Add(newOverlay_imar);
-                        overlaysByName[overlayName_imar] = newOverlay_imar;  // Store overlay by its name
-                        overlaysByLayerIndex[layer_index] = newOverlay_imar; // Link overlay to layer index
-
-                        // Update the checkbox text for Imar
-                        if (layer_index < checkBoxes_imar.Length)  // Ensure the index is within bounds
-                        {
-                            checkBoxes_imar[layer_index].Text = overlayName_imar;  // Link checkbox to overlay
-                        }
-
-                        gMapControl_imar.Refresh(); // Refresh the map to apply changes
-                    }
-
-                    // Add to YGA map
-                    if (gMapControl_yga != null)
-                    {
-                        GMapOverlay newOverlay_yga = new GMapOverlay(overlayName_yga);
-                        CopyPolygons(overlay_to_be_saved, newOverlay_yga);  // Copy polygons from the source overlay
-                        gMapControl_yga.Overlays.Add(newOverlay_yga);
-                        overlaysByName[overlayName_yga] = newOverlay_yga;  // Store overlay by its name
-                        overlaysByLayerIndex[layer_index] = newOverlay_yga; // Link overlay to layer index
-
-                        // Update the checkbox text for YGA
-                        if (layer_index < checkBoxes_yga.Length)  // Ensure the index is within bounds
-                        {
-                            checkBoxes_yga[layer_index].Text = overlayName_yga;  // Link checkbox to overlay
-                        }
-
-                        gMapControl_yga.Refresh(); // Refresh the map to apply changes
-                    }
-
-                    // Add to Stokastik map
-                    if (gMapControl_stokastik != null)
-                    {
-                        GMapOverlay newOverlay_stokastik = new GMapOverlay(overlayName_stokastik);
-                        CopyPolygons(overlay_to_be_saved, newOverlay_stokastik);  // Copy polygons from the source overlay
-                        gMapControl_stokastik.Overlays.Add(newOverlay_stokastik);
-                        overlaysByName[overlayName_stokastik] = newOverlay_stokastik;  // Store overlay by its name
-                        overlaysByLayerIndex[layer_index] = newOverlay_stokastik; // Link overlay to layer index
-
-                        // Update the checkbox text for Stokastik
-                        if (layer_index < checkBoxes_stokastik.Length)  // Ensure the index is within bounds
-                        {
-                            checkBoxes_stokastik[layer_index].Text = overlayName_stokastik;  // Link checkbox to overlay
-                        }
-
-                        gMapControl_stokastik.Refresh(); // Refresh the map to apply changes
-                    }
-                }*/
         private void AddPolygonToAllMaps(GMapOverlay overlay_to_be_saved)
         {
+            // Get the active map control
+            GMapControl activeMap = cbs.GetActiveGMapControl();
+            string activeMapName = activeMap.Name;
 
             // Track overlay counts per map to ensure unique names for each overlay
-            int ygaOverlayCount = gMapControl_yga.Overlays.Count; // This is after adding the overlay
-            int imarOverlayCount = gMapControl_imar.Overlays.Count;
-            int stokastikOverlayCount = gMapControl_stokastik.Overlays.Count;
+            // int ygaOverlayCount = gMapControl_yga.Overlays[0].Polygons.Count;
+            int ygaOverlayCount = gMapControl_yga.Overlays.Count -3 ;
+            int imarOverlayCount = gMapControl_imar.Overlays.Count -3 ;
+            int stokastikOverlayCount = gMapControl_stokastik.Overlays.Count - 3;
 
             // Create unique names for each map's overlay based on the count
             string overlayName_yga = "Polygon_" + (ygaOverlayCount + 1) + "_yga";
             string overlayName_imar = "Polygon_" + (imarOverlayCount + 1) + "_imar";
             string overlayName_stokastik = "Polygon_" + (stokastikOverlayCount + 1) + "_stokastik";
 
+            // Debugging: Log the overlay names and counts
+            // Debugging: Log overlay counts
+            Console.WriteLine($"Overlay Counts: YGA={ygaOverlayCount}, Imar={imarOverlayCount}, Stokastik={stokastikOverlayCount}");
+            Console.WriteLine($"Overlay Names: YGA={overlayName_yga}, Imar={overlayName_imar}, Stokastik={overlayName_stokastik}");
+
             // Add to Imar map
             if (gMapControl_imar != null)
             {
                 GMapOverlay newOverlay_imar = new GMapOverlay(overlayName_imar);
                 CopyPolygons(overlay_to_be_saved, newOverlay_imar);
+
                 gMapControl_imar.Overlays.Add(newOverlay_imar);
                 overlaysByName[overlayName_imar] = newOverlay_imar;
-                overlaysByLayerIndex[imarOverlayCount] = newOverlay_imar; // Corrected index
+                overlaysByLayerIndex[imarOverlayCount] = newOverlay_imar;
 
                 // Update the checkbox text for Imar dynamically
                 UpdateCheckboxTextForLayer(imarOverlayCount, checkBoxes_imar, overlayName_imar);
@@ -4322,9 +4263,10 @@ namespace SLF
             {
                 GMapOverlay newOverlay_yga = new GMapOverlay(overlayName_yga);
                 CopyPolygons(overlay_to_be_saved, newOverlay_yga);
+                // Ensure overlay is added to Stokastik map
                 gMapControl_yga.Overlays.Add(newOverlay_yga);
                 overlaysByName[overlayName_yga] = newOverlay_yga;
-                overlaysByLayerIndex[ygaOverlayCount] = newOverlay_yga; // Corrected index
+                overlaysByLayerIndex[ygaOverlayCount] = newOverlay_yga;
 
                 // Update the checkbox text for YGA dynamically
                 UpdateCheckboxTextForLayer(ygaOverlayCount, checkBoxes_yga, overlayName_yga);
@@ -4339,27 +4281,28 @@ namespace SLF
                 CopyPolygons(overlay_to_be_saved, newOverlay_stokastik);
                 gMapControl_stokastik.Overlays.Add(newOverlay_stokastik);
                 overlaysByName[overlayName_stokastik] = newOverlay_stokastik;
-                overlaysByLayerIndex[stokastikOverlayCount] = newOverlay_stokastik; // Corrected index
-
+                overlaysByLayerIndex[stokastikOverlayCount] = newOverlay_stokastik;
                 // Update the checkbox text for Stokastik dynamically
                 UpdateCheckboxTextForLayer(stokastikOverlayCount, checkBoxes_stokastik, overlayName_stokastik);
 
                 gMapControl_stokastik.Refresh();
             }
         }
+ 
 
         // Function to update the checkbox text based on layer index and map category
         private void UpdateCheckboxTextForLayer(int layerIndex, CheckBox[] checkBoxes, string overlayName)
         {
-            // Ensure the index is within bounds
             if (layerIndex < checkBoxes.Length)
             {
-                checkBoxes[layerIndex].Text = overlayName;  // Set the text of the checkbox to the overlay's name
-                checkBoxes[layerIndex].Visible = true;     // Make sure the checkbox is visible
-                checkBoxes[layerIndex].Checked = true; // Ensure checkbox is checked for new overlay
+                checkBoxes[layerIndex].Text = overlayName;
+                checkBoxes[layerIndex].Visible = true;
+                checkBoxes[layerIndex].Checked = true;
+
+                // Debugging: Log checkbox updates
+                Console.WriteLine($"Updated checkbox for Layer {layerIndex}: {overlayName}");
             }
         }
-
 
 
         private void CopyPolygons(GMapOverlay sourceOverlay, GMapOverlay destinationOverlay)
@@ -4376,6 +4319,9 @@ namespace SLF
                 destinationOverlay.Polygons.Add(newPolygon);
             }
         }
+
+
+
 
         private void checkBox_CheckedChanged(object sender, EventArgs e)
         {
