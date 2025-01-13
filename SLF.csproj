@@ -604,7 +604,9 @@
     <Compile Include="LoginForm.Designer.cs">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="services\DatabaseHelpers.cs" />
     <Compile Include="services\DatabaseManager .cs" />
+    <Compile Include="services\IsImportedModule.cs" />
     <Compile Include="YGAPopupForm.cs">
       <SubType>Form</SubType>
     </Compile>

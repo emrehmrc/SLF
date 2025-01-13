@@ -20,12 +20,26 @@ using DrawingImage = System.Drawing.Image;
 using MapWinGIS;
 using System.Text;
 using SLF.services;
+using OSGeo.OGR;
 
 
 namespace SLF
 {
     public partial class ModülFormu : Form
     {
+        private static ModülFormu instance;
+        public static ModülFormu Instance
+        {
+            get
+            {
+                if (instance == null || instance.IsDisposed)
+                {
+                    instance = new ModülFormu();
+                }
+                return instance;
+            }
+        }
+
         public readonly CBS cbs;
         private readonly double startX = 0;
         private readonly double startY = 0;
@@ -41,7 +55,7 @@ namespace SLF
         private string _selectedCity = null;
         private Form popupForm; // easim ekran popup 
         private DataTable veriMonteCarlo;
-        List<string> modulescheck = new List<string>();
+        public static List<string> modulescheck = new List<string>();
         private bool isDtrLoaded = false;
         private Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
         {
@@ -56,7 +70,7 @@ namespace SLF
         // form objeleri
         public HomePageForm gir1;
         private GirdiModülü girdiModülü;
-        private Dictionary<string, GirdiModülü> girdiModülleri = new Dictionary<string, GirdiModülü> {
+        public static Dictionary<string, GirdiModülü> girdiModülleri = new Dictionary<string, GirdiModülü> {
             {"Abone Verileri", new AboneVerileri()},
             {"DEK Verileri", new DEKModulu()},
             {"DTR Verileri", new DTRModulu()},
@@ -73,7 +87,7 @@ namespace SLF
         public Tablo_Formu tablo_formu;
 
         // variables to be used to create "ruler" in Stochastic/EA modules
-        public List<PointLatLng> rulerPoints_yga= new List<PointLatLng>();
+        public List<PointLatLng> rulerPoints_yga = new List<PointLatLng>();
         public List<PointLatLng> rulerPoints_stokastik = new List<PointLatLng>();
         public List<PointLatLng> rulerPoints_ea = new List<PointLatLng>();
         public List<PointLatLng> rulerPoints_yuk = new List<PointLatLng>();
@@ -244,6 +258,7 @@ namespace SLF
 
             _excelService = new ExcelService();
             InitializeLogTextBox(); // Initialize logTextBox
+
             this.DoubleBuffered = true;
             this.selectedMethod = selectedMethod;  // Store the method
             InitializeComboBoxes();
@@ -560,8 +575,9 @@ namespace SLF
                 MessageBox.Show("No valid method selected.");
             }
 
-            girdiModülü = girdiModülleri[seçilenVeriTipi];
 
+            girdiModülü = girdiModülleri[seçilenVeriTipi];
+            Console.WriteLine("girdimodulusecilenveritipi" + seçilenVeriTipi);
             girdiModülü.SlfStartYear = slfStartYear;
             girdiModülü.SlfEndYear = slfEndYear;
 
@@ -571,17 +587,77 @@ namespace SLF
 
             // Call VEERProcess with skipPrerequisites flag
             var isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
+            //Console.WriteLine(isImported.ToString());
+            isİmportedModule(isImported, seçilenVeriTipi);
+            //if (isImported)
+            //{
+            //    modulescheck.Add(seçilenVeriTipi);
+            //    veri_listesi_seçimi.Refresh();
+            //    Console.WriteLine(modulescheck.Count);
+            //    dataGridView_girdi.DataSource = girdiModülü.CurrentDataTable;
 
-            if (isImported)
+
+            //}
+
+        }
+
+        public void isİmportedModule(bool isImported, string seçilenVeriTipi)
+        {
+            if (!isImported)
             {
-                modulescheck.Add(seçilenVeriTipi);
-                veri_listesi_seçimi.Refresh();
-                Console.WriteLine(modulescheck.Count);
-                dataGridView_girdi.DataSource = girdiModülü.CurrentDataTable;
+                Console.WriteLine($"isİmportedModule: {seçilenVeriTipi} işlemi başarısız.");
+                return;
+            }
 
+            if (!GirdiModülü.dataTablesByType.ContainsKey(seçilenVeriTipi))
+            {
+                Console.WriteLine($"isImportedModule: {seçilenVeriTipi} için tablo bulunamadı.");
+                return;
+            }
 
+            var importedDataTable = GirdiModülü.dataTablesByType[seçilenVeriTipi];
+            Console.WriteLine($"isImportedModule: {seçilenVeriTipi} tablosu bulundu. Satır sayısı: {girdiModülü.importedDataTable.Rows.Count}");
+
+            // DataGridView temizleme ve bağlama
+
+            //dataGridView_girdi.DataSource = null;
+            //dataGridView_girdi.Rows.Clear();
+            //dataGridView_girdi.Columns.Clear();
+            //dataGridView_girdi.AutoGenerateColumns = true;
+
+            dataGridView_girdi.DataSource = girdiModülü.importedDataTable;
+            Console.WriteLine("datagridview"+dataGridView_girdi.DataSource);
+            // Görünürlük kontrolleri
+            EnsureVisibility(dataGridView_girdi);
+
+            // UI güncelleme
+            dataGridView_girdi.Invoke((MethodInvoker)delegate
+            {
+                dataGridView_girdi.Refresh();
+                dataGridView_girdi.BringToFront();
+            });
+
+            Console.WriteLine($"DataGridView Görünürlük: {dataGridView_girdi.Visible}");
+            Console.WriteLine($"DataGridView Boyut: {dataGridView_girdi.Width}x{dataGridView_girdi.Height}");
+        }
+
+        private void EnsureVisibility(Control control)
+        {
+            // Parent kontrolü görünür değilse, görünür hale getir
+            if (control.Parent != null && !control.Parent.Visible)
+            {
+                Console.WriteLine($"{control.Name} Parent kontrolü gizli. Görünür hale getiriliyor...");
+                control.Parent.Visible = true;
+            }
+
+            // DataGridView görünür değilse, görünür hale getir
+            if (!control.Visible)
+            {
+                Console.WriteLine($"{control.Name} gizli. Görünür hale getiriliyor...");
+                control.Visible = true;
             }
         }
+
         private void ModülFormu_FormClosing(object sender, FormClosingEventArgs e)
         {
             // Kapanış onayı al
@@ -1194,6 +1270,7 @@ namespace SLF
         {
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
             girdiModülü = girdiModülleri[seçilenVeriTipi];
+            Console.WriteLine("veri_listesi_secimi"+girdiModülü.importedDataTable.Rows.Count);
             dataGridView_girdi.DataSource = girdiModülü.importedDataTable;
         }
 
@@ -1218,30 +1295,27 @@ namespace SLF
         }
         private void veri_listesi_seçimi_DrawItem(object sender, DrawItemEventArgs e)
         {
-
-            // Check if the index is valid
+            Console.WriteLine($"DrawItem Tetiklendi - Index: {e.Index}");
             if (e.Index < 0)
                 return;
 
-            // Get the current item to be drawn
             string text = veri_listesi_seçimi.Items[e.Index].ToString();
+            Console.WriteLine($"Çizilen Item: {text}");
 
-            // Determine the color based on some condition
             Color textColor = Color.Red;
-            var girdiModülü = girdiModülleri[text];
-            if (girdiModülü.importedDataTable.Rows.Count > 0)
+            if (girdiModülleri.ContainsKey(text) && girdiModülleri[text].importedDataTable != null)
             {
-                textColor = Color.Green;
+                if (girdiModülleri[text].importedDataTable.Rows.Count > 0)
+                {
+                    textColor = Color.Green;
+                }
             }
 
             e.DrawBackground();
-            // Draw the text with the determined color
             using (Brush brush = new SolidBrush(textColor))
             {
                 e.Graphics.DrawString(text, e.Font, brush, e.Bounds);
             }
-
-            // Draw the focus rectangle if the item is selected
             e.DrawFocusRectangle();
         }
 
@@ -4349,28 +4423,56 @@ namespace SLF
         {
             if (DatabaseManager.GetInstance().IsConnected())
             {
-                // Zaten bağlantı açık, DatabaseListForm'u göster
-                using (var databaseListForm = new DatabaseListForm())
+                try
                 {
-                    databaseListForm.ShowDialog();
+                    using (var databaseListForm = new DatabaseListForm())
+                    {
+                        databaseListForm.Owner = this;
+                        databaseListForm.FormClosed += (s, args) => {
+                            // Form kapandığında gerekli güncellemeleri yap
+                            if (dataGridView_girdi.DataSource != null)
+                            {
+                                dataGridView_girdi.Refresh();
+                            }
+                        };
+                        databaseListForm.ShowDialog();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Veritabanı listesi gösterilirken hata oluştu: {ex.Message}",
+                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             else
             {
-                // Giriş yapılmamışsa veya bağlantı yoksa LoginForm'u göster
                 using (var loginForm = new LoginForm())
                 {
                     if (loginForm.ShowDialog() == DialogResult.OK)
                     {
                         using (var databaseListForm = new DatabaseListForm())
                         {
+                            databaseListForm.Owner = this;
                             databaseListForm.ShowDialog();
                         }
                     }
                 }
             }
         }
-
+        private void LogDataTableInfo(DataTable dt, string source)
+        {
+            if (dt != null)
+            {
+                LogOutput($"Veri Kaynağı: {source}");
+                LogOutput($"Satır Sayısı: {dt.Rows.Count}");
+                LogOutput($"Kolon Sayısı: {dt.Columns.Count}");
+                LogOutput($"Kolonlar: {string.Join(", ", dt.Columns.Cast<DataColumn>().Select(c => c.ColumnName))}");
+            }
+            else
+            {
+                LogOutput($"Veri Kaynağı {source}: DataTable null");
+            }
+        }
         // ------------------------------------------------------------------------------------- //
 
 

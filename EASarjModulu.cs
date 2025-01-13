@@ -19,7 +19,7 @@ namespace SLF
                                       .Select(row => row["TRAFO_KODU"].ToString())
                                       .Distinct()
             );
-
+            
             // Loop through currentDataTable to find invalid trafos and their indexes
             foreach (DataRow row in currentDataTable.Rows)
             {

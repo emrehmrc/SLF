@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using SLF.services;
 
 
 namespace SLF
@@ -29,9 +30,9 @@ namespace SLF
     {
         protected Önizleme onizleme1 = new Önizleme();
         protected Raporlama raporlama1 = new Raporlama(); // excel sayfası için yapılmıs calısma excelexporter ve excel importer için bakılabilir ileri durumlarda 
-        protected readonly List<string> veri_listesi_requires_xlsx = new List<string> {  // 2. ekran list kosullar tanımlı birbirine baglı olan moduller ekle olup olmadıgı kontrolu yapılıyor
-            "EA Şarj Verileri",
+        protected readonly List<string> veri_listesi_requires_xlsx = new List<string> {  
             "Ekonometrik Yük Tahmini Verileri",
+            "EA Şarj Verileri",
             "Fider Verileri",
             "TM Verileri",
             "DTR Verileri",
@@ -46,7 +47,9 @@ namespace SLF
         };
         protected readonly List<string> veri_listesi_requires_csv = new List<string> { }; 
         protected readonly List<string> veri_listesi_requires_tabular = new List<string> { };
-
+        protected readonly List<string> veri_listesi_requires_database = new List<string> { 
+            "EA_Sarj_verileri"  // Sadece veritabanından yüklenecek veriler
+        };
         protected readonly List<string> nullLikeStrings = new List<string> // doluluk bosluk check kısımları kontrolu yapılıyor
         {
             "",
@@ -54,7 +57,7 @@ namespace SLF
             "N/A",
             "#N/A"
         };
-        protected string seçilenVeriTipi;
+        public string seçilenVeriTipi { get; set; }
         public int slfStartYear;
         public int slfEndYear;
         public int SlfStartYear
@@ -96,7 +99,7 @@ namespace SLF
         protected readonly string combinedCsvFilter;
         protected readonly string combinedTabularFilter;
 
-        protected DataTable currentDataTable = new DataTable();
+        public DataTable currentDataTable = new DataTable();
         public DataTable importedDataTable = new DataTable();
         public static Dictionary<string, DataTable> dataTablesByType = new Dictionary<string, DataTable>();  // Static so that it can be accessed as the same instance from other subclasses
         protected DataTable errorDataTable = new DataTable();
@@ -195,8 +198,9 @@ namespace SLF
 
                 // ProcessFileSelection metodu ile dosya seçme işlemi yapılır ve seçilen dosya veri tablosuna yüklenir
                 ProcessFileSelection(seçilenVeriTipi);
+                
                 DataTable dataTable = CurrentDataTable;
-
+                
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
                     Onizleme1.Onizleme_DataGrid1.DataSource = dataTable;
@@ -266,7 +270,7 @@ namespace SLF
         public void ShowImportedMessage()
         {
             StringBuilder sb = new StringBuilder();
-
+            
             sb.AppendLine($"{seçilenVeriTipi} başarıyla yüklendi.");
             sb.AppendLine($"Toplam satır sayısı: {importedDataTable.Rows.Count}");
 
@@ -407,12 +411,23 @@ namespace SLF
         {
             try
             {
-                // Set cursor to wait
                 Cursor.Current = Cursors.WaitCursor;
 
+                // Veriyi kopyala
                 importedDataTable = currentDataTable.Copy();
-                dataTablesByType[seçilenVeriTipi] = importedDataTable;
+                Console.WriteLine(importedDataTable + "  " + seçilenVeriTipi);
+                // Veri tipini dictionary'e ekle
+                if (seçilenVeriTipi == "EA_Sarj_verileri")
+                {
+                    seçilenVeriTipi = "EA Sarj Verileri";
+                }
+                if (!dataTablesByType.ContainsKey(seçilenVeriTipi))
+                {
+                    //dataTablesByType.Add(SeçilenVeriTipi, importedDataTable);
+                    dataTablesByType[seçilenVeriTipi] = importedDataTable;
+                    Console.WriteLine("datatable" + importedDataTable.Rows.Count + seçilenVeriTipi);
 
+                }
                 // If "Ekonometrik Yük Tahmini Verileri" is selected, export to Excel and run the R script
                 if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
                 {
@@ -433,14 +448,40 @@ namespace SLF
                     {
                         MessageBox.Show($"Error while saving the file: {ex.Message}");
                     }
+
+                    // ModülFormu'nu güncelle
+                    //ModülFormu.Instance.isİmportedModule(true, SeçilenVeriTipi);
+
+                    // Debug bilgisi
+                    Debug.WriteLine($"ImportProcessedData - Veri tipi: {seçilenVeriTipi}");
+                    Debug.WriteLine($"ImportProcessedData - Satır sayısı: {importedDataTable.Rows.Count}");
+
+                    // Konsol Çıkışı
+                    Console.WriteLine("---- İşlenen Veri Detayları ----");
+                    Console.WriteLine($"Tablo Tipi: {seçilenVeriTipi}");
+                    Console.WriteLine($"Toplam Satır Sayısı: {importedDataTable.Rows.Count}");
+                    Console.WriteLine("İlk 5 Satır:");
+
+                    for (int i = 0; i < Math.Min(5, importedDataTable.Rows.Count); i++)
+                    {
+                        Console.WriteLine(string.Join(", ", importedDataTable.Rows[i].ItemArray));
+                    }
+                    Console.WriteLine("-------------------------------");
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Veri içeri aktarılırken hata oluştu: {ex.Message}",
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Debug.WriteLine($"ImportProcessedData Hatası: {ex.Message}");
+                Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
             }
             finally
             {
-                // Restore cursor to default
                 Cursor.Current = Cursors.Default;
             }
         }
+
 
         private void RunRScript(string excelFilePath)
         {
@@ -492,11 +533,36 @@ namespace SLF
                 MessageBox.Show($"An error occurred while running the R script: {ex.Message}");
             }
         }
+        private DataTable ConvertColumnNamesToUpperCase(DataTable dataTable)
+        {
+            // Yeni bir DataTable oluşturup kolon adlarını büyük harfe çeviriyoruz
+            DataTable updatedTable = new DataTable();
 
+            foreach (DataColumn column in dataTable.Columns)
+            {
+                // DEBUG: Her kolon adını göstermek
+                Console.WriteLine($"Orijinal Kolon: {column.ColumnName}");
+
+                updatedTable.Columns.Add(column.ColumnName.ToUpperInvariant(), column.DataType);
+            }
+
+            // Orijinal verileri yeni tabloya taşı
+            foreach (DataRow row in dataTable.Rows)
+            {
+                updatedTable.Rows.Add(row.ItemArray);
+            }
+
+            // DEBUG: Yeni tablonun kolonlarını yazdır
+            string updatedColumns = string.Join(", ", updatedTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
+            Console.WriteLine($"Yeni Kolonlar: {updatedColumns}");
+
+            return updatedTable;
+        }
 
         public void ProcessFileSelection(string seçilenVeriTipi)
         {
             this.seçilenVeriTipi = seçilenVeriTipi;
+
             var fileDialog1 = new OpenFileDialog
             {
                 Title = FileDialogTitle
@@ -532,7 +598,39 @@ namespace SLF
                 }
                 else throw new NoFileSelectedException("Dosya seçimi gerçekleştirilemedi.");
             }
-            else throw new NoFileSelectedException("Bu veri tipi için atanmış bir dosya seçimi prosedürü henüz yok.");
+            else if (veri_listesi_requires_database.Contains(seçilenVeriTipi))
+            {
+                try
+                {
+
+                    currentDataTable = DatabaseHelper.LoadTable(seçilenVeriTipi);
+                    currentDataTable = ProcesssqlFile(seçilenVeriTipi);
+                    if (currentDataTable.Columns.Contains("ID"))
+                    {
+                        currentDataTable.Columns.Remove("ID");
+                        MessageBox.Show("ID kolonu kaldırıldı.", "Bilgilendirme", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("ID kolonu bulunamadı.", "Bilgilendirme", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    if (seçilenVeriTipi == "EA_Sarj_verileri")
+                    {
+                        //seçilenVeriTipi = "EA Şarj Verileri";
+                        //dataTablesByType[seçilenVeriTipi] = importedDataTable;
+                    }
+
+                    //currentDataTable = ConvertColumnNamesToUpperCase(currentDataTable);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Veritabanından veri alınırken hata oluştu: {ex.Message}");
+                }
+            }
+            else
+            {
+                throw new NoFileSelectedException("Bu veri tipi için atanmış bir dosya veya veritabanı seçimi prosedürü henüz yok.");
+            }
         }
 
         protected DataTable ProcessExcelFile(string fileName, string seçilenVeriTipi)
@@ -550,7 +648,12 @@ namespace SLF
             // TODO: Implement CSV file processing
             return new DataTable();
         }
-
+        protected DataTable ProcesssqlFile(string fileName)
+        {
+            DataTable dataTable = DatabaseHelper.LoadTable(seçilenVeriTipi); ;
+            
+            return dataTable;
+        }
         protected DataTable ProcessTabularFile(string fileName)
         {
             // TODO: Implement tabular file processing

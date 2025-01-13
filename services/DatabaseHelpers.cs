@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Npgsql;
 using System.Data;
+using System.Diagnostics;
 namespace SLF.services
 {
     public static class DatabaseHelper
@@ -103,15 +104,30 @@ namespace SLF.services
         /// </summary>
         public static DataTable LoadTable(string tableName)
         {
+            DataTable dataTable = new DataTable();
+            var connection = DatabaseManager.GetInstance().GetConnection();
+
             try
             {
                 string query = $"SELECT * FROM \"{tableName}\"";
-                return ExecuteQuery(query);
+                using (var cmd = new NpgsqlCommand(query, connection))
+                using (var adapter = new NpgsqlDataAdapter(cmd))
+                {
+                    adapter.Fill(dataTable);
+                    
+                    // Kolon isimlerini büyük harfe çevir
+                    foreach (DataColumn col in dataTable.Columns)
+                    {
+                        col.ColumnName = col.ColumnName.ToUpperInvariant();
+                    }
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception($"Tablo yüklenirken hata oluştu: {ex.Message}");
+                throw new Exception($"Tablo yüklenirken hata: {ex.Message}");
             }
+
+            return dataTable;
         }
     }
 }

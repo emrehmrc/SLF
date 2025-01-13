@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using DocumentFormat.OpenXml.Office2010.PowerPoint;
 using NetTopologySuite.IO;
 using NetTopologySuite.IO.ShapeFile.Extended;
 using Npgsql;
@@ -15,6 +16,18 @@ namespace SLF
     public partial class DatabaseListForm : Form
 
     {
+        private GirdiModülü girdiModülü;
+        //public Dictionary<string, GirdiModülü> girdiModülleri = new Dictionary<string, GirdiModülü> {
+        //    {"Abone Verileri", new AboneVerileri()},
+        //    {"DEK Verileri", new DEKModulu()},
+        //    {"DTR Verileri", new DTRModulu()},
+        //    {"EA Şarj Verileri", new EASarjModulu()},
+        //    {"Ekonometrik Yük Tahmini Verileri", new EkonometrikYukTahminiModulu()},
+        //    {"Fider Verileri", new FiderVerileri()},
+        //    {"İmar Verileri", new GirdiModülü()},
+        //    {"Enerji Müsaadeleri Verileri", new EnerjiMusaadeleri()},
+        //    {"Yeni Projelendirilmiş DTR Verileri", new YeniProjelendirilmisDTR()},
+        //};
         private readonly Dictionary<string, List<string>> requiredColumns = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
 
 
@@ -146,34 +159,60 @@ namespace SLF
 
             return dataTable;
         }
-        private bool ValidateTabColumns(string filePath, List<string> expectedColumns)
+        private bool ValidateColumns(DataTable table, List<string> requiredColumns)
         {
-            var extractedColumns = ExtractColumnsFromTabFile(filePath);
-
-            var missingColumns = expectedColumns.Except(extractedColumns.Select(c => c.ColumnName)).ToList();
-
-            if (missingColumns.Count > 0)
+            if (table == null || table.Columns.Count == 0)
             {
-                MessageBox.Show($"Eksik Kolonlar: {string.Join(", ", missingColumns)}",
-                    "Eksik Kolonlar",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
+                MessageBox.Show("Tablo boş veya geçersiz!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            // Mevcut kolon isimlerini büyük harfe çevir
+            var currentColumns = table.Columns.Cast<DataColumn>()
+                .Select(c => c.ColumnName.ToUpperInvariant())
+                .ToList();
+
+            // Eksik kolonları bul
+            var missingColumns = requiredColumns
+                .Where(col => !currentColumns.Contains(col.ToUpperInvariant()))
+                .ToList();
+
+            // Eksik kolon varsa kullanıcıya bildir
+            if (missingColumns.Any())
+            {
+                string missingMessage = $"Tabloda eksik olan sütunlar: {string.Join(", ", missingColumns)}";
+                MessageBox.Show(missingMessage, "Eksik Kolonlar", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
             return true;
         }
+
         // Veritabanından tabloyu yükle
         public DataTable LoadDatabaseTable(string tableName)
         {
             DataTable dataTable = new DataTable();
             var connection = DatabaseManager.GetInstance().GetConnection();
 
-            string query = $"SELECT * FROM \"{tableName}\"";
-            using (var cmd = new NpgsqlCommand(query, connection))
-            using (var adapter = new NpgsqlDataAdapter(cmd))
+            try
             {
-                adapter.Fill(dataTable);
+                string query = $"SELECT * FROM \"{tableName}\"";
+                using (var cmd = new NpgsqlCommand(query, connection))
+                using (var adapter = new NpgsqlDataAdapter(cmd))
+                {
+                    adapter.Fill(dataTable);
+                    
+                    // Kolon isimlerini büyük harfe çevir
+                    foreach (DataColumn col in dataTable.Columns)
+                    {
+                        col.ColumnName = col.ColumnName.ToUpperInvariant();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Veritabanı tablosu yüklenirken hata: {ex.Message}", 
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             return dataTable;
@@ -314,34 +353,38 @@ namespace SLF
                 {
                     // Veritabanı tablosunu yükle
                     dataTable = LoadDatabaseTable(source);
+                    
+                    // GirdiModülü'nü oluştur ve veriyi işle
+                    GirdiModülü module = new GirdiModülü();
+                    module.importedDataTable = dataTable;
+                    
+                    if (module.VEERProcess(dataType))
+                    {
+                        // Başarılı işlem sonrası ModülFormu'nu güncelle
+                        ModülFormu modülFormu = new ModülFormu();
+                        modülFormu.isİmportedModule(true, dataType);
+                        
+                        MessageBox.Show($"{dataType} başarıyla işlendi ve Girdi Modülü'ne aktarıldı.", 
+                            "Başarılı!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        
+                        // Ana form DataGridView'ı güncelle
+                        dataGridViewTableData.DataSource = module.importedDataTable;
+                    }
+                    else
+                    {
+                        MessageBox.Show($"{dataType} işleme sırasında hata oluştu.", 
+                            "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
                 else
                 {
-                    // CSV dosyasını yükle
-                    dataTable = LoadCsvFile(source);
-                }
-
-                // Gerekli kolonları doğrula
-                ValidateRequiredColumns(dataTable, dataType);
-
-                // Girdi Modülü ile işleme devam et
-                GirdiModülü module = new GirdiModülü
-                {
-                    importedDataTable = dataTable
-                };
-
-                if (module.VEERProcess(dataType))
-                {
-                    MessageBox.Show($"{dataType} başarıyla işlendi ve Girdi Modülü'ne aktarıldı.", "Başarılı!", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    MessageBox.Show($"{dataType} işleme sırasında hata oluştu.", "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // CSV dosyası işleme kodu...
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Veri işleme hatası: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Veri işleme hatası: {ex.Message}", 
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void listBoxCbsFiles_SelectedIndexChanged(object sender, EventArgs e)
@@ -694,57 +737,153 @@ namespace SLF
             RunPythonScript(scriptPath, arguments);
         }
 
-
+       
         private void EaSarjTablosuOlustur_Click(object sender, EventArgs e)
         {
             try
             {
-                string tableName = "EA_GDZ";
-                DataTable rawDataTable = LoadDatabaseTable(tableName);
-
-                var requiredColumnsMap = new Dictionary<string, string>
-        {
-            { "istasyon_adi", "ISTASYON_ADI" },
-            { "istasyon_tipi", "ISTASYON_TIPI" },
-            { "istasyon_gucu", "ISTASYON_GUCU" },
-            { "ea_trafo_kodu", "EA_TRAFO_KODU" },
-            { "ea_x_koordinat", "EA_X_KOORDINAT" },
-            { "ea_y_koordinat", "EA_Y_KOORDINAT" }
-        };
-
-                // Kolon adlarını eşleştir
-                foreach (var column in requiredColumnsMap)
+                // Kullanıcı seçimi al
+                if (listBoxTables.SelectedItem == null)
                 {
-                    if (rawDataTable.Columns.Contains(column.Key))
-                    {
-                        rawDataTable.Columns[column.Key].ColumnName = column.Value;
-                    }
+                    MessageBox.Show("Lütfen bir tablo seçin!", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
 
-                // EA Şarj Modülü'nü çalıştır
-                var eaSarjModulu = new EASarjModulu
+                string selectedTable = listBoxTables.SelectedItem.ToString();
+
+                // 1. Tabloyu Veritabanından Yükle
+                DataTable rawDataTable = DatabaseHelper.LoadTable(selectedTable);
+
+                // DEBUG: Yüklenen kolonları göster
+                string originalColumns = string.Join(", ", rawDataTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
+                MessageBox.Show($"Orijinal Kolonlar: {originalColumns}", "Debug: Kolonlar");
+
+                // 2. Kolon adlarını büyük harfe çevir
+                //rawDataTable = ConvertColumnNamesToUpperCase(rawDataTable);
+
+                // DEBUG: Büyük harfe çevrilen kolonları göster
+                string updatedColumns = string.Join(", ", rawDataTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
+                MessageBox.Show($"Güncellenmiş Kolonlar: {updatedColumns}", "Debug: Kolonlar");
+                
+
+                // 3. Gerekli sütunları kontrol edin
+                var requiredColumns = new List<string>
                 {
-                    //currentDataTable = rawDataTable
+                    "ISTASYON_ADI",
+                    "ISTASYON_TIPI",
+                    "ISTASYON_GUCU",
+                    "EA_TRAFO_KODU",
+                    "EA_X_KOORDINAT",
+                    "EA_Y_KOORDINAT"
                 };
 
-                if (eaSarjModulu.VEERProcess(tableName))
+                if (!ValidateColumns(rawDataTable, requiredColumns))
                 {
-                    MessageBox.Show($"{tableName} başarıyla işlendi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Tablo gerekli sütunlara sahip değil!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // 4. EA Şarj Modülünü Çalıştır
+
+                girdiModülü = ModülFormu.girdiModülleri["EA Şarj Verileri"];
+                if (girdiModülü.VEERProcess("EA_Sarj_verileri"))
+                {
+
+                    
+                    string secilen_veri_tipi = "EA Sarj Verileri";
+                    //var isImported = girdiModülü.VEERProcess("EA_Sarj_verileri");
+                    ModülFormu modülFormu = new ModülFormu();
+                    modülFormu.isİmportedModule(true, secilen_veri_tipi);
+                    
+
+
+                    MessageBox.Show("Şarj istasyonu başarıyla eklendi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
                 }
                 else
                 {
-                    MessageBox.Show($"{tableName} işlenirken hata oluştu.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"{selectedTable} işlenirken hata oluştu.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void dekTablosuOlustur_Click(object sender, EventArgs e)
         {
+            try
+            {
+                // Kullanıcı seçimi al
+                if (listBoxTables.SelectedItem == null)
+                {
+                    MessageBox.Show("Lütfen bir tablo seçin!", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
+                string selectedTable = listBoxTables.SelectedItem.ToString();
+
+                // 1. Tabloyu Veritabanından Yükle
+                DataTable rawDataTable = DatabaseHelper.LoadTable(selectedTable);
+
+                // DEBUG: Yüklenen kolonları göster
+                string originalColumns = string.Join(", ", rawDataTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
+                MessageBox.Show($"Orijinal Kolonlar: {originalColumns}", "Debug: Kolonlar");
+
+                // 2. Kolon adlarını büyük harfe çevir
+                //rawDataTable = ConvertColumnNamesToUpperCase(rawDataTable);
+
+                // DEBUG: Büyük harfe çevrilen kolonları göster
+                string updatedColumns = string.Join(", ", rawDataTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
+                MessageBox.Show($"Güncellenmiş Kolonlar: {updatedColumns}", "Debug: Kolonlar");
+
+                // 3. Gerekli sütunları kontrol edin
+                var requiredColumns = new List<string>
+                {
+                    "ILCE_ADI",
+                    "KAYNAK_TIPI",
+                    "DEK_KURULU_GUCU",
+                    "DEK_X_KOORDINAT",
+                    "DEK_Y_KOORDINAT",
+                    "DEK_TM_ADI",
+                    "DEK_KURULUM_YERI",
+                    "DEK_BAGLANDIGI_TRAFO_KODU"
+                };
+
+                if (!ValidateColumns(rawDataTable, requiredColumns))
+                {
+                    MessageBox.Show("Tablo gerekli sütunlara sahip değil!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // 4. DEK Modülünü Çalıştır
+                var dekModulu = new DEKModulu
+                {
+                    currentDataTable = rawDataTable // Modüle tabloyu gönder
+                };
+
+                if (dekModulu.VEERProcess(selectedTable))
+                {
+                    
+
+                    // "DEK Verileri" olarak modu işaretle
+                    string secilen_veri_tipi = "DEK Verileri";
+                    ModülFormu modülFormu = new ModülFormu();
+                    modülFormu.isİmportedModule(true, secilen_veri_tipi);
+                    MessageBox.Show($"{selectedTable} başarıyla işlendi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show($"{selectedTable} işlenirken hata oluştu.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void aboneVeriTablosuOlustur_Click(object sender, EventArgs e)
