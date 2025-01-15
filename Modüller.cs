@@ -2859,7 +2859,99 @@ namespace SLF
                 }
             }
         }
-        private void temizleToolStripMenuItem_Click(object sender, EventArgs e)
+                private void temizleToolStripMenuItem_Click(object sender, EventArgs e)
+                {
+                    ToolStripMenuItem delete_menu_item = sender as ToolStripMenuItem;
+
+                    if (delete_menu_item != null)
+                    {
+                        System.Windows.Forms.CheckBox checkBox = delete_menu_item.Tag as System.Windows.Forms.CheckBox;
+
+                        // Ensure the Tag is set and is a valid number
+                        if (checkBox != null && checkBox.Tag != null)
+                        {
+                            int checkbox_index;
+                            if (int.TryParse(checkBox.Tag.ToString(), out checkbox_index))
+                            {
+                                checkbox_index -= 1;  // Adjust for 0-based indexing
+
+                                // Ensure the index is within bounds of the array and the item exists
+                                if (checkbox_index >= 0 && checkbox_index < cbs.tüm_katmanlar_array.Length &&
+                                    cbs.tüm_katmanlar_array[checkbox_index] != null)
+                                {
+                                    string katman_ismi = cbs.tüm_katmanlar_array_names[checkbox_index];
+
+                                    DialogResult temizle_result = MessageBox.Show(katman_ismi + " isimli katman " +
+                                        "silinecektir. Emin misiniz?", "", MessageBoxButtons.YesNo);
+
+                                    if (temizle_result == DialogResult.Yes)
+                                    {
+
+                                        // Safe removal from overlays
+                                        if (cbs.tüm_katmanlar_array[checkbox_index] != null)
+                                        {
+                                            cbs.GetActiveGMapControl().Overlays.Remove(cbs.tüm_katmanlar_array[checkbox_index]);
+                                            cbs.GetActiveGMapControl().Refresh();
+                                        }
+
+                                        // Dispose and nullify references
+                                        cbs.tüm_katmanlar_array[checkbox_index]?.Dispose();
+                                        cbs.tüm_katmanlar_array[checkbox_index] = null;
+                                        cbs.tüm_katmanlar_array_names[checkbox_index] = null;
+                                        cbs.tüm_katmanlar_datatable[checkbox_index] = null;
+
+                                        // Clear checkboxes for all maps
+                                        ClearCheckboxesForAllMaps(checkbox_index);
+                                        // RemoveSelectedLayerFromAllMaps(checkbox_index);
+                                    }
+                                }
+                                else
+                                {
+                                    MessageBox.Show("Invalid index or layer not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("Invalid checkbox tag.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                        }
+                    }
+                }
+
+                private void ClearCheckboxesForAllMaps(int checkboxIndex)
+                {
+                    // Define all checkboxes for the maps
+                    var allCheckBoxes = new List<CheckBox>
+                    {
+                        checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5,
+                        checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
+                        checkBox_imar_11, checkBox_imar_12, checkBox_imar_13,
+
+                        checkBox_yga_1, checkBox_yga_2, checkBox_yga_3, checkBox_yga_4, checkBox_yga_5,
+                        checkBox_yga_6, checkBox_yga_7, checkBox_yga_8, checkBox_yga_9, checkBox_yga_10,
+                        checkBox_yga_11, checkBox_yga_12, checkBox_yga_13,
+
+                        checkBox_stokastik_1, checkBox_stokastik_2, checkBox_stokastik_3, checkBox_stokastik_4,
+                        checkBox_stokastik_5, checkBox_stokastik_6, checkBox_stokastik_7, checkBox_stokastik_8,
+                        checkBox_stokastik_9, checkBox_stokastik_10, checkBox_stokastik_11, checkBox_stokastik_12, checkBox_stokastik_13
+                    };
+
+                    // Loop through all checkboxes and uncheck/hide the selected one
+                    foreach (var checkBox in allCheckBoxes)
+                    {
+                        if (checkBox.Tag != null && int.TryParse(checkBox.Tag.ToString(), out int tagIndex))
+                        {
+                            if (tagIndex - 1 == checkboxIndex)  // Match the checkbox index
+                            {
+                                checkBox.Checked = false;  // Uncheck the checkbox
+                                checkBox.Visible = false;  // Hide the checkbox
+                            }
+                        }
+                    }
+                }
+
+        
+/*        private void temizleToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem delete_menu_item = sender as ToolStripMenuItem;
 
@@ -2886,12 +2978,17 @@ namespace SLF
 
                             if (temizle_result == DialogResult.Yes)
                             {
-
                                 // Safe removal from overlays
                                 if (cbs.tüm_katmanlar_array[checkbox_index] != null)
                                 {
-                                    cbs.GetActiveGMapControl().Overlays.Remove(cbs.tüm_katmanlar_array[checkbox_index]);
-                                    cbs.GetActiveGMapControl().Refresh();
+                                    // Check if the overlay exists and remove it safely
+                                    var overlay = cbs.tüm_katmanlar_array[checkbox_index];
+                                    var activeMap = cbs.GetActiveGMapControl();
+                                    if (activeMap.Overlays.Contains(overlay))
+                                    {
+                                        activeMap.Overlays.Remove(overlay);
+                                        activeMap.Refresh();
+                                    }
                                 }
 
                                 // Dispose and nullify references
@@ -2902,7 +2999,6 @@ namespace SLF
 
                                 // Clear checkboxes for all maps
                                 ClearCheckboxesForAllMaps(checkbox_index);
-                                // RemoveSelectedLayerFromAllMaps(checkbox_index);
                             }
                         }
                         else
@@ -2922,19 +3018,19 @@ namespace SLF
         {
             // Define all checkboxes for the maps
             var allCheckBoxes = new List<CheckBox>
-            {
-                checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5,
-                checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
-                checkBox_imar_11, checkBox_imar_12, checkBox_imar_13,
+    {
+        checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5,
+        checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
+        checkBox_imar_11, checkBox_imar_12, checkBox_imar_13,
 
-                checkBox_yga_1, checkBox_yga_2, checkBox_yga_3, checkBox_yga_4, checkBox_yga_5,
-                checkBox_yga_6, checkBox_yga_7, checkBox_yga_8, checkBox_yga_9, checkBox_yga_10,
-                checkBox_yga_11, checkBox_yga_12, checkBox_yga_13,
+        checkBox_yga_1, checkBox_yga_2, checkBox_yga_3, checkBox_yga_4, checkBox_yga_5,
+        checkBox_yga_6, checkBox_yga_7, checkBox_yga_8, checkBox_yga_9, checkBox_yga_10,
+        checkBox_yga_11, checkBox_yga_12, checkBox_yga_13,
 
-                checkBox_stokastik_1, checkBox_stokastik_2, checkBox_stokastik_3, checkBox_stokastik_4,
-                checkBox_stokastik_5, checkBox_stokastik_6, checkBox_stokastik_7, checkBox_stokastik_8,
-                checkBox_stokastik_9, checkBox_stokastik_10, checkBox_stokastik_11, checkBox_stokastik_12, checkBox_stokastik_13
-            };
+        checkBox_stokastik_1, checkBox_stokastik_2, checkBox_stokastik_3, checkBox_stokastik_4,
+        checkBox_stokastik_5, checkBox_stokastik_6, checkBox_stokastik_7, checkBox_stokastik_8,
+        checkBox_stokastik_9, checkBox_stokastik_10, checkBox_stokastik_11, checkBox_stokastik_12, checkBox_stokastik_13
+    };
 
             // Loop through all checkboxes and uncheck/hide the selected one
             foreach (var checkBox in allCheckBoxes)
@@ -2949,8 +3045,7 @@ namespace SLF
                 }
             }
         }
-
-
+*/
         // Remove the selected layer from all maps (Imar, YGA, Stokastik)
         private void RemoveSelectedLayerFromAllMaps(int checkbox_index)
         {
@@ -4376,7 +4471,11 @@ namespace SLF
             {
                 GMapOverlay newOverlay_imar = new GMapOverlay(overlayName_imar);
                 CopyPolygons(overlay_to_be_saved, newOverlay_imar);
-
+                if (activeMapName == "gMapControl_imar" && gMapControl_imar.Overlays.Contains(overlay_to_be_saved))
+                {
+                    gMapControl_imar.Overlays.Remove(overlay_to_be_saved);
+                    gMapControl_imar.Refresh(); // Refresh map
+                }
                 gMapControl_imar.Overlays.Add(newOverlay_imar);
                 overlaysByName[overlayName_imar] = newOverlay_imar;
                 overlaysByLayerIndex[imarOverlayCount] = newOverlay_imar;
@@ -4392,6 +4491,11 @@ namespace SLF
             {
                 GMapOverlay newOverlay_yga = new GMapOverlay(overlayName_yga);
                 CopyPolygons(overlay_to_be_saved, newOverlay_yga);
+                if (activeMapName == "gMapControl_yga" && gMapControl_yga.Overlays.Contains(overlay_to_be_saved))
+                {
+                    gMapControl_yga.Overlays.Remove(overlay_to_be_saved);
+                    gMapControl_yga.Refresh(); // Refresh map
+                }
                 // Ensure overlay is added to Stokastik map
                 gMapControl_yga.Overlays.Add(newOverlay_yga);
                 overlaysByName[overlayName_yga] = newOverlay_yga;
@@ -4408,12 +4512,7 @@ namespace SLF
             {
                 GMapOverlay newOverlay_stokastik = new GMapOverlay(overlayName_stokastik);
                 CopyPolygons(overlay_to_be_saved, newOverlay_stokastik);
-                /*                if (gMapControl_stokastik != null && activeMapName != "gMapControl_stokastik")
-                                {
-                                    //gMapControl_stokastik.Overlays.Add(overlay_to_be_saved);
-                                    //gMapControl_stokastik.Overlays.Remove(overlay_to_be_saved);
-                                    gMapControl_stokastik.Refresh(); // Refresh map
-                                }*/
+
                 if (activeMapName == "gMapControl_stokastik" && gMapControl_stokastik.Overlays.Contains(overlay_to_be_saved))
                 {
                     gMapControl_stokastik.Overlays.Remove(overlay_to_be_saved);
@@ -4425,9 +4524,6 @@ namespace SLF
                 overlaysByLayerIndex[stokastikOverlayCount] = newOverlay_stokastik;
                 // Update the checkbox text for Stokastik dynamically
                 UpdateCheckboxTextForLayer(stokastikOverlayCount, checkBoxes_stokastik, overlayName_stokastik);
-
-           //     gMapControl_stokastik.Overlays.Remove(overlay_to_be_saved);
-
                 gMapControl_stokastik.Refresh();
             }
         } 
