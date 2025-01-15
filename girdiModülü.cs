@@ -414,7 +414,8 @@ namespace SLF
                 importedDataTable = currentDataTable.Copy();
                 dataTablesByType[seçilenVeriTipi] = importedDataTable;
 
-                // If "Ekonometrik Yük Tahmini Verileri" is selected, export to Excel and run the R script
+            
+                    // If "Ekonometrik Yük Tahmini Verileri" is selected, export to Excel and run the R script
                 if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
                 {
                     string filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";

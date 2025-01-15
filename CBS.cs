@@ -1865,17 +1865,16 @@ namespace SLF
         }
         public void Draw_Polygon(List<PointLatLng> polygonPoints, GMapOverlay polygonOverlay, GMapControl gmap)
         {
-            // Bu noktalar arasında poligon çiz, mavi ile işaretle ve polygonOverlay katmanına ekle.
+            // bu noktalar arasında poligon çiz, mavi ile işaretle, ve de 
+            // polygonOverlay katmanına ekle.
             string poligonIsim = $"Poligon_{polygonOverlay.Polygons.Count + 1}";
             GMapPolygon polygon = new GMapPolygon(polygonPoints, poligonIsim)
             {
                 Stroke = new Pen(System.Drawing.Color.Purple, 2)
             };
 
-            // Mevcut poligonları silmeden yeni poligonu ekle
+            polygonOverlay.Polygons.Clear();
             polygonOverlay.Polygons.Add(polygon);
-
-            // Haritayı yenile
             gmap.Refresh();
         }
         public System.Data.DataTable CreatePolygonDataTable(List<PointLatLng> polygonPoints, int polygonId)
