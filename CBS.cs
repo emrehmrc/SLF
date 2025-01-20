@@ -310,29 +310,39 @@ namespace SLF
             gmapcontrol.Refresh();
             gmapcontrol.ReloadMap();
         }
-        private async Task ProcessShapefile(string filepath, string filename, Form callingForm, DataGridView dataGridView)
+        private async Task ProcessShapefile(string filepath, string overlayName, Form callingForm, DataGridView dataGridView)
         {
+            // Create overlays for the shapefile
             GMapOverlay[] overlays = CreateOverlays("shp");
 
-            // Add the first overlay to each map
-            modülFormu.gMapControl_imar.Overlays.Add(overlays[0]);
+            // Add the first overlay to each map control
+            if (modülFormu.gMapControl_imar == null) 
+            {
+                modülFormu.gMapControl_imar.Overlays.Add(overlays[0]);
+            }
+            //modülFormu.gMapControl_imar.Overlays.Add(overlays[0]);
             modülFormu.gMapControl_yuk.Overlays.Add(overlays[1]);
             modülFormu.gMapControl_stokastik.Overlays.Add(overlays[2]);
             modülFormu.gMapControl_yga.Overlays.Add(overlays[3]);
 
+            // Create a DataTable for the shapefile data
             System.Data.DataTable shapefileDatatable = new System.Data.DataTable();
             callingForm.Cursor = Cursors.WaitCursor;
+
+            // Load the shapefile asynchronously
             await LoadShapefile(filepath, overlays[0], shapefileDatatable, dataGridView);
             callingForm.Cursor = Cursors.Default;
 
-            // Copy the contents from the first overlay to the others
-            CopyOverlayContents(overlays[0], overlays[1]);
-            CopyOverlayContents(overlays[0], overlays[2]);
-            CopyOverlayContents(overlays[0], overlays[3]);
-
-            AddLayerToArrays(overlays[0], filename, shapefileDatatable);
-            HandleCheckBoxes(layer_index, filename);
+            // Add polygons to all maps (after copying them to overlays)
+            modülFormu.AddShapefileLayerToAllMaps(overlays[0]);  // Assuming overlays[0] contains the shapes to be added to all maps
+                                                                 //AddLayerToArrays(0, overlays[0], overlayName, shapefileDatatable);
+                                                                 // Add each overlay to the layer arrays
+            for (int i = 0; i < overlays.Length; i++)
+            {
+                AddLayerToArrays(i, overlays[i], overlayName, shapefileDatatable);  // Add overlays to layer array using their index
+            }
         }
+
 
         private async Task ProcessKml(string filepath, string filename, Form callingForm, GMapControl gmapcontrol)
         {
@@ -354,10 +364,10 @@ namespace SLF
             CopyOverlayContents(overlays[0], overlays[2]);
             CopyOverlayContents(overlays[0], overlays[3]);
 
-            AddLayerToArrays(overlays[0], filename, kmlDatatable);
-            HandleCheckBoxes(layer_index, filename);
+            //AddLayerToArrays(overlays[0], filename, kmlDatatable);
+            //HandleCheckBoxes(layer_index, filename);
         }
-        private void CopyOverlayContents(GMapOverlay sourceOverlay, GMapOverlay targetOverlay)
+        public void CopyOverlayContents(GMapOverlay sourceOverlay, GMapOverlay targetOverlay)
         {
             // Copy Polygons
             foreach (var polygon in sourceOverlay.Polygons)
@@ -406,7 +416,80 @@ namespace SLF
             }
         }
 
+        private void HandleCheckBoxes(int layerIndex, string filename)
+        {
+            // Get the checkboxes that correspond to the layerIndex
+            var associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layerIndex);
 
+            if (associatedCheckBoxes != null)
+            {
+                // Loop through each checkbox in the list and apply the required settings
+                foreach (var checkBox in associatedCheckBoxes)
+                {
+                    // Make sure the checkbox is visible and checked
+                    checkBox.Checked = true;
+                    checkBox.Visible = true;
+                    checkBox.Text = filename;  // Set the name of the layer to the checkbox text
+                }
+            }
+        }
+        public GMapOverlay[] CreateOverlays(string type)
+        {
+            string baseName = $"{type}Overlay_{layer_index + 1}";
+            return new[]
+            {
+                new GMapOverlay($"{baseName}_imar"),
+                new GMapOverlay($"{baseName}_yuk"),
+                new GMapOverlay($"{baseName}_stokastik"),
+                new GMapOverlay($"{baseName}_yga")
+
+            };
+        }
+        // Dictionary to store layers by unique identifier
+        private Dictionary<string, GMapOverlay> layerDictionary = new Dictionary<string, GMapOverlay>();
+        /*        public void AddLayerToArrays(int layerIndex, GMapOverlay overlay)
+                {
+                    string overlayName = "Shape" + (layerIndex + 1).ToString();
+
+                    // Ensure overlaysByName is initialized
+                    if (modülFormu.overlaysByName == null)
+                    {
+                        modülFormu.overlaysByName = new Dictionary<string, GMapOverlay>();
+                    }
+
+                    // Only add the overlay if it's not already present
+                    if (!modülFormu.overlaysByName.ContainsKey(overlayName))
+                    {
+                        modülFormu.overlaysByName.Add(overlayName, overlay);
+                        Console.WriteLine($"Added overlay with name: {overlayName}");
+                    }
+                    else
+                    {
+                        // Update the overlay if it already exists
+                        modülFormu.overlaysByName[overlayName] = overlay;
+                        Console.WriteLine($"Updated overlay with name: {overlayName}");
+                    }
+                }*/
+
+        private void AddLayerToArrays(int layerIndex, GMapOverlay overlay, string overlayName, System.Data.DataTable datatable)
+        {
+            // Check if the layer index is valid
+            if (layerIndex >= 0 && layerIndex < tüm_katmanlar_array.Length)
+            {
+                tüm_katmanlar_array[layerIndex] = overlay;
+                tüm_katmanlar_array_names[layerIndex] = overlayName;
+                tüm_katmanlar_datatable[layerIndex] = datatable;
+
+                Console.WriteLine($"Added layer at index {layerIndex}: {overlayName}");
+            }
+            else
+            {
+                Console.WriteLine($"Invalid layer index: {layerIndex}");
+            }
+        }
+
+        /*
+        */
         /*        private async Task ProcessShapefile(string filepath, string filename, Form callingForm, DataGridView dataGridView)
                 {
                     GMapOverlay[] overlays = CreateOverlays("shp");
@@ -419,8 +502,6 @@ namespace SLF
 
                     }
 
-
-
                     System.Data.DataTable shapefileDatatable = new System.Data.DataTable();
                     callingForm.Cursor = Cursors.WaitCursor;
                     await LoadShapefile(filepath, overlays[0], shapefileDatatable, dataGridView);
@@ -428,9 +509,9 @@ namespace SLF
 
                     AddLayerToArrays(overlays[0], filename, shapefileDatatable);
                     HandleCheckBoxes(layer_index, filename);
-                }
+                }*/
 
-                private async Task ProcessKml(string filepath, string filename, Form callingForm, GMapControl gmapcontrol)
+        /*        private async Task ProcessKml(string filepath, string filename, Form callingForm, GMapControl gmapcontrol)
                 {
                     GMapOverlay[] overlays = CreateOverlays("kml");
                     foreach (var overlay in overlays)
@@ -449,47 +530,6 @@ namespace SLF
                     AddLayerToArrays(overlays[0], filename, kmlDatatable);
                     HandleCheckBoxes(layer_index, filename);
                 }*/
-
-        private GMapOverlay[] CreateOverlays(string type)
-        {
-            string baseName = $"{type}Overlay_{layer_index + 1}";
-            return new[]
-            {
-                new GMapOverlay($"{baseName}_imar"),
-                new GMapOverlay($"{baseName}_yuk"),
-                new GMapOverlay($"{baseName}_stokastik"),
-                new GMapOverlay($"{baseName}_yga")
-
-            };
-        }
-        // Dictionary to store layers by unique identifier
-        private Dictionary<string, GMapOverlay> layerDictionary = new Dictionary<string, GMapOverlay>();
-
-        private void AddLayerToArrays(GMapOverlay overlay, string filename, System.Data.DataTable datatable)
-        {
-            tüm_katmanlar_array[layer_index] = overlay;
-            tüm_katmanlar_array_names[layer_index] = filename;
-            tüm_katmanlar_datatable[layer_index] = datatable;
-        }
-
-        private void HandleCheckBoxes(int layerIndex, string filename)
-        {
-            // Get the checkboxes that correspond to the layerIndex
-            var associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layerIndex);
-
-            if (associatedCheckBoxes != null)
-            {
-                // Loop through each checkbox in the list and apply the required settings
-                foreach (var checkBox in associatedCheckBoxes)
-                {
-                    // Make sure the checkbox is visible and checked
-                    checkBox.Checked = true;
-                    checkBox.Visible = true;
-                    checkBox.Text = filename;  // Set the name of the layer to the checkbox text
-                }
-            }
-        }
-
 
         /*        private void CopyOverlayContents(GMapOverlay sourceOverlay, GMapOverlay targetOverlay)
                 {
@@ -545,8 +585,8 @@ namespace SLF
             (System.Drawing.Color.Red, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Red)),
             (System.Drawing.Color.Blue, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Blue)),
             (System.Drawing.Color.Green, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Green)),
-            //(System.Drawing.Color.DarkGoldenrod, System.Drawing.Color.FromArgb(50, System.Drawing.Color.DarkGoldenrod)),
-            (System.Drawing.Color.Yellow, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Yellow)),
+            (System.Drawing.Color.DarkGoldenrod, System.Drawing.Color.FromArgb(50, System.Drawing.Color.DarkGoldenrod)),
+           // (System.Drawing.Color.Yellow, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Yellow)),
             (System.Drawing.Color.Purple, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Purple)),
             (System.Drawing.Color.Orange, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Orange)),
             (System.Drawing.Color.Pink, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Pink)),

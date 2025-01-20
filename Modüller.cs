@@ -2595,14 +2595,29 @@ namespace SLF
             // Return an empty list if index is out of range
             return new List<CheckBox>();  // Empty list instead of null
         }
+        public List<CheckBox> GetCheckBoxesByFilename(string filename)
+        {
+            var checkBoxes = new List<CheckBox>();
 
+            // Example: Assuming you have checkboxes named checkBox_imar_1, checkBox_yuk_1, etc.
+            // Replace this logic with your actual checkbox naming convention.
+            foreach (var control in this.Controls)
+            {
+                if (control is CheckBox checkBox && checkBox.Name.Contains(filename))
+                {
+                    checkBoxes.Add(checkBox);
+                }
+            }
+
+            return checkBoxes;
+        }
         // Initialize all checkboxes
         // Class-level declaration of checkbox arrays
-        private CheckBox[] checkBoxes_yga;
-        private CheckBox[] checkBoxes_imar;
-        private CheckBox[] checkBoxes_stokastik;
+        public CheckBox[] checkBoxes_yga;
+        public CheckBox[] checkBoxes_imar;
+        public CheckBox[] checkBoxes_stokastik;
 
-        private void checkboxes_init()
+        public void checkboxes_init()
         {
             // Initialize the arrays with the checkboxes for each map category
             checkBoxes_yga = new CheckBox[] { checkBox_yga_1, checkBox_yga_2, checkBox_yga_3, checkBox_yga_4, checkBox_yga_5, checkBox_yga_6, checkBox_yga_7, checkBox_yga_8, checkBox_yga_9, checkBox_yga_10, checkBox_yga_11, checkBox_yga_12, checkBox_yga_13 };
@@ -2682,10 +2697,54 @@ namespace SLF
 
         // mouse down event of the checkboxes which displays the related data table with the corresponding
         // checkbox/layer
+        /*        private void checkBox_MouseDown(object sender, MouseEventArgs e)
+                {
+                    System.Windows.Forms.CheckBox sender_checkbox = sender as System.Windows.Forms.CheckBox;
+                    int checkbox_index = int.Parse(sender_checkbox.Tag.ToString()) - 1;
+
+                    // Update the last clicked checkbox
+                    if (lastClickedCheckbox != null)
+                    {
+                        // Reset previous checkbox style to normal
+                        lastClickedCheckbox.Font = new Font(lastClickedCheckbox.Font, FontStyle.Regular);
+                    }
+
+                    //sender_checkbox.Font = new Font(sender_checkbox.Font, FontStyle.Italic | FontStyle.Underline);
+                    lastClickedCheckbox = sender_checkbox;
+
+                    temizleToolStripMenuItem.Tag = sender_checkbox;
+                    rengiDeğiştirToolStripMenuItem.Tag = sender_checkbox;
+                    kaydetToolStripMenuItem.Tag = sender_checkbox;
+                    yenidenAdlandırToolStripMenuItem.Tag = sender_checkbox;
+
+                    if (cbs.tüm_katmanlar_array[checkbox_index] != null)
+                    {
+                        tablo_formu.Text = "Veri Tablosu -- " + cbs.tüm_katmanlar_array_names[checkbox_index] +
+                           " -- " + cbs.tüm_katmanlar_datatable[checkbox_index].Rows.Count + " satır -- " +
+                           cbs.tüm_katmanlar_datatable[checkbox_index].Columns.Count + " sütun";
+                        ShowAttributeTable(cbs.tüm_katmanlar_datatable[checkbox_index]);
+                    }
+                }*/
         private void checkBox_MouseDown(object sender, MouseEventArgs e)
         {
+            // Cast the sender to a CheckBox
             System.Windows.Forms.CheckBox sender_checkbox = sender as System.Windows.Forms.CheckBox;
-            int checkbox_index = int.Parse(sender_checkbox.Tag.ToString()) - 1;
+            if (sender_checkbox == null)
+            {
+                Console.WriteLine("Sender is not a CheckBox.");
+                return;
+            }
+
+            // Safely parse the Tag property to an integer
+            int checkbox_index;
+            if (!Int32.TryParse(sender_checkbox.Tag?.ToString(), out checkbox_index))
+            {
+                Console.WriteLine($"Invalid Tag value: '{sender_checkbox.Tag}'. Expected a valid integer.");
+                return;
+            }
+
+            // Adjust the index (if necessary)
+            checkbox_index -= 1;
 
             // Update the last clicked checkbox
             if (lastClickedCheckbox != null)
@@ -2694,35 +2753,43 @@ namespace SLF
                 lastClickedCheckbox.Font = new Font(lastClickedCheckbox.Font, FontStyle.Regular);
             }
 
-            //sender_checkbox.Font = new Font(sender_checkbox.Font, FontStyle.Italic | FontStyle.Underline);
+            // Update the last clicked checkbox reference
             lastClickedCheckbox = sender_checkbox;
 
+            // Set the Tag property for context menu items
             temizleToolStripMenuItem.Tag = sender_checkbox;
             rengiDeğiştirToolStripMenuItem.Tag = sender_checkbox;
             kaydetToolStripMenuItem.Tag = sender_checkbox;
             yenidenAdlandırToolStripMenuItem.Tag = sender_checkbox;
 
-            if (cbs.tüm_katmanlar_array[checkbox_index] != null)
+            // Check if the layer at the checkbox index exists
+            if (checkbox_index >= 0 && checkbox_index < cbs.tüm_katmanlar_array.Length && cbs.tüm_katmanlar_array[checkbox_index] != null)
             {
+                // Update the table form text
                 tablo_formu.Text = "Veri Tablosu -- " + cbs.tüm_katmanlar_array_names[checkbox_index] +
-                   " -- " + cbs.tüm_katmanlar_datatable[checkbox_index].Rows.Count + " satır -- " +
-                   cbs.tüm_katmanlar_datatable[checkbox_index].Columns.Count + " sütun";
+                    " -- " + cbs.tüm_katmanlar_datatable[checkbox_index].Rows.Count + " satır -- " +
+                    cbs.tüm_katmanlar_datatable[checkbox_index].Columns.Count + " sütun";
+
+                // Show the attribute table
                 ShowAttributeTable(cbs.tüm_katmanlar_datatable[checkbox_index]);
             }
-        }
-
-        // display or hide the layers by checkboxes of the form
-/*        private void checkBox_CheckedChanged(object sender, EventArgs e)
-        {
-            System.Windows.Forms.CheckBox checkBox = (System.Windows.Forms.CheckBox)sender;
-            int index = int.Parse(checkBox.Tag.ToString()) - 1;
-
-            if (cbs.tüm_katmanlar_array[index] != null)
+            else
             {
-                cbs.tüm_katmanlar_array[index].IsVisibile = checkBox.Checked;
-                cbs.GetActiveGMapControl().Refresh();
+                Console.WriteLine($"Invalid checkbox index or layer not found: {checkbox_index}");
             }
-        }*/
+        }
+        // display or hide the layers by checkboxes of the form
+        /*        private void checkBox_CheckedChanged(object sender, EventArgs e)
+                {
+                    System.Windows.Forms.CheckBox checkBox = (System.Windows.Forms.CheckBox)sender;
+                    int index = int.Parse(checkBox.Tag.ToString()) - 1;
+
+                    if (cbs.tüm_katmanlar_array[index] != null)
+                    {
+                        cbs.tüm_katmanlar_array[index].IsVisibile = checkBox.Checked;
+                        cbs.GetActiveGMapControl().Refresh();
+                    }
+                }*/
         /*        private void checkBox_MouseDown(object sender, MouseEventArgs e)
                 {
                     System.Windows.Forms.CheckBox sender_checkbox = sender as System.Windows.Forms.CheckBox;
@@ -4367,9 +4434,9 @@ namespace SLF
 
 
         */
-        private Dictionary<int, GMapOverlay> overlaysByLayerIndex = new Dictionary<int, GMapOverlay>();
-        private Dictionary<int, CheckBox[]> checkboxesByLayerIndex = new Dictionary<int, CheckBox[]>();
-        private Dictionary<string, GMapOverlay> overlaysByName = new Dictionary<string, GMapOverlay>();
+        public Dictionary<int, GMapOverlay> overlaysByLayerIndex = new Dictionary<int, GMapOverlay>();
+        public Dictionary<int, CheckBox[]> checkboxesByLayerIndex = new Dictionary<int, CheckBox[]>();
+        public Dictionary<string, GMapOverlay> overlaysByName = new Dictionary<string, GMapOverlay>();
 
         public void PoligonKaydetEventi(object sender, EventArgs e, GMapOverlay polygonOverlay,
                 GMapOverlay markerOverlay, List<PointLatLng> polygonPoints,
@@ -4427,7 +4494,7 @@ namespace SLF
             }
         }
 
-        private void AddOverlayToDictionary(int layerIndex, GMapOverlay overlay)
+        public void AddOverlayToDictionary(int layerIndex, GMapOverlay overlay)
         {
             string overlayName = "Polygon_" + (layerIndex + 1).ToString();
 
@@ -4444,11 +4511,11 @@ namespace SLF
             // For debugging: log the overlay being added
             Console.WriteLine($"Added overlay with name: {overlayName}");
         }
-        private int ygaPolygonOverlayCount = 0;
-        private int imarPolygonOverlayCount = 0;
-        private int stokastikPolygonOverlayCount = 0;
+        public int ygaOverlayCount = 0;
+        public int imarOverlayCount = 0;
+        public int stokastikOverlayCount = 0;
 
-        private void AddPolygonToAllMaps(GMapOverlay overlay_to_be_saved)
+        public void AddPolygonToAllMaps(GMapOverlay overlay_to_be_saved)
         {
             // Get the active map control
             GMapControl activeMap = cbs.GetActiveGMapControl();
@@ -4456,12 +4523,12 @@ namespace SLF
 
             // Debugging: Log overlay counts and active map name
             Console.WriteLine($"Active Map: {activeMapName}");
-            Console.WriteLine($"Overlay Counts: YGA={ygaPolygonOverlayCount}, Imar={imarPolygonOverlayCount}, Stokastik={stokastikPolygonOverlayCount}");
+            Console.WriteLine($"Overlay Counts: YGA={ygaOverlayCount}, Imar={imarOverlayCount}, Stokastik={stokastikOverlayCount}");
 
             // Create unique names for each map's overlay based on the count
-            string overlayName_yga = "Polygon_" + (ygaPolygonOverlayCount + 1) + "_yga";
-            string overlayName_imar = "Polygon_" + (imarPolygonOverlayCount + 1) + "_imar";
-            string overlayName_stokastik = "Polygon_" + (stokastikPolygonOverlayCount + 1) + "_stokastik";
+            string overlayName_yga = "Polygon_" + (ygaOverlayCount + 1) + "_yga";
+            string overlayName_imar = "Polygon_" + (imarOverlayCount + 1) + "_imar";
+            string overlayName_stokastik = "Polygon_" + (stokastikOverlayCount + 1) + "_stokastik";
 
             // Debugging: Log the overlay names
             Console.WriteLine($"Overlay Names: YGA={overlayName_yga}, Imar={overlayName_imar}, Stokastik={overlayName_stokastik}");
@@ -4480,14 +4547,14 @@ namespace SLF
 
                 gMapControl_imar.Overlays.Add(newOverlay_imar);
                 overlaysByName[overlayName_imar] = newOverlay_imar;
-                overlaysByLayerIndex[imarPolygonOverlayCount] = newOverlay_imar;
+                overlaysByLayerIndex[imarOverlayCount] = newOverlay_imar;
 
                 // Update the checkbox text for Imar dynamically
-                UpdateCheckboxTextForLayer(imarPolygonOverlayCount, checkBoxes_imar, overlayName_imar);
+                UpdateCheckboxTextForLayer(imarOverlayCount, checkBoxes_imar, overlayName_imar);
                 Console.WriteLine($"Updated checkbox for Imar: {overlayName_imar}");
 
                 gMapControl_imar.Refresh();
-                imarPolygonOverlayCount++; // Increment the counter
+                imarOverlayCount++; // Increment the counter
             }
 
             // Add to YGA map
@@ -4504,14 +4571,14 @@ namespace SLF
 
                 gMapControl_yga.Overlays.Add(newOverlay_yga);
                 overlaysByName[overlayName_yga] = newOverlay_yga;
-                overlaysByLayerIndex[ygaPolygonOverlayCount] = newOverlay_yga;
+                overlaysByLayerIndex[ygaOverlayCount] = newOverlay_yga;
 
                 // Update the checkbox text for YGA dynamically
-                UpdateCheckboxTextForLayer(ygaPolygonOverlayCount, checkBoxes_yga, overlayName_yga);
+                UpdateCheckboxTextForLayer(ygaOverlayCount, checkBoxes_yga, overlayName_yga);
                 Console.WriteLine($"Updated checkbox for YGA: {overlayName_yga}");
 
                 gMapControl_yga.Refresh();
-                ygaPolygonOverlayCount++; // Increment the counter
+                ygaOverlayCount++; // Increment the counter
             }
 
             // Add to Stokastik map
@@ -4528,106 +4595,109 @@ namespace SLF
 
                 gMapControl_stokastik.Overlays.Add(newOverlay_stokastik);
                 overlaysByName[overlayName_stokastik] = newOverlay_stokastik;
-                overlaysByLayerIndex[stokastikPolygonOverlayCount] = newOverlay_stokastik;
+                overlaysByLayerIndex[stokastikOverlayCount] = newOverlay_stokastik;
 
                 // Update the checkbox text for Stokastik dynamically
-                UpdateCheckboxTextForLayer(stokastikPolygonOverlayCount, checkBoxes_stokastik, overlayName_stokastik);
+                UpdateCheckboxTextForLayer(stokastikOverlayCount, checkBoxes_stokastik, overlayName_stokastik);
                 Console.WriteLine($"Updated checkbox for Stokastik: {overlayName_stokastik}");
 
                 gMapControl_stokastik.Refresh();
-                stokastikPolygonOverlayCount++; // Increment the counter
+                stokastikOverlayCount++; // Increment the counter
             }
         }
-        /*        private void AddPolygonToAllMaps(GMapOverlay overlay_to_be_saved)
+        public void AddShapefileLayerToAllMaps(GMapOverlay overlay_to_be_saved)
+        {
+            // Get the active map control
+            GMapControl activeMap = cbs.GetActiveGMapControl();
+            string activeMapName = activeMap.Name;
+
+            // Debugging: Log overlay counts and active map name
+            Console.WriteLine($"Active Map: {activeMapName}");
+            Console.WriteLine($"Overlay Counts: YGA={ygaOverlayCount}, Imar={imarOverlayCount}, Stokastik={stokastikOverlayCount}");
+
+            // Create unique names for each map's overlay based on the count
+            string overlayName_yga = "Shapefile_" + (ygaOverlayCount + 1) + "_yga";
+            string overlayName_imar = "Shapefile_" + (imarOverlayCount + 1) + "_imar";
+            string overlayName_stokastik = "Shapefile_" + (stokastikOverlayCount + 1) + "_stokastik";
+
+            // Debugging: Log the overlay names
+            Console.WriteLine($"Overlay Names: YGA={overlayName_yga}, Imar={overlayName_imar}, Stokastik={overlayName_stokastik}");
+
+            // Add to Imar map
+            if (gMapControl_imar != null)
+            {
+                GMapOverlay newOverlay_imar = new GMapOverlay(overlayName_imar);
+                cbs.CopyOverlayContents(overlay_to_be_saved, newOverlay_imar);  // Copy shapefile data to the new overlay
+
+                // Remove the old overlay only if this is the active map
+                if (activeMapName == "gMapControl_imar" && gMapControl_imar.Overlays.Contains(overlay_to_be_saved))
                 {
-                    // Get the active map control
-                    GMapControl activeMap = cbs.GetActiveGMapControl();
-                    string activeMapName = activeMap.Name;
+                    gMapControl_imar.Overlays.Remove(overlay_to_be_saved);
+                }
 
-                    // Track overlay counts per map to ensure unique names for each overlay
-                    // int ygaOverlayCount = gMapControl_yga.Overlays[0].Polygons.Count;
-                    int ygaOverlayCount = gMapControl_yga.Overlays.Count -3 ;
-                    int imarOverlayCount = gMapControl_imar.Overlays.Count -3 ;
-                    int stokastikOverlayCount = gMapControl_stokastik.Overlays.Count - 3;
-                    // Debugging: Log overlay counts and active map name
-                    Console.WriteLine($"Active Map: {activeMapName}");
-                    // Create unique names for each map's overlay based on the count
-                    string overlayName_yga = "Polygon_" + (ygaOverlayCount + 1) + "_yga";
-                    string overlayName_imar = "Polygon_" + (imarOverlayCount + 1) + "_imar";
-                    string overlayName_stokastik = "Polygon_" + (stokastikOverlayCount + 1) + "_stokastik";
+                gMapControl_imar.Overlays.Add(newOverlay_imar);
+                overlaysByName[overlayName_imar] = newOverlay_imar;
+                overlaysByLayerIndex[imarOverlayCount] = newOverlay_imar;
 
-                    // Debugging: Log the overlay names and counts
-                    // Debugging: Log overlay counts
-                    Console.WriteLine($"Overlay Counts: YGA={ygaOverlayCount}, Imar={imarOverlayCount}, Stokastik={stokastikOverlayCount}");
-                    Console.WriteLine($"Overlay Names: YGA={overlayName_yga}, Imar={overlayName_imar}, Stokastik={overlayName_stokastik}");
+                // Update the checkbox text for Imar dynamically
+                UpdateCheckboxTextForLayer(imarOverlayCount, checkBoxes_imar, overlayName_imar);
+                Console.WriteLine($"Updated checkbox for Imar: {overlayName_imar}");
 
-                    // Add to Imar map
-                    if (gMapControl_imar != null && activeMapName == "gMapControl_imar" && gMapControl_imar.Overlays.Contains(overlay_to_be_saved))
-                    {
-                        GMapOverlay newOverlay_imar = new GMapOverlay(overlayName_imar);
-                        CopyPolygons(overlay_to_be_saved, newOverlay_imar);
-                        if (activeMapName == "gMapControl_imar" && gMapControl_imar.Overlays.Contains(overlay_to_be_saved))
-                        {
-                            gMapControl_imar.Overlays.Remove(overlay_to_be_saved);
+                gMapControl_imar.Refresh();
+                imarOverlayCount++; // Increment the counter
+            }
 
-                            gMapControl_imar.Refresh(); // Refresh map
-                        }
+            // Add to YGA map
+            if (gMapControl_yga != null)
+            {
+                GMapOverlay newOverlay_yga = new GMapOverlay(overlayName_yga);
+                cbs.CopyOverlayContents(overlay_to_be_saved, newOverlay_yga);  // Copy shapefile data to the new overlay
 
-                        gMapControl_imar.Overlays.Add(newOverlay_imar);
-                        overlaysByName[overlayName_imar] = newOverlay_imar;
-                        overlaysByLayerIndex[imarOverlayCount] = newOverlay_imar;
+                // Remove the old overlay only if this is the active map
+                if (activeMapName == "gMapControl_yga" && gMapControl_yga.Overlays.Contains(overlay_to_be_saved))
+                {
+                    gMapControl_yga.Overlays.Remove(overlay_to_be_saved);
+                }
 
-                        // Update the checkbox text for Imar dynamically
-                        UpdateCheckboxTextForLayer(imarOverlayCount, checkBoxes_imar, overlayName_imar);
+                gMapControl_yga.Overlays.Add(newOverlay_yga);
+                overlaysByName[overlayName_yga] = newOverlay_yga;
+                overlaysByLayerIndex[ygaOverlayCount] = newOverlay_yga;
 
-                        gMapControl_imar.Refresh();
-                    }
+                // Update the checkbox text for YGA dynamically
+                UpdateCheckboxTextForLayer(ygaOverlayCount, checkBoxes_yga, overlayName_yga);
+                Console.WriteLine($"Updated checkbox for YGA: {overlayName_yga}");
 
-                    // Add to YGA map
-                    if (gMapControl_yga != null)
-                    {
-                        GMapOverlay newOverlay_yga = new GMapOverlay(overlayName_yga);
-                        CopyPolygons(overlay_to_be_saved, newOverlay_yga);
-                        if (activeMapName == "gMapControl_yga" && gMapControl_yga.Overlays.Contains(overlay_to_be_saved))
-                        {
-                            gMapControl_yga.Overlays.Remove(overlay_to_be_saved);
-                            gMapControl_yga.Refresh(); // Refresh map
-                        }
-                        // Ensure overlay is added to Stokastik map
-                        gMapControl_yga.Overlays.Add(newOverlay_yga);
-                        overlaysByName[overlayName_yga] = newOverlay_yga;
-                        overlaysByLayerIndex[ygaOverlayCount] = newOverlay_yga;
+                gMapControl_yga.Refresh();
+                ygaOverlayCount++; // Increment the counter
+            }
 
-                        // Update the checkbox text for YGA dynamically
-                        UpdateCheckboxTextForLayer(ygaOverlayCount, checkBoxes_yga, overlayName_yga);
+            // Add to Stokastik map
+            if (gMapControl_stokastik != null)
+            {
+                GMapOverlay newOverlay_stokastik = new GMapOverlay(overlayName_stokastik);
+                cbs.CopyOverlayContents(overlay_to_be_saved, newOverlay_stokastik);  // Copy shapefile data to the new overlay
 
-                        gMapControl_yga.Refresh();
-                    }
+                // Remove the old overlay only if this is the active map
+                if (activeMapName == "gMapControl_stokastik" && gMapControl_stokastik.Overlays.Contains(overlay_to_be_saved))
+                {
+                    gMapControl_stokastik.Overlays.Remove(overlay_to_be_saved);
+                }
 
-                    // Add to Stokastik map
-                    if (gMapControl_stokastik != null)
-                    {
-                        GMapOverlay newOverlay_stokastik = new GMapOverlay(overlayName_stokastik);
-                        CopyPolygons(overlay_to_be_saved, newOverlay_stokastik);
+                gMapControl_stokastik.Overlays.Add(newOverlay_stokastik);
+                overlaysByName[overlayName_stokastik] = newOverlay_stokastik;
+                overlaysByLayerIndex[stokastikOverlayCount] = newOverlay_stokastik;
 
-                        if (activeMapName == "gMapControl_stokastik" && gMapControl_stokastik.Overlays.Contains(overlay_to_be_saved))
-                        {
-                            gMapControl_stokastik.Overlays.Remove(overlay_to_be_saved);
-                            gMapControl_stokastik.Refresh(); // Refresh map
-                        }
+                // Update the checkbox text for Stokastik dynamically
+                UpdateCheckboxTextForLayer(stokastikOverlayCount, checkBoxes_stokastik, overlayName_stokastik);
+                Console.WriteLine($"Updated checkbox for Stokastik: {overlayName_stokastik}");
 
-                        gMapControl_stokastik.Overlays.Add(newOverlay_stokastik);
-                        overlaysByName[overlayName_stokastik] = newOverlay_stokastik;
-                        overlaysByLayerIndex[stokastikOverlayCount] = newOverlay_stokastik;
-                        // Update the checkbox text for Stokastik dynamically
-                        UpdateCheckboxTextForLayer(stokastikOverlayCount, checkBoxes_stokastik, overlayName_stokastik);
-                        gMapControl_stokastik.Refresh();
-                    }
-                } */
-
+                gMapControl_stokastik.Refresh();
+                stokastikOverlayCount++; // Increment the counter
+            }
+        }
 
         // Function to update the checkbox text based on layer index and map category
-        private void UpdateCheckboxTextForLayer(int layerIndex, CheckBox[] checkBoxes, string overlayName)
+        public void UpdateCheckboxTextForLayer(int layerIndex, CheckBox[] checkBoxes, string overlayName)
         {
             if (layerIndex < checkBoxes.Length)
             {
@@ -4656,10 +4726,7 @@ namespace SLF
             }
         }
 
-
-
-
-        private void checkBox_CheckedChanged(object sender, EventArgs e)
+        public void checkBox_CheckedChanged(object sender, EventArgs e)
         {
             var checkbox = sender as CheckBox;
             if (checkbox != null)
@@ -4673,14 +4740,24 @@ namespace SLF
                     // Debugging: Log overlay visibility update
                     Console.WriteLine($"Updating visibility for overlay: {checkbox.Text}");
 
-                    // Update the visibility of polygons inside the overlay based on checkbox state
+                    // Update visibility of polygons, routes, and markers inside the overlay
                     foreach (var polygon in overlay.Polygons)
                     {
                         polygon.IsVisible = checkbox.Checked; // Toggle visibility of each polygon
                     }
 
+                    foreach (var route in overlay.Routes)
+                    {
+                        route.IsVisible = checkbox.Checked; // Toggle visibility of each route
+                    }
+
+                    foreach (var marker in overlay.Markers)
+                    {
+                        marker.IsVisible = checkbox.Checked; // Toggle visibility of each marker
+                    }
+
                     // Refresh each map to apply the changes
-                    foreach (var mapControl in new[] { gMapControl_imar, gMapControl_yga, gMapControl_stokastik })
+                    foreach (var mapControl in new[] { gMapControl_imar, gMapControl_yga, gMapControl_stokastik, gMapControl_yuk })
                     {
                         if (mapControl != null && mapControl.Overlays.Contains(overlay))
                         {
@@ -4696,7 +4773,46 @@ namespace SLF
             }
         }
 
-                                                                                                                        
+
+
+        /*        private void checkBox_CheckedChanged(object sender, EventArgs e)
+                {
+                    var checkbox = sender as CheckBox;
+                    if (checkbox != null)
+                    {
+                        // Debugging: Log the checkbox text
+                        Console.WriteLine($"Checkbox '{checkbox.Text}' changed.");
+
+                        // Try to get the corresponding overlay by its unique name
+                        if (overlaysByName.TryGetValue(checkbox.Text, out var overlay))
+                        {
+                            // Debugging: Log overlay visibility update
+                            Console.WriteLine($"Updating visibility for overlay: {checkbox.Text}");
+
+                            // Update the visibility of polygons inside the overlay based on checkbox state
+                            foreach (var polygon in overlay.Polygons)
+                            {
+                                polygon.IsVisible = checkbox.Checked; // Toggle visibility of each polygon
+                            }
+
+                            // Refresh each map to apply the changes
+                            foreach (var mapControl in new[] { gMapControl_imar, gMapControl_yga, gMapControl_stokastik })
+                            {
+                                if (mapControl != null && mapControl.Overlays.Contains(overlay))
+                                {
+                                    mapControl.Refresh(); // Refresh the map to apply changes
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Log if overlay is not found
+                            Console.WriteLine($"Overlay for checkbox '{checkbox.Text}' not found.");
+                        }
+                    }
+                }
+        */
+
 
         // This method handles the checkbox checked event to update visibility
 
@@ -4977,51 +5093,145 @@ namespace SLF
         {
             if (e.Button == MouseButtons.Left)
             {
-
-                if (cbs.tüm_katmanlar_array[layer_index] != null)
+                try
                 {
-
-                    foreach (var polygon in cbs.tüm_katmanlar_array[layer_index].Polygons)
+                    // Ensure the layer at the current layer_index is not null
+                    if (cbs.tüm_katmanlar_array[layer_index] != null)
                     {
-                        if (cbs.IsPointInPolygon(pointClick, polygon))
+                        // Iterate through the polygons in the current layer
+                        foreach (var polygon in cbs.tüm_katmanlar_array[layer_index].Polygons)
                         {
-                            cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
-
-                            if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
+                            // Check if the point is inside the polygon
+                            if (cbs.IsPointInPolygon(pointClick, polygon))
                             {
-                                ShowAttributeRow(row);
-                                tablo_formu.Show();
+                                // Highlight the polygon if it's clicked
+                                cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
+
+                                // Try to get the polygon's attributes
+                                if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
+                                {
+                                    // Show the attribute row
+                                    ShowAttributeRow(row);
+                                    tablo_formu.Show(); // Display the attribute table form
+                                }
+                                else
+                                {
+                                    // Log the case where polygon attributes are not found
+                                    Console.WriteLine("Attributes for the selected polygon not found.");
+                                }
                             }
                         }
                     }
+                    else
+                    {
+                        // Log the case where the layer at the current index is null
+                        Console.WriteLine($"Layer at index {layer_index} is null.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Handle unexpected exceptions and log them
+                    Console.WriteLine($"Error in gMapControl_yga_OnMapDoubleClick: {ex.Message}");
                 }
             }
         }
-        // show information about polygons when double-clicking on the map
+
+        /*        private void gMapControl_yga_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
+                {
+                    if (e.Button == MouseButtons.Left)
+                    {
+
+                        if (cbs.tüm_katmanlar_array[layer_index] != null)
+                        {
+
+                            foreach (var polygon in cbs.tüm_katmanlar_array[layer_index].Polygons)
+                            {
+                                if (cbs.IsPointInPolygon(pointClick, polygon))
+                                {
+                                    cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
+
+                                    if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
+                                    {
+                                        ShowAttributeRow(row);
+                                        tablo_formu.Show();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }*/
         private void gMapControl_stokastik_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
-
-                if (cbs.tüm_katmanlar_array[layer_index] != null)
+                try
                 {
-
-                    foreach (var polygon in cbs.tüm_katmanlar_array[layer_index].Polygons)
+                    // Ensure the layer at the current layer_index is not null
+                    if (cbs.tüm_katmanlar_array[layer_index] != null)
                     {
-                        if (cbs.IsPointInPolygon(pointClick, polygon))
+                        // Iterate through the polygons in the current layer
+                        foreach (var polygon in cbs.tüm_katmanlar_array[layer_index].Polygons)
                         {
-                            cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
-
-                            if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
+                            // Check if the point is inside the polygon
+                            if (cbs.IsPointInPolygon(pointClick, polygon))
                             {
-                                ShowAttributeRow(row);
-                                tablo_formu.Show();
+                                // Highlight the polygon if it's clicked
+                                cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
+
+                                // Try to get the polygon's attributes
+                                if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
+                                {
+                                    // Show the attribute row
+                                    ShowAttributeRow(row);
+                                    tablo_formu.Show(); // Display the attribute table form
+                                }
+                                else
+                                {
+                                    // Handle case where polygon attributes are not found
+                                    Console.WriteLine("Attributes for the selected polygon not found.");
+                                }
                             }
                         }
                     }
+                    else
+                    {
+                        // Handle case where the layer at the current index is null
+                        Console.WriteLine($"Layer at index {layer_index} is null.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Handle any unexpected exceptions and log the error
+                    Console.WriteLine($"Error in gMapControl_stokastik_OnMapDoubleClick: {ex.Message}");
                 }
             }
         }
+
+        // show information about polygons when double-clicking on the map
+        /*        private void gMapControl_stokastik_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
+                {
+                    if (e.Button == MouseButtons.Left)
+                    {
+
+                        if (cbs.tüm_katmanlar_array[layer_index] != null)
+                        {
+
+                            foreach (var polygon in cbs.tüm_katmanlar_array[layer_index].Polygons)
+                            {
+                                if (cbs.IsPointInPolygon(pointClick, polygon))
+                                {
+                                    cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
+
+                                    if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
+                                    {
+                                        ShowAttributeRow(row);
+                                        tablo_formu.Show();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }*/
         /*        private void gMapControl_imar_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
                 {
                     // Check if the left mouse button was clicked and if lastClickedCheckbox is valid
@@ -5131,37 +5341,91 @@ namespace SLF
                     }
                 }*/
 
-
         private void gMapControl_imar_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left && lastClickedCheckbox != null)
             {
-                int checkbox_index = int.Parse(lastClickedCheckbox.Tag.ToString()) - 1;
-
-                foreach (var polygon in cbs.tüm_katmanlar_array[checkbox_index].Polygons)
+                try
                 {
-                    if (cbs.IsPointInPolygon(pointClick, polygon))
+                    int checkbox_index = int.Parse(lastClickedCheckbox.Tag.ToString()) - 1;
+
+                    // Ensure checkbox_index is within valid range
+                    if (checkbox_index < 0 || checkbox_index >= cbs.tüm_katmanlar_array.Length)
                     {
-                        cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
-                        layer_index = checkbox_index;
-                        if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
+                        Console.WriteLine("Invalid checkbox index.");
+                        return;
+                    }
+
+                    foreach (var polygon in cbs.tüm_katmanlar_array[checkbox_index].Polygons)
+                    {
+                        if (cbs.IsPointInPolygon(pointClick, polygon))
                         {
-                            ShowAttributeRow(row);
-                            tablo_formu.Show();
+                            // Highlight the polygon and update the layer index
+                            cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
+                            layer_index = checkbox_index;  // Update the current layer index to the clicked polygon's layer
+
+                            // Try to get the attributes of the clicked polygon
+                            if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
+                            {
+                                ShowAttributeRow(row);  // Show the row attributes
+                                tablo_formu.Show();     // Display the table form
+                            }
+                            else
+                            {
+                                Console.WriteLine("Polygon attributes not found.");
+                            }
                         }
                     }
+                }
+                catch (Exception ex)
+                {
+                    // Handle any exceptions to prevent the app from crashing
+                    Console.WriteLine($"Error: {ex.Message}");
                 }
             }
         }
 
-        // show just the single row whenever a polygon is clicked on which corresponds to its row
+        // Show just the single row whenever a polygon is clicked on which corresponds to its row
         private void ShowAttributeRow(DataRow row)
         {
-            DataTable singleRowTable = row.Table.Clone(); // Clone the structure of the original table
-            singleRowTable.ImportRow(row); // Import the specific row into the new table
+            // Clone the structure of the original table and import the specific row
+            DataTable singleRowTable = row.Table.Clone();
+            singleRowTable.ImportRow(row);
+
+            // Show the attribute table with just one row
             ShowAttributeTable(singleRowTable);
         }
 
+        /*        private void gMapControl_imar_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
+                {
+                    if (e.Button == MouseButtons.Left && lastClickedCheckbox != null)
+                    {
+                        int checkbox_index = int.Parse(lastClickedCheckbox.Tag.ToString()) - 1;
+
+                        foreach (var polygon in cbs.tüm_katmanlar_array[checkbox_index].Polygons)
+                        {
+                            if (cbs.IsPointInPolygon(pointClick, polygon))
+                            {
+                                cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
+                                layer_index = checkbox_index;
+                                if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
+                                {
+                                    ShowAttributeRow(row);
+                                    tablo_formu.Show();
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // show just the single row whenever a polygon is clicked on which corresponds to its row
+                private void ShowAttributeRow(DataRow row)
+                {
+                    DataTable singleRowTable = row.Table.Clone(); // Clone the structure of the original table
+                    singleRowTable.ImportRow(row); // Import the specific row into the new table
+                    ShowAttributeTable(singleRowTable);
+                }
+        */
         // show information about polygons when double-clicking on the map
         private void gMapControl_EA_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
         {
