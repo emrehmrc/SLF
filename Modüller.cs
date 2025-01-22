@@ -2992,96 +2992,96 @@ namespace SLF
                 }
             }
         }
-        /*                private void temizleToolStripMenuItem_Click(object sender, EventArgs e)
+        /*        private void temizleToolStripMenuItem_Click(object sender, EventArgs e)
+                {
+                    ToolStripMenuItem delete_menu_item = sender as ToolStripMenuItem;
+
+                    if (delete_menu_item != null)
+                    {
+                        System.Windows.Forms.CheckBox checkBox = delete_menu_item.Tag as System.Windows.Forms.CheckBox;
+
+                        // Ensure the Tag is set and is a valid number
+                        if (checkBox != null && checkBox.Tag != null)
                         {
-                            ToolStripMenuItem delete_menu_item = sender as ToolStripMenuItem;
-
-                            if (delete_menu_item != null)
+                            int checkbox_index;
+                            if (int.TryParse(checkBox.Tag.ToString(), out checkbox_index))
                             {
-                                System.Windows.Forms.CheckBox checkBox = delete_menu_item.Tag as System.Windows.Forms.CheckBox;
+                                checkbox_index -= 1;  // Adjust for 0-based indexing
 
-                                // Ensure the Tag is set and is a valid number
-                                if (checkBox != null && checkBox.Tag != null)
+                                // Ensure the index is within bounds of the array and the item exists
+                                if (checkbox_index >= 0 && checkbox_index < cbs.tüm_katmanlar_array.Length &&
+                                    cbs.tüm_katmanlar_array[checkbox_index] != null)
                                 {
-                                    int checkbox_index;
-                                    if (int.TryParse(checkBox.Tag.ToString(), out checkbox_index))
+                                    string katman_ismi = cbs.tüm_katmanlar_array_names[checkbox_index];
+
+                                    DialogResult temizle_result = MessageBox.Show(katman_ismi + " isimli katman " +
+                                        "silinecektir. Emin misiniz?", "", MessageBoxButtons.YesNo);
+
+                                    if (temizle_result == DialogResult.Yes)
                                     {
-                                        checkbox_index -= 1;  // Adjust for 0-based indexing
 
-                                        // Ensure the index is within bounds of the array and the item exists
-                                        if (checkbox_index >= 0 && checkbox_index < cbs.tüm_katmanlar_array.Length &&
-                                            cbs.tüm_katmanlar_array[checkbox_index] != null)
+                                        // Safe removal from overlays
+                                        if (cbs.tüm_katmanlar_array[checkbox_index] != null)
                                         {
-                                            string katman_ismi = cbs.tüm_katmanlar_array_names[checkbox_index];
-
-                                            DialogResult temizle_result = MessageBox.Show(katman_ismi + " isimli katman " +
-                                                "silinecektir. Emin misiniz?", "", MessageBoxButtons.YesNo);
-
-                                            if (temizle_result == DialogResult.Yes)
-                                            {
-
-                                                // Safe removal from overlays
-                                                if (cbs.tüm_katmanlar_array[checkbox_index] != null)
-                                                {
-                                                    cbs.GetActiveGMapControl().Overlays.Remove(cbs.tüm_katmanlar_array[checkbox_index]);
-                                                    cbs.GetActiveGMapControl().Refresh();
-                                                }
-
-                                                // Dispose and nullify references
-                                                cbs.tüm_katmanlar_array[checkbox_index]?.Dispose();
-                                                cbs.tüm_katmanlar_array[checkbox_index] = null;
-                                                cbs.tüm_katmanlar_array_names[checkbox_index] = null;
-                                                cbs.tüm_katmanlar_datatable[checkbox_index] = null;
-
-                                                // Clear checkboxes for all maps
-                                                ClearCheckboxesForAllMaps(checkbox_index);
-                                                // RemoveSelectedLayerFromAllMaps(checkbox_index);
-                                            }
+                                            cbs.GetActiveGMapControl().Overlays.Remove(cbs.tüm_katmanlar_array[checkbox_index]);
+                                            cbs.GetActiveGMapControl().Refresh();
                                         }
-                                        else
-                                        {
-                                            MessageBox.Show("Invalid index or layer not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        MessageBox.Show("Invalid checkbox tag.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                                        // Dispose and nullify references
+                                        cbs.tüm_katmanlar_array[checkbox_index]?.Dispose();
+                                        cbs.tüm_katmanlar_array[checkbox_index] = null;
+                                        cbs.tüm_katmanlar_array_names[checkbox_index] = null;
+                                        cbs.tüm_katmanlar_datatable[checkbox_index] = null;
+
+                                        // Clear checkboxes for all maps
+                                        ClearCheckboxesForAllMaps(checkbox_index);
+                                        // RemoveSelectedLayerFromAllMaps(checkbox_index);
                                     }
                                 }
+                                else
+                                {
+                                    MessageBox.Show("Invalid index or layer not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("Invalid checkbox tag.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             }
                         }
+                    }
+                }
 
-                        private void ClearCheckboxesForAllMaps(int checkboxIndex)
-                        {
-                            // Define all checkboxes for the maps
-                            var allCheckBoxes = new List<CheckBox>
-                            {
-                                checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5,
-                                checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
-                                checkBox_imar_11, checkBox_imar_12, checkBox_imar_13,
-
-                                checkBox_yga_1, checkBox_yga_2, checkBox_yga_3, checkBox_yga_4, checkBox_yga_5,
-                                checkBox_yga_6, checkBox_yga_7, checkBox_yga_8, checkBox_yga_9, checkBox_yga_10,
-                                checkBox_yga_11, checkBox_yga_12, checkBox_yga_13,
-
-                                checkBox_stokastik_1, checkBox_stokastik_2, checkBox_stokastik_3, checkBox_stokastik_4,
-                                checkBox_stokastik_5, checkBox_stokastik_6, checkBox_stokastik_7, checkBox_stokastik_8,
-                                checkBox_stokastik_9, checkBox_stokastik_10, checkBox_stokastik_11, checkBox_stokastik_12, checkBox_stokastik_13
-                            };
-
-                            // Loop through all checkboxes and uncheck/hide the selected one
-                            foreach (var checkBox in allCheckBoxes)
-                            {
-                                if (checkBox.Tag != null && int.TryParse(checkBox.Tag.ToString(), out int tagIndex))
-                                {
-                                    if (tagIndex - 1 == checkboxIndex)  // Match the checkbox index
+                private void ClearCheckboxesForAllMaps(int checkboxIndex)
+                {
+                    // Define all checkboxes for the maps
+                    var allCheckBoxes = new List<CheckBox>
                                     {
-                                        checkBox.Checked = false;  // Uncheck the checkbox
-                                        checkBox.Visible = false;  // Hide the checkbox
-                                    }
-                                }
+                                        checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5,
+                                        checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
+                                        checkBox_imar_11, checkBox_imar_12, checkBox_imar_13,
+
+                                        checkBox_yga_1, checkBox_yga_2, checkBox_yga_3, checkBox_yga_4, checkBox_yga_5,
+                                        checkBox_yga_6, checkBox_yga_7, checkBox_yga_8, checkBox_yga_9, checkBox_yga_10,
+                                        checkBox_yga_11, checkBox_yga_12, checkBox_yga_13,
+
+                                        checkBox_stokastik_1, checkBox_stokastik_2, checkBox_stokastik_3, checkBox_stokastik_4,
+                                        checkBox_stokastik_5, checkBox_stokastik_6, checkBox_stokastik_7, checkBox_stokastik_8,
+                                        checkBox_stokastik_9, checkBox_stokastik_10, checkBox_stokastik_11, checkBox_stokastik_12, checkBox_stokastik_13
+                                    };
+
+                    // Loop through all checkboxes and uncheck/hide the selected one
+                    foreach (var checkBox in allCheckBoxes)
+                    {
+                        if (checkBox.Tag != null && int.TryParse(checkBox.Tag.ToString(), out int tagIndex))
+                        {
+                            if (tagIndex - 1 == checkboxIndex)  // Match the checkbox index
+                            {
+                                checkBox.Checked = false;  // Uncheck the checkbox
+                                checkBox.Visible = false;  // Hide the checkbox
                             }
-                        }*/
+                        }
+                    }
+                }*/
 
 
         private void temizleToolStripMenuItem_Click(object sender, EventArgs e)
@@ -3126,9 +3126,9 @@ namespace SLF
 
                                 // Dispose and nullify references
                                 cbs.tüm_katmanlar_array[checkbox_index]?.Dispose();
-                                cbs.tüm_katmanlar_array[checkbox_index] = null;
+/*                                cbs.tüm_katmanlar_array[checkbox_index] = null;
                                 cbs.tüm_katmanlar_array_names[checkbox_index] = null;
-                                cbs.tüm_katmanlar_datatable[checkbox_index] = null;
+                                cbs.tüm_katmanlar_datatable[checkbox_index] = null;*/
 
                                 // Clear checkboxes for all maps
                                 ClearCheckboxesForAllMaps(checkbox_index);
@@ -3151,19 +3151,19 @@ namespace SLF
         {
             // Define all checkboxes for the maps
             var allCheckBoxes = new List<CheckBox>
-    {
-        checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5,
-        checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
-        checkBox_imar_11, checkBox_imar_12, checkBox_imar_13,
+            {
+                checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5,
+                checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
+                checkBox_imar_11, checkBox_imar_12, checkBox_imar_13,
 
-        checkBox_yga_1, checkBox_yga_2, checkBox_yga_3, checkBox_yga_4, checkBox_yga_5,
-        checkBox_yga_6, checkBox_yga_7, checkBox_yga_8, checkBox_yga_9, checkBox_yga_10,
-        checkBox_yga_11, checkBox_yga_12, checkBox_yga_13,
+                checkBox_yga_1, checkBox_yga_2, checkBox_yga_3, checkBox_yga_4, checkBox_yga_5,
+                checkBox_yga_6, checkBox_yga_7, checkBox_yga_8, checkBox_yga_9, checkBox_yga_10,
+                checkBox_yga_11, checkBox_yga_12, checkBox_yga_13,
 
-        checkBox_stokastik_1, checkBox_stokastik_2, checkBox_stokastik_3, checkBox_stokastik_4,
-        checkBox_stokastik_5, checkBox_stokastik_6, checkBox_stokastik_7, checkBox_stokastik_8,
-        checkBox_stokastik_9, checkBox_stokastik_10, checkBox_stokastik_11, checkBox_stokastik_12, checkBox_stokastik_13
-    };
+                checkBox_stokastik_1, checkBox_stokastik_2, checkBox_stokastik_3, checkBox_stokastik_4,
+                checkBox_stokastik_5, checkBox_stokastik_6, checkBox_stokastik_7, checkBox_stokastik_8,
+                checkBox_stokastik_9, checkBox_stokastik_10, checkBox_stokastik_11, checkBox_stokastik_12, checkBox_stokastik_13
+            };
 
             // Loop through all checkboxes and uncheck/hide the selected one
             foreach (var checkBox in allCheckBoxes)
@@ -3174,39 +3174,12 @@ namespace SLF
                     {
                         checkBox.Checked = false;  // Uncheck the checkbox
                         checkBox.Visible = false;  // Hide the checkbox
+                        checkBox.Tag = null;       // Reset the Tag to allow reuse
                     }
                 }
             }
         }
 
-        // Remove the selected layer from all maps (Imar, YGA, Stokastik)
-        private void RemoveSelectedLayerFromAllMaps(int checkbox_index)
-        {
-            // Get the layer to remove
-            var layerToRemove = cbs.tüm_katmanlar_array[checkbox_index];
-
-            if (layerToRemove != null)
-            {
-                // Remove the layer from all map controls (Imar, YGA, Stokastik)
-                if (gMapControl_imar != null)
-                {
-                    gMapControl_imar.Overlays.Remove(layerToRemove);
-                    gMapControl_imar.Refresh();
-                }
-
-                if (gMapControl_yga != null)
-                {
-                    gMapControl_yga.Overlays.Remove(layerToRemove);
-                    gMapControl_yga.Refresh();
-                }
-
-                if (gMapControl_stokastik != null)
-                {
-                    gMapControl_stokastik.Overlays.Remove(layerToRemove);
-                    gMapControl_stokastik.Refresh();
-                }
-            }
-        }
 
 
         /*        private void temizleToolStripMenuItem_Click(object sender, EventArgs e)

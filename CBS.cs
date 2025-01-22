@@ -336,17 +336,11 @@ namespace SLF
             // Add polygons to all maps (after copying them to overlays)
             modülFormu.AddShapefileLayerToAllMaps(overlays[0]);  // Assuming overlays[0] contains the shapes to be added to all maps
             AddLayerToArrays(overlays[0], overlayName, shapefileDatatable);
-
-/*            // Add each overlay to the layer arrays
-            for (int i = 0; i < overlays.Length; i++)
-            {
-                AddLayerToArrays(overlays[i], overlayName, shapefileDatatable);
-            }*/
         }
 
         public GMapOverlay[] CreateOverlays(string type)
         {
-            string baseName = $"{type}Overlay_{layer_index + 1}";
+            string baseName = $"{type}Overlay_{layer_index}";
             Console.WriteLine($"Created layer at index {layer_index}: {baseName}");
             return new[]
             {
@@ -377,134 +371,6 @@ namespace SLF
             // Increment the layer_index for the next layer
             layer_index++;
         }
-        /*        private void AddLayerToArrays(int layer_index, GMapOverlay overlay, string overlayName, System.Data.DataTable datatable)
-                {
-                    // Check if the layer index is valid
-                    if (layer_index >= 0 && layer_index < tüm_katmanlar_array.Length)
-                    {
-                        tüm_katmanlar_array[layer_index] = overlay;
-                        tüm_katmanlar_array_names[layer_index] = overlayName;
-                        tüm_katmanlar_datatable[layer_index] = datatable;
-
-                        Console.WriteLine($"Added layer at index {layer_index}: {overlayName}");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Invalid layer index: {layer_index}");
-                    }
-                }
-        */
-        private async Task ProcessKml(string filepath, string filename, Form callingForm, GMapControl gmapcontrol)
-        {
-            GMapOverlay[] overlays = CreateOverlays("kml");
-
-            // Add the first overlay to each map
-            modülFormu.gMapControl_imar.Overlays.Add(overlays[0]);
-            modülFormu.gMapControl_yuk.Overlays.Add(overlays[1]);
-            modülFormu.gMapControl_stokastik.Overlays.Add(overlays[2]);
-            modülFormu.gMapControl_yga.Overlays.Add(overlays[3]);
-
-            System.Data.DataTable kmlDatatable = new System.Data.DataTable();
-            callingForm.Cursor = Cursors.WaitCursor;
-            await LoadKmlFile(filepath, overlays[0], kmlDatatable, gmapcontrol);
-            callingForm.Cursor = Cursors.Default;
-
-            // Copy the contents from the first overlay to the others
-            CopyOverlayContents(overlays[0], overlays[1]);
-            CopyOverlayContents(overlays[0], overlays[2]);
-            CopyOverlayContents(overlays[0], overlays[3]);
-
-            //AddLayerToArrays(overlays[0], filename, kmlDatatable);
-            //HandleCheckBoxes(layer_index, filename);
-        }
-        /*
-        */
-        /*        private async Task ProcessShapefile(string filepath, string filename, Form callingForm, DataGridView dataGridView)
-                {
-                    GMapOverlay[] overlays = CreateOverlays("shp");
-                    foreach (var overlay in overlays)
-                    {
-                        modülFormu.gMapControl_imar.Overlays.Add(overlay);
-                        modülFormu.gMapControl_yuk.Overlays.Add(overlay);
-                        modülFormu.gMapControl_stokastik.Overlays.Add(overlay);
-                        modülFormu.gMapControl_yga.Overlays.Add(overlay);
-
-                    }
-
-                    System.Data.DataTable shapefileDatatable = new System.Data.DataTable();
-                    callingForm.Cursor = Cursors.WaitCursor;
-                    await LoadShapefile(filepath, overlays[0], shapefileDatatable, dataGridView);
-                    callingForm.Cursor = Cursors.Default;
-
-                    AddLayerToArrays(overlays[0], filename, shapefileDatatable);
-                    HandleCheckBoxes(layer_index, filename);
-                }*/
-
-        /*        private async Task ProcessKml(string filepath, string filename, Form callingForm, GMapControl gmapcontrol)
-                {
-                    GMapOverlay[] overlays = CreateOverlays("kml");
-                    foreach (var overlay in overlays)
-                    {
-                        modülFormu.gMapControl_imar.Overlays.Add(overlay);
-                        modülFormu.gMapControl_yuk.Overlays.Add(overlay);
-                        modülFormu.gMapControl_stokastik.Overlays.Add(overlay);
-                        modülFormu.gMapControl_yga.Overlays.Add(overlay);
-                    }
-
-                    System.Data.DataTable kmlDatatable = new System.Data.DataTable();
-                    callingForm.Cursor = Cursors.WaitCursor;
-                    await LoadKmlFile(filepath, overlays[0], kmlDatatable, gmapcontrol);
-                    callingForm.Cursor = Cursors.Default;
-
-                    AddLayerToArrays(overlays[0], filename, kmlDatatable);
-                    HandleCheckBoxes(layer_index, filename);
-                }*/
-
-        /*        private void CopyOverlayContents(GMapOverlay sourceOverlay, GMapOverlay targetOverlay)
-                {
-                    foreach (var polygon in sourceOverlay.Polygons)
-                    {
-                        var newPolygon = new GMapPolygon(polygon.Points, polygon.Name)
-                        {
-                            Stroke = polygon.Stroke,
-                            Fill = polygon.Fill
-                        };
-                        targetOverlay.Polygons.Add(newPolygon);
-                    }
-
-                    foreach (var route in sourceOverlay.Routes)
-                    {
-                        var newRoute = new GMapRoute(route.Points, route.Name)
-                        {
-                            Stroke = route.Stroke
-                        };
-                        targetOverlay.Routes.Add(newRoute);
-                    }
-
-                    foreach (var marker in sourceOverlay.Markers)
-                    {
-                        GMapMarker newMarker;
-
-                        if (marker is GMarkerGoogle googleMarker)
-                        {
-                            // Create a GMarkerGoogle with the same type as the original
-                            newMarker = new GMarkerGoogle(marker.Position, googleMarker.Type)
-                            {
-                                ToolTipText = marker.ToolTipText
-                            };
-                        }
-                        else
-                        {
-                            // Use a GMarkerGoogle with a default type for non-GMarkerGoogle markers
-                            newMarker = new GMarkerGoogle(marker.Position, GMarkerGoogleType.red)
-                            {
-                                ToolTipText = marker.ToolTipText
-                            };
-                        }
-
-                        targetOverlay.Markers.Add(newMarker);
-                    }
-                }*/
 
 
         public void CopyOverlayContents(GMapOverlay sourceOverlay, GMapOverlay targetOverlay)
@@ -554,6 +420,29 @@ namespace SLF
 
                 targetOverlay.Markers.Add(newMarker);  // Add to target overlay
             }
+        }
+        private async Task ProcessKml(string filepath, string filename, Form callingForm, GMapControl gmapcontrol)
+        {
+            GMapOverlay[] overlays = CreateOverlays("kml");
+
+            // Add the first overlay to each map
+            modülFormu.gMapControl_imar.Overlays.Add(overlays[0]);
+            modülFormu.gMapControl_yuk.Overlays.Add(overlays[1]);
+            modülFormu.gMapControl_stokastik.Overlays.Add(overlays[2]);
+            modülFormu.gMapControl_yga.Overlays.Add(overlays[3]);
+
+            System.Data.DataTable kmlDatatable = new System.Data.DataTable();
+            callingForm.Cursor = Cursors.WaitCursor;
+            await LoadKmlFile(filepath, overlays[0], kmlDatatable, gmapcontrol);
+            callingForm.Cursor = Cursors.Default;
+
+            // Copy the contents from the first overlay to the others
+            CopyOverlayContents(overlays[0], overlays[1]);
+            CopyOverlayContents(overlays[0], overlays[2]);
+            CopyOverlayContents(overlays[0], overlays[3]);
+
+            //AddLayerToArrays(overlays[0], filename, kmlDatatable);
+            //HandleCheckBoxes(layer_index, filename);
         }
         // define default colors for each overlay object
         public (System.Drawing.Color BorderColor, System.Drawing.Color FillColor)[] overlayColors = new (System.Drawing.Color, System.Drawing.Color)[]
