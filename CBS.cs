@@ -335,15 +335,65 @@ namespace SLF
 
             // Add polygons to all maps (after copying them to overlays)
             modülFormu.AddShapefileLayerToAllMaps(overlays[0]);  // Assuming overlays[0] contains the shapes to be added to all maps
-                                                                 //AddLayerToArrays(0, overlays[0], overlayName, shapefileDatatable);
-                                                                 // Add each overlay to the layer arrays
+            AddLayerToArrays(overlays[0], overlayName, shapefileDatatable);
+
+/*            // Add each overlay to the layer arrays
             for (int i = 0; i < overlays.Length; i++)
             {
-                AddLayerToArrays(i, overlays[i], overlayName, shapefileDatatable);  // Add overlays to layer array using their index
-            }
+                AddLayerToArrays(overlays[i], overlayName, shapefileDatatable);
+            }*/
         }
 
+        public GMapOverlay[] CreateOverlays(string type)
+        {
+            string baseName = $"{type}Overlay_{layer_index + 1}";
+            Console.WriteLine($"Created layer at index {layer_index}: {baseName}");
+            return new[]
+            {
+                new GMapOverlay($"{baseName}_imar"),
+                new GMapOverlay($"{baseName}_yuk"),
+                new GMapOverlay($"{baseName}_stokastik"),
+                new GMapOverlay($"{baseName}_yga")
 
+            };
+        }
+        private void AddLayerToArrays(GMapOverlay overlay, string overlayName, System.Data.DataTable datatable)
+        {
+            // Check if the maximum number of layers has been reached
+            if (layer_index >= tüm_katmanlar_array.Length)
+            {
+                Console.WriteLine("Error: Maximum number of layers (20) reached. Cannot add more layers.");
+                MessageBox.Show("Maximum number of layers (20) reached. Cannot add more layers.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Add the overlay, name, and datatable to the arrays at the current layer_index
+            tüm_katmanlar_array[layer_index] = overlay;
+            tüm_katmanlar_array_names[layer_index] = overlayName;
+            tüm_katmanlar_datatable[layer_index] = datatable;
+
+            Console.WriteLine($"Added layer at index {layer_index}: {overlayName}");
+
+            // Increment the layer_index for the next layer
+            layer_index++;
+        }
+        /*        private void AddLayerToArrays(int layer_index, GMapOverlay overlay, string overlayName, System.Data.DataTable datatable)
+                {
+                    // Check if the layer index is valid
+                    if (layer_index >= 0 && layer_index < tüm_katmanlar_array.Length)
+                    {
+                        tüm_katmanlar_array[layer_index] = overlay;
+                        tüm_katmanlar_array_names[layer_index] = overlayName;
+                        tüm_katmanlar_datatable[layer_index] = datatable;
+
+                        Console.WriteLine($"Added layer at index {layer_index}: {overlayName}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Invalid layer index: {layer_index}");
+                    }
+                }
+        */
         private async Task ProcessKml(string filepath, string filename, Form callingForm, GMapControl gmapcontrol)
         {
             GMapOverlay[] overlays = CreateOverlays("kml");
@@ -367,127 +417,6 @@ namespace SLF
             //AddLayerToArrays(overlays[0], filename, kmlDatatable);
             //HandleCheckBoxes(layer_index, filename);
         }
-        public void CopyOverlayContents(GMapOverlay sourceOverlay, GMapOverlay targetOverlay)
-        {
-            // Copy Polygons
-            foreach (var polygon in sourceOverlay.Polygons)
-            {
-                var newPolygon = new GMapPolygon(polygon.Points, polygon.Name)
-                {
-                    Stroke = polygon.Stroke,  // Copy stroke style
-                    Fill = polygon.Fill       // Copy fill color
-                };
-                targetOverlay.Polygons.Add(newPolygon); // Add to target overlay
-            }
-
-            // Copy Routes
-            foreach (var route in sourceOverlay.Routes)
-            {
-                var newRoute = new GMapRoute(route.Points, route.Name)
-                {
-                    Stroke = route.Stroke  // Copy stroke style
-                };
-                targetOverlay.Routes.Add(newRoute);  // Add to target overlay
-            }
-
-            // Copy Markers
-            foreach (var marker in sourceOverlay.Markers)
-            {
-                GMapMarker newMarker;
-
-                // Check if the marker is of type GMarkerGoogle and copy it accordingly
-                if (marker is GMarkerGoogle googleMarker)
-                {
-                    newMarker = new GMarkerGoogle(marker.Position, googleMarker.Type)
-                    {
-                        ToolTipText = marker.ToolTipText  // Copy tooltip text
-                    };
-                }
-                else
-                {
-                    // For non-GMarkerGoogle markers, create a default one
-                    newMarker = new GMarkerGoogle(marker.Position, GMarkerGoogleType.red)
-                    {
-                        ToolTipText = marker.ToolTipText  // Copy tooltip text
-                    };
-                }
-
-                targetOverlay.Markers.Add(newMarker);  // Add to target overlay
-            }
-        }
-
-        private void HandleCheckBoxes(int layerIndex, string filename)
-        {
-            // Get the checkboxes that correspond to the layerIndex
-            var associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layerIndex);
-
-            if (associatedCheckBoxes != null)
-            {
-                // Loop through each checkbox in the list and apply the required settings
-                foreach (var checkBox in associatedCheckBoxes)
-                {
-                    // Make sure the checkbox is visible and checked
-                    checkBox.Checked = true;
-                    checkBox.Visible = true;
-                    checkBox.Text = filename;  // Set the name of the layer to the checkbox text
-                }
-            }
-        }
-        public GMapOverlay[] CreateOverlays(string type)
-        {
-            string baseName = $"{type}Overlay_{layer_index + 1}";
-            return new[]
-            {
-                new GMapOverlay($"{baseName}_imar"),
-                new GMapOverlay($"{baseName}_yuk"),
-                new GMapOverlay($"{baseName}_stokastik"),
-                new GMapOverlay($"{baseName}_yga")
-
-            };
-        }
-        // Dictionary to store layers by unique identifier
-        private Dictionary<string, GMapOverlay> layerDictionary = new Dictionary<string, GMapOverlay>();
-        /*        public void AddLayerToArrays(int layerIndex, GMapOverlay overlay)
-                {
-                    string overlayName = "Shape" + (layerIndex + 1).ToString();
-
-                    // Ensure overlaysByName is initialized
-                    if (modülFormu.overlaysByName == null)
-                    {
-                        modülFormu.overlaysByName = new Dictionary<string, GMapOverlay>();
-                    }
-
-                    // Only add the overlay if it's not already present
-                    if (!modülFormu.overlaysByName.ContainsKey(overlayName))
-                    {
-                        modülFormu.overlaysByName.Add(overlayName, overlay);
-                        Console.WriteLine($"Added overlay with name: {overlayName}");
-                    }
-                    else
-                    {
-                        // Update the overlay if it already exists
-                        modülFormu.overlaysByName[overlayName] = overlay;
-                        Console.WriteLine($"Updated overlay with name: {overlayName}");
-                    }
-                }*/
-
-        private void AddLayerToArrays(int layerIndex, GMapOverlay overlay, string overlayName, System.Data.DataTable datatable)
-        {
-            // Check if the layer index is valid
-            if (layerIndex >= 0 && layerIndex < tüm_katmanlar_array.Length)
-            {
-                tüm_katmanlar_array[layerIndex] = overlay;
-                tüm_katmanlar_array_names[layerIndex] = overlayName;
-                tüm_katmanlar_datatable[layerIndex] = datatable;
-
-                Console.WriteLine($"Added layer at index {layerIndex}: {overlayName}");
-            }
-            else
-            {
-                Console.WriteLine($"Invalid layer index: {layerIndex}");
-            }
-        }
-
         /*
         */
         /*        private async Task ProcessShapefile(string filepath, string filename, Form callingForm, DataGridView dataGridView)
@@ -578,7 +507,54 @@ namespace SLF
                 }*/
 
 
+        public void CopyOverlayContents(GMapOverlay sourceOverlay, GMapOverlay targetOverlay)
+        {
+            // Copy Polygons
+            foreach (var polygon in sourceOverlay.Polygons)
+            {
+                var newPolygon = new GMapPolygon(polygon.Points, polygon.Name)
+                {
+                    Stroke = polygon.Stroke,  // Copy stroke style
+                    Fill = polygon.Fill       // Copy fill color
+                };
+                targetOverlay.Polygons.Add(newPolygon); // Add to target overlay
+            }
 
+            // Copy Routes
+            foreach (var route in sourceOverlay.Routes)
+            {
+                var newRoute = new GMapRoute(route.Points, route.Name)
+                {
+                    Stroke = route.Stroke  // Copy stroke style
+                };
+                targetOverlay.Routes.Add(newRoute);  // Add to target overlay
+            }
+
+            // Copy Markers
+            foreach (var marker in sourceOverlay.Markers)
+            {
+                GMapMarker newMarker;
+
+                // Check if the marker is of type GMarkerGoogle and copy it accordingly
+                if (marker is GMarkerGoogle googleMarker)
+                {
+                    newMarker = new GMarkerGoogle(marker.Position, googleMarker.Type)
+                    {
+                        ToolTipText = marker.ToolTipText  // Copy tooltip text
+                    };
+                }
+                else
+                {
+                    // For non-GMarkerGoogle markers, create a default one
+                    newMarker = new GMarkerGoogle(marker.Position, GMarkerGoogleType.red)
+                    {
+                        ToolTipText = marker.ToolTipText  // Copy tooltip text
+                    };
+                }
+
+                targetOverlay.Markers.Add(newMarker);  // Add to target overlay
+            }
+        }
         // define default colors for each overlay object
         public (System.Drawing.Color BorderColor, System.Drawing.Color FillColor)[] overlayColors = new (System.Drawing.Color, System.Drawing.Color)[]
         {
@@ -838,7 +814,7 @@ namespace SLF
                 var firstRow = polygonAttributes[firstPolygon];
                 foreach (DataColumn column in firstRow.Table.Columns)
                 {
-                    shapefile.EditAddField(column.ColumnName, MapWinGIS.FieldType.STRING_FIELD, 10, 10);
+                    shapefile.EditAddField(column.ColumnName, MapWinGIS.FieldType.STRING_FIELD, 5, 100);
                 }
             }
 
@@ -986,7 +962,7 @@ namespace SLF
                 var firstRow = polygonAttributes[firstPolygon];
                 foreach (DataColumn column in firstRow.Table.Columns)
                 {
-                    shapefile.EditAddField(column.ColumnName, MapWinGIS.FieldType.STRING_FIELD, 10, 10);
+                    shapefile.EditAddField(column.ColumnName, MapWinGIS.FieldType.STRING_FIELD, 5, 100);
                 }
             }
 
@@ -1025,7 +1001,7 @@ namespace SLF
                 var firstRow = routeAttributes_kml[firstRoute];
                 foreach (DataColumn column in firstRow.Table.Columns)
                 {
-                    shapefile.EditAddField(column.ColumnName, MapWinGIS.FieldType.STRING_FIELD, 10, 10);
+                    shapefile.EditAddField(column.ColumnName, MapWinGIS.FieldType.STRING_FIELD, 5, 100);
                 }
             }
 
