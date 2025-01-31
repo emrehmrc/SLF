@@ -1333,7 +1333,7 @@ namespace SLF
             slfStartYear = slfEndYear = 0;
             int currentYear = DateTime.Now.Year;
             int lastYear = currentYear - 1;
-
+            int lastYear2 = currentYear -2;
             startYearComboBox.SelectedIndex = -1;
             startYearComboBox.Text = "Yıl seçiniz";
             endYearComboBox.SelectedIndex = -1;
@@ -1344,6 +1344,7 @@ namespace SLF
             startYearComboBox.Items.Clear();
 
             // Add the years to the ComboBox
+            startYearComboBox.Items.Add(lastYear2);
             startYearComboBox.Items.Add(lastYear);
             startYearComboBox.Items.Add(currentYear);
 
