@@ -499,7 +499,7 @@ namespace SLF
                 double imputedValue;
                 if (double.TryParse(tuketim_value.ToString(), out double tuketimDouble))
                 {
-                    imputedValue = K_FACTOR * tuketimDouble / HoursInYear;
+                    imputedValue = K_FACTOR * (tuketimDouble / HoursInYear);
                     missingRow[demandColumn] = imputedValue;
                 }
             }
@@ -576,56 +576,98 @@ namespace SLF
         }
         private void ReportErrorLessThanZero(string columnName)
         {
-            float negativePercentage, zeroPercentage;
-            int totalRows = currentDataTable.Rows.Count;
-            var column = currentDataTable.Columns[columnName];
-            var nullRows = new List<int>();
-            var imputableRows = new List<int>();
-
-            int negativeCount = 0;
-            int zeroCount = 0;
-
-            foreach (DataRow row in currentDataTable.Rows)
+            try
             {
-                if (
-                    row.IsNull(column) ||
-                    row[column] == DBNull.Value ||
-                    nullLikeStrings.Contains(row[column]?.ToString(), StringComparer.OrdinalIgnoreCase) ||
-                    float.TryParse(row[column]?.ToString(), out float value) && value < 0)
+                Console.WriteLine($"ReportErrorLessThanZero başlıyor - Kolon: {columnName}");
+
+                // Önce kolonun varlığını kontrol et
+                if (!currentDataTable.Columns.Contains(columnName))
                 {
-                    // Son yıl tüketimi 0'dan az ise
-                    negativeCount++;
-                    imputableRows.Add(currentDataTable.Rows.IndexOf(row));
+                    Console.WriteLine($"HATA: {columnName} kolonu bulunamadı");
+                    return;
                 }
-                else if (float.TryParse(row[column]?.ToString(), out float value2) && value2 == 0) 
-                { 
-                    zeroCount++;
-                    nullRows.Add(currentDataTable.Rows.IndexOf(row));
+
+                float negativePercentage, zeroPercentage;
+                int totalRows = currentDataTable.Rows.Count;
+                var column = currentDataTable.Columns[columnName];
+                var nullRows = new List<int>();
+                var imputableRows = new List<int>();
+
+                int negativeCount = 0;
+                int zeroCount = 0;
+
+                for (int rowIndex = 0; rowIndex < currentDataTable.Rows.Count; rowIndex++)
+                {
+                    var row = currentDataTable.Rows[rowIndex];
+                    var value = row[columnName];
+
+                    if (value == null || value == DBNull.Value ||
+                        nullLikeStrings.Contains(value.ToString(), StringComparer.OrdinalIgnoreCase))
+                    {
+                        negativeCount++;
+                        imputableRows.Add(rowIndex);
+                        continue;
+                    }
+
+                    if (float.TryParse(value.ToString(), out float numValue))
+                    {
+                        if (numValue < 0)
+                        {
+                            negativeCount++;
+                            imputableRows.Add(rowIndex);
+                        }
+                        else if (numValue == 0)
+                        {
+                            zeroCount++;
+                            nullRows.Add(rowIndex);
+                        }
+                    }
+                    else
+                    {
+                        // Sayısal değere dönüştürülemeyenler negatif olarak kabul edilir
+                        negativeCount++;
+                        imputableRows.Add(rowIndex);
+                    }
                 }
+
+                columnNullRowsMap[columnName] = nullRows;
+                imputableRowsMap[columnName] = imputableRows;
+
+                negativePercentage = (float)negativeCount / totalRows;
+                zeroPercentage = (float)zeroCount / totalRows;
+
+                Console.WriteLine($"İstatistikler - Negatif: {negativePercentage:P1}, Sıfır: {zeroPercentage:P1}");
+
+                if (negativePercentage > 0)
+                {
+                    var thresholds = TUKETIM_ERROR_THRESHOLD;
+                    var datatableLevel = GetDataTableBasedOnThreshold(negativePercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+
+                    datatableLevel.Rows.Add(new object[] {
+                columnName,
+                "Son yıl verisi",
+                $"{negativePercentage:P1} abonenin tüketim verisi yok",
+                "Bu abonelerin tüketim verileri silinecek."
+            });
+                }
+
+                if (zeroPercentage > 0)
+                {
+                    infoDataTable.Rows.Add(new object[] {
+                columnName,
+                "Son yıl verisi",
+                $"{zeroPercentage:P1}",
+                "Bu trafolarda son yıl verisi yok. Tüketim verileri silinecek."
+            });
+                }
+
+                Console.WriteLine("ReportErrorLessThanZero tamamlandı");
             }
-
-            columnNullRowsMap[column.ColumnName] = nullRows;
-            imputableRowsMap[column.ColumnName] = imputableRows;
-            negativePercentage = (float)negativeCount / totalRows;
-            zeroPercentage = (float)zeroCount / totalRows;
-
-            if (negativePercentage > 0)
+            catch (Exception ex)
             {
-                var thresholds = TUKETIM_ERROR_THRESHOLD;
-                var datatableLevel = GetDataTableBasedOnThreshold(negativePercentage, thresholds.warningThreshold, thresholds.errorThreshold);
-
-                // Append the column name and null count to the report message
-                datatableLevel.Rows.Add(new object[] {
-                    column.ColumnName, "Son yıl verisi", $"{negativePercentage:P1} abonenin tüketim verisi yok",
-                    "Bu abonelerin tüketim verileri silinecek."
-                });
-            }
-            if (zeroPercentage > 0)
-            {
-                // Append the column name and null count to the report message
-                infoDataTable.Rows.Add(new object[] {
-                    column.ColumnName, "Son yıl verisi", $"{zeroPercentage:P1}", "Bu trafolarda son yıl verisi yok. Tüketim verileri silinecek."
-                });
+                Console.WriteLine($"ReportErrorLessThanZero Hatası: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                throw;
             }
         }
         void ImputeAverageDate()

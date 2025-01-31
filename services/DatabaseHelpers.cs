@@ -109,25 +109,47 @@ namespace SLF.services
 
             try
             {
+                Console.WriteLine($"LoadTable başladı - Tablo adı: {tableName}");
+
+                // Bağlantı durumunu kontrol et
+                Console.WriteLine($"Bağlantı durumu: {connection.State}");
+
                 string query = $"SELECT * FROM \"{tableName}\"";
+                Console.WriteLine($"Çalıştırılacak sorgu: {query}");
+
                 using (var cmd = new NpgsqlCommand(query, connection))
-                using (var adapter = new NpgsqlDataAdapter(cmd))
                 {
-                    adapter.Fill(dataTable);
-                    
-                    // Kolon isimlerini büyük harfe çevir
-                    foreach (DataColumn col in dataTable.Columns)
+                    Console.WriteLine("NpgsqlCommand oluşturuldu");
+
+                    using (var adapter = new NpgsqlDataAdapter(cmd))
                     {
-                        col.ColumnName = col.ColumnName.ToUpperInvariant();
+                        Console.WriteLine("DataAdapter oluşturuldu");
+
+                        Console.WriteLine("Fill işlemi başlıyor...");
+                        adapter.Fill(dataTable);
+                        Console.WriteLine($"Fill işlemi tamamlandı. Satır sayısı: {dataTable.Rows.Count}");
+
+                        Console.WriteLine("Kolon isimleri büyük harfe çevriliyor...");
+                        // Kolon isimlerini büyük harfe çevir
+                        foreach (DataColumn col in dataTable.Columns)
+                        {
+                            string oldName = col.ColumnName;
+                            col.ColumnName = col.ColumnName.ToUpperInvariant();
+                            Console.WriteLine($"Kolon adı değiştirildi: {oldName} -> {col.ColumnName}");
+                        }
                     }
                 }
+
+                Console.WriteLine($"LoadTable başarıyla tamamlandı. Toplam satır: {dataTable.Rows.Count}");
+                return dataTable;
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"LoadTable HATA: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
                 throw new Exception($"Tablo yüklenirken hata: {ex.Message}");
             }
-
-            return dataTable;
         }
     }
 }
+

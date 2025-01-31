@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using SLF.services;
+using Microsoft.CodeAnalysis.FlowAnalysis;
 
 
 namespace SLF
@@ -25,7 +26,7 @@ namespace SLF
         {
         }
     }
-
+  
     public class GirdiModülü
     {
         protected Önizleme onizleme1 = new Önizleme();
@@ -47,8 +48,14 @@ namespace SLF
         };
         protected readonly List<string> veri_listesi_requires_csv = new List<string> { }; 
         protected readonly List<string> veri_listesi_requires_tabular = new List<string> { };
-        protected readonly List<string> veri_listesi_requires_database = new List<string> { 
-            "EA_Sarj_verileri"  // Sadece veritabanından yüklenecek veriler
+        protected readonly Dictionary<string, string> veri_listesi_requires_database = new Dictionary<string, string>
+        {
+            { "EA_Sarj_verileri", "EA Şarj Verileri" },
+            { "dek_verileri", "DEK Verileri" },
+            { "projelendirilmis_trafolar", "Yeni Projelendirilmiş DTR Verileri" },
+            { "enerji_musaade_verileri", "Enerji Müsaadeleri Verileri" },
+            { "dtr_verileri", "DTR Verileri" },
+            {"abone_final_tablosu","Abone Verileri" }
         };
         protected readonly List<string> nullLikeStrings = new List<string> // doluluk bosluk check kısımları kontrolu yapılıyor
         {
@@ -64,8 +71,9 @@ namespace SLF
         {
             get { return slfStartYear; }
             set { slfStartYear = value; }
+            
         }
-
+        
         public int SlfEndYear
         {
             get { return slfEndYear; }
@@ -193,14 +201,13 @@ namespace SLF
                 // Skip prerequisite check if the flag is true
                 if (!skipPrerequisites)
                 {
-                    CheckPrerequisites(seçilenVeriTipi); // Check the required datatables for the given module
+                    CheckPrerequisites(seçilenVeriTipi);
                 }
 
-                // ProcessFileSelection metodu ile dosya seçme işlemi yapılır ve seçilen dosya veri tablosuna yüklenir
                 ProcessFileSelection(seçilenVeriTipi);
-                
+
                 DataTable dataTable = CurrentDataTable;
-                
+                Console.WriteLine(seçilenVeriTipi);
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
                     Onizleme1.Onizleme_DataGrid1.DataSource = dataTable;
@@ -221,13 +228,12 @@ namespace SLF
                             onizleme1.Buton_İLERLE.Enabled = false;
                         }
 
-                        // Exit the loop if there are no info or warning messages
                         if (!IsInfo() && !IsWarning())
                         {
                             onizleme1.Buton_YUKLE.Enabled = true;
                             onizleme1.Buton_İLERLE.Enabled = false;
-
                         }
+
                         var dialogResult = Onizleme1.ShowDialog();
                         if (dialogResult == DialogResult.Cancel)
                         {
@@ -235,6 +241,10 @@ namespace SLF
                         }
                         else if (dialogResult == DialogResult.OK)
                         {
+                            // ImportProcessedData buraya eklenmeli
+                            Console.WriteLine("Dialog OK - ImportProcessedData çağrılıyor");
+                            ImportProcessedData();  // Bu satır çalışıyor mu?
+                            Console.WriteLine("ImportProcessedData tamamlandı");
                             break;
                         }
 
@@ -243,28 +253,18 @@ namespace SLF
                         Validate();
                         Impute();
                     }
+
                     Postprocess();
-                    ImportProcessedData();
-                    ShowImportedMessage();
                     return true;
                 }
-                else
-                {
-                    MessageBox.Show("Dosya seçimi gerçekleştirilemedi.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
             }
-            catch (NoFileSelectedException ex)
+            catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Console.WriteLine($"VEERProcess Hatası: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                throw;
             }
-            catch (InvalidColumnHeadersException ex)
-            {
-                MessageBox.Show("Geçersiz sütun biçimi: " + ex.Message, "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            catch (PrerequisiteException ex)
-            {
-                MessageBox.Show(ex.Message, "Önkoşul hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+
             return false;
         }
         public void ShowImportedMessage()
@@ -413,68 +413,61 @@ namespace SLF
             {
                 Cursor.Current = Cursors.WaitCursor;
 
+                Console.WriteLine("\n=== ImportProcessedData Başlıyor ===");
+
+                // CurrentDataTable kontrolü
+                if (currentDataTable == null)
+                {
+                    throw new ArgumentNullException("currentDataTable", "CurrentDataTable null olamaz");
+                }
+
                 // Veriyi kopyala
                 importedDataTable = currentDataTable.Copy();
-                Console.WriteLine(importedDataTable + "  " + seçilenVeriTipi);
-                // Veri tipini dictionary'e ekle
-                if (seçilenVeriTipi == "EA_Sarj_verileri")
+                Console.WriteLine($"Veri kopyalandı - Satır sayısı: {importedDataTable.Rows.Count}");
+                Console.WriteLine($"Orijinal seçilenVeriTipi: {seçilenVeriTipi}");
+
+                // Key dönüşümü
+                if (veri_listesi_requires_database.TryGetValue(seçilenVeriTipi, out string displayKey))
                 {
-                    seçilenVeriTipi = "EA Sarj Verileri";
+                    Console.WriteLine($"Key dönüşümü: {seçilenVeriTipi} -> {displayKey}");
+                    seçilenVeriTipi = displayKey;
                 }
+
+                // dataTablesByType null kontrolü
+                if (dataTablesByType == null)
+                {
+                    Console.WriteLine("dataTablesByType null, yeni instance oluşturuluyor");
+                    dataTablesByType = new Dictionary<string, DataTable>();
+                }
+
+                // Dictionary'e ekle
                 if (!dataTablesByType.ContainsKey(seçilenVeriTipi))
                 {
-                    //dataTablesByType.Add(SeçilenVeriTipi, importedDataTable);
-                    dataTablesByType[seçilenVeriTipi] = importedDataTable;
-                    Console.WriteLine("datatable" + importedDataTable.Rows.Count + seçilenVeriTipi);
-
+                    Console.WriteLine($"Yeni veri ekleniyor: {seçilenVeriTipi}");
                 }
-                // If "Ekonometrik Yük Tahmini Verileri" is selected, export to Excel and run the R script
-                if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
+                else
                 {
-                    string filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
-
-
-                    try
-                    {
-                        var excelExporter = new ExcelExporter();
-
-                        // Update the first sheet of the Excel file with the imported data
-                        excelExporter.UpdateExcelFileFirstSheet(filePath, importedDataTable);
-
-                        // Run the R script after exporting to Excel
-                        RunRScript(filePath); // Call the synchronous method
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error while saving the file: {ex.Message}");
-                    }
-
-                    // ModülFormu'nu güncelle
-                    //ModülFormu.Instance.isİmportedModule(true, SeçilenVeriTipi);
-
-                    // Debug bilgisi
-                    Debug.WriteLine($"ImportProcessedData - Veri tipi: {seçilenVeriTipi}");
-                    Debug.WriteLine($"ImportProcessedData - Satır sayısı: {importedDataTable.Rows.Count}");
-
-                    // Konsol Çıkışı
-                    Console.WriteLine("---- İşlenen Veri Detayları ----");
-                    Console.WriteLine($"Tablo Tipi: {seçilenVeriTipi}");
-                    Console.WriteLine($"Toplam Satır Sayısı: {importedDataTable.Rows.Count}");
-                    Console.WriteLine("İlk 5 Satır:");
-
-                    for (int i = 0; i < Math.Min(5, importedDataTable.Rows.Count); i++)
-                    {
-                        Console.WriteLine(string.Join(", ", importedDataTable.Rows[i].ItemArray));
-                    }
-                    Console.WriteLine("-------------------------------");
+                    Console.WriteLine($"Mevcut veri güncelleniyor: {seçilenVeriTipi}");
                 }
+
+                dataTablesByType[seçilenVeriTipi] = importedDataTable;
+                Console.WriteLine($"Veri eklendi/güncellendi - Key: {seçilenVeriTipi}, Satır sayısı: {importedDataTable.Rows.Count}");
+
+                // Mevcut durumu logla
+                Console.WriteLine("\nMevcut Dictionary durumu:");
+                foreach (var kvp in dataTablesByType)
+                {
+                    Console.WriteLine($"Key: {kvp.Key}, Satır: {kvp.Value?.Rows.Count}");
+                }
+
+                Console.WriteLine("=== ImportProcessedData Tamamlandı ===\n");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Veri içeri aktarılırken hata oluştu: {ex.Message}",
-                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Debug.WriteLine($"ImportProcessedData Hatası: {ex.Message}");
-                Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
+                Console.WriteLine($"\n!!! ImportProcessedData HATA !!!");
+                Console.WriteLine($"Hata Mesajı: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                throw;
             }
             finally
             {
@@ -598,29 +591,35 @@ namespace SLF
                 }
                 else throw new NoFileSelectedException("Dosya seçimi gerçekleştirilemedi.");
             }
-            else if (veri_listesi_requires_database.Contains(seçilenVeriTipi))
+            else if (veri_listesi_requires_database.Keys.Contains(seçilenVeriTipi))
             {
                 try
                 {
 
-                    currentDataTable = DatabaseHelper.LoadTable(seçilenVeriTipi);
+                    //currentDataTable = DatabaseHelper.LoadTable(seçilenVeriTipi);
                     currentDataTable = ProcesssqlFile(seçilenVeriTipi);
+                    Console.WriteLine(seçilenVeriTipi);                    
                     if (currentDataTable.Columns.Contains("ID"))
                     {
                         currentDataTable.Columns.Remove("ID");
                         MessageBox.Show("ID kolonu kaldırıldı.", "Bilgilendirme", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        Console.WriteLine("hi");
                     }
                     else
                     {
                         MessageBox.Show("ID kolonu bulunamadı.", "Bilgilendirme", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
-                    if (seçilenVeriTipi == "EA_Sarj_verileri")
-                    {
-                        //seçilenVeriTipi = "EA Şarj Verileri";
-                        //dataTablesByType[seçilenVeriTipi] = importedDataTable;
-                    }
+                    //if (seçilenVeriTipi == "EA_Sarj_verileri")
+                    //{
+                    //    //seçilenVeriTipi = "EA Şarj Verileri";
+                    //    //dataTablesByType[seçilenVeriTipi] = importedDataTable;
+                    //}
 
-                    //currentDataTable = ConvertColumnNamesToUpperCase(currentDataTable);
+                    currentDataTable = ConvertColumnNamesToUpperCase(currentDataTable);
+                    Console.WriteLine(seçilenVeriTipi);
+                    Console.WriteLine(currentDataTable.Rows.Count);
+
+
                 }
                 catch (Exception ex)
                 {
@@ -650,9 +649,50 @@ namespace SLF
         }
         protected DataTable ProcesssqlFile(string fileName)
         {
-            DataTable dataTable = DatabaseHelper.LoadTable(seçilenVeriTipi); ;
-            
-            return dataTable;
+            try
+            {
+                Console.WriteLine($"ProcesssqlFile başladı - fileName: {fileName}");
+                DataTable dataTable = DatabaseHelper.LoadTable(fileName);
+
+                // Gelen veriyi kontrol et
+                Console.WriteLine("Kolonlar kontrol ediliyor...");
+                foreach (DataColumn col in dataTable.Columns)
+                {
+                    if (col == null)
+                    {
+                        Console.WriteLine("NULL kolon bulundu!");
+                        continue;
+                    }
+                    Console.WriteLine($"Kolon adı: {col.ColumnName}");
+                }
+
+                // ID kolonunu güvenli şekilde kaldır
+                if (dataTable.Columns.Contains("ID"))
+                {
+                    Console.WriteLine("ID kolonu kaldırılıyor");
+                    dataTable.Columns.Remove("ID");
+                }
+
+                // Kolon isimlerini güvenli şekilde büyük harfe çevir
+                foreach (DataColumn col in dataTable.Columns)
+                {
+                    if (col != null && col.ColumnName != null)
+                    {
+                        string oldName = col.ColumnName;
+                        col.ColumnName = oldName.ToUpperInvariant();
+                        Console.WriteLine($"Kolon adı değiştirildi: {oldName} -> {col.ColumnName}");
+                    }
+                }
+
+                Console.WriteLine($"Toplam satır sayısı: {dataTable.Rows.Count}");
+                return dataTable;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ProcesssqlFile Hatası: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                throw;
+            }
         }
         protected DataTable ProcessTabularFile(string fileName)
         {

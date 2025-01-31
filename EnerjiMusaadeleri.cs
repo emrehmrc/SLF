@@ -335,7 +335,7 @@ namespace SLF
             }
 
             // Step 3: Log removed rows details to the specified static path
-            string logFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\RemovedRowsLog.txt";
+            string logFilePath = @"C:\Users\batuhan.yetis\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\RemovedRowsLog.txt";
             File.WriteAllLines(logFilePath, removedRowsDetails);
 
             // Output log location to console

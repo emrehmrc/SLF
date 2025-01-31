@@ -309,6 +309,7 @@ namespace SLF
             this.Seç_Stokastik = new System.Windows.Forms.ToolStrip();
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
             this.HeaderPanel = new System.Windows.Forms.Panel();
+            this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.HomePageButton = new SLF.CustomButton();
             this.buton_ea_harita_katmanlar = new System.Windows.Forms.Button();
@@ -1362,7 +1363,7 @@ namespace SLF
             this.ELFLowResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFLowResultsTable.Name = "ELFLowResultsTable";
             this.ELFLowResultsTable.RowHeadersWidth = 51;
-            this.ELFLowResultsTable.Size = new System.Drawing.Size(1081, 551);
+            this.ELFLowResultsTable.Size = new System.Drawing.Size(1081, 559);
             this.ELFLowResultsTable.TabIndex = 1;
             // 
             // ELFBaseResultsTabPage
@@ -1390,7 +1391,7 @@ namespace SLF
             this.ELFBaseResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFBaseResultsTable.Name = "ELFBaseResultsTable";
             this.ELFBaseResultsTable.RowHeadersWidth = 51;
-            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1080, 551);
+            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1080, 559);
             this.ELFBaseResultsTable.TabIndex = 1;
             // 
             // ELFHighResultsTabPage
@@ -1418,7 +1419,7 @@ namespace SLF
             this.ELFHighResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFHighResultsTable.Name = "ELFHighResultsTable";
             this.ELFHighResultsTable.RowHeadersWidth = 51;
-            this.ELFHighResultsTable.Size = new System.Drawing.Size(1076, 551);
+            this.ELFHighResultsTable.Size = new System.Drawing.Size(1076, 559);
             this.ELFHighResultsTable.TabIndex = 1;
             // 
             // ELFMaxResultsTabPage
@@ -1447,7 +1448,7 @@ namespace SLF
             this.ELFMaxResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFMaxResultsTable.Name = "ELFMaxResultsTable";
             this.ELFMaxResultsTable.RowHeadersWidth = 51;
-            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1084, 555);
+            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1084, 563);
             this.ELFMaxResultsTable.TabIndex = 1;
             // 
             // ELFGraphicOutputsTabPage
@@ -1475,7 +1476,7 @@ namespace SLF
             this.panel_ELF_Grafikler.Controls.Add(this.pictureBox_ELF_1);
             this.panel_ELF_Grafikler.Location = new System.Drawing.Point(2, 2);
             this.panel_ELF_Grafikler.Name = "panel_ELF_Grafikler";
-            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1080, 490);
+            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1080, 498);
             this.panel_ELF_Grafikler.TabIndex = 6;
             // 
             // pictureBox_ELF_5
@@ -4344,6 +4345,7 @@ namespace SLF
             // HeaderPanel
             // 
             this.HeaderPanel.BackColor = System.Drawing.Color.NavajoWhite;
+            this.HeaderPanel.Controls.Add(this.button2);
             this.HeaderPanel.Controls.Add(this.button1);
             this.HeaderPanel.Controls.Add(this.HomePageButton);
             this.HeaderPanel.Dock = System.Windows.Forms.DockStyle.Top;
@@ -4351,6 +4353,16 @@ namespace SLF
             this.HeaderPanel.Name = "HeaderPanel";
             this.HeaderPanel.Size = new System.Drawing.Size(1290, 31);
             this.HeaderPanel.TabIndex = 6;
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(134, 6);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(116, 23);
+            this.button2.TabIndex = 7;
+            this.button2.Text = "Tablo Oluştur";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // button1
             // 
@@ -4815,5 +4827,6 @@ namespace SLF
         private ToolStripSeparator toolStripSeparator19;
         private ToolStripButton Yga_Fonksiyonlar;
         private Button button1;
+        private Button button2;
     }
 }

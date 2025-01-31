@@ -603,6 +603,17 @@ namespace SLF
 
         public void isİmportedModule(bool isImported, string seçilenVeriTipi)
         {
+            girdiModülü = girdiModülleri[seçilenVeriTipi];
+            if (!GirdiModülü.dataTablesByType.ContainsKey(seçilenVeriTipi))
+            {
+                // Create a new DataTable and add it to the dictionary
+                GirdiModülü.dataTablesByType[seçilenVeriTipi] = new DataTable();
+                Console.WriteLine($"isİmportedModule: {seçilenVeriTipi} için yeni bir tablo oluşturuldu.");
+            }
+            //girdiModülü = girdiModülleri[seçilenVeriTipi];
+            var importedDataTable = GirdiModülü.dataTablesByType[seçilenVeriTipi];
+            
+
             if (!isImported)
             {
                 Console.WriteLine($"isİmportedModule: {seçilenVeriTipi} işlemi başarısız.");
@@ -615,18 +626,12 @@ namespace SLF
                 return;
             }
 
-            var importedDataTable = GirdiModülü.dataTablesByType[seçilenVeriTipi];
-            Console.WriteLine($"isImportedModule: {seçilenVeriTipi} tablosu bulundu. Satır sayısı: {girdiModülü.importedDataTable.Rows.Count}");
+            Console.WriteLine($"isImportedModule: {seçilenVeriTipi} tablosu bulundu. Satır sayısı: {importedDataTable.Rows.Count}");
 
             // DataGridView temizleme ve bağlama
+            dataGridView_girdi.DataSource = importedDataTable;
+            Console.WriteLine("datagridview" + dataGridView_girdi.DataSource);
 
-            //dataGridView_girdi.DataSource = null;
-            //dataGridView_girdi.Rows.Clear();
-            //dataGridView_girdi.Columns.Clear();
-            //dataGridView_girdi.AutoGenerateColumns = true;
-
-            dataGridView_girdi.DataSource = girdiModülü.importedDataTable;
-            Console.WriteLine("datagridview"+dataGridView_girdi.DataSource);
             // Görünürlük kontrolleri
             EnsureVisibility(dataGridView_girdi);
 
@@ -640,7 +645,6 @@ namespace SLF
             Console.WriteLine($"DataGridView Görünürlük: {dataGridView_girdi.Visible}");
             Console.WriteLine($"DataGridView Boyut: {dataGridView_girdi.Width}x{dataGridView_girdi.Height}");
         }
-
         private void EnsureVisibility(Control control)
         {
             // Parent kontrolü görünür değilse, görünür hale getir
@@ -1295,12 +1299,12 @@ namespace SLF
         }
         private void veri_listesi_seçimi_DrawItem(object sender, DrawItemEventArgs e)
         {
-            Console.WriteLine($"DrawItem Tetiklendi - Index: {e.Index}");
+           
             if (e.Index < 0)
                 return;
 
             string text = veri_listesi_seçimi.Items[e.Index].ToString();
-            Console.WriteLine($"Çizilen Item: {text}");
+           
 
             Color textColor = Color.Red;
             if (girdiModülleri.ContainsKey(text) && girdiModülleri[text].importedDataTable != null)
@@ -1308,6 +1312,7 @@ namespace SLF
                 if (girdiModülleri[text].importedDataTable.Rows.Count > 0)
                 {
                     textColor = Color.Green;
+                    
                 }
             }
 
@@ -1445,7 +1450,7 @@ namespace SLF
         }
         private void ModülFormu_Load(object sender, EventArgs e)
         {
-            // Modül formunu yüklerken reset year selection sürecini başlat
+          // Modül formunu yüklerken reset year selection sürecini başlat
             ResetYearSelectionProcessGirdiModulu();
         }
 
@@ -1606,6 +1611,7 @@ namespace SLF
                 if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Haritası Modülü") && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
                 {
                     // Sekme geçişini tamamen iptal et
+                    Console.WriteLine(GirdiModülü.dataTablesByType.Count);
                     MessageBox.Show("DTR verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
                     Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
                     Modül_Tabları.SelectedTab = tab_girdi;
@@ -1622,8 +1628,8 @@ namespace SLF
                     return;
                 }*/
                 else if (selectedTabText == "Optimal DTR Konumlandırma"
-       && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")
-       && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri")))
+                           && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")
+                           && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri")))
                 {
                     // Sekme geçişini tamamen iptal et
                     MessageBox.Show("DTR verileri ve İmar planı yüklenmeden bu sekmeye geçiş yapılamaz.");
@@ -4421,10 +4427,19 @@ namespace SLF
 
         private void button1_Click(object sender, EventArgs e)
         {
+            
+            if (slfStartYear == 0 || slfEndYear == 0)
+            {
+                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            girdiModülü.SlfStartYear = slfStartYear;
+            girdiModülü.SlfEndYear = slfEndYear;
             if (DatabaseManager.GetInstance().IsConnected())
             {
                 try
                 {
+                    
                     using (var databaseListForm = new DatabaseListForm())
                     {
                         databaseListForm.Owner = this;
@@ -4473,6 +4488,14 @@ namespace SLF
                 LogOutput($"Veri Kaynağı {source}: DataTable null");
             }
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            // Tablonun bulunduğu formu oluştur ve göster
+            Tablo_olustur tabloForm = new Tablo_olustur();
+            tabloForm.Show();
+        }
+
         // ------------------------------------------------------------------------------------- //
 
 
