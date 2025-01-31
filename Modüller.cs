@@ -3099,7 +3099,7 @@ namespace SLF
                     if (int.TryParse(checkBox.Tag.ToString(), out checkbox_index))
                     {
                         checkbox_index -= 1;  // Adjust for 0-based indexing
-
+                        Debug.WriteLine($"Checkbox index parsed: {checkbox_index}");
                         // Ensure the index is within bounds of the array and the item exists
                         if (checkbox_index >= 0 && checkbox_index < cbs.tüm_katmanlar_array.Length &&
                             cbs.tüm_katmanlar_array[checkbox_index] != null)
@@ -3116,6 +3116,7 @@ namespace SLF
                                 {
                                     // Check if the overlay exists and remove it safely
                                     var overlay = cbs.tüm_katmanlar_array[checkbox_index];
+                                    Debug.WriteLine($"Overlay retrieved: {overlay.Id}");
                                     var activeMap = cbs.GetActiveGMapControl();
                                     if (activeMap.Overlays.Contains(overlay))
                                     {
@@ -3126,9 +3127,6 @@ namespace SLF
 
                                 // Dispose and nullify references
                                 cbs.tüm_katmanlar_array[checkbox_index]?.Dispose();
-/*                                cbs.tüm_katmanlar_array[checkbox_index] = null;
-                                cbs.tüm_katmanlar_array_names[checkbox_index] = null;
-                                cbs.tüm_katmanlar_datatable[checkbox_index] = null;*/
 
                                 // Clear checkboxes for all maps
                                 ClearCheckboxesForAllMaps(checkbox_index);
@@ -3240,63 +3238,164 @@ namespace SLF
                     }
                 }
         */
-
         private void rengiDeğiştirToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem rengini_degistir_menu_item = sender as ToolStripMenuItem;
+            Debug.WriteLine("rengiDeğiştirToolStripMenuItem_Click: Method started.");
 
             if (rengini_degistir_menu_item != null)
             {
                 System.Windows.Forms.CheckBox checkBox = rengini_degistir_menu_item.Tag as System.Windows.Forms.CheckBox;
-                int checkbox_index = int.Parse(checkBox.Tag.ToString()) - 1;
 
-                if (checkbox_index < 0 || checkbox_index >= cbs.tüm_katmanlar_array.Length)
+                // Ensure the Tag is set and is a valid number
+                if (checkBox == null || checkBox.Tag == null || !int.TryParse(checkBox.Tag.ToString(), out int checkbox_index))
                 {
-                    MessageBox.Show("Yanlış katman endeksi!", "",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Invalid checkbox tag.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                GMapOverlay overlay = cbs.tüm_katmanlar_array[checkbox_index];
-                if (overlay == null)
+                checkbox_index -= 1; // Adjust for 0-based indexing
+                Debug.WriteLine($"Checkbox index parsed: {checkbox_index}");
+
+                // Ensure the index is within bounds of the array and the item exists
+                if (checkbox_index >= 0 && checkbox_index < cbs.tüm_katmanlar_array.Length && cbs.tüm_katmanlar_array[checkbox_index] != null)
                 {
-                    MessageBox.Show("Katmanda herhangi bir data bulunamadı.",
-                        "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                ColorDialog colorDialog = new ColorDialog
-                {
-                    AnyColor = true,
-                    AllowFullOpen = true,
-                    FullOpen = true
-                };
-
-                if (colorDialog.ShowDialog() == DialogResult.OK)
-                {
-                    Color selectedColor = colorDialog.Color;
-                    byte a = selectedColor.A;
-                    byte r = selectedColor.R;
-                    byte g = selectedColor.G;
-                    byte b = selectedColor.B;
-
-                    // Combine them into a single uint in the order expected by the Color class
-                    uint abgr = (uint)(a << 24 | b << 16 | g << 8 | r);
-
-                    // Update the polygons in the overlay
-                    foreach (var polygon in overlay.Polygons)
+                    var overlay = cbs.tüm_katmanlar_array[checkbox_index];
+                    var activeMap = cbs.GetActiveGMapControl();
+                    if (activeMap == null)
                     {
-                        polygon.Stroke = new Pen(Color.FromArgb(a, r, g, b), 2); // Set border color
-                        polygon.Fill = new SolidBrush(Color.FromArgb(50, selectedColor)); // Set fill color with transparency
+                        Debug.WriteLine("Active map is null.");
+                        MessageBox.Show("Active map is not available.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
                     }
 
-                    checkBox.ForeColor = Color.FromArgb(a, r, g, b);
+                    Debug.WriteLine($"Overlay retrieved: {overlay.Id}");
+                    Debug.WriteLine($"Overlay validated. Polygon count: {overlay.Polygons.Count}");
 
-                    cbs.GetActiveGMapControl().Refresh(); // Redraw the map to reflect the changes
+                    // Show color dialog
+                    using (ColorDialog colorDialog = new ColorDialog { AnyColor = true, AllowFullOpen = true, FullOpen = true })
+                    {
+                        // Set default color to the current polygon color (if polygons exist)
+                        if (overlay.Polygons.Count > 0)
+                        {
+                            colorDialog.Color = overlay.Polygons[0].Stroke.Color;
+                            Debug.WriteLine($"Default color set to: {colorDialog.Color}");
+                        }
+
+                        if (colorDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            Color selectedColor = colorDialog.Color;
+                            Debug.WriteLine($"Selected color: {selectedColor}");
+
+                            try
+                            {
+                                // Update polygon colors
+                                Debug.WriteLine("Updating polygon colors...");
+                                foreach (var polygon in overlay.Polygons)
+                                {
+                                    polygon.Stroke = new Pen(selectedColor, 2); // Stroke width could be configurable
+                                    polygon.Fill = new SolidBrush(Color.FromArgb(50, selectedColor));
+                                    polygon.IsVisible = true;
+                                }
+
+                                // Update checkbox color
+                                checkBox.ForeColor = selectedColor;
+                                Debug.WriteLine($"Checkbox color updated: {checkBox.ForeColor}");
+
+                                // Ensure the overlay is part of the map
+                                if (!activeMap.Overlays.Any(o => o.Id == overlay.Id))
+                                {
+                                    Debug.WriteLine($"Adding overlay '{overlay.Id}' to the map.");
+                                    activeMap.Overlays.Add(overlay);
+                                }
+                                else
+                                {
+                                    Debug.WriteLine($"Overlay '{overlay.Id}' already exists in the map.");
+                                }
+
+                                // Invalidate and refresh the map to reflect changes
+                                Debug.WriteLine("Invalidating and refreshing the map...");
+                                activeMap.Invalidate();
+                                activeMap.Refresh();
+                                Debug.WriteLine("Map refreshed.");
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine($"Error occurred: {ex.Message}");
+                                MessageBox.Show($"An error occurred while updating the layer: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                        }
+                        else
+                        {
+                            Debug.WriteLine("Color dialog canceled.");
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Invalid index or layer not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+
+            Debug.WriteLine("rengiDeğiştirToolStripMenuItem_Click: Method completed.");
         }
 
+        /*        private void rengiDeğiştirToolStripMenuItem_Click(object sender, EventArgs e)
+                {
+                    ToolStripMenuItem rengini_degistir_menu_item = sender as ToolStripMenuItem;
+
+                    if (rengini_degistir_menu_item != null)
+                    {
+                        System.Windows.Forms.CheckBox checkBox = rengini_degistir_menu_item.Tag as System.Windows.Forms.CheckBox;
+                        int checkbox_index = int.Parse(checkBox.Tag.ToString()) - 1;
+
+                        if (checkbox_index < 0 || checkbox_index >= cbs.tüm_katmanlar_array.Length)
+                        {
+                            MessageBox.Show("Yanlış katman endeksi!", "",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        GMapOverlay overlay = cbs.tüm_katmanlar_array[checkbox_index];
+                        if (overlay == null)
+                        {
+                            MessageBox.Show("Katmanda herhangi bir data bulunamadı.",
+                                "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        ColorDialog colorDialog = new ColorDialog
+                        {
+                            AnyColor = true,
+                            AllowFullOpen = true,
+                            FullOpen = true
+                        };
+
+                        if (colorDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            Color selectedColor = colorDialog.Color;
+                            byte a = selectedColor.A;
+                            byte r = selectedColor.R;
+                            byte g = selectedColor.G;
+                            byte b = selectedColor.B;
+
+                            // Combine them into a single uint in the order expected by the Color class
+                            uint abgr = (uint)(a << 24 | b << 16 | g << 8 | r);
+
+                            // Update the polygons in the overlay
+                            foreach (var polygon in overlay.Polygons)
+                            {
+                                polygon.Stroke = new Pen(Color.FromArgb(a, r, g, b), 2); // Set border color
+                                polygon.Fill = new SolidBrush(Color.FromArgb(50, selectedColor)); // Set fill color with transparency
+                            }
+
+                            checkBox.ForeColor = Color.FromArgb(a, r, g, b);
+
+                            cbs.GetActiveGMapControl().Refresh(); // Redraw the map to reflect the changes
+                        }
+                    }
+                }
+        */
         // when clicked on "Tabloyu Gör" toolStripMenuItem applied onto the layers added
         // onto the maps, open up their attribute table
         private void tabloyuGörToolStripMenuItem_Click(object sender, EventArgs e)
@@ -4281,7 +4380,7 @@ namespace SLF
             // Calculate min and max values for the specified column
             foreach (DataRow row in dataTable.Rows)
             {
-                if (row[columnName] != DBNull.Value && double.TryParse(row[columnName].ToString(), out double value))
+                if (row[columnName] != DBNull.Value && int.TryParse(row[columnName].ToString(), out int value))
                 {
                     if (value < min) min = value;
                     if (value > max) max = value;
@@ -4649,7 +4748,7 @@ namespace SLF
             // Get the active map control
             GMapControl activeMap = cbs.GetActiveGMapControl();
             string activeMapName = activeMap.Name;
-
+            System.Data.DataTable shapefileDatatable = new System.Data.DataTable();
             // Debugging: Log overlay counts and active map name
             Console.WriteLine($"Active Map: {activeMapName}");
             Console.WriteLine($"Overlay Counts: YGA={ygaOverlayCount}, Imar={imarOverlayCount}, Stokastik={stokastikOverlayCount}");
@@ -4658,7 +4757,7 @@ namespace SLF
             string overlayName_yga = "Shapefile_" + (ygaOverlayCount + 1) + "_yga";
             string overlayName_imar = "Shapefile_" + (imarOverlayCount + 1) + "_imar";
             string overlayName_stokastik = "Shapefile_" + (stokastikOverlayCount + 1) + "_stokastik";
-
+            cbs.AddLayerToArrays(ygaOverlayCount, overlay_to_be_saved, activeMapName, shapefileDatatable);
             // Debugging: Log the overlay names
             Console.WriteLine($"Overlay Names: YGA={overlayName_yga}, Imar={overlayName_imar}, Stokastik={overlayName_stokastik}");
 
@@ -4667,11 +4766,14 @@ namespace SLF
             {
                 GMapOverlay newOverlay_imar = new GMapOverlay(overlayName_imar);
                 cbs.CopyOverlayContents(overlay_to_be_saved, newOverlay_imar);  // Copy shapefile data to the new overlay
+                                                                                // Add the overlay to the arrays
 
                 // Remove the old overlay only if this is the active map
                 if (activeMapName == "gMapControl_imar" && gMapControl_imar.Overlays.Contains(overlay_to_be_saved))
                 {
+                    //cbs.AddLayerToArrays(imarOverlayCount, newOverlay_imar, overlayName_imar, shapefileDatatable);
                     gMapControl_imar.Overlays.Remove(overlay_to_be_saved);
+
                 }
 
                 gMapControl_imar.Overlays.Add(newOverlay_imar);
@@ -4684,6 +4786,7 @@ namespace SLF
 
                 gMapControl_imar.Refresh();
                 imarOverlayCount++; // Increment the counter
+
             }
 
             // Add to YGA map
@@ -4696,6 +4799,7 @@ namespace SLF
                 if (activeMapName == "gMapControl_yga" && gMapControl_yga.Overlays.Contains(overlay_to_be_saved))
                 {
                     gMapControl_yga.Overlays.Remove(overlay_to_be_saved);
+                    //cbs.AddLayerToArrays(ygaOverlayCount, newOverlay_yga, overlayName_yga, shapefileDatatable);
                 }
 
                 gMapControl_yga.Overlays.Add(newOverlay_yga);
@@ -4720,6 +4824,7 @@ namespace SLF
                 if (activeMapName == "gMapControl_stokastik" && gMapControl_stokastik.Overlays.Contains(overlay_to_be_saved))
                 {
                     gMapControl_stokastik.Overlays.Remove(overlay_to_be_saved);
+                    //cbs.AddLayerToArrays(stokastikOverlayCount, newOverlay_stokastik, overlayName_stokastik, shapefileDatatable);
                 }
 
                 gMapControl_stokastik.Overlays.Add(newOverlay_stokastik);
@@ -4778,7 +4883,7 @@ namespace SLF
                 if (overlaysByName.TryGetValue(checkbox.Text, out var overlay))
                 {
                     // Debugging: Log overlay visibility update
-                    Console.WriteLine($"Updating visibility for overlay: {checkbox.Text}");
+                  //  Console.WriteLine($"Updating visibility for overlay: {checkbox.Text}");
 
                     // Update visibility of polygons, routes, and markers inside the overlay
                     foreach (var polygon in overlay.Polygons)

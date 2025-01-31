@@ -16,6 +16,8 @@ using System.Windows.Forms;
 using GMap.NET.WindowsForms.Markers;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Font = System.Drawing.Font;
+using SharpMap.Data.Providers;
+using DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace SLF
 {
@@ -66,8 +68,8 @@ namespace SLF
             // Initialize the arrays and other components
             tüm_katmanlar_array_names = new string[20];
             tüm_katmanlar_array = new GMapOverlay[20];
-            shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[13];
-            tüm_katmanlar_datatable = new System.Data.DataTable[13];
+            shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[20];
+            tüm_katmanlar_datatable = new System.Data.DataTable[20];
 
             targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
 
@@ -310,38 +312,38 @@ namespace SLF
             gmapcontrol.Refresh();
             gmapcontrol.ReloadMap();
         }
-        private async Task ProcessShapefile(string filepath, string overlayName, Form callingForm, DataGridView dataGridView)
+        /*        private async Task ProcessShapefile(string filepath, string overlayName, Form callingForm, DataGridView dataGridView)
+                {
+                    // Create overlays for the shapefile
+                    GMapOverlay[] overlays = CreateOverlays("shp");
+
+                    // Add the first overlay to each map control
+                    if (modülFormu.gMapControl_imar == null) 
+                    {
+                        modülFormu.gMapControl_imar.Overlays.Add(overlays[0]);
+                    }
+                    //modülFormu.gMapControl_imar.Overlays.Add(overlays[0]);
+                    modülFormu.gMapControl_yuk.Overlays.Add(overlays[1]);
+                    modülFormu.gMapControl_stokastik.Overlays.Add(overlays[2]);
+                    modülFormu.gMapControl_yga.Overlays.Add(overlays[3]);
+
+                    // Create a DataTable for the shapefile data
+                    System.Data.DataTable shapefileDatatable = new System.Data.DataTable();
+                    callingForm.Cursor = Cursors.WaitCursor;
+
+                    // Load the shapefile asynchronously
+                    await LoadShapefile(filepath, overlays[0], shapefileDatatable, dataGridView);
+                    callingForm.Cursor = Cursors.Default;
+
+                    // Add polygons to all maps (after copying them to overlays)
+                    modülFormu.AddShapefileLayerToAllMaps(overlays[0]);  // Assuming overlays[0] contains the shapes to be added to all maps
+                    AddLayerToArrays(overlays[0], overlayName, shapefileDatatable);
+                }*/
+        /*        public GMapOverlay[] CreateOverlays(string type)
         {
-            // Create overlays for the shapefile
-            GMapOverlay[] overlays = CreateOverlays("shp");
-
-            // Add the first overlay to each map control
-            if (modülFormu.gMapControl_imar == null) 
-            {
-                modülFormu.gMapControl_imar.Overlays.Add(overlays[0]);
-            }
-            //modülFormu.gMapControl_imar.Overlays.Add(overlays[0]);
-            modülFormu.gMapControl_yuk.Overlays.Add(overlays[1]);
-            modülFormu.gMapControl_stokastik.Overlays.Add(overlays[2]);
-            modülFormu.gMapControl_yga.Overlays.Add(overlays[3]);
-
-            // Create a DataTable for the shapefile data
-            System.Data.DataTable shapefileDatatable = new System.Data.DataTable();
-            callingForm.Cursor = Cursors.WaitCursor;
-
-            // Load the shapefile asynchronously
-            await LoadShapefile(filepath, overlays[0], shapefileDatatable, dataGridView);
-            callingForm.Cursor = Cursors.Default;
-
-            // Add polygons to all maps (after copying them to overlays)
-            modülFormu.AddShapefileLayerToAllMaps(overlays[0]);  // Assuming overlays[0] contains the shapes to be added to all maps
-            AddLayerToArrays(overlays[0], overlayName, shapefileDatatable);
-        }
-
-        public GMapOverlay[] CreateOverlays(string type)
-        {
-            string baseName = $"{type}Overlay_{layer_index}";
-            Console.WriteLine($"Created layer at index {layer_index}: {baseName}");
+            //string baseName = $"{type}Overlay_{layer_index + 1}";
+            string baseName = $"Shapefile_{layer_index + 1}";
+            Console.WriteLine($"Created layer at index {layer_index + 1}: {baseName}");
             return new[]
             {
                 new GMapOverlay($"{baseName}_imar"),
@@ -350,8 +352,80 @@ namespace SLF
                 new GMapOverlay($"{baseName}_yga")
 
             };
+        }*/
+        private async Task ProcessShapefile(string filepath, string overlayName, Form callingForm, DataGridView dataGridView)
+        {
+            try
+            {
+                // Create overlays for the shapefile
+                GMapOverlay[] overlays = CreateOverlays(overlayName);
+
+                foreach (var overlay in overlays)
+                {
+/*                    // Add the first overlay to each map control
+                    if (modülFormu.gMapControl_imar == null)
+                    {
+                        modülFormu.gMapControl_imar.Overlays.Add(overlay);
+                    }
+                    // Add the first overlay to each map control
+                    if (modülFormu.gMapControl_stokastik == null)
+                    {
+                        modülFormu.gMapControl_stokastik.Overlays.Add(overlay);
+                    }
+                    // Add the first overlay to each map control
+                    if (modülFormu.gMapControl_yga == null)
+                    {
+                        modülFormu.gMapControl_yga.Overlays.Add(overlay);
+                    }*/
+
+
+                    // Add the overlay to the arrays
+                 //   AddLayerToArrays(layer_index, overlay, overlayName, shapefileDatatable);
+                    //modülFormu.gMapControl_imar.Overlays.Add(overlays[0]);
+                    // modülFormu.gMapControl_yuk.Overlays.Add(overlay);
+                    // modülFormu.gMapControl_stokastik.Overlays.Add(overlay);
+                    //  modülFormu.gMapControl_yga.Overlays.Add(overlay);
+
+                }
+                // Load the shapefile asynchronously
+                System.Data.DataTable shapefileDatatable = new System.Data.DataTable();
+                await LoadShapefile(filepath, overlays[0], shapefileDatatable, dataGridView);
+                // Add polygons to all maps (after copying them to overlays)
+                modülFormu.AddShapefileLayerToAllMaps(overlays[0]);  // Assuming overlays[0] contains the shapes to be added to all maps
+                // Create a DataTable for the shapefile data
+                //System.Data.DataTable shapefileDatatable = new System.Data.DataTable();
+                callingForm.Cursor = Cursors.WaitCursor;
+
+            }
+            catch (Exception ex)
+            {
+                // Handle any errors that occur during processing
+                Console.WriteLine($"Error processing shapefile: {ex.Message}");
+                MessageBox.Show($"An error occurred while processing the shapefile: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // Restore the cursor
+                callingForm.Cursor = Cursors.Default;
+            }
         }
-        private void AddLayerToArrays(GMapOverlay overlay, string overlayName, System.Data.DataTable datatable)
+        public GMapOverlay[] CreateOverlays(string overlayName)
+        {
+            // Create unique names for each overlay
+            string baseName = $"Shapefile_{layer_index + 1}";
+            Console.WriteLine($"Created layer at index {layer_index + 1}: {baseName}");
+
+            return new[]
+            {
+        new GMapOverlay($"{baseName}_imar"),
+        new GMapOverlay($"{baseName}_yuk"),
+        new GMapOverlay($"{baseName}_stokastik"),
+        new GMapOverlay($"{baseName}_yga")
+    };
+
+        }
+
+        public void AddLayerToArrays(int layerIndex, GMapOverlay overlay, string overlayName, System.Data.DataTable datatable)
         {
             // Check if the maximum number of layers has been reached
             if (layer_index >= tüm_katmanlar_array.Length)
@@ -1206,7 +1280,7 @@ namespace SLF
 
 
 
-        private void EnsureColumnExists(DataTable dataTable, string columnName)
+        private void EnsureColumnExists(System.Data.DataTable dataTable, string columnName)
         {
             if (!dataTable.Columns.Contains(columnName))
             {
@@ -1214,7 +1288,7 @@ namespace SLF
             }
         }
 
-        private void ProcessPlacemark(SharpKml.Dom.Feature document, DataTable dataTable, GMapOverlay kmlOverlay, ref int rowCnt)
+        private void ProcessPlacemark(SharpKml.Dom.Feature document, System.Data.DataTable dataTable, GMapOverlay kmlOverlay, ref int rowCnt)
         {
             foreach (var placemark in document.Flatten().OfType<SharpKml.Dom.Placemark>())
             {
@@ -1229,7 +1303,7 @@ namespace SLF
             }
         }
 
-        private void ProcessPlacemarkData(SharpKml.Dom.Placemark placemark, DataTable dataTable, ref int rowCnt)
+        private void ProcessPlacemarkData(SharpKml.Dom.Placemark placemark, System.Data.DataTable dataTable, ref int rowCnt)
         {
             var row = dataTable.NewRow();
 
@@ -1294,7 +1368,7 @@ namespace SLF
             }
         }
 
-        private void AddColumnsFromSchema(SharpKml.Dom.Document document, DataTable dataTable)
+        private void AddColumnsFromSchema(SharpKml.Dom.Document document, System.Data.DataTable dataTable)
         {
             foreach (var schema in document.Schemas)
             {
