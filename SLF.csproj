@@ -607,6 +607,12 @@
     <Compile Include="services\DatabaseHelpers.cs" />
     <Compile Include="services\DatabaseManager .cs" />
     <Compile Include="services\IsImportedModule.cs" />
+    <Compile Include="Tablo_olustur.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tablo_olustur.Designer.cs">
+      <DependentUpon>Tablo_olustur.cs</DependentUpon>
+    </Compile>
     <Compile Include="YGAPopupForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -739,6 +745,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tablo_olustur.resx">
+      <DependentUpon>Tablo_olustur.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="YGAPopupForm.resx">
       <DependentUpon>YGAPopupForm.cs</DependentUpon>
