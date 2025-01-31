@@ -592,7 +592,6 @@
     <Compile Include="Ana_Menü.Designer.cs">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
     </Compile>
-    <Compile Include="CBS2.cs" />
     <Compile Include="YGAPopupForm.cs">
       <SubType>Form</SubType>
     </Compile>
