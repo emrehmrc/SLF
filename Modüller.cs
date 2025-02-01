@@ -1073,17 +1073,9 @@ namespace SLF
         private async void stokastik_dosya_seçimi_Click(object sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
-            this.Refresh();
-            try
-            {
-                // Use 'await' so this method actually waits for cbs_dosya_secimi to finish
-                await cbs.cbs_dosya_secimi(gMapControl_stokastik, this, tablo_formu.attribute_table);
-            }
-            finally
-            {
-                this.Cursor = Cursors.Default;
-            }
-
+            // Use 'await' so this method actually waits for cbs_dosya_secimi to finish
+            await cbs.cbs_dosya_secimi(gMapControl_stokastik, this, tablo_formu.attribute_table);
+            this.Cursor = Cursors.Default;
         }
 
         private void Stokastik_Fonksiyonlar_MouseDown(object sender, MouseEventArgs e)
@@ -1217,49 +1209,26 @@ namespace SLF
         }
 
 
+        // show information about polygons when double-clicking on the map
         private void gMapControl_stokastik_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left)
+            if (e.Button == MouseButtons.Left && lastClickedCheckbox != null)
             {
-                try
-                {
-                    // Ensure the layer at the current layer_index is not null
-                    if (cbs.tüm_katmanlar_array[layer_index] != null)
-                    {
-                        // Iterate through the polygons in the current layer
-                        foreach (var polygon in cbs.tüm_katmanlar_array[layer_index].Polygons)
-                        {
-                            // Check if the point is inside the polygon
-                            if (cbs.IsPointInPolygon(pointClick, polygon))
-                            {
-                                // Highlight the polygon if it's clicked
-                                cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
+                int checkbox_index = int.Parse(lastClickedCheckbox.Tag.ToString()) - 1;
 
-                                // Try to get the polygon's attributes
-                                if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
-                                {
-                                    // Show the attribute row
-                                    ShowAttributeRow(row);
-                                    tablo_formu.Show(); // Display the attribute table form
-                                }
-                                else
-                                {
-                                    // Handle case where polygon attributes are not found
-                                    Console.WriteLine("Attributes for the selected polygon not found.");
-                                }
-                            }
+                foreach (var polygon in cbs.tüm_katmanlar_array[checkbox_index].Polygons)
+                {
+                    if (cbs.IsPointInPolygon(pointClick, polygon))
+                    {
+                        cbs.HighlightPolygon(polygon, checkbox_index, cbs.GetActiveGMapControl());
+
+                        if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
+                        {
+                            ShowAttributeRow(row);
+                            tablo_formu.Show();
+                            tablo_formu.BringToFront();
                         }
                     }
-                    else
-                    {
-                        // Handle case where the layer at the current index is null
-                        Console.WriteLine($"Layer at index {layer_index} is null.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // Handle any unexpected exceptions and log the error
-                    Console.WriteLine($"Error in gMapControl_stokastik_OnMapDoubleClick: {ex.Message}");
                 }
             }
         }

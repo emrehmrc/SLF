@@ -186,7 +186,9 @@ namespace SLF
                     System.Data.DataTable shapefile_datatable = new System.Data.DataTable();
 
                     // run the import method
+                    callingForm.Cursor = Cursors.WaitCursor;
                     await LoadShapefile(filepath, shapeFileOverlay_stokastik, shapefile_datatable, dataGridView);
+                    callingForm.Cursor = Cursors.Default;
 
                     // Duplicate the polygons and routes from shapeFileOverlay_imar into each new overlay
                     CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_yuk);
@@ -225,6 +227,7 @@ namespace SLF
                     System.Data.DataTable kml_datatable = new System.Data.DataTable();
                     callingForm.Cursor = Cursors.WaitCursor;
                     await LoadKmlFile(filepath, kmlOverlay_imar, kml_datatable, gmapcontrol);
+                    callingForm.Cursor = Cursors.Default;
 
                     tüm_katmanlar_array[layer_index] = kmlOverlay_imar;
                     tüm_katmanlar_array_names[layer_index] = filename;
@@ -240,7 +243,7 @@ namespace SLF
                     CopyOverlayContents(kmlOverlay_imar, kmlOverlay_yuk);
                     CopyOverlayContents(kmlOverlay_imar, kmlOverlay_stokastik);
 
-                    callingForm.Cursor = Cursors.Default;
+
 
                     // Get the list of associated checkboxes for the given layer_index
                     List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
@@ -625,6 +628,7 @@ namespace SLF
                 targetOverlay.Markers.Add(newMarker);  // Add to target overlay
             }
         }
+        /*
         private async Task ProcessKml(string filepath, string filename, Form callingForm, GMapControl gmapcontrol)
         {
             GMapOverlay[] overlays = CreateOverlays("kml");
@@ -647,7 +651,8 @@ namespace SLF
 
             //AddLayerToArrays(overlays[0], filename, kmlDatatable);
             //HandleCheckBoxes(layer_index, filename);
-        }
+        }*/
+
         // define default colors for each overlay object
         public (System.Drawing.Color BorderColor, System.Drawing.Color FillColor)[] overlayColors = new (System.Drawing.Color, System.Drawing.Color)[]
         {
@@ -701,82 +706,6 @@ namespace SLF
 
             return data_table;
         }
-
-
-        /*        private System.Data.DataTable LoadAttributeTable(DataRow row, DataGridView dataGridView,
-                ShapefileDataReader shapefile_reader, System.Data.DataTable data_table, int row_cnt)
-                {
-
-                    // populate the new row by using the .GetValue method 
-                    for (int i = 0; i < shapefile_reader.DbaseHeader.NumFields; i++)
-                    {
-                        row["Row_No"] = row_cnt;
-                        row[i] = shapefile_reader.GetValue(i); // get the value of all columns for the i-th row
-                    }
-                    // Check if Invoke is needed for cross-thread operations
-                    if (dataGridView.InvokeRequired)
-                    {
-                        // If we are on a background thread, invoke the operation on the UI thread
-                        dataGridView.Invoke(new Action(() =>
-                        {
-                            dataGridView.DataSource = data_table;
-                        }));
-                    }
-                    else
-                    {
-                        // If we are on the UI thread, directly set the DataSource
-                        dataGridView.DataSource = data_table;
-                    }
-                    // add the resulting row to the datatable
-                    data_table.Rows.Add(row);
-                    return data_table;
-                }*/
-        /*        private System.Data.DataTable LoadAttributeTable(DataRow row, DataGridView dataGridView,
-                    ShapefileDataReader shapefile_reader, System.Data.DataTable data_table, int row_cnt)
-                {
-                    // Ensure the DataTable has the same number of columns as the shapefile fields
-                    if (data_table.Columns.Count == 0)  // Check if columns are not already added
-                    {
-                        // Add "Row_No" column to the DataTable
-                        data_table.Columns.Add("Row_No", typeof(int));
-
-                        // Add columns for each shapefile field dynamically based on the shapefile's header
-                        for (int i = 0; i < shapefile_reader.DbaseHeader.NumFields; i++)
-                        {
-                            string fieldName = shapefile_reader.DbaseHeader.Fields[i].Name; // Correctly access the field name
-                            data_table.Columns.Add(fieldName, typeof(string)); // Assuming string type for all fields
-                        }
-                    }
-
-                    // Populate the new row using the .GetValue method
-                    row["Row_No"] = row_cnt;  // Set the row number
-
-                    for (int i = 0; i < shapefile_reader.DbaseHeader.NumFields; i++)  // Start from 0 for valid indexing
-                    {
-                        row[shapefile_reader.DbaseHeader.Fields[i].Name] = shapefile_reader.GetValue(i); // Use field names to insert values
-                    }
-
-                    // Add the resulting row to the DataTable
-                    data_table.Rows.Add(row);
-
-                    // Check if Invoke is needed for cross-thread operations
-                    if (dataGridView.InvokeRequired)
-                    {
-                        // If we are on a background thread, invoke the operation on the UI thread
-                        dataGridView.Invoke(new Action(() =>
-                        {
-                            dataGridView.DataSource = data_table;
-                        }));
-                    }
-                    else
-                    {
-                        // If we are on the UI thread, directly set the DataSource
-                        dataGridView.DataSource = data_table;
-                    }
-
-                    return data_table;
-                }
-        */
 
         public void AddPolygonToOverlay(NetTopologySuite.Geometries.Polygon polygon,
                 GMapOverlay overlay, string gMapPolygonId, DataRow attributes)
@@ -834,66 +763,6 @@ namespace SLF
             overlay.Polygons.Add(polygon);
             polygonAttributes[polygon] = attributes;
         }
-
-        /*        public MapWinGIS.Shapefile ConvertOverlayToShapefile(GMapOverlay overlay)
-                {
-                    var shapefile = new MapWinGIS.Shapefile();
-                    shapefile.CreateNewWithShapeID("", ShpfileType.SHP_POLYGON);
-
-                    // Ensure attributes are added as fields
-                    if (polygonAttributes.Count > 0)
-                    {
-                        var firstPolygon = polygonAttributes.Keys.First();
-                        var firstRow = polygonAttributes[firstPolygon];
-
-                        // Dynamically handle different field types based on DataColumn data type
-                        foreach (DataColumn column in firstRow.Table.Columns)
-                        {
-                            FieldType fieldType = column.DataType == typeof(int) || column.DataType == typeof(long) ? FieldType.INTEGER_FIELD :
-                                                  column.DataType == typeof(double) || column.DataType == typeof(float) ? FieldType.DOUBLE_FIELD :
-                                                  FieldType.STRING_FIELD;
-
-                            shapefile.EditAddField(column.ColumnName, fieldType, 50, 10);
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("No attributes found for polygons.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
-
-                    foreach (var gMapPolygon in overlay.Polygons)
-                    {
-                        var shape = new MapWinGIS.Shape();
-                        shape.Create(ShpfileType.SHP_POLYGON);
-
-                        // Add points to shape from polygon
-                        for (int i = 0; i < gMapPolygon.Points.Count; i++)
-                        {
-                            var point = new MapWinGIS.Point
-                            {
-                                x = gMapPolygon.Points[i].Lng,
-                                y = gMapPolygon.Points[i].Lat
-                            };
-                            shape.InsertPoint(point, ref i);
-                        }
-
-                        int shapeIndex = shapefile.NumShapes;
-                        shapefile.EditInsertShape(shape, ref shapeIndex);
-
-                        // Add attributes to the shape
-                        if (polygonAttributes.TryGetValue(gMapPolygon, out DataRow row))
-                        {
-                            for (int i = 0; i < row.Table.Columns.Count; i++)
-                            {
-                                // Add attribute value from the DataRow to the shapefile
-                                shapefile.EditCellValue(i, shapeIndex, row[i]?.ToString());
-                            }
-                        }
-                    }
-
-                    return shapefile;
-                }*/
-
 
         public MapWinGIS.Shapefile ConvertOverlayToShapefile(GMapOverlay overlay)
         {
@@ -1409,111 +1278,6 @@ namespace SLF
         }
 
 
-
-        private void EnsureColumnExists(System.Data.DataTable dataTable, string columnName)
-        {
-            if (!dataTable.Columns.Contains(columnName))
-            {
-                dataTable.Columns.Add(columnName);
-            }
-        }
-
-        private void ProcessPlacemark(SharpKml.Dom.Feature document, System.Data.DataTable dataTable, GMapOverlay kmlOverlay, ref int rowCnt)
-        {
-            foreach (var placemark in document.Flatten().OfType<SharpKml.Dom.Placemark>())
-            {
-                var row = dataTable.NewRow();
-
-                ProcessPlacemarkData(placemark, dataTable, ref rowCnt); // Process placemark data
-
-                dataTable.Rows.Add(row);
-                rowCnt++;  // Increment row count
-
-                AddGeometryToOverlay(placemark, kmlOverlay, row);
-            }
-        }
-
-        private void ProcessPlacemarkData(SharpKml.Dom.Placemark placemark, System.Data.DataTable dataTable, ref int rowCnt)
-        {
-            var row = dataTable.NewRow();
-
-            // Handle ExtendedData
-            if (placemark.ExtendedData != null)
-            {
-                foreach (var schemaData in placemark.ExtendedData.SchemaData)
-                {
-                    foreach (var simpleData in schemaData.SimpleData)
-                    {
-                        EnsureColumnExists(dataTable, simpleData.Name);
-                        row[simpleData.Name] = simpleData.Text;
-                    }
-                }
-
-                foreach (var data in placemark.ExtendedData.Data)
-                {
-                    EnsureColumnExists(dataTable, data.Name);
-                    row[data.Name] = data.Value;
-                }
-            }
-
-            // Handle Coordinates (polygon, point, line)
-            HandleCoordinates(placemark, row, ref rowCnt);
-
-            // Handle Direct Attributes
-            var attributes = placemark.GetType().GetProperties();
-            foreach (var attribute in attributes)
-            {
-                EnsureColumnExists(dataTable, attribute.Name);
-                row[attribute.Name] = attribute.GetValue(placemark)?.ToString();
-            }
-
-            dataTable.Rows.Add(row);
-        }
-
-        private void HandleCoordinates(SharpKml.Dom.Placemark placemark, DataRow row, ref int rowCnt)
-        {
-            foreach (var polygon in placemark.Flatten().OfType<SharpKml.Dom.Polygon>())
-            {
-                var coordinatesString = string.Join(" ; ",
-                    polygon.Flatten().OfType<SharpKml.Dom.OuterBoundary>()
-                    .SelectMany(outerBoundary => outerBoundary.Flatten().OfType<SharpKml.Dom.LinearRing>())
-                    .Select(coord => $"{Math.Round(coord.Coordinates.First().Longitude, 6)},{Math.Round(coord.Coordinates.First().Latitude, 6)}"));
-                row["Row_No"] = rowCnt;
-                row["coordinates"] = coordinatesString;
-            }
-
-            foreach (var point in placemark.Flatten().OfType<SharpKml.Dom.Point>())
-            {
-                string pointCoordinates = $"{Math.Round(point.Coordinate.Longitude, 6)} ; {Math.Round(point.Coordinate.Latitude, 6)}";
-                row["Row_No"] = rowCnt;
-                row["coordinates"] = pointCoordinates;
-            }
-
-            foreach (var lineString in placemark.Flatten().OfType<SharpKml.Dom.LineString>())
-            {
-                var coordinatesString = string.Join(" ; ",
-                    lineString.Coordinates.Select(coord => $"{Math.Round(coord.Longitude, 6)},{Math.Round(coord.Latitude, 6)}"));
-                row["Row_No"] = rowCnt;
-                row["coordinates"] = coordinatesString;
-            }
-        }
-
-
-        private void AddGeometryToOverlay(SharpKml.Dom.Placemark placemark, GMapOverlay kmlOverlay, DataRow row)
-        {
-            var geometry = placemark.Geometry;
-
-            if (geometry is SharpKml.Dom.Polygon polygon)
-            {
-                AddPolygonToOverlay_kml(polygon, kmlOverlay, row);
-            }
-            else if (geometry is SharpKml.Dom.LineString lineString)
-            {
-                AddLineStringToOverlay_kml(lineString, kmlOverlay);
-            }
-        }
-
-
         // ----------------------------------- GRID CREATION ---------------------------------//
 
         // methods to convert meters info to longitude/latitude info to be used to create grids of mxm size
@@ -1790,12 +1554,12 @@ namespace SLF
                 // Reset previous selected polygon
                 foreach (var poly in gridOverlay.Polygons)
                 {
-                    poly.Stroke = new Pen(overlayColors[index].BorderColor, 2);
+                    poly.Stroke = new Pen(overlayColors[index].BorderColor, 3);
                     poly.Fill = new SolidBrush(overlayColors[index].FillColor);
                 }
 
                 // Highlight new selected polygon
-                polygon.Stroke = new Pen(System.Drawing.Color.LawnGreen, 2);
+                polygon.Stroke = new Pen(System.Drawing.Color.LawnGreen, 3);
                 polygon.Fill = new SolidBrush(System.Drawing.Color.FromArgb(50, System.Drawing.Color.LawnGreen));
 
 
@@ -1807,19 +1571,20 @@ namespace SLF
                 // Reset previous selected polygon to the previously defined default map colors
                 if (selectedPolygon != null)
                 {
-                    selectedPolygon.Stroke = new Pen(overlayColors[index].BorderColor, 2);
+                    selectedPolygon.Stroke = new Pen(overlayColors[index].BorderColor, 3);
                     selectedPolygon.Fill = new SolidBrush(overlayColors[index].FillColor);
                 }
 
                 // Highlight new selected polygon with a different border and fill color
                 selectedPolygon = polygon;
-                selectedPolygon.Stroke = new Pen(System.Drawing.Color.LawnGreen, 2);
+                selectedPolygon.Stroke = new Pen(System.Drawing.Color.LawnGreen, 3);
                 selectedPolygon.Fill = new SolidBrush(System.Drawing.Color.FromArgb(50, System.Drawing.Color.LawnGreen));
 
                 gMapControl.Refresh();
             }
 
         }
+
         public void Draw_Polygon(List<PointLatLng> polygonPoints, GMapOverlay polygonOverlay, GMapControl gmap)
         {
             // bu noktalar arasında poligon çiz, mavi ile işaretle, ve de 
