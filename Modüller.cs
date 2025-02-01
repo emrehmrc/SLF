@@ -14,7 +14,6 @@ using GMap.NET.WindowsForms.Markers;
 using System.Xml;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Threading.Tasks;
-using ClosedXML.Excel;
 using OfficeOpenXml;
 using DrawingImage = System.Drawing.Image;
 
@@ -310,7 +309,7 @@ namespace SLF
 
             _excelService = new ExcelService();
             InitializeLogTextBox(); // Initialize logTextBox
-            this.DoubleBuffered = true;
+            //this.DoubleBuffered = true;
             this.selectedMethod = selectedMethod;  // Store the method
             InitializeComboBoxes();
 
@@ -371,7 +370,7 @@ namespace SLF
             SortTabPagesAlphabetically(Modül_Tabları, true);
 
             // Enable double buffering to reduce flickering
-            this.DoubleBuffered = true;
+            // this.DoubleBuffered = true;
 
             // Set Default Selected Tab
             Modül_Tabları.SelectedTab = tab_girdi;
@@ -1073,9 +1072,17 @@ namespace SLF
 
         private async void stokastik_dosya_seçimi_Click(object sender, EventArgs e)
         {
-
-            // Assume `cbs` is properly instantiated
-            await cbs.cbs_dosya_secimi(gMapControl_stokastik, this, tablo_formu.attribute_table);
+            this.Cursor = Cursors.WaitCursor;
+            this.Refresh();
+            try
+            {
+                // Use 'await' so this method actually waits for cbs_dosya_secimi to finish
+                await cbs.cbs_dosya_secimi(gMapControl_stokastik, this, tablo_formu.attribute_table);
+            }
+            finally
+            {
+                this.Cursor = Cursors.Default;
+            }
 
         }
 
@@ -3389,7 +3396,6 @@ namespace SLF
             buton_ea_harita_katmanlar.BringToFront();
             buton_yuk_haritası_katmanlar.BringToFront();
             buton_imar_katmanlar.BringToFront();
-            buton_optimalDTR_katmanlar.BringToFront();
         }
 
 
