@@ -14,10 +14,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GMap.NET.WindowsForms.Markers;
-using DocumentFormat.OpenXml.Wordprocessing;
 using Font = System.Drawing.Font;
-using SharpMap.Data.Providers;
-using DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace SLF
 {
@@ -147,127 +144,6 @@ namespace SLF
 
         }
 
-
-        //-----------------------------------------------------------------------------//
-        /*        public async Task cbs_dosya_secimi(GMapControl gmapcontrol, Form callingForm, DataGridView dataGridView)
-                {
-                    // Find the first available slot in the array that holds shapefile overlay layers
-                    layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
-
-                    if (layer_index == -1)
-                    {
-                        MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
-                        return;
-                    }
-
-                    // file dialog to select a file to import
-                    OpenFileDialog vektorel_veri_seçimi = new OpenFileDialog();
-
-                    string targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
-                    vektorel_veri_seçimi.Filter = "Shapefile|*.shp|Google Earth File|*.kml|CSV File|*.csv";
-                    vektorel_veri_seçimi.InitialDirectory = targetDirectory;
-
-                    DialogResult result = vektorel_veri_seçimi.ShowDialog();
-
-                    if (result == DialogResult.OK)
-                    {
-                        string filepath = vektorel_veri_seçimi.FileName;
-                        string filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
-                        string extension = filename.Substring(filename.Length - 3);
-
-                        if (extension == "shp")
-                        {
-                            // create a new layer to be added onto the map
-                            GMapOverlay shapeFileOverlay_imar = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_imar");
-                            GMapOverlay shapeFileOverlay_yuk = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_yuk");
-                            GMapOverlay shapeFileOverlay_stokastik = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_stokastik");
-
-                            modülFormu.gMapControl_imar.Overlays.Add(shapeFileOverlay_imar);
-                            modülFormu.gMapControl_yuk.Overlays.Add(shapeFileOverlay_yuk);
-                            modülFormu.gMapControl_stokastik.Overlays.Add(shapeFileOverlay_stokastik);
-
-                            // create a new datatable to be added to the tüm_katmanlar_datatable array
-                            System.Data.DataTable shapefile_datatable = new System.Data.DataTable();
-
-                            // run the import method
-                            callingForm.Cursor = Cursors.WaitCursor;
-                            await LoadShapefile(filepath, shapeFileOverlay_imar, shapefile_datatable, dataGridView);
-                            callingForm.Cursor = Cursors.Default;
-
-                            // Duplicate the polygons and routes from shapeFileOverlay_imar into each new overlay
-                            CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_yuk);
-                            CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_stokastik);
-
-
-                            // add the layer and its name to the specified arrays
-                            tüm_katmanlar_array[layer_index] = shapeFileOverlay_imar;
-                            tüm_katmanlar_array_names[layer_index] = filename;
-                            tüm_katmanlar_datatable[layer_index] = shapefile_datatable;
-
-                            // Get the list of associated checkboxes for the given layer_index
-                            List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
-
-                            if (associatedCheckBoxes != null)
-                            {
-                                // Loop through each checkbox in the list and apply the required settings
-                                foreach (var checkBox in associatedCheckBoxes)
-                                {
-                                    checkBox.Checked = true;
-                                    checkBox.Visible = true;
-                                    checkBox.Text = tüm_katmanlar_array_names[layer_index];
-                                }
-                            }
-                        }
-                        else if (extension == "kml")
-                        {
-                            GMapOverlay kmlOverlay_imar = new GMapOverlay($"kmlOverlay_{layer_index + 1}_imar");
-                            GMapOverlay kmlOverlay_yuk = new GMapOverlay($"kmlOverlay_{layer_index + 1}_yuk");
-                            GMapOverlay kmlOverlay_stokastik = new GMapOverlay($"kmlOverlay_{layer_index + 1}_stokastik");
-
-                            modülFormu.gMapControl_imar.Overlays.Add(kmlOverlay_imar);
-                            modülFormu.gMapControl_yuk.Overlays.Add(kmlOverlay_yuk);
-                            modülFormu.gMapControl_stokastik.Overlays.Add(kmlOverlay_stokastik);
-
-                            System.Data.DataTable kml_datatable = new System.Data.DataTable();
-                            callingForm.Cursor = Cursors.WaitCursor;
-                            await LoadKmlFile(filepath, kmlOverlay_imar, kml_datatable, gmapcontrol);
-
-                            tüm_katmanlar_array[layer_index] = kmlOverlay_imar;
-                            tüm_katmanlar_array_names[layer_index] = filename;
-                            tüm_katmanlar_datatable[layer_index] = kml_datatable;
-
-                            // convert .kml overlay into a MapWinGIS.Shapefile object
-                            polygonAttributes_kml = new Dictionary<GMapPolygon, DataRow>();
-                            routeAttributes_kml = new Dictionary<GMapRoute, DataRow>();
-                            MapWinGIS.Shapefile shapefile = ConvertKmlToShapefile(kmlOverlay_imar);
-                            shapeFileArray_MapWinGIS[layer_index] = shapefile;
-
-                            // Duplicate the polygons and routes from shapeFileOverlay_imar into each new overlay
-                            CopyOverlayContents(kmlOverlay_imar, kmlOverlay_yuk);
-                            CopyOverlayContents(kmlOverlay_imar, kmlOverlay_stokastik);
-
-                            callingForm.Cursor = Cursors.Default;
-
-                            // Get the list of associated checkboxes for the given layer_index
-                            List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
-
-                            if (associatedCheckBoxes != null)
-                            {
-                                // Loop through each checkbox in the list and apply the required settings
-                                foreach (var checkBox in associatedCheckBoxes)
-                                {
-                                    checkBox.Checked = true;
-                                    checkBox.Visible = true;
-                                    checkBox.Text = tüm_katmanlar_array_names[layer_index];
-                                }
-                            }
-                        }
-                    }
-                    gmapcontrol.Refresh();
-                    gmapcontrol.ReloadMap();
-
-                }*/
-
         public async Task cbs_dosya_secimi(GMapControl gmapcontrol, Form callingForm, DataGridView dataGridView)
         {
             // Find the first available slot in the array that holds shapefile overlay layers
@@ -312,47 +188,7 @@ namespace SLF
             gmapcontrol.Refresh();
             gmapcontrol.ReloadMap();
         }
-        /*        private async Task ProcessShapefile(string filepath, string overlayName, Form callingForm, DataGridView dataGridView)
-                {
-                    // Create overlays for the shapefile
-                    GMapOverlay[] overlays = CreateOverlays("shp");
 
-                    // Add the first overlay to each map control
-                    if (modülFormu.gMapControl_imar == null) 
-                    {
-                        modülFormu.gMapControl_imar.Overlays.Add(overlays[0]);
-                    }
-                    //modülFormu.gMapControl_imar.Overlays.Add(overlays[0]);
-                    modülFormu.gMapControl_yuk.Overlays.Add(overlays[1]);
-                    modülFormu.gMapControl_stokastik.Overlays.Add(overlays[2]);
-                    modülFormu.gMapControl_yga.Overlays.Add(overlays[3]);
-
-                    // Create a DataTable for the shapefile data
-                    System.Data.DataTable shapefileDatatable = new System.Data.DataTable();
-                    callingForm.Cursor = Cursors.WaitCursor;
-
-                    // Load the shapefile asynchronously
-                    await LoadShapefile(filepath, overlays[0], shapefileDatatable, dataGridView);
-                    callingForm.Cursor = Cursors.Default;
-
-                    // Add polygons to all maps (after copying them to overlays)
-                    modülFormu.AddShapefileLayerToAllMaps(overlays[0]);  // Assuming overlays[0] contains the shapes to be added to all maps
-                    AddLayerToArrays(overlays[0], overlayName, shapefileDatatable);
-                }*/
-        /*        public GMapOverlay[] CreateOverlays(string type)
-        {
-            //string baseName = $"{type}Overlay_{layer_index + 1}";
-            string baseName = $"Shapefile_{layer_index + 1}";
-            Console.WriteLine($"Created layer at index {layer_index + 1}: {baseName}");
-            return new[]
-            {
-                new GMapOverlay($"{baseName}_imar"),
-                new GMapOverlay($"{baseName}_yuk"),
-                new GMapOverlay($"{baseName}_stokastik"),
-                new GMapOverlay($"{baseName}_yga")
-
-            };
-        }*/
         private async Task ProcessShapefile(string filepath, string overlayName, Form callingForm, DataGridView dataGridView)
         {
             try
@@ -1368,16 +1204,6 @@ namespace SLF
             }
         }
 
-        private void AddColumnsFromSchema(SharpKml.Dom.Document document, System.Data.DataTable dataTable)
-        {
-            foreach (var schema in document.Schemas)
-            {
-                foreach (var field in schema.Fields)
-                {
-                    EnsureColumnExists(dataTable, field.Name);
-                }
-            }
-        }
 
         private void AddGeometryToOverlay(SharpKml.Dom.Placemark placemark, GMapOverlay kmlOverlay, DataRow row)
         {
@@ -1466,88 +1292,6 @@ namespace SLF
             MapWinGIS.Shapefile myShapefile = ConvertOverlayToShapefile(shapeFileOverlay);
             shapeFileArray_MapWinGIS[layer_index] = myShapefile;
         }
-
-
-        /*        // method that loads a shapefile object to the specified GMapOverlay map object
-                public async Task LoadShapefile(string filepath, GMapOverlay shapeFileOverlay,
-                                       System.Data.DataTable shapefile_datatable, DataGridView dataGridView)
-                {
-                    // eğer dosya bulunamadıysa uyarı ver
-                    if (!File.Exists(filepath))
-                    {
-                        MessageBox.Show("Herhangi bir dosya bulunamadı. Lütfen tekrardan kontrol ediniz.");
-                        return;
-                    }
-
-                    if (!shapefile_datatable.Columns.Contains("Row_No"))
-                    {
-                        // datatable that will hold the attribute table of the .shp file
-                        shapefile_datatable.Columns.Add("Row_No");
-                    }
-
-                    // shpReader object to read from the shp file that is being imported
-                    var shpReader = new ShapefileDataReader(filepath, new NetTopologySuite.Geometries.GeometryFactory());
-
-                    // Initialize the DataTable columns based on the shapefile's attribute fields
-                    for (int i = 0; i < shpReader.DbaseHeader.NumFields; i++)
-                    {
-                        var sütunlar = shpReader.DbaseHeader.Fields[i];
-
-                        if (!shapefile_datatable.Columns.Contains(sütunlar.Name))
-                        {
-                            shapefile_datatable.Columns.Add(sütunlar.Name, typeof(string)); // Simplified to string for all fields
-                        }
-                    }
-
-                    int row_cnt = 1;
-
-                    // Wrap the entire processing part in Task.Run to make it non-blocking
-                    await Task.Run(() =>
-                    {
-                        // read the lines of the .shp file one by one until no more line/row is left
-                        while (shpReader.Read())
-                        {
-                            // extract the geometry information of each line in the .shp file
-                            var geometry = shpReader.Geometry;
-
-                            // create a new row for the datatable and then populate it by
-                            // using the LoadAttributeTable() method
-                            DataRow row = shapefile_datatable.NewRow();
-                            shapefile_datatable = LoadAttributeTable(row, dataGridView,
-                                       shpReader, shapefile_datatable, row_cnt);
-
-                            row_cnt++;
-
-                            // check if the geometry of the shapefile includes one polygon or is a multipolygon,
-                            // add each of the polygons to the shapeFileOverlay by a for loop if multipolygon.
-                            if (geometry is NetTopologySuite.Geometries.Polygon polygon)
-                            {
-                                AddPolygonToOverlay(polygon, shapeFileOverlay, "shapeFilePolygon", row);
-                            }
-                            else if (geometry is NetTopologySuite.Geometries.MultiPolygon multiPolygon)
-                            {
-                                foreach (NetTopologySuite.Geometries.Polygon poly in multiPolygon.Geometries)
-                                {
-                                    AddPolygonToOverlay(poly, shapeFileOverlay, "shapeFilePolygon", row);
-                                }
-                            }
-                        }
-                    });
-
-                    // Find the first available slot in the array that holds shapefile overlay layers
-                    layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
-
-                    if (layer_index == -1)
-                    {
-                        MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
-                        return;
-                    }
-
-                    // Convert GMapOverlay to MapWinGIS.Shapefile
-                    MapWinGIS.Shapefile myShapefile = ConvertOverlayToShapefile(shapeFileOverlay);
-                    shapeFileArray_MapWinGIS[layer_index] = myShapefile;
-                }
-        */
 
 
         // ----------------------------------- GRID CREATION ---------------------------------//
@@ -1775,7 +1519,9 @@ namespace SLF
                         return webView;
                     }
                 }
+
             }
+
             return null;
         }
 
@@ -1892,27 +1638,6 @@ namespace SLF
             return dt;
         }
 
-        /*        public System.Data.DataTable CreatePolygonDataTable(List<PointLatLng> polygonPoints, int polygonId)
-                {
-                    System.Data.DataTable dt = new System.Data.DataTable();
-                    dt.Columns.Add("PolygonID", typeof(int));
-                    dt.Columns.Add("Coordinates", typeof(string));
-                    dt.Columns.Add("Area_Size(m2)", typeof(string));
-
-                    // Create a string representation of the coordinates
-                    string coordinates = string.Join(", ", polygonPoints.Select(p => $"({p.Lat}, {p.Lng})"));
-
-                    double area = CalculatePolygonArea(polygonPoints);
-
-                    // Create a new row
-                    DataRow row = dt.NewRow();
-                    row["PolygonID"] = polygonId;
-                    row["Coordinates"] = coordinates;
-                    row["Area_Size(m2)"] = Math.Round(area, 0).ToString();
-                    dt.Rows.Add(row);
-
-                    return dt;
-                }*/
 
         public double CalculatePolygonArea(List<PointLatLng> points)
         {
