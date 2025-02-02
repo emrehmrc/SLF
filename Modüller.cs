@@ -122,6 +122,11 @@ namespace SLF
         // sol tıkla nokta ekleyebilme kontrolü
         public bool adding_points = false;
 
+        // initialize the count of overlays within each mao
+        public int ygaOverlayCount = 0;
+        public int imarOverlayCount = 0;
+        public int stokastikOverlayCount = 0;
+
 
         // ------------------------------------------------------------------------------------------------------------ //
 
@@ -1076,6 +1081,8 @@ namespace SLF
             // Use 'await' so this method actually waits for cbs_dosya_secimi to finish
             await cbs.cbs_dosya_secimi(gMapControl_stokastik, this, tablo_formu.attribute_table);
             this.Cursor = Cursors.Default;
+
+            AddShapefileLayerToAllMaps(gMapControl_stokastik.Overlays[0]);
         }
 
         private void Stokastik_Fonksiyonlar_MouseDown(object sender, MouseEventArgs e)
@@ -1221,6 +1228,7 @@ namespace SLF
                     if (cbs.IsPointInPolygon(pointClick, polygon))
                     {
                         cbs.HighlightPolygon(polygon, checkbox_index, cbs.GetActiveGMapControl());
+
 
                         if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
                         {
@@ -4035,22 +4043,13 @@ System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
                 overlaysByName[overlayName] = overlay; // Update if overlay already exists for this name
             }
 
-            // For debugging: log the overlay being added
-            Console.WriteLine($"Added overlay with name: {overlayName}");
         }
-        public int ygaOverlayCount = 0;
-        public int imarOverlayCount = 0;
-        public int stokastikOverlayCount = 0;
 
         public void AddPolygonToAllMaps(GMapOverlay overlay_to_be_saved)
         {
             // Get the active map control
             GMapControl activeMap = cbs.GetActiveGMapControl();
             string activeMapName = activeMap.Name;
-
-            // Debugging: Log overlay counts and active map name
-            Console.WriteLine($"Active Map: {activeMapName}");
-            Console.WriteLine($"Overlay Counts: YGA={ygaOverlayCount}, Imar={imarOverlayCount}, Stokastik={stokastikOverlayCount}");
 
             // Create unique names for each map's overlay based on the count
             string overlayName_yga = "Polygon_" + (ygaOverlayCount + 1) + "_yga";
@@ -4139,17 +4138,12 @@ System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
             GMapControl activeMap = cbs.GetActiveGMapControl();
             string activeMapName = activeMap.Name;
             System.Data.DataTable shapefileDatatable = new System.Data.DataTable();
-            // Debugging: Log overlay counts and active map name
-            Console.WriteLine($"Active Map: {activeMapName}");
-            Console.WriteLine($"Overlay Counts: YGA={ygaOverlayCount}, Imar={imarOverlayCount}, Stokastik={stokastikOverlayCount}");
 
             // Create unique names for each map's overlay based on the count
             string overlayName_yga = "Shapefile_" + (ygaOverlayCount + 1) + "_yga";
             string overlayName_imar = "Shapefile_" + (imarOverlayCount + 1) + "_imar";
             string overlayName_stokastik = "Shapefile_" + (stokastikOverlayCount + 1) + "_stokastik";
             cbs.AddLayerToArrays(ygaOverlayCount, overlay_to_be_saved, activeMapName, shapefileDatatable);
-            // Debugging: Log the overlay names
-            Console.WriteLine($"Overlay Names: YGA={overlayName_yga}, Imar={overlayName_imar}, Stokastik={overlayName_stokastik}");
 
             // Add to Imar map
             if (gMapControl_imar != null)
@@ -4172,7 +4166,6 @@ System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
 
                 // Update the checkbox text for Imar dynamically
                 UpdateCheckboxTextForLayer(imarOverlayCount, checkBoxes_imar, overlayName_imar);
-                Console.WriteLine($"Updated checkbox for Imar: {overlayName_imar}");
 
                 gMapControl_imar.Refresh();
                 imarOverlayCount++; // Increment the counter
@@ -4214,7 +4207,6 @@ System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
                 if (activeMapName == "gMapControl_stokastik" && gMapControl_stokastik.Overlays.Contains(overlay_to_be_saved))
                 {
                     gMapControl_stokastik.Overlays.Remove(overlay_to_be_saved);
-                    //cbs.AddLayerToArrays(stokastikOverlayCount, newOverlay_stokastik, overlayName_stokastik, shapefileDatatable);
                 }
 
                 gMapControl_stokastik.Overlays.Add(newOverlay_stokastik);
@@ -4266,14 +4258,10 @@ System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
             var checkbox = sender as CheckBox;
             if (checkbox != null)
             {
-                // Debugging: Log the checkbox text
-                Console.WriteLine($"Checkbox '{checkbox.Text}' changed.");
 
                 // Try to get the corresponding overlay by its unique name
                 if (overlaysByName.TryGetValue(checkbox.Text, out var overlay))
                 {
-                    // Debugging: Log overlay visibility update
-                  //  Console.WriteLine($"Updating visibility for overlay: {checkbox.Text}");
 
                     // Update visibility of polygons, routes, and markers inside the overlay
                     foreach (var polygon in overlay.Polygons)

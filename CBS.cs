@@ -190,13 +190,13 @@ namespace SLF
                     await LoadShapefile(filepath, shapeFileOverlay_stokastik, shapefile_datatable, dataGridView);
                     callingForm.Cursor = Cursors.Default;
 
-                    // Duplicate the polygons and routes from shapeFileOverlay_imar into each new overlay
-                    CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_yuk);
-                    CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_stokastik);
+                    // Duplicate the polygons and routes from first overlay to other overlays
+                    CopyOverlayContents(shapeFileOverlay_stokastik, shapeFileOverlay_imar);
+                    CopyOverlayContents(shapeFileOverlay_stokastik, shapeFileOverlay_yuk);
 
 
                     // add the layer and its name to the specified arrays
-                    tüm_katmanlar_array[layer_index] = shapeFileOverlay_imar;
+                    tüm_katmanlar_array[layer_index] = shapeFileOverlay_stokastik;
                     tüm_katmanlar_array_names[layer_index] = filename;
                     tüm_katmanlar_datatable[layer_index] = shapefile_datatable;
 
@@ -563,8 +563,7 @@ namespace SLF
             // Check if the maximum number of layers has been reached
             if (layer_index >= tüm_katmanlar_array.Length)
             {
-                Console.WriteLine("Error: Maximum number of layers (20) reached. Cannot add more layers.");
-                MessageBox.Show("Maximum number of layers (20) reached. Cannot add more layers.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Maksimum katman sayısına (13) ulaşıldı. Daha fazla katman eklenememektedir.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
