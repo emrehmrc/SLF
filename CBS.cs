@@ -177,7 +177,6 @@ namespace SLF
         public async Task cbs_dosya_secimi(GMapControl callingMap, Form callingForm, DataGridView dataGridView)
         {
             // Find the first available slot in the array that holds shapefile overlay layers
-            //layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
             layer_index = FindFirstFreeLayerIndex();
 
             if (layer_index == -1)
@@ -1165,8 +1164,7 @@ namespace SLF
             // grid e ait oluşturulmuş mxm hücreleri "polygons" listesiyle return et.
             return polygons;
         }
-
-        /*
+        
         // creates a grid and adds it onto the map
         public void AddGridToMap(GMapControl gMapControl)
         {
@@ -1202,8 +1200,16 @@ namespace SLF
             gMapControl.Refresh();
 
             // Find the first available slot in the array that holds shapefile overlay layers
-            layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
-            tüm_katmanlar_array[layer_index] = gridOverlay;
+            layer_index = Array.FindIndex(tüm_katmanlar_array_imar, s => s == null);
+            tüm_katmanlar_array_imar[layer_index] = gridOverlay;
+            tüm_katmanlar_array_stokastik[layer_index] = gridOverlay;
+            tüm_katmanlar_array_yga[layer_index] = gridOverlay;
+            tüm_katmanlar_array_yuk[layer_index] = gridOverlay;
+
+            // add grid overlay to the specified gmapcontrol objects
+            modülFormu.gMapControl_imar.Overlays.Add(gridOverlay);
+            modülFormu.gMapControl_stokastik.Overlays.Add(gridOverlay);
+
             tüm_katmanlar_array_names[layer_index] = "Grid_" + grid_size + "_" + (layer_index + 1).ToString();
             tüm_katmanlar_datatable[layer_index] = gridTable;
 
@@ -1225,8 +1231,11 @@ namespace SLF
                     checkBox.Text = tüm_katmanlar_array_names[layer_index];
                 }
             }
-        }*/
 
+            modülFormu.gMapControl_stokastik.Refresh();
+            modülFormu.gMapControl_imar.Refresh();
+
+        }
 
 
         // ------------------------------------ EXTRAS --------------------------------------//
@@ -1661,17 +1670,48 @@ namespace SLF
         // check whether two polygons intersect
         private bool PolygonsIntersect(GMapPolygon polygon1, GMapPolygon polygon2)
         {
-            // Convert GMapPolygon to NTS Polygon
             var geometryFactory = new NetTopologySuite.Geometries.GeometryFactory();
 
-            var coordinates1 = polygon1.Points.Select(p => new NetTopologySuite.Geometries.Coordinate(p.Lng, p.Lat)).ToArray();
-            var coordinates2 = polygon2.Points.Select(p => new NetTopologySuite.Geometries.Coordinate(p.Lng, p.Lat)).ToArray();
+            // Convert polygon1
+            var coords1 = polygon1.Points
+                .Select(p => new NetTopologySuite.Geometries.Coordinate(p.Lng, p.Lat))
+                .ToList();
 
-            var ntsPolygon1 = geometryFactory.CreatePolygon(coordinates1);
-            var ntsPolygon2 = geometryFactory.CreatePolygon(coordinates2);
+            if (!AreCoordinatesClosed(coords1))
+            {
+                coords1.Add(coords1[0]);
+            }
+
+            var ntsPolygon1 = geometryFactory.CreatePolygon(coords1.ToArray());
+
+            // Convert polygon2
+            var coords2 = polygon2.Points
+                .Select(p => new NetTopologySuite.Geometries.Coordinate(p.Lng, p.Lat))
+                .ToList();
+
+            if (!AreCoordinatesClosed(coords2))
+            {
+                coords2.Add(coords2[0]);
+            }
+
+            var ntsPolygon2 = geometryFactory.CreatePolygon(coords2.ToArray());
 
             return ntsPolygon1.Intersects(ntsPolygon2);
         }
+
+        // Helper that checks if the last coordinate equals the first
+        private bool AreCoordinatesClosed(List<NetTopologySuite.Geometries.Coordinate> coords)
+        {
+            if (coords.Count < 2) return false;
+
+            var first = coords[0];
+            var last = coords[coords.Count - 1];
+
+            // The standard 'closed' test is that first == last
+            // If your data is lat/long, you might do a tolerance-based comparison
+            return first.Equals2D(last);
+        }
+
 
         // Method to extract consumption value from DataRow
         private double ExtractConsumptionValue(DataRow row, string columnName)
@@ -1970,6 +2010,8 @@ namespace SLF
 
             // add the resulting layer and its name to the specified arrays
             tüm_katmanlar_array_imar[layer_index] = resultingOverlay;
+            tüm_katmanlar_array_stokastik[layer_index] = resultingOverlay; 
+
             tüm_katmanlar_array_names[layer_index] = "Birleştirilmiş_Katman_" + layer_index.ToString();
 
             // create a data table object and fill it with the information from the joinedData object

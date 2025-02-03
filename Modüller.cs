@@ -569,8 +569,9 @@ namespace SLF
             string selectedTabText = Modül_Tabları.SelectedTab.Text;
 
             // Modüllerin yüklü olup olmadığını kontrol et
-            if (selectedMethod == "SLF (Jeo-Uzamsal)")
+            /*if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
+                
                 if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Haritası Modülü") && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
                 {
                     // Sekme geçişini tamamen iptal et
@@ -580,7 +581,7 @@ namespace SLF
                     Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
                     return;
                 }
-                /*else if (selectedTabText == "İmar Analizleri" && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")))
+                else if (selectedTabText == "İmar Analizleri" && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")))
                 {
                     // Sekme geçişini tamamen iptal et
                     MessageBox.Show("İmar planı verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
@@ -588,7 +589,7 @@ namespace SLF
                     Modül_Tabları.SelectedTab = tab_girdi;
                     Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
                     return;
-                }*/
+                }
                 else if (selectedTabText == "Optimal DTR Konumlandırma"
                    && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")
                    && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri")))
@@ -633,40 +634,13 @@ namespace SLF
                 {
                     await dekHaritayaVeriYukleAsync();
                 }
-            }
+            }*/
         }
 
         private void SenaryoNewSelectionButton_Click(object sender, EventArgs e)
         {
             Modül_Tabları.SelectedTab = tab_senaryo;
         }
-
-        /*
-        private void checkBox_CheckedChanged(object sender, EventArgs e)
-        {
-            CheckBox cb = sender as CheckBox;
-            if (cb == null) return;
-
-            // The layer index is stored in cb.Tag (set above)
-            if (!int.TryParse(cb.Tag?.ToString(), out int layerIndex))
-                return; // invalid Tag
-
-            bool isVisible = cb.Checked;
-            layerIndex -= 1;
-
-            // Toggle all three overlays for this layerIndex
-            SetOverlayVisibility(cbs.tüm_katmanlar_array_imar[layerIndex], isVisible);
-            SetOverlayVisibility(cbs.tüm_katmanlar_array_yga[layerIndex], isVisible);
-            SetOverlayVisibility(cbs.tüm_katmanlar_array_yuk[layerIndex], isVisible);
-            SetOverlayVisibility(cbs.tüm_katmanlar_array_stokastik[layerIndex], isVisible);
-
-            // Refresh the maps
-            gMapControl_imar.Refresh();
-            gMapControl_yga.Refresh();
-            gMapControl_yuk.Refresh();
-            gMapControl_stokastik.Refresh();
-        }*/
-
 
         private void checkBox_CheckedChanged(object sender, EventArgs e)
         {
@@ -1349,7 +1323,9 @@ namespace SLF
                 // Clear the selection polygon and refresh the map
                 gMapControl_stokastik.Overlays.Remove(cbs.bounding_box_overlay);
                 //cbs.AddGridToMap(gMapControl_stokastik);
+
                 gMapControl_stokastik.Refresh();
+                gMapControl_imar.Refresh();
             }
         }
 
@@ -2922,7 +2898,6 @@ namespace SLF
 
                 // Clear the selection polygon and refresh the map
                 gMapControl_yuk.Overlays.Remove(cbs.bounding_box_overlay);
-                //cbs.AddGridToMap(gMapControl_yuk);
                 gMapControl_yuk.Refresh();
             }
         }
@@ -3932,7 +3907,11 @@ namespace SLF
                     if (!string.IsNullOrEmpty(newName))
                     {
                         // Rename the layer in your underlying data structure
-                        checkBox.Text = newName; // Adjust this according to your layer data structure
+                        checkBoxes_imar[checkbox_index].Text = newName;
+                        checkBoxes_stokastik[checkbox_index].Text = newName;
+                        checkBoxes_yga[checkbox_index].Text = newName;
+
+
                         cbs.tüm_katmanlar_array_names[checkbox_index] = newName;
 
                         // Refresh the list/tree view
@@ -4052,6 +4031,14 @@ namespace SLF
                                 cbs.tüm_katmanlar_array_yga[checkbox_index]?.Dispose();
                                 cbs.tüm_katmanlar_array_yuk[checkbox_index]?.Dispose();
                                 cbs.tüm_katmanlar_array_stokastik[checkbox_index]?.Dispose();
+
+                                cbs.tüm_katmanlar_array_imar[checkbox_index] = null;
+                                cbs.tüm_katmanlar_array_yga[checkbox_index] = null;
+                                cbs.tüm_katmanlar_array_yuk[checkbox_index] = null;
+                                cbs.tüm_katmanlar_array_stokastik[checkbox_index] = null;
+
+                                cbs.tüm_katmanlar_datatable[checkbox_index] = null;
+                                cbs.tüm_katmanlar_array_names[checkbox_index] = null;
 
                                 // Clear checkboxes for all maps
                                 ClearCheckboxesForAllMaps(checkbox_index);
