@@ -2611,6 +2611,30 @@ namespace SLF
 
         }
 
+        private void gMapControl_yga_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && lastClickedCheckbox != null)
+            {
+                int checkbox_index = int.Parse(lastClickedCheckbox.Tag.ToString()) - 1;
+
+                foreach (var polygon in cbs.tüm_katmanlar_array_yga[checkbox_index].Polygons)
+                {
+                    if (cbs.IsPointInPolygon(pointClick, polygon))
+                    {
+                        cbs.HighlightPolygon(polygon, checkbox_index, cbs.GetActiveGMapControl());
+
+                        if (cbs.polygonAttributes_yga.TryGetValue(polygon, out DataRow row))
+                        {
+                            ShowAttributeRow(row);
+                            tablo_formu.Show();
+                            tablo_formu.BringToFront();
+
+                        }
+                    }
+                }
+            }
+        }
+
         private void gMapControl_yga_OnMarkerClick(GMapMarker item, MouseEventArgs e)
         {
             if (item.Tag != null && item.Tag is NoktaVeri && Modül_Tabları.SelectedTab == tab_yga)
@@ -3503,10 +3527,6 @@ namespace SLF
                     // now set polygonOverlay = that array entry
                     polygonOverlay = arrayForActiveMap[layerIndex];
 
-                    // we can remove any old polygons if you want to re-draw from scratch
-                    //    (Optional) 
-                    // polygonOverlay.Polygons.Clear();
-
                     // if there are at least 3 points, let's draw or re-draw the polygon
                     if (polygonPoints.Count >= 3)
                     {
@@ -4348,6 +4368,14 @@ namespace SLF
             else
             {
                 harita_katmanları_right_click.Hide();
+            }
+        }
+
+        private void toolStrip_yga_poligon_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                ContextMenuStrip_Poligon.Show(Cursor.Position);
             }
         }
 

@@ -22,17 +22,17 @@ namespace SLF
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ModülFormu));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
             this.Modül_Tabları = new System.Windows.Forms.TabControl();
             this.tab_girdi = new System.Windows.Forms.TabPage();
             this.label_girdi_veri_onizleme = new System.Windows.Forms.Label();
@@ -251,19 +251,19 @@ namespace SLF
             this.checkBox_yga_13 = new System.Windows.Forms.CheckBox();
             this.checkBox_yga_12 = new System.Windows.Forms.CheckBox();
             this.toolStrip_yga = new System.Windows.Forms.ToolStrip();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            this.toolStrip_yga_seç = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator15 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
+            this.toolStrip_yga_kaydır = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator16 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
+            this.toolStrip_yga_mesafe = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator17 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
+            this.toolStrip_yga_poligon = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator18 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
+            this.toolStrip_yga_nokta = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator19 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripButton6 = new System.Windows.Forms.ToolStripButton();
+            this.toolStrip_yga_grid = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator20 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripButton7 = new System.Windows.Forms.ToolStripButton();
+            this.toolStrip_yga_fonksiyon = new System.Windows.Forms.ToolStripButton();
             this.mesafe_metre_yga = new System.Windows.Forms.Label();
             this.yga_dosya_secimi = new System.Windows.Forms.Button();
             this.checkBox_yga_11 = new System.Windows.Forms.CheckBox();
@@ -511,22 +511,22 @@ namespace SLF
             this.dataGridView_girdi.BackgroundColor = System.Drawing.Color.Snow;
             this.dataGridView_girdi.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridView_girdi.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.DarkOrange;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridView_girdi.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle12.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle12.ForeColor = System.Drawing.Color.DarkOrange;
+            dataGridViewCellStyle12.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridView_girdi.DefaultCellStyle = dataGridViewCellStyle12;
             this.dataGridView_girdi.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.dataGridView_girdi.Location = new System.Drawing.Point(3, 113);
             this.dataGridView_girdi.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.dataGridView_girdi.Name = "dataGridView_girdi";
             this.dataGridView_girdi.ReadOnly = true;
             this.dataGridView_girdi.RowHeadersWidth = 18;
-            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            this.dataGridView_girdi.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle13.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            this.dataGridView_girdi.RowsDefaultCellStyle = dataGridViewCellStyle13;
             this.dataGridView_girdi.RowTemplate.Height = 24;
             this.dataGridView_girdi.Size = new System.Drawing.Size(1577, 494);
             this.dataGridView_girdi.TabIndex = 4;
@@ -873,7 +873,7 @@ namespace SLF
             this.EAStationsLegendPanel.Controls.Add(this.ACHomeLegendLabel);
             this.EAStationsLegendPanel.Controls.Add(this.AddStationLabel);
             this.EAStationsLegendPanel.Controls.Add(this.EAStationAddButton);
-            this.EAStationsLegendPanel.Location = new System.Drawing.Point(1313, 3071);
+            this.EAStationsLegendPanel.Location = new System.Drawing.Point(1313, 3149);
             this.EAStationsLegendPanel.Margin = new System.Windows.Forms.Padding(4);
             this.EAStationsLegendPanel.Name = "EAStationsLegendPanel";
             this.EAStationsLegendPanel.Size = new System.Drawing.Size(268, 326);
@@ -1210,7 +1210,7 @@ namespace SLF
             this.ELFResultsTabControls.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFResultsTabControls.Name = "ELFResultsTabControls";
             this.ELFResultsTabControls.SelectedIndex = 0;
-            this.ELFResultsTabControls.Size = new System.Drawing.Size(1330, 673);
+            this.ELFResultsTabControls.Size = new System.Drawing.Size(1330, 699);
             this.ELFResultsTabControls.TabIndex = 3;
             // 
             // ELFMinResultsTabPage
@@ -1220,7 +1220,7 @@ namespace SLF
             this.ELFMinResultsTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFMinResultsTabPage.Name = "ELFMinResultsTabPage";
             this.ELFMinResultsTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFMinResultsTabPage.Size = new System.Drawing.Size(1322, 639);
+            this.ELFMinResultsTabPage.Size = new System.Drawing.Size(1322, 665);
             this.ELFMinResultsTabPage.TabIndex = 0;
             this.ELFMinResultsTabPage.Text = "Minimum Sonuçlar";
             this.ELFMinResultsTabPage.UseVisualStyleBackColor = true;
@@ -1230,21 +1230,21 @@ namespace SLF
             this.ELFMinResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
             this.ELFMinResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFMinResultsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.Snow;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFMinResultsTable.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle14.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle14.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle14.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFMinResultsTable.DefaultCellStyle = dataGridViewCellStyle14;
             this.ELFMinResultsTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFMinResultsTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFMinResultsTable.Location = new System.Drawing.Point(3, 2);
             this.ELFMinResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFMinResultsTable.Name = "ELFMinResultsTable";
             this.ELFMinResultsTable.RowHeadersWidth = 51;
-            this.ELFMinResultsTable.Size = new System.Drawing.Size(1316, 635);
+            this.ELFMinResultsTable.Size = new System.Drawing.Size(1316, 661);
             this.ELFMinResultsTable.TabIndex = 0;
             // 
             // ELFLowResultsTabPage
@@ -1272,7 +1272,7 @@ namespace SLF
             this.ELFLowResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFLowResultsTable.Name = "ELFLowResultsTable";
             this.ELFLowResultsTable.RowHeadersWidth = 51;
-            this.ELFLowResultsTable.Size = new System.Drawing.Size(1441, 458);
+            this.ELFLowResultsTable.Size = new System.Drawing.Size(1441, 437);
             this.ELFLowResultsTable.TabIndex = 1;
             // 
             // ELFBaseResultsTabPage
@@ -1300,7 +1300,7 @@ namespace SLF
             this.ELFBaseResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFBaseResultsTable.Name = "ELFBaseResultsTable";
             this.ELFBaseResultsTable.RowHeadersWidth = 51;
-            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1440, 458);
+            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1440, 437);
             this.ELFBaseResultsTable.TabIndex = 1;
             // 
             // ELFHighResultsTabPage
@@ -1328,7 +1328,7 @@ namespace SLF
             this.ELFHighResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFHighResultsTable.Name = "ELFHighResultsTable";
             this.ELFHighResultsTable.RowHeadersWidth = 51;
-            this.ELFHighResultsTable.Size = new System.Drawing.Size(1435, 458);
+            this.ELFHighResultsTable.Size = new System.Drawing.Size(1435, 437);
             this.ELFHighResultsTable.TabIndex = 1;
             // 
             // ELFMaxResultsTabPage
@@ -1357,7 +1357,7 @@ namespace SLF
             this.ELFMaxResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFMaxResultsTable.Name = "ELFMaxResultsTable";
             this.ELFMaxResultsTable.RowHeadersWidth = 51;
-            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1445, 462);
+            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1445, 441);
             this.ELFMaxResultsTable.TabIndex = 1;
             // 
             // ELFGraphicOutputsTabPage
@@ -1367,7 +1367,7 @@ namespace SLF
             this.ELFGraphicOutputsTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFGraphicOutputsTabPage.Name = "ELFGraphicOutputsTabPage";
             this.ELFGraphicOutputsTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFGraphicOutputsTabPage.Size = new System.Drawing.Size(1322, 639);
+            this.ELFGraphicOutputsTabPage.Size = new System.Drawing.Size(1322, 665);
             this.ELFGraphicOutputsTabPage.TabIndex = 5;
             this.ELFGraphicOutputsTabPage.Text = "Projeksiyon Grafik Sonuçları";
             this.ELFGraphicOutputsTabPage.UseVisualStyleBackColor = true;
@@ -1386,7 +1386,7 @@ namespace SLF
             this.panel_ELF_Grafikler.Location = new System.Drawing.Point(3, 2);
             this.panel_ELF_Grafikler.Margin = new System.Windows.Forms.Padding(4);
             this.panel_ELF_Grafikler.Name = "panel_ELF_Grafikler";
-            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1440, 356);
+            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1440, 361);
             this.panel_ELF_Grafikler.TabIndex = 6;
             // 
             // pictureBox_ELF_5
@@ -1447,7 +1447,7 @@ namespace SLF
             this.ELFTablePanel.Location = new System.Drawing.Point(307, 2);
             this.ELFTablePanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFTablePanel.Name = "ELFTablePanel";
-            this.ELFTablePanel.Size = new System.Drawing.Size(965, 5007);
+            this.ELFTablePanel.Size = new System.Drawing.Size(965, 5085);
             this.ELFTablePanel.TabIndex = 21;
             // 
             // ELFGraphicsPanel
@@ -1462,7 +1462,7 @@ namespace SLF
             this.ELFGraphicsPanel.Location = new System.Drawing.Point(3, 2);
             this.ELFGraphicsPanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFGraphicsPanel.Name = "ELFGraphicsPanel";
-            this.ELFGraphicsPanel.Size = new System.Drawing.Size(249, 673);
+            this.ELFGraphicsPanel.Size = new System.Drawing.Size(249, 699);
             this.ELFGraphicsPanel.TabIndex = 22;
             // 
             // SenaryoResultsLabel
@@ -1601,7 +1601,7 @@ namespace SLF
             this.panel_imar.Controls.Add(this.Mesafe_imar);
             this.panel_imar.Location = new System.Drawing.Point(249, 69);
             this.panel_imar.Name = "panel_imar";
-            this.panel_imar.Size = new System.Drawing.Size(1268, 683);
+            this.panel_imar.Size = new System.Drawing.Size(1268, 761);
             this.panel_imar.TabIndex = 58;
             // 
             // buton_imar_katmanlar
@@ -1612,7 +1612,7 @@ namespace SLF
             this.buton_imar_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
             this.buton_imar_katmanlar.Cursor = System.Windows.Forms.Cursors.Default;
             this.buton_imar_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_imar_katmanlar.Location = new System.Drawing.Point(3, 628);
+            this.buton_imar_katmanlar.Location = new System.Drawing.Point(3, 706);
             this.buton_imar_katmanlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buton_imar_katmanlar.Name = "buton_imar_katmanlar";
             this.buton_imar_katmanlar.Size = new System.Drawing.Size(61, 53);
@@ -1699,7 +1699,7 @@ namespace SLF
             this.webView_imar.Location = new System.Drawing.Point(0, 0);
             this.webView_imar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.webView_imar.Name = "webView_imar";
-            this.webView_imar.Size = new System.Drawing.Size(1268, 683);
+            this.webView_imar.Size = new System.Drawing.Size(1268, 761);
             this.webView_imar.Source = new System.Uri("https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu", System.UriKind.Absolute);
             this.webView_imar.TabIndex = 38;
             this.webView_imar.Visible = false;
@@ -1731,7 +1731,7 @@ namespace SLF
             this.gMapControl_imar.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_imar.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_imar.ShowTileGridLines = false;
-            this.gMapControl_imar.Size = new System.Drawing.Size(1268, 683);
+            this.gMapControl_imar.Size = new System.Drawing.Size(1268, 761);
             this.gMapControl_imar.TabIndex = 35;
             this.gMapControl_imar.Zoom = 0D;
             this.gMapControl_imar.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_imar_OnMapClick);
@@ -2203,7 +2203,7 @@ namespace SLF
             this.gMapControl_optimalDTR.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_optimalDTR.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_optimalDTR.ShowTileGridLines = false;
-            this.gMapControl_optimalDTR.Size = new System.Drawing.Size(1033, 1037);
+            this.gMapControl_optimalDTR.Size = new System.Drawing.Size(1033, 1115);
             this.gMapControl_optimalDTR.TabIndex = 42;
             this.gMapControl_optimalDTR.Zoom = 0D;
             // 
@@ -2219,7 +2219,7 @@ namespace SLF
             this.webView_optimalDTR.Location = new System.Drawing.Point(8, 2);
             this.webView_optimalDTR.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.webView_optimalDTR.Name = "webView_optimalDTR";
-            this.webView_optimalDTR.Size = new System.Drawing.Size(1033, 690);
+            this.webView_optimalDTR.Size = new System.Drawing.Size(1033, 768);
             this.webView_optimalDTR.Source = new System.Uri("https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu", System.UriKind.Absolute);
             this.webView_optimalDTR.TabIndex = 40;
             this.webView_optimalDTR.Visible = false;
@@ -2383,33 +2383,33 @@ namespace SLF
             // 
             // ELFMinSenaryoTable
             // 
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.Navy;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.Snow;
-            this.ELFMinSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.Color.Navy;
+            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFMinSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle15;
             this.ELFMinSenaryoTable.BackgroundColor = System.Drawing.Color.Snow;
             this.ELFMinSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFMinSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.Color.Snow;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFMinSenaryoTable.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle16.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle16.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle16.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle16.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle16.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFMinSenaryoTable.DefaultCellStyle = dataGridViewCellStyle16;
             this.ELFMinSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFMinSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFMinSenaryoTable.Location = new System.Drawing.Point(3, 2);
             this.ELFMinSenaryoTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFMinSenaryoTable.Name = "ELFMinSenaryoTable";
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.ELFMinSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle17.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle17.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle17.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ELFMinSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle17;
             this.ELFMinSenaryoTable.RowHeadersWidth = 18;
             this.ELFMinSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
             this.ELFMinSenaryoTable.Size = new System.Drawing.Size(1081, 972);
@@ -2430,9 +2430,9 @@ namespace SLF
             // 
             // ELFLowSenaryoTable
             // 
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.Color.Navy;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.Color.Snow;
-            this.ELFLowSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle18.SelectionBackColor = System.Drawing.Color.Navy;
+            dataGridViewCellStyle18.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFLowSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle18;
             this.ELFLowSenaryoTable.BackgroundColor = System.Drawing.Color.Snow;
             this.ELFLowSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFLowSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -2443,7 +2443,7 @@ namespace SLF
             this.ELFLowSenaryoTable.Name = "ELFLowSenaryoTable";
             this.ELFLowSenaryoTable.RowHeadersWidth = 18;
             this.ELFLowSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(1081, 951);
+            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(1081, 977);
             this.ELFLowSenaryoTable.TabIndex = 1;
             // 
             // tabPage_baz_senaryo
@@ -2461,20 +2461,20 @@ namespace SLF
             // 
             // ELFBaseSenaryoTable
             // 
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.Color.Snow;
-            this.ELFBaseSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle19.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle19.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFBaseSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle19;
             this.ELFBaseSenaryoTable.BackgroundColor = System.Drawing.Color.Snow;
             this.ELFBaseSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFBaseSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle9.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle9.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.Color.MidnightBlue;
-            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.Color.Snow;
-            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFBaseSenaryoTable.DefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle20.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle20.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle20.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle20.SelectionBackColor = System.Drawing.Color.MidnightBlue;
+            dataGridViewCellStyle20.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle20.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFBaseSenaryoTable.DefaultCellStyle = dataGridViewCellStyle20;
             this.ELFBaseSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFBaseSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFBaseSenaryoTable.Location = new System.Drawing.Point(3, 2);
@@ -2482,7 +2482,7 @@ namespace SLF
             this.ELFBaseSenaryoTable.Name = "ELFBaseSenaryoTable";
             this.ELFBaseSenaryoTable.RowHeadersWidth = 18;
             this.ELFBaseSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(1081, 951);
+            this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(1081, 977);
             this.ELFBaseSenaryoTable.TabIndex = 1;
             // 
             // tabPage_yuksek_senaryo
@@ -2500,20 +2500,20 @@ namespace SLF
             // 
             // ELFHighSenaryoTable
             // 
-            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.Color.Snow;
-            this.ELFHighSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle21.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle21.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFHighSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle21;
             this.ELFHighSenaryoTable.BackgroundColor = System.Drawing.Color.Snow;
             this.ELFHighSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFHighSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle11.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle11.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.Color.Snow;
-            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFHighSenaryoTable.DefaultCellStyle = dataGridViewCellStyle11;
+            dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle22.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle22.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle22.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle22.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle22.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle22.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFHighSenaryoTable.DefaultCellStyle = dataGridViewCellStyle22;
             this.ELFHighSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFHighSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFHighSenaryoTable.Location = new System.Drawing.Point(3, 2);
@@ -2521,7 +2521,7 @@ namespace SLF
             this.ELFHighSenaryoTable.Name = "ELFHighSenaryoTable";
             this.ELFHighSenaryoTable.RowHeadersWidth = 51;
             this.ELFHighSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFHighSenaryoTable.Size = new System.Drawing.Size(1081, 951);
+            this.ELFHighSenaryoTable.Size = new System.Drawing.Size(1081, 977);
             this.ELFHighSenaryoTable.TabIndex = 1;
             // 
             // tabPage_maks_senaryo
@@ -2549,7 +2549,7 @@ namespace SLF
             this.ELFMaxSenaryoTable.Name = "ELFMaxSenaryoTable";
             this.ELFMaxSenaryoTable.RowHeadersWidth = 18;
             this.ELFMaxSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(1081, 951);
+            this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(1081, 977);
             this.ELFMaxSenaryoTable.TabIndex = 1;
             // 
             // YeniGenislemeSenaryoTabPage
@@ -3363,11 +3363,9 @@ namespace SLF
             this.tab_yga.Controls.Add(this.checkBox_yga_13);
             this.tab_yga.Controls.Add(this.checkBox_yga_12);
             this.tab_yga.Controls.Add(this.toolStrip_yga);
-            this.tab_yga.Controls.Add(this.mesafe_metre_yga);
             this.tab_yga.Controls.Add(this.yga_dosya_secimi);
             this.tab_yga.Controls.Add(this.checkBox_yga_11);
             this.tab_yga.Controls.Add(this.checkBox_yga_10);
-            this.tab_yga.Controls.Add(this.Mesafe_yga);
             this.tab_yga.Controls.Add(this.checkBox_yga_9);
             this.tab_yga.Controls.Add(this.checkBox_yga_8);
             this.tab_yga.Controls.Add(this.checkBox_yga_5);
@@ -3422,6 +3420,8 @@ namespace SLF
             this.panel_yga.Controls.Add(this.webView_yga);
             this.panel_yga.Controls.Add(this.gMapControl_yga);
             this.panel_yga.Controls.Add(this.buton_yga_harita_katmanlar);
+            this.panel_yga.Controls.Add(this.Mesafe_yga);
+            this.panel_yga.Controls.Add(this.mesafe_metre_yga);
             this.panel_yga.Location = new System.Drawing.Point(244, 38);
             this.panel_yga.Name = "panel_yga";
             this.panel_yga.Size = new System.Drawing.Size(1276, 670);
@@ -3473,6 +3473,7 @@ namespace SLF
             this.gMapControl_yga.TabIndex = 57;
             this.gMapControl_yga.Zoom = 0D;
             this.gMapControl_yga.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_yga_OnMapClick);
+            this.gMapControl_yga.OnMapDoubleClick += new GMap.NET.WindowsForms.MapDoubleClick(this.gMapControl_yga_OnMapDoubleClick);
             this.gMapControl_yga.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(this.gMapControl_yga_OnMarkerClick);
             // 
             // buton_yga_harita_katmanlar
@@ -3496,7 +3497,7 @@ namespace SLF
             this.label_yga_katmanlar.BackColor = System.Drawing.Color.Transparent;
             this.label_yga_katmanlar.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label_yga_katmanlar.ForeColor = System.Drawing.Color.DarkOrange;
-            this.label_yga_katmanlar.Location = new System.Drawing.Point(8, 49);
+            this.label_yga_katmanlar.Location = new System.Drawing.Point(5, 38);
             this.label_yga_katmanlar.Name = "label_yga_katmanlar";
             this.label_yga_katmanlar.Size = new System.Drawing.Size(99, 24);
             this.label_yga_katmanlar.TabIndex = 42;
@@ -3550,19 +3551,19 @@ namespace SLF
             // 
             this.toolStrip_yga.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.toolStrip_yga.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripButton1,
+            this.toolStrip_yga_seç,
             this.toolStripSeparator15,
-            this.toolStripButton2,
+            this.toolStrip_yga_kaydır,
             this.toolStripSeparator16,
-            this.toolStripButton3,
+            this.toolStrip_yga_mesafe,
             this.toolStripSeparator17,
-            this.toolStripButton4,
+            this.toolStrip_yga_poligon,
             this.toolStripSeparator18,
-            this.toolStripButton5,
+            this.toolStrip_yga_nokta,
             this.toolStripSeparator19,
-            this.toolStripButton6,
+            this.toolStrip_yga_grid,
             this.toolStripSeparator20,
-            this.toolStripButton7});
+            this.toolStrip_yga_fonksiyon});
             this.toolStrip_yga.Location = new System.Drawing.Point(4, 4);
             this.toolStrip_yga.MaximumSize = new System.Drawing.Size(1550, 0);
             this.toolStrip_yga.Name = "toolStrip_yga";
@@ -3571,25 +3572,25 @@ namespace SLF
             this.toolStrip_yga.TabIndex = 58;
             this.toolStrip_yga.Text = "toolStrip1";
             // 
-            // toolStripButton1
+            // toolStrip_yga_seç
             // 
-            this.toolStripButton1.AccessibleDescription = "";
-            this.toolStripButton1.AccessibleName = "";
-            this.toolStripButton1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(250)))), ((int)(((byte)(249)))));
-            this.toolStripButton1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.toolStripButton1.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
-            this.toolStripButton1.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton1.Margin = new System.Windows.Forms.Padding(175, 1, 0, 2);
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.toolStripButton1.Size = new System.Drawing.Size(73, 29);
-            this.toolStripButton1.Tag = "";
-            this.toolStripButton1.Text = "Seç";
-            this.toolStripButton1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.toolStripButton1.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.toolStripButton1.ToolTipText = "Harita üzerinde seçim yapar.";
+            this.toolStrip_yga_seç.AccessibleDescription = "";
+            this.toolStrip_yga_seç.AccessibleName = "";
+            this.toolStrip_yga_seç.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(250)))), ((int)(((byte)(249)))));
+            this.toolStrip_yga_seç.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.toolStrip_yga_seç.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.toolStrip_yga_seç.Image = ((System.Drawing.Image)(resources.GetObject("toolStrip_yga_seç.Image")));
+            this.toolStrip_yga_seç.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolStrip_yga_seç.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStrip_yga_seç.Margin = new System.Windows.Forms.Padding(175, 1, 0, 2);
+            this.toolStrip_yga_seç.Name = "toolStrip_yga_seç";
+            this.toolStrip_yga_seç.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.toolStrip_yga_seç.Size = new System.Drawing.Size(73, 29);
+            this.toolStrip_yga_seç.Tag = "";
+            this.toolStrip_yga_seç.Text = "Seç";
+            this.toolStrip_yga_seç.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.toolStrip_yga_seç.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.toolStrip_yga_seç.ToolTipText = "Harita üzerinde seçim yapar.";
             // 
             // toolStripSeparator15
             // 
@@ -3598,25 +3599,25 @@ namespace SLF
             this.toolStripSeparator15.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
             this.toolStripSeparator15.Size = new System.Drawing.Size(6, 32);
             // 
-            // toolStripButton2
+            // toolStrip_yga_kaydır
             // 
-            this.toolStripButton2.AccessibleDescription = "";
-            this.toolStripButton2.AccessibleName = "";
-            this.toolStripButton2.BackColor = System.Drawing.Color.LightGoldenrodYellow;
-            this.toolStripButton2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.toolStripButton2.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.toolStripButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton2.Image")));
-            this.toolStripButton2.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton2.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
-            this.toolStripButton2.Name = "toolStripButton2";
-            this.toolStripButton2.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.toolStripButton2.Size = new System.Drawing.Size(95, 29);
-            this.toolStripButton2.Tag = "";
-            this.toolStripButton2.Text = "Kaydır";
-            this.toolStripButton2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.toolStripButton2.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.toolStripButton2.ToolTipText = "Harita üzerine basılı tutup farklı yönlerde hareketi sağlar.";
+            this.toolStrip_yga_kaydır.AccessibleDescription = "";
+            this.toolStrip_yga_kaydır.AccessibleName = "";
+            this.toolStrip_yga_kaydır.BackColor = System.Drawing.Color.LightGoldenrodYellow;
+            this.toolStrip_yga_kaydır.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.toolStrip_yga_kaydır.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.toolStrip_yga_kaydır.Image = ((System.Drawing.Image)(resources.GetObject("toolStrip_yga_kaydır.Image")));
+            this.toolStrip_yga_kaydır.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolStrip_yga_kaydır.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStrip_yga_kaydır.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.toolStrip_yga_kaydır.Name = "toolStrip_yga_kaydır";
+            this.toolStrip_yga_kaydır.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.toolStrip_yga_kaydır.Size = new System.Drawing.Size(95, 29);
+            this.toolStrip_yga_kaydır.Tag = "";
+            this.toolStrip_yga_kaydır.Text = "Kaydır";
+            this.toolStrip_yga_kaydır.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.toolStrip_yga_kaydır.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.toolStrip_yga_kaydır.ToolTipText = "Harita üzerine basılı tutup farklı yönlerde hareketi sağlar.";
             // 
             // toolStripSeparator16
             // 
@@ -3625,25 +3626,25 @@ namespace SLF
             this.toolStripSeparator16.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
             this.toolStripSeparator16.Size = new System.Drawing.Size(6, 32);
             // 
-            // toolStripButton3
+            // toolStrip_yga_mesafe
             // 
-            this.toolStripButton3.AccessibleDescription = "";
-            this.toolStripButton3.AccessibleName = "";
-            this.toolStripButton3.BackColor = System.Drawing.Color.Honeydew;
-            this.toolStripButton3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.toolStripButton3.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.toolStripButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton3.Image")));
-            this.toolStripButton3.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton3.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
-            this.toolStripButton3.Name = "toolStripButton3";
-            this.toolStripButton3.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.toolStripButton3.Size = new System.Drawing.Size(134, 29);
-            this.toolStripButton3.Tag = "";
-            this.toolStripButton3.Text = "Mesafe Ölç";
-            this.toolStripButton3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.toolStripButton3.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.toolStripButton3.ToolTipText = "Noktalar arası doğrusal uzaklığı hesaplar.";
+            this.toolStrip_yga_mesafe.AccessibleDescription = "";
+            this.toolStrip_yga_mesafe.AccessibleName = "";
+            this.toolStrip_yga_mesafe.BackColor = System.Drawing.Color.Honeydew;
+            this.toolStrip_yga_mesafe.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.toolStrip_yga_mesafe.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.toolStrip_yga_mesafe.Image = ((System.Drawing.Image)(resources.GetObject("toolStrip_yga_mesafe.Image")));
+            this.toolStrip_yga_mesafe.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolStrip_yga_mesafe.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStrip_yga_mesafe.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.toolStrip_yga_mesafe.Name = "toolStrip_yga_mesafe";
+            this.toolStrip_yga_mesafe.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.toolStrip_yga_mesafe.Size = new System.Drawing.Size(134, 29);
+            this.toolStrip_yga_mesafe.Tag = "";
+            this.toolStrip_yga_mesafe.Text = "Mesafe Ölç";
+            this.toolStrip_yga_mesafe.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.toolStrip_yga_mesafe.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.toolStrip_yga_mesafe.ToolTipText = "Noktalar arası doğrusal uzaklığı hesaplar.";
             // 
             // toolStripSeparator17
             // 
@@ -3651,25 +3652,26 @@ namespace SLF
             this.toolStripSeparator17.Name = "toolStripSeparator17";
             this.toolStripSeparator17.Size = new System.Drawing.Size(6, 32);
             // 
-            // toolStripButton4
+            // toolStrip_yga_poligon
             // 
-            this.toolStripButton4.AccessibleDescription = "";
-            this.toolStripButton4.AccessibleName = "";
-            this.toolStripButton4.BackColor = System.Drawing.Color.Thistle;
-            this.toolStripButton4.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.toolStripButton4.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.toolStripButton4.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton4.Image")));
-            this.toolStripButton4.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.toolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton4.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
-            this.toolStripButton4.Name = "toolStripButton4";
-            this.toolStripButton4.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.toolStripButton4.Size = new System.Drawing.Size(106, 29);
-            this.toolStripButton4.Tag = "";
-            this.toolStripButton4.Text = "Poligon";
-            this.toolStripButton4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.toolStripButton4.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.toolStripButton4.ToolTipText = "Poligon çizme, silme veya kaydetme fonksiyonlarını yerine getirir.";
+            this.toolStrip_yga_poligon.AccessibleDescription = "";
+            this.toolStrip_yga_poligon.AccessibleName = "";
+            this.toolStrip_yga_poligon.BackColor = System.Drawing.Color.Thistle;
+            this.toolStrip_yga_poligon.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.toolStrip_yga_poligon.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.toolStrip_yga_poligon.Image = ((System.Drawing.Image)(resources.GetObject("toolStrip_yga_poligon.Image")));
+            this.toolStrip_yga_poligon.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolStrip_yga_poligon.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStrip_yga_poligon.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.toolStrip_yga_poligon.Name = "toolStrip_yga_poligon";
+            this.toolStrip_yga_poligon.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.toolStrip_yga_poligon.Size = new System.Drawing.Size(106, 29);
+            this.toolStrip_yga_poligon.Tag = "";
+            this.toolStrip_yga_poligon.Text = "Poligon";
+            this.toolStrip_yga_poligon.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.toolStrip_yga_poligon.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.toolStrip_yga_poligon.ToolTipText = "Poligon çizme, silme veya kaydetme fonksiyonlarını yerine getirir.";
+            this.toolStrip_yga_poligon.MouseDown += new System.Windows.Forms.MouseEventHandler(this.toolStrip_yga_poligon_MouseDown);
             // 
             // toolStripSeparator18
             // 
@@ -3677,25 +3679,25 @@ namespace SLF
             this.toolStripSeparator18.Name = "toolStripSeparator18";
             this.toolStripSeparator18.Size = new System.Drawing.Size(6, 32);
             // 
-            // toolStripButton5
+            // toolStrip_yga_nokta
             // 
-            this.toolStripButton5.AccessibleDescription = "";
-            this.toolStripButton5.AccessibleName = "";
-            this.toolStripButton5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
-            this.toolStripButton5.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.toolStripButton5.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.toolStripButton5.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton5.Image")));
-            this.toolStripButton5.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.toolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton5.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
-            this.toolStripButton5.Name = "toolStripButton5";
-            this.toolStripButton5.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.toolStripButton5.Size = new System.Drawing.Size(94, 29);
-            this.toolStripButton5.Tag = "";
-            this.toolStripButton5.Text = "Nokta";
-            this.toolStripButton5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.toolStripButton5.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.toolStripButton5.ToolTipText = "Haritaya tıklanarak nokta/marker eklemeye veya silmeye yarar.";
+            this.toolStrip_yga_nokta.AccessibleDescription = "";
+            this.toolStrip_yga_nokta.AccessibleName = "";
+            this.toolStrip_yga_nokta.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
+            this.toolStrip_yga_nokta.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.toolStrip_yga_nokta.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.toolStrip_yga_nokta.Image = ((System.Drawing.Image)(resources.GetObject("toolStrip_yga_nokta.Image")));
+            this.toolStrip_yga_nokta.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolStrip_yga_nokta.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStrip_yga_nokta.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.toolStrip_yga_nokta.Name = "toolStrip_yga_nokta";
+            this.toolStrip_yga_nokta.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.toolStrip_yga_nokta.Size = new System.Drawing.Size(94, 29);
+            this.toolStrip_yga_nokta.Tag = "";
+            this.toolStrip_yga_nokta.Text = "Nokta";
+            this.toolStrip_yga_nokta.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.toolStrip_yga_nokta.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.toolStrip_yga_nokta.ToolTipText = "Haritaya tıklanarak nokta/marker eklemeye veya silmeye yarar.";
             // 
             // toolStripSeparator19
             // 
@@ -3703,25 +3705,25 @@ namespace SLF
             this.toolStripSeparator19.Name = "toolStripSeparator19";
             this.toolStripSeparator19.Size = new System.Drawing.Size(6, 32);
             // 
-            // toolStripButton6
+            // toolStrip_yga_grid
             // 
-            this.toolStripButton6.AccessibleDescription = "";
-            this.toolStripButton6.AccessibleName = "";
-            this.toolStripButton6.BackColor = System.Drawing.Color.Beige;
-            this.toolStripButton6.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.toolStripButton6.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.toolStripButton6.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton6.Image")));
-            this.toolStripButton6.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.toolStripButton6.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton6.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
-            this.toolStripButton6.Name = "toolStripButton6";
-            this.toolStripButton6.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.toolStripButton6.Size = new System.Drawing.Size(142, 29);
-            this.toolStripButton6.Tag = "";
-            this.toolStripButton6.Text = "Grid Oluştur";
-            this.toolStripButton6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.toolStripButton6.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.toolStripButton6.ToolTipText = "Belirli bir alan seçilip bu alanda mxn şeklinde bir grid (ızgara) tanımlar.";
+            this.toolStrip_yga_grid.AccessibleDescription = "";
+            this.toolStrip_yga_grid.AccessibleName = "";
+            this.toolStrip_yga_grid.BackColor = System.Drawing.Color.Beige;
+            this.toolStrip_yga_grid.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.toolStrip_yga_grid.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.toolStrip_yga_grid.Image = ((System.Drawing.Image)(resources.GetObject("toolStrip_yga_grid.Image")));
+            this.toolStrip_yga_grid.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolStrip_yga_grid.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStrip_yga_grid.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.toolStrip_yga_grid.Name = "toolStrip_yga_grid";
+            this.toolStrip_yga_grid.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.toolStrip_yga_grid.Size = new System.Drawing.Size(142, 29);
+            this.toolStrip_yga_grid.Tag = "";
+            this.toolStrip_yga_grid.Text = "Grid Oluştur";
+            this.toolStrip_yga_grid.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.toolStrip_yga_grid.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.toolStrip_yga_grid.ToolTipText = "Belirli bir alan seçilip bu alanda mxn şeklinde bir grid (ızgara) tanımlar.";
             // 
             // toolStripSeparator20
             // 
@@ -3729,30 +3731,30 @@ namespace SLF
             this.toolStripSeparator20.Name = "toolStripSeparator20";
             this.toolStripSeparator20.Size = new System.Drawing.Size(6, 32);
             // 
-            // toolStripButton7
+            // toolStrip_yga_fonksiyon
             // 
-            this.toolStripButton7.AccessibleDescription = "";
-            this.toolStripButton7.AccessibleName = "";
-            this.toolStripButton7.BackColor = System.Drawing.Color.LightBlue;
-            this.toolStripButton7.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.toolStripButton7.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.toolStripButton7.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton7.Image")));
-            this.toolStripButton7.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.toolStripButton7.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton7.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
-            this.toolStripButton7.Name = "toolStripButton7";
-            this.toolStripButton7.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.toolStripButton7.Size = new System.Drawing.Size(146, 29);
-            this.toolStripButton7.Tag = "";
-            this.toolStripButton7.Text = "Fonksiyonlar";
-            this.toolStripButton7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.toolStripButton7.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.toolStripButton7.ToolTipText = "Çeşitli vektörel veya tabular algoritmaları içerir.";
+            this.toolStrip_yga_fonksiyon.AccessibleDescription = "";
+            this.toolStrip_yga_fonksiyon.AccessibleName = "";
+            this.toolStrip_yga_fonksiyon.BackColor = System.Drawing.Color.LightBlue;
+            this.toolStrip_yga_fonksiyon.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.toolStrip_yga_fonksiyon.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.toolStrip_yga_fonksiyon.Image = ((System.Drawing.Image)(resources.GetObject("toolStrip_yga_fonksiyon.Image")));
+            this.toolStrip_yga_fonksiyon.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolStrip_yga_fonksiyon.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStrip_yga_fonksiyon.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.toolStrip_yga_fonksiyon.Name = "toolStrip_yga_fonksiyon";
+            this.toolStrip_yga_fonksiyon.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.toolStrip_yga_fonksiyon.Size = new System.Drawing.Size(146, 29);
+            this.toolStrip_yga_fonksiyon.Tag = "";
+            this.toolStrip_yga_fonksiyon.Text = "Fonksiyonlar";
+            this.toolStrip_yga_fonksiyon.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.toolStrip_yga_fonksiyon.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.toolStrip_yga_fonksiyon.ToolTipText = "Çeşitli vektörel veya tabular algoritmaları içerir.";
             // 
             // mesafe_metre_yga
             // 
             this.mesafe_metre_yga.AutoSize = true;
-            this.mesafe_metre_yga.Location = new System.Drawing.Point(377, 38);
+            this.mesafe_metre_yga.Location = new System.Drawing.Point(112, 11);
             this.mesafe_metre_yga.Name = "mesafe_metre_yga";
             this.mesafe_metre_yga.Size = new System.Drawing.Size(0, 23);
             this.mesafe_metre_yga.TabIndex = 56;
@@ -3806,7 +3808,7 @@ namespace SLF
             // Mesafe_yga
             // 
             this.Mesafe_yga.AutoSize = true;
-            this.Mesafe_yga.Location = new System.Drawing.Point(268, 38);
+            this.Mesafe_yga.Location = new System.Drawing.Point(15, 11);
             this.Mesafe_yga.Name = "Mesafe_yga";
             this.Mesafe_yga.Size = new System.Drawing.Size(70, 23);
             this.Mesafe_yga.TabIndex = 56;
@@ -4672,6 +4674,7 @@ namespace SLF
             this.tab_yga.ResumeLayout(false);
             this.tab_yga.PerformLayout();
             this.panel_yga.ResumeLayout(false);
+            this.panel_yga.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.webView_yga)).EndInit();
             this.toolStrip_yga.ResumeLayout(false);
             this.toolStrip_yga.PerformLayout();
@@ -4960,19 +4963,19 @@ namespace SLF
         private Label Mesafe_yga;
         private ToolStrip miniToolStrip;
         private ToolStrip toolStrip_yga;
-        private ToolStripButton toolStripButton1;
+        private ToolStripButton toolStrip_yga_seç;
         private ToolStripSeparator toolStripSeparator15;
-        private ToolStripButton toolStripButton2;
+        private ToolStripButton toolStrip_yga_kaydır;
         private ToolStripSeparator toolStripSeparator16;
-        private ToolStripButton toolStripButton3;
+        private ToolStripButton toolStrip_yga_mesafe;
         private ToolStripSeparator toolStripSeparator17;
-        private ToolStripButton toolStripButton4;
+        private ToolStripButton toolStrip_yga_poligon;
         private ToolStripSeparator toolStripSeparator18;
-        private ToolStripButton toolStripButton5;
+        private ToolStripButton toolStrip_yga_nokta;
         private ToolStripSeparator toolStripSeparator19;
-        private ToolStripButton toolStripButton6;
+        private ToolStripButton toolStrip_yga_grid;
         private ToolStripSeparator toolStripSeparator20;
-        private ToolStripButton toolStripButton7;
+        private ToolStripButton toolStrip_yga_fonksiyon;
         private Microsoft.Web.WebView2.WinForms.WebView2 webView_yga;
         public GMap.NET.WindowsForms.GMapControl gMapControl_yga;
         private Button buton_yga_harita_katmanlar;

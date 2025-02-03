@@ -14,7 +14,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GMap.NET.WindowsForms.Markers;
-using NetTopologySuite.Operation.OverlayNG;
 
 namespace SLF
 {
