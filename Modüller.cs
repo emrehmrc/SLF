@@ -663,7 +663,7 @@ namespace SLF
             // Disable the button initially
             OpenModuleButton.Enabled = false;
 
-            string filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+            string filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\INPUT_FILE\INPUT_FILE.xlsx";
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
 
             // Load the data table for the selected type
@@ -742,7 +742,7 @@ namespace SLF
         private void LoadImagesIntoPictureBoxes()
         {
             // Path to the folder where the images are saved
-            string imageFolderPath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\Grafik Outputs\";
+            string imageFolderPath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Grafik Outputs\";
 
             // Load images into PictureBox controls with checks
             LoadImageIntoPictureBox(pictureBox_ELF_1, Path.Combine(imageFolderPath, "bolge_aydınlatma_projections.png"));
@@ -764,8 +764,8 @@ namespace SLF
         // Save button logic to update Excel file with changes from DataGridViews
         private async void ELFScenerioSaveButton_Click(object sender, EventArgs e)
         {
-            string originalFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
-            string modifiedFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+            string originalFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\INPUT_FILE\INPUT_FILE.xlsx";
+            string modifiedFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\INPUT_FILE\Modified_INPUT_FILE.xlsx";
 
             try
             {
@@ -774,11 +774,11 @@ namespace SLF
                     using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
                     {
                         // Update worksheets with data from DataGridViews
-                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[0], ELFMinSenaryoTable);
-                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[1], ELFLowSenaryoTable);
-                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[2], ELFBaseSenaryoTable);
-                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[3], ELFHighSenaryoTable);
-                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[4], ELFMaxSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[1], ELFMinSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[2], ELFLowSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[3], ELFBaseSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[4], ELFHighSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[5], ELFMaxSenaryoTable);
 
                         // Save the modified Excel file
                         package.SaveAs(new FileInfo(modifiedFilePath));
@@ -803,11 +803,11 @@ namespace SLF
             using (var package = new ExcelPackage(new FileInfo(resultsFilePath)))
             {
                 // Load the corresponding results into each DataGridView
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[1], ELFMinResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[2], ELFLowResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[3], ELFBaseResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[4], ELFHighResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[5], ELFMaxResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[0], ELFMinResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[1], ELFLowResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[2], ELFBaseResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[3], ELFHighResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[4], ELFMaxResultsTable);
             }
 
             // Switch to the results tab after loading all the data
@@ -957,7 +957,7 @@ namespace SLF
                 // Set cursor to wait while running the operations
                 Cursor.Current = Cursors.WaitCursor;
 
-                string modifiedFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+                string modifiedFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\INPUT_FILE\INPUT_FILE.xlsx";
 
                 // Check if the modified file exists
                 if (!File.Exists(modifiedFilePath))
@@ -978,6 +978,8 @@ namespace SLF
 
                 // Load results into tab_ekonometrik
                 LoadResultsToTabEkonometrik(resultsFilePath);
+                // Load images into PictureBox controls after loading the results
+                LoadImagesIntoPictureBoxes();
             }
             finally
             {
@@ -989,8 +991,8 @@ namespace SLF
         // Method to run the R script
         private string RunModelRScript(string modifiedFilePath)
         {
-            string rScriptPath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\begum_model_deneme.R";
-            string resultsFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\";
+            string rScriptPath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\model.R";
+            string resultsFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\ELF_Tahmin_Sonuçları.xlsx";
 
             // Set up process info
             var processInfo = new ProcessStartInfo()
@@ -1011,7 +1013,7 @@ namespace SLF
                     if (!string.IsNullOrEmpty(args.Data))
                     {
                         Console.WriteLine(args.Data);
-                        resultsFilePath = args.Data;  // Capture the file path
+                        //resultsFilePath = args.Data;  // Capture the file path
                     }
                 };
 
@@ -1028,6 +1030,7 @@ namespace SLF
             }
 
             MessageBox.Show("R script executed successfully. Results saved in: " + resultsFilePath);
+            Console.WriteLine("R script executed successfully. Results saved in: " + resultsFilePath);
             return resultsFilePath;  // Return the results file path
         }
 
@@ -1079,6 +1082,7 @@ namespace SLF
             if (!File.Exists(filePath))
             {
                 MessageBox.Show($"Excel file not found: {filePath}");
+                Console.WriteLine($"Excel file not found: {filePath}");
                 return null;
             }
 

@@ -1862,13 +1862,20 @@ namespace SLF
             dt.Columns.Add("PolygonID", typeof(int));
             dt.Columns.Add("Coordinates", typeof(string));
             dt.Columns.Add("Area_Size(m2)", typeof(string));
-            dt.Columns.Add("baslangic_yili", typeof(string)); // Add custom fields
+/*            dt.Columns.Add("baslangic_yili", typeof(string)); // Add custom fields
             dt.Columns.Add("ilce", typeof(string));          // Add custom fields
             dt.Columns.Add("imar_tipi", typeof(string));     // Add custom fields
             dt.Columns.Add("IsDevelopmentArea", typeof(string)); // Add custom fields
             dt.Columns.Add("yasakli_alan_percentage", typeof(string)); // Add custom fields
             dt.Columns.Add("agirlik_hiz", typeof(string));   // Add custom fields
-            dt.Columns.Add("taks", typeof(string));          // Add custom fields
+            dt.Columns.Add("taks", typeof(string));          // Add custom fields*/
+            dt.Columns.Add("Mesken", typeof(string)); // Add custom fields
+            dt.Columns.Add("Sanayi", typeof(string));          // Add custom fields
+            dt.Columns.Add("Ticarethane", typeof(string));     // Add custom fields
+            dt.Columns.Add("start_year", typeof(string)); // Add custom fields
+            dt.Columns.Add("saturation_speed", typeof(string)); // Add custom fields
+            dt.Columns.Add("density", typeof(string));   // Add custom fields
+
 
             // Create a string representation of the coordinates in WKT format
             string coordinates = $"Polygon (({string.Join(", ", polygonPoints.Select(p => $"{p.Lat} {p.Lng}"))}))";
@@ -1880,13 +1887,13 @@ namespace SLF
             row["PolygonID"] = polygonId;
             row["Coordinates"] = coordinates;  // Store as WKT format
             row["Area_Size(m2)"] = Math.Round(area, 0).ToString();
-            row["baslangic_yili"] = ""; // Default empty value
-            row["ilce"] = ""; // Default empty value
-            row["imar_tipi"] = ""; // Default empty value
-            row["IsDevelopmentArea"] = ""; // Default empty value
-            row["yasakli_alan_percentage"] = ""; // Default empty value
-            row["agirlik_hiz"] = ""; // Default empty value
-            row["taks"] = ""; // Default empty value
+            row["Mesken"] = ""; // Default empty value
+            row["Sanayi"] = ""; // Default empty value
+            row["Ticarethane"] = ""; // Default empty value
+            row["start_year"] = ""; // Default empty value
+            row["saturation_speed"] = ""; // Default empty value
+            row["density"] = ""; // Default empty value
+           // row["taks"] = ""; // Default empty value
             dt.Rows.Add(row);
 
             return dt;
