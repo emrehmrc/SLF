@@ -18,6 +18,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using Font = System.Drawing.Font;
 using SharpMap.Data.Providers;
 using DocumentFormat.OpenXml.Drawing.Charts;
+using System.Web.UI.WebControls.WebParts;
 
 namespace SLF
 {
@@ -1869,12 +1870,15 @@ namespace SLF
             dt.Columns.Add("yasakli_alan_percentage", typeof(string)); // Add custom fields
             dt.Columns.Add("agirlik_hiz", typeof(string));   // Add custom fields
             dt.Columns.Add("taks", typeof(string));          // Add custom fields*/
+            dt.Columns.Add("taks", typeof(string));          // Add custom fields
             dt.Columns.Add("Mesken", typeof(string)); // Add custom fields
             dt.Columns.Add("Sanayi", typeof(string));          // Add custom fields
             dt.Columns.Add("Ticarethane", typeof(string));     // Add custom fields
             dt.Columns.Add("start_year", typeof(string)); // Add custom fields
             dt.Columns.Add("saturation_speed", typeof(string)); // Add custom fields
             dt.Columns.Add("density", typeof(string));   // Add custom fields
+            dt.Columns.Add("Park, yol, kaldırım oranı (%)", typeof(string));          // Add custom fields
+            dt.Columns.Add("Sosyal yapı parsel oranı (%)", typeof(string));          // Add custom fields
 
 
             // Create a string representation of the coordinates in WKT format
@@ -1893,7 +1897,9 @@ namespace SLF
             row["start_year"] = ""; // Default empty value
             row["saturation_speed"] = ""; // Default empty value
             row["density"] = ""; // Default empty value
-           // row["taks"] = ""; // Default empty value
+                                 // row["taks"] = ""; // Default empty value
+            row["Park, yol, kaldırım oranı (%)"] = ""; // Default empty value
+            row["Sosyal yapı parsel oranı (%)"] = ""; // Default empty value
             dt.Rows.Add(row);
 
             return dt;

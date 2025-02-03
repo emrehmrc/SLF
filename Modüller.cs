@@ -2650,29 +2650,74 @@ namespace SLF
             initializeCheckBoxes(checkBoxes_stokastik, tagValuesForCheckboxes);
         }
 
+        /*        private void YGASaveButton_Click(object sender, EventArgs e)
+                {
+                    if (polygonPoints_yga.Count >= 3)  // Ensure polygon is valid (at least 3 points)
+                    {
+                        // Create a DataTable with polygon data (latitude, longitude, and parameters)
+                        DataTable polygonDataTable = cbs.CreatePolygonDataTable(polygonPoints_yga, layer_index);
+
+
+
+                        // Clean up after saving the polygon
+                        polygonPoints_yga.Clear(); // Clear the list of points for the polygon
+
+                        // Show the YGA-specific attribute table popup
+                        ShowAttributeTable(polygonDataTable, true);  // `true` indicates it's for YGA
+                                                                     // Call PoligonKaydetEventi to save the polygon and handle other operations
+                        PoligonKaydetEventi(sender, e, polygonOverlay_yga, markerOverlay_yga, polygonPoints_yga, Mesafe_yga, mesafe_metre_yga);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Lütfen önce bir poligon çiziniz.");
+                    }
+                }
+
+                private void ShowAttributeTable(DataTable datatable, bool isYga = false)
+                {
+                    // Always update the DataGridView with the DataTable
+                    tablo_formu.attribute_table.DataSource = datatable;
+
+                    // If it's for YGA, trigger the popup for additional input
+                    if (isYga)
+                    {
+                        // Display the YGA popup form and pass the polygonDataTable
+                        ShowYGAPopupForm(datatable);
+                    }
+
+                }
+
+                private void ShowYGAPopupForm(DataTable datatable)
+                {
+                    // Create the YGA-specific popup and pass the DataTable for context
+                    YGAPopupForm popup = new YGAPopupForm(datatable);
+
+                    // Show the form as a dialog (blocking until it's closed)
+                    if (popup.ShowDialog() == DialogResult.OK)
+                    {
+                        // After user input, get the updated DataTable from the popup
+                        //DataTable updatedData = popup.GetUpdatedData();  // Get the updated table
+                        //ShowAttributeTable(updatedData, true);  // Update the UI with the new data for YGA
+                    }
+                    else if (popup.OperationCancelled)
+                    {
+                        // Clean up after saving the polygon
+                        polygonPoints_yga.Clear(); // Clear the list of points for the polygon
+                    }
+                }*/
         private void YGASaveButton_Click(object sender, EventArgs e)
         {
-            if (polygonPoints_yga.Count >= 3)  // Ensure polygon is valid (at least 3 points)
+            if (polygonPoints_yga.Count >= 3)
             {
-                // Create a DataTable with polygon data (latitude, longitude, and parameters)
                 DataTable polygonDataTable = cbs.CreatePolygonDataTable(polygonPoints_yga, layer_index);
-
-
-
-                // Clean up after saving the polygon
-                polygonPoints_yga.Clear(); // Clear the list of points for the polygon
-
-                // Show the YGA-specific attribute table popup
-                ShowAttributeTable(polygonDataTable, true);  // `true` indicates it's for YGA
-                                                             // Call PoligonKaydetEventi to save the polygon and handle other operations
-                PoligonKaydetEventi(sender, e, polygonOverlay_yga, markerOverlay_yga, polygonPoints_yga, Mesafe_yga, mesafe_metre_yga);
+                ShowAttributeTable(polygonDataTable, true); // Popup shown here
+                                                            // PoligonKaydetEventi is now called inside the popup's OK handler
             }
             else
             {
-                MessageBox.Show("Please draw a polygon with at least 3 points.");
+                MessageBox.Show("Lütfen önce bir poligon çiziniz.");
             }
         }
-
         private void ShowAttributeTable(DataTable datatable, bool isYga = false)
         {
             // Always update the DataGridView with the DataTable
@@ -2684,22 +2729,41 @@ namespace SLF
                 // Display the YGA popup form and pass the polygonDataTable
                 ShowYGAPopupForm(datatable);
             }
+
         }
 
         private void ShowYGAPopupForm(DataTable datatable)
         {
-            // Create the YGA-specific popup and pass the DataTable for context
             YGAPopupForm popup = new YGAPopupForm(datatable);
-
-            // Show the form as a dialog (blocking until it's closed)
             if (popup.ShowDialog() == DialogResult.OK)
             {
-                // After user input, get the updated DataTable from the popup
-                //DataTable updatedData = popup.GetUpdatedData();  // Get the updated table
-                //ShowAttributeTable(updatedData, true);  // Update the UI with the new data for YGA
+                // User confirmed: Save and clear
+                PoligonKaydetEventi(null, null, polygonOverlay_yga, markerOverlay_yga, polygonPoints_yga, Mesafe_yga, mesafe_metre_yga);
+                CleanupAfterSave();
+            }
+            else if (popup.OperationCancelled)
+            {
+                MessageBox.Show("İşlem iptal edildi.");
+                // User canceled: Clear without saving
+                CleanupAfterCancel();
             }
         }
 
+        private void CleanupAfterSave()
+        {
+            polygonPoints_yga.Clear();
+            polygonOverlay_yga.Polygons.Clear();
+            markerOverlay_yga.Markers.Clear();
+            // Refresh the map if necessary
+        }
+
+        private void CleanupAfterCancel()
+        {
+            polygonPoints_yga.Clear();
+            polygonOverlay_yga.Polygons.Clear();
+            markerOverlay_yga.Markers.Clear();
+            // Refresh the map if necessary
+        }
         // mouse down event of the checkboxes which displays the related data table with the corresponding
         // checkbox/layer
         /*        private void checkBox_MouseDown(object sender, MouseEventArgs e)

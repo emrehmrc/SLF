@@ -37,6 +37,11 @@ namespace SLF
             // Remove the existing "imar_tipi" column (if already present as a text column)
             YGADataGridView.Columns.Remove("density");
 
+            if (!YGADataGridView.Columns.Contains("saturation_speed"))
+                return;
+
+            // Remove the existing "imar_tipi" column (if already present as a text column)
+            YGADataGridView.Columns.Remove("saturation_speed");
             // Create and add a new ComboBox column for "imar_tipi"
             var comboBoxColumn = new DataGridViewComboBoxColumn
             {
@@ -47,9 +52,20 @@ namespace SLF
                 DisplayStyle = DataGridViewComboBoxDisplayStyle.ComboBox,
                 AutoComplete = true
             };
+            var comboBoxColumn2 = new DataGridViewComboBoxColumn
+            {
+                Name = "saturation_speed", // Name must match the original column
+                HeaderText = "Saturation Speed",
+                DataSource = new List<string> { "1", "2", "3", "4","5" },
+                DataPropertyName = "saturation_speed", // Map to the DataTable column
+                DisplayStyle = DataGridViewComboBoxDisplayStyle.ComboBox,
+                AutoComplete = true
+            };
 
             // Add the combobox column to the DataGridView
             YGADataGridView.Columns.Add(comboBoxColumn);
+            // Add the combobox column to the DataGridView
+            YGADataGridView.Columns.Add(comboBoxColumn2);
         }
 
         // Save button logic
@@ -74,7 +90,7 @@ namespace SLF
         {
             if (isOperationCancelled)
             {
-                MessageBox.Show("Operation cancelled.");
+                MessageBox.Show("İşlem iptal edildi.");
             }
         }
         private void SaveAsShapefile(DataTable dataTable, string filePath)
@@ -152,7 +168,7 @@ namespace SLF
                 shapefile.SaveAs(filePath);
                 shapefile.Close();
 
-                MessageBox.Show($"Shapefile saved successfully at: {filePath}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Shapefile başarıyla kaydedildi: {filePath}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
