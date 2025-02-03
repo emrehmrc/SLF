@@ -1904,7 +1904,7 @@ namespace SLF
             dt.Columns.Add("yasakli_alan_percentage", typeof(string)); // Add custom fields
             dt.Columns.Add("agirlik_hiz", typeof(string));   // Add custom fields
             dt.Columns.Add("taks", typeof(string));          // Add custom fields*/
-            dt.Columns.Add("taks", typeof(string));          // Add custom fields
+            //dt.Columns.Add("taks", typeof(string));          // Add custom fields
             dt.Columns.Add("Mesken", typeof(string)); // Add custom fields
             dt.Columns.Add("Sanayi", typeof(string));          // Add custom fields
             dt.Columns.Add("Ticarethane", typeof(string));     // Add custom fields

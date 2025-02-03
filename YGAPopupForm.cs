@@ -234,6 +234,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace SLF
@@ -272,8 +273,16 @@ namespace SLF
             if (!YGADataGridView.Columns.Contains("saturation_speed"))
                 return;
 
-            // Remove the existing "imar_tipi" column (if already present as a text column)
+            // Remove the existing "saturation_speed" column (if already present as a text column)
             YGADataGridView.Columns.Remove("saturation_speed");
+
+            if (!YGADataGridView.Columns.Contains("start_year"))
+                return;
+
+            // Remove the existing "saturation_speed" column (if already present as a text column)
+            YGADataGridView.Columns.Remove("start_year");
+
+
             // Create and add a new ComboBox column for "imar_tipi"
             var comboBoxColumn = new DataGridViewComboBoxColumn
             {
@@ -293,50 +302,205 @@ namespace SLF
                 DisplayStyle = DataGridViewComboBoxDisplayStyle.ComboBox,
                 AutoComplete = true
             };
-
+            var comboBoxColumn3 = new DataGridViewComboBoxColumn
+            {
+                Name = "start_year", // Name must match the original column
+                HeaderText = "Başlangıç Yılı",
+                DataSource = new List<string> { "2024", "2025", "2026", "2027", "2028", "2029", "2030", "2031", "2032", "2033" , "2034", "2035" },
+                DataPropertyName = "start_year", // Map to the DataTable column
+                DisplayStyle = DataGridViewComboBoxDisplayStyle.ComboBox,
+                AutoComplete = true
+            };
             // Add the combobox column to the DataGridView
             YGADataGridView.Columns.Add(comboBoxColumn);
             // Add the combobox column to the DataGridView
             YGADataGridView.Columns.Add(comboBoxColumn2);
+            // Add the combobox column to the DataGridView
+            YGADataGridView.Columns.Add(comboBoxColumn3);
         }
         private void YGATableSaveButton_Click(object sender, EventArgs e)
         {
             // Show a SaveFileDialog to let the user choose a base filename
             using (SaveFileDialog saveDialog = new SaveFileDialog())
             {
-                // Configure the dialog
-                saveDialog.Filter = "All Files (*.*)|*.*"; // Allow any filename
+                saveDialog.Filter = "All Files (*.*)|*.*";
                 saveDialog.Title = "Save YGA Parameters (SHP and Excel)";
-                //saveDialog.FileName = "YGA_Parameters"; // Default base name (no extension)
+               // saveDialog.FileName = "YGA_Parameters"; // Default base name
 
                 if (saveDialog.ShowDialog() == DialogResult.OK)
                 {
-                    // Extract the directory and base filename (without extension)
                     string directory = Path.GetDirectoryName(saveDialog.FileName);
                     string baseName = Path.GetFileNameWithoutExtension(saveDialog.FileName);
 
-                    // Generate paths for both SHP and Excel files
                     string shpPath = Path.Combine(directory, $"{baseName}.shp");
                     string xlsxPath = Path.Combine(directory, $"{baseName}.xlsx");
 
-                    // Save both files
+                    // Save new files
                     SaveAsShapefile(dataTable, shpPath);
                     SaveToExcel(dataTable, xlsxPath);
 
-                    // Show success message with paths
+                    // Append data to the fixed Excel file
+                    AppendToFixedExcelFile(dataTable);
+
+                    // Show success message
                     MessageBox.Show(
-                        $"Files saved successfully:\n\nShapefile: {shpPath}\nExcel: {xlsxPath}",
+                        $"New files saved:\n\nShapefile: {shpPath}\nExcel: {xlsxPath}\n\n" +
+                        $"Data also appended to fixed Excel file.",
                         "Success",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information
                     );
 
-                    // Close the form
                     this.DialogResult = DialogResult.OK;
                     this.Close();
                 }
             }
         }
+        private readonly Dictionary<string, string> _columnMappings = new Dictionary<string, string>
+{
+    { "density", "density" },               // Maps DataTable's "density" to Excel's "Density"
+    { "saturation_speed", "saturation_speed" },
+    //{ "Coordinates", "Geometry" },
+    // Add other columns as needed
+        { "Mesken", "Mesken" },
+            { "Sanayi", "Sanayi" },
+                { "Ticarethane", "Ticarethane" },
+                                { "start_year", "start_year" },
+};
+        private void AppendToFixedExcelFile(DataTable dataTable)
+        {
+            string fixedExcelPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda_slf\v2\kullanici_girdisi2.xlsx";
+
+            try
+            {
+                using (var workbook = File.Exists(fixedExcelPath)
+                        ? new XLWorkbook(fixedExcelPath)
+                        : new XLWorkbook())
+                {
+                    var worksheet = workbook.Worksheets.Count > 0
+                        ? workbook.Worksheet(1)
+                        : workbook.Worksheets.Add("User Inputs");
+
+                    // Ensure headers exist for mapped columns
+                    int lastRow = worksheet.LastRowUsed()?.RowNumber() ?? 0;
+                    bool isNewFile = lastRow == 0;
+
+                    // Add headers if the file is new or missing mapped columns
+                    if (isNewFile)
+                    {
+                        int col = 1;
+                        foreach (var mapping in _columnMappings.Values)
+                        {
+                            worksheet.Cell(1, col).Value = mapping;
+                            col++;
+                        }
+                        lastRow = 1; // Start data from row 2
+                    }
+
+                    // Verify that all mapped columns exist in the Excel file
+                    var headerCells = worksheet.Row(1).CellsUsed();
+                    var excelHeaders = headerCells.Select(c => c.Value.ToString()).ToList();
+
+                    // Create a dictionary to map Excel column names to their indices
+                    var excelColumnIndices = new Dictionary<string, int>();
+                    foreach (var header in excelHeaders)
+                    {
+                        excelColumnIndices[header] = worksheet.Row(1).CellsUsed()
+                            .First(c => c.Value.ToString() == header).Address.ColumnNumber;
+                    }
+
+                    // Append data rows
+                    foreach (DataRow dataRow in dataTable.Rows)
+                    {
+                        lastRow++;
+                        foreach (var mapping in _columnMappings)
+                        {
+                            string dataTableColumn = mapping.Key;
+                            string excelColumn = mapping.Value;
+
+                            // Skip if the DataTable column doesn't exist
+                            if (!dataTable.Columns.Contains(dataTableColumn))
+                            {
+                                MessageBox.Show($"DataTable column '{dataTableColumn}' not found.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                continue;
+                            }
+
+                            // Skip if the Excel column doesn't exist
+                            if (!excelColumnIndices.ContainsKey(excelColumn))
+                            {
+                                MessageBox.Show($"Excel column '{excelColumn}' not found.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                continue;
+                            }
+
+                            // Get the Excel column index
+                            int excelColIndex = excelColumnIndices[excelColumn];
+
+                            // Update the cell
+                            worksheet.Cell(lastRow, excelColIndex).Value = dataRow[dataTableColumn].ToString();
+                        }
+                    }
+
+                    // Save changes
+                    workbook.SaveAs(fixedExcelPath);
+                }
+
+                MessageBox.Show($"Data appended to fixed Excel file:\n{fixedExcelPath}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating fixed Excel file: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        /*        private void AppendToFixedExcelFile(DataTable dataTable)
+                {
+                    string fixedExcelPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda_slf\v2\kullanici_girdisi2.xlsx";
+
+                    try
+                    {
+                        using (var workbook = File.Exists(fixedExcelPath)
+                                ? new XLWorkbook(fixedExcelPath)
+                                : new XLWorkbook())
+                        {
+                            // Get the worksheet or create it if it doesn't exist
+                            var worksheet = workbook.Worksheets.Count > 0
+                                ? workbook.Worksheet(1)
+                                : workbook.Worksheets.Add("User Inputs");
+
+                            // Find the last used row (skip header if it exists)
+                            int lastRow = worksheet.LastRowUsed()?.RowNumber() ?? 0;
+                            bool hasHeaders = lastRow > 0;
+
+                            // Add headers if the file is new or empty
+                            if (lastRow == 0)
+                            {
+                                for (int i = 0; i < dataTable.Columns.Count; i++)
+                                {
+                                    worksheet.Cell(1, i + 1).Value = dataTable.Columns[i].ColumnName;
+                                }
+                                lastRow = 1; // Start appending data from row 2
+                            }
+
+                            // Append data rows
+                            foreach (DataRow dataRow in dataTable.Rows)
+                            {
+                                lastRow++;
+                                for (int i = 0; i < dataTable.Columns.Count; i++)
+                                {
+                                    worksheet.Cell(lastRow, i + 1).Value = dataRow[i].ToString();
+                                }
+                            }
+
+                            // Save changes
+                            workbook.SaveAs(fixedExcelPath);
+                        }
+
+                        MessageBox.Show($"Data appended to fixed Excel file:\n{fixedExcelPath}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error updating fixed Excel file: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }*/
         // Save button logic
         /*        private void YGATableSaveButton_Click(object sender, EventArgs e)
                 {
