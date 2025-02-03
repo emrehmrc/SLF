@@ -392,6 +392,7 @@ namespace SLF
                 System.Data.DataTable shapefileDatatable = new System.Data.DataTable();
                 await LoadShapefile(filepath, overlays[0], shapefileDatatable, dataGridView);
                 // Add polygons to all maps (after copying them to overlays)
+                AddLayerToArrays(overlays[0], overlayName, shapefileDatatable);
                 modülFormu.AddShapefileLayerToAllMaps(overlays[0]);  // Assuming overlays[0] contains the shapes to be added to all maps
                 // Create a DataTable for the shapefile data
                 //System.Data.DataTable shapefileDatatable = new System.Data.DataTable();
@@ -410,23 +411,20 @@ namespace SLF
                 callingForm.Cursor = Cursors.Default;
             }
         }
-        public GMapOverlay[] CreateOverlays(string overlayName)
+        public GMapOverlay[] CreateOverlays(string type)
         {
-            // Create unique names for each overlay
-            string baseName = $"Shapefile_{layer_index + 1}";
-            Console.WriteLine($"Created layer at index {layer_index + 1}: {baseName}");
-
+            string baseName = $"{type}Overlay_{layer_index}";
+            Console.WriteLine($"Created layer at index {layer_index}: {baseName}");
             return new[]
             {
-        new GMapOverlay($"{baseName}_imar"),
-        new GMapOverlay($"{baseName}_yuk"),
-        new GMapOverlay($"{baseName}_stokastik"),
-        new GMapOverlay($"{baseName}_yga")
-    };
+                new GMapOverlay($"{baseName}_imar"),
+                new GMapOverlay($"{baseName}_yuk"),
+                new GMapOverlay($"{baseName}_stokastik"),
+                new GMapOverlay($"{baseName}_yga")
 
+            };
         }
-
-        public void AddLayerToArrays(int layerIndex, GMapOverlay overlay, string overlayName, System.Data.DataTable datatable)
+        public void AddLayerToArrays(GMapOverlay overlay, string overlayName, System.Data.DataTable datatable)
         {
             // Check if the maximum number of layers has been reached
             if (layer_index >= tüm_katmanlar_array.Length)
@@ -446,6 +444,42 @@ namespace SLF
             // Increment the layer_index for the next layer
             layer_index++;
         }
+        /*        public GMapOverlay[] CreateOverlays(string overlayName)
+                {
+                    // Create unique names for each overlay
+                    string baseName = $"Shapefile_{layer_index + 1}";
+                    Console.WriteLine($"Created layer at index {layer_index + 1}: {baseName}");
+
+                    return new[]
+                    {
+                new GMapOverlay($"{baseName}_imar"),
+                new GMapOverlay($"{baseName}_yuk"),
+                new GMapOverlay($"{baseName}_stokastik"),
+                new GMapOverlay($"{baseName}_yga")
+            };
+
+                }
+
+                public void AddLayerToArrays(int layerIndex, GMapOverlay overlay, string overlayName, System.Data.DataTable datatable)
+                {
+                    // Check if the maximum number of layers has been reached
+                    if (layer_index >= tüm_katmanlar_array.Length)
+                    {
+                        Console.WriteLine("Error: Maximum number of layers (20) reached. Cannot add more layers.");
+                        MessageBox.Show("Maximum number of layers (20) reached. Cannot add more layers.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    // Add the overlay, name, and datatable to the arrays at the current layer_index
+                    tüm_katmanlar_array[layer_index] = overlay;
+                    tüm_katmanlar_array_names[layer_index] = overlayName;
+                    tüm_katmanlar_datatable[layer_index] = datatable;
+
+                    Console.WriteLine($"Added layer at index {layer_index}: {overlayName}");
+
+                    // Increment the layer_index for the next layer
+                    layer_index++;
+                }*/
 
 
         public void CopyOverlayContents(GMapOverlay sourceOverlay, GMapOverlay targetOverlay)
