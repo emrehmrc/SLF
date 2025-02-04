@@ -5664,6 +5664,20 @@ namespace SLF
             }
         }
 
+        private void CreateReportButton_Click(object sender, EventArgs e)
+        {
+            ReportTableForm popup = new ReportTableForm();
+            if (popup.ShowDialog() == DialogResult.OK)
+            {
+
+            }
+            else
+            {
+                this.Close();
+                MessageBox.Show("İşlem iptal edildi.");
+            }
+        }
+
         // ------------------------------------------------------------------------------------- //
 
 
