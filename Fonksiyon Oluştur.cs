@@ -28,6 +28,7 @@ namespace SLF
         public Fonksiyon_Oluştur()
         {
             InitializeComponent();
+            Height = 200;
         }
 
         private async void buton_jabl_Click(object sender, EventArgs e)
@@ -53,9 +54,12 @@ namespace SLF
             }
 
             Cursor = Cursors.Default;
+
+            mod1.gMapControl_stokastik.Refresh();
+            mod1.gMapControl_imar.Refresh();
         }
         
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        private void checkBox_cell_statistics_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBox_cell_statistics.Checked == true)
             {
@@ -63,7 +67,7 @@ namespace SLF
             }
             else
             {
-                Height = 240;
+                Height = 200;
             }
         }
 

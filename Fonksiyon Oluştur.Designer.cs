@@ -38,8 +38,6 @@
             this.FunctionFormLPicBox = new System.Windows.Forms.PictureBox();
             this.buton_iptal_fonksiyonForm = new System.Windows.Forms.Button();
             this.buton_jabl = new System.Windows.Forms.Button();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.FunctionFormMainPanel = new System.Windows.Forms.Panel();
             this.checkBoxSum = new System.Windows.Forms.CheckBox();
             this.checkBoxMin = new System.Windows.Forms.CheckBox();
             this.checkBoxMaks = new System.Windows.Forms.CheckBox();
@@ -56,8 +54,6 @@
             this.FunctionFormTopPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.FunctionFormRPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.FunctionFormLPicBox)).BeginInit();
-            this.panel1.SuspendLayout();
-            this.FunctionFormMainPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3_fonksiyonForm)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2_fonksiyonForm)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1_fonksiyonForm)).BeginInit();
@@ -153,7 +149,7 @@
             this.buton_iptal_fonksiyonForm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buton_iptal_fonksiyonForm.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buton_iptal_fonksiyonForm.ForeColor = System.Drawing.Color.Snow;
-            this.buton_iptal_fonksiyonForm.Location = new System.Drawing.Point(777, 14);
+            this.buton_iptal_fonksiyonForm.Location = new System.Drawing.Point(576, 555);
             this.buton_iptal_fonksiyonForm.Margin = new System.Windows.Forms.Padding(2);
             this.buton_iptal_fonksiyonForm.Name = "buton_iptal_fonksiyonForm";
             this.buton_iptal_fonksiyonForm.Size = new System.Drawing.Size(132, 37);
@@ -170,7 +166,7 @@
             this.buton_jabl.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buton_jabl.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buton_jabl.ForeColor = System.Drawing.Color.Snow;
-            this.buton_jabl.Location = new System.Drawing.Point(913, 14);
+            this.buton_jabl.Location = new System.Drawing.Point(789, 555);
             this.buton_jabl.Margin = new System.Windows.Forms.Padding(2);
             this.buton_jabl.Name = "buton_jabl";
             this.buton_jabl.Size = new System.Drawing.Size(132, 37);
@@ -179,46 +175,12 @@
             this.buton_jabl.UseVisualStyleBackColor = false;
             this.buton_jabl.Click += new System.EventHandler(this.buton_jabl_Click);
             // 
-            // panel1
-            // 
-            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
-            this.panel1.Controls.Add(this.buton_iptal_fonksiyonForm);
-            this.panel1.Controls.Add(this.buton_jabl);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 541);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1050, 62);
-            this.panel1.TabIndex = 38;
-            // 
-            // FunctionFormMainPanel
-            // 
-            this.FunctionFormMainPanel.BackColor = System.Drawing.Color.Snow;
-            this.FunctionFormMainPanel.Controls.Add(this.checkBoxSum);
-            this.FunctionFormMainPanel.Controls.Add(this.checkBoxMin);
-            this.FunctionFormMainPanel.Controls.Add(this.checkBoxMaks);
-            this.FunctionFormMainPanel.Controls.Add(this.checkBoxCount);
-            this.FunctionFormMainPanel.Controls.Add(this.pictureBox3_fonksiyonForm);
-            this.FunctionFormMainPanel.Controls.Add(this.checkBox_cell_statistics);
-            this.FunctionFormMainPanel.Controls.Add(this.label_fonksiyonlar_fonksiyonForm);
-            this.FunctionFormMainPanel.Controls.Add(this.pictureBox2_fonksiyonForm);
-            this.FunctionFormMainPanel.Controls.Add(this.pictureBox1_fonksiyonForm);
-            this.FunctionFormMainPanel.Controls.Add(this.label_sütun_fonksiyonForm);
-            this.FunctionFormMainPanel.Controls.Add(this.secilen_sutunlar_fonksiyonForm);
-            this.FunctionFormMainPanel.Controls.Add(this.tum_sutunlar_fonksiyonForm);
-            this.FunctionFormMainPanel.Controls.Add(this.label_agregasyon_fonksiyonForm);
-            this.FunctionFormMainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.FunctionFormMainPanel.ForeColor = System.Drawing.Color.DarkMagenta;
-            this.FunctionFormMainPanel.Location = new System.Drawing.Point(0, 100);
-            this.FunctionFormMainPanel.Name = "FunctionFormMainPanel";
-            this.FunctionFormMainPanel.Size = new System.Drawing.Size(1050, 441);
-            this.FunctionFormMainPanel.TabIndex = 39;
-            // 
             // checkBoxSum
             // 
             this.checkBoxSum.AutoSize = true;
             this.checkBoxSum.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.checkBoxSum.ForeColor = System.Drawing.Color.DarkSlateBlue;
-            this.checkBoxSum.Location = new System.Drawing.Point(804, 155);
+            this.checkBoxSum.Location = new System.Drawing.Point(810, 283);
             this.checkBoxSum.Margin = new System.Windows.Forms.Padding(2);
             this.checkBoxSum.Name = "checkBoxSum";
             this.checkBoxSum.Size = new System.Drawing.Size(81, 32);
@@ -231,7 +193,7 @@
             this.checkBoxMin.AutoSize = true;
             this.checkBoxMin.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.checkBoxMin.ForeColor = System.Drawing.Color.DarkSlateBlue;
-            this.checkBoxMin.Location = new System.Drawing.Point(804, 187);
+            this.checkBoxMin.Location = new System.Drawing.Point(811, 332);
             this.checkBoxMin.Margin = new System.Windows.Forms.Padding(2);
             this.checkBoxMin.Name = "checkBoxMin";
             this.checkBoxMin.Size = new System.Drawing.Size(68, 32);
@@ -244,7 +206,7 @@
             this.checkBoxMaks.AutoSize = true;
             this.checkBoxMaks.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.checkBoxMaks.ForeColor = System.Drawing.Color.DarkSlateBlue;
-            this.checkBoxMaks.Location = new System.Drawing.Point(804, 221);
+            this.checkBoxMaks.Location = new System.Drawing.Point(811, 378);
             this.checkBoxMaks.Margin = new System.Windows.Forms.Padding(2);
             this.checkBoxMaks.Name = "checkBoxMaks";
             this.checkBoxMaks.Size = new System.Drawing.Size(80, 32);
@@ -257,7 +219,7 @@
             this.checkBoxCount.AutoSize = true;
             this.checkBoxCount.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.checkBoxCount.ForeColor = System.Drawing.Color.DarkSlateBlue;
-            this.checkBoxCount.Location = new System.Drawing.Point(804, 123);
+            this.checkBoxCount.Location = new System.Drawing.Point(810, 232);
             this.checkBoxCount.Margin = new System.Windows.Forms.Padding(2);
             this.checkBoxCount.Name = "checkBoxCount";
             this.checkBoxCount.Size = new System.Drawing.Size(65, 32);
@@ -271,7 +233,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox3_fonksiyonForm.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.pictureBox3_fonksiyonForm.Image = global::SLF.Properties.Resources.Double_Left;
-            this.pictureBox3_fonksiyonForm.Location = new System.Drawing.Point(318, 256);
+            this.pictureBox3_fonksiyonForm.Location = new System.Drawing.Point(315, 374);
             this.pictureBox3_fonksiyonForm.Margin = new System.Windows.Forms.Padding(2);
             this.pictureBox3_fonksiyonForm.Name = "pictureBox3_fonksiyonForm";
             this.pictureBox3_fonksiyonForm.Size = new System.Drawing.Size(106, 36);
@@ -285,13 +247,14 @@
             this.checkBox_cell_statistics.AutoSize = true;
             this.checkBox_cell_statistics.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.checkBox_cell_statistics.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.checkBox_cell_statistics.Location = new System.Drawing.Point(359, 14);
+            this.checkBox_cell_statistics.Location = new System.Drawing.Point(329, 105);
             this.checkBox_cell_statistics.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox_cell_statistics.Name = "checkBox_cell_statistics";
             this.checkBox_cell_statistics.Size = new System.Drawing.Size(281, 28);
             this.checkBox_cell_statistics.TabIndex = 40;
             this.checkBox_cell_statistics.Text = "Hücresel İstatistikleri Oluştur";
             this.checkBox_cell_statistics.UseVisualStyleBackColor = true;
+            this.checkBox_cell_statistics.CheckedChanged += new System.EventHandler(this.checkBox_cell_statistics_CheckedChanged);
             // 
             // label_fonksiyonlar_fonksiyonForm
             // 
@@ -301,7 +264,7 @@
             this.label_fonksiyonlar_fonksiyonForm.AutoSize = true;
             this.label_fonksiyonlar_fonksiyonForm.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label_fonksiyonlar_fonksiyonForm.ForeColor = System.Drawing.Color.DarkMagenta;
-            this.label_fonksiyonlar_fonksiyonForm.Location = new System.Drawing.Point(800, 81);
+            this.label_fonksiyonlar_fonksiyonForm.Location = new System.Drawing.Point(805, 186);
             this.label_fonksiyonlar_fonksiyonForm.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label_fonksiyonlar_fonksiyonForm.Name = "label_fonksiyonlar_fonksiyonForm";
             this.label_fonksiyonlar_fonksiyonForm.Size = new System.Drawing.Size(239, 28);
@@ -312,7 +275,7 @@
             // 
             this.pictureBox2_fonksiyonForm.BackColor = System.Drawing.Color.PaleTurquoise;
             this.pictureBox2_fonksiyonForm.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.pictureBox2_fonksiyonForm.Location = new System.Drawing.Point(758, 81);
+            this.pictureBox2_fonksiyonForm.Location = new System.Drawing.Point(765, 202);
             this.pictureBox2_fonksiyonForm.Margin = new System.Windows.Forms.Padding(2);
             this.pictureBox2_fonksiyonForm.Name = "pictureBox2_fonksiyonForm";
             this.pictureBox2_fonksiyonForm.Size = new System.Drawing.Size(25, 302);
@@ -326,7 +289,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox1_fonksiyonForm.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.pictureBox1_fonksiyonForm.Image = global::SLF.Properties.Resources.Double_Right;
-            this.pictureBox1_fonksiyonForm.Location = new System.Drawing.Point(318, 176);
+            this.pictureBox1_fonksiyonForm.Location = new System.Drawing.Point(315, 269);
             this.pictureBox1_fonksiyonForm.Margin = new System.Windows.Forms.Padding(2);
             this.pictureBox1_fonksiyonForm.Name = "pictureBox1_fonksiyonForm";
             this.pictureBox1_fonksiyonForm.Size = new System.Drawing.Size(106, 36);
@@ -343,7 +306,7 @@
             this.label_sütun_fonksiyonForm.AutoSize = true;
             this.label_sütun_fonksiyonForm.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label_sütun_fonksiyonForm.ForeColor = System.Drawing.Color.DarkMagenta;
-            this.label_sütun_fonksiyonForm.Location = new System.Drawing.Point(32, 81);
+            this.label_sütun_fonksiyonForm.Location = new System.Drawing.Point(9, 202);
             this.label_sütun_fonksiyonForm.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label_sütun_fonksiyonForm.Name = "label_sütun_fonksiyonForm";
             this.label_sütun_fonksiyonForm.Size = new System.Drawing.Size(128, 28);
@@ -359,7 +322,7 @@
             this.secilen_sutunlar_fonksiyonForm.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.secilen_sutunlar_fonksiyonForm.FormattingEnabled = true;
             this.secilen_sutunlar_fonksiyonForm.ItemHeight = 21;
-            this.secilen_sutunlar_fonksiyonForm.Location = new System.Drawing.Point(439, 113);
+            this.secilen_sutunlar_fonksiyonForm.Location = new System.Drawing.Point(444, 232);
             this.secilen_sutunlar_fonksiyonForm.Margin = new System.Windows.Forms.Padding(2);
             this.secilen_sutunlar_fonksiyonForm.Name = "secilen_sutunlar_fonksiyonForm";
             this.secilen_sutunlar_fonksiyonForm.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
@@ -376,7 +339,7 @@
             this.tum_sutunlar_fonksiyonForm.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tum_sutunlar_fonksiyonForm.FormattingEnabled = true;
             this.tum_sutunlar_fonksiyonForm.ItemHeight = 21;
-            this.tum_sutunlar_fonksiyonForm.Location = new System.Drawing.Point(32, 113);
+            this.tum_sutunlar_fonksiyonForm.Location = new System.Drawing.Point(11, 232);
             this.tum_sutunlar_fonksiyonForm.Margin = new System.Windows.Forms.Padding(2);
             this.tum_sutunlar_fonksiyonForm.Name = "tum_sutunlar_fonksiyonForm";
             this.tum_sutunlar_fonksiyonForm.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
@@ -391,7 +354,7 @@
             this.label_agregasyon_fonksiyonForm.AutoSize = true;
             this.label_agregasyon_fonksiyonForm.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label_agregasyon_fonksiyonForm.ForeColor = System.Drawing.Color.DarkMagenta;
-            this.label_agregasyon_fonksiyonForm.Location = new System.Drawing.Point(434, 81);
+            this.label_agregasyon_fonksiyonForm.Location = new System.Drawing.Point(439, 184);
             this.label_agregasyon_fonksiyonForm.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label_agregasyon_fonksiyonForm.Name = "label_agregasyon_fonksiyonForm";
             this.label_agregasyon_fonksiyonForm.Size = new System.Drawing.Size(302, 28);
@@ -405,15 +368,27 @@
             this.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.ClientSize = new System.Drawing.Size(1050, 603);
-            this.Controls.Add(this.FunctionFormMainPanel);
-            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.buton_iptal_fonksiyonForm);
+            this.Controls.Add(this.buton_jabl);
+            this.Controls.Add(this.pictureBox3_fonksiyonForm);
+            this.Controls.Add(this.checkBoxSum);
+            this.Controls.Add(this.checkBoxMin);
+            this.Controls.Add(this.checkBoxMaks);
             this.Controls.Add(this.FunctionFormTopPanel);
+            this.Controls.Add(this.checkBoxCount);
+            this.Controls.Add(this.label_sütun_fonksiyonForm);
+            this.Controls.Add(this.tum_sutunlar_fonksiyonForm);
+            this.Controls.Add(this.label_fonksiyonlar_fonksiyonForm);
+            this.Controls.Add(this.checkBox_cell_statistics);
+            this.Controls.Add(this.pictureBox2_fonksiyonForm);
+            this.Controls.Add(this.pictureBox1_fonksiyonForm);
+            this.Controls.Add(this.secilen_sutunlar_fonksiyonForm);
+            this.Controls.Add(this.label_agregasyon_fonksiyonForm);
             this.DoubleBuffered = true;
             this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2);
-            this.MinimumSize = new System.Drawing.Size(1000, 650);
             this.Name = "Fonksiyon_Oluştur";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Fonksiyon Oluştur";
@@ -421,13 +396,11 @@
             this.FunctionFormTopPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.FunctionFormRPicBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.FunctionFormLPicBox)).EndInit();
-            this.panel1.ResumeLayout(false);
-            this.FunctionFormMainPanel.ResumeLayout(false);
-            this.FunctionFormMainPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3_fonksiyonForm)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2_fonksiyonForm)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1_fonksiyonForm)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -442,8 +415,6 @@
         private System.Windows.Forms.PictureBox FunctionFormRPicBox;
         private System.Windows.Forms.Button buton_iptal_fonksiyonForm;
         private System.Windows.Forms.Button buton_jabl;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Panel FunctionFormMainPanel;
         public System.Windows.Forms.CheckBox checkBoxSum;
         public System.Windows.Forms.CheckBox checkBoxMin;
         public System.Windows.Forms.CheckBox checkBoxMaks;

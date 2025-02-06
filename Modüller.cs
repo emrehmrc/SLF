@@ -2629,7 +2629,6 @@ namespace SLF
                 DataTable polygonDataTable = cbs.CreatePolygonDataTable(polygonPoints_yga, layer_index);
 
 
-
                 // Clean up after saving the polygon
                 polygonPoints_yga.Clear(); // Clear the list of points for the polygon
 
@@ -4363,9 +4362,22 @@ namespace SLF
             if (e.Button == MouseButtons.Left)
             {
                 ContextMenuStrip_Poligon.Show(Cursor.Position);
+                ContextMenuStrip_Poligon.Show(Cursor.Position);
             }
         }
 
+        private async void buton_dosya_yga_Click(object sender, EventArgs e)
+        {
+            await cbs.cbs_dosya_secimi(gMapControl_yga, this, tablo_formu.attribute_table);
+        }
+
+        private void toolStrip_yga_fonksiyon_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                ContextMenuStrip_Fonksiyon.Show(Cursor.Position);
+            }
+        }
 
         // Show just the single row whenever a polygon is clicked on which corresponds to its row
         private void ShowAttributeRow(DataRow row)
