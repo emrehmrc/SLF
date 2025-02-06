@@ -37,15 +37,15 @@
             this.ExportKmlButton = new System.Windows.Forms.Button();
             this.ReportTableBottomPanel = new System.Windows.Forms.Panel();
             this.SaveButton = new System.Windows.Forms.Button();
-            this.CancelButton = new System.Windows.Forms.Button();
+            this.ReportCancelButton = new System.Windows.Forms.Button();
             this.ReportTablePanel = new System.Windows.Forms.Panel();
+            this.ReportMapSelectionComboBox = new System.Windows.Forms.ComboBox();
+            this.ReportSelectionComboBox = new System.Windows.Forms.ComboBox();
             this.ReportsTableDataGridView = new System.Windows.Forms.DataGridView();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
-            this.ReportSelectionComboBox = new System.Windows.Forms.ComboBox();
-            this.ReportMapSelectionComboBox = new System.Windows.Forms.ComboBox();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.ReportTableBottomPanel.SuspendLayout();
             this.ReportTablePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ReportsTableDataGridView)).BeginInit();
@@ -86,7 +86,7 @@
             // 
             this.ReportTableBottomPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(161)))), ((int)(((byte)(227)))), ((int)(((byte)(249)))));
             this.ReportTableBottomPanel.Controls.Add(this.SaveButton);
-            this.ReportTableBottomPanel.Controls.Add(this.CancelButton);
+            this.ReportTableBottomPanel.Controls.Add(this.ReportCancelButton);
             this.ReportTableBottomPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.ReportTableBottomPanel.Location = new System.Drawing.Point(0, 476);
             this.ReportTableBottomPanel.Name = "ReportTableBottomPanel";
@@ -109,21 +109,22 @@
             this.SaveButton.Text = "DIŞA AKTAR";
             this.SaveButton.UseVisualStyleBackColor = false;
             // 
-            // CancelButton
+            // ReportCancelButton
             // 
-            this.CancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.CancelButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(11)))), ((int)(((byte)(47)))), ((int)(((byte)(159)))));
-            this.CancelButton.FlatAppearance.BorderSize = 0;
-            this.CancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.CancelButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.CancelButton.ForeColor = System.Drawing.Color.Snow;
-            this.CancelButton.Location = new System.Drawing.Point(411, 4);
-            this.CancelButton.Margin = new System.Windows.Forms.Padding(2);
-            this.CancelButton.Name = "CancelButton";
-            this.CancelButton.Size = new System.Drawing.Size(180, 45);
-            this.CancelButton.TabIndex = 40;
-            this.CancelButton.Text = "İPTAL";
-            this.CancelButton.UseVisualStyleBackColor = false;
+            this.ReportCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.ReportCancelButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(11)))), ((int)(((byte)(47)))), ((int)(((byte)(159)))));
+            this.ReportCancelButton.FlatAppearance.BorderSize = 0;
+            this.ReportCancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ReportCancelButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.ReportCancelButton.ForeColor = System.Drawing.Color.Snow;
+            this.ReportCancelButton.Location = new System.Drawing.Point(411, 4);
+            this.ReportCancelButton.Margin = new System.Windows.Forms.Padding(2);
+            this.ReportCancelButton.Name = "ReportCancelButton";
+            this.ReportCancelButton.Size = new System.Drawing.Size(180, 45);
+            this.ReportCancelButton.TabIndex = 40;
+            this.ReportCancelButton.Text = "İPTAL";
+            this.ReportCancelButton.UseVisualStyleBackColor = false;
+            this.ReportCancelButton.Click += new System.EventHandler(this.ReportCancelButton_Click);
             // 
             // ReportTablePanel
             // 
@@ -136,6 +137,42 @@
             this.ReportTablePanel.Name = "ReportTablePanel";
             this.ReportTablePanel.Size = new System.Drawing.Size(982, 527);
             this.ReportTablePanel.TabIndex = 6;
+            // 
+            // ReportMapSelectionComboBox
+            // 
+            this.ReportMapSelectionComboBox.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.ReportMapSelectionComboBox.ForeColor = System.Drawing.Color.DarkOrange;
+            this.ReportMapSelectionComboBox.FormattingEnabled = true;
+            this.ReportMapSelectionComboBox.Items.AddRange(new object[] {
+            "EA Haritası",
+            "DEK Haritası",
+            "YGA Haritası",
+            "Imar Haritası",
+            "DTR Haritası",
+            "Stokastik Harita"});
+            this.ReportMapSelectionComboBox.Location = new System.Drawing.Point(282, 12);
+            this.ReportMapSelectionComboBox.Name = "ReportMapSelectionComboBox";
+            this.ReportMapSelectionComboBox.Size = new System.Drawing.Size(233, 25);
+            this.ReportMapSelectionComboBox.TabIndex = 46;
+            this.ReportMapSelectionComboBox.Text = "Dışa aktarmak için harita seçimi yapınız.";
+            // 
+            // ReportSelectionComboBox
+            // 
+            this.ReportSelectionComboBox.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.ReportSelectionComboBox.ForeColor = System.Drawing.Color.DarkOrange;
+            this.ReportSelectionComboBox.FormattingEnabled = true;
+            this.ReportSelectionComboBox.Items.AddRange(new object[] {
+            "EA Sonuçları Tablosu",
+            "DEK Sonuçları Tablosu",
+            "YGA Sonuçları Tablosu",
+            "Imar Sonuçları Tablosu",
+            "DTR Sonuçları Tablosu",
+            "Stokastik Sonuçlar Tablosu"});
+            this.ReportSelectionComboBox.Location = new System.Drawing.Point(12, 12);
+            this.ReportSelectionComboBox.Name = "ReportSelectionComboBox";
+            this.ReportSelectionComboBox.Size = new System.Drawing.Size(233, 25);
+            this.ReportSelectionComboBox.TabIndex = 45;
+            this.ReportSelectionComboBox.Text = "Raporlama oluşturmak için modül seçimi yapınız.";
             // 
             // ReportsTableDataGridView
             // 
@@ -199,21 +236,21 @@
             this.panel1.Size = new System.Drawing.Size(196, 527);
             this.panel1.TabIndex = 7;
             // 
-            // button1
+            // button3
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(11)))), ((int)(((byte)(47)))), ((int)(((byte)(159)))));
-            this.button1.FlatAppearance.BorderSize = 0;
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.button1.ForeColor = System.Drawing.Color.Snow;
-            this.button1.Location = new System.Drawing.Point(14, 209);
-            this.button1.Margin = new System.Windows.Forms.Padding(2);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(180, 45);
-            this.button1.TabIndex = 42;
-            this.button1.Text = "MODÜL TABLOLARI";
-            this.button1.UseVisualStyleBackColor = false;
+            this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(11)))), ((int)(((byte)(47)))), ((int)(((byte)(159)))));
+            this.button3.FlatAppearance.BorderSize = 0;
+            this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button3.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.button3.ForeColor = System.Drawing.Color.Snow;
+            this.button3.Location = new System.Drawing.Point(14, 111);
+            this.button3.Margin = new System.Windows.Forms.Padding(2);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(180, 45);
+            this.button3.TabIndex = 44;
+            this.button3.Text = "HARİTALAR";
+            this.button3.UseVisualStyleBackColor = false;
             // 
             // button2
             // 
@@ -231,57 +268,21 @@
             this.button2.Text = "SENARYO SONUÇLARI";
             this.button2.UseVisualStyleBackColor = false;
             // 
-            // button3
+            // button1
             // 
-            this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(11)))), ((int)(((byte)(47)))), ((int)(((byte)(159)))));
-            this.button3.FlatAppearance.BorderSize = 0;
-            this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button3.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.button3.ForeColor = System.Drawing.Color.Snow;
-            this.button3.Location = new System.Drawing.Point(14, 111);
-            this.button3.Margin = new System.Windows.Forms.Padding(2);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(180, 45);
-            this.button3.TabIndex = 44;
-            this.button3.Text = "HARİTALAR";
-            this.button3.UseVisualStyleBackColor = false;
-            // 
-            // ReportSelectionComboBox
-            // 
-            this.ReportSelectionComboBox.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.ReportSelectionComboBox.ForeColor = System.Drawing.Color.DarkOrange;
-            this.ReportSelectionComboBox.FormattingEnabled = true;
-            this.ReportSelectionComboBox.Items.AddRange(new object[] {
-            "EA Sonuçları Tablosu",
-            "DEK Sonuçları Tablosu",
-            "YGA Sonuçları Tablosu",
-            "Imar Sonuçları Tablosu",
-            "DTR Sonuçları Tablosu",
-            "Stokastik Sonuçlar Tablosu"});
-            this.ReportSelectionComboBox.Location = new System.Drawing.Point(12, 12);
-            this.ReportSelectionComboBox.Name = "ReportSelectionComboBox";
-            this.ReportSelectionComboBox.Size = new System.Drawing.Size(233, 25);
-            this.ReportSelectionComboBox.TabIndex = 45;
-            this.ReportSelectionComboBox.Text = "Raporlama oluşturmak için modül seçimi yapınız.";
-            // 
-            // ReportMapSelectionComboBox
-            // 
-            this.ReportMapSelectionComboBox.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.ReportMapSelectionComboBox.ForeColor = System.Drawing.Color.DarkOrange;
-            this.ReportMapSelectionComboBox.FormattingEnabled = true;
-            this.ReportMapSelectionComboBox.Items.AddRange(new object[] {
-            "EA Haritası",
-            "DEK Haritası",
-            "YGA Haritası",
-            "Imar Haritası",
-            "DTR Haritası",
-            "Stokastik Harita"});
-            this.ReportMapSelectionComboBox.Location = new System.Drawing.Point(282, 12);
-            this.ReportMapSelectionComboBox.Name = "ReportMapSelectionComboBox";
-            this.ReportMapSelectionComboBox.Size = new System.Drawing.Size(233, 25);
-            this.ReportMapSelectionComboBox.TabIndex = 46;
-            this.ReportMapSelectionComboBox.Text = "Dışa aktarmak için harita seçimi yapınız.";
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(11)))), ((int)(((byte)(47)))), ((int)(((byte)(159)))));
+            this.button1.FlatAppearance.BorderSize = 0;
+            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button1.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.button1.ForeColor = System.Drawing.Color.Snow;
+            this.button1.Location = new System.Drawing.Point(14, 209);
+            this.button1.Margin = new System.Windows.Forms.Padding(2);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(180, 45);
+            this.button1.TabIndex = 42;
+            this.button1.Text = "MODÜL TABLOLARI";
+            this.button1.UseVisualStyleBackColor = false;
             // 
             // ReportTableForm
             // 
@@ -309,7 +310,7 @@
         private System.Windows.Forms.Button ExportPngButton;
         private System.Windows.Forms.Panel ReportTableBottomPanel;
         private System.Windows.Forms.Button SaveButton;
-        private System.Windows.Forms.Button CancelButton;
+        private System.Windows.Forms.Button ReportCancelButton;
         private System.Windows.Forms.Panel ReportTablePanel;
         private System.Windows.Forms.DataGridView ReportsTableDataGridView;
         private System.Windows.Forms.Panel panel1;

@@ -12,9 +12,16 @@ namespace SLF
 {
     public partial class ReportTableForm : Form
     {
+        private bool isOperationCancelled = true;
+        public bool OperationCancelled => isOperationCancelled;
         public ReportTableForm()
         {
             InitializeComponent();
+        }
+
+        private void ReportCancelButton_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

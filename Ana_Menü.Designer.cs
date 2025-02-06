@@ -97,7 +97,7 @@
             this.StartButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.StartButton.Font = new System.Drawing.Font("Maiandra GD", 25.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.StartButton.ForeColor = System.Drawing.Color.Transparent;
-            this.StartButton.Location = new System.Drawing.Point(942, 3);
+            this.StartButton.Location = new System.Drawing.Point(963, 8);
             this.StartButton.Name = "StartButton";
             this.StartButton.Size = new System.Drawing.Size(222, 63);
             this.StartButton.TabIndex = 8;
@@ -135,7 +135,7 @@
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.Color.Moccasin;
+            this.panel1.BackColor = System.Drawing.Color.NavajoWhite;
             this.panel1.Controls.Add(this.roundButton1);
             this.panel1.Controls.Add(this.roundButton2);
             this.panel1.Controls.Add(this.label1);
@@ -194,11 +194,12 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Snow;
-            this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
+            this.BackgroundImage = global::SLF.Properties.Resources.location_tech;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(1197, 630);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
+            this.DoubleBuffered = true;
             this.Font = new System.Drawing.Font("Microsoft Tai Le", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ForeColor = System.Drawing.Color.BlueViolet;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;

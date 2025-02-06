@@ -5671,12 +5671,12 @@ namespace SLF
             {
 
             }
-            else
+            else if(popup.OperationCancelled)
             {
-                this.Close();
                 MessageBox.Show("İşlem iptal edildi.");
             }
         }
+
 
         // ------------------------------------------------------------------------------------- //
 

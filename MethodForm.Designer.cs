@@ -45,9 +45,9 @@
             this.MethodPanel.Controls.Add(this.ForwardButton);
             this.MethodPanel.Controls.Add(this.label1);
             this.MethodPanel.Controls.Add(this.MethodComboBox);
-            this.MethodPanel.Location = new System.Drawing.Point(44, 53);
+            this.MethodPanel.Location = new System.Drawing.Point(45, 58);
             this.MethodPanel.Name = "MethodPanel";
-            this.MethodPanel.Size = new System.Drawing.Size(299, 352);
+            this.MethodPanel.Size = new System.Drawing.Size(291, 347);
             this.MethodPanel.TabIndex = 0;
             this.MethodPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.MethodPanel_Paint);
             // 
@@ -62,7 +62,7 @@
             this.ForwardButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ForwardButton.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.ForwardButton.ForeColor = System.Drawing.Color.White;
-            this.ForwardButton.Location = new System.Drawing.Point(75, 247);
+            this.ForwardButton.Location = new System.Drawing.Point(71, 235);
             this.ForwardButton.Name = "ForwardButton";
             this.ForwardButton.Size = new System.Drawing.Size(150, 40);
             this.ForwardButton.TabIndex = 3;
@@ -75,13 +75,13 @@
             // 
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
-            this.label1.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.label1.ForeColor = System.Drawing.Color.Coral;
-            this.label1.Location = new System.Drawing.Point(13, 101);
+            this.label1.Location = new System.Drawing.Point(96, 68);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(101, 19);
+            this.label1.Size = new System.Drawing.Size(89, 17);
             this.label1.TabIndex = 2;
-            this.label1.Text = "Metot Seçimi:";
+            this.label1.Text = "Metot Seçimi";
             // 
             // MethodComboBox
             // 
@@ -93,9 +93,9 @@
             this.MethodComboBox.Items.AddRange(new object[] {
             "SLF (Jeo-Uzamsal)",
             "ELF (Ekonometrik)"});
-            this.MethodComboBox.Location = new System.Drawing.Point(26, 155);
+            this.MethodComboBox.Location = new System.Drawing.Point(53, 122);
             this.MethodComboBox.Name = "MethodComboBox";
-            this.MethodComboBox.Size = new System.Drawing.Size(253, 25);
+            this.MethodComboBox.Size = new System.Drawing.Size(186, 25);
             this.MethodComboBox.TabIndex = 1;
             this.MethodComboBox.Text = "Başlangıç metodu seçiniz.";
             // 
@@ -103,7 +103,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
+            this.BackgroundImage = global::SLF.Properties.Resources.location_tech;
             this.ClientSize = new System.Drawing.Size(384, 461);
             this.Controls.Add(this.MethodPanel);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));

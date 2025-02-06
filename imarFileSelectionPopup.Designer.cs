@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(imarFileSelectionPopup));
             this.imarFileSelectionPanel = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.SelectCsvButton = new System.Windows.Forms.Button();
@@ -44,12 +45,11 @@
             // imarFileSelectionPanel
             // 
             this.imarFileSelectionPanel.BackColor = System.Drawing.Color.NavajoWhite;
-            this.imarFileSelectionPanel.Controls.Add(this.label1);
-            this.imarFileSelectionPanel.Controls.Add(this.SelectCsvButton);
             this.imarFileSelectionPanel.Controls.Add(this.SelectKmlButton);
-            this.imarFileSelectionPanel.Location = new System.Drawing.Point(38, 227);
+            this.imarFileSelectionPanel.Controls.Add(this.SelectCsvButton);
+            this.imarFileSelectionPanel.Location = new System.Drawing.Point(134, 272);
             this.imarFileSelectionPanel.Name = "imarFileSelectionPanel";
-            this.imarFileSelectionPanel.Size = new System.Drawing.Size(296, 118);
+            this.imarFileSelectionPanel.Size = new System.Drawing.Size(109, 118);
             this.imarFileSelectionPanel.TabIndex = 5;
             this.imarFileSelectionPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.imarFileSelectionPanel_Paint);
             // 
@@ -58,7 +58,7 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.label1.ForeColor = System.Drawing.Color.DarkOrange;
-            this.label1.Location = new System.Drawing.Point(3, 9);
+            this.label1.Location = new System.Drawing.Point(104, 252);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(170, 17);
             this.label1.TabIndex = 2;
@@ -68,7 +68,7 @@
             // 
             this.SelectCsvButton.BackgroundImage = global::SLF.Properties.Resources.CSV21;
             this.SelectCsvButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.SelectCsvButton.Location = new System.Drawing.Point(75, 44);
+            this.SelectCsvButton.Location = new System.Drawing.Point(68, 36);
             this.SelectCsvButton.Name = "SelectCsvButton";
             this.SelectCsvButton.Size = new System.Drawing.Size(33, 38);
             this.SelectCsvButton.TabIndex = 0;
@@ -79,7 +79,7 @@
             // 
             this.SelectKmlButton.BackgroundImage = global::SLF.Properties.Resources.KML21;
             this.SelectKmlButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.SelectKmlButton.Location = new System.Drawing.Point(167, 44);
+            this.SelectKmlButton.Location = new System.Drawing.Point(9, 36);
             this.SelectKmlButton.Name = "SelectKmlButton";
             this.SelectKmlButton.Size = new System.Drawing.Size(33, 38);
             this.SelectKmlButton.TabIndex = 1;
@@ -94,20 +94,19 @@
             this.imarMethodSelectionComboBox.Items.AddRange(new object[] {
             "Verileri Güncelle",
             "Varolan Verileri Kullan"});
-            this.imarMethodSelectionComboBox.Location = new System.Drawing.Point(75, 40);
+            this.imarMethodSelectionComboBox.Location = new System.Drawing.Point(70, 42);
             this.imarMethodSelectionComboBox.Name = "imarMethodSelectionComboBox";
             this.imarMethodSelectionComboBox.Size = new System.Drawing.Size(222, 25);
             this.imarMethodSelectionComboBox.TabIndex = 6;
             this.imarMethodSelectionComboBox.Text = "Yapmak istediğiniz işlemi seçiniz.";
-           // this.imarMethodSelectionComboBox.SelectedIndexChanged += new System.EventHandler(this.imarMethodSelectionComboBox_SelectedIndexChanged);
             // 
             // imarCitySelectionPanel
             // 
             this.imarCitySelectionPanel.Controls.Add(this.imarEskisehirRadioButton);
             this.imarCitySelectionPanel.Controls.Add(this.imarizmirRadioButton);
-            this.imarCitySelectionPanel.Location = new System.Drawing.Point(38, 89);
+            this.imarCitySelectionPanel.Location = new System.Drawing.Point(134, 92);
             this.imarCitySelectionPanel.Name = "imarCitySelectionPanel";
-            this.imarCitySelectionPanel.Size = new System.Drawing.Size(296, 100);
+            this.imarCitySelectionPanel.Size = new System.Drawing.Size(109, 157);
             this.imarCitySelectionPanel.TabIndex = 7;
             // 
             // imarEskisehirRadioButton
@@ -115,7 +114,7 @@
             this.imarEskisehirRadioButton.AutoSize = true;
             this.imarEskisehirRadioButton.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.imarEskisehirRadioButton.ForeColor = System.Drawing.Color.DarkOrange;
-            this.imarEskisehirRadioButton.Location = new System.Drawing.Point(88, 36);
+            this.imarEskisehirRadioButton.Location = new System.Drawing.Point(21, 48);
             this.imarEskisehirRadioButton.Name = "imarEskisehirRadioButton";
             this.imarEskisehirRadioButton.Size = new System.Drawing.Size(80, 21);
             this.imarEskisehirRadioButton.TabIndex = 1;
@@ -128,7 +127,7 @@
             this.imarizmirRadioButton.AutoSize = true;
             this.imarizmirRadioButton.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.imarizmirRadioButton.ForeColor = System.Drawing.Color.DarkOrange;
-            this.imarizmirRadioButton.Location = new System.Drawing.Point(88, 13);
+            this.imarizmirRadioButton.Location = new System.Drawing.Point(21, 25);
             this.imarizmirRadioButton.Name = "imarizmirRadioButton";
             this.imarizmirRadioButton.Size = new System.Drawing.Size(57, 21);
             this.imarizmirRadioButton.TabIndex = 0;
@@ -138,7 +137,6 @@
             // 
             // OkButton
             // 
-
             this.OkButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.OkButton.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.OkButton.BorderColor = System.Drawing.Color.PaleVioletRed;
@@ -148,9 +146,9 @@
             this.OkButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.OkButton.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.OkButton.ForeColor = System.Drawing.Color.White;
-            this.OkButton.Location = new System.Drawing.Point(113, 381);
+            this.OkButton.Location = new System.Drawing.Point(107, 396);
             this.OkButton.Name = "OkButton";
-            this.OkButton.Size = new System.Drawing.Size(150, 40);
+            this.OkButton.Size = new System.Drawing.Size(167, 40);
             this.OkButton.TabIndex = 5;
             this.OkButton.Text = "TAMAM";
             this.OkButton.TextColor = System.Drawing.Color.White;
@@ -163,20 +161,22 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.NavajoWhite;
             this.ClientSize = new System.Drawing.Size(384, 461);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.imarCitySelectionPanel);
             this.Controls.Add(this.imarMethodSelectionComboBox);
             this.Controls.Add(this.OkButton);
             this.Controls.Add(this.imarFileSelectionPanel);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximumSize = new System.Drawing.Size(400, 500);
             this.MinimumSize = new System.Drawing.Size(400, 500);
             this.Name = "imarFileSelectionPopup";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "İmar Girdileri Seçimi";
             this.imarFileSelectionPanel.ResumeLayout(false);
-            this.imarFileSelectionPanel.PerformLayout();
             this.imarCitySelectionPanel.ResumeLayout(false);
             this.imarCitySelectionPanel.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
