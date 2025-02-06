@@ -846,6 +846,8 @@
     <None Include="Pictures\Exterior1.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Pictures\Spreadsheet File.png" />
+    <None Include="Pictures\Homen.png" />
     <None Include="Pictures\Next page2.png" />
     <None Include="Pictures\Next page.png" />
     <None Include="Pictures\homepage %281%29.png" />
@@ -867,6 +869,9 @@
     <None Include="Pictures\Double Left.png" />
     <None Include="Pictures\Folder2.png" />
     <None Include="Pictures\Folder.png" />
+    <None Include="Pictures\Health Graph.png" />
+    <None Include="Pictures\Folder3.png" />
+    <None Include="Pictures\Documents Folder.png" />
     <Content Include="Pictures\Home3.png" />
   </ItemGroup>
   <ItemGroup>

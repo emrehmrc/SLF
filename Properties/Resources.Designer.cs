@@ -93,6 +93,16 @@ namespace SLF.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Documents_Folder {
+            get {
+                object obj = ResourceManager.GetObject("Documents Folder", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Double_Left {
             get {
                 object obj = ResourceManager.GetObject("Double Left", resourceCulture);
@@ -153,6 +163,16 @@ namespace SLF.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Folder3 {
+            get {
+                object obj = ResourceManager.GetObject("Folder3", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Gears {
             get {
                 object obj = ResourceManager.GetObject("Gears", resourceCulture);
@@ -166,6 +186,16 @@ namespace SLF.Properties {
         internal static System.Drawing.Bitmap Gears4 {
             get {
                 object obj = ResourceManager.GetObject("Gears4", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Health_Graph {
+            get {
+                object obj = ResourceManager.GetObject("Health Graph", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -233,6 +263,16 @@ namespace SLF.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Homen {
+            get {
+                object obj = ResourceManager.GetObject("Homen", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap homepage {
             get {
                 object obj = ResourceManager.GetObject("homepage", resourceCulture);
@@ -286,6 +326,16 @@ namespace SLF.Properties {
         internal static System.Drawing.Bitmap Next_page2 {
             get {
                 object obj = ResourceManager.GetObject("Next page2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Spreadsheet_File {
+            get {
+                object obj = ResourceManager.GetObject("Spreadsheet File", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

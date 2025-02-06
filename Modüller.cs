@@ -1086,7 +1086,7 @@ namespace SLF
             startYearComboBox.Text = "Yıl seçiniz";
             endYearComboBox.SelectedIndex = -1;
             endYearComboBox.Text = "Yıl seçiniz";
-            yearApproveButton.Text = "Onayla";
+            yearApproveButton.Text = "ONAYLA";
 
             //// Clear any existing items in the ComboBox
             startYearComboBox.Items.Clear();
@@ -1195,7 +1195,7 @@ namespace SLF
                 slfEndYear = (int)endYearComboBox.SelectedItem;
                 MessageBox.Show($"Başlangıç yılı: {slfStartYear}, Bitiş yılı: {slfEndYear}", "Yıllar belirlendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 //yearApproveButton.Enabled = false;
-                yearApproveButton.Text = "Sıfırla";
+                yearApproveButton.Text = "SIFIRLA";
             }
         }
 
