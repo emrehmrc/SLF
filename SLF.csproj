@@ -872,6 +872,7 @@
     <None Include="Pictures\Health Graph.png" />
     <None Include="Pictures\Folder3.png" />
     <None Include="Pictures\Documents Folder.png" />
+    <None Include="Pictures\Folder4.png" />
     <Content Include="Pictures\Home3.png" />
   </ItemGroup>
   <ItemGroup>
