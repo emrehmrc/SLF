@@ -65,10 +65,10 @@
             this.Onizleme_Tablar.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Onizleme_Tablar.ImageList = this.imageList1;
             this.Onizleme_Tablar.Location = new System.Drawing.Point(9, 10);
-            this.Onizleme_Tablar.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Onizleme_Tablar.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_Tablar.Name = "Onizleme_Tablar";
             this.Onizleme_Tablar.SelectedIndex = 0;
-            this.Onizleme_Tablar.Size = new System.Drawing.Size(886, 462);
+            this.Onizleme_Tablar.Size = new System.Drawing.Size(886, 460);
             this.Onizleme_Tablar.TabIndex = 0;
             // 
             // Onizleme_Hata
@@ -77,10 +77,10 @@
             this.Onizleme_Hata.Controls.Add(this.Onizleme_dataGrid2);
             this.Onizleme_Hata.ImageIndex = 0;
             this.Onizleme_Hata.Location = new System.Drawing.Point(4, 28);
-            this.Onizleme_Hata.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Onizleme_Hata.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_Hata.Name = "Onizleme_Hata";
-            this.Onizleme_Hata.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.Onizleme_Hata.Size = new System.Drawing.Size(878, 430);
+            this.Onizleme_Hata.Padding = new System.Windows.Forms.Padding(2);
+            this.Onizleme_Hata.Size = new System.Drawing.Size(878, 428);
             this.Onizleme_Hata.TabIndex = 1;
             this.Onizleme_Hata.Text = "Hatalar";
             this.Onizleme_Hata.UseVisualStyleBackColor = true;
@@ -93,12 +93,12 @@
             this.Onizleme_dataGrid2.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.Onizleme_dataGrid2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.Onizleme_dataGrid2.Location = new System.Drawing.Point(2, 2);
-            this.Onizleme_dataGrid2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Onizleme_dataGrid2.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_dataGrid2.Name = "Onizleme_dataGrid2";
             this.Onizleme_dataGrid2.ReadOnly = true;
             this.Onizleme_dataGrid2.RowHeadersWidth = 51;
             this.Onizleme_dataGrid2.RowTemplate.Height = 24;
-            this.Onizleme_dataGrid2.Size = new System.Drawing.Size(874, 425);
+            this.Onizleme_dataGrid2.Size = new System.Drawing.Size(874, 423);
             this.Onizleme_dataGrid2.TabIndex = 0;
             // 
             // Onizleme_Warning
@@ -106,7 +106,7 @@
             this.Onizleme_Warning.Controls.Add(this.Onizleme_dataGrid3);
             this.Onizleme_Warning.ImageIndex = 1;
             this.Onizleme_Warning.Location = new System.Drawing.Point(4, 28);
-            this.Onizleme_Warning.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Onizleme_Warning.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_Warning.Name = "Onizleme_Warning";
             this.Onizleme_Warning.Size = new System.Drawing.Size(878, 430);
             this.Onizleme_Warning.TabIndex = 2;
@@ -121,7 +121,7 @@
             this.Onizleme_dataGrid3.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.Onizleme_dataGrid3.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.Onizleme_dataGrid3.Location = new System.Drawing.Point(2, 2);
-            this.Onizleme_dataGrid3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Onizleme_dataGrid3.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_dataGrid3.Name = "Onizleme_dataGrid3";
             this.Onizleme_dataGrid3.ReadOnly = true;
             this.Onizleme_dataGrid3.RowHeadersWidth = 51;
@@ -134,7 +134,7 @@
             this.Onizleme_Information.Controls.Add(this.Onizleme_dataGrid4);
             this.Onizleme_Information.ImageIndex = 2;
             this.Onizleme_Information.Location = new System.Drawing.Point(4, 28);
-            this.Onizleme_Information.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Onizleme_Information.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_Information.Name = "Onizleme_Information";
             this.Onizleme_Information.Size = new System.Drawing.Size(878, 430);
             this.Onizleme_Information.TabIndex = 3;
@@ -149,7 +149,7 @@
             this.Onizleme_dataGrid4.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.Onizleme_dataGrid4.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.Onizleme_dataGrid4.Location = new System.Drawing.Point(2, 2);
-            this.Onizleme_dataGrid4.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Onizleme_dataGrid4.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_dataGrid4.Name = "Onizleme_dataGrid4";
             this.Onizleme_dataGrid4.ReadOnly = true;
             this.Onizleme_dataGrid4.RowHeadersWidth = 51;
@@ -162,7 +162,7 @@
             this.Onizleme_Statistics.Controls.Add(this.Onizleme_dataGrid5);
             this.Onizleme_Statistics.ImageIndex = 3;
             this.Onizleme_Statistics.Location = new System.Drawing.Point(4, 28);
-            this.Onizleme_Statistics.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Onizleme_Statistics.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_Statistics.Name = "Onizleme_Statistics";
             this.Onizleme_Statistics.Size = new System.Drawing.Size(878, 430);
             this.Onizleme_Statistics.TabIndex = 4;
@@ -177,7 +177,7 @@
             this.Onizleme_dataGrid5.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.Onizleme_dataGrid5.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.Onizleme_dataGrid5.Location = new System.Drawing.Point(4, 2);
-            this.Onizleme_dataGrid5.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Onizleme_dataGrid5.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_dataGrid5.Name = "Onizleme_dataGrid5";
             this.Onizleme_dataGrid5.ReadOnly = true;
             this.Onizleme_dataGrid5.RowHeadersWidth = 51;
@@ -200,7 +200,7 @@
             this.buton_ÇIK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buton_ÇIK.Font = new System.Drawing.Font("Maiandra GD", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buton_ÇIK.Location = new System.Drawing.Point(769, 474);
-            this.buton_ÇIK.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.buton_ÇIK.Margin = new System.Windows.Forms.Padding(2);
             this.buton_ÇIK.Name = "buton_ÇIK";
             this.buton_ÇIK.Size = new System.Drawing.Size(124, 31);
             this.buton_ÇIK.TabIndex = 2;
@@ -213,7 +213,7 @@
             this.excelExportButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.excelExportButton.Font = new System.Drawing.Font("Maiandra GD", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.excelExportButton.Location = new System.Drawing.Point(625, 474);
-            this.excelExportButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.excelExportButton.Margin = new System.Windows.Forms.Padding(2);
             this.excelExportButton.Name = "excelExportButton";
             this.excelExportButton.Size = new System.Drawing.Size(124, 31);
             this.excelExportButton.TabIndex = 3;
@@ -230,7 +230,7 @@
             this.Controls.Add(this.buton_ÇIK);
             this.Controls.Add(this.Onizleme_Tablar);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Raporlama";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Veri Önizleme ve Doğrulama";

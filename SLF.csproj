@@ -846,6 +846,7 @@
     <None Include="Pictures\Exterior1.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Pictures\XLS.png" />
     <None Include="Pictures\Spreadsheet File.png" />
     <None Include="Pictures\Homen.png" />
     <None Include="Pictures\Next page2.png" />
