@@ -3122,12 +3122,13 @@ namespace SLF
                 // Set cursor to wait while running the operations
                 Cursor.Current = Cursors.WaitCursor;
 
-                string modifiedFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+                string modifiedFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\INPUT_FILE\INPUT_FILE.xlsx";
 
                 // Check if the modified file exists
                 if (!File.Exists(modifiedFilePath))
                 {
-                    MessageBox.Show("Lütfen önce senaryo dosyasını ekleyin.");
+                    MessageBox.Show("The modified Excel file does not exist. Please save the scena" +
+                        "rio first.");
                     return;
                 }
 
@@ -3142,6 +3143,8 @@ namespace SLF
 
                 // Load results into tab_ekonometrik
                 LoadResultsToTabEkonometrik(resultsFilePath);
+                // Load images into PictureBox controls after loading the results
+                LoadImagesIntoPictureBoxes();
             }
             finally
             {
@@ -3153,8 +3156,8 @@ namespace SLF
         // Method to run the R script
         private string RunModelRScript(string modifiedFilePath)
         {
-            string rScriptPath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\begum_model_deneme.R";
-            string resultsFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\";
+            string rScriptPath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\model.R";
+            string resultsFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\ELF_Tahmin_Sonuçları.xlsx";
 
             // Set up process info
             var processInfo = new ProcessStartInfo()
@@ -3175,7 +3178,7 @@ namespace SLF
                     if (!string.IsNullOrEmpty(args.Data))
                     {
                         Console.WriteLine(args.Data);
-                        resultsFilePath = args.Data;  // Capture the file path
+                        //resultsFilePath = args.Data;  // Capture the file path
                     }
                 };
 
@@ -3191,7 +3194,8 @@ namespace SLF
                 return null;
             }
 
-            MessageBox.Show("Modeller başarıyla çalıştırıldı. " + resultsFilePath);
+            MessageBox.Show("R script executed successfully. Results saved in: " + resultsFilePath);
+            Console.WriteLine("R script executed successfully. Results saved in: " + resultsFilePath);
             return resultsFilePath;  // Return the results file path
         }
 
