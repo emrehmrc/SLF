@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EAStationPopupForm));
@@ -40,7 +39,6 @@
             this.EA_X_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.EA_Y_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ChargingStationpanel2 = new System.Windows.Forms.Panel();
-            this.guna2AnimateWindow1_Charging_Popup = new Guna.UI2.WinForms.Guna2AnimateWindow(this.components);
             this.EATamamButton = new SLF.CustomButton();
             this.EACancelButton = new SLF.CustomButton();
             this.ChargingStationpanel.SuspendLayout();
@@ -204,7 +202,6 @@
         #endregion
         private System.Windows.Forms.Panel ChargingStationpanel;
         private System.Windows.Forms.Panel ChargingStationpanel2;
-        private Guna.UI2.WinForms.Guna2AnimateWindow guna2AnimateWindow1_Charging_Popup;
         private CustomButton EACancelButton;
         private CustomButton EATamamButton;
         private System.Windows.Forms.DataGridView ChargingStationDataGridView;
