@@ -564,14 +564,12 @@ namespace SLF
         // BURASI SONRADAN AÇILACAK, SIMDILIK BOYLE KALSIN.
         private async void Modül_Tabları_SelectedIndexChanged(object sender, EventArgs e)
         {
-
             // Gerekli kontrolleri yapmak için seçilen sekmeyi ve modülleri kontrol et
             string selectedTabText = Modül_Tabları.SelectedTab.Text;
 
             // Modüllerin yüklü olup olmadığını kontrol et
-            /*if (selectedMethod == "SLF (Jeo-Uzamsal)")
+            if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
-                
                 if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Haritası Modülü") && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
                 {
                     // Sekme geçişini tamamen iptal et
@@ -581,7 +579,7 @@ namespace SLF
                     Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
                     return;
                 }
-                else if (selectedTabText == "İmar Analizleri" && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")))
+                /*else if (selectedTabText == "İmar Analizleri" && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")))
                 {
                     // Sekme geçişini tamamen iptal et
                     MessageBox.Show("İmar planı verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
@@ -589,10 +587,10 @@ namespace SLF
                     Modül_Tabları.SelectedTab = tab_girdi;
                     Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
                     return;
-                }
+                }*/
                 else if (selectedTabText == "Optimal DTR Konumlandırma"
-                   && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")
-                   && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri")))
+&& (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")
+&& !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri")))
                 {
                     // Sekme geçişini tamamen iptal et
                     MessageBox.Show("DTR verileri ve İmar planı yüklenmeden bu sekmeye geçiş yapılamaz.");
@@ -634,7 +632,7 @@ namespace SLF
                 {
                     await dekHaritayaVeriYukleAsync();
                 }
-            }*/
+            }
         }
 
         private void SenaryoNewSelectionButton_Click(object sender, EventArgs e)
