@@ -21,18 +21,18 @@ namespace SLF
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle34 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle35 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle36 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ModülFormu));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle37 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle38 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle39 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle40 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle41 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle42 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle43 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle44 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
             this.Modül_Tabları = new System.Windows.Forms.TabControl();
             this.tab_girdi = new System.Windows.Forms.TabPage();
             this.OpenModuleButton = new SLF.CustomButton();
@@ -66,12 +66,6 @@ namespace SLF
             this.comboBox_DEK_il = new System.Windows.Forms.ComboBox();
             this.comboBox_DEK_Yıl = new System.Windows.Forms.ComboBox();
             this.tab_ea = new System.Windows.Forms.TabPage();
-            this.panel_ea = new System.Windows.Forms.Panel();
-            this.checkBox_DC_Fast = new System.Windows.Forms.CheckBox();
-            this.checkBox_AC_Public = new System.Windows.Forms.CheckBox();
-            this.checkBox_AC_Home = new System.Windows.Forms.CheckBox();
-            this.checkBox_AC_Work = new System.Windows.Forms.CheckBox();
-            this.GelecekSimPanel = new System.Windows.Forms.Panel();
             this.EAStationsLegendPanel = new System.Windows.Forms.Panel();
             this.DCFastLegendValueLabel = new System.Windows.Forms.Label();
             this.DCFastLegendLabel = new System.Windows.Forms.Label();
@@ -83,6 +77,12 @@ namespace SLF
             this.ACHomeLegendLabel = new System.Windows.Forms.Label();
             this.AddStationLabel = new System.Windows.Forms.Label();
             this.EAStationAddButton = new SLF.CustomButton();
+            this.panel_ea = new System.Windows.Forms.Panel();
+            this.checkBox_DC_Fast = new System.Windows.Forms.CheckBox();
+            this.checkBox_AC_Public = new System.Windows.Forms.CheckBox();
+            this.checkBox_AC_Home = new System.Windows.Forms.CheckBox();
+            this.checkBox_AC_Work = new System.Windows.Forms.CheckBox();
+            this.GelecekSimPanel = new System.Windows.Forms.Panel();
             this.EaSimMaxBtn = new System.Windows.Forms.RadioButton();
             this.EaSimDefBtn = new System.Windows.Forms.RadioButton();
             this.EaSimMinBtn = new System.Windows.Forms.RadioButton();
@@ -320,6 +320,7 @@ namespace SLF
             this.miniToolStrip = new System.Windows.Forms.ToolStrip();
             this.buton_ea_harita_katmanlar = new System.Windows.Forms.Button();
             this.ELFMinSenaryoGraphPicBox = new System.Windows.Forms.PictureBox();
+            this.EANewSimulationResultsButton = new SLF.CustomButton();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
             this.panel_girdi_rapor_olustur.SuspendLayout();
@@ -330,9 +331,9 @@ namespace SLF
             this.tab_dek.SuspendLayout();
             this.panel_DEK.SuspendLayout();
             this.tab_ea.SuspendLayout();
+            this.EAStationsLegendPanel.SuspendLayout();
             this.panel_ea.SuspendLayout();
             this.GelecekSimPanel.SuspendLayout();
-            this.EAStationsLegendPanel.SuspendLayout();
             this.tab_ekonometrik.SuspendLayout();
             this.ELFResultsTabControls.SuspendLayout();
             this.ELFMinResultsTabPage.SuspendLayout();
@@ -534,22 +535,22 @@ namespace SLF
             this.dataGridView_girdi.BackgroundColor = System.Drawing.Color.Snow;
             this.dataGridView_girdi.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridView_girdi.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle34.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle34.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle34.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle34.ForeColor = System.Drawing.Color.DarkOrange;
-            dataGridViewCellStyle34.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle34.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle34.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridView_girdi.DefaultCellStyle = dataGridViewCellStyle34;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.DarkOrange;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridView_girdi.DefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView_girdi.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.dataGridView_girdi.Location = new System.Drawing.Point(2, 92);
             this.dataGridView_girdi.Margin = new System.Windows.Forms.Padding(2);
             this.dataGridView_girdi.Name = "dataGridView_girdi";
             this.dataGridView_girdi.ReadOnly = true;
             this.dataGridView_girdi.RowHeadersWidth = 18;
-            dataGridViewCellStyle35.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            this.dataGridView_girdi.RowsDefaultCellStyle = dataGridViewCellStyle35;
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            this.dataGridView_girdi.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView_girdi.RowTemplate.Height = 24;
             this.dataGridView_girdi.Size = new System.Drawing.Size(1356, 400);
             this.dataGridView_girdi.TabIndex = 4;
@@ -931,6 +932,146 @@ namespace SLF
             this.tab_ea.Text = "EA Şarj Modülü";
             this.tab_ea.UseVisualStyleBackColor = true;
             // 
+            // EAStationsLegendPanel
+            // 
+            this.EAStationsLegendPanel.BackColor = System.Drawing.Color.NavajoWhite;
+            this.EAStationsLegendPanel.Controls.Add(this.EANewSimulationResultsButton);
+            this.EAStationsLegendPanel.Controls.Add(this.DCFastLegendValueLabel);
+            this.EAStationsLegendPanel.Controls.Add(this.DCFastLegendLabel);
+            this.EAStationsLegendPanel.Controls.Add(this.ACPublicLegendValueLabel);
+            this.EAStationsLegendPanel.Controls.Add(this.ACPublicLegendLabel);
+            this.EAStationsLegendPanel.Controls.Add(this.ACWorkLegendValueLabel);
+            this.EAStationsLegendPanel.Controls.Add(this.ACWorkLegendLabel);
+            this.EAStationsLegendPanel.Controls.Add(this.ACHomeLegendValueLabel);
+            this.EAStationsLegendPanel.Controls.Add(this.ACHomeLegendLabel);
+            this.EAStationsLegendPanel.Controls.Add(this.AddStationLabel);
+            this.EAStationsLegendPanel.Controls.Add(this.EAStationAddButton);
+            this.EAStationsLegendPanel.Dock = System.Windows.Forms.DockStyle.Right;
+            this.EAStationsLegendPanel.Location = new System.Drawing.Point(952, 26);
+            this.EAStationsLegendPanel.Name = "EAStationsLegendPanel";
+            this.EAStationsLegendPanel.Size = new System.Drawing.Size(206, 520);
+            this.EAStationsLegendPanel.TabIndex = 51;
+            // 
+            // DCFastLegendValueLabel
+            // 
+            this.DCFastLegendValueLabel.AutoSize = true;
+            this.DCFastLegendValueLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.DCFastLegendValueLabel.ForeColor = System.Drawing.Color.DarkBlue;
+            this.DCFastLegendValueLabel.Location = new System.Drawing.Point(99, 135);
+            this.DCFastLegendValueLabel.Name = "DCFastLegendValueLabel";
+            this.DCFastLegendValueLabel.Size = new System.Drawing.Size(45, 13);
+            this.DCFastLegendValueLabel.TabIndex = 57;
+            this.DCFastLegendValueLabel.Text = "150 kW";
+            // 
+            // DCFastLegendLabel
+            // 
+            this.DCFastLegendLabel.AutoSize = true;
+            this.DCFastLegendLabel.ForeColor = System.Drawing.Color.DarkBlue;
+            this.DCFastLegendLabel.Location = new System.Drawing.Point(5, 135);
+            this.DCFastLegendLabel.Name = "DCFastLegendLabel";
+            this.DCFastLegendLabel.Size = new System.Drawing.Size(55, 17);
+            this.DCFastLegendLabel.TabIndex = 56;
+            this.DCFastLegendLabel.Text = "DC-Fast";
+            // 
+            // ACPublicLegendValueLabel
+            // 
+            this.ACPublicLegendValueLabel.AutoSize = true;
+            this.ACPublicLegendValueLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.ACPublicLegendValueLabel.ForeColor = System.Drawing.Color.DarkBlue;
+            this.ACPublicLegendValueLabel.Location = new System.Drawing.Point(99, 104);
+            this.ACPublicLegendValueLabel.Name = "ACPublicLegendValueLabel";
+            this.ACPublicLegendValueLabel.Size = new System.Drawing.Size(42, 13);
+            this.ACPublicLegendValueLabel.TabIndex = 55;
+            this.ACPublicLegendValueLabel.Text = " 22 kW";
+            // 
+            // ACPublicLegendLabel
+            // 
+            this.ACPublicLegendLabel.AutoSize = true;
+            this.ACPublicLegendLabel.ForeColor = System.Drawing.Color.DarkBlue;
+            this.ACPublicLegendLabel.Location = new System.Drawing.Point(5, 101);
+            this.ACPublicLegendLabel.Name = "ACPublicLegendLabel";
+            this.ACPublicLegendLabel.Size = new System.Drawing.Size(66, 17);
+            this.ACPublicLegendLabel.TabIndex = 54;
+            this.ACPublicLegendLabel.Text = "AC-Public";
+            // 
+            // ACWorkLegendValueLabel
+            // 
+            this.ACWorkLegendValueLabel.AutoSize = true;
+            this.ACWorkLegendValueLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.ACWorkLegendValueLabel.ForeColor = System.Drawing.Color.DarkBlue;
+            this.ACWorkLegendValueLabel.Location = new System.Drawing.Point(99, 72);
+            this.ACWorkLegendValueLabel.Name = "ACWorkLegendValueLabel";
+            this.ACWorkLegendValueLabel.Size = new System.Drawing.Size(42, 13);
+            this.ACWorkLegendValueLabel.TabIndex = 53;
+            this.ACWorkLegendValueLabel.Text = " 11 kW";
+            // 
+            // ACWorkLegendLabel
+            // 
+            this.ACWorkLegendLabel.AutoSize = true;
+            this.ACWorkLegendLabel.ForeColor = System.Drawing.Color.DarkBlue;
+            this.ACWorkLegendLabel.Location = new System.Drawing.Point(5, 69);
+            this.ACWorkLegendLabel.Name = "ACWorkLegendLabel";
+            this.ACWorkLegendLabel.Size = new System.Drawing.Size(63, 17);
+            this.ACWorkLegendLabel.TabIndex = 52;
+            this.ACWorkLegendLabel.Text = "AC-Work";
+            // 
+            // ACHomeLegendValueLabel
+            // 
+            this.ACHomeLegendValueLabel.AutoSize = true;
+            this.ACHomeLegendValueLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.ACHomeLegendValueLabel.ForeColor = System.Drawing.Color.DarkBlue;
+            this.ACHomeLegendValueLabel.Location = new System.Drawing.Point(102, 37);
+            this.ACHomeLegendValueLabel.Name = "ACHomeLegendValueLabel";
+            this.ACHomeLegendValueLabel.Size = new System.Drawing.Size(39, 13);
+            this.ACHomeLegendValueLabel.TabIndex = 51;
+            this.ACHomeLegendValueLabel.Text = "11 kW";
+            // 
+            // ACHomeLegendLabel
+            // 
+            this.ACHomeLegendLabel.AutoSize = true;
+            this.ACHomeLegendLabel.ForeColor = System.Drawing.Color.DarkBlue;
+            this.ACHomeLegendLabel.Location = new System.Drawing.Point(3, 33);
+            this.ACHomeLegendLabel.Name = "ACHomeLegendLabel";
+            this.ACHomeLegendLabel.Size = new System.Drawing.Size(67, 17);
+            this.ACHomeLegendLabel.TabIndex = 50;
+            this.ACHomeLegendLabel.Text = "AC-Home";
+            // 
+            // AddStationLabel
+            // 
+            this.AddStationLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.AddStationLabel.AutoSize = true;
+            this.AddStationLabel.BackColor = System.Drawing.Color.DarkOrange;
+            this.AddStationLabel.ForeColor = System.Drawing.Color.DarkBlue;
+            this.AddStationLabel.Location = new System.Drawing.Point(2, 0);
+            this.AddStationLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.AddStationLabel.Name = "AddStationLabel";
+            this.AddStationLabel.Size = new System.Drawing.Size(102, 17);
+            this.AddStationLabel.TabIndex = 45;
+            this.AddStationLabel.Text = "İstasyon Tipleri:";
+            // 
+            // EAStationAddButton
+            // 
+            this.EAStationAddButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.EAStationAddButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.EAStationAddButton.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.EAStationAddButton.BorderColor = System.Drawing.Color.PaleVioletRed;
+            this.EAStationAddButton.BorderRadius = 0;
+            this.EAStationAddButton.BorderSize = 0;
+            this.EAStationAddButton.FlatAppearance.BorderSize = 0;
+            this.EAStationAddButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.EAStationAddButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.EAStationAddButton.ForeColor = System.Drawing.Color.White;
+            this.EAStationAddButton.Location = new System.Drawing.Point(24, 172);
+            this.EAStationAddButton.Name = "EAStationAddButton";
+            this.EAStationAddButton.Size = new System.Drawing.Size(140, 42);
+            this.EAStationAddButton.TabIndex = 49;
+            this.EAStationAddButton.Text = "EA Şarj İstasyonu Ekle";
+            this.EAStationAddButton.TextColor = System.Drawing.Color.White;
+            this.EAStationAddButton.UseVisualStyleBackColor = false;
+            this.EAStationAddButton.Click += new System.EventHandler(this.EAStationAddButton_Click);
+            // 
             // panel_ea
             // 
             this.panel_ea.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
@@ -1022,136 +1163,6 @@ namespace SLF
             this.GelecekSimPanel.Name = "GelecekSimPanel";
             this.GelecekSimPanel.Size = new System.Drawing.Size(202, 546);
             this.GelecekSimPanel.TabIndex = 43;
-            // 
-            // EAStationsLegendPanel
-            // 
-            this.EAStationsLegendPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.EAStationsLegendPanel.BackColor = System.Drawing.Color.NavajoWhite;
-            this.EAStationsLegendPanel.Controls.Add(this.DCFastLegendValueLabel);
-            this.EAStationsLegendPanel.Controls.Add(this.DCFastLegendLabel);
-            this.EAStationsLegendPanel.Controls.Add(this.ACPublicLegendValueLabel);
-            this.EAStationsLegendPanel.Controls.Add(this.ACPublicLegendLabel);
-            this.EAStationsLegendPanel.Controls.Add(this.ACWorkLegendValueLabel);
-            this.EAStationsLegendPanel.Controls.Add(this.ACWorkLegendLabel);
-            this.EAStationsLegendPanel.Controls.Add(this.ACHomeLegendValueLabel);
-            this.EAStationsLegendPanel.Controls.Add(this.ACHomeLegendLabel);
-            this.EAStationsLegendPanel.Controls.Add(this.AddStationLabel);
-            this.EAStationsLegendPanel.Controls.Add(this.EAStationAddButton);
-            this.EAStationsLegendPanel.Location = new System.Drawing.Point(1158, 268);
-            this.EAStationsLegendPanel.Name = "EAStationsLegendPanel";
-            this.EAStationsLegendPanel.Size = new System.Drawing.Size(206, 279);
-            this.EAStationsLegendPanel.TabIndex = 51;
-            // 
-            // DCFastLegendValueLabel
-            // 
-            this.DCFastLegendValueLabel.AutoSize = true;
-            this.DCFastLegendValueLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.DCFastLegendValueLabel.Location = new System.Drawing.Point(99, 135);
-            this.DCFastLegendValueLabel.Name = "DCFastLegendValueLabel";
-            this.DCFastLegendValueLabel.Size = new System.Drawing.Size(45, 13);
-            this.DCFastLegendValueLabel.TabIndex = 57;
-            this.DCFastLegendValueLabel.Text = "150 kW";
-            // 
-            // DCFastLegendLabel
-            // 
-            this.DCFastLegendLabel.AutoSize = true;
-            this.DCFastLegendLabel.Location = new System.Drawing.Point(5, 135);
-            this.DCFastLegendLabel.Name = "DCFastLegendLabel";
-            this.DCFastLegendLabel.Size = new System.Drawing.Size(55, 17);
-            this.DCFastLegendLabel.TabIndex = 56;
-            this.DCFastLegendLabel.Text = "DC-Fast";
-            // 
-            // ACPublicLegendValueLabel
-            // 
-            this.ACPublicLegendValueLabel.AutoSize = true;
-            this.ACPublicLegendValueLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.ACPublicLegendValueLabel.Location = new System.Drawing.Point(99, 104);
-            this.ACPublicLegendValueLabel.Name = "ACPublicLegendValueLabel";
-            this.ACPublicLegendValueLabel.Size = new System.Drawing.Size(42, 13);
-            this.ACPublicLegendValueLabel.TabIndex = 55;
-            this.ACPublicLegendValueLabel.Text = " 22 kW";
-            // 
-            // ACPublicLegendLabel
-            // 
-            this.ACPublicLegendLabel.AutoSize = true;
-            this.ACPublicLegendLabel.Location = new System.Drawing.Point(5, 101);
-            this.ACPublicLegendLabel.Name = "ACPublicLegendLabel";
-            this.ACPublicLegendLabel.Size = new System.Drawing.Size(66, 17);
-            this.ACPublicLegendLabel.TabIndex = 54;
-            this.ACPublicLegendLabel.Text = "AC-Public";
-            // 
-            // ACWorkLegendValueLabel
-            // 
-            this.ACWorkLegendValueLabel.AutoSize = true;
-            this.ACWorkLegendValueLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.ACWorkLegendValueLabel.Location = new System.Drawing.Point(99, 72);
-            this.ACWorkLegendValueLabel.Name = "ACWorkLegendValueLabel";
-            this.ACWorkLegendValueLabel.Size = new System.Drawing.Size(42, 13);
-            this.ACWorkLegendValueLabel.TabIndex = 53;
-            this.ACWorkLegendValueLabel.Text = " 11 kW";
-            // 
-            // ACWorkLegendLabel
-            // 
-            this.ACWorkLegendLabel.AutoSize = true;
-            this.ACWorkLegendLabel.Location = new System.Drawing.Point(5, 69);
-            this.ACWorkLegendLabel.Name = "ACWorkLegendLabel";
-            this.ACWorkLegendLabel.Size = new System.Drawing.Size(63, 17);
-            this.ACWorkLegendLabel.TabIndex = 52;
-            this.ACWorkLegendLabel.Text = "AC-Work";
-            // 
-            // ACHomeLegendValueLabel
-            // 
-            this.ACHomeLegendValueLabel.AutoSize = true;
-            this.ACHomeLegendValueLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.ACHomeLegendValueLabel.Location = new System.Drawing.Point(102, 37);
-            this.ACHomeLegendValueLabel.Name = "ACHomeLegendValueLabel";
-            this.ACHomeLegendValueLabel.Size = new System.Drawing.Size(39, 13);
-            this.ACHomeLegendValueLabel.TabIndex = 51;
-            this.ACHomeLegendValueLabel.Text = "11 kW";
-            // 
-            // ACHomeLegendLabel
-            // 
-            this.ACHomeLegendLabel.AutoSize = true;
-            this.ACHomeLegendLabel.Location = new System.Drawing.Point(3, 33);
-            this.ACHomeLegendLabel.Name = "ACHomeLegendLabel";
-            this.ACHomeLegendLabel.Size = new System.Drawing.Size(67, 17);
-            this.ACHomeLegendLabel.TabIndex = 50;
-            this.ACHomeLegendLabel.Text = "AC-Home";
-            // 
-            // AddStationLabel
-            // 
-            this.AddStationLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.AddStationLabel.AutoSize = true;
-            this.AddStationLabel.Location = new System.Drawing.Point(2, 0);
-            this.AddStationLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.AddStationLabel.Name = "AddStationLabel";
-            this.AddStationLabel.Size = new System.Drawing.Size(102, 17);
-            this.AddStationLabel.TabIndex = 45;
-            this.AddStationLabel.Text = "İstasyon Tipleri:";
-            // 
-            // EAStationAddButton
-            // 
-            this.EAStationAddButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.EAStationAddButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.EAStationAddButton.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.EAStationAddButton.BorderColor = System.Drawing.Color.PaleVioletRed;
-            this.EAStationAddButton.BorderRadius = 0;
-            this.EAStationAddButton.BorderSize = 0;
-            this.EAStationAddButton.FlatAppearance.BorderSize = 0;
-            this.EAStationAddButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.EAStationAddButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.EAStationAddButton.ForeColor = System.Drawing.Color.White;
-            this.EAStationAddButton.Location = new System.Drawing.Point(27, 189);
-            this.EAStationAddButton.Name = "EAStationAddButton";
-            this.EAStationAddButton.Size = new System.Drawing.Size(140, 42);
-            this.EAStationAddButton.TabIndex = 49;
-            this.EAStationAddButton.Text = "EA Şarj İstasyonu Ekle";
-            this.EAStationAddButton.TextColor = System.Drawing.Color.White;
-            this.EAStationAddButton.UseVisualStyleBackColor = false;
-            this.EAStationAddButton.Click += new System.EventHandler(this.EAStationAddButton_Click);
             // 
             // EaSimMaxBtn
             // 
@@ -1336,14 +1347,14 @@ namespace SLF
             this.ELFMinResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
             this.ELFMinResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFMinResultsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle36.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle36.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle36.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle36.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            dataGridViewCellStyle36.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle36.SelectionForeColor = System.Drawing.Color.Snow;
-            dataGridViewCellStyle36.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFMinResultsTable.DefaultCellStyle = dataGridViewCellStyle36;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFMinResultsTable.DefaultCellStyle = dataGridViewCellStyle3;
             this.ELFMinResultsTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFMinResultsTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFMinResultsTable.Location = new System.Drawing.Point(2, 2);
@@ -1378,7 +1389,7 @@ namespace SLF
             this.ELFLowResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFLowResultsTable.Name = "ELFLowResultsTable";
             this.ELFLowResultsTable.RowHeadersWidth = 51;
-            this.ELFLowResultsTable.Size = new System.Drawing.Size(1079, 263);
+            this.ELFLowResultsTable.Size = new System.Drawing.Size(1079, 267);
             this.ELFLowResultsTable.TabIndex = 1;
             // 
             // ELFBaseResultsTabPage
@@ -1406,7 +1417,7 @@ namespace SLF
             this.ELFBaseResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFBaseResultsTable.Name = "ELFBaseResultsTable";
             this.ELFBaseResultsTable.RowHeadersWidth = 51;
-            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1078, 263);
+            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1078, 267);
             this.ELFBaseResultsTable.TabIndex = 1;
             // 
             // ELFHighResultsTabPage
@@ -1434,7 +1445,7 @@ namespace SLF
             this.ELFHighResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFHighResultsTable.Name = "ELFHighResultsTable";
             this.ELFHighResultsTable.RowHeadersWidth = 51;
-            this.ELFHighResultsTable.Size = new System.Drawing.Size(1074, 263);
+            this.ELFHighResultsTable.Size = new System.Drawing.Size(1074, 267);
             this.ELFHighResultsTable.TabIndex = 1;
             // 
             // ELFMaxResultsTabPage
@@ -1463,7 +1474,7 @@ namespace SLF
             this.ELFMaxResultsTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFMaxResultsTable.Name = "ELFMaxResultsTable";
             this.ELFMaxResultsTable.RowHeadersWidth = 51;
-            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1082, 267);
+            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1082, 271);
             this.ELFMaxResultsTable.TabIndex = 1;
             // 
             // ELFGraphicOutputsTabPage
@@ -1491,7 +1502,7 @@ namespace SLF
             this.panel_ELF_Grafikler.Controls.Add(this.pictureBox_ELF_1);
             this.panel_ELF_Grafikler.Location = new System.Drawing.Point(2, 2);
             this.panel_ELF_Grafikler.Name = "panel_ELF_Grafikler";
-            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1078, 514);
+            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1078, 518);
             this.panel_ELF_Grafikler.TabIndex = 6;
             // 
             // pictureBox_ELF_5
@@ -2594,33 +2605,33 @@ namespace SLF
             // 
             // ELFMinSenaryoTable
             // 
-            dataGridViewCellStyle37.SelectionBackColor = System.Drawing.Color.Navy;
-            dataGridViewCellStyle37.SelectionForeColor = System.Drawing.Color.Snow;
-            this.ELFMinSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle37;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.Navy;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFMinSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle4;
             this.ELFMinSenaryoTable.BackgroundColor = System.Drawing.Color.Snow;
             this.ELFMinSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFMinSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle38.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle38.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle38.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle38.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            dataGridViewCellStyle38.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle38.SelectionForeColor = System.Drawing.Color.Snow;
-            dataGridViewCellStyle38.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFMinSenaryoTable.DefaultCellStyle = dataGridViewCellStyle38;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFMinSenaryoTable.DefaultCellStyle = dataGridViewCellStyle5;
             this.ELFMinSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFMinSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFMinSenaryoTable.Location = new System.Drawing.Point(2, 2);
             this.ELFMinSenaryoTable.Margin = new System.Windows.Forms.Padding(2);
             this.ELFMinSenaryoTable.Name = "ELFMinSenaryoTable";
-            dataGridViewCellStyle39.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle39.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle39.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle39.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle39.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle39.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle39.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.ELFMinSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle39;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ELFMinSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this.ELFMinSenaryoTable.RowHeadersWidth = 18;
             this.ELFMinSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
             this.ELFMinSenaryoTable.Size = new System.Drawing.Size(924, 760);
@@ -2641,9 +2652,9 @@ namespace SLF
             // 
             // ELFLowSenaryoTable
             // 
-            dataGridViewCellStyle40.SelectionBackColor = System.Drawing.Color.Navy;
-            dataGridViewCellStyle40.SelectionForeColor = System.Drawing.Color.Snow;
-            this.ELFLowSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle40;
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.Color.Navy;
+            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFLowSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle7;
             this.ELFLowSenaryoTable.BackgroundColor = System.Drawing.Color.Snow;
             this.ELFLowSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFLowSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -2672,20 +2683,20 @@ namespace SLF
             // 
             // ELFBaseSenaryoTable
             // 
-            dataGridViewCellStyle41.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle41.SelectionForeColor = System.Drawing.Color.Snow;
-            this.ELFBaseSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle41;
+            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFBaseSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle8;
             this.ELFBaseSenaryoTable.BackgroundColor = System.Drawing.Color.Snow;
             this.ELFBaseSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFBaseSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle42.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle42.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle42.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle42.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            dataGridViewCellStyle42.SelectionBackColor = System.Drawing.Color.MidnightBlue;
-            dataGridViewCellStyle42.SelectionForeColor = System.Drawing.Color.Snow;
-            dataGridViewCellStyle42.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFBaseSenaryoTable.DefaultCellStyle = dataGridViewCellStyle42;
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle9.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle9.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.Color.MidnightBlue;
+            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFBaseSenaryoTable.DefaultCellStyle = dataGridViewCellStyle9;
             this.ELFBaseSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFBaseSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFBaseSenaryoTable.Location = new System.Drawing.Point(2, 2);
@@ -2711,20 +2722,20 @@ namespace SLF
             // 
             // ELFHighSenaryoTable
             // 
-            dataGridViewCellStyle43.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle43.SelectionForeColor = System.Drawing.Color.Snow;
-            this.ELFHighSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle43;
+            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFHighSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle10;
             this.ELFHighSenaryoTable.BackgroundColor = System.Drawing.Color.Snow;
             this.ELFHighSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFHighSenaryoTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle44.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle44.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle44.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle44.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            dataGridViewCellStyle44.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle44.SelectionForeColor = System.Drawing.Color.Snow;
-            dataGridViewCellStyle44.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFHighSenaryoTable.DefaultCellStyle = dataGridViewCellStyle44;
+            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle11.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle11.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFHighSenaryoTable.DefaultCellStyle = dataGridViewCellStyle11;
             this.ELFHighSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFHighSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFHighSenaryoTable.Location = new System.Drawing.Point(2, 2);
@@ -4551,6 +4562,27 @@ namespace SLF
             this.ELFMinSenaryoGraphPicBox.TabIndex = 22;
             this.ELFMinSenaryoGraphPicBox.TabStop = false;
             // 
+            // EANewSimulationResultsButton
+            // 
+            this.EANewSimulationResultsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.EANewSimulationResultsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.EANewSimulationResultsButton.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.EANewSimulationResultsButton.BorderColor = System.Drawing.Color.PaleVioletRed;
+            this.EANewSimulationResultsButton.BorderRadius = 0;
+            this.EANewSimulationResultsButton.BorderSize = 0;
+            this.EANewSimulationResultsButton.FlatAppearance.BorderSize = 0;
+            this.EANewSimulationResultsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.EANewSimulationResultsButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.EANewSimulationResultsButton.ForeColor = System.Drawing.Color.White;
+            this.EANewSimulationResultsButton.Location = new System.Drawing.Point(24, 241);
+            this.EANewSimulationResultsButton.Name = "EANewSimulationResultsButton";
+            this.EANewSimulationResultsButton.Size = new System.Drawing.Size(140, 42);
+            this.EANewSimulationResultsButton.TabIndex = 58;
+            this.EANewSimulationResultsButton.Text = "Yeni Simülasyon Sonuçları";
+            this.EANewSimulationResultsButton.TextColor = System.Drawing.Color.White;
+            this.EANewSimulationResultsButton.UseVisualStyleBackColor = false;
+            this.EANewSimulationResultsButton.Click += new System.EventHandler(this.EANewSimulationResultsButton_Click);
+            // 
             // ModülFormu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -4586,12 +4618,12 @@ namespace SLF
             this.panel_DEK.ResumeLayout(false);
             this.panel_DEK.PerformLayout();
             this.tab_ea.ResumeLayout(false);
+            this.EAStationsLegendPanel.ResumeLayout(false);
+            this.EAStationsLegendPanel.PerformLayout();
             this.panel_ea.ResumeLayout(false);
             this.panel_ea.PerformLayout();
             this.GelecekSimPanel.ResumeLayout(false);
             this.GelecekSimPanel.PerformLayout();
-            this.EAStationsLegendPanel.ResumeLayout(false);
-            this.EAStationsLegendPanel.PerformLayout();
             this.tab_ekonometrik.ResumeLayout(false);
             this.ELFResultsTabControls.ResumeLayout(false);
             this.ELFMinResultsTabPage.ResumeLayout(false);
@@ -4971,5 +5003,6 @@ namespace SLF
         private CheckBox checkBox_yga_15;
         private CheckBox checkBox_yga_14;
         private Button buton_dosya_yga;
+        private CustomButton EANewSimulationResultsButton;
     }
 }

@@ -1639,6 +1639,55 @@ namespace SLF
             isAddingChargingStation = false;
         }
 
+        private void EANewSimulationResultsButton_Click(object sender, EventArgs e)
+        {
+            // Get the updated input file path (it was saved earlier in the popup form)
+            string inputFilePath = @"C:\path\to\updated_input_file.csv"; // Modify this path accordingly
+
+            // Check if the file exists
+            if (File.Exists(inputFilePath))
+            {
+                // Call the Python script with the updated input file
+                RunPythonScript(inputFilePath);
+            }
+            else
+            {
+                MessageBox.Show("Input file not found! Please ensure the file is saved correctly.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private void RunPythonScript(string inputFilePath)
+        {
+            try
+            {
+                string pythonScriptPath = @"C:\path\to\your\python_script.py"; // Modify this path accordingly
+                string pythonExePath = @"C:\path\to\python.exe"; // Path to your Python executable
+
+                // Build the process start information
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = pythonExePath,
+                    Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",  // Pass the input file path to the script
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                // Start the process and get the output
+                Process process = new Process { StartInfo = startInfo };
+                process.Start();
+
+                // Optional: Read output from Python script
+                string output = process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
+
+                // Display result
+                MessageBox.Show($"Python script executed successfully!\nOutput:\n{output}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error running Python script: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         private async Task eaHaritayaVeriYukleAsync()
         {
@@ -4380,6 +4429,7 @@ namespace SLF
                 ContextMenuStrip_Fonksiyon.Show(Cursor.Position);
             }
         }
+
 
         // Show just the single row whenever a polygon is clicked on which corresponds to its row
         private void ShowAttributeRow(DataRow row)
