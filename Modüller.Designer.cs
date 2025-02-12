@@ -1099,6 +1099,7 @@ namespace SLF
             this.checkBox_DC_Fast.TabIndex = 42;
             this.checkBox_DC_Fast.Text = "DC-FAST";
             this.checkBox_DC_Fast.UseVisualStyleBackColor = true;
+            this.checkBox_DC_Fast.Visible = false;
             this.checkBox_DC_Fast.CheckedChanged += new System.EventHandler(this.checkBox_Dc_Fast);
             // 
             // checkBox_AC_Public
@@ -1114,6 +1115,7 @@ namespace SLF
             this.checkBox_AC_Public.TabIndex = 41;
             this.checkBox_AC_Public.Text = "AC-PUBLIC";
             this.checkBox_AC_Public.UseVisualStyleBackColor = true;
+            this.checkBox_AC_Public.Visible = false;
             this.checkBox_AC_Public.CheckedChanged += new System.EventHandler(this.checkBox_Ac_Public);
             // 
             // checkBox_AC_Home
@@ -1130,6 +1132,7 @@ namespace SLF
             this.checkBox_AC_Home.TabIndex = 39;
             this.checkBox_AC_Home.Text = "AC-HOME";
             this.checkBox_AC_Home.UseVisualStyleBackColor = true;
+            this.checkBox_AC_Home.Visible = false;
             this.checkBox_AC_Home.CheckedChanged += new System.EventHandler(this.checkBox_Ac_Home);
             // 
             // checkBox_AC_Work
@@ -1145,6 +1148,7 @@ namespace SLF
             this.checkBox_AC_Work.TabIndex = 40;
             this.checkBox_AC_Work.Text = "AC-WORK";
             this.checkBox_AC_Work.UseVisualStyleBackColor = true;
+            this.checkBox_AC_Work.Visible = false;
             this.checkBox_AC_Work.CheckedChanged += new System.EventHandler(this.checkBox_Ac_Work);
             // 
             // GelecekSimPanel

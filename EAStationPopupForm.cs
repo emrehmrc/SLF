@@ -17,6 +17,137 @@ namespace SLF
         private bool isOperationCancelled = true;
         public bool OperationCancelled => isOperationCancelled;
 
+        // Private field to store NoktaVeri
+        private NoktaVeri noktaVeri;
+
+        // Public property to expose NoktaVeri
+        public NoktaVeri NoktaVeri => noktaVeri;
+
+        private readonly List<string> acPowers = new List<string> { "11 kW", "22 kW" };
+
+        public EAStationPopupForm(DataTable existingDataTable, NoktaVeri veri)
+        {
+            InitializeComponent();
+            dataTable = existingDataTable;
+
+            // Initialize NoktaVeri
+            noktaVeri = veri;
+
+            InitializeDataGridView(veri);
+            SetupEventHandlers();
+        }
+
+        private void InitializeDataGridView(NoktaVeri veri)
+        {
+            // Add a new row to the DataGridView and capture its index
+            int rowIndex = ChargingStationDataGridView.Rows.Add();
+
+            // Fill initial coordinates from the provided NoktaVeri instance
+            ChargingStationDataGridView.Rows[rowIndex].Cells["EA_X_KOORDINAT"].Value = veri.Enlem;
+            ChargingStationDataGridView.Rows[rowIndex].Cells["EA_Y_KOORDINAT"].Value = veri.Boylam;
+
+            // Set the cell (grid) ID using the new CellId property of NoktaVeri.
+            // If CellId is not set, default to "Not Selected".
+            ChargingStationDataGridView.Rows[rowIndex].Cells["ID"].Value =
+                !string.IsNullOrEmpty(veri.CellId) ? veri.CellId : "Not Selected";
+
+            // Populate the StartYear combobox column with years 2024 to 2035.
+            if (ChargingStationDataGridView.Columns["StartYear"] is DataGridViewComboBoxColumn startYearColumn)
+            {
+                List<int> years = Enumerable.Range(2024, 2035 - 2024 + 1).ToList();
+                startYearColumn.DataSource = years;
+
+                // Optionally set the default value (here, the first year 2024)
+                ChargingStationDataGridView.Rows[rowIndex].Cells["StartYear"].Value = years.First();
+            }
+
+            // Set ISTASYON_TIPI options to AC types and DC
+            if (ChargingStationDataGridView.Columns["ISTASYON_TIPI"] is DataGridViewComboBoxColumn typeComboBoxColumn)
+            {
+                typeComboBoxColumn.DataSource = new List<string> { "AC (Home)", "AC (Work)", "AC (Public)", "DC-Fast" };
+            }
+
+            // Set default ISTASYON_GUCU options for the charging station power
+            if (ChargingStationDataGridView.Columns["ISTASYON_GUCU"] is DataGridViewComboBoxColumn powerComboBoxColumn)
+            {
+                powerComboBoxColumn.DataSource = acPowers;
+            }
+
+            // Populate transformer codes if available
+            if (GirdiModülü.dataTablesByType.TryGetValue("DTR Verileri", out DataTable trafoDataTable))
+            {
+                List<string> trafoKoduListesi = trafoDataTable.AsEnumerable()
+                    .Select(row => row["TRAFO_KODU"].ToString())
+                    .Distinct()
+                    .ToList();
+
+                if (ChargingStationDataGridView.Columns["EA_TRAFO_KODU"] is DataGridViewComboBoxColumn comboBoxColumn)
+                {
+                    comboBoxColumn.DataSource = trafoKoduListesi;
+                }
+            }
+            else
+            {
+                MessageBox.Show("DTR Verileri bulunamadı. Lütfen kontrol edin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void EATamamButton_Click(object sender, EventArgs e)
+        {
+            // Step 1: Ensure all necessary fields are filled
+            foreach (DataGridViewCell cell in ChargingStationDataGridView.Rows[0].Cells)
+            {
+                if (cell.Value == null || string.IsNullOrWhiteSpace(cell.Value.ToString()))
+                {
+                    MessageBox.Show("Lütfen tüm alanları doldurun.");
+                    return;
+                }
+            }
+
+            // Step 2: Extract coordinates and validate
+            if (double.TryParse(ChargingStationDataGridView.Rows[0].Cells["EA_X_KOORDINAT"].Value.ToString(), out double enlem) &&
+                double.TryParse(ChargingStationDataGridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value.ToString(), out double boylam))
+            {
+                // Update NoktaVeri with the new values
+                noktaVeri.Enlem = enlem;
+                noktaVeri.Boylam = boylam;
+                noktaVeri.CellId = ChargingStationDataGridView.Rows[0].Cells["ID"].Value?.ToString();
+
+                // Step 3: Add new row to the DataTable
+                DataRow newRow = dataTable.NewRow();
+                newRow["ISTASYON_ADI"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_ADI"].Value.ToString();
+                newRow["ISTASYON_TIPI"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_TIPI"].Value.ToString();
+                newRow["ISTASYON_GUCU"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_GUCU"].Value.ToString();
+                newRow["EA_X_KOORDINAT"] = enlem;
+                newRow["EA_Y_KOORDINAT"] = boylam;
+                dataTable.Rows.Add(newRow);
+
+                // Step 4: Save updated DataTable to file
+          //      SaveUpdatedInputFile(dataTable);  // Save to input file
+
+                // Step 5: Inform the user about the successful update
+                MessageBox.Show("Şarj istasyonu başarıyla eklendi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Step 6: Proceed with the new simulation (update and run Python script)
+                // This will be triggered in the main form when the user clicks the button
+                isOperationCancelled = false;
+
+                // Close the form after saving
+                this.DialogResult = DialogResult.OK;
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Lütfen geçerli değerler girin.");
+            }
+        }
+
+/*    public partial class EAStationPopupForm : Form
+    {
+        private readonly DataTable dataTable;
+        private bool isOperationCancelled = true;
+        public bool OperationCancelled => isOperationCancelled;
+
         private readonly List<string> acPowers = new List<string> {"11 kW", "22 kW" };
         //private readonly List<string> dcPowers = new List<string> {"150 kW"};
 
@@ -30,10 +161,25 @@ namespace SLF
         }
         private void InitializeDataGridView(NoktaVeri veri)
         {
-            // Fill initial coordinates
-            ChargingStationDataGridView.Rows.Add();
-            ChargingStationDataGridView.Rows[0].Cells["EA_X_KOORDINAT"].Value = veri.Enlem;
-            ChargingStationDataGridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value = veri.Boylam;
+            int rowIndex = ChargingStationDataGridView.Rows.Add();
+
+            // Fill initial coordinates from the provided NoktaVeri instance
+            ChargingStationDataGridView.Rows[rowIndex].Cells["EA_X_KOORDINAT"].Value = veri.Enlem;
+            ChargingStationDataGridView.Rows[rowIndex].Cells["EA_Y_KOORDINAT"].Value = veri.Boylam;
+
+            // Use the SelectedCellId property (if set) to populate the "ID" cell.
+            // If no cell was selected yet, you could leave it blank or assign a default value.
+*//*            ChargingStationDataGridView.Rows[rowIndex].Cells["ID"].Value =
+                !string.IsNullOrEmpty(this.SelectedCellId) ? this.SelectedCellId : "Not Selected";*//*
+
+            // Populate the StartYear combobox column with years 2024 to 2035.
+            if (ChargingStationDataGridView.Columns["StartYear"] is DataGridViewComboBoxColumn startYearColumn)
+            {
+                List<int> years = Enumerable.Range(2024, 2035 - 2024 + 1).ToList();
+                startYearColumn.DataSource = years;
+                // Optionally, set the default value (here, the first year 2024)
+                ChargingStationDataGridView.Rows[rowIndex].Cells["StartYear"].Value = years.First();
+            }
 
             // Set ISTASYON_TIPI options to AC types and DC
             if (ChargingStationDataGridView.Columns["ISTASYON_TIPI"] is DataGridViewComboBoxColumn typeComboBoxColumn)
@@ -44,7 +190,6 @@ namespace SLF
             // Set default ISTASYON_GUCU options for AC (Home), AC (Work), AC (Public), and DC-Fast
             if (ChargingStationDataGridView.Columns["ISTASYON_GUCU"] is DataGridViewComboBoxColumn powerComboBoxColumn)
             {
-                // Initialize with AC power options
                 powerComboBoxColumn.DataSource = acPowers;
             }
 
@@ -52,9 +197,9 @@ namespace SLF
             if (GirdiModülü.dataTablesByType.TryGetValue("DTR Verileri", out DataTable trafoDataTable))
             {
                 List<string> trafoKoduListesi = trafoDataTable.AsEnumerable()
-                                                                  .Select(row => row["TRAFO_KODU"].ToString())
-                                                                  .Distinct()
-                                                                  .ToList();
+                                                              .Select(row => row["TRAFO_KODU"].ToString())
+                                                              .Distinct()
+                                                              .ToList();
 
                 if (ChargingStationDataGridView.Columns["EA_TRAFO_KODU"] is DataGridViewComboBoxColumn comboBoxColumn)
                 {
@@ -66,6 +211,46 @@ namespace SLF
                 MessageBox.Show("DTR Verileri bulunamadı. Lütfen kontrol edin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+*/
+
+        /*        private void InitializeDataGridView(NoktaVeri veri)
+                {
+                    // Fill initial coordinates
+                    ChargingStationDataGridView.Rows.Add();
+                    ChargingStationDataGridView.Rows[0].Cells["EA_X_KOORDINAT"].Value = veri.Enlem;
+                    ChargingStationDataGridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value = veri.Boylam;
+
+                    // Set ISTASYON_TIPI options to AC types and DC
+                    if (ChargingStationDataGridView.Columns["ISTASYON_TIPI"] is DataGridViewComboBoxColumn typeComboBoxColumn)
+                    {
+                        typeComboBoxColumn.DataSource = new List<string> { "AC (Home)", "AC (Work)", "AC (Public)", "DC-Fast" };
+                    }
+
+                    // Set default ISTASYON_GUCU options for AC (Home), AC (Work), AC (Public), and DC-Fast
+                    if (ChargingStationDataGridView.Columns["ISTASYON_GUCU"] is DataGridViewComboBoxColumn powerComboBoxColumn)
+                    {
+                        // Initialize with AC power options
+                        powerComboBoxColumn.DataSource = acPowers;
+                    }
+
+                    // Populate transformer codes if available
+                    if (GirdiModülü.dataTablesByType.TryGetValue("DTR Verileri", out DataTable trafoDataTable))
+                    {
+                        List<string> trafoKoduListesi = trafoDataTable.AsEnumerable()
+                                                                          .Select(row => row["TRAFO_KODU"].ToString())
+                                                                          .Distinct()
+                                                                          .ToList();
+
+                        if (ChargingStationDataGridView.Columns["EA_TRAFO_KODU"] is DataGridViewComboBoxColumn comboBoxColumn)
+                        {
+                            comboBoxColumn.DataSource = trafoKoduListesi;
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("DTR Verileri bulunamadı. Lütfen kontrol edin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }*/
         private void SetupEventHandlers()
         {
             this.FormClosing += ChargingStationPopupForm_FormClosing;
@@ -103,7 +288,7 @@ namespace SLF
                 }
             }
         }
-        private void EATamamButton_Click(object sender, EventArgs e)
+/*        private void EATamamButton_Click(object sender, EventArgs e)
         {
             // Step 1: Ensure all necessary fields are filled
             foreach (DataGridViewCell cell in ChargingStationDataGridView.Rows[0].Cells)
@@ -147,7 +332,7 @@ namespace SLF
             {
                 MessageBox.Show("Lütfen geçerli değerler girin.");
             }
-        }
+        }*/
 
         // Save the DataTable to an input file
         private void SaveUpdatedInputFile(DataTable updatedData)

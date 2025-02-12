@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DEKCenterPopupForm));
@@ -36,7 +35,6 @@
             this.DEKTamamButton = new SLF.CustomButton();
             this.DEKCancelButton = new SLF.CustomButton();
             this.DEKCenterpanel1_Dek_Popup = new System.Windows.Forms.Panel();
-            this.guna2AnimateWindow1_Dek_Popup = new Guna.UI2.WinForms.Guna2AnimateWindow(this.components);
             this.DEKCenterDataGridView = new System.Windows.Forms.DataGridView();
             this.KAYNAK_TIPI = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.DEK_KURULU_GUCU = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -222,7 +220,6 @@
         #endregion
         private System.Windows.Forms.Panel DEKCenterpanel2_Dek_Popup;
         private System.Windows.Forms.Panel DEKCenterpanel1_Dek_Popup;
-        private Guna.UI2.WinForms.Guna2AnimateWindow guna2AnimateWindow1_Dek_Popup;
         private CustomButton DEKCancelButton;
         private CustomButton DEKTamamButton;
         private System.Windows.Forms.DataGridView DEKCenterDataGridView;

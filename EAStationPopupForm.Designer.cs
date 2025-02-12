@@ -33,11 +33,13 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EAStationPopupForm));
             this.ChargingStationpanel = new System.Windows.Forms.Panel();
             this.ChargingStationDataGridView = new System.Windows.Forms.DataGridView();
+            this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ISTASYON_ADI = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ISTASYON_TIPI = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.ISTASYON_GUCU = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.EA_X_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.EA_Y_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.StartYear = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.ChargingStationpanel2 = new System.Windows.Forms.Panel();
             this.EATamamButton = new SLF.CustomButton();
             this.EACancelButton = new SLF.CustomButton();
@@ -77,12 +79,14 @@
             this.ChargingStationDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.ChargingStationDataGridView.ColumnHeadersHeight = 25;
             this.ChargingStationDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.ID,
             this.ISTASYON_ADI,
             this.ISTASYON_TIPI,
             this.ISTASYON_GUCU,
             this.EA_X_KOORDINAT,
-            this.EA_Y_KOORDINAT});
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            this.EA_Y_KOORDINAT,
+            this.StartYear});
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
             dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
@@ -92,14 +96,23 @@
             this.ChargingStationDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
             this.ChargingStationDataGridView.EnableHeadersVisualStyles = false;
             this.ChargingStationDataGridView.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(182)))), ((int)(((byte)(224)))), ((int)(((byte)(216)))));
-            this.ChargingStationDataGridView.Location = new System.Drawing.Point(37, 12);
+            this.ChargingStationDataGridView.Location = new System.Drawing.Point(12, 12);
             this.ChargingStationDataGridView.Name = "ChargingStationDataGridView";
             this.ChargingStationDataGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             this.ChargingStationDataGridView.RowHeadersVisible = false;
             this.ChargingStationDataGridView.RowHeadersWidth = 18;
             this.ChargingStationDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.ChargingStationDataGridView.Size = new System.Drawing.Size(727, 363);
+            this.ChargingStationDataGridView.Size = new System.Drawing.Size(776, 375);
             this.ChargingStationDataGridView.TabIndex = 3;
+            // 
+            // ID
+            // 
+            this.ID.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.ID.HeaderText = "ID";
+            this.ID.Name = "ID";
+            this.ID.ReadOnly = true;
+            this.ID.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.ID.Width = 44;
             // 
             // ISTASYON_ADI
             // 
@@ -127,6 +140,11 @@
             this.EA_Y_KOORDINAT.HeaderText = "EA_Y_KOORDINAT";
             this.EA_Y_KOORDINAT.Name = "EA_Y_KOORDINAT";
             this.EA_Y_KOORDINAT.ReadOnly = true;
+            // 
+            // StartYear
+            // 
+            this.StartYear.HeaderText = "BASLANGIC_YILI";
+            this.StartYear.Name = "StartYear";
             // 
             // ChargingStationpanel2
             // 
@@ -205,10 +223,12 @@
         private CustomButton EACancelButton;
         private CustomButton EATamamButton;
         private System.Windows.Forms.DataGridView ChargingStationDataGridView;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ID;
         private System.Windows.Forms.DataGridViewTextBoxColumn ISTASYON_ADI;
         private System.Windows.Forms.DataGridViewComboBoxColumn ISTASYON_TIPI;
         private System.Windows.Forms.DataGridViewComboBoxColumn ISTASYON_GUCU;
         private System.Windows.Forms.DataGridViewTextBoxColumn EA_X_KOORDINAT;
         private System.Windows.Forms.DataGridViewTextBoxColumn EA_Y_KOORDINAT;
+        private System.Windows.Forms.DataGridViewComboBoxColumn StartYear;
     }
 }

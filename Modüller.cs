@@ -190,7 +190,7 @@ namespace SLF
             public double Boylam { get; set; }
             public double Bina_Demandi { get; set; }
             public int Abone_Sayısı { get; set; }
-
+            public string CellId { get; set; } // Cell ID (optional)
 
         }
 
@@ -1377,8 +1377,367 @@ namespace SLF
         // -------------------------------------------- EA ------------------------------------------------------------ //
 
 
+        private async Task HandlePopupFormAsync(PointLatLng point, string cellId)
+        {
+            // Create a NoktaVeri instance with the marker's data
+            NoktaVeri noktaVeri_marker = new NoktaVeri
+            {
+                Enlem = Math.Round(point.Lat, 4),
+                Boylam = Math.Round(point.Lng, 4),
+                CellId = cellId // Pass the CellId to the popup form
+            };
 
-        private async void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+            // Open the popup form to display/edit the marker's details
+            using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+            {
+                if (popupForm.ShowDialog() == DialogResult.OK)
+                {
+                    // Reload the map data asynchronously after the popup form saves the data
+                    await eaHaritayaVeriYukleAsync();
+
+                    // Add the marker to the map
+                    AddMarkerToMap(noktaVeri_marker);
+                }
+
+            }
+        }
+
+        /*        private async Task HandlePopupFormAsync(PointLatLng point, string cellId)
+                {
+                    // Create a NoktaVeri instance with the marker's data
+                    NoktaVeri noktaVeri_marker = new NoktaVeri
+                    {
+                        Enlem = Math.Round(point.Lat, 4),
+                        Boylam = Math.Round(point.Lng, 4),
+                        CellId = cellId // Pass the CellId to the popup form
+                    };
+
+                    // Create a temporary marker for the charging station
+                    GMapMarker tempMarker = new GMarkerGoogle(point, GMarkerGoogleType.yellow)
+                    {
+                        ToolTipText = "Yeni Şarj İstasyonu",
+                        Tag = cellId // Store CellId in the marker's Tag temporarily
+                    };
+
+                    // Add the temporary marker to the overlay
+                    markerOverlay_ea.Markers.Add(tempMarker);
+
+                    try
+                    {
+                        // Open the popup form to display/edit the marker's details
+                        using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+                        {
+                            if (popupForm.ShowDialog() == DialogResult.OK)
+                            {
+                                // Reload the map data asynchronously after the popup form saves the data
+                                await eaHaritayaVeriYukleAsync();
+
+                                // Add the marker to the map (if not already added)
+                                AddMarkerToMap(noktaVeri_marker);
+                            }
+                            else if (popupForm.OperationCancelled)
+                            {
+                                // If cancelled, remove the temporary marker
+                                RemoveMarkerFromOverlays(tempMarker);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Handle any errors that occur during the process
+                        MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                        // Ensure the temporary marker is removed in case of an error
+                        RemoveMarkerFromOverlays(tempMarker);
+                    }
+                }*/
+
+        // Helper method to safely remove a marker from overlays
+        private void RemoveMarkerFromOverlays(GMapMarker marker)
+        {
+            if (markerOverlay_ea.Markers.Contains(marker))
+            {
+                markerOverlay_ea.Markers.Remove(marker);
+            }
+
+            if (simulationOverlay.Markers.Contains(marker))
+            {
+                simulationOverlay.Markers.Remove(marker);
+            }
+
+            if (cellToolTipOverlay.Markers.Contains(marker))
+            {
+                cellToolTipOverlay.Markers.Remove(marker);
+            }
+        }
+        private void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                // Check if the user is in "adding charging station" mode
+                if (isAddingChargingStation)
+                {
+                    // Simulate a new marker at the clicked location
+                    GMapMarker simulatedMarker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow)
+                    {
+                        ToolTipText = "Yeni Şarj İstasyonu",
+                        Tag = ModülFormu.SelectedCellId // Use the selected CellId
+                    };
+
+                    // Call gMapControl_EA_OnMarkerClick with the simulated marker
+                    gMapControl_EA_OnMarkerClick(simulatedMarker, e);
+
+                    // Reset the flag after adding the station
+                    isAddingChargingStation = false;
+                    return;
+                }
+
+                // If not in "adding charging station" mode, check if the click is near an existing marker
+                GMapMarker clickedMarker = FindMarkerAtPosition(pointClick);
+                if (clickedMarker != null)
+                {
+                    // Call gMapControl_EA_OnMarkerClick with the clicked marker
+                    gMapControl_EA_OnMarkerClick(clickedMarker, e);
+                }
+                else
+                {
+                    // Standard map click handling (if no marker is clicked)
+                    OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
+                        ref polygonOverlay_ea, Mesafe_yuk, mesafe_metre_yuk);
+                }
+            }
+        }
+
+        private async void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                // Check if the user is in "adding charging station" mode
+                if (isAddingChargingStation)
+                {
+                    // Use the selected CellId from ModülFormu
+                    string cellId = item.Tag?.ToString() ?? ModülFormu.SelectedCellId;
+
+                    // Create a temporary marker for the charging station at the clicked location
+                    GMapMarker marker = new GMarkerGoogle(item.Position, GMarkerGoogleType.yellow)
+                    {
+                        ToolTipText = "Yeni Şarj İstasyonu",
+                        Tag = cellId // Store CellId in the marker's Tag temporarily
+                    };
+                    markerOverlay_ea.Markers.Add(marker);
+
+
+                    try
+                    {
+                        // Use the helper method to handle the popup form
+                        await HandlePopupFormAsync(item.Position, cellId);
+                    }
+                    catch
+                    {
+                        // If an error occurs or the operation is cancelled, remove the temporary marker
+                        markerOverlay_ea.Markers.Remove(marker);
+                        simulationOverlay.Markers.Remove(marker);
+                        cellToolTipOverlay.Markers.Remove(marker);
+                    }
+
+                    // Reset the flag after adding the station
+                    isAddingChargingStation = false;
+                    return;
+                }
+
+                // If not in "adding charging station" mode, open the popup form to edit the clicked marker
+                if (item.Tag != null)
+                {
+                    // Retrieve the CellId from the marker's Tag
+                    string cellId = item.Tag.ToString();
+
+                    // Use the helper method to handle the popup form
+                    await HandlePopupFormAsync(item.Position, cellId);
+                }
+            }
+        }
+        private GMapMarker FindMarkerAtPosition(PointLatLng point)
+        {
+            foreach (var marker in cellToolTipOverlay.Markers)
+            {
+                if (marker.Position.Lat == point.Lat && marker.Position.Lng == point.Lng)
+                {
+                    return marker;
+                }
+            }
+            return null;
+        }
+        private void AddMarkerToMap(NoktaVeri noktaVeri)
+        {
+            // Create a new marker for the charging station
+            GMapMarker marker = new GMarkerGoogle(new PointLatLng(noktaVeri.Enlem, noktaVeri.Boylam), GMarkerGoogleType.yellow)
+            {
+                ToolTipText = $"Şarj İstasyonu: {noktaVeri.CellId}",
+                Tag = noktaVeri.CellId // Store CellId in the marker's Tag
+            };
+
+            // Add the marker to the appropriate overlay
+            markerOverlay_ea.Markers.Add(marker);
+            simulationOverlay.Markers.Add(marker);
+            cellToolTipOverlay.Markers.Add(marker);
+
+            // Refresh the map to display the new marker
+            gMapControl_EA.Refresh();
+        }
+        /*        private async void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+                {
+                    if (isAddingChargingStation)
+                    {
+                        // Create a new marker for the charging station
+                        GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow)
+                        {
+                            ToolTipText = "Yeni Şarj İstasyonu",
+                            Tag = ModülFormu.SelectedCellId // Access the static property
+                        };
+                        markerOverlay_ea.Markers.Add(marker);
+                        simulationOverlay.Markers.Add(marker);
+                        cellToolTipOverlay.Markers.Add(marker);
+                        // Create the point data including the selected CellId (if any)
+                        NoktaVeri noktaVeri_marker = new NoktaVeri
+                        {
+                            Enlem = Math.Round(pointClick.Lat, 4),
+                            Boylam = Math.Round(pointClick.Lng, 4),
+                            CellId = ModülFormu.SelectedCellId // Access the static property
+                        };
+
+                        // Show the popup form to add a new charging station
+                        using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+                        {
+                            if (popupForm.ShowDialog() == DialogResult.OK)
+                            {
+                                // If successful, reload the map data asynchronously
+                                await eaHaritayaVeriYukleAsync();
+                            }
+                            else if (popupForm.OperationCancelled)
+                            {
+                                // If cancelled, remove the marker
+                                markerOverlay_ea.Markers.Remove(marker);
+                                simulationOverlay.Markers.Remove(marker);
+                                cellToolTipOverlay.Markers.Remove(marker);
+                            }
+                        }
+
+                        // Reset the flag after adding the station
+                        isAddingChargingStation = false;
+                        return;
+                    }
+
+                    // Standard map click handling
+                    OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
+                        ref polygonOverlay_ea, Mesafe_yuk, mesafe_metre_yuk);
+                }
+
+                private async void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
+                {
+                    if (e.Button == MouseButtons.Left)
+                    {
+                        // Check if the user is in "adding charging station" mode
+                        if (isAddingChargingStation)
+                        {
+                            // Create a new marker for the charging station at the clicked location
+                            GMapMarker marker = new GMarkerGoogle(item.Position, GMarkerGoogleType.yellow)
+                            {
+                                ToolTipText = "Yeni Şarj İstasyonu",
+                                Tag = ModülFormu.SelectedCellId // Access the static property
+                            };
+                            markerOverlay_ea.Markers.Add(marker);
+                            simulationOverlay.Markers.Add(marker);
+                            cellToolTipOverlay.Markers.Add(marker);
+                            // Create the point data including the selected CellId (if any)
+                            NoktaVeri noktaVeri_marker = new NoktaVeri
+                            {
+                                Enlem = Math.Round(item.Position.Lat, 4),
+                                Boylam = Math.Round(item.Position.Lng, 4),
+                                CellId = ModülFormu.SelectedCellId // Access the static property
+                            };
+
+                            // Show the popup form to add a new charging station
+                            using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+                            {
+                                if (popupForm.ShowDialog() == DialogResult.OK)
+                                {
+                                    // If successful, reload the map data asynchronously
+                                  await eaHaritayaVeriYukleAsync();
+                                }
+                                else if (popupForm.OperationCancelled)
+                                {
+                                    // If cancelled, remove the marker
+                                    markerOverlay_ea.Markers.Remove(marker);
+                                }
+                            }
+
+                            // Reset the flag after adding the station
+                            isAddingChargingStation = false;
+                            return;
+                        }
+
+                        // If not in "adding charging station" mode, open the popup form to edit the clicked marker
+                        if (item.Tag != null)
+                        {
+                            // Retrieve the CellId from the marker's Tag
+                            string cellId = item.Tag.ToString();
+
+                            // Create a NoktaVeri instance with the marker's data
+                            NoktaVeri noktaVeri_marker = new NoktaVeri
+                            {
+                                Enlem = Math.Round(item.Position.Lat, 4),
+                                Boylam = Math.Round(item.Position.Lng, 4),
+                                CellId = cellId // Pass the CellId to the popup form
+                            };
+
+                            // Open the popup form to display/edit the marker's details
+                            using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+                            {
+                                if (popupForm.ShowDialog() == DialogResult.OK)
+                                {
+                                    // Retrieve the updated NoktaVeri from the popup form
+                                    NoktaVeri updatedNoktaVeri = popupForm.NoktaVeri;
+
+                                    // Update the marker's Tag with the new CellId
+                                    item.Tag = updatedNoktaVeri.CellId;
+                                }
+                            }
+                        }
+                    }
+                }*/
+        /*        private void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
+                {
+                    if (e.Button == MouseButtons.Left)
+                    {
+                        if (item.Tag != null)
+                        {
+                            // Retrieve the CellId from the marker's Tag
+                            string cellId = item.Tag.ToString();
+
+                            // Create a NoktaVeri instance with the marker's data
+                            NoktaVeri noktaVeri_marker = new NoktaVeri
+                            {
+                                Enlem = Math.Round(item.Position.Lat, 4),
+                                Boylam = Math.Round(item.Position.Lng, 4),
+                                CellId = cellId // Pass the CellId to the popup form
+                            };
+
+                            // Open the popup form to display/edit the marker's details
+                            using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+                            {
+                                if (popupForm.ShowDialog() == DialogResult.OK)
+                                {
+                                    // Retrieve the updated NoktaVeri from the popup form
+                                    NoktaVeri updatedNoktaVeri = popupForm.NoktaVeri;
+
+                                    // Update the marker's Tag with the new CellId
+                                    item.Tag = updatedNoktaVeri.CellId;
+                                }
+                            }
+                        }
+                    }
+                }*/
+        /*        private async void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
 
             if (isAddingChargingStation)
@@ -1421,16 +1780,15 @@ namespace SLF
                 ref polygonOverlay_ea, Mesafe_yuk, mesafe_metre_yuk);
 
         }
-
-
-        private void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
-        {
-            if (item.Tag != null && item.Tag is NoktaVeri && Modül_Tabları.SelectedTab == tab_ea)
-            {
-                NoktaVeri seçili_nokta = item.Tag as NoktaVeri;
-                NoktaBilgileriniGoster(seçili_nokta);
-            }
-        }
+*/
+        /*        private void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
+                {
+                    if (item.Tag != null && item.Tag is NoktaVeri && Modül_Tabları.SelectedTab == tab_ea)
+                    {
+                        NoktaVeri seçili_nokta = item.Tag as NoktaVeri;
+                        NoktaBilgileriniGoster(seçili_nokta);
+                    }
+                }*/
 
 
         private void EA_Nokta_MouseDown(object sender, MouseEventArgs e)
@@ -1466,27 +1824,45 @@ namespace SLF
                 SelectedSpeed = "varsayılan";
             }
         }
-
-
         private void ToggleMarkers(string markerType, bool isVisible)
         {
-            // gMapControl_EA üzerindeki tüm overlay'leri dolaşarak marker'ları kontrol ediyoruz
+            // Iterate through all overlays and markers
             foreach (var overlay in gMapControl_EA.Overlays)
             {
                 foreach (var marker in overlay.Markers)
                 {
-                    // Marker, GMarkerGoogle türündeyse ve ToolTipText ile belirtilen türle eşleşiyorsa
-                    if (marker is GMarkerGoogle googleMarker && googleMarker.ToolTipText == markerType)
+                    // Check if the marker is a GMarkerGoogle and has the specified type in its Tag
+                    if (marker is GMarkerGoogle googleMarker && googleMarker.Tag?.ToString() == markerType)
                     {
-                        // Marker'ın görünürlük durumunu güncelle
+                        // Update the marker's visibility
                         googleMarker.IsVisible = isVisible;
                     }
                 }
             }
 
-            // Harita güncellenmesi için refresh yapıyoruz
+            // Refresh the map to reflect changes
             gMapControl_EA.Refresh();
         }
+
+        /*        private void ToggleMarkers(string markerType, bool isVisible)
+                {
+                    // gMapControl_EA üzerindeki tüm overlay'leri dolaşarak marker'ları kontrol ediyoruz
+                    foreach (var overlay in gMapControl_EA.Overlays)
+                    {
+                        foreach (var marker in overlay.Markers)
+                        {
+                            // Marker, GMarkerGoogle türündeyse ve ToolTipText ile belirtilen türle eşleşiyorsa
+                            if (marker is GMarkerGoogle googleMarker && googleMarker.ToolTipText == markerType)
+                            {
+                                // Marker'ın görünürlük durumunu güncelle
+                                googleMarker.IsVisible = isVisible;
+                            }
+                        }
+                    }
+
+                    // Harita güncellenmesi için refresh yapıyoruz
+                    gMapControl_EA.Refresh();
+                }*/
 
 
         // Şehir seçimi yapıldığında çağrılan metot
@@ -1885,67 +2261,155 @@ namespace SLF
             popupForm.Show(); // Yeni pencereyi göster
         }
 
+        /*                private Task HaritaUzerindeSimulasyonGosterimi(DataTable veriTablosu)
+                        {
+                            // Create a new overlay for simulation markers
+                            GMapOverlay simulationOverlay = new GMapOverlay("Simulasyon_Layer");
+
+                            // Add a new overlay for simulation markers (No need to remove it if it's new)
+                            gMapControl_EA.Overlays.Clear(); // Optionally clear the previous overlays, if needed
+                            gMapControl_EA.Overlays.Add(simulationOverlay);
+
+                            // Dictionary to hold markers based on their coordinates and types
+                            Dictionary<(double, double, string), GMarkerGoogle> markerDictionary = new Dictionary<(double, double, string), GMarkerGoogle>();
+
+                            // Process the rows in the DataTable
+                            foreach (DataRow row in veriTablosu.Rows)
+                            {
+                                if (row["Enlem"] != DBNull.Value && row["Boylam"] != DBNull.Value)
+                                {
+                                    double enlem = Convert.ToDouble(row["Enlem"]);
+                                    double boylam = Convert.ToDouble(row["Boylam"]);
+
+                                    // Check the counts and add markers accordingly
+                                    bool acHome = row["AC (Home)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Home)_count"]) != 0;
+                                    bool acWork = row["AC (Work)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Work)_count"]) != 0;
+                                    bool acPublic = row["AC (Public)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Public)_count"]) != 0;
+                                    bool fastDc = row["Fast DC_count"] != DBNull.Value && Convert.ToInt32(row["Fast DC_count"]) != 0;
+
+                                    // Create markers based on the conditions
+                                    if (acHome)
+                                    {
+                                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.green);
+                                        marker.ToolTipText = "AC-Home";
+                                        markerDictionary[(enlem, boylam, "AC-Home")] = marker;
+                                    }
+                                    if (acWork)
+                                    {
+                                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.blue);
+                                        marker.ToolTipText = "AC-Work";
+                                        markerDictionary[(enlem, boylam, "AC-Work")] = marker;
+                                    }
+                                    if (acPublic)
+                                    {
+                                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.yellow);
+                                        marker.ToolTipText = "AC-Public";
+                                        markerDictionary[(enlem, boylam, "AC-Public")] = marker;
+                                    }
+                                    if (fastDc)
+                                    {
+                                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.red);
+                                        marker.ToolTipText = "DC-Fast";
+                                        markerDictionary[(enlem, boylam, "DC-Fast")] = marker;
+                                    }
+                                }
+                            }
+
+                            // Add the created markers to the simulation overlay
+                            foreach (var marker in markerDictionary.Values)
+                            {
+                                simulationOverlay.Markers.Add(marker);
+                            }
+
+                            // Refresh the map control to show the new markers
+                            Invoke(new Action(() =>
+                            {
+                                gMapControl_EA.Refresh();
+                            }));
+
+                            return Task.CompletedTask;
+                        }*/
+        GMapOverlay simulationOverlay = new GMapOverlay("Simulasyon_Layer");
+        GMapOverlay cellToolTipOverlay = new GMapOverlay("CellToolTips");
+        public static string SelectedCellId { get; set; }
         private Task HaritaUzerindeSimulasyonGosterimi(DataTable veriTablosu)
         {
-            // Create a new overlay for simulation markers
-            GMapOverlay simulationOverlay = new GMapOverlay("Simulasyon_Layer");
+            // Create overlays:
 
-            // Add a new overlay for simulation markers (No need to remove it if it's new)
-            gMapControl_EA.Overlays.Clear(); // Optionally clear the previous overlays, if needed
+            gMapControl_EA.Overlays.Clear();
             gMapControl_EA.Overlays.Add(simulationOverlay);
+            gMapControl_EA.Overlays.Add(cellToolTipOverlay);
 
-            // Dictionary to hold markers based on their coordinates and types
+            // Create a transparent bitmap for invisible markers
+            Bitmap transparentBitmap = new Bitmap(16, 16);
+            using (Graphics g = Graphics.FromImage(transparentBitmap))
+            {
+                g.Clear(Color.Transparent);
+            }
+
             Dictionary<(double, double, string), GMarkerGoogle> markerDictionary = new Dictionary<(double, double, string), GMarkerGoogle>();
 
-            // Process the rows in the DataTable
             foreach (DataRow row in veriTablosu.Rows)
             {
                 if (row["Enlem"] != DBNull.Value && row["Boylam"] != DBNull.Value)
                 {
                     double enlem = Convert.ToDouble(row["Enlem"]);
                     double boylam = Convert.ToDouble(row["Boylam"]);
+                    string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
 
-                    // Check the counts and add markers accordingly
+                    // Add an invisible marker for cell tooltips and selection
+                    var invisibleMarker = new GMarkerGoogle(new PointLatLng(enlem, boylam), transparentBitmap);
+                    invisibleMarker.ToolTipText = $"Cell: {cellId}";
+                    invisibleMarker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                    invisibleMarker.Tag = cellId; // Store the cell ID in the marker's Tag
+                    cellToolTipOverlay.Markers.Add(invisibleMarker);
+
+                    // Create simulation markers for EV points
                     bool acHome = row["AC (Home)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Home)_count"]) != 0;
                     bool acWork = row["AC (Work)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Work)_count"]) != 0;
                     bool acPublic = row["AC (Public)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Public)_count"]) != 0;
                     bool fastDc = row["Fast DC_count"] != DBNull.Value && Convert.ToInt32(row["Fast DC_count"]) != 0;
 
-                    // Create markers based on the conditions
                     if (acHome)
                     {
                         var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.green);
-                        marker.ToolTipText = "AC-Home";
+                        marker.ToolTipText = $"Grid: {cellId}\nAC-Home";
+                        marker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                        marker.Tag = "AC-Home"; // Store marker type in Tag
                         markerDictionary[(enlem, boylam, "AC-Home")] = marker;
                     }
                     if (acWork)
                     {
                         var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.blue);
-                        marker.ToolTipText = "AC-Work";
+                        marker.ToolTipText = $"Grid: {cellId}\nAC-Work";
+                        marker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                        marker.Tag = "AC-Work"; // Store marker type in Tag
                         markerDictionary[(enlem, boylam, "AC-Work")] = marker;
                     }
                     if (acPublic)
                     {
                         var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.yellow);
-                        marker.ToolTipText = "AC-Public";
+                        marker.ToolTipText = $"Grid: {cellId}\nAC-Public";
+                        marker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                        marker.Tag = "AC-Public"; // Store marker type in Tag
                         markerDictionary[(enlem, boylam, "AC-Public")] = marker;
                     }
                     if (fastDc)
                     {
                         var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.red);
-                        marker.ToolTipText = "DC-Fast";
+                        marker.ToolTipText = $"Grid: {cellId}\nDC-Fast";
+                        marker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                        marker.Tag = "DC-Fast"; // Store marker type in Tag
                         markerDictionary[(enlem, boylam, "DC-Fast")] = marker;
                     }
                 }
             }
 
-            // Add the created markers to the simulation overlay
             foreach (var marker in markerDictionary.Values)
             {
                 simulationOverlay.Markers.Add(marker);
             }
 
-            // Refresh the map control to show the new markers
             Invoke(new Action(() =>
             {
                 gMapControl_EA.Refresh();
@@ -1953,7 +2417,90 @@ namespace SLF
 
             return Task.CompletedTask;
         }
+        /*        private Task HaritaUzerindeSimulasyonGosterimi(DataTable veriTablosu)
+                {
+                    // Create overlays:
+                    GMapOverlay simulationOverlay = new GMapOverlay("Simulasyon_Layer");
+                    GMapOverlay cellToolTipOverlay = new GMapOverlay("CellToolTips");
 
+                    gMapControl_EA.Overlays.Clear();
+                    gMapControl_EA.Overlays.Add(simulationOverlay);
+                    gMapControl_EA.Overlays.Add(cellToolTipOverlay);
+
+                    Bitmap transparentBitmap = new Bitmap(16, 16);
+                    using (Graphics g = Graphics.FromImage(transparentBitmap))
+                    {
+                        g.Clear(Color.Transparent);
+                    }
+
+                    Dictionary<(double, double, string), GMarkerGoogle> markerDictionary = new Dictionary<(double, double, string), GMarkerGoogle>();
+
+                    foreach (DataRow row in veriTablosu.Rows)
+                    {
+                        if (row["Enlem"] != DBNull.Value && row["Boylam"] != DBNull.Value)
+                        {
+                            double enlem = Convert.ToDouble(row["Enlem"]);
+                            double boylam = Convert.ToDouble(row["Boylam"]);
+                            string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
+
+                            // Add an invisible marker for cell tooltips and selection
+                            var invisibleMarker = new GMarkerGoogle(new PointLatLng(enlem, boylam), transparentBitmap);
+                            invisibleMarker.ToolTipText = $"Cell: {cellId}";
+                            invisibleMarker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                            // Store the cell ID in the marker's Tag for later reference
+                            invisibleMarker.Tag = cellId;
+                            cellToolTipOverlay.Markers.Add(invisibleMarker);
+
+                            // Create simulation markers for EV points (as before)
+                            bool acHome = row["AC (Home)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Home)_count"]) != 0;
+                            bool acWork = row["AC (Work)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Work)_count"]) != 0;
+                            bool acPublic = row["AC (Public)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Public)_count"]) != 0;
+                            bool fastDc = row["Fast DC_count"] != DBNull.Value && Convert.ToInt32(row["Fast DC_count"]) != 0;
+
+                            if (acHome)
+                            {
+                                var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.green);
+                                marker.ToolTipText = $"Grid: {cellId}\nAC-Home";
+                                marker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                                markerDictionary[(enlem, boylam, "AC-Home")] = marker;
+                            }
+                            if (acWork)
+                            {
+                                var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.blue);
+                                marker.ToolTipText = $"Grid: {cellId}\nAC-Work";
+                                marker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                                markerDictionary[(enlem, boylam, "AC-Work")] = marker;
+                            }
+                            if (acPublic)
+                            {
+                                var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.yellow);
+                                marker.ToolTipText = $"Grid: {cellId}\nAC-Public";
+                                marker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                                markerDictionary[(enlem, boylam, "AC-Public")] = marker;
+                            }
+                            if (fastDc)
+                            {
+                                var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.red);
+                                marker.ToolTipText = $"Grid: {cellId}\nDC-Fast";
+                                marker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                                markerDictionary[(enlem, boylam, "DC-Fast")] = marker;
+                            }
+                        }
+                    }
+
+                    foreach (var marker in markerDictionary.Values)
+                    {
+                        simulationOverlay.Markers.Add(marker);
+                    }
+
+                    Invoke(new Action(() =>
+                    {
+                        gMapControl_EA.Refresh();
+                    }));
+
+                    return Task.CompletedTask;
+                }
+        */
 
         private void calculateChargeStationWithFilter(int acHomeCount, int acWorkCount, int acPublicCount, int fastDcCount)
         {
@@ -1991,6 +2538,7 @@ namespace SLF
 
         private void checkBox_Ac_Home(object sender, EventArgs e)
         {
+
             ToggleMarkers("AC-Home", checkBox_AC_Home.Checked);
         }
 
@@ -2010,8 +2558,6 @@ namespace SLF
             ToggleMarkers("DC-Fast", checkBox_DC_Fast.Checked);
 
         }
-
-
 
         // ------------------------------------------------------------------------------------------------------------ //
 
