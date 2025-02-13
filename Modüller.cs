@@ -314,7 +314,7 @@ namespace SLF
         {
             // initialize the Modul Formu
             InitializeComponent();
-
+            gMapControl_EA.OnMarkerClick -= gMapControl_EA_OnMarkerClick;
             _excelService = new ExcelService();
             InitializeLogTextBox(); // Initialize logTextBox
             //this.DoubleBuffered = true;
@@ -1375,216 +1375,7 @@ namespace SLF
 
 
         // -------------------------------------------- EA ------------------------------------------------------------ //
-
-
-        private async Task HandlePopupFormAsync(PointLatLng point, string cellId)
-        {
-            // Create a NoktaVeri instance with the marker's data
-            NoktaVeri noktaVeri_marker = new NoktaVeri
-            {
-                Enlem = Math.Round(point.Lat, 4),
-                Boylam = Math.Round(point.Lng, 4),
-                CellId = cellId // Pass the CellId to the popup form
-            };
-
-            // Open the popup form to display/edit the marker's details
-            using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
-            {
-                if (popupForm.ShowDialog() == DialogResult.OK)
-                {
-                    // Reload the map data asynchronously after the popup form saves the data
-                    await eaHaritayaVeriYukleAsync();
-
-                    // Add the marker to the map
-                    AddMarkerToMap(noktaVeri_marker);
-                }
-
-            }
-        }
-
-        /*        private async Task HandlePopupFormAsync(PointLatLng point, string cellId)
-                {
-                    // Create a NoktaVeri instance with the marker's data
-                    NoktaVeri noktaVeri_marker = new NoktaVeri
-                    {
-                        Enlem = Math.Round(point.Lat, 4),
-                        Boylam = Math.Round(point.Lng, 4),
-                        CellId = cellId // Pass the CellId to the popup form
-                    };
-
-                    // Create a temporary marker for the charging station
-                    GMapMarker tempMarker = new GMarkerGoogle(point, GMarkerGoogleType.yellow)
-                    {
-                        ToolTipText = "Yeni Şarj İstasyonu",
-                        Tag = cellId // Store CellId in the marker's Tag temporarily
-                    };
-
-                    // Add the temporary marker to the overlay
-                    markerOverlay_ea.Markers.Add(tempMarker);
-
-                    try
-                    {
-                        // Open the popup form to display/edit the marker's details
-                        using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
-                        {
-                            if (popupForm.ShowDialog() == DialogResult.OK)
-                            {
-                                // Reload the map data asynchronously after the popup form saves the data
-                                await eaHaritayaVeriYukleAsync();
-
-                                // Add the marker to the map (if not already added)
-                                AddMarkerToMap(noktaVeri_marker);
-                            }
-                            else if (popupForm.OperationCancelled)
-                            {
-                                // If cancelled, remove the temporary marker
-                                RemoveMarkerFromOverlays(tempMarker);
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        // Handle any errors that occur during the process
-                        MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                        // Ensure the temporary marker is removed in case of an error
-                        RemoveMarkerFromOverlays(tempMarker);
-                    }
-                }*/
-
-        // Helper method to safely remove a marker from overlays
-        private void RemoveMarkerFromOverlays(GMapMarker marker)
-        {
-            if (markerOverlay_ea.Markers.Contains(marker))
-            {
-                markerOverlay_ea.Markers.Remove(marker);
-            }
-
-            if (simulationOverlay.Markers.Contains(marker))
-            {
-                simulationOverlay.Markers.Remove(marker);
-            }
-
-            if (cellToolTipOverlay.Markers.Contains(marker))
-            {
-                cellToolTipOverlay.Markers.Remove(marker);
-            }
-        }
-        private void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                // Check if the user is in "adding charging station" mode
-                if (isAddingChargingStation)
-                {
-                    // Simulate a new marker at the clicked location
-                    GMapMarker simulatedMarker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow)
-                    {
-                        ToolTipText = "Yeni Şarj İstasyonu",
-                        Tag = ModülFormu.SelectedCellId // Use the selected CellId
-                    };
-
-                    // Call gMapControl_EA_OnMarkerClick with the simulated marker
-                    gMapControl_EA_OnMarkerClick(simulatedMarker, e);
-
-                    // Reset the flag after adding the station
-                    isAddingChargingStation = false;
-                    return;
-                }
-
-                // If not in "adding charging station" mode, check if the click is near an existing marker
-                GMapMarker clickedMarker = FindMarkerAtPosition(pointClick);
-                if (clickedMarker != null)
-                {
-                    // Call gMapControl_EA_OnMarkerClick with the clicked marker
-                    gMapControl_EA_OnMarkerClick(clickedMarker, e);
-                }
-                else
-                {
-                    // Standard map click handling (if no marker is clicked)
-                    OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
-                        ref polygonOverlay_ea, Mesafe_yuk, mesafe_metre_yuk);
-                }
-            }
-        }
-
-        private async void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                // Check if the user is in "adding charging station" mode
-                if (isAddingChargingStation)
-                {
-                    // Use the selected CellId from ModülFormu
-                    string cellId = item.Tag?.ToString() ?? ModülFormu.SelectedCellId;
-
-                    // Create a temporary marker for the charging station at the clicked location
-                    GMapMarker marker = new GMarkerGoogle(item.Position, GMarkerGoogleType.yellow)
-                    {
-                        ToolTipText = "Yeni Şarj İstasyonu",
-                        Tag = cellId // Store CellId in the marker's Tag temporarily
-                    };
-                    markerOverlay_ea.Markers.Add(marker);
-
-
-                    try
-                    {
-                        // Use the helper method to handle the popup form
-                        await HandlePopupFormAsync(item.Position, cellId);
-                    }
-                    catch
-                    {
-                        // If an error occurs or the operation is cancelled, remove the temporary marker
-                        markerOverlay_ea.Markers.Remove(marker);
-                        simulationOverlay.Markers.Remove(marker);
-                        cellToolTipOverlay.Markers.Remove(marker);
-                    }
-
-                    // Reset the flag after adding the station
-                    isAddingChargingStation = false;
-                    return;
-                }
-
-                // If not in "adding charging station" mode, open the popup form to edit the clicked marker
-                if (item.Tag != null)
-                {
-                    // Retrieve the CellId from the marker's Tag
-                    string cellId = item.Tag.ToString();
-
-                    // Use the helper method to handle the popup form
-                    await HandlePopupFormAsync(item.Position, cellId);
-                }
-            }
-        }
-        private GMapMarker FindMarkerAtPosition(PointLatLng point)
-        {
-            foreach (var marker in cellToolTipOverlay.Markers)
-            {
-                if (marker.Position.Lat == point.Lat && marker.Position.Lng == point.Lng)
-                {
-                    return marker;
-                }
-            }
-            return null;
-        }
-        private void AddMarkerToMap(NoktaVeri noktaVeri)
-        {
-            // Create a new marker for the charging station
-            GMapMarker marker = new GMarkerGoogle(new PointLatLng(noktaVeri.Enlem, noktaVeri.Boylam), GMarkerGoogleType.yellow)
-            {
-                ToolTipText = $"Şarj İstasyonu: {noktaVeri.CellId}",
-                Tag = noktaVeri.CellId // Store CellId in the marker's Tag
-            };
-
-            // Add the marker to the appropriate overlay
-            markerOverlay_ea.Markers.Add(marker);
-            simulationOverlay.Markers.Add(marker);
-            cellToolTipOverlay.Markers.Add(marker);
-
-            // Refresh the map to display the new marker
-            gMapControl_EA.Refresh();
-        }
-        /*        private async void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+                /*        private async void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
                 {
                     if (isAddingChargingStation)
                     {
@@ -1789,6 +1580,217 @@ namespace SLF
                         NoktaBilgileriniGoster(seçili_nokta);
                     }
                 }*/
+        /*        private async Task HandlePopupFormAsync(PointLatLng point, string cellId)
+        {
+            // Create a NoktaVeri instance with the marker's data
+            NoktaVeri noktaVeri_marker = new NoktaVeri
+            {
+                Enlem = Math.Round(point.Lat, 4),
+                Boylam = Math.Round(point.Lng, 4),
+                CellId = cellId // Pass the CellId to the popup form
+            };
+
+            // Create a temporary marker for the charging station
+            GMapMarker tempMarker = new GMarkerGoogle(point, GMarkerGoogleType.yellow)
+            {
+                ToolTipText = "Yeni Şarj İstasyonu",
+                Tag = cellId // Store CellId in the marker's Tag temporarily
+            };
+
+            // Add the temporary marker to the overlay
+            markerOverlay_ea.Markers.Add(tempMarker);
+
+            try
+            {
+                // Open the popup form to display/edit the marker's details
+                using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+                {
+                    if (popupForm.ShowDialog() == DialogResult.OK)
+                    {
+                        // Reload the map data asynchronously after the popup form saves the data
+                        await eaHaritayaVeriYukleAsync();
+
+                        // Add the marker to the map (if not already added)
+                        AddMarkerToMap(noktaVeri_marker);
+                    }
+                    else if (popupForm.OperationCancelled)
+                    {
+                        // If cancelled, remove the temporary marker
+                        RemoveMarkerFromOverlays(tempMarker);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle any errors that occur during the process
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                // Ensure the temporary marker is removed in case of an error
+                RemoveMarkerFromOverlays(tempMarker);
+            }
+        }*/
+
+        private async Task HandlePopupFormAsync(PointLatLng point, string cellId)
+        {
+            // Create a NoktaVeri instance with the marker's data
+            NoktaVeri noktaVeri_marker = new NoktaVeri
+            {
+                Enlem = Math.Round(point.Lat, 4),
+                Boylam = Math.Round(point.Lng, 4),
+                CellId = cellId // Pass the CellId to the popup form
+            };
+
+            // Open the popup form to display/edit the marker's details
+            using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+            {
+                if (popupForm.ShowDialog() == DialogResult.OK)
+                {
+                    // Reload the map data asynchronously after the popup form saves the data
+                    await eaHaritayaVeriYukleAsync();
+
+                    // Add the marker to the map
+                    AddMarkerToMap(noktaVeri_marker);
+                }
+
+            }
+        }
+
+
+        // Helper method to safely remove a marker from overlays
+        private void RemoveMarkerFromOverlays(GMapMarker marker)
+        {
+            if (markerOverlay_ea.Markers.Contains(marker))
+            {
+                markerOverlay_ea.Markers.Remove(marker);
+            }
+
+            if (simulationOverlay.Markers.Contains(marker))
+            {
+                simulationOverlay.Markers.Remove(marker);
+            }
+
+            if (cellToolTipOverlay.Markers.Contains(marker))
+            {
+                cellToolTipOverlay.Markers.Remove(marker);
+            }
+        }
+        private void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                // Check if the user is in "adding charging station" mode
+                if (isAddingChargingStation)
+                {
+                    // Simulate a new marker at the clicked location
+                    GMapMarker simulatedMarker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow)
+                    {
+                        ToolTipText = "Yeni Şarj İstasyonu",
+                        Tag = ModülFormu.SelectedCellId // Use the selected CellId
+                    };
+                    // Reset the flag after adding the station
+                    isAddingChargingStation = false;
+                    // Call gMapControl_EA_OnMarkerClick with the simulated marker
+                    gMapControl_EA_OnMarkerClick(simulatedMarker, e);
+
+
+                    return;
+                }
+
+                // If not in "adding charging station" mode, check if the click is near an existing marker
+                GMapMarker clickedMarker = FindMarkerAtPosition(pointClick);
+                if (clickedMarker != null)
+                {
+                    // Call gMapControl_EA_OnMarkerClick with the clicked marker
+                    gMapControl_EA_OnMarkerClick(clickedMarker, e);
+                }
+                else
+                {
+                    // Standard map click handling (if no marker is clicked)
+                    OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
+                        ref polygonOverlay_ea, Mesafe_yuk, mesafe_metre_yuk);
+                }
+            }
+        }
+
+        private async void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                // Check if the user is in "adding charging station" mode
+                if (isAddingChargingStation)
+                {
+                    // Use the selected CellId from ModülFormu
+                    string cellId = item.Tag?.ToString() ?? ModülFormu.SelectedCellId;
+
+                    // Create a temporary marker for the charging station at the clicked location
+                    GMapMarker marker = new GMarkerGoogle(item.Position, GMarkerGoogleType.yellow)
+                    {
+                        ToolTipText = "Yeni Şarj İstasyonu",
+                        Tag = cellId // Store CellId in the marker's Tag temporarily
+                    };
+/*                    markerOverlay_ea.Markers.Add(marker);
+                    simulationOverlay.Markers.Add(marker);
+                    cellToolTipOverlay.Markers.Add(marker);*/
+
+                    try
+                    {
+                        // Use the helper method to handle the popup form
+                        await HandlePopupFormAsync(item.Position, cellId);
+                    }
+                    catch
+                    {
+                        // If an error occurs or the operation is cancelled, remove the temporary marker
+                        markerOverlay_ea.Markers.Remove(marker);
+                        simulationOverlay.Markers.Remove(marker);
+                        cellToolTipOverlay.Markers.Remove(marker);
+                    }
+
+                    // Reset the flag after adding the station
+                    isAddingChargingStation = false;
+
+                    return;
+                }
+
+                // If not in "adding charging station" mode, open the popup form to edit the clicked marker
+/*                if (item.Tag != null)
+                {
+                    // Retrieve the CellId from the marker's Tag
+                    string cellId = item.Tag.ToString();
+
+                    // Use the helper method to handle the popup form
+                    await HandlePopupFormAsync(item.Position, cellId);
+                }*/
+            }
+        }
+        private GMapMarker FindMarkerAtPosition(PointLatLng point)
+        {
+            foreach (var marker in cellToolTipOverlay.Markers)
+            {
+                if (marker.Position.Lat == point.Lat && marker.Position.Lng == point.Lng)
+                {
+                    return marker;
+                }
+            }
+            return null;
+        }
+        private void AddMarkerToMap(NoktaVeri noktaVeri)
+        {
+            // Create a new marker for the charging station
+            GMapMarker marker = new GMarkerGoogle(new PointLatLng(noktaVeri.Enlem, noktaVeri.Boylam), GMarkerGoogleType.yellow)
+            {
+                ToolTipText = $"Şarj İstasyonu: {noktaVeri.CellId}",
+                Tag = noktaVeri.CellId // Store CellId in the marker's Tag
+            };
+
+            // Add the marker to the appropriate overlay
+            markerOverlay_ea.Markers.Add(marker);
+            simulationOverlay.Markers.Add(marker);
+            cellToolTipOverlay.Markers.Add(marker);
+
+            // Refresh the map to display the new marker
+            gMapControl_EA.Refresh();
+        }
+ 
 
 
         private void EA_Nokta_MouseDown(object sender, MouseEventArgs e)
@@ -1821,7 +1823,7 @@ namespace SLF
         {
             if (EaSimMinBtn.Checked)
             {
-                SelectedSpeed = "varsayılan";
+                SelectedSpeed = "Varsayılan";
             }
         }
         private void ToggleMarkers(string markerType, bool isVisible)
@@ -2003,6 +2005,7 @@ namespace SLF
             {
                 MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
                 isAddingChargingStation = true;
+                gMapControl_EA.OnMarkerClick += gMapControl_EA_OnMarkerClick;
                 return; // Exit to wait for the user to click on the map
             }
 
@@ -2013,6 +2016,7 @@ namespace SLF
 
             // Reset the flag after adding the station
             isAddingChargingStation = false;
+            gMapControl_EA.OnMarkerClick -= gMapControl_EA_OnMarkerClick;
         }
 
         private void EANewSimulationResultsButton_Click(object sender, EventArgs e)
@@ -2258,7 +2262,7 @@ namespace SLF
             };
 
             popupForm.Controls.Add(dataGridView);
-            popupForm.Show(); // Yeni pencereyi göster
+          //  popupForm.Show(); // Yeni pencereyi göster
         }
 
         /*                private Task HaritaUzerindeSimulasyonGosterimi(DataTable veriTablosu)
