@@ -33,6 +33,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EAStationPopupForm));
             this.ChargingStationpanel = new System.Windows.Forms.Panel();
             this.ChargingStationDataGridView = new System.Windows.Forms.DataGridView();
+            this.ChargingStationpanel2 = new System.Windows.Forms.Panel();
+            this.EATamamButton = new SLF.CustomButton();
+            this.EACancelButton = new SLF.CustomButton();
             this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ISTASYON_ADI = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ISTASYON_TIPI = new System.Windows.Forms.DataGridViewComboBoxColumn();
@@ -40,9 +43,6 @@
             this.EA_X_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.EA_Y_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.StartYear = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.ChargingStationpanel2 = new System.Windows.Forms.Panel();
-            this.EATamamButton = new SLF.CustomButton();
-            this.EACancelButton = new SLF.CustomButton();
             this.ChargingStationpanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ChargingStationDataGridView)).BeginInit();
             this.ChargingStationpanel2.SuspendLayout();
@@ -105,47 +105,6 @@
             this.ChargingStationDataGridView.Size = new System.Drawing.Size(776, 375);
             this.ChargingStationDataGridView.TabIndex = 3;
             // 
-            // ID
-            // 
-            this.ID.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.ID.HeaderText = "ID";
-            this.ID.Name = "ID";
-            this.ID.ReadOnly = true;
-            this.ID.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.ID.Width = 44;
-            // 
-            // ISTASYON_ADI
-            // 
-            this.ISTASYON_ADI.HeaderText = "ISTASYON_ADI";
-            this.ISTASYON_ADI.Name = "ISTASYON_ADI";
-            // 
-            // ISTASYON_TIPI
-            // 
-            this.ISTASYON_TIPI.HeaderText = "ISTASYON_TIPI";
-            this.ISTASYON_TIPI.Name = "ISTASYON_TIPI";
-            // 
-            // ISTASYON_GUCU
-            // 
-            this.ISTASYON_GUCU.HeaderText = "ISTASYON_GUCU";
-            this.ISTASYON_GUCU.Name = "ISTASYON_GUCU";
-            // 
-            // EA_X_KOORDINAT
-            // 
-            this.EA_X_KOORDINAT.HeaderText = "EA_X_KOORDINAT";
-            this.EA_X_KOORDINAT.Name = "EA_X_KOORDINAT";
-            this.EA_X_KOORDINAT.ReadOnly = true;
-            // 
-            // EA_Y_KOORDINAT
-            // 
-            this.EA_Y_KOORDINAT.HeaderText = "EA_Y_KOORDINAT";
-            this.EA_Y_KOORDINAT.Name = "EA_Y_KOORDINAT";
-            this.EA_Y_KOORDINAT.ReadOnly = true;
-            // 
-            // StartYear
-            // 
-            this.StartYear.HeaderText = "BASLANGIC_YILI";
-            this.StartYear.Name = "StartYear";
-            // 
             // ChargingStationpanel2
             // 
             this.ChargingStationpanel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(158)))), ((int)(((byte)(223)))), ((int)(((byte)(156)))));
@@ -198,6 +157,60 @@
             this.EACancelButton.TextColor = System.Drawing.Color.White;
             this.EACancelButton.UseVisualStyleBackColor = false;
             this.EACancelButton.Click += new System.EventHandler(this.EACancelButton_Click);
+            // 
+            // ID
+            // 
+            this.ID.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.ID.HeaderText = "ID";
+            this.ID.Name = "ID";
+            this.ID.ReadOnly = true;
+            this.ID.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.ID.Width = 44;
+            // 
+            // ISTASYON_ADI
+            // 
+            this.ISTASYON_ADI.HeaderText = "ISTASYON_ADI";
+            this.ISTASYON_ADI.Name = "ISTASYON_ADI";
+            // 
+            // ISTASYON_TIPI
+            // 
+            this.ISTASYON_TIPI.HeaderText = "ISTASYON_TIPI";
+            this.ISTASYON_TIPI.Name = "ISTASYON_TIPI";
+            // 
+            // ISTASYON_GUCU
+            // 
+            this.ISTASYON_GUCU.HeaderText = "ISTASYON_GUCU";
+            this.ISTASYON_GUCU.Name = "ISTASYON_GUCU";
+            // 
+            // EA_X_KOORDINAT
+            // 
+            this.EA_X_KOORDINAT.HeaderText = "EA_X_KOORDINAT";
+            this.EA_X_KOORDINAT.Name = "EA_X_KOORDINAT";
+            this.EA_X_KOORDINAT.ReadOnly = true;
+            // 
+            // EA_Y_KOORDINAT
+            // 
+            this.EA_Y_KOORDINAT.HeaderText = "EA_Y_KOORDINAT";
+            this.EA_Y_KOORDINAT.Name = "EA_Y_KOORDINAT";
+            this.EA_Y_KOORDINAT.ReadOnly = true;
+            // 
+            // StartYear
+            // 
+            this.StartYear.HeaderText = "BASLANGIC_YILI";
+            this.StartYear.Items.AddRange(new object[] {
+            "2024",
+            "2025",
+            "2026",
+            "2027",
+            "2028",
+            "2029",
+            "2030",
+            "2031",
+            "2032",
+            "2033",
+            "2034",
+            "2035"});
+            this.StartYear.Name = "StartYear";
             // 
             // EAStationPopupForm
             // 

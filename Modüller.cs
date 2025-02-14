@@ -1729,9 +1729,6 @@ namespace SLF
                         ToolTipText = "Yeni Şarj İstasyonu",
                         Tag = cellId // Store CellId in the marker's Tag temporarily
                     };
-/*                    markerOverlay_ea.Markers.Add(marker);
-                    simulationOverlay.Markers.Add(marker);
-                    cellToolTipOverlay.Markers.Add(marker);*/
 
                     try
                     {
@@ -1740,11 +1737,6 @@ namespace SLF
                     }
                     catch
                     {
-                        // If an error occurs or the operation is cancelled, remove the temporary marker
-/*                        markerOverlay_ea.Markers.Remove(marker);
-                        simulationOverlay.Markers.Remove(marker);
-                        cellToolTipOverlay.Markers.Remove(marker);*/
-
                         RemoveMarkerFromOverlays(marker);
                     }
 
@@ -1753,16 +1745,6 @@ namespace SLF
 
                     return;
                 }
-
-                // If not in "adding charging station" mode, open the popup form to edit the clicked marker
-/*                if (item.Tag != null)
-                {
-                    // Retrieve the CellId from the marker's Tag
-                    string cellId = item.Tag.ToString();
-
-                    // Use the helper method to handle the popup form
-                    await HandlePopupFormAsync(item.Position, cellId);
-                }*/
             }
         }
         private GMapMarker FindMarkerAtPosition(PointLatLng point)
@@ -2007,11 +1989,6 @@ namespace SLF
             {
                 gMapControl_EA.OnMapClick += gMapControl_Ea_OnMapClick;
             }
-/*            else 
-            {
-                gMapControl_EA.OnMapClick -= gMapControl_Ea_OnMapClick;
-            }
-            */
             // Check if we are in the process of adding a charging station
             if (!isAddingChargingStation)
             {
@@ -2032,11 +2009,10 @@ namespace SLF
             
             
         }
-
         private void EANewSimulationResultsButton_Click(object sender, EventArgs e)
         {
             // Get the updated input file path (it was saved earlier in the popup form)
-            string inputFilePath = @"C:\path\to\updated_input_file.csv"; // Modify this path accordingly
+            string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\DELTA_EA_DENEME_IMAR.xlsx"; // Modify this path accordingly
 
             // Check if the file exists
             if (File.Exists(inputFilePath))
@@ -2049,12 +2025,13 @@ namespace SLF
                 MessageBox.Show("Input file not found! Please ensure the file is saved correctly.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         private void RunPythonScript(string inputFilePath)
         {
             try
             {
-                string pythonScriptPath = @"C:\path\to\your\python_script.py"; // Modify this path accordingly
-                string pythonExePath = @"C:\path\to\python.exe"; // Path to your Python executable
+                string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\ea.py"; // Modify this path accordingly
+                string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe"; // Path to your Python executable
 
                 // Build the process start information
                 ProcessStartInfo startInfo = new ProcessStartInfo
@@ -2082,6 +2059,56 @@ namespace SLF
                 MessageBox.Show($"Error running Python script: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        /*        private void EANewSimulationResultsButton_Click(object sender, EventArgs e)
+                {
+                    // Get the updated input file path (it was saved earlier in the popup form)
+                    string inputFilePath = @"C:\path\to\updated_input_file.csv"; // Modify this path accordingly
+
+                    // Check if the file exists
+                    if (File.Exists(inputFilePath))
+                    {
+                        // Call the Python script with the updated input file
+                        RunPythonScript(inputFilePath);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Input file not found! Please ensure the file is saved correctly.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                private void RunPythonScript(string inputFilePath)
+                {
+                    try
+                    {
+                        string pythonScriptPath = @"C:\path\to\your\python_script.py"; // Modify this path accordingly
+                        string pythonExePath = @"C:\path\to\python.exe"; // Path to your Python executable
+
+                        // Build the process start information
+                        ProcessStartInfo startInfo = new ProcessStartInfo
+                        {
+                            FileName = pythonExePath,
+                            Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",  // Pass the input file path to the script
+                            RedirectStandardOutput = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        };
+
+                        // Start the process and get the output
+                        Process process = new Process { StartInfo = startInfo };
+                        process.Start();
+
+                        // Optional: Read output from Python script
+                        string output = process.StandardOutput.ReadToEnd();
+                        process.WaitForExit();
+
+                        // Display result
+                        MessageBox.Show($"Python script executed successfully!\nOutput:\n{output}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error running Python script: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }*/
 
         private async Task eaHaritayaVeriYukleAsync()
         {
@@ -2202,7 +2229,7 @@ namespace SLF
             {
                 filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Düşük.xlsx";
             }
-            else if (SelectedCity == "İzmir" && SelectedSpeed == "varsayılan")
+            else if (SelectedCity == "İzmir" && SelectedSpeed == "Varsayılan")
             {
                 filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_baz.xlsx";
             }
@@ -2214,7 +2241,7 @@ namespace SLF
             {
                 filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Düşük.xlsx";
             }
-            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "varsayılan")
+            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Varsayılan")
             {
                 filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_esk_baz.xlsx";
             }
