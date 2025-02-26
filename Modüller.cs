@@ -295,9 +295,11 @@ namespace SLF
 
 
 
+
         private void InitializeGMap(GMap.NET.WindowsForms.GMapControl gmap)
         {
-            gmap.MapProvider = GMapProviders.GoogleSatelliteMap;
+            //gmap.MapProvider = GMapProviders.GoogleSatelliteMap;
+            gmap.MapProvider = GMapProviders.BingHybridMap;
             gmap.ShowCenter = false;
             gmap.Position = new PointLatLng(38.472, 27.10);
             gmap.MinZoom = 8;
@@ -1966,99 +1968,509 @@ namespace SLF
 
             return formattedEATable;
         }
-
-
         private void EAStationAddButton_Click(object sender, EventArgs e)
-        {
-            // Check if the "EA Şarj Verileri" key exists in the dataTablesByType dictionary
-            if (!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
-            {
-                MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
-                return;
-            }
-            gMapControl_EA.OnMarkerClick -= gMapControl_EA_OnMarkerClick;
-            gMapControl_EA.OnMapClick -= gMapControl_Ea_OnMapClick;
-            // Use dataGridView1.DataSource as the DataTable instead of eaDataTable
-            DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
-            if (dataTable == null || dataTable.Rows.Count == 0)
-            {
-                MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
-                return;
-            }
-            if (!gMapControl_EA.Overlays.Contains(simulationOverlay) || !gMapControl_EA.Overlays.Contains(cellToolTipOverlay))
-            {
-                gMapControl_EA.OnMapClick += gMapControl_Ea_OnMapClick;
-            }
-            // Check if we are in the process of adding a charging station
-            if (!isAddingChargingStation)
-            {
-                MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
-                isAddingChargingStation = true;
-                gMapControl_EA.OnMarkerClick += gMapControl_EA_OnMarkerClick;
-                return; // Exit to wait for the user to click on the map
-            }
-
-            // Get the clicked point on the map
-            var pointClick = gMapControl_EA.FromLocalToLatLng(MousePosition.X, MousePosition.Y);
-
-            // Refresh the map to show the new marker
-            gMapControl_EA.Refresh();
-
-            // Reset the flag after adding the station
-            isAddingChargingStation = false;
-            
-            
-        }
-        private void EANewSimulationResultsButton_Click(object sender, EventArgs e)
-        {
-            // Get the updated input file path (it was saved earlier in the popup form)
-            string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\DELTA_EA_DENEME_IMAR.xlsx"; // Modify this path accordingly
-
-            // Check if the file exists
-            if (File.Exists(inputFilePath))
-            {
-                // Call the Python script with the updated input file
-                RunPythonScript(inputFilePath);
-            }
-            else
-            {
-                MessageBox.Show("Input file not found! Please ensure the file is saved correctly.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void RunPythonScript(string inputFilePath)
         {
             try
             {
-                string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\ea.py"; // Modify this path accordingly
-                string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe"; // Path to your Python executable
+                // Show wait cursor
+                Cursor = Cursors.WaitCursor;
+
+                // Check if the "EA Şarj Verileri" key exists in the dataTablesByType dictionary
+                if (!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
+                {
+                    MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
+                    return;
+                }
+
+                gMapControl_EA.OnMarkerClick -= gMapControl_EA_OnMarkerClick;
+                gMapControl_EA.OnMapClick -= gMapControl_Ea_OnMapClick;
+
+                // Use dataGridView1.DataSource as the DataTable instead of eaDataTable
+                DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
+                if (dataTable == null || dataTable.Rows.Count == 0)
+                {
+                    MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
+                    return;
+                }
+
+                if (!gMapControl_EA.Overlays.Contains(simulationOverlay) || !gMapControl_EA.Overlays.Contains(cellToolTipOverlay))
+                {
+                    gMapControl_EA.OnMapClick += gMapControl_Ea_OnMapClick;
+                }
+
+                // Check if we are in the process of adding a charging station
+                if (!isAddingChargingStation)
+                {
+                    MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
+                    isAddingChargingStation = true;
+                    gMapControl_EA.OnMarkerClick += gMapControl_EA_OnMarkerClick;
+                    return; // Exit to wait for the user to click on the map
+                }
+
+                // Get the clicked point on the map
+                var pointClick = gMapControl_EA.FromLocalToLatLng(MousePosition.X, MousePosition.Y);
+
+                // Refresh the map to show the new marker
+                gMapControl_EA.Refresh();
+
+                // Reset the flag after adding the station
+                isAddingChargingStation = false;
+            }
+            catch (Exception ex)
+            {
+                // Handle any unexpected exceptions
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // Restore cursor to default
+                Cursor = Cursors.Default;
+            }
+        }
+
+        // Assuming you have a status label on your form. If not, you can remove these lines.
+        private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
+        {
+            // Disable the button to prevent multiple clicks while processing
+            EANewSimulationResultsButton.Enabled = false;
+
+            try
+            {
+                // Update UI to indicate process start
+                Cursor = Cursors.WaitCursor;
+                if (statusLabel != null)
+                    statusLabel.Text = "Python script started. This may take a while. Please wait...";
+                statusLabel.Visible = true;
+
+                if (progressBar != null)
+                {
+
+                    progressBar.Style = ProgressBarStyle.Marquee;
+                    progressBar.Visible = true;
+                }
+
+                // Get the updated input file path (modify as needed)
+                string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\DELTA_EA_DENEME_IMAR.xlsx";
+
+                // Check if the file exists
+                if (File.Exists(inputFilePath))
+                {
+                    // Run the Python script asynchronously
+                    await RunPythonScriptAsync(inputFilePath);
+                }
+                else
+                {
+                    MessageBox.Show("Input file not found! Please ensure the file is saved correctly.",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // Restore UI elements after processing
+                Cursor = Cursors.Default;
+                if (progressBar != null)
+                    progressBar.Visible = false;
+                if (statusLabel != null)
+                    statusLabel.Text = "New simulation process is completed";
+
+                // Re-enable the button after the process completes
+                EANewSimulationResultsButton.Enabled = true;
+            }
+        }
+
+        private async Task RunPythonScriptAsync(string inputFilePath)
+        {
+            try
+            {
+                string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\ea.py"; // Modify as needed
+                string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe"; // Modify as needed
 
                 // Build the process start information
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
                     FileName = pythonExePath,
-                    Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",  // Pass the input file path to the script
+                    Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",
                     RedirectStandardOutput = true,
+                    RedirectStandardError = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };
 
-                // Start the process and get the output
-                Process process = new Process { StartInfo = startInfo };
-                process.Start();
+                using (Process process = new Process { StartInfo = startInfo })
+                {
+                    process.Start();
 
-                // Optional: Read output from Python script
-                string output = process.StandardOutput.ReadToEnd();
-                process.WaitForExit();
+                    // Asynchronously read the standard output and error streams
+                    Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
+                    Task<string> errorTask = process.StandardError.ReadToEndAsync();
 
-                // Display result
-                MessageBox.Show($"Python script executed successfully!\nOutput:\n{output}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // Wait for the process to exit without blocking the UI thread
+                    await Task.Run(() => process.WaitForExit());
+
+                    string output = await outputTask;
+                    string error = await errorTask;
+
+                    // Check for errors from the Python script
+                    if (process.ExitCode != 0)
+                    {
+                        MessageBox.Show($"Python script failed with exit code {process.ExitCode}.\nError:\n{error}",
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Python script executed successfully!\nOutput:\n{output}",
+                            "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error running Python script: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error running Python script: {ex.Message}",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+
+
+        /*        private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
+                {
+                    try
+                    {
+                        Cursor = Cursors.WaitCursor;
+                        // Inform the user that the Python script has started.
+                        // If you have a status label, update it:
+                        if (statusLabel != null)
+                            statusLabel.Text = "Python script started. Please wait...";
+                        // Alternatively, you might log this or display a non-blocking notification.
+
+                        // Get the updated input file path (modify as needed)
+                        string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\DELTA_EA_DENEME_IMAR.xlsx";
+
+                        // Check if the file exists
+                        if (File.Exists(inputFilePath))
+                        {
+                            // Run the Python script asynchronously
+                            await RunPythonScriptAsync(inputFilePath);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Input file not found! Please ensure the file is saved correctly.",
+                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        Cursor = Cursors.Default;
+                        // Optionally update the status label to indicate the process is done.
+                        if (statusLabel != null)
+                            statusLabel.Text = "Idle";
+                    }
+                }
+
+                private async Task RunPythonScriptAsync(string inputFilePath)
+                {
+                    try
+                    {
+                        string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\ea.py"; // Modify as needed
+                        string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe"; // Modify as needed
+
+                        // Build the process start information
+                        ProcessStartInfo startInfo = new ProcessStartInfo
+                        {
+                            FileName = pythonExePath,
+                            Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        };
+
+                        using (Process process = new Process { StartInfo = startInfo })
+                        {
+                            process.Start();
+
+                            // Asynchronously read the standard output and error streams
+                            Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
+                            Task<string> errorTask = process.StandardError.ReadToEndAsync();
+
+                            // Wait for the process to exit without blocking the UI thread
+                            await Task.Run(() => process.WaitForExit());
+
+                            string output = await outputTask;
+                            string error = await errorTask;
+
+                            // Inform the user upon completion with appropriate messaging
+                            if (process.ExitCode != 0)
+                            {
+                                MessageBox.Show($"Python script failed with exit code {process.ExitCode}.\nError:\n{error}",
+                                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                            else
+                            {
+                                MessageBox.Show($"Python script executed successfully!\nOutput:\n{output}",
+                                    "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error running Python script: {ex.Message}",
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }*/
+
+        /*        private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
+                {
+                    try
+                    {
+                        // Show wait cursor
+                        Cursor = Cursors.WaitCursor;
+
+                        // Get the updated input file path (modify this path accordingly)
+                        string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\DELTA_EA_DENEME_IMAR.xlsx";
+
+                        // Check if the file exists
+                        if (File.Exists(inputFilePath))
+                        {
+                            // Run the Python script asynchronously
+                            await RunPythonScriptAsync(inputFilePath);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Input file not found! Please ensure the file is saved correctly.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        // Restore cursor to default
+                        Cursor = Cursors.Default;
+                    }
+                }
+
+                private async Task RunPythonScriptAsync(string inputFilePath)
+                {
+                    try
+                    {
+                        string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\ea.py"; // Modify this path accordingly
+                        string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe"; // Path to your Python executable
+
+                        // Build the process start information
+                        ProcessStartInfo startInfo = new ProcessStartInfo
+                        {
+                            FileName = pythonExePath,
+                            Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",  // Pass the input file path to the script
+                            RedirectStandardOutput = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        };
+
+                        using (Process process = new Process { StartInfo = startInfo, EnableRaisingEvents = true })
+                        {
+                            // Create a TaskCompletionSource to await process exit
+                            var tcs = new TaskCompletionSource<bool>();
+
+                            process.Exited += (s, e) =>
+                            {
+                                tcs.TrySetResult(true);
+                            };
+
+                            process.Start();
+
+                            // Asynchronously read the output from the Python script
+                            string output = await process.StandardOutput.ReadToEndAsync();
+
+                            // Await process exit
+                            await tcs.Task;
+
+                            // Display result
+                            MessageBox.Show($"Python script executed successfully!\nOutput:\n{output}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error running Python script: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }*/
+
+        /*        private void EANewSimulationResultsButton_Click(object sender, EventArgs e)
+                {
+                    try
+                    {
+                        // Show wait cursor
+                        Cursor = Cursors.WaitCursor;
+
+                        // Get the updated input file path (it was saved earlier in the popup form)
+                        string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\DELTA_EA_DENEME_IMAR.xlsx"; // Modify this path accordingly
+
+                        // Check if the file exists
+                        if (File.Exists(inputFilePath))
+                        {
+                            // Call the Python script with the updated input file
+                            RunPythonScript(inputFilePath);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Input file not found! Please ensure the file is saved correctly.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        // Restore cursor to default
+                        Cursor = Cursors.Default;
+                    }
+                }
+
+                private void RunPythonScript(string inputFilePath)
+                {
+                    try
+                    {
+                        // Show wait cursor
+                        Cursor = Cursors.WaitCursor;
+
+                        string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\ea.py"; // Modify this path accordingly
+                        string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe"; // Path to your Python executable
+
+                        // Build the process start information
+                        ProcessStartInfo startInfo = new ProcessStartInfo
+                        {
+                            FileName = pythonExePath,
+                            Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",  // Pass the input file path to the script
+                            RedirectStandardOutput = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        };
+
+                        // Start the process and get the output
+                        Process process = new Process { StartInfo = startInfo };
+                        process.Start();
+
+                        // Optional: Read output from Python script
+                        string output = process.StandardOutput.ReadToEnd();
+                        process.WaitForExit();
+
+                        // Display result
+                        MessageBox.Show($"Python script executed successfully!\nOutput:\n{output}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Handle any unexpected exceptions
+                        MessageBox.Show($"Error running Python script: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        // Restore cursor to default
+                        Cursor = Cursors.Default;
+                    }
+                }
+        */
+
+        /*        private void EAStationAddButton_Click(object sender, EventArgs e)
+                {
+                    // Check if the "EA Şarj Verileri" key exists in the dataTablesByType dictionary
+                    if (!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
+                    {
+                        MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
+                        return;
+                    }
+                    gMapControl_EA.OnMarkerClick -= gMapControl_EA_OnMarkerClick;
+                    gMapControl_EA.OnMapClick -= gMapControl_Ea_OnMapClick;
+                    // Use dataGridView1.DataSource as the DataTable instead of eaDataTable
+                    DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
+                    if (dataTable == null || dataTable.Rows.Count == 0)
+                    {
+                        MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
+                        return;
+                    }
+                    if (!gMapControl_EA.Overlays.Contains(simulationOverlay) || !gMapControl_EA.Overlays.Contains(cellToolTipOverlay))
+                    {
+                        gMapControl_EA.OnMapClick += gMapControl_Ea_OnMapClick;
+                    }
+                    // Check if we are in the process of adding a charging station
+                    if (!isAddingChargingStation)
+                    {
+                        MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
+                        isAddingChargingStation = true;
+                        gMapControl_EA.OnMarkerClick += gMapControl_EA_OnMarkerClick;
+                        return; // Exit to wait for the user to click on the map
+                    }
+
+                    // Get the clicked point on the map
+                    var pointClick = gMapControl_EA.FromLocalToLatLng(MousePosition.X, MousePosition.Y);
+
+                    // Refresh the map to show the new marker
+                    gMapControl_EA.Refresh();
+
+                    // Reset the flag after adding the station
+                    isAddingChargingStation = false;
+
+
+                }
+                private void EANewSimulationResultsButton_Click(object sender, EventArgs e)
+                {
+                    // Get the updated input file path (it was saved earlier in the popup form)
+                    string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\DELTA_EA_DENEME_IMAR.xlsx"; // Modify this path accordingly
+
+                    // Check if the file exists
+                    if (File.Exists(inputFilePath))
+                    {
+                        // Call the Python script with the updated input file
+                        RunPythonScript(inputFilePath);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Input file not found! Please ensure the file is saved correctly.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+
+                private void RunPythonScript(string inputFilePath)
+                {
+                    try
+                    {
+                        string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\ea.py"; // Modify this path accordingly
+                        string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe"; // Path to your Python executable
+
+                        // Build the process start information
+                        ProcessStartInfo startInfo = new ProcessStartInfo
+                        {
+                            FileName = pythonExePath,
+                            Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",  // Pass the input file path to the script
+                            RedirectStandardOutput = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        };
+
+                        // Start the process and get the output
+                        Process process = new Process { StartInfo = startInfo };
+                        process.Start();
+
+                        // Optional: Read output from Python script
+                        string output = process.StandardOutput.ReadToEnd();
+                        process.WaitForExit();
+
+                        // Display result
+                        MessageBox.Show($"Python script executed successfully!\nOutput:\n{output}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error running Python script: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }*/
 
         /*        private void EANewSimulationResultsButton_Click(object sender, EventArgs e)
                 {
@@ -3752,26 +4164,32 @@ namespace SLF
         }
 
 
-
-        private void ELFPredictionShowResultsButton_Click(object sender, EventArgs e)
+        private async void ELFPredictionShowResultsButton_Click(object sender, EventArgs e)
         {
             try
             {
-                // Set cursor to wait while running the operations
+                // Update UI to indicate process start
                 Cursor.Current = Cursors.WaitCursor;
+                if (RModelStatusLabel != null)
+                    RModelStatusLabel.Text = "R script started. Please wait...";
+                RModelStatusLabel.Visible = true;
+                if (RModelProgressBar != null)
+                {
+                    RModelProgressBar.Style = ProgressBarStyle.Marquee;
+                    RModelProgressBar.Visible = true;
+                }
 
                 string modifiedFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\INPUT_FILE\INPUT_FILE.xlsx";
 
                 // Check if the modified file exists
                 if (!File.Exists(modifiedFilePath))
                 {
-                    MessageBox.Show("The modified Excel file does not exist. Please save the scena" +
-                        "rio first.");
+                    MessageBox.Show("The modified Excel file does not exist. Please save the scenario first.");
                     return;
                 }
 
-                // Run the R script
-                string resultsFilePath = RunModelRScript(modifiedFilePath);
+                // Run the R script asynchronously
+                string resultsFilePath = await RunModelRScriptAsync(modifiedFilePath);
 
                 if (resultsFilePath == null)
                 {
@@ -3784,21 +4202,29 @@ namespace SLF
                 // Load images into PictureBox controls after loading the results
                 LoadImagesIntoPictureBoxes();
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("An error occurred: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             finally
             {
-                // Restore cursor to default
+                // Restore UI elements after processing
                 Cursor.Current = Cursors.Default;
+                if (RModelProgressBar != null)
+                    RModelProgressBar.Visible = false;
+                if (RModelStatusLabel != null)
+                    RModelStatusLabel.Text = "Process is done.";
             }
         }
 
-        // Method to run the R script
-        private string RunModelRScript(string modifiedFilePath)
+        private async Task<string> RunModelRScriptAsync(string modifiedFilePath)
         {
+            // Define the paths (adjust these paths as needed)
             string rScriptPath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\model.R";
             string resultsFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\ELF_Tahmin_Sonuçları.xlsx";
 
-            // Set up process info
-            var processInfo = new ProcessStartInfo()
+            // Set up process start information
+            var processInfo = new ProcessStartInfo
             {
                 FileName = "Rscript.exe",
                 Arguments = $"\"{rScriptPath}\" \"{modifiedFilePath}\"",
@@ -3808,35 +4234,122 @@ namespace SLF
                 CreateNoWindow = true
             };
 
-            // Start the process
-            using (var process = Process.Start(processInfo))
+            using (var process = new Process { StartInfo = processInfo, EnableRaisingEvents = true })
             {
-                process.OutputDataReceived += (sender, args) =>
+                process.Start();
+
+                // Asynchronously read the output and error streams
+                Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
+                Task<string> errorTask = process.StandardError.ReadToEndAsync();
+
+                // Wait for the process to exit without blocking the UI thread
+                await Task.Run(() => process.WaitForExit());
+
+                string output = await outputTask;
+                string error = await errorTask;
+
+                // Optionally log the output and error for debugging
+                Console.WriteLine("R script output: " + output);
+                Console.WriteLine("R script error: " + error);
+
+                if (process.ExitCode != 0)
                 {
-                    if (!string.IsNullOrEmpty(args.Data))
-                    {
-                        Console.WriteLine(args.Data);
-                        //resultsFilePath = args.Data;  // Capture the file path
-                    }
-                };
+                    MessageBox.Show($"R script execution failed with exit code {process.ExitCode}.\nError:\n{error}",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return null;
+                }
 
-                process.ErrorDataReceived += (sender, args) => Console.WriteLine("ERROR: " + args.Data);
-
-                process.BeginOutputReadLine();
-                process.WaitForExit();
+                MessageBox.Show("R script executed successfully. Results saved in: " + resultsFilePath);
+                Console.WriteLine("R script executed successfully. Results saved in: " + resultsFilePath);
+                return resultsFilePath;
             }
-
-            if (string.IsNullOrEmpty(resultsFilePath))
-            {
-                MessageBox.Show("Error: No results file path was generated by the R script.");
-                return null;
-            }
-
-            MessageBox.Show("R script executed successfully. Results saved in: " + resultsFilePath);
-            Console.WriteLine("R script executed successfully. Results saved in: " + resultsFilePath);
-            return resultsFilePath;  // Return the results file path
         }
 
+
+        /*        private void ELFPredictionShowResultsButton_Click(object sender, EventArgs e)
+                {
+                    try
+                    {
+                        // Set cursor to wait while running the operations
+                        Cursor.Current = Cursors.WaitCursor;
+
+                        string modifiedFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\INPUT_FILE\INPUT_FILE.xlsx";
+
+                        // Check if the modified file exists
+                        if (!File.Exists(modifiedFilePath))
+                        {
+                            MessageBox.Show("The modified Excel file does not exist. Please save the scena" +
+                                "rio first.");
+                            return;
+                        }
+
+                        // Run the R script
+                        string resultsFilePath = RunModelRScript(modifiedFilePath);
+
+                        if (resultsFilePath == null)
+                        {
+                            // If R script failed or no results path was returned, stop further execution
+                            return;
+                        }
+
+                        // Load results into tab_ekonometrik
+                        LoadResultsToTabEkonometrik(resultsFilePath);
+                        // Load images into PictureBox controls after loading the results
+                        LoadImagesIntoPictureBoxes();
+                    }
+                    finally
+                    {
+                        // Restore cursor to default
+                        Cursor.Current = Cursors.Default;
+                    }
+                }
+
+                // Method to run the R script
+                private string RunModelRScript(string modifiedFilePath)
+                {
+                    string rScriptPath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\model.R";
+                    string resultsFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\ELF_Tahmin_Sonuçları.xlsx";
+
+                    // Set up process info
+                    var processInfo = new ProcessStartInfo()
+                    {
+                        FileName = "Rscript.exe",
+                        Arguments = $"\"{rScriptPath}\" \"{modifiedFilePath}\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+
+                    // Start the process
+                    using (var process = Process.Start(processInfo))
+                    {
+                        process.OutputDataReceived += (sender, args) =>
+                        {
+                            if (!string.IsNullOrEmpty(args.Data))
+                            {
+                                Console.WriteLine(args.Data);
+                                //resultsFilePath = args.Data;  // Capture the file path
+                            }
+                        };
+
+                        process.ErrorDataReceived += (sender, args) => Console.WriteLine("ERROR: " + args.Data);
+
+                        process.BeginOutputReadLine();
+                        process.WaitForExit();
+                    }
+
+                    if (string.IsNullOrEmpty(resultsFilePath))
+                    {
+                        MessageBox.Show("Error: No results file path was generated by the R script.");
+                        return null;
+                    }
+
+                    MessageBox.Show("R script executed successfully. Results saved in: " + resultsFilePath);
+                    Console.WriteLine("R script executed successfully. Results saved in: " + resultsFilePath);
+                    return resultsFilePath;  // Return the results file path
+                }
+        */
 
         // Helper method to load data from an Excel worksheet into a DataGridView
         private void LoadWorksheetToDataGridView(ExcelWorksheet worksheet, DataGridView dataGridView)
