@@ -55,7 +55,7 @@ namespace SLF
             this.label_girdi_dosya_secimi = new System.Windows.Forms.Label();
             this.SelectFolderButton = new System.Windows.Forms.Button();
             this.tab_dek = new System.Windows.Forms.TabPage();
-            this.gMapControl_DEK = new GMap.NET.WindowsForms.GMapControl();
+            //this.gMapControl_DEK = new GMap.NET.WindowsForms.GMapControl();
             this.panel_DEK = new System.Windows.Forms.Panel();
             this.dekSimMaxBtn = new System.Windows.Forms.RadioButton();
             this.dekSimDefBtn = new System.Windows.Forms.RadioButton();
@@ -91,7 +91,7 @@ namespace SLF
             this.FutureSimLabel = new System.Windows.Forms.Label();
             this.comboBox_ea_il_secimi = new System.Windows.Forms.ComboBox();
             this.comboBox_ea_yıl_secimi = new System.Windows.Forms.ComboBox();
-            this.gMapControl_EA = new GMap.NET.WindowsForms.GMapControl();
+            //this.gMapControl_EA = new GMap.NET.WindowsForms.GMapControl();
             this.tab_ekonometrik = new System.Windows.Forms.TabPage();
             this.ELFResultsTabControls = new System.Windows.Forms.TabControl();
             this.ELFMinResultsTabPage = new System.Windows.Forms.TabPage();
@@ -136,7 +136,7 @@ namespace SLF
             this.Sokak_Görünümü = new System.Windows.Forms.ToolStripMenuItem();
             this.Uydu = new System.Windows.Forms.ToolStripMenuItem();
             this.webView_imar = new Microsoft.Web.WebView2.WinForms.WebView2();
-            this.gMapControl_imar = new GMap.NET.WindowsForms.GMapControl();
+            //this.gMapControl_imar = new GMap.NET.WindowsForms.GMapControl();
             this.mesafe_metre_imar = new System.Windows.Forms.Label();
             this.Mesafe_imar = new System.Windows.Forms.Label();
             this.checkBox_imar_1 = new System.Windows.Forms.CheckBox();
@@ -169,7 +169,7 @@ namespace SLF
             this.toolStripSeparator14 = new System.Windows.Forms.ToolStripSeparator();
             this.İmar_Fonksiyonlar = new System.Windows.Forms.ToolStripButton();
             this.tab_optDTR = new System.Windows.Forms.TabPage();
-            this.gMapControl_optimalDTR = new GMap.NET.WindowsForms.GMapControl();
+            //this.gMapControl_optimalDTR = new GMap.NET.WindowsForms.GMapControl();
             this.webView_optimalDTR = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.checkBox_optDTR_Eskişehir = new System.Windows.Forms.CheckBox();
             this.checkBox_optDTR_İzmir = new System.Windows.Forms.CheckBox();
@@ -200,7 +200,7 @@ namespace SLF
             this.checkBox_stokastik_14 = new System.Windows.Forms.CheckBox();
             this.panel_stokastik = new System.Windows.Forms.Panel();
             this.webView_stokastik = new Microsoft.Web.WebView2.WinForms.WebView2();
-            this.gMapControl_stokastik = new GMap.NET.WindowsForms.GMapControl();
+            //this.gMapControl_stokastik = new GMap.NET.WindowsForms.GMapControl();
             this.buton_stokastik_harita_katmanlar = new System.Windows.Forms.Button();
             this.checkBox_stokastik_13 = new System.Windows.Forms.CheckBox();
             this.checkBox_stokastik_12 = new System.Windows.Forms.CheckBox();
@@ -246,7 +246,7 @@ namespace SLF
             this.Yuk_Kaydır = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.Yuk_Mesafe_Ölç = new System.Windows.Forms.ToolStripButton();
-            this.gMapControl_yuk = new GMap.NET.WindowsForms.GMapControl();
+            //this.gMapControl_yuk = new GMap.NET.WindowsForms.GMapControl();
             this.buton_yuk_haritası_katmanlar = new System.Windows.Forms.Button();
             this.tab_rapor = new System.Windows.Forms.TabPage();
             this.tab_validasyon = new System.Windows.Forms.TabPage();
@@ -256,7 +256,7 @@ namespace SLF
             this.checkBox_yga_14 = new System.Windows.Forms.CheckBox();
             this.panel_yga = new System.Windows.Forms.Panel();
             this.webView_yga = new Microsoft.Web.WebView2.WinForms.WebView2();
-            this.gMapControl_yga = new GMap.NET.WindowsForms.GMapControl();
+            //this.gMapControl_yga = new GMap.NET.WindowsForms.GMapControl();
             this.buton_yga_harita_katmanlar = new System.Windows.Forms.Button();
             this.Mesafe_yga = new System.Windows.Forms.Label();
             this.mesafe_metre_yga = new System.Windows.Forms.Label();
@@ -313,7 +313,7 @@ namespace SLF
             this.overlap_analizi = new System.Windows.Forms.ToolStripMenuItem();
             this.ModuleTabPanel = new System.Windows.Forms.Panel();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.gMapControl_optimal_dtr = new GMap.NET.WindowsForms.GMapControl();
+            //this.gMapControl_optimal_dtr = new GMap.NET.WindowsForms.GMapControl();
             this.Seç_Stokastik = new System.Windows.Forms.ToolStrip();
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
             this.HeaderPanel = new System.Windows.Forms.Panel();
@@ -743,7 +743,7 @@ namespace SLF
             // 
             // tab_dek
             // 
-            this.tab_dek.Controls.Add(this.gMapControl_DEK);
+            //this.tab_dek.Controls.Add(this.gMapControl_DEK);
             this.tab_dek.Controls.Add(this.panel_DEK);
             this.tab_dek.ImageIndex = 0;
             this.tab_dek.Location = new System.Drawing.Point(4, 48);
@@ -756,6 +756,8 @@ namespace SLF
             // 
             // gMapControl_DEK
             // 
+            
+            /*
             this.gMapControl_DEK.AllowDrop = true;
             this.gMapControl_DEK.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
@@ -786,7 +788,7 @@ namespace SLF
             this.gMapControl_DEK.TabIndex = 38;
             this.gMapControl_DEK.Zoom = 0D;
             this.gMapControl_DEK.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_DEK_OnMapClick);
-            this.gMapControl_DEK.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(this.gMapControl_Dek_OnMarkerClick);
+            this.gMapControl_DEK.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(this.gMapControl_Dek_OnMarkerClick);*/
             // 
             // panel_DEK
             // 
@@ -926,7 +928,7 @@ namespace SLF
             this.tab_ea.Controls.Add(this.EAStationsLegendPanel);
             this.tab_ea.Controls.Add(this.panel_ea);
             this.tab_ea.Controls.Add(this.GelecekSimPanel);
-            this.tab_ea.Controls.Add(this.gMapControl_EA);
+            //this.tab_ea.Controls.Add(this.gMapControl_EA);
             this.tab_ea.ImageIndex = 2;
             this.tab_ea.Location = new System.Drawing.Point(4, 48);
             this.tab_ea.Margin = new System.Windows.Forms.Padding(2);
@@ -1296,6 +1298,7 @@ namespace SLF
             // 
             // gMapControl_EA
             // 
+            /*
             this.gMapControl_EA.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -1324,6 +1327,7 @@ namespace SLF
             this.gMapControl_EA.Size = new System.Drawing.Size(1358, 547);
             this.gMapControl_EA.TabIndex = 18;
             this.gMapControl_EA.Zoom = 0D;
+            */
             // 
             // tab_ekonometrik
             // 
@@ -1782,7 +1786,7 @@ namespace SLF
             this.panel_imar.AutoSize = true;
             this.panel_imar.Controls.Add(this.buton_imar_katmanlar);
             this.panel_imar.Controls.Add(this.webView_imar);
-            this.panel_imar.Controls.Add(this.gMapControl_imar);
+            //this.panel_imar.Controls.Add(this.gMapControl_imar);
             this.panel_imar.Controls.Add(this.mesafe_metre_imar);
             this.panel_imar.Controls.Add(this.Mesafe_imar);
             this.panel_imar.Location = new System.Drawing.Point(187, 56);
@@ -1894,6 +1898,7 @@ namespace SLF
             // 
             // gMapControl_imar
             // 
+            /*
             this.gMapControl_imar.AllowDrop = true;
             this.gMapControl_imar.Bearing = 0F;
             this.gMapControl_imar.CanDragMap = true;
@@ -1926,6 +1931,7 @@ namespace SLF
             this.gMapControl_imar.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_imar_MouseDown);
             this.gMapControl_imar.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_imar_MouseMove);
             this.gMapControl_imar.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gMapControl_imar_MouseUp);
+            */
             // 
             // mesafe_metre_imar
             // 
@@ -2353,7 +2359,7 @@ namespace SLF
             // 
             // tab_optDTR
             // 
-            this.tab_optDTR.Controls.Add(this.gMapControl_optimalDTR);
+            //this.tab_optDTR.Controls.Add(this.gMapControl_optimalDTR);
             this.tab_optDTR.Controls.Add(this.webView_optimalDTR);
             this.tab_optDTR.Controls.Add(this.checkBox_optDTR_Eskişehir);
             this.tab_optDTR.Controls.Add(this.checkBox_optDTR_İzmir);
@@ -2367,6 +2373,7 @@ namespace SLF
             // 
             // gMapControl_optimalDTR
             // 
+            /*
             this.gMapControl_optimalDTR.AllowDrop = true;
             this.gMapControl_optimalDTR.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
@@ -2396,6 +2403,7 @@ namespace SLF
             this.gMapControl_optimalDTR.Size = new System.Drawing.Size(802, 582);
             this.gMapControl_optimalDTR.TabIndex = 42;
             this.gMapControl_optimalDTR.Zoom = 0D;
+            */
             // 
             // webView_optimalDTR
             // 
@@ -2880,7 +2888,7 @@ namespace SLF
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel_stokastik.Controls.Add(this.webView_stokastik);
-            this.panel_stokastik.Controls.Add(this.gMapControl_stokastik);
+            //this.panel_stokastik.Controls.Add(this.gMapControl_stokastik);
             this.panel_stokastik.Controls.Add(this.buton_stokastik_harita_katmanlar);
             this.panel_stokastik.Location = new System.Drawing.Point(173, 28);
             this.panel_stokastik.Margin = new System.Windows.Forms.Padding(2);
@@ -2905,6 +2913,7 @@ namespace SLF
             // 
             // gMapControl_stokastik
             // 
+            /*
             this.gMapControl_stokastik.AllowDrop = true;
             this.gMapControl_stokastik.Bearing = 0F;
             this.gMapControl_stokastik.CanDragMap = true;
@@ -2938,6 +2947,7 @@ namespace SLF
             this.gMapControl_stokastik.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_stokastik_MouseDown);
             this.gMapControl_stokastik.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_stokastik_MouseMove);
             this.gMapControl_stokastik.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gMapControl_stokastik_MouseUp);
+            */
             // 
             // buton_stokastik_harita_katmanlar
             // 
@@ -3385,7 +3395,7 @@ namespace SLF
             this.tab_yükHaritası.Controls.Add(this.Mesafe_yuk);
             this.tab_yükHaritası.Controls.Add(this.mesafe_metre_yuk);
             this.tab_yükHaritası.Controls.Add(this.toolStrip_yuk);
-            this.tab_yükHaritası.Controls.Add(this.gMapControl_yuk);
+            //this.tab_yükHaritası.Controls.Add(this.gMapControl_yuk);
             this.tab_yükHaritası.Controls.Add(this.buton_yuk_haritası_katmanlar);
             this.tab_yükHaritası.Location = new System.Drawing.Point(4, 48);
             this.tab_yükHaritası.Margin = new System.Windows.Forms.Padding(2);
@@ -3547,6 +3557,7 @@ namespace SLF
             // 
             // gMapControl_yuk
             // 
+            /*
             this.gMapControl_yuk.AllowDrop = true;
             this.gMapControl_yuk.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
@@ -3580,6 +3591,7 @@ namespace SLF
             this.gMapControl_yuk.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_yuk_MouseDown);
             this.gMapControl_yuk.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_yuk_MouseMove);
             this.gMapControl_yuk.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gMapControl_yuk_MouseUp);
+            */
             // 
             // buton_yuk_haritası_katmanlar
             // 
@@ -3695,7 +3707,7 @@ namespace SLF
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel_yga.Controls.Add(this.webView_yga);
-            this.panel_yga.Controls.Add(this.gMapControl_yga);
+            //this.panel_yga.Controls.Add(this.gMapControl_yga);
             this.panel_yga.Controls.Add(this.buton_yga_harita_katmanlar);
             this.panel_yga.Controls.Add(this.Mesafe_yga);
             this.panel_yga.Controls.Add(this.mesafe_metre_yga);
@@ -3723,6 +3735,7 @@ namespace SLF
             // 
             // gMapControl_yga
             // 
+            /*
             this.gMapControl_yga.AllowDrop = true;
             this.gMapControl_yga.Bearing = 0F;
             this.gMapControl_yga.CanDragMap = true;
@@ -3756,6 +3769,7 @@ namespace SLF
             this.gMapControl_yga.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_yga_MouseDown);
             this.gMapControl_yga.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_yga_MouseMove);
             // 
+            */
             // buton_yga_harita_katmanlar
             // 
             this.buton_yga_harita_katmanlar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -4181,6 +4195,7 @@ namespace SLF
             // 
             // imageList
             // 
+            /*
             this.imageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList.ImageStream")));
             this.imageList.TransparentColor = System.Drawing.Color.Transparent;
             this.imageList.Images.SetKeyName(0, "Sun.ico");
@@ -4200,6 +4215,7 @@ namespace SLF
             this.imageList.Images.SetKeyName(14, "Health Graph.ico");
             this.imageList.Images.SetKeyName(15, "Deviation.ico");
             this.imageList.Images.SetKeyName(16, "Graph Report2.ico");
+            */
             // 
             // Toolbox_EA
             // 
@@ -4481,6 +4497,7 @@ namespace SLF
             // 
             // gMapControl_optimal_dtr
             // 
+            /*
             this.gMapControl_optimal_dtr.AllowDrop = true;
             this.gMapControl_optimal_dtr.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
@@ -4511,6 +4528,7 @@ namespace SLF
             this.gMapControl_optimal_dtr.TabIndex = 31;
             this.gMapControl_optimal_dtr.Zoom = 0D;
             // 
+            */
             // Seç_Stokastik
             // 
             this.Seç_Stokastik.ImageScalingSize = new System.Drawing.Size(20, 20);

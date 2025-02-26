@@ -310,14 +310,290 @@ namespace SLF
 
         }
 
+        private void StartGMapValues()
+        {
+            gMapControl_yga = new GMapControl();
+            gMapControl_stokastik = new GMapControl();
+            gMapControl_optimalDTR = new GMapControl();
+            gMapControl_optimal_dtr = new GMapControl();
+            gMapControl_DEK = new GMapControl();
+            gMapControl_yuk = new GMapControl();
+            gMapControl_imar = new GMapControl();
+            gMapControl_EA = new GMapControl();
+
+
+            gMapControl_yga.AllowDrop = true;
+            gMapControl_yga.Bearing = 0F;
+            gMapControl_yga.CanDragMap = true;
+            gMapControl_yga.Cursor = System.Windows.Forms.Cursors.Arrow;
+            gMapControl_yga.Dock = System.Windows.Forms.DockStyle.Fill;
+            gMapControl_yga.EmptyTileColor = System.Drawing.Color.Navy;
+            gMapControl_yga.GrayScaleMode = false;
+            gMapControl_yga.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
+            gMapControl_yga.Location = new System.Drawing.Point(0, 37);
+            gMapControl_yga.MarkersEnabled = true;
+            gMapControl_yga.MaxZoom = 2;
+            gMapControl_yga.MinZoom = 2;
+            gMapControl_yga.MouseWheelZoomEnabled = true;
+            gMapControl_yga.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
+            gMapControl_yga.Name = "gMapControl_yga";
+            gMapControl_yga.NegativeMode = false;
+            gMapControl_yga.PolygonsEnabled = true;
+            gMapControl_yga.RetryLoadTile = 0;
+            gMapControl_yga.RoutesEnabled = true;
+            gMapControl_yga.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
+            gMapControl_yga.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
+            gMapControl_yga.ShowTileGridLines = false;
+            gMapControl_yga.Size = new System.Drawing.Size(1382, 795);
+            gMapControl_yga.TabIndex = 37;
+            gMapControl_yga.Zoom = 0D;
+            gMapControl_yga.MouseClick += new MouseEventHandler(gMapControl_yga_OnMapClick);
+            gMapControl_yga.MouseDoubleClick += new MouseEventHandler(gMapControl_yga_OnMapDoubleClick);
+            gMapControl_yga.OnMarkerClick += new MarkerClick(gMapControl_yga_OnMarkerClick);
+            gMapControl_yga.MouseDown += new System.Windows.Forms.MouseEventHandler(gMapControl_yga_MouseDown);
+
+            gMapControl_yuk.AllowDrop = true;
+            gMapControl_yuk.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            gMapControl_yuk.Bearing = 0F;
+            gMapControl_yuk.CanDragMap = true;
+            gMapControl_yuk.Cursor = System.Windows.Forms.Cursors.Arrow;
+            gMapControl_yuk.EmptyTileColor = System.Drawing.Color.Navy;
+            gMapControl_yuk.GrayScaleMode = false;
+            gMapControl_yuk.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
+
+            gMapControl_yuk.Location = new System.Drawing.Point(364, 82);
+            gMapControl_yuk.MarkersEnabled = true;
+            gMapControl_yuk.MaxZoom = 2;
+            gMapControl_yuk.MinZoom = 2;
+            gMapControl_yuk.MouseWheelZoomEnabled = true;
+            gMapControl_yuk.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
+            gMapControl_yuk.Name = "gMapControl_yuk";
+            gMapControl_yuk.NegativeMode = false;
+            gMapControl_yuk.PolygonsEnabled = true;
+            gMapControl_yuk.RetryLoadTile = 0;
+            gMapControl_yuk.RoutesEnabled = true;
+            gMapControl_yuk.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
+            gMapControl_yuk.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
+            gMapControl_yuk.ShowTileGridLines = false;
+            gMapControl_yuk.Size = new System.Drawing.Size(1412, 717);
+            gMapControl_yuk.TabIndex = 34;
+            gMapControl_yuk.Zoom = 0D;
+            gMapControl_yuk.MouseClick += new MouseEventHandler(this.gMapControl_yuk_OnMapClick);
+            gMapControl_yuk.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_yuk_MouseDown);
+            gMapControl_yuk.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_yuk_MouseMove);
+            gMapControl_yuk.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gMapControl_yuk_MouseUp);
+
+            gMapControl_stokastik.AllowDrop = true;
+            gMapControl_stokastik.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            gMapControl_stokastik.Bearing = 0F;
+            gMapControl_stokastik.CanDragMap = true;
+            gMapControl_stokastik.Cursor = System.Windows.Forms.Cursors.Arrow;
+            gMapControl_stokastik.EmptyTileColor = System.Drawing.Color.Navy;
+            gMapControl_stokastik.GrayScaleMode = false;
+            gMapControl_stokastik.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
+            gMapControl_stokastik.Location = new System.Drawing.Point(352, 57);
+            gMapControl_stokastik.MarkersEnabled = true;
+            gMapControl_stokastik.MaxZoom = 2;
+            gMapControl_stokastik.MinZoom = 2;
+            gMapControl_stokastik.MouseWheelZoomEnabled = true;
+            gMapControl_stokastik.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
+            gMapControl_stokastik.Name = "gMapControl_stokastik";
+            gMapControl_stokastik.NegativeMode = false;
+            gMapControl_stokastik.PolygonsEnabled = true;
+            gMapControl_stokastik.RetryLoadTile = 0;
+            gMapControl_stokastik.RoutesEnabled = true;
+            gMapControl_stokastik.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
+            gMapControl_stokastik.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
+            gMapControl_stokastik.ShowTileGridLines = false;
+            gMapControl_stokastik.Size = new System.Drawing.Size(1551, 768);
+            gMapControl_stokastik.TabIndex = 30;
+            gMapControl_stokastik.Zoom = 0D;
+            gMapControl_stokastik.MouseClick += new MouseEventHandler(this.gMapControl_stokastik_OnMapClick);
+            gMapControl_stokastik.MouseDoubleClick += new MouseEventHandler(this.gMapControl_stokastik_OnMapDoubleClick);
+            gMapControl_stokastik.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(this.gMapControl_stokastik_OnMarkerClick);
+            gMapControl_stokastik.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_stokastik_MouseDown);
+            gMapControl_stokastik.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_stokastik_MouseMove);
+            gMapControl_stokastik.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gMapControl_stokastik_MouseUp);
+
+            gMapControl_optimalDTR.AllowDrop = true;
+            gMapControl_optimalDTR.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            gMapControl_optimalDTR.Bearing = 0F;
+            gMapControl_optimalDTR.CanDragMap = true;
+            gMapControl_optimalDTR.Cursor = System.Windows.Forms.Cursors.Arrow;
+            gMapControl_optimalDTR.EmptyTileColor = System.Drawing.Color.Navy;
+            gMapControl_optimalDTR.GrayScaleMode = false;
+            gMapControl_optimalDTR.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
+            gMapControl_optimalDTR.Location = new System.Drawing.Point(3, 3);
+            gMapControl_optimalDTR.MarkersEnabled = true;
+            gMapControl_optimalDTR.MaxZoom = 2;
+            gMapControl_optimalDTR.MinZoom = 2;
+            gMapControl_optimalDTR.MouseWheelZoomEnabled = true;
+            gMapControl_optimalDTR.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
+            gMapControl_optimalDTR.Name = "gMapControl_optimalDTR";
+            gMapControl_optimalDTR.NegativeMode = false;
+            gMapControl_optimalDTR.PolygonsEnabled = true;
+            gMapControl_optimalDTR.RetryLoadTile = 0;
+            gMapControl_optimalDTR.RoutesEnabled = true;
+            gMapControl_optimalDTR.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
+            gMapControl_optimalDTR.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
+            gMapControl_optimalDTR.ShowTileGridLines = false;
+            gMapControl_optimalDTR.Size = new System.Drawing.Size(1305, 3629);
+            gMapControl_optimalDTR.TabIndex = 42;
+            gMapControl_optimalDTR.Zoom = 0D;
+
+
+            gMapControl_imar.AllowDrop = true;
+            gMapControl_imar.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            gMapControl_imar.Bearing = 0F;
+            gMapControl_imar.CanDragMap = true;
+            gMapControl_imar.Cursor = System.Windows.Forms.Cursors.Arrow;
+            gMapControl_imar.EmptyTileColor = System.Drawing.Color.Navy;
+            gMapControl_imar.GrayScaleMode = false;
+            gMapControl_imar.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
+            gMapControl_imar.Location = new System.Drawing.Point(285, 43);
+            gMapControl_imar.MarkersEnabled = true;
+            gMapControl_imar.MaxZoom = 2;
+            gMapControl_imar.MinZoom = 2;
+            gMapControl_imar.MouseWheelZoomEnabled = true;
+            gMapControl_imar.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
+            gMapControl_imar.Name = "gMapControl_imar";
+            gMapControl_imar.NegativeMode = false;
+            gMapControl_imar.PolygonsEnabled = true;
+            gMapControl_imar.RetryLoadTile = 0;
+            gMapControl_imar.RoutesEnabled = true;
+            gMapControl_imar.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
+            gMapControl_imar.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
+            gMapControl_imar.ShowTileGridLines = false;
+            gMapControl_imar.Size = new System.Drawing.Size(1587, 1771);
+            gMapControl_imar.TabIndex = 35;
+            gMapControl_imar.Zoom = 0D;
+            gMapControl_imar.MouseClick += new MouseEventHandler(gMapControl_imar_OnMapClick);
+            gMapControl_imar.MouseDoubleClick += new MouseEventHandler(gMapControl_imar_OnMapDoubleClick);
+            gMapControl_imar.MouseDown += new System.Windows.Forms.MouseEventHandler(gMapControl_imar_MouseDown);
+            gMapControl_imar.MouseMove += new System.Windows.Forms.MouseEventHandler(gMapControl_imar_MouseMove);
+            gMapControl_imar.MouseUp += new System.Windows.Forms.MouseEventHandler(gMapControl_imar_MouseUp);
+
+            gMapControl_EA.Bearing = 0F;
+            gMapControl_EA.CanDragMap = true;
+            gMapControl_EA.Cursor = System.Windows.Forms.Cursors.Default;
+            gMapControl_EA.Dock = System.Windows.Forms.DockStyle.Fill;
+            gMapControl_EA.EmptyTileColor = System.Drawing.Color.Navy;
+            gMapControl_EA.GrayScaleMode = false;
+            gMapControl_EA.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
+            gMapControl_EA.Location = new System.Drawing.Point(0, 0);
+            gMapControl_EA.MarkersEnabled = true;
+            gMapControl_EA.MaxZoom = 2;
+            gMapControl_EA.MinZoom = 2;
+            gMapControl_EA.MouseWheelZoomEnabled = true;
+            gMapControl_EA.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
+            gMapControl_EA.Name = "gMapControl_EA";
+            gMapControl_EA.NegativeMode = false;
+            gMapControl_EA.PolygonsEnabled = true;
+            gMapControl_EA.RetryLoadTile = 0;
+            gMapControl_EA.RoutesEnabled = true;
+            gMapControl_EA.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
+            gMapControl_EA.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
+            gMapControl_EA.ShowTileGridLines = false;
+            gMapControl_EA.Size = new System.Drawing.Size(1927, 848);
+            gMapControl_EA.TabIndex = 18;
+            gMapControl_EA.Zoom = 0D;
+            gMapControl_EA.MouseClick += new MouseEventHandler(gMapControl_Ea_OnMapClick);
+            gMapControl_EA.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(gMapControl_EA_OnMarkerClick);
+
+            gMapControl_DEK.AllowDrop = true;
+            gMapControl_DEK.Bearing = 0F;
+            gMapControl_DEK.CanDragMap = true;
+            gMapControl_DEK.Cursor = System.Windows.Forms.Cursors.Arrow;
+            gMapControl_DEK.Dock = System.Windows.Forms.DockStyle.Fill;
+            gMapControl_DEK.EmptyTileColor = System.Drawing.Color.Navy;
+            gMapControl_DEK.GrayScaleMode = false;
+            gMapControl_DEK.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
+            //gMapControl_DEK.LevelsKeepInMemory = 5;
+            gMapControl_DEK.Location = new System.Drawing.Point(0, 0);
+            gMapControl_DEK.MarkersEnabled = true;
+            gMapControl_DEK.MaxZoom = 2;
+            gMapControl_DEK.MinZoom = 2;
+            gMapControl_DEK.MouseWheelZoomEnabled = true;
+            gMapControl_DEK.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
+            gMapControl_DEK.Name = "gMapControl_DEK";
+            gMapControl_DEK.NegativeMode = false;
+            gMapControl_DEK.PolygonsEnabled = true;
+            gMapControl_DEK.RetryLoadTile = 0;
+            gMapControl_DEK.RoutesEnabled = true;
+            gMapControl_DEK.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
+            gMapControl_DEK.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
+            gMapControl_DEK.ShowTileGridLines = false;
+            gMapControl_DEK.Size = new System.Drawing.Size(1648, 848);
+            gMapControl_DEK.TabIndex = 38;
+            gMapControl_DEK.Zoom = 0D;
+
+            gMapControl_DEK.MouseClick += new MouseEventHandler(gMapControl_DEK_OnMapClick);  
+            gMapControl_DEK.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(gMapControl_Dek_OnMarkerClick);
+
+            gMapControl_optimal_dtr.AllowDrop = true;
+            gMapControl_optimal_dtr.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            gMapControl_optimal_dtr.Bearing = 0F;
+            gMapControl_optimal_dtr.CanDragMap = true;
+            gMapControl_optimal_dtr.Cursor = System.Windows.Forms.Cursors.Default;
+            gMapControl_optimal_dtr.EmptyTileColor = System.Drawing.Color.Navy;
+            gMapControl_optimal_dtr.GrayScaleMode = false;
+            gMapControl_optimal_dtr.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
+            gMapControl_optimal_dtr.Location = new System.Drawing.Point(294, 38);
+            gMapControl_optimal_dtr.Margin = new System.Windows.Forms.Padding(2);
+            gMapControl_optimal_dtr.MarkersEnabled = true;
+            gMapControl_optimal_dtr.MaxZoom = 2;
+            gMapControl_optimal_dtr.MinZoom = 2;
+            gMapControl_optimal_dtr.MouseWheelZoomEnabled = true;
+            gMapControl_optimal_dtr.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
+            gMapControl_optimal_dtr.Name = "gMapControl_optimal_dtr";
+            gMapControl_optimal_dtr.NegativeMode = false;
+            gMapControl_optimal_dtr.PolygonsEnabled = true;
+            gMapControl_optimal_dtr.RetryLoadTile = 0;
+            gMapControl_optimal_dtr.RoutesEnabled = true;
+            gMapControl_optimal_dtr.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
+            gMapControl_optimal_dtr.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
+            gMapControl_optimal_dtr.ShowTileGridLines = false;
+            gMapControl_optimal_dtr.Size = new System.Drawing.Size(736, 519);
+            gMapControl_optimal_dtr.TabIndex = 31;
+            gMapControl_optimal_dtr.Zoom = 0D;
+
+
+
+
+            this.tab_stokastik.Controls.Add(gMapControl_stokastik);
+            this.tab_yga.Controls.Add(gMapControl_yga);
+            this.tab_dek.Controls.Add(gMapControl_DEK);
+            this.tab_ea.Controls.Add(gMapControl_EA);
+            this.tab_yükHaritası.Controls.Add(gMapControl_yuk);
+            this.tab_imar.Controls.Add(gMapControl_imar);
+            this.tab_optDTR.Controls.Add(gMapControl_optimalDTR);
+
+
+        }
+
+
 
         // Main constructor of the Modüller Formu 
         public ModülFormu(string selectedMethod = "", string tabToSelect = "")
         {
             // initialize the Modul Formu
             InitializeComponent();
-            gMapControl_EA.OnMarkerClick -= gMapControl_EA_OnMarkerClick;
-            gMapControl_EA.OnMapClick -= gMapControl_Ea_OnMapClick;
+            StartGMapValues();
+            // 2602
+            //gMapControl_EA.OnMarkerClick -= gMapControl_EA_OnMarkerClick;
+            //gMapControl_EA.OnMapClick -= gMapControl_Ea_OnMapClick;
+            // 2602
+
             _excelService = new ExcelService();
             InitializeLogTextBox(); // Initialize logTextBox
             //this.DoubleBuffered = true;
@@ -1330,7 +1606,25 @@ namespace SLF
             }
         }
 
-        private void gMapControl_stokastik_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        private void gMapControl_stokastik_OnMapClick(object sender, MouseEventArgs e)
+        {
+            // GMapControl üzerinden tıklama koordinatlarını elde et
+            if (!(sender is GMap.NET.WindowsForms.GMapControl gMapControl))
+            {
+                Console.WriteLine("gMapControl instance is null.");
+                return;
+            }
+
+            // Tıklama konumunu harita koordinatlarına dönüştür
+            PointLatLng pointClick = gMapControl.FromLocalToLatLng(e.X, e.Y);
+
+            // Orijinal metodu çağır
+            OnMapClickEventi(pointClick, e, markerOverlay_stokastik, ref polygonPoints_stokastik,
+                ref polygonOverlay_stokastik, Mesafe_stokastik, mesafe_metre_stokastik);
+        }
+
+
+        private void gMapControl_stokastik_OnMapClickold(PointLatLng pointClick, MouseEventArgs e)
         {
             OnMapClickEventi(pointClick, e, markerOverlay_stokastik, ref polygonPoints_stokastik,
                 ref polygonOverlay_stokastik, Mesafe_stokastik, mesafe_metre_stokastik);
@@ -1348,8 +1642,68 @@ namespace SLF
         }
 
 
+        private void gMapControl_stokastik_OnMapDoubleClick(object sender, MouseEventArgs e)
+        {
+            // Sadece sol tıklamaları işleme al
+            if (e.Button != MouseButtons.Left) return;
+
+            try
+            {
+                // GMapControl üzerinden tıklama koordinatlarını elde et
+                if (!(sender is GMap.NET.WindowsForms.GMapControl gMapControl))
+                {
+                    Console.WriteLine("gMapControl instance is null.");
+                    return;
+                }
+
+                // Tıklama konumunu harita koordinatlarına dönüştür
+                PointLatLng pointClick = gMapControl.FromLocalToLatLng(e.X, e.Y);
+
+                // Geçerli katmanı kontrol et
+                if (layer_index < 0 || layer_index >= cbs.tüm_katmanlar_array_stokastik.Length)
+                {
+                    Console.WriteLine("Layer index is out of bounds.");
+                    return;
+                }
+
+                var currentLayer = cbs.tüm_katmanlar_array_stokastik[layer_index];
+                if (currentLayer == null)
+                {
+                    Console.WriteLine($"Layer at index {layer_index} is null.");
+                    return;
+                }
+
+                // Katmandaki poligonlar üzerinde işlem yap
+                foreach (var polygon in currentLayer.Polygons)
+                {
+                    // Noktanın poligon içinde olup olmadığını kontrol et
+                    if (cbs.IsPointInPolygon(pointClick, polygon))
+                    {
+                        // Poligonu vurgula
+                        cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
+
+                        // Poligonun özelliklerini al
+                        if (cbs.polygonAttributes_stokastik.TryGetValue(polygon, out DataRow row))
+                        {
+                            // Özellikleri göster
+                            ShowAttributeRow(row);
+                            tablo_formu.Show(); // Özellik tablo formunu göster
+                        }
+                        else
+                        {
+                            Console.WriteLine("Attributes for the selected polygon not found.");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Beklenmedik hataları yakala ve logla
+                Console.WriteLine($"Error in gMapControl_stokastik_OnMapDoubleClick: {ex.Message}\n{ex.StackTrace}");
+            }
+        }
         // show information about polygons when double-clicking on the map
-        private void gMapControl_stokastik_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
+        private void gMapControl_stokastik_OnMapDoubleClickold(PointLatLng pointClick, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left && lastClickedCheckbox != null)
             {
@@ -1531,7 +1885,80 @@ namespace SLF
                         }
                     }
                 }*/
-        private async void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+
+        private async void gMapControl_Ea_OnMapClick(object sender, MouseEventArgs e)
+        {
+            // GMapControl üzerinden tıklama koordinatlarını elde et
+            if (!(sender is GMap.NET.WindowsForms.GMapControl gMapControl))
+            {
+                Console.WriteLine("gMapControl instance is null.");
+                return;
+            }
+
+            // Tıklama konumunu harita koordinatlarına dönüştür
+            PointLatLng pointClick = gMapControl.FromLocalToLatLng(e.X, e.Y);
+
+            if (isAddingChargingStation)
+            {
+                try
+                {
+                    // Yeni marker oluştur
+                    var marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow)
+                    {
+                        ToolTipText = "Yeni Şarj İstasyonu"
+                    };
+                    markerOverlay_ea.Markers.Add(marker);
+
+                    // Nokta verisini oluştur
+                    var noktaVeriMarker = new NoktaVeri
+                    {
+                        Enlem = Math.Round(pointClick.Lat, 4),
+                        Boylam = Math.Round(pointClick.Lng, 4)
+                    };
+
+                    // Popup formu göster
+                    using (var popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeriMarker))
+                    {
+                        var dialogResult = popupForm.ShowDialog();
+                        if (dialogResult == DialogResult.OK)
+                        {
+                            // Başarılı olduğunda harita verilerini yükle
+                            await eaHaritayaVeriYukleAsync();
+                        }
+                        else if (popupForm.OperationCancelled)
+                        {
+                            // İşlem iptal edilirse marker'ı kaldır
+                            markerOverlay_ea.Markers.Remove(marker);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Hataları logla veya kullanıcıya bildir
+                    Console.WriteLine($"Error: {ex.Message}\n{ex.StackTrace}");
+                }
+                finally
+                {
+                    // İşaretleme işlemini sıfırla
+                    isAddingChargingStation = false;
+                }
+
+                return;
+            }
+
+            // İşaretleme yapılmıyorsa varsayılan metodu çalıştır
+            try
+            {
+                OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
+                    ref polygonOverlay_ea, Mesafe_yuk, mesafe_metre_yuk);
+            }
+            catch (Exception ex)
+            {
+                // Varsayılan metot sırasında oluşan hataları yakala
+                Console.WriteLine($"Error in OnMapClickEventi: {ex.Message}\n{ex.StackTrace}");
+            }
+        }
+        private async void gMapControl_Ea_OnMapClickold(PointLatLng pointClick, MouseEventArgs e)
         {
 
             if (isAddingChargingStation)
@@ -1983,7 +2410,7 @@ namespace SLF
                 }
 
                 gMapControl_EA.OnMarkerClick -= gMapControl_EA_OnMarkerClick;
-                gMapControl_EA.OnMapClick -= gMapControl_Ea_OnMapClick;
+                gMapControl_EA.MouseClick -= gMapControl_Ea_OnMapClick;
 
                 // Use dataGridView1.DataSource as the DataTable instead of eaDataTable
                 DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
@@ -1995,7 +2422,7 @@ namespace SLF
 
                 if (!gMapControl_EA.Overlays.Contains(simulationOverlay) || !gMapControl_EA.Overlays.Contains(cellToolTipOverlay))
                 {
-                    gMapControl_EA.OnMapClick += gMapControl_Ea_OnMapClick;
+                    gMapControl_EA.MouseClick += gMapControl_Ea_OnMapClick;
                 }
 
                 // Check if we are in the process of adding a charging station
@@ -3093,8 +3520,76 @@ namespace SLF
             }
         }
 
+        private async void gMapControl_DEK_OnMapClick(object sender, MouseEventArgs e)
+        {
+            // GMapControl üzerinden tıklama koordinatlarını elde et
+            if (!(sender is GMap.NET.WindowsForms.GMapControl gMapControl))
+            {
+                Console.WriteLine("gMapControl instance is null.");
+                return;
+            }
 
-        private async void gMapControl_DEK_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+            // Tıklama konumunu harita koordinatlarına dönüştür
+            PointLatLng pointClick = gMapControl.FromLocalToLatLng(e.X, e.Y);
+
+            // DEK modülü için OnMapClickEventi çağrısı
+            try
+            {
+                OnMapClickEventi(pointClick, e, markerOverlay_DEK, ref polygonPoints_DEK,
+                    ref polygonOverlay_DEK, Mesafe_Dek, mesafe_metre_DeK);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in OnMapClickEventi: {ex.Message}\n{ex.StackTrace}");
+            }
+
+            // Eğer DEK noktası ekleme modu aktifse
+            if (isAddingDekPoint)
+            {
+                try
+                {
+                    // Yeni marker oluştur
+                    var marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green)
+                    {
+                        ToolTipText = "Yeni DEK Noktası"
+                    };
+                    markerOverlay_DEK.Markers.Add(marker);
+
+                    // Nokta verisini oluştur
+                    var noktaVeriMarker = new NoktaVeri
+                    {
+                        Enlem = Math.Round(pointClick.Lat, 4),
+                        Boylam = Math.Round(pointClick.Lng, 4)
+                    };
+
+                    // Popup formu göster
+                    using (var popupForm = new DEKCenterPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeriMarker))
+                    {
+                        var dialogResult = popupForm.ShowDialog();
+                        if (dialogResult == DialogResult.OK)
+                        {
+                            // Başarılı olduğunda harita verilerini yükle
+                            await dekHaritayaVeriYukleAsync();
+                        }
+                        else if (popupForm.OperationCancelled)
+                        {
+                            // İşlem iptal edilirse marker'ı kaldır
+                            markerOverlay_DEK.Markers.Remove(marker);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error while adding DEK point: {ex.Message}\n{ex.StackTrace}");
+                }
+                finally
+                {
+                    // İşaretleme işlemini sıfırla
+                    isAddingDekPoint = false;
+                }
+            }
+        }
+        private async void gMapControl_DEK_OnMapClickold(PointLatLng pointClick, MouseEventArgs e)
         {
             // DEK modülü için OnMapClickEventi çağrısı
             OnMapClickEventi(pointClick, e, markerOverlay_DEK, ref polygonPoints_DEK,
@@ -3630,14 +4125,85 @@ namespace SLF
             }
         }
 
-        private void gMapControl_yga_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        private void gMapControl_yga_OnMapClick(object sender, MouseEventArgs e)
+        {
+            // Tıklama konumunu harita koordinatlarına dönüştür
+            var gMapControl = sender as GMapControl;
+            if (gMapControl != null)
+            {
+                PointLatLng pointClick = gMapControl.FromLocalToLatLng(e.X, e.Y);
+
+                // Orijinal metodunuzu burada çağırabilirsiniz
+                OnMapClickEventi(pointClick, e, markerOverlay_yga, ref polygonPoints_yga,
+                    ref polygonOverlay_yga, Mesafe_yga, mesafe_metre_yga);
+            }
+        }
+
+
+        private void gMapControl_yga_OnMapClickold(PointLatLng pointClick, MouseEventArgs e)
         {
             OnMapClickEventi(pointClick, e, markerOverlay_yga, ref polygonPoints_yga,
                 ref polygonOverlay_yga, Mesafe_yga, mesafe_metre_yga);
 
         }
 
-        private void gMapControl_yga_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
+
+        private void gMapControl_yga_OnMapDoubleClick(object sender, MouseEventArgs e)
+        {
+            // Sadece sol tıklamaları işleme al
+            if (e.Button != MouseButtons.Left) return;
+
+            try
+            {
+                // GMapControl üzerinden tıklama koordinatlarını elde et
+                var gMapControl = sender as GMap.NET.WindowsForms.GMapControl;
+                if (gMapControl == null)
+                {
+                    Console.WriteLine("gMapControl instance is null.");
+                    return;
+                }
+
+                // Tıklama konumunu harita koordinatlarına dönüştür
+                PointLatLng pointClick = gMapControl.FromLocalToLatLng(e.X, e.Y);
+
+                // Geçerli katmanı kontrol et
+                var currentLayer = cbs.tüm_katmanlar_array_yga[layer_index];
+                if (currentLayer == null)
+                {
+                    Console.WriteLine($"Layer at index {layer_index} is null.");
+                    return;
+                }
+
+                // Katmandaki poligonlar üzerinde işlem yap
+                foreach (var polygon in currentLayer.Polygons)
+                {
+                    // Noktanın poligon içinde olup olmadığını kontrol et
+                    if (cbs.IsPointInPolygon(pointClick, polygon))
+                    {
+                        // Poligonu vurgula
+                        cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
+
+                        // Poligonun özelliklerini al
+                        if (cbs.polygonAttributes_yga.TryGetValue(polygon, out DataRow row))
+                        {
+                            // Özellikleri göster
+                            ShowAttributeRow(row);
+                            tablo_formu.Show(); // Özellik tablo formunu göster
+                        }
+                        else
+                        {
+                            Console.WriteLine("Attributes for the selected polygon not found.");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Beklenmedik hataları yakala ve logla
+                Console.WriteLine($"Error in gMapControl_yga_OnMapDoubleClick: {ex.Message}\n{ex.StackTrace}");
+            }
+        }
+        private void gMapControl_yga_OnMapDoubleClickold(PointLatLng pointClick, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left && lastClickedCheckbox != null)
             {
@@ -3811,7 +4377,24 @@ namespace SLF
             }
         }
 
-        private void gMapControl_imar_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+
+        private void gMapControl_imar_OnMapClick(object sender, MouseEventArgs e)
+        {
+            // GMapControl üzerinden tıklama koordinatlarını elde et
+            if (!(sender is GMap.NET.WindowsForms.GMapControl gMapControl))
+            {
+                Console.WriteLine("gMapControl instance is null.");
+                return;
+            }
+
+            // Tıklama konumunu harita koordinatlarına dönüştür
+            PointLatLng pointClick = gMapControl.FromLocalToLatLng(e.X, e.Y);
+
+            // Orijinal metodu çağır
+            OnMapClickEventi(pointClick, e, markerOverlay_imar, ref polygonPoints_imar,
+                    ref polygonOverlay_imar, Mesafe_imar, mesafe_metre_imar);
+        }
+        private void gMapControl_imar_OnMapClickold(PointLatLng pointClick, MouseEventArgs e)
         {
             OnMapClickEventi(pointClick, e, markerOverlay_imar, ref polygonPoints_imar,
                     ref polygonOverlay_imar, Mesafe_imar, mesafe_metre_imar);
@@ -3836,8 +4419,70 @@ namespace SLF
             }
         }
 
+        private void gMapControl_imar_OnMapDoubleClick(object sender, MouseEventArgs e)
+        {
+            // Sadece sol tıklamalar ve geçerli bir checkbox ile işlem yapılır
+            if (e.Button != MouseButtons.Left || lastClickedCheckbox == null)
+                return;
 
-        private void gMapControl_imar_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
+            try
+            {
+                // GMapControl üzerinden tıklama koordinatlarını elde et
+                if (!(sender is GMap.NET.WindowsForms.GMapControl gMapControl))
+                {
+                    Console.WriteLine("gMapControl instance is null.");
+                    return;
+                }
+
+                // Tıklama konumunu harita koordinatlarına dönüştür
+                PointLatLng pointClick = gMapControl.FromLocalToLatLng(e.X, e.Y);
+
+                // Checkbox'tan alınan index bilgisi
+                if (!int.TryParse(lastClickedCheckbox.Tag?.ToString(), out int checkboxIndex) || checkboxIndex <= 0)
+                {
+                    Console.WriteLine("Invalid or missing checkbox index.");
+                    return;
+                }
+
+                checkboxIndex--; // Checkbox indeksini dizi için sıfır tabanlı hale getir
+
+                // Index'in geçerli bir katman aralığında olup olmadığını kontrol et
+                if (checkboxIndex < 0 || checkboxIndex >= cbs.tüm_katmanlar_array_imar.Length)
+                {
+                    Console.WriteLine("Checkbox index out of bounds.");
+                    return;
+                }
+
+                // Belirtilen katmandaki poligonlar üzerinde işlem yap
+                foreach (var polygon in cbs.tüm_katmanlar_array_imar[checkboxIndex].Polygons)
+                {
+                    // Noktanın poligon içinde olup olmadığını kontrol et
+                    if (cbs.IsPointInPolygon(pointClick, polygon))
+                    {
+                        // Poligonu vurgula ve katman indeksini güncelle
+                        cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
+                        layer_index = checkboxIndex; // Geçerli katman indeksini güncelle
+
+                        // Poligonun özelliklerini al
+                        if (cbs.polygonAttributes_imar.TryGetValue(polygon, out DataRow row))
+                        {
+                            ShowAttributeRow(row);  // Özellikleri göster
+                            tablo_formu.Show();    // Tablo formunu göster
+                        }
+                        else
+                        {
+                            Console.WriteLine("Polygon attributes not found.");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Hataları yakala ve logla
+                Console.WriteLine($"Error in gMapControl_imar_OnMapDoubleClick: {ex.Message}\n{ex.StackTrace}");
+            }
+        }
+        private void gMapControl_imar_OnMapDoubleClickold(PointLatLng pointClick, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left && lastClickedCheckbox != null)
             {
@@ -3951,7 +4596,24 @@ namespace SLF
             }
         }
 
-        private void gMapControl_yuk_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        private void gMapControl_yuk_OnMapClick(object sender, MouseEventArgs e)
+        {
+            // GMapControl üzerinden tıklama koordinatlarını elde et
+            if (!(sender is GMap.NET.WindowsForms.GMapControl gMapControl))
+            {
+                Console.WriteLine("gMapControl instance is null.");
+                return;
+            }
+
+            // Tıklama konumunu harita koordinatlarına dönüştür
+            PointLatLng pointClick = gMapControl.FromLocalToLatLng(e.X, e.Y);
+
+            // Orijinal metodu çağır
+            OnMapClickEventi(pointClick, e, markerOverlay_yuk, ref polygonPoints_yuk,
+                ref polygonOverlay_yuk, Mesafe_yuk, mesafe_metre_yuk);
+        }
+
+        private void gMapControl_yuk_OnMapClickold(PointLatLng pointClick, MouseEventArgs e)
         {
             OnMapClickEventi(pointClick, e, markerOverlay_yuk, ref polygonPoints_yuk,
         ref polygonOverlay_yuk, Mesafe_yuk, mesafe_metre_yuk);

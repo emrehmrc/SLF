@@ -1,5 +1,4 @@
-﻿using GMap.NET.Avalonia;
-using GMap.NET;
+﻿using GMap.NET;
 using GMap.NET.WindowsForms;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SharpMap.Layers;
