@@ -543,10 +543,10 @@ namespace SLF
             else if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
                 // Hide the specific item you want to remove
-                HideComboBoxItem("Ekonometrik Yük Tahmini Verileri"); // Replace with the actual item you want to hide
+                //HideComboBoxItem("Ekonometrik Yük Tahmini Verileri"); // Replace with the actual item you want to hide
                 // For SLF, do not hide any tabs. Add logic here if needed.
                 // List of tab names to hide
-                string[] tabsToHide = { "EkonometrikSenaryoTabPage", "tab_ekonometrik" };
+/*                string[] tabsToHide = { "EkonometrikSenaryoTabPage", "tab_ekonometrik" };
 
                 // Loop through each tab name and remove it if it exists
                 foreach (string tabName in tabsToHide)
@@ -559,7 +559,7 @@ namespace SLF
                     {
                         Modül_Tabları.TabPages.RemoveByKey(tabName);
                     }
-                }
+                }*/
             }
         }
 
