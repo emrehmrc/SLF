@@ -82,7 +82,7 @@
             // Onizleme_Onizleme
             // 
             this.Onizleme_Onizleme.Controls.Add(this.Onizleme_dataGrid1);
-            this.Onizleme_Onizleme.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Onizleme_Onizleme.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Onizleme_Onizleme.ImageIndex = 4;
             this.Onizleme_Onizleme.Location = new System.Drawing.Point(4, 26);
             this.Onizleme_Onizleme.Margin = new System.Windows.Forms.Padding(2);
@@ -95,17 +95,15 @@
             // 
             // Onizleme_dataGrid1
             // 
-            this.Onizleme_dataGrid1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.Onizleme_dataGrid1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
+            this.Onizleme_dataGrid1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.Onizleme_dataGrid1.BackgroundColor = System.Drawing.Color.Snow;
             this.Onizleme_dataGrid1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.Onizleme_dataGrid1.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.DarkOrange;
             dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.Onizleme_dataGrid1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
@@ -114,18 +112,21 @@
             dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
             dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.GradientActiveCaption;
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.Onizleme_dataGrid1.DefaultCellStyle = dataGridViewCellStyle2;
+            this.Onizleme_dataGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Onizleme_dataGrid1.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.Onizleme_dataGrid1.Location = new System.Drawing.Point(6, 4);
+            this.Onizleme_dataGrid1.Location = new System.Drawing.Point(2, 2);
             this.Onizleme_dataGrid1.Margin = new System.Windows.Forms.Padding(2);
             this.Onizleme_dataGrid1.Name = "Onizleme_dataGrid1";
             this.Onizleme_dataGrid1.ReadOnly = true;
+            this.Onizleme_dataGrid1.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             this.Onizleme_dataGrid1.RowHeadersWidth = 18;
             this.Onizleme_dataGrid1.RowTemplate.Height = 24;
-            this.Onizleme_dataGrid1.Size = new System.Drawing.Size(876, 433);
+            this.Onizleme_dataGrid1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.Onizleme_dataGrid1.Size = new System.Drawing.Size(874, 428);
             this.Onizleme_dataGrid1.TabIndex = 0;
             // 
             // Onizleme_Hata
@@ -331,6 +332,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
             this.ClientSize = new System.Drawing.Size(904, 516);
             this.Controls.Add(this.buton_YUKLE);
             this.Controls.Add(this.buton_İlerle);
