@@ -371,7 +371,7 @@ namespace SLF
 
         protected void AddColumnsToDataTable(DataTable table)
         {
-            table.Columns.Add("Satır Bilgisi", typeof(string));
+           // table.Columns.Add("Satır Bilgisi", typeof(string));
             table.Columns.Add("Sütun Adı", typeof(string));
             table.Columns.Add("Validasyon Türü", typeof(string));
             table.Columns.Add("Validasyon Bilgisi", typeof(string));

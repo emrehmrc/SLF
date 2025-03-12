@@ -378,10 +378,10 @@ namespace SLF
             double trafoKapasitesi = Convert.ToDouble(matchingTrafo["TRAFO_KAPASITESI"]);
             
             infoDataTable.Rows.Add(
-                enerjiMusaadeNo,
                 "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID",
+                enerjiMusaadeNo,
               //  "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID - ENERJI_MUSAADE_BAGLANTI_GUCU - TRAFO_KAPASITESI",
-                "Removed Rows Report",
+               // "Removed Rows Report",
                 $"TRAFO_ID: {trafoID}, BaglantiGucuKW: {baglantiGucuKW:F2}, Percentage: {(baglantiGucuKW/trafoKapasitesi):P1}",
                 "Exceeded capacity"
             );
@@ -391,7 +391,7 @@ namespace SLF
             infoDataTable.Rows.Add(
                 enerjiMusaadeNo,
                 "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID",
-                "Removed Rows Report", 
+               // "Removed Rows Report", 
                 $"Invalid numeric value: {ex.Message}", 
                 "Data corruption"
             );
@@ -415,7 +415,7 @@ namespace SLF
                         invalidCount++;
                         infoDataTable.Rows.Add(
                             enerjiMusaadeNo,
-                            "OG Transformer Report",
+                           // "OG Transformer Report",
                             "Missing transformer ID.",
                             "Voltage level set to '#N/A'."
                         );
@@ -486,7 +486,7 @@ namespace SLF
                     row["ENERJI_MUSAADE_TALEP_DURUMU"] = 0;
                     infoDataTable.Rows.Add(
                         enerjiMusaadeNo,
-                        "Impute Onay",
+                     //   "Impute Onay",
                         "Request status was null.",
                         "Defaulted to 0."
                     );
@@ -624,8 +624,8 @@ namespace SLF
                             enerjiMusaadeNo,                      // Identifier
                             column.ColumnName,                         // ReportType
                             $"{nullPercentage:P1}",               // Details (or you could merge with the summary if desired)
-                            "This row will be flagged for removal or imputation.",  // Action
-                            additionalSummary                     // Additional summary column
+                            "This row will be flagged for removal or imputation." // Action
+                           // additionalSummary                     // Additional summary column
                         );
                     }
                 }
