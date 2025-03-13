@@ -173,10 +173,9 @@ namespace SLF
             return -1; // none free
         }
 
-        
+
         public async Task cbs_dosya_secimi(GMapControl callingMap, Form callingForm, DataGridView dataGridView)
         {
-            // Find the first available slot in the array that holds shapefile overlay layers
             layer_index = FindFirstFreeLayerIndex();
 
             if (layer_index == -1)
@@ -185,7 +184,6 @@ namespace SLF
                 return;
             }
 
-            // file dialog to select a file to import
             OpenFileDialog vektorel_veri_seçimi = new OpenFileDialog();
 
             string targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
@@ -200,8 +198,6 @@ namespace SLF
                 string filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
                 string extension = filename.Substring(filename.Length - 3);
 
-
-                // Create new overlays for all four maps:
                 GMapOverlay overlay_imar = new GMapOverlay($"overlay_{layer_index + 1}_imar");
                 GMapOverlay overlay_yuk = new GMapOverlay($"overlay_{layer_index + 1}_yuk");
                 GMapOverlay overlay_stokastik = new GMapOverlay($"overlay_{layer_index + 1}_stokastik");
@@ -212,10 +208,8 @@ namespace SLF
                 modülFormu.gMapControl_stokastik.Overlays.Add(overlay_stokastik);
                 modülFormu.gMapControl_yga.Overlays.Add(overlay_yga);
 
-                // create a new datatable to be added to the tüm_katmanlar_datatable array
                 DataTable dt = new DataTable();
                 callingForm.Cursor = Cursors.WaitCursor;
-
 
                 try
                 {
@@ -224,31 +218,19 @@ namespace SLF
                         await LoadShapefile(filepath, overlay_imar, dt, dataGridView);
                         callingForm.Cursor = Cursors.Default;
 
-                        // Duplicate the polygons and routes from shapeFileOverlay_imar into each new overlay
                         CopyOverlayContents(overlay_imar, overlay_yuk, polygonAttributes_imar, polygonAttributes_yuk);
                         CopyOverlayContents(overlay_imar, overlay_stokastik, polygonAttributes_imar, polygonAttributes_stokastik);
                         CopyOverlayContents(overlay_imar, overlay_yga, polygonAttributes_imar, polygonAttributes_yga);
-
                     }
                     else if (extension == "kml")
                     {
-
                         await LoadKmlFile(filepath, overlay_imar, dt, callingMap);
-                        /*
-                        // convert .kml overlay into a MapWinGIS.Shapefile object
-                        polygonAttributes_kml = new Dictionary<GMapPolygon, DataRow>();
-                        routeAttributes_kml = new Dictionary<GMapRoute, DataRow>();
-                        MapWinGIS.Shapefile shapefile = ConvertKmlToShapefile(kmlOverlay_imar);
-                        shapeFileArray_MapWinGIS[layer_index] = shapefile;*/
 
-                        // Duplicate the polygons and routes from shapeFileOverlay_imar into each new overlay
                         CopyOverlayContents(overlay_imar, overlay_yuk, polygonAttributes_imar, polygonAttributes_yuk);
                         CopyOverlayContents(overlay_imar, overlay_stokastik, polygonAttributes_imar, polygonAttributes_stokastik);
                         CopyOverlayContents(overlay_imar, overlay_yga, polygonAttributes_imar, polygonAttributes_yga);
-
                     }
 
-                    // store references in your arrays
                     tüm_katmanlar_array_imar[layer_index] = overlay_imar;
                     tüm_katmanlar_array_yuk[layer_index] = overlay_yuk;
                     tüm_katmanlar_array_stokastik[layer_index] = overlay_stokastik;
@@ -257,21 +239,28 @@ namespace SLF
                     tüm_katmanlar_datatable[layer_index] = dt;
                     tüm_katmanlar_array_names[layer_index] = filename;
 
-                    // Update the checkboxes for that layer in each 4 different map
                     List<CheckBox> associatedChecks = modülFormu.GetCheckBoxesByIndex(layer_index);
                     foreach (var chk in associatedChecks)
                     {
-                        chk.Text = filename;   // display layer name
+                        chk.Text = filename;
                         chk.Visible = true;
                         chk.Checked = true;
                     }
 
+                    // Mark all categories for update
+                    modülFormu.pendingUpdates["imar"] = true;
+                    modülFormu.pendingUpdates["yga"] = true;
+                    modülFormu.pendingUpdates["stokastik"] = true;
+
+                    // Update only the active tab immediately
+                    modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_imar, "imar");
+                    modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_yga, "yga");
+                    modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_stokastik, "stokastik");
                 }
                 finally
                 {
                     callingForm.Cursor = Cursors.Default;
                 }
-
             }
 
             modülFormu.gMapControl_imar.Refresh();
@@ -1487,7 +1476,6 @@ namespace SLF
 
             return dt;
         }
-
 
 
         public double CalculatePolygonArea(List<PointLatLng> points)

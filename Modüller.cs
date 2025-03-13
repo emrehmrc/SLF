@@ -30,7 +30,7 @@ namespace SLF
         public readonly CBS cbs;
         public int slfStartYear = 0, slfEndYear = 0;
 
-        TextBox logTextBox; // Declare logTextBox here --------------
+        System.Windows.Forms.TextBox logTextBox; // Declare logTextBox here --------------
         private ExcelService _excelService;
         private ExcelService excelService = new ExcelService();
 
@@ -80,7 +80,7 @@ namespace SLF
         public GMapOverlay polygonOverlay_DEK = new GMapOverlay("polygonOverlay_DEK");
 
         public Dictionary<int, GMapOverlay> overlaysByLayerIndex = new Dictionary<int, GMapOverlay>();
-        public Dictionary<int, CheckBox[]> checkboxesByLayerIndex = new Dictionary<int, CheckBox[]>();
+        public Dictionary<int, System.Windows.Forms.CheckBox[]> checkboxesByLayerIndex = new Dictionary<int, System.Windows.Forms.CheckBox[]>();
         public Dictionary<string, GMapOverlay> overlaysByName = new Dictionary<string, GMapOverlay>();
 
         public bool isRulerEnabled = false;
@@ -111,9 +111,12 @@ namespace SLF
 
         // Initialize all checkboxes
         // Class-level declaration of checkbox arrays
-        public CheckBox[] checkBoxes_yga;
-        public CheckBox[] checkBoxes_imar;
-        public CheckBox[] checkBoxes_stokastik;
+        public System.Windows.Forms.CheckBox[] checkBoxes_yga;
+        public System.Windows.Forms.CheckBox[] checkBoxes_imar;
+        public System.Windows.Forms.CheckBox[] checkBoxes_stokastik;
+
+
+
 
 
         // nokta ekleme/çıkarma gibi opsiyonların olduğu sağ tık menüsü
@@ -129,6 +132,10 @@ namespace SLF
 
         // variable to control the simultaneous on/off operations for all the related checkboxes together
         private bool _isSynchronizingCheckboxes = false;
+
+        private Dictionary<string, int> checkboxStartY = new Dictionary<string, int>();
+        private Dictionary<string, TabPage> categoryTabPages = new Dictionary<string, TabPage>();
+        private TabControl tabControlMain; // Reference to the TabControl
 
 
         // ------------------------------------------------------------------------------------------------------------ //
@@ -294,26 +301,88 @@ namespace SLF
         // ------------------------------------------ INITIALIZATION METHODS ------------------------------------------ //
 
 
-
         private void InitializeGMap(GMap.NET.WindowsForms.GMapControl gmap)
         {
             gmap.MapProvider = GMapProviders.GoogleSatelliteMap;
             gmap.ShowCenter = false;
-            gmap.Position = new PointLatLng(38.472, 27.10);
             gmap.MinZoom = 8;
             gmap.Manager.Mode = AccessMode.ServerAndCache;
             gmap.MaxZoom = 20;
             gmap.Zoom = 13;
             gmap.DragButton = MouseButtons.Left;
-
+            gmap.Position = new PointLatLng(38.4644, 27.1114);
         }
 
+        private const float PanelWidthRatio = 0.840f; // 1335/1585 ≈ 84.2% of tab_imar width
+        private const float PanelHeightRatio = 0.850f; // 649/677 ≈ 95.9% of tab_imar height
+        private const float PanelXOffsetRatio = 0.128f; // 203/1585 ≈ 12.8% (unchanged)
+        private const float PanelYOffsetRatio = 0.0635f; // 43/677 ≈ 6.35% (unchanged)
+
+        private void UpdatePanelSize()
+        {
+            // Get tab_imar client size (accounting for padding/margins if any)
+            Rectangle tabClientArea = tab_imar.ClientRectangle;
+            int tabWidth = tabClientArea.Width;
+            int tabHeight = tabClientArea.Height;
+
+            // Calculate panel size based on ratios
+            int targetWidth = (int)(tabWidth * PanelWidthRatio);
+            int targetHeight = (int)(tabHeight * PanelHeightRatio);
+
+            // Calculate panel position based on ratios
+            int targetX = (int)(tabWidth * PanelXOffsetRatio);
+            int targetY = (int)(tabHeight * PanelYOffsetRatio);
+
+            // Apply size to panel_imar
+            panel_imar.Size = new Size(targetWidth, targetHeight);
+
+            // Boundary check: Ensure panel stays within tab_imar and form boundaries
+            int margin = 10; // Small margin to prevent touching edges
+            int maxX = tabWidth - targetWidth - margin; // Maximum X position to keep panel inside tab_imar
+            int maxY = tabHeight - targetHeight - margin; // Maximum Y position to keep panel inside tab_imar
+
+            // Further constrain by form's client size (to prevent overflow outside form)
+            Rectangle formClientArea = this.ClientRectangle;
+            int formMaxX = formClientArea.Width - targetWidth - margin - (this.Width - this.ClientSize.Width); // Account for form borders
+            int formMaxY = formClientArea.Height - targetHeight - margin - (this.Height - this.ClientSize.Height);
+
+            // Use the more restrictive boundary (tab_imar or form)
+            maxX = Math.Min(maxX, formMaxX - tab_imar.Location.X); // Adjust for tab_imar's offset in form
+            maxY = Math.Min(maxY, formMaxY - tab_imar.Location.Y);
+
+            // Ensure position doesn't go negative
+            targetX = Math.Max(0, Math.Min(targetX, maxX));
+            targetY = Math.Max(0, Math.Min(targetY, maxY));
+
+            // Apply the constrained position
+            panel_imar.Location = new Point(targetX, targetY);
+
+            // Refresh GMapControl to handle rendering
+            gMapControl_imar.Refresh();
+        }
+
+
+        private void SetupLayout()
+        {
+            // Set initial size based on form size
+            UpdatePanelSize();
+
+            // Handle form resize to update constraints
+            this.Resize += Form1_Resize;
+        }
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            UpdatePanelSize();
+            gMapControl_imar.Refresh(); // Refresh GMapControl to handle rendering
+        }
 
         // Main constructor of the Modüller Formu 
         public ModülFormu(string selectedMethod = "", string tabToSelect = "")
         {
             // initialize the Modul Formu
             InitializeComponent();
+            SetupLayout();
 
             _excelService = new ExcelService();
             InitializeLogTextBox(); // Initialize logTextBox
@@ -337,7 +406,19 @@ namespace SLF
                 InitializeFormBasedOnMethod();  // Initialize based on the selected method
             }
 
+            InitializeCheckboxStartPositions();
+            InitializeCategoryTabPages();
+        }
 
+
+        private void InitializeCheckboxStartPositions()
+        {
+            if (checkBoxes_imar[0] != null && checkBoxes_imar[0].Parent != null)
+                checkboxStartY["imar"] = checkBoxes_imar[0].Location.Y;
+            if (checkBoxes_yga[0] != null && checkBoxes_yga[0].Parent != null)
+                checkboxStartY["yga"] = checkBoxes_yga[0].Location.Y;
+            if (checkBoxes_stokastik[0] != null && checkBoxes_stokastik[0].Parent != null)
+                checkboxStartY["stokastik"] = checkBoxes_stokastik[0].Location.Y;
         }
 
 
@@ -565,6 +646,21 @@ namespace SLF
         private async void Modül_Tabları_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+            foreach (var category in categoryTabPages.Keys)
+            {
+                if (pendingUpdates[category] && tabControlMain.SelectedTab == categoryTabPages[category])
+                {
+                    if (category == "imar")
+                        UpdateCheckboxPositions(checkBoxes_imar, "imar");
+                    else if (category == "yga")
+                        UpdateCheckboxPositions(checkBoxes_yga, "yga");
+                    else if (category == "stokastik")
+                        UpdateCheckboxPositions(checkBoxes_stokastik, "stokastik");
+                    // Add "yuk" if applicable
+                    pendingUpdates[category] = false;
+                }
+            }
+
             // Gerekli kontrolleri yapmak için seçilen sekmeyi ve modülleri kontrol et
             string selectedTabText = Modül_Tabları.SelectedTab.Text;
 
@@ -731,43 +827,165 @@ namespace SLF
             foreach (var marker in overlay.Markers)
                 marker.IsVisible = visible;
         }
+        
+        private void InitializeCategoryTabPages()
+        {
+            // Adjust these names based on your designer
+            tabControlMain = Modül_Tabları; // The TabControl containing all tabs
+            categoryTabPages["imar"] = tab_imar; // Tab page for "İmar Analizi"
+            categoryTabPages["yga"] = tab_yga;   // Tab page for "Yük Haritası Modülü"
+            categoryTabPages["stokastik"] = tab_stokastik; 
+        }
 
 
         public void checkboxes_init()
         {
-            // Initialize the arrays with the checkboxes for each map category
-            checkBoxes_yga = new CheckBox[] { checkBox_yga_1, checkBox_yga_2, checkBox_yga_3, checkBox_yga_4, 
-                checkBox_yga_5, checkBox_yga_6, checkBox_yga_7, checkBox_yga_8, checkBox_yga_9, 
-                checkBox_yga_10, checkBox_yga_11, checkBox_yga_12, 
-                checkBox_yga_13, checkBox_yga_14, checkBox_yga_15 };
-            checkBoxes_imar = new CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, 
-                checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, 
-                checkBox_imar_10, checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15 };
-            checkBoxes_stokastik = new CheckBox[] { checkBox_stokastik_1, checkBox_stokastik_2, checkBox_stokastik_3, 
-                checkBox_stokastik_4, checkBox_stokastik_5, checkBox_stokastik_6, checkBox_stokastik_7, 
-                checkBox_stokastik_8, checkBox_stokastik_9, checkBox_stokastik_10, checkBox_stokastik_11, 
-                checkBox_stokastik_12, checkBox_stokastik_13, checkBox_stokastik_14, checkBox_stokastik_15 };
+            checkBoxes_yga = new System.Windows.Forms.CheckBox[] { checkBox_yga_1, checkBox_yga_2, checkBox_yga_3, checkBox_yga_4,
+        checkBox_yga_5, checkBox_yga_6, checkBox_yga_7, checkBox_yga_8, checkBox_yga_9,
+        checkBox_yga_10, checkBox_yga_11, checkBox_yga_12,
+        checkBox_yga_13, checkBox_yga_14, checkBox_yga_15 };
+            checkBoxes_imar = new System.Windows.Forms.CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4,
+        checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9,
+        checkBox_imar_10, checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15 };
+            checkBoxes_stokastik = new System.Windows.Forms.CheckBox[] { checkBox_stokastik_1, checkBox_stokastik_2, checkBox_stokastik_3,
+        checkBox_stokastik_4, checkBox_stokastik_5, checkBox_stokastik_6, checkBox_stokastik_7,
+        checkBox_stokastik_8, checkBox_stokastik_9, checkBox_stokastik_10, checkBox_stokastik_11,
+        checkBox_stokastik_12, checkBox_stokastik_13, checkBox_stokastik_14, checkBox_stokastik_15 };
 
-            // generate an array of [1, 2, 3, ..., 15]
-            int[] tagValuesForCheckboxes = Enumerable.Range(1, 15).ToArray();  
+            int[] tagValuesForCheckboxes = Enumerable.Range(1, 15).ToArray();
 
-            // Function to initialize CheckBoxes with a tag, event handlers, and forecolor
-            void initializeCheckBoxes(CheckBox[] checkBoxes, int[] tagValues)
+            void initializeCheckBoxes(System.Windows.Forms.CheckBox[] checkBoxes, int[] tagValues)
             {
                 for (int i = 0; i < checkBoxes.Length; i++)
                 {
                     checkBoxes[i].Tag = tagValues[i];
                     checkBoxes[i].CheckedChanged += checkBox_CheckedChanged;
                     checkBoxes[i].MouseDown += checkBox_MouseDown;
-                    checkBoxes[i].ForeColor = cbs.overlayColors[i].BorderColor;  // Set the color from the corresponding cbs.overlayColors
+                    checkBoxes[i].ForeColor = cbs.overlayColors[i].BorderColor;
+                    checkBoxes[i].Visible = false;
                 }
             }
 
-            // Initialize all checkboxes
             initializeCheckBoxes(checkBoxes_yga, tagValuesForCheckboxes);
             initializeCheckBoxes(checkBoxes_imar, tagValuesForCheckboxes);
             initializeCheckBoxes(checkBoxes_stokastik, tagValuesForCheckboxes);
         }
+
+        private const int CheckboxHeight = 27; // Height of each checkbox (adjust as needed)
+        private const int CheckboxSpacing = 8; // Space between checkboxes
+
+        public Dictionary<string, bool> pendingUpdates = new Dictionary<string, bool>
+        {
+            { "imar", false },
+            { "yga", false },
+            { "stokastik", false }
+        };
+
+        public void UpdateCheckboxPositions(CheckBox[] checkBoxes, string mapCategory)
+        {
+            if (!checkboxStartY.ContainsKey(mapCategory) || !categoryTabPages.ContainsKey(mapCategory))
+                return;
+
+            TabPage tabPage = categoryTabPages[mapCategory];
+
+            // If the tab is not currently visible, mark it for a pending update
+            if (tabControlMain.SelectedTab != tabPage)
+            {
+                pendingUpdates[mapCategory] = true;
+                return;
+            }
+
+            int currentY = checkboxStartY[mapCategory];
+
+            tabControlMain.SuspendLayout();
+            tabPage.SuspendLayout();
+
+            for (int i = 0; i < checkBoxes.Length; i++)
+            {
+                if (checkBoxes[i] != null && checkBoxes[i].Visible)
+                {
+                    checkBoxes[i].Location = new Point(checkBoxes[i].Location.X, currentY);
+                    currentY += CheckboxHeight + CheckboxSpacing;
+                }
+            }
+
+            tabPage.ResumeLayout(false);
+            tabControlMain.ResumeLayout(true);
+
+            foreach (Control control in tabPage.Controls)
+            {
+                control.Invalidate();
+                control.Update();
+            }
+
+            tabControlMain.Invalidate();
+            tabControlMain.Update();
+            this.Invalidate();
+            this.Update();
+        }
+
+        private void ClearCheckboxesForAllMaps(int checkboxIndex)
+        {
+            var allCheckBoxes = new List<CheckBox>
+            {
+                checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5,
+                checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
+                checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15,
+
+                checkBox_yga_1, checkBox_yga_2, checkBox_yga_3, checkBox_yga_4, checkBox_yga_5,
+                checkBox_yga_6, checkBox_yga_7, checkBox_yga_8, checkBox_yga_9, checkBox_yga_10,
+                checkBox_yga_11, checkBox_yga_12, checkBox_yga_13, checkBox_yga_14, checkBox_yga_15,
+
+                checkBox_stokastik_1, checkBox_stokastik_2, checkBox_stokastik_3, checkBox_stokastik_4,
+                checkBox_stokastik_5, checkBox_stokastik_6, checkBox_stokastik_7, checkBox_stokastik_8,
+                checkBox_stokastik_9, checkBox_stokastik_10, checkBox_stokastik_11, checkBox_stokastik_12,
+                checkBox_stokastik_13, checkBox_stokastik_14, checkBox_stokastik_15
+            };
+
+            var categoryCheckboxes = new Dictionary<string, CheckBox[]>
+            {
+                { "imar", checkBoxes_imar },
+                { "yga", checkBoxes_yga },
+                { "stokastik", checkBoxes_stokastik }
+                // Add "yuk" if applicable
+            };
+
+            CheckBox targetCheckbox = null;
+            string targetCategory = null;
+            foreach (var checkBox in allCheckBoxes)
+            {
+                if (checkBox.Tag != null && int.TryParse(checkBox.Tag.ToString(), out int tagIndex))
+                {
+                    if (tagIndex - 1 == checkboxIndex)
+                    {
+                        targetCheckbox = checkBox;
+                        if (checkBox.Name.Contains("imar")) targetCategory = "imar";
+                        else if (checkBox.Name.Contains("yga")) targetCategory = "yga";
+                        else if (checkBox.Name.Contains("stokastik")) targetCategory = "stokastik";
+                        break;
+                    }
+                }
+            }
+
+            if (targetCheckbox == null || targetCategory == null)
+                return;
+
+            foreach (var category in categoryCheckboxes.Keys)
+            {
+                if (categoryCheckboxes[category][checkboxIndex] != null)
+                {
+                    categoryCheckboxes[category][checkboxIndex].Checked = false;
+                    categoryCheckboxes[category][checkboxIndex].Visible = false;
+                    categoryCheckboxes[category][checkboxIndex].Refresh();
+                }
+            }
+
+            foreach (var category in categoryCheckboxes.Keys)
+            {
+                UpdateCheckboxPositions(categoryCheckboxes[category], category);
+            }
+        }
+
 
 
         // ------------------------------------------------------------------------------------------------------------ //
@@ -858,7 +1076,6 @@ namespace SLF
                 veri_listesi_seçimi.Refresh();
                 Console.WriteLine(modulescheck.Count);
                 dataGridView_girdi.DataSource = girdiModülü.CurrentDataTable;
-
 
             }
         }
@@ -3839,7 +4056,7 @@ namespace SLF
 
         }
 
-
+        /*
         private void ClearCheckboxesForAllMaps(int checkboxIndex)
         {
             // Define all checkboxes for the maps
@@ -3872,7 +4089,7 @@ namespace SLF
                     }
                 }
             }
-        }
+        }*/
 
         // Helper method to reset map controls for a specific map
         private void ResetMapControls(GMapControl mapControl, System.Windows.Forms.Label distanceLabel, System.Windows.Forms.Label distanceMetreLabel,
