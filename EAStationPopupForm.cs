@@ -25,7 +25,23 @@ namespace SLF
         public NoktaVeri NoktaVeri => noktaVeri;
 
         private readonly List<string> acPowers = new List<string> { "11 kW", "22 kW" };
+        private static class Constants
+        {
+            public static readonly Dictionary<string, string> StationTypeToCountColumn = new Dictionary<string, string>
+    {
+        { "AC (Home)_count", "AC (Home)_count" },
+        { "AC (Work)_count", "AC (Work)_count" },
+        { "AC (Public)_count", "AC (Public)_count" },
+        { "Fast DC_count", "Fast DC_count" }
+    };
 
+            public static readonly List<int> Years = Enumerable.Range(2024, 2035 - 2024 + 1).ToList();
+        }
+
+        private string GetCountColumnName(string stationType)
+        {
+            return Constants.StationTypeToCountColumn.TryGetValue(stationType, out string columnName) ? columnName : null;
+        }
         public EAStationPopupForm(DataTable existingDataTable, NoktaVeri veri)
         {
             InitializeComponent();
@@ -64,7 +80,7 @@ namespace SLF
             // Set ISTASYON_TIPI options to AC types and DC
             if (ChargingStationDataGridView.Columns["ISTASYON_TIPI"] is DataGridViewComboBoxColumn typeComboBoxColumn)
             {
-                typeComboBoxColumn.DataSource = new List<string> { "AC (Home)", "AC (Work)", "AC (Public)", "DC-Fast" };
+                typeComboBoxColumn.DataSource = new List<string> { "AC (Home)_count", "AC (Work)_count", "AC (Public)_count", "Fast DC_count" };
             }
 
             // Set default ISTASYON_GUCU options for the charging station power
@@ -94,222 +110,96 @@ namespace SLF
             // Event handler to handle changes in StartYear column
             ChargingStationDataGridView.CellValueChanged += ChargingStationDataGridView_CellValueChanged;
         }
-        /*        private void InitializeDataGridView(NoktaVeri veri)
+        private void EATamamButton_Click(object sender, EventArgs e)
+        {
+            // Set the cursor to a wait cursor.
+            this.Cursor = Cursors.WaitCursor;
+
+            try
+            {
+                foreach (DataGridViewCell cell in ChargingStationDataGridView.Rows[0].Cells)
                 {
-                    // Add a new row to the DataGridView and capture its index
-                    int rowIndex = ChargingStationDataGridView.Rows.Add();
-
-                    // Fill initial coordinates from the provided NoktaVeri instance
-                    ChargingStationDataGridView.Rows[rowIndex].Cells["EA_X_KOORDINAT"].Value = veri.Enlem;
-                    ChargingStationDataGridView.Rows[rowIndex].Cells["EA_Y_KOORDINAT"].Value = veri.Boylam;
-
-                    // Set the cell (grid) ID using the new CellId property of NoktaVeri.
-                    // If CellId is not set, default to "Not Selected".
-                    ChargingStationDataGridView.Rows[rowIndex].Cells["ID"].Value =
-                        !string.IsNullOrEmpty(veri.CellId) ? veri.CellId : "Not Selected";
-
-                    // Populate the StartYear combobox column with years 2024 to 2035.
-                    if (ChargingStationDataGridView.Columns["StartYear"] is DataGridViewComboBoxColumn startYearColumn)
+                    if (cell.Value == null || string.IsNullOrWhiteSpace(cell.Value.ToString()))
                     {
-                        List<int> years = Enumerable.Range(2024, 2035 - 2024 + 1).ToList();
-                        startYearColumn.DataSource = years;
-
-                        // Optionally set the default value (here, the first year 2024)
-                        ChargingStationDataGridView.Rows[rowIndex].Cells["StartYear"].Value = years.First();
+                        MessageBox.Show("Lütfen tüm alanları doldurun.");
+                        return;
                     }
+                }
 
-                    // Set ISTASYON_TIPI options to AC types and DC
-                    if (ChargingStationDataGridView.Columns["ISTASYON_TIPI"] is DataGridViewComboBoxColumn typeComboBoxColumn)
+                if (double.TryParse(ChargingStationDataGridView.Rows[0].Cells["EA_X_KOORDINAT"].Value.ToString(), out double enlem) &&
+                    double.TryParse(ChargingStationDataGridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value.ToString(), out double boylam))
+                {
+                    noktaVeri.Enlem = enlem;
+                    noktaVeri.Boylam = boylam;
+                    noktaVeri.CellId = ChargingStationDataGridView.Rows[0].Cells["ID"].Value?.ToString();
+
+                    DataRow newRow = dataTable.NewRow();
+                    newRow["ISTASYON_ADI"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_ADI"].Value.ToString();
+                    newRow["ISTASYON_TIPI"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_TIPI"].Value.ToString();
+                    newRow["ISTASYON_GUCU"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_GUCU"].Value.ToString();
+                    newRow["EA_X_KOORDINAT"] = enlem;
+                    newRow["EA_Y_KOORDINAT"] = boylam;
+                    dataTable.Rows.Add(newRow);
+
+                    SaveUpdatedInputFile(dataTable);
+
+                    MessageBox.Show("Şarj istasyonu başarıyla eklendi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    isOperationCancelled = false;
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show("Lütfen geçerli değerler girin.");
+                }
+            }
+            finally
+            {
+                // Always reset the cursor to default.
+                this.Cursor = Cursors.Default;
+            }
+        }
+
+        /*        private void EATamamButton_Click(object sender, EventArgs e)
+                {
+                    foreach (DataGridViewCell cell in ChargingStationDataGridView.Rows[0].Cells)
                     {
-                        typeComboBoxColumn.DataSource = new List<string> { "AC (Home)", "AC (Work)", "AC (Public)", "DC-Fast" };
-                    }
-
-                    // Set default ISTASYON_GUCU options for the charging station power
-                    if (ChargingStationDataGridView.Columns["ISTASYON_GUCU"] is DataGridViewComboBoxColumn powerComboBoxColumn)
-                    {
-                        powerComboBoxColumn.DataSource = acPowers;
-                    }
-
-                    // Populate transformer codes if available
-                    if (GirdiModülü.dataTablesByType.TryGetValue("DTR Verileri", out DataTable trafoDataTable))
-                    {
-                        List<string> trafoKoduListesi = trafoDataTable.AsEnumerable()
-                            .Select(row => row["TRAFO_KODU"].ToString())
-                            .Distinct()
-                            .ToList();
-
-                        if (ChargingStationDataGridView.Columns["EA_TRAFO_KODU"] is DataGridViewComboBoxColumn comboBoxColumn)
+                        if (cell.Value == null || string.IsNullOrWhiteSpace(cell.Value.ToString()))
                         {
-                            comboBoxColumn.DataSource = trafoKoduListesi;
+                            MessageBox.Show("Lütfen tüm alanları doldurun.");
+                            return;
                         }
+                    }
+
+                    if (double.TryParse(ChargingStationDataGridView.Rows[0].Cells["EA_X_KOORDINAT"].Value.ToString(), out double enlem) &&
+                        double.TryParse(ChargingStationDataGridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value.ToString(), out double boylam))
+                    {
+                        noktaVeri.Enlem = enlem;
+                        noktaVeri.Boylam = boylam;
+                        noktaVeri.CellId = ChargingStationDataGridView.Rows[0].Cells["ID"].Value?.ToString();
+
+                        DataRow newRow = dataTable.NewRow();
+                      //  newRow["ID"] = ChargingStationDataGridView.Rows[0].Cells["ID"].Value.ToString();
+                        newRow["ISTASYON_ADI"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_ADI"].Value.ToString();
+                        newRow["ISTASYON_TIPI"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_TIPI"].Value.ToString();
+                        newRow["ISTASYON_GUCU"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_GUCU"].Value.ToString();
+                        newRow["EA_X_KOORDINAT"] = enlem;
+                        newRow["EA_Y_KOORDINAT"] = boylam;
+                        //newRow["StartYear"] = ChargingStationDataGridView.Rows[0].Cells["StartYear"].Value.ToString();
+                        dataTable.Rows.Add(newRow);
+
+                        SaveUpdatedInputFile(dataTable);
+
+                        MessageBox.Show("Şarj istasyonu başarıyla eklendi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        isOperationCancelled = false;
+                        this.DialogResult = DialogResult.OK;
+                        this.Close();
                     }
                     else
                     {
-                        MessageBox.Show("DTR Verileri bulunamadı. Lütfen kontrol edin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Lütfen geçerli değerler girin.");
                     }
-                }
-        */
-        private void EATamamButton_Click(object sender, EventArgs e)
-        {
-            // Step 1: Ensure all necessary fields are filled
-            foreach (DataGridViewCell cell in ChargingStationDataGridView.Rows[0].Cells)
-            {
-                if (cell.Value == null || string.IsNullOrWhiteSpace(cell.Value.ToString()))
-                {
-                    MessageBox.Show("Lütfen tüm alanları doldurun.");
-                    return;
-                }
-            }
-
-            // Step 2: Extract coordinates and validate
-            if (double.TryParse(ChargingStationDataGridView.Rows[0].Cells["EA_X_KOORDINAT"].Value.ToString(), out double enlem) &&
-                double.TryParse(ChargingStationDataGridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value.ToString(), out double boylam))
-            {
-                // Update NoktaVeri with the new values
-                noktaVeri.Enlem = enlem;
-                noktaVeri.Boylam = boylam;
-                noktaVeri.CellId = ChargingStationDataGridView.Rows[0].Cells["ID"].Value?.ToString();
-
-                // Step 3: Add new row to the DataTable
-                DataRow newRow = dataTable.NewRow();
-      //        newRow["ID"] = ChargingStationDataGridView.Rows[0].Cells["ID"].Value.ToString();
-                newRow["ISTASYON_ADI"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_ADI"].Value.ToString();
-                newRow["ISTASYON_TIPI"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_TIPI"].Value.ToString();
-                newRow["ISTASYON_GUCU"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_GUCU"].Value.ToString();
-                newRow["EA_X_KOORDINAT"] = enlem;
-                newRow["EA_Y_KOORDINAT"] = boylam;
-     //         newRow["StartYear"] = ChargingStationDataGridView.Rows[0].Cells["StartYear"].Value.ToString();
-                dataTable.Rows.Add(newRow);
-
-                // Step 4: Save updated DataTable to file
-                SaveUpdatedInputFile(dataTable);  // Save to input file
-
-                // Step 5: Inform the user about the successful update
-                MessageBox.Show("Şarj istasyonu başarıyla eklendi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                // Step 6: Proceed with the new simulation (update and run Python script)
-                // This will be triggered in the main form when the user clicks the button
-                isOperationCancelled = false;
-
-                // Close the form after saving
-                this.DialogResult = DialogResult.OK;
-                this.Close();
-            }
-            else
-            {
-                MessageBox.Show("Lütfen geçerli değerler girin.");
-            }
-        }
-
-/*    public partial class EAStationPopupForm : Form
-    {
-        private readonly DataTable dataTable;
-        private bool isOperationCancelled = true;
-        public bool OperationCancelled => isOperationCancelled;
-
-        private readonly List<string> acPowers = new List<string> {"11 kW", "22 kW" };
-        //private readonly List<string> dcPowers = new List<string> {"150 kW"};
-
-        public EAStationPopupForm(DataTable existingDataTable, NoktaVeri veri)
-        {
-            InitializeComponent();
-            dataTable = existingDataTable;
-
-            InitializeDataGridView(veri);
-            SetupEventHandlers();
-        }
-        private void InitializeDataGridView(NoktaVeri veri)
-        {
-            int rowIndex = ChargingStationDataGridView.Rows.Add();
-
-            // Fill initial coordinates from the provided NoktaVeri instance
-            ChargingStationDataGridView.Rows[rowIndex].Cells["EA_X_KOORDINAT"].Value = veri.Enlem;
-            ChargingStationDataGridView.Rows[rowIndex].Cells["EA_Y_KOORDINAT"].Value = veri.Boylam;
-
-            // Use the SelectedCellId property (if set) to populate the "ID" cell.
-            // If no cell was selected yet, you could leave it blank or assign a default value.
-*//*            ChargingStationDataGridView.Rows[rowIndex].Cells["ID"].Value =
-                !string.IsNullOrEmpty(this.SelectedCellId) ? this.SelectedCellId : "Not Selected";*//*
-
-            // Populate the StartYear combobox column with years 2024 to 2035.
-            if (ChargingStationDataGridView.Columns["StartYear"] is DataGridViewComboBoxColumn startYearColumn)
-            {
-                List<int> years = Enumerable.Range(2024, 2035 - 2024 + 1).ToList();
-                startYearColumn.DataSource = years;
-                // Optionally, set the default value (here, the first year 2024)
-                ChargingStationDataGridView.Rows[rowIndex].Cells["StartYear"].Value = years.First();
-            }
-
-            // Set ISTASYON_TIPI options to AC types and DC
-            if (ChargingStationDataGridView.Columns["ISTASYON_TIPI"] is DataGridViewComboBoxColumn typeComboBoxColumn)
-            {
-                typeComboBoxColumn.DataSource = new List<string> { "AC (Home)", "AC (Work)", "AC (Public)", "DC-Fast" };
-            }
-
-            // Set default ISTASYON_GUCU options for AC (Home), AC (Work), AC (Public), and DC-Fast
-            if (ChargingStationDataGridView.Columns["ISTASYON_GUCU"] is DataGridViewComboBoxColumn powerComboBoxColumn)
-            {
-                powerComboBoxColumn.DataSource = acPowers;
-            }
-
-            // Populate transformer codes if available
-            if (GirdiModülü.dataTablesByType.TryGetValue("DTR Verileri", out DataTable trafoDataTable))
-            {
-                List<string> trafoKoduListesi = trafoDataTable.AsEnumerable()
-                                                              .Select(row => row["TRAFO_KODU"].ToString())
-                                                              .Distinct()
-                                                              .ToList();
-
-                if (ChargingStationDataGridView.Columns["EA_TRAFO_KODU"] is DataGridViewComboBoxColumn comboBoxColumn)
-                {
-                    comboBoxColumn.DataSource = trafoKoduListesi;
-                }
-            }
-            else
-            {
-                MessageBox.Show("DTR Verileri bulunamadı. Lütfen kontrol edin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-*/
-
-        private void SetupEventHandlers()
-        {
-            this.FormClosing += ChargingStationPopupForm_FormClosing;
-            ChargingStationDataGridView.CellValueChanged += ChargingStationDataGridView_CellValueChanged;
-        }
-
-        private void ChargingStationDataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.ColumnIndex == ChargingStationDataGridView.Columns["ISTASYON_TIPI"].Index)
-            {
-                string selectedType = ChargingStationDataGridView.Rows[e.RowIndex].Cells["ISTASYON_TIPI"].Value?.ToString();
-
-                // If the type is AC, set ISTASYON_GUCU to AC power options
-                if (ChargingStationDataGridView.Columns["ISTASYON_GUCU"] is DataGridViewComboBoxColumn powerComboBoxColumn)
-                {
-                    if (selectedType != null)
-                    {
-                        if (selectedType == "AC (Home)" || selectedType == "AC (Work)")
-                        {
-                            powerComboBoxColumn.DataSource = new List<string> { "11 kW" };  // Set 11 kW for AC Home and AC Work
-                        }
-                        else if (selectedType == "AC (Public)")
-                        {
-                            powerComboBoxColumn.DataSource = new List<string> { "22 kW" };  // Set 22 kW for AC Public
-                        }
-                        else if (selectedType == "DC-Fast")
-                        {
-                            powerComboBoxColumn.DataSource = new List<string> { "150 kW" };  // Set 150 kW for Fast DC
-                        }
-                        else
-                        {
-                            powerComboBoxColumn.DataSource = new List<string>();  // Clear options if none match
-                        }
-                    }
-                }
-            }
-
-        }
+                }*/
         /*        private void EATamamButton_Click(object sender, EventArgs e)
                 {
                     // Step 1: Ensure all necessary fields are filled
@@ -326,14 +216,20 @@ namespace SLF
                     if (double.TryParse(ChargingStationDataGridView.Rows[0].Cells["EA_X_KOORDINAT"].Value.ToString(), out double enlem) &&
                         double.TryParse(ChargingStationDataGridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value.ToString(), out double boylam))
                     {
+                        // Update NoktaVeri with the new values
+                        noktaVeri.Enlem = enlem;
+                        noktaVeri.Boylam = boylam;
+                        noktaVeri.CellId = ChargingStationDataGridView.Rows[0].Cells["ID"].Value?.ToString();
+
                         // Step 3: Add new row to the DataTable
                         DataRow newRow = dataTable.NewRow();
+              //        newRow["ID"] = ChargingStationDataGridView.Rows[0].Cells["ID"].Value.ToString();
                         newRow["ISTASYON_ADI"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_ADI"].Value.ToString();
                         newRow["ISTASYON_TIPI"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_TIPI"].Value.ToString();
                         newRow["ISTASYON_GUCU"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_GUCU"].Value.ToString();
                         newRow["EA_X_KOORDINAT"] = enlem;
                         newRow["EA_Y_KOORDINAT"] = boylam;
-
+             //         newRow["StartYear"] = ChargingStationDataGridView.Rows[0].Cells["StartYear"].Value.ToString();
                         dataTable.Rows.Add(newRow);
 
                         // Step 4: Save updated DataTable to file
@@ -354,84 +250,137 @@ namespace SLF
                     {
                         MessageBox.Show("Lütfen geçerli değerler girin.");
                     }
-                }*/
+                }
+        */
 
-        // Save the DataTable to an input file
+        private void SetupEventHandlers()
+        {
+            this.FormClosing += ChargingStationPopupForm_FormClosing;
+            ChargingStationDataGridView.CellValueChanged += ChargingStationDataGridView_CellValueChanged;
+        }
+
+        private void ChargingStationDataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == ChargingStationDataGridView.Columns["ISTASYON_TIPI"].Index)
+            {
+                string selectedType = ChargingStationDataGridView.Rows[e.RowIndex].Cells["ISTASYON_TIPI"].Value?.ToString();
+
+                // If the type is AC, set ISTASYON_GUCU to AC power options
+                if (ChargingStationDataGridView.Columns["ISTASYON_GUCU"] is DataGridViewComboBoxColumn powerComboBoxColumn)
+                {
+                    if (selectedType != null)
+                    {
+                        if (selectedType == "AC (Home)_count" || selectedType == "AC (Work)_count")
+                        {
+                            powerComboBoxColumn.DataSource = new List<string> { "11 kW" };  // Set 11 kW for AC Home and AC Work
+                        }
+                        else if (selectedType == "AC (Public)_count")
+                        {
+                            powerComboBoxColumn.DataSource = new List<string> { "22 kW" };  // Set 22 kW for AC Public
+                        }
+                        else if (selectedType == "Fast DC_count")
+                        {
+                            powerComboBoxColumn.DataSource = new List<string> { "150 kW" };  // Set 150 kW for Fast DC
+                        }
+                        else
+                        {
+                            powerComboBoxColumn.DataSource = new List<string>();  // Clear options if none match
+                        }
+                    }
+                }
+            }
+
+        }
         private void SaveUpdatedInputFile(DataTable updatedData)
         {
             try
             {
-                // Retrieve the start year from the DataGridView
-                string startYear = (string)ChargingStationDataGridView.Rows[0].Cells["StartYear"].Value;
+                // Retrieve values from the DataGridView
+                string startYear = ChargingStationDataGridView.Rows[0].Cells["StartYear"].Value?.ToString();
+                string cellId = ChargingStationDataGridView.Rows[0].Cells["ID"].Value?.ToString();
+                string stationType = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_TIPI"].Value?.ToString();
+                double enlem = Convert.ToDouble(ChargingStationDataGridView.Rows[0].Cells["EA_X_KOORDINAT"].Value);
+                double boylam = Convert.ToDouble(ChargingStationDataGridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value);
 
-                string existingFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\yedek\DELTA_EA_DENEME_IMAR - Copy.xlsx"; // Path to the existing file
+                if (string.IsNullOrEmpty(startYear) || string.IsNullOrEmpty(cellId) || string.IsNullOrEmpty(stationType))
+                {
+                    MessageBox.Show("Please ensure StartYear, ID, and ISTASYON_TIPI are filled.");
+                    return;
+                }
 
-                // Load the existing Excel file using EPPlus
+                string countColumnName = GetCountColumnName(stationType);
+                if (countColumnName == null)
+                {
+                    MessageBox.Show("Invalid ISTASYON_TIPI selected.");
+                    return;
+                }
+
+                string existingFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\çıktı\evcs_monte_carlo_distribution_kumulatif3 - Copy.xlsx";
+
                 using (var package = new OfficeOpenXml.ExcelPackage(new FileInfo(existingFilePath)))
                 {
-                    // Access the worksheet corresponding to the selected startYear
-                    var worksheet = package.Workbook.Worksheets[startYear.ToString()]; // Sheet name is the year
-
-                    if (worksheet == null)
+                    int startYearInt = int.Parse(startYear);
+                    foreach (int year in Constants.Years.Where(y => y >= startYearInt))
                     {
-                        MessageBox.Show($"Worksheet for year {startYear} not found.");
-                        return;
-                    }
-
-                    // Find the last row with data
-                    int lastRow = worksheet.Dimension.End.Row;
-
-                    // Iterate through each row of the DataGridView and update the corresponding cells in the Excel sheet
-                    foreach (DataGridViewRow dgvRow in ChargingStationDataGridView.Rows)
-                    {
-                        // Skip new rows (empty rows)
-                        if (dgvRow.IsNewRow) continue;
-
-                        // Get the values from the DataGridView for each cell
-                        string cellId = dgvRow.Cells["ID"].Value?.ToString();
-                        double? eaXKoordinat = dgvRow.Cells["EA_X_KOORDINAT"].Value as double?;
-                        double? eaYKoordinat = dgvRow.Cells["EA_Y_KOORDINAT"].Value as double?;
-
-                        // Ensure the values are not null or invalid
-                        if (string.IsNullOrEmpty(cellId) || !eaXKoordinat.HasValue || !eaYKoordinat.HasValue)
+                        var worksheet = package.Workbook.Worksheets[year.ToString()];
+                        if (worksheet == null)
                         {
-                            MessageBox.Show("Please ensure that all necessary fields are filled.");
-                            return;
+                            // Optionally create a new sheet if it doesn’t exist
+                            worksheet = package.Workbook.Worksheets.Add(year.ToString());
+                            worksheet.Cells[1, 1].Value = "ID";
+                            worksheet.Cells[1, 2].Value = "EA_X_KOORDINAT";
+                            worksheet.Cells[1, 3].Value = "EA_Y_KOORDINAT";
+                            worksheet.Cells[1, 4].Value = "AC (Home)_count";
+                            worksheet.Cells[1, 5].Value = "AC (Work)_count";
+                            worksheet.Cells[1, 6].Value = "AC (Public)_count";
+                            worksheet.Cells[1, 7].Value = "Fast DC_count";
                         }
 
-                        // Find the corresponding row in the worksheet by matching the "ID" column
+                        int lastRow = worksheet.Dimension?.End.Row ?? 1;
                         bool rowUpdated = false;
-                        for (int i = 2; i <= lastRow; i++)  // Assuming the data starts from row 2
-                        {
-                            string existingId = worksheet.Cells[i, 1].Text; // Assuming "ID" is in the first column
 
+                        // Find the row with the matching CellId
+                        for (int i = 2; i <= lastRow; i++)
+                        {
+                            string existingId = worksheet.Cells[i, 1].Text;
                             if (existingId == cellId)
                             {
-                                // Update the "EA_X_KOORDINAT" and "EA_Y_KOORDINAT" columns in the existing row
-                                worksheet.Cells[i, 2].Value = eaXKoordinat;  // Assuming EA_X_KOORDINAT is in the 2nd column
-                                worksheet.Cells[i, 3].Value = eaYKoordinat;  // Assuming EA_Y_KOORDINAT is in the 3rd column
+                                // Update coordinates
+                                worksheet.Cells[i, 2].Value = enlem;
+                                worksheet.Cells[i, 3].Value = boylam;
+
+                                // Increment the count for the selected station type
+                                int columnIndex = worksheet.Cells[1, 1, 1, worksheet.Dimension.End.Column]
+                                    .FirstOrDefault(c => c.Text == countColumnName)?.Start.Column ?? 0;
+                                if (columnIndex > 0)
+                                {
+                                    int currentCount = worksheet.Cells[i, columnIndex].Value != null ? Convert.ToInt32(worksheet.Cells[i, columnIndex].Value) : 0;
+                                    worksheet.Cells[i, columnIndex].Value = currentCount + 1;
+                                }
 
                                 rowUpdated = true;
                                 break;
                             }
                         }
 
-                        // If no matching row found (i.e., new row), add a new row with the new values
+                        // If no matching row found, add a new row
                         if (!rowUpdated)
                         {
-                            worksheet.Cells[lastRow + 1, 1].Value = cellId;
-                            worksheet.Cells[lastRow + 1, 2].Value = eaXKoordinat;
-                            worksheet.Cells[lastRow + 1, 3].Value = eaYKoordinat;
+                            int newRowIndex = lastRow + 1;
+                            worksheet.Cells[newRowIndex, 1].Value = cellId;
+                            worksheet.Cells[newRowIndex, 2].Value = enlem;
+                            worksheet.Cells[newRowIndex, 3].Value = boylam;
 
-                            lastRow++;  // Increment last row count for the next insertion
+                            // Set initial counts (1 for the selected type, 0 for others)
+                            worksheet.Cells[newRowIndex, 4].Value = stationType == "AC (Home)_count" ? 1 : 0;
+                            worksheet.Cells[newRowIndex, 5].Value = stationType == "AC (Work)_count" ? 1 : 0;
+                            worksheet.Cells[newRowIndex, 6].Value = stationType == "AC (Public)_count" ? 1 : 0;
+                            worksheet.Cells[newRowIndex, 7].Value = stationType == "Fast DC_count" ? 1 : 0;
                         }
                     }
 
-                    // Save the updated Excel file
                     package.Save();
-
-                    // Inform the user that the file was saved
-                    MessageBox.Show("Data saved to the existing Excel file successfully!");
+                    MessageBox.Show("Data and counts updated successfully in the Excel file!");
                 }
             }
             catch (Exception ex)
@@ -439,7 +388,90 @@ namespace SLF
                 MessageBox.Show($"Error saving data: {ex.Message}");
             }
         }
+        // Save the DataTable to an input file
+        /*        private void SaveUpdatedInputFile(DataTable updatedData)
+                {
+                    try
+                    {
+                        // Retrieve the start year from the DataGridView
+                        string startYear = (string)ChargingStationDataGridView.Rows[0].Cells["StartYear"].Value;
 
+                        string existingFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\çıktı\evcs_monte_carlo_distribution_kumulatif3 - Copy.xlsx"; // Path to the existing file
+
+                        // Load the existing Excel file using EPPlus
+                        using (var package = new OfficeOpenXml.ExcelPackage(new FileInfo(existingFilePath)))
+                        {
+                            // Access the worksheet corresponding to the selected startYear
+                            var worksheet = package.Workbook.Worksheets[startYear.ToString()]; // Sheet name is the year
+
+                            if (worksheet == null)
+                            {
+                                MessageBox.Show($"Worksheet for year {startYear} not found.");
+                                return;
+                            }
+
+                            // Find the last row with data
+                            int lastRow = worksheet.Dimension.End.Row;
+
+                            // Iterate through each row of the DataGridView and update the corresponding cells in the Excel sheet
+                            foreach (DataGridViewRow dgvRow in ChargingStationDataGridView.Rows)
+                            {
+                                // Skip new rows (empty rows)
+                                if (dgvRow.IsNewRow) continue;
+
+                                // Get the values from the DataGridView for each cell
+                                string cellId = dgvRow.Cells["ID"].Value?.ToString();
+                                double? eaXKoordinat = dgvRow.Cells["EA_X_KOORDINAT"].Value as double?;
+                                double? eaYKoordinat = dgvRow.Cells["EA_Y_KOORDINAT"].Value as double?;
+
+                                // Ensure the values are not null or invalid
+                                if (string.IsNullOrEmpty(cellId) || !eaXKoordinat.HasValue || !eaYKoordinat.HasValue)
+                                {
+                                    MessageBox.Show("Please ensure that all necessary fields are filled.");
+                                    return;
+                                }
+
+                                // Find the corresponding row in the worksheet by matching the "ID" column
+                                bool rowUpdated = false;
+                                for (int i = 2; i <= lastRow; i++)  // Assuming the data starts from row 2
+                                {
+                                    string existingId = worksheet.Cells[i, 1].Text; // Assuming "ID" is in the first column
+
+                                    if (existingId == cellId)
+                                    {
+                                        // Update the "EA_X_KOORDINAT" and "EA_Y_KOORDINAT" columns in the existing row
+                                        worksheet.Cells[i, 2].Value = eaXKoordinat;  // Assuming EA_X_KOORDINAT is in the 2nd column
+                                        worksheet.Cells[i, 3].Value = eaYKoordinat;  // Assuming EA_Y_KOORDINAT is in the 3rd column
+
+                                        rowUpdated = true;
+                                        break;
+                                    }
+                                }
+
+                                // If no matching row found (i.e., new row), add a new row with the new values
+                                if (!rowUpdated)
+                                {
+                                    worksheet.Cells[lastRow + 1, 1].Value = cellId;
+                                    worksheet.Cells[lastRow + 1, 2].Value = eaXKoordinat;
+                                    worksheet.Cells[lastRow + 1, 3].Value = eaYKoordinat;
+
+                                    lastRow++;  // Increment last row count for the next insertion
+                                }
+                            }
+
+                            // Save the updated Excel file
+                            package.Save();
+
+                            // Inform the user that the file was saved
+                            MessageBox.Show("Data saved to the existing Excel file successfully!");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error saving data: {ex.Message}");
+                    }
+                }
+        */
 
 
         /*        private void SaveUpdatedInputFile(DataTable updatedData)
@@ -491,42 +523,6 @@ namespace SLF
                     }
                 }*/
 
-        /*        private void EATamamButton_Click(object sender, EventArgs e)
-                {
-
-                    foreach (DataGridViewCell cell in ChargingStationDataGridView.Rows[0].Cells)
-                    {
-                        if (cell.Value == null || string.IsNullOrWhiteSpace(cell.Value.ToString()))
-                        {
-                            MessageBox.Show("Lütfen tüm alanları doldurun.");
-                            return;
-                        }
-                    }
-
-                    if (double.TryParse(ChargingStationDataGridView.Rows[0].Cells["EA_X_KOORDINAT"].Value.ToString(), out double enlem) &&
-                        double.TryParse(ChargingStationDataGridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value.ToString(), out double boylam))
-                    {
-                        DataRow newRow = dataTable.NewRow();
-                        newRow["ISTASYON_ADI"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_ADI"].Value.ToString();
-                        newRow["ISTASYON_TIPI"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_TIPI"].Value.ToString();
-                        newRow["ISTASYON_GUCU"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_GUCU"].Value.ToString();
-                        // newRow["EA_TRAFO_KODU"] = ChargingStationDataGridView.Rows[0].Cells["EA_TRAFO_KODU"].Value.ToString();
-                        newRow["EA_X_KOORDINAT"] = enlem;
-                        newRow["EA_Y_KOORDINAT"] = boylam;
-
-                        dataTable.Rows.Add(newRow);
-                        // Show success message
-                        MessageBox.Show("Şarj istasyonu başarıyla eklendi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        isOperationCancelled = false;
-                        this.DialogResult = DialogResult.OK;
-                        this.Close();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Lütfen geçerli değerler girin.");
-                    }
-                }
-        */
         private void EACancelButton_Click(object sender, EventArgs e)
         {
             this.Close();

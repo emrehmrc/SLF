@@ -1378,159 +1378,7 @@ namespace SLF
 
 
         // -------------------------------------------- EA ------------------------------------------------------------ //
-        /*        private async void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
-        {
-            if (isAddingChargingStation)
-            {
-                // Create a new marker for the charging station
-                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow)
-                {
-                    ToolTipText = "Yeni Şarj İstasyonu",
-                    Tag = ModülFormu.SelectedCellId // Access the static property
-                };
-                markerOverlay_ea.Markers.Add(marker);
-                simulationOverlay.Markers.Add(marker);
-                cellToolTipOverlay.Markers.Add(marker);
-                // Create the point data including the selected CellId (if any)
-                NoktaVeri noktaVeri_marker = new NoktaVeri
-                {
-                    Enlem = Math.Round(pointClick.Lat, 4),
-                    Boylam = Math.Round(pointClick.Lng, 4),
-                    CellId = ModülFormu.SelectedCellId // Access the static property
-                };
 
-                // Show the popup form to add a new charging station
-                using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
-                {
-                    if (popupForm.ShowDialog() == DialogResult.OK)
-                    {
-                        // If successful, reload the map data asynchronously
-                        await eaHaritayaVeriYukleAsync();
-                    }
-                    else if (popupForm.OperationCancelled)
-                    {
-                        // If cancelled, remove the marker
-                        markerOverlay_ea.Markers.Remove(marker);
-                        simulationOverlay.Markers.Remove(marker);
-                        cellToolTipOverlay.Markers.Remove(marker);
-                    }
-                }
-
-                // Reset the flag after adding the station
-                isAddingChargingStation = false;
-                return;
-            }
-
-            // Standard map click handling
-            OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
-                ref polygonOverlay_ea, Mesafe_yuk, mesafe_metre_yuk);
-        }
-
-        private async void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                // Check if the user is in "adding charging station" mode
-                if (isAddingChargingStation)
-                {
-                    // Create a new marker for the charging station at the clicked location
-                    GMapMarker marker = new GMarkerGoogle(item.Position, GMarkerGoogleType.yellow)
-                    {
-                        ToolTipText = "Yeni Şarj İstasyonu",
-                        Tag = ModülFormu.SelectedCellId // Access the static property
-                    };
-                    markerOverlay_ea.Markers.Add(marker);
-                    simulationOverlay.Markers.Add(marker);
-                    cellToolTipOverlay.Markers.Add(marker);
-                    // Create the point data including the selected CellId (if any)
-                    NoktaVeri noktaVeri_marker = new NoktaVeri
-                    {
-                        Enlem = Math.Round(item.Position.Lat, 4),
-                        Boylam = Math.Round(item.Position.Lng, 4),
-                        CellId = ModülFormu.SelectedCellId // Access the static property
-                    };
-
-                    // Show the popup form to add a new charging station
-                    using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
-                    {
-                        if (popupForm.ShowDialog() == DialogResult.OK)
-                        {
-                            // If successful, reload the map data asynchronously
-                          await eaHaritayaVeriYukleAsync();
-                        }
-                        else if (popupForm.OperationCancelled)
-                        {
-                            // If cancelled, remove the marker
-                            markerOverlay_ea.Markers.Remove(marker);
-                        }
-                    }
-
-                    // Reset the flag after adding the station
-                    isAddingChargingStation = false;
-                    return;
-                }
-
-                // If not in "adding charging station" mode, open the popup form to edit the clicked marker
-                if (item.Tag != null)
-                {
-                    // Retrieve the CellId from the marker's Tag
-                    string cellId = item.Tag.ToString();
-
-                    // Create a NoktaVeri instance with the marker's data
-                    NoktaVeri noktaVeri_marker = new NoktaVeri
-                    {
-                        Enlem = Math.Round(item.Position.Lat, 4),
-                        Boylam = Math.Round(item.Position.Lng, 4),
-                        CellId = cellId // Pass the CellId to the popup form
-                    };
-
-                    // Open the popup form to display/edit the marker's details
-                    using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
-                    {
-                        if (popupForm.ShowDialog() == DialogResult.OK)
-                        {
-                            // Retrieve the updated NoktaVeri from the popup form
-                            NoktaVeri updatedNoktaVeri = popupForm.NoktaVeri;
-
-                            // Update the marker's Tag with the new CellId
-                            item.Tag = updatedNoktaVeri.CellId;
-                        }
-                    }
-                }
-            }
-        }*/
-        /*        private void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
-                {
-                    if (e.Button == MouseButtons.Left)
-                    {
-                        if (item.Tag != null)
-                        {
-                            // Retrieve the CellId from the marker's Tag
-                            string cellId = item.Tag.ToString();
-
-                            // Create a NoktaVeri instance with the marker's data
-                            NoktaVeri noktaVeri_marker = new NoktaVeri
-                            {
-                                Enlem = Math.Round(item.Position.Lat, 4),
-                                Boylam = Math.Round(item.Position.Lng, 4),
-                                CellId = cellId // Pass the CellId to the popup form
-                            };
-
-                            // Open the popup form to display/edit the marker's details
-                            using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
-                            {
-                                if (popupForm.ShowDialog() == DialogResult.OK)
-                                {
-                                    // Retrieve the updated NoktaVeri from the popup form
-                                    NoktaVeri updatedNoktaVeri = popupForm.NoktaVeri;
-
-                                    // Update the marker's Tag with the new CellId
-                                    item.Tag = updatedNoktaVeri.CellId;
-                                }
-                            }
-                        }
-                    }
-                }*/
         private async void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
 
@@ -1574,90 +1422,66 @@ namespace SLF
                 ref polygonOverlay_ea, Mesafe_yuk, mesafe_metre_yuk);
 
         }
-
-        /*        private void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
-                {
-                    if (item.Tag != null && item.Tag is NoktaVeri && Modül_Tabları.SelectedTab == tab_ea)
-                    {
-                        NoktaVeri seçili_nokta = item.Tag as NoktaVeri;
-                        NoktaBilgileriniGoster(seçili_nokta);
-                    }
-                }*/
-        /*        private async Task HandlePopupFormAsync(PointLatLng point, string cellId)
-        {
-            // Create a NoktaVeri instance with the marker's data
-            NoktaVeri noktaVeri_marker = new NoktaVeri
-            {
-                Enlem = Math.Round(point.Lat, 4),
-                Boylam = Math.Round(point.Lng, 4),
-                CellId = cellId // Pass the CellId to the popup form
-            };
-
-            // Create a temporary marker for the charging station
-            GMapMarker tempMarker = new GMarkerGoogle(point, GMarkerGoogleType.yellow)
-            {
-                ToolTipText = "Yeni Şarj İstasyonu",
-                Tag = cellId // Store CellId in the marker's Tag temporarily
-            };
-
-            // Add the temporary marker to the overlay
-            markerOverlay_ea.Markers.Add(tempMarker);
-
-            try
-            {
-                // Open the popup form to display/edit the marker's details
-                using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
-                {
-                    if (popupForm.ShowDialog() == DialogResult.OK)
-                    {
-                        // Reload the map data asynchronously after the popup form saves the data
-                        await eaHaritayaVeriYukleAsync();
-
-                        // Add the marker to the map (if not already added)
-                        AddMarkerToMap(noktaVeri_marker);
-                    }
-                    else if (popupForm.OperationCancelled)
-                    {
-                        // If cancelled, remove the temporary marker
-                        RemoveMarkerFromOverlays(tempMarker);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                // Handle any errors that occur during the process
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                // Ensure the temporary marker is removed in case of an error
-                RemoveMarkerFromOverlays(tempMarker);
-            }
-        }*/
-
         private async Task HandlePopupFormAsync(PointLatLng point, string cellId)
         {
-            // Create a NoktaVeri instance with the marker's data
             NoktaVeri noktaVeri_marker = new NoktaVeri
             {
                 Enlem = Math.Round(point.Lat, 4),
                 Boylam = Math.Round(point.Lng, 4),
-                CellId = cellId // Pass the CellId to the popup form
+                CellId = cellId
             };
 
-            // Open the popup form to display/edit the marker's details
             using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
             {
                 if (popupForm.ShowDialog() == DialogResult.OK)
                 {
-                    // Reload the map data asynchronously after the popup form saves the data
-                    await eaHaritayaVeriYukleAsync();
+                    Console.WriteLine("Popup form closed with OK. Updating data...");
+                   // await eaHaritayaVeriYukleAsync();
 
-                    // Add the marker to the map
-                    AddMarkerToMap(noktaVeri_marker);
+                    DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
+                    DataRow updatedRow = dataTable.Rows.Cast<DataRow>().FirstOrDefault(r => r["id"].ToString() == cellId);
+                    if (updatedRow != null)
+                    {
+                        Console.WriteLine($"Cell {cellId}: AC (Home): {updatedRow["AC (Home)_count"]}, " +
+                                          $"AC (Work): {updatedRow["AC (Work)_count"]}, " +
+                                          $"AC (Public): {updatedRow["AC (Public)_count"]}, " +
+                                          $"Fast DC: {updatedRow["Fast DC_count"]}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"No row found for Cell {cellId} in DataTable.");
+                    }
+
+                    Console.WriteLine("Calling HaritaUzerindeSimulasyonGosterimi...");
+                    await HaritaUzerindeSimulasyonGosterimi(dataTable);
+                    Console.WriteLine("HaritaUzerindeSimulasyonGosterimi completed.");
                 }
-
             }
         }
+        /*        private async Task HandlePopupFormAsync(PointLatLng point, string cellId)
+                {
+                    // Create a NoktaVeri instance with the marker's data
+                    NoktaVeri noktaVeri_marker = new NoktaVeri
+                    {
+                        Enlem = Math.Round(point.Lat, 4),
+                        Boylam = Math.Round(point.Lng, 4),
+                        CellId = cellId // Pass the CellId to the popup form
+                    };
 
+                    // Open the popup form to display/edit the marker's details
+                    using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+                    {
+                        if (popupForm.ShowDialog() == DialogResult.OK)
+                        {
+                            // Reload the map data asynchronously after the popup form saves the data
+                            await eaHaritayaVeriYukleAsync();
+
+                            // Add the marker to the map
+                            AddMarkerToMap(noktaVeri_marker);
+                        }
+
+                    }
+                }*/
 
         // Helper method to safely remove a marker from overlays
         private void RemoveMarkerFromOverlays(GMapMarker marker)
@@ -1677,43 +1501,6 @@ namespace SLF
                 cellToolTipOverlay.Markers.Remove(marker);
             }
         }
-/*        private void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                // Check if the user is in "adding charging station" mode
-                if (isAddingChargingStation)
-                {
-                    // Simulate a new marker at the clicked location
-                    GMapMarker simulatedMarker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow)
-                    {
-                        ToolTipText = "Yeni Şarj İstasyonu",
-                        Tag = ModülFormu.SelectedCellId // Use the selected CellId
-                    };
-                    // Reset the flag after adding the station
-                    isAddingChargingStation = false;
-                    // Call gMapControl_EA_OnMarkerClick with the simulated marker
-                    gMapControl_EA_OnMarkerClick(simulatedMarker, e);
-
-
-                    return;
-                }
-
-                // If not in "adding charging station" mode, check if the click is near an existing marker
-                GMapMarker clickedMarker = FindMarkerAtPosition(pointClick);
-                if (clickedMarker != null)
-                {
-                    // Call gMapControl_EA_OnMarkerClick with the clicked marker
-                    gMapControl_EA_OnMarkerClick(clickedMarker, e);
-                }
-                else
-                {
-                    // Standard map click handling (if no marker is clicked)
-                    OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
-                        ref polygonOverlay_ea, Mesafe_yuk, mesafe_metre_yuk);
-                }
-            }
-        }*/
 
         private async void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
         {
@@ -1833,27 +1620,6 @@ namespace SLF
             gMapControl_EA.Refresh();
         }
 
-        /*        private void ToggleMarkers(string markerType, bool isVisible)
-                {
-                    // gMapControl_EA üzerindeki tüm overlay'leri dolaşarak marker'ları kontrol ediyoruz
-                    foreach (var overlay in gMapControl_EA.Overlays)
-                    {
-                        foreach (var marker in overlay.Markers)
-                        {
-                            // Marker, GMarkerGoogle türündeyse ve ToolTipText ile belirtilen türle eşleşiyorsa
-                            if (marker is GMarkerGoogle googleMarker && googleMarker.ToolTipText == markerType)
-                            {
-                                // Marker'ın görünürlük durumunu güncelle
-                                googleMarker.IsVisible = isVisible;
-                            }
-                        }
-                    }
-
-                    // Harita güncellenmesi için refresh yapıyoruz
-                    gMapControl_EA.Refresh();
-                }*/
-
-
         // Şehir seçimi yapıldığında çağrılan metot
         private void ilSecimiMonteCarlo(object sender, EventArgs e)
         {
@@ -1970,6 +1736,7 @@ namespace SLF
         }
         private void EAStationAddButton_Click(object sender, EventArgs e)
         {
+
             try
             {
                 // Show wait cursor
@@ -1983,7 +1750,7 @@ namespace SLF
                 }
 
                 gMapControl_EA.OnMarkerClick -= gMapControl_EA_OnMarkerClick;
-                gMapControl_EA.OnMapClick -= gMapControl_Ea_OnMapClick;
+             //   gMapControl_EA.OnMapClick -= gMapControl_Ea_OnMapClick;
 
                 // Use dataGridView1.DataSource as the DataTable instead of eaDataTable
                 DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
@@ -1993,11 +1760,11 @@ namespace SLF
                     return;
                 }
 
-                if (!gMapControl_EA.Overlays.Contains(simulationOverlay) || !gMapControl_EA.Overlays.Contains(cellToolTipOverlay))
+/*                if (!gMapControl_EA.Overlays.Contains(simulationOverlay) || !gMapControl_EA.Overlays.Contains(cellToolTipOverlay))
                 {
                     gMapControl_EA.OnMapClick += gMapControl_Ea_OnMapClick;
                 }
-
+*/
                 // Check if we are in the process of adding a charging station
                 if (!isAddingChargingStation)
                 {
@@ -2050,7 +1817,7 @@ namespace SLF
                 }
 
                 // Get the updated input file path (modify as needed)
-                string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\DELTA_EA_DENEME_IMAR.xlsx";
+                string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\girdiler\new_buildings_2024_2035.xlsx";
 
                 // Check if the file exists
                 if (File.Exists(inputFilePath))
@@ -2086,7 +1853,7 @@ namespace SLF
         {
             try
             {
-                string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\ea.py"; // Modify as needed
+                string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V1\yedek_deneme\ea.py"; // Modify as needed
                 string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe"; // Modify as needed
 
                 // Build the process start information
@@ -2133,394 +1900,6 @@ namespace SLF
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-
-
-        /*        private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
-                {
-                    try
-                    {
-                        Cursor = Cursors.WaitCursor;
-                        // Inform the user that the Python script has started.
-                        // If you have a status label, update it:
-                        if (statusLabel != null)
-                            statusLabel.Text = "Python script started. Please wait...";
-                        // Alternatively, you might log this or display a non-blocking notification.
-
-                        // Get the updated input file path (modify as needed)
-                        string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\DELTA_EA_DENEME_IMAR.xlsx";
-
-                        // Check if the file exists
-                        if (File.Exists(inputFilePath))
-                        {
-                            // Run the Python script asynchronously
-                            await RunPythonScriptAsync(inputFilePath);
-                        }
-                        else
-                        {
-                            MessageBox.Show("Input file not found! Please ensure the file is saved correctly.",
-                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    finally
-                    {
-                        Cursor = Cursors.Default;
-                        // Optionally update the status label to indicate the process is done.
-                        if (statusLabel != null)
-                            statusLabel.Text = "Idle";
-                    }
-                }
-
-                private async Task RunPythonScriptAsync(string inputFilePath)
-                {
-                    try
-                    {
-                        string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\ea.py"; // Modify as needed
-                        string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe"; // Modify as needed
-
-                        // Build the process start information
-                        ProcessStartInfo startInfo = new ProcessStartInfo
-                        {
-                            FileName = pythonExePath,
-                            Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",
-                            RedirectStandardOutput = true,
-                            RedirectStandardError = true,
-                            UseShellExecute = false,
-                            CreateNoWindow = true
-                        };
-
-                        using (Process process = new Process { StartInfo = startInfo })
-                        {
-                            process.Start();
-
-                            // Asynchronously read the standard output and error streams
-                            Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
-                            Task<string> errorTask = process.StandardError.ReadToEndAsync();
-
-                            // Wait for the process to exit without blocking the UI thread
-                            await Task.Run(() => process.WaitForExit());
-
-                            string output = await outputTask;
-                            string error = await errorTask;
-
-                            // Inform the user upon completion with appropriate messaging
-                            if (process.ExitCode != 0)
-                            {
-                                MessageBox.Show($"Python script failed with exit code {process.ExitCode}.\nError:\n{error}",
-                                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            }
-                            else
-                            {
-                                MessageBox.Show($"Python script executed successfully!\nOutput:\n{output}",
-                                    "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error running Python script: {ex.Message}",
-                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }*/
-
-        /*        private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
-                {
-                    try
-                    {
-                        // Show wait cursor
-                        Cursor = Cursors.WaitCursor;
-
-                        // Get the updated input file path (modify this path accordingly)
-                        string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\DELTA_EA_DENEME_IMAR.xlsx";
-
-                        // Check if the file exists
-                        if (File.Exists(inputFilePath))
-                        {
-                            // Run the Python script asynchronously
-                            await RunPythonScriptAsync(inputFilePath);
-                        }
-                        else
-                        {
-                            MessageBox.Show("Input file not found! Please ensure the file is saved correctly.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    finally
-                    {
-                        // Restore cursor to default
-                        Cursor = Cursors.Default;
-                    }
-                }
-
-                private async Task RunPythonScriptAsync(string inputFilePath)
-                {
-                    try
-                    {
-                        string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\ea.py"; // Modify this path accordingly
-                        string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe"; // Path to your Python executable
-
-                        // Build the process start information
-                        ProcessStartInfo startInfo = new ProcessStartInfo
-                        {
-                            FileName = pythonExePath,
-                            Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",  // Pass the input file path to the script
-                            RedirectStandardOutput = true,
-                            UseShellExecute = false,
-                            CreateNoWindow = true
-                        };
-
-                        using (Process process = new Process { StartInfo = startInfo, EnableRaisingEvents = true })
-                        {
-                            // Create a TaskCompletionSource to await process exit
-                            var tcs = new TaskCompletionSource<bool>();
-
-                            process.Exited += (s, e) =>
-                            {
-                                tcs.TrySetResult(true);
-                            };
-
-                            process.Start();
-
-                            // Asynchronously read the output from the Python script
-                            string output = await process.StandardOutput.ReadToEndAsync();
-
-                            // Await process exit
-                            await tcs.Task;
-
-                            // Display result
-                            MessageBox.Show($"Python script executed successfully!\nOutput:\n{output}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error running Python script: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }*/
-
-        /*        private void EANewSimulationResultsButton_Click(object sender, EventArgs e)
-                {
-                    try
-                    {
-                        // Show wait cursor
-                        Cursor = Cursors.WaitCursor;
-
-                        // Get the updated input file path (it was saved earlier in the popup form)
-                        string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\DELTA_EA_DENEME_IMAR.xlsx"; // Modify this path accordingly
-
-                        // Check if the file exists
-                        if (File.Exists(inputFilePath))
-                        {
-                            // Call the Python script with the updated input file
-                            RunPythonScript(inputFilePath);
-                        }
-                        else
-                        {
-                            MessageBox.Show("Input file not found! Please ensure the file is saved correctly.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    finally
-                    {
-                        // Restore cursor to default
-                        Cursor = Cursors.Default;
-                    }
-                }
-
-                private void RunPythonScript(string inputFilePath)
-                {
-                    try
-                    {
-                        // Show wait cursor
-                        Cursor = Cursors.WaitCursor;
-
-                        string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\ea.py"; // Modify this path accordingly
-                        string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe"; // Path to your Python executable
-
-                        // Build the process start information
-                        ProcessStartInfo startInfo = new ProcessStartInfo
-                        {
-                            FileName = pythonExePath,
-                            Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",  // Pass the input file path to the script
-                            RedirectStandardOutput = true,
-                            UseShellExecute = false,
-                            CreateNoWindow = true
-                        };
-
-                        // Start the process and get the output
-                        Process process = new Process { StartInfo = startInfo };
-                        process.Start();
-
-                        // Optional: Read output from Python script
-                        string output = process.StandardOutput.ReadToEnd();
-                        process.WaitForExit();
-
-                        // Display result
-                        MessageBox.Show($"Python script executed successfully!\nOutput:\n{output}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Handle any unexpected exceptions
-                        MessageBox.Show($"Error running Python script: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    finally
-                    {
-                        // Restore cursor to default
-                        Cursor = Cursors.Default;
-                    }
-                }
-        */
-
-        /*        private void EAStationAddButton_Click(object sender, EventArgs e)
-                {
-                    // Check if the "EA Şarj Verileri" key exists in the dataTablesByType dictionary
-                    if (!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
-                    {
-                        MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
-                        return;
-                    }
-                    gMapControl_EA.OnMarkerClick -= gMapControl_EA_OnMarkerClick;
-                    gMapControl_EA.OnMapClick -= gMapControl_Ea_OnMapClick;
-                    // Use dataGridView1.DataSource as the DataTable instead of eaDataTable
-                    DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
-                    if (dataTable == null || dataTable.Rows.Count == 0)
-                    {
-                        MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
-                        return;
-                    }
-                    if (!gMapControl_EA.Overlays.Contains(simulationOverlay) || !gMapControl_EA.Overlays.Contains(cellToolTipOverlay))
-                    {
-                        gMapControl_EA.OnMapClick += gMapControl_Ea_OnMapClick;
-                    }
-                    // Check if we are in the process of adding a charging station
-                    if (!isAddingChargingStation)
-                    {
-                        MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
-                        isAddingChargingStation = true;
-                        gMapControl_EA.OnMarkerClick += gMapControl_EA_OnMarkerClick;
-                        return; // Exit to wait for the user to click on the map
-                    }
-
-                    // Get the clicked point on the map
-                    var pointClick = gMapControl_EA.FromLocalToLatLng(MousePosition.X, MousePosition.Y);
-
-                    // Refresh the map to show the new marker
-                    gMapControl_EA.Refresh();
-
-                    // Reset the flag after adding the station
-                    isAddingChargingStation = false;
-
-
-                }
-                private void EANewSimulationResultsButton_Click(object sender, EventArgs e)
-                {
-                    // Get the updated input file path (it was saved earlier in the popup form)
-                    string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\DELTA_EA_DENEME_IMAR.xlsx"; // Modify this path accordingly
-
-                    // Check if the file exists
-                    if (File.Exists(inputFilePath))
-                    {
-                        // Call the Python script with the updated input file
-                        RunPythonScript(inputFilePath);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Input file not found! Please ensure the file is saved correctly.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-
-                private void RunPythonScript(string inputFilePath)
-                {
-                    try
-                    {
-                        string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\ea\ea.py"; // Modify this path accordingly
-                        string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe"; // Path to your Python executable
-
-                        // Build the process start information
-                        ProcessStartInfo startInfo = new ProcessStartInfo
-                        {
-                            FileName = pythonExePath,
-                            Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",  // Pass the input file path to the script
-                            RedirectStandardOutput = true,
-                            UseShellExecute = false,
-                            CreateNoWindow = true
-                        };
-
-                        // Start the process and get the output
-                        Process process = new Process { StartInfo = startInfo };
-                        process.Start();
-
-                        // Optional: Read output from Python script
-                        string output = process.StandardOutput.ReadToEnd();
-                        process.WaitForExit();
-
-                        // Display result
-                        MessageBox.Show($"Python script executed successfully!\nOutput:\n{output}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error running Python script: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }*/
-
-        /*        private void EANewSimulationResultsButton_Click(object sender, EventArgs e)
-                {
-                    // Get the updated input file path (it was saved earlier in the popup form)
-                    string inputFilePath = @"C:\path\to\updated_input_file.csv"; // Modify this path accordingly
-
-                    // Check if the file exists
-                    if (File.Exists(inputFilePath))
-                    {
-                        // Call the Python script with the updated input file
-                        RunPythonScript(inputFilePath);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Input file not found! Please ensure the file is saved correctly.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-                private void RunPythonScript(string inputFilePath)
-                {
-                    try
-                    {
-                        string pythonScriptPath = @"C:\path\to\your\python_script.py"; // Modify this path accordingly
-                        string pythonExePath = @"C:\path\to\python.exe"; // Path to your Python executable
-
-                        // Build the process start information
-                        ProcessStartInfo startInfo = new ProcessStartInfo
-                        {
-                            FileName = pythonExePath,
-                            Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",  // Pass the input file path to the script
-                            RedirectStandardOutput = true,
-                            UseShellExecute = false,
-                            CreateNoWindow = true
-                        };
-
-                        // Start the process and get the output
-                        Process process = new Process { StartInfo = startInfo };
-                        process.Start();
-
-                        // Optional: Read output from Python script
-                        string output = process.StandardOutput.ReadToEnd();
-                        process.WaitForExit();
-
-                        // Display result
-                        MessageBox.Show($"Python script executed successfully!\nOutput:\n{output}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error running Python script: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }*/
 
         private async Task eaHaritayaVeriYukleAsync()
         {
@@ -2617,6 +1996,9 @@ namespace SLF
 
         private async void gelecekSimilasyonGoruntule(object sender, EventArgs e)
         {
+
+            // Disable the button to prevent multiple clicks while processing
+            EAStationAddButton.Enabled = false;
             // Checkbox'ları görünür hale getir
             checkBox_AC_Home.Visible = true;
             checkBox_AC_Public.Visible = true;
@@ -2639,7 +2021,7 @@ namespace SLF
             }
             else if (SelectedCity == "İzmir" && SelectedSpeed == "Yavaş")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Düşük.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\çıktı\evcs_monte_carlo_distribution_kumulatif3 - Copy.xlsx";
             }
             else if (SelectedCity == "İzmir" && SelectedSpeed == "Varsayılan")
             {
@@ -2677,6 +2059,8 @@ namespace SLF
 
                 // Veri başarıyla yüklendiğinde bir bildirim gösterin
                 MessageBox.Show("Veri başarıyla yüklendi.");
+                // Disable the button to prevent multiple clicks while processing
+                EAStationAddButton.Enabled = true;
             }
             catch (Exception ex)
             {
@@ -2789,10 +2173,146 @@ namespace SLF
         GMapOverlay simulationOverlay = new GMapOverlay("Simulasyon_Layer");
         GMapOverlay cellToolTipOverlay = new GMapOverlay("CellToolTips");
         public static string SelectedCellId { get; set; }
+        // Define the ToolTip at the class level
+        /*        private System.Windows.Forms.ToolTip EVTooltip = new System.Windows.Forms.ToolTip();
+
+
+                private Task HaritaUzerindeSimulasyonGosterimi(DataTable veriTablosu)
+                {
+                    // Clear existing overlays and re-add them
+                    gMapControl_EA.Overlays.Clear();
+                    gMapControl_EA.Overlays.Add(simulationOverlay);
+                    gMapControl_EA.Overlays.Add(cellToolTipOverlay);
+
+                    // Dictionary to store marker data for quick lookup in MouseMove
+                    Dictionary<GMarkerGoogle, string> markerTooltips = new Dictionary<GMarkerGoogle, string>();
+
+                    foreach (DataRow row in veriTablosu.Rows)
+                    {
+                        if (row["Enlem"] == DBNull.Value || row["Boylam"] == DBNull.Value) continue;
+
+                        double enlem = Convert.ToDouble(row["Enlem"]);
+                        double boylam = Convert.ToDouble(row["Boylam"]);
+                        string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
+
+                        // Get counts for each EV type, defaulting to 0 if null
+                        int acHomeCount = row["AC (Home)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Home)_count"]) : 0;
+                        int acWorkCount = row["AC (Work)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Work)_count"]) : 0;
+                        int acPublicCount = row["AC (Public)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Public)_count"]) : 0;
+                        int fastDcCount = row["Fast DC_count"] != DBNull.Value ? Convert.ToInt32(row["Fast DC_count"]) : 0;
+
+                        // Create a single marker for the cell
+                        GMarkerGoogleType markerType = DetermineMarkerType(acHomeCount, acWorkCount, acPublicCount, fastDcCount);
+                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), markerType)
+                        {
+                            Tag = cellId // Store the cell ID in the marker's Tag
+                        };
+
+                        // Build the tooltip text with all counts
+                        string tooltipText = $"Cell: {cellId}\n" +
+                                             $"AC (Home): {acHomeCount}\n" +
+                                             $"AC (Work): {acWorkCount}\n" +
+                                             $"AC (Public): {acPublicCount}\n" +
+                                             $"Fast DC: {fastDcCount}";
+
+                        // Store the marker and its tooltip text
+                        markerTooltips[marker] = tooltipText;
+
+                        // Add the marker to the simulation overlay
+                        simulationOverlay.Markers.Add(marker);
+                    }
+
+                    // Set up the MouseMove event (only attach once, e.g., in form constructor or initialization)
+                    gMapControl_EA.MouseMove -= GMapControl_EA_MouseMove; // Remove any existing handler to avoid duplicates
+                    gMapControl_EA.MouseMove += GMapControl_EA_MouseMove;
+
+                    // Store markerTooltips for use in the event handler (e.g., as a class-level field)
+                    this.markerTooltips = markerTooltips;
+
+                    // Refresh the map on the UI thread
+                    Invoke(new Action(() => gMapControl_EA.Refresh()));
+
+                    return Task.CompletedTask;
+                }
+
+                // Class-level field to store marker tooltips
+                private Dictionary<GMarkerGoogle, string> markerTooltips;
+
+                // MouseMove event handler
+                private void GMapControl_EA_MouseMove(object sender, MouseEventArgs e)
+                {
+                    if (markerTooltips == null || markerTooltips.Count == 0) return;
+
+                    // Convert mouse position to map coordinates
+                    PointLatLng mousePos = gMapControl_EA.FromLocalToLatLng(e.X, e.Y);
+
+                    // Find the nearest marker within a small threshold (e.g., 0.01 degrees)
+                    const double threshold = 0.01; // Adjust this value based on your map scale
+                    GMarkerGoogle nearestMarker = null;
+                    double minDistance = double.MaxValue;
+
+                    foreach (var marker in markerTooltips.Keys)
+                    {
+                        double distance = Math.Sqrt(
+                            Math.Pow(marker.Position.Lat - mousePos.Lat, 2) +
+                            Math.Pow(marker.Position.Lng - mousePos.Lng, 2));
+                        if (distance < minDistance && distance < threshold)
+                        {
+                            minDistance = distance;
+                            nearestMarker = marker;
+                        }
+                    }
+
+                    // Show or hide the tooltip based on proximity
+                    if (nearestMarker != null)
+                    {
+                        EVTooltip.Show(markerTooltips[nearestMarker], gMapControl_EA, e.X + 10, e.Y + 10, 2000); // Show for 2 seconds
+                    }
+                    else
+                    {
+                        EVTooltip.Hide(gMapControl_EA);
+                    }
+                }
+
+                // Helper method to determine marker type based on counts (C# 7.3 compatible)
+                private GMarkerGoogleType DetermineMarkerType(int acHomeCount, int acWorkCount, int acPublicCount, int fastDcCount)
+                {
+                    int totalCount = acHomeCount + acWorkCount + acPublicCount + fastDcCount;
+                    if (totalCount == 0) return GMarkerGoogleType.gray_small; // No stations
+
+                    var counts = new[]
+                    {
+                new { Type = "AC (Home)", Count = acHomeCount },
+                new { Type = "AC (Work)", Count = acWorkCount },
+                new { Type = "AC (Public)", Count = acPublicCount },
+                new { Type = "Fast DC", Count = fastDcCount }
+            };
+                    var dominantType = counts.OrderByDescending(c => c.Count).First().Type;
+
+                    if (dominantType == "AC (Home)")
+                    {
+                        return GMarkerGoogleType.green;
+                    }
+                    else if (dominantType == "AC (Work)")
+                    {
+                        return GMarkerGoogleType.blue;
+                    }
+                    else if (dominantType == "AC (Public)")
+                    {
+                        return GMarkerGoogleType.yellow;
+                    }
+                    else if (dominantType == "Fast DC")
+                    {
+                        return GMarkerGoogleType.red;
+                    }
+                    else
+                    {
+                        return GMarkerGoogleType.orange; // Fallback
+                    }
+                }*/
         private Task HaritaUzerindeSimulasyonGosterimi(DataTable veriTablosu)
         {
-            // Create overlays:
-
+            // Clear existing overlays and re-add them
             gMapControl_EA.Overlays.Clear();
             gMapControl_EA.Overlays.Add(simulationOverlay);
             gMapControl_EA.Overlays.Add(cellToolTipOverlay);
@@ -2804,76 +2324,291 @@ namespace SLF
                 g.Clear(Color.Transparent);
             }
 
-            Dictionary<(double, double, string), GMarkerGoogle> markerDictionary = new Dictionary<(double, double, string), GMarkerGoogle>();
-
             foreach (DataRow row in veriTablosu.Rows)
             {
-                if (row["Enlem"] != DBNull.Value && row["Boylam"] != DBNull.Value)
+                if (row["Enlem"] == DBNull.Value || row["Boylam"] == DBNull.Value) continue;
+
+                double enlem = Convert.ToDouble(row["Enlem"]);
+                double boylam = Convert.ToDouble(row["Boylam"]);
+                string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
+
+                // Get counts for each EV type, defaulting to 0 if null
+                int acHomeCount = row["AC (Home)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Home)_count"]) : 0;
+                int acWorkCount = row["AC (Work)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Work)_count"]) : 0;
+                int acPublicCount = row["AC (Public)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Public)_count"]) : 0;
+                int fastDcCount = row["Fast DC_count"] != DBNull.Value ? Convert.ToInt32(row["Fast DC_count"]) : 0;
+
+                // Calculate total count
+                int totalCount = acHomeCount + acWorkCount + acPublicCount + fastDcCount;
+
+                // Build the detailed tooltip text for all cells
+                string tooltipText = $"Cell: {cellId}\n" +
+                                     $"AC (Home): {acHomeCount}\n" +
+                                     $"AC (Work): {acWorkCount}\n" +
+                                     $"AC (Public): {acPublicCount}\n" +
+                                     $"Fast DC: {fastDcCount}";
+
+                if (totalCount == 0)
                 {
-                    double enlem = Convert.ToDouble(row["Enlem"]);
-                    double boylam = Convert.ToDouble(row["Boylam"]);
-                    string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
-
-                    // Add an invisible marker for cell tooltips and selection
-                    var invisibleMarker = new GMarkerGoogle(new PointLatLng(enlem, boylam), transparentBitmap);
-                    invisibleMarker.ToolTipText = $"Cell: {cellId}";
-                    invisibleMarker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
-                    invisibleMarker.Tag = cellId; // Store the cell ID in the marker's Tag
+                    // Invisible marker for empty cells
+                    var invisibleMarker = new GMarkerGoogle(new PointLatLng(enlem, boylam), transparentBitmap)
+                    {
+                        ToolTipText = tooltipText,
+                        ToolTipMode = MarkerTooltipMode.OnMouseOver,
+                        Tag = cellId
+                    };
                     cellToolTipOverlay.Markers.Add(invisibleMarker);
-
-                    // Create simulation markers for EV points
-                    bool acHome = row["AC (Home)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Home)_count"]) != 0;
-                    bool acWork = row["AC (Work)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Work)_count"]) != 0;
-                    bool acPublic = row["AC (Public)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Public)_count"]) != 0;
-                    bool fastDc = row["Fast DC_count"] != DBNull.Value && Convert.ToInt32(row["Fast DC_count"]) != 0;
-
-                    if (acHome)
+                }
+                else
+                {
+                    // Visible marker for cells with EV stations
+                    GMarkerGoogleType markerType = DetermineMarkerType(acHomeCount, acWorkCount, acPublicCount, fastDcCount);
+                    var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), markerType)
                     {
-                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.green);
-                        marker.ToolTipText = $"Grid: {cellId}\nAC-Home";
-                        marker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
-                        marker.Tag = "AC-Home"; // Store marker type in Tag
-                        markerDictionary[(enlem, boylam, "AC-Home")] = marker;
-                    }
-                    if (acWork)
-                    {
-                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.blue);
-                        marker.ToolTipText = $"Grid: {cellId}\nAC-Work";
-                        marker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
-                        marker.Tag = "AC-Work"; // Store marker type in Tag
-                        markerDictionary[(enlem, boylam, "AC-Work")] = marker;
-                    }
-                    if (acPublic)
-                    {
-                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.yellow);
-                        marker.ToolTipText = $"Grid: {cellId}\nAC-Public";
-                        marker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
-                        marker.Tag = "AC-Public"; // Store marker type in Tag
-                        markerDictionary[(enlem, boylam, "AC-Public")] = marker;
-                    }
-                    if (fastDc)
-                    {
-                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.red);
-                        marker.ToolTipText = $"Grid: {cellId}\nDC-Fast";
-                        marker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
-                        marker.Tag = "DC-Fast"; // Store marker type in Tag
-                        markerDictionary[(enlem, boylam, "DC-Fast")] = marker;
-                    }
+                        ToolTipMode = MarkerTooltipMode.OnMouseOver,
+                        Tag = cellId,
+                        ToolTipText = tooltipText
+                    };
+                    simulationOverlay.Markers.Add(marker);
                 }
             }
 
-            foreach (var marker in markerDictionary.Values)
-            {
-                simulationOverlay.Markers.Add(marker);
-            }
-
-            Invoke(new Action(() =>
-            {
-                gMapControl_EA.Refresh();
-            }));
+            // Refresh the map on the UI thread
+            Invoke(new Action(() => gMapControl_EA.Refresh()));
 
             return Task.CompletedTask;
         }
+
+        // Helper method to determine marker type (unchanged)
+        private GMarkerGoogleType DetermineMarkerType(int acHomeCount, int acWorkCount, int acPublicCount, int fastDcCount)
+        {
+            int totalCount = acHomeCount + acWorkCount + acPublicCount + fastDcCount;
+            if (totalCount == 0) return GMarkerGoogleType.gray_small; // Not used, but kept for consistency
+
+            var counts = new[]
+            {
+        new { Type = "AC (Home)", Count = acHomeCount },
+        new { Type = "AC (Work)", Count = acWorkCount },
+        new { Type = "AC (Public)", Count = acPublicCount },
+        new { Type = "Fast DC", Count = fastDcCount }
+    };
+            var dominantType = counts.OrderByDescending(c => c.Count).First().Type;
+
+            if (dominantType == "AC (Home)")
+            {
+                return GMarkerGoogleType.green;
+            }
+            else if (dominantType == "AC (Work)")
+            {
+                return GMarkerGoogleType.blue;
+            }
+            else if (dominantType == "AC (Public)")
+            {
+                return GMarkerGoogleType.yellow;
+            }
+            else if (dominantType == "Fast DC")
+            {
+                return GMarkerGoogleType.red;
+            }
+            else
+            {
+                return GMarkerGoogleType.orange; // Fallback
+            }
+        }
+        /*        private Task HaritaUzerindeSimulasyonGosterimi(DataTable veriTablosu)
+                {
+                    // Clear existing overlays and re-add them
+                    gMapControl_EA.Overlays.Clear();
+                    gMapControl_EA.Overlays.Add(simulationOverlay);
+                    gMapControl_EA.Overlays.Add(cellToolTipOverlay);
+
+                    // Create a transparent bitmap for invisible markers
+                    Bitmap transparentBitmap = new Bitmap(16, 16);
+                    using (Graphics g = Graphics.FromImage(transparentBitmap))
+                    {
+                        g.Clear(Color.Transparent);
+                    }
+
+                    foreach (DataRow row in veriTablosu.Rows)
+                    {
+                        if (row["Enlem"] == DBNull.Value || row["Boylam"] == DBNull.Value) continue;
+
+                        double enlem = Convert.ToDouble(row["Enlem"]);
+                        double boylam = Convert.ToDouble(row["Boylam"]);
+                        string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
+
+                        // Get counts for each EV type, defaulting to 0 if null
+                        int acHomeCount = row["AC (Home)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Home)_count"]) : 0;
+                        int acWorkCount = row["AC (Work)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Work)_count"]) : 0;
+                        int acPublicCount = row["AC (Public)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Public)_count"]) : 0;
+                        int fastDcCount = row["Fast DC_count"] != DBNull.Value ? Convert.ToInt32(row["Fast DC_count"]) : 0;
+
+                        // Calculate total count
+                        int totalCount = acHomeCount + acWorkCount + acPublicCount + fastDcCount;
+
+                        // Build the detailed tooltip text for all cells
+                        string tooltipText = $"Cell: {cellId}\n" +
+                                             $"AC (Home): {acHomeCount}\n" +
+                                             $"AC (Work): {acWorkCount}\n" +
+                                             $"AC (Public): {acPublicCount}\n" +
+                                             $"Fast DC: {fastDcCount}";
+
+                        // Add an invisible marker for empty cells to show the full tooltip
+                        if (totalCount == 0)
+                        {
+                            var invisibleMarker = new GMarkerGoogle(new PointLatLng(enlem, boylam), transparentBitmap)
+                            {
+                                ToolTipText = tooltipText,
+                                ToolTipMode = MarkerTooltipMode.OnMouseOver,
+                                Tag = cellId // Store the cell ID in the marker's Tag
+                            };
+                            cellToolTipOverlay.Markers.Add(invisibleMarker);
+                        }
+                        // Add a visible marker for cells with EV stations
+                        else
+                        {
+                            GMarkerGoogleType markerType = DetermineMarkerType(acHomeCount, acWorkCount, acPublicCount, fastDcCount);
+                            var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), markerType)
+                            {
+                                ToolTipMode = MarkerTooltipMode.OnMouseOver,
+                                Tag = cellId // Store the cell ID in the marker's Tag
+                            };
+
+                            // Set the same detailed tooltip for visible markers
+                            marker.ToolTipText = tooltipText;
+
+                            // Add the marker to the simulation overlay
+                            simulationOverlay.Markers.Add(marker);
+                        }
+                    }
+
+                    // Refresh the map on the UI thread
+                    Invoke(new Action(() => gMapControl_EA.Refresh()));
+
+                    return Task.CompletedTask;
+                }
+
+                // Helper method to determine marker type based on counts (C# 7.3 compatible)
+                private GMarkerGoogleType DetermineMarkerType(int acHomeCount, int acWorkCount, int acPublicCount, int fastDcCount)
+                {
+                    int totalCount = acHomeCount + acWorkCount + acPublicCount + fastDcCount;
+                    if (totalCount == 0) return GMarkerGoogleType.gray_small; // Not used, but kept for consistency
+
+                    var counts = new[]
+                    {
+                new { Type = "AC (Home)", Count = acHomeCount },
+                new { Type = "AC (Work)", Count = acWorkCount },
+                new { Type = "AC (Public)", Count = acPublicCount },
+                new { Type = "Fast DC", Count = fastDcCount }
+            };
+                    var dominantType = counts.OrderByDescending(c => c.Count).First().Type;
+
+                    if (dominantType == "AC (Home)")
+                    {
+                        return GMarkerGoogleType.green;
+                    }
+                    else if (dominantType == "AC (Work)")
+                    {
+                        return GMarkerGoogleType.blue;
+                    }
+                    else if (dominantType == "AC (Public)")
+                    {
+                        return GMarkerGoogleType.yellow;
+                    }
+                    else if (dominantType == "Fast DC")
+                    {
+                        return GMarkerGoogleType.red;
+                    }
+                    else
+                    {
+                        return GMarkerGoogleType.orange; // Fallback
+                    }
+                }*/
+        /*        private Task HaritaUzerindeSimulasyonGosterimi(DataTable veriTablosu)
+                {
+                    // Create overlays:
+
+                    gMapControl_EA.Overlays.Clear();
+                    gMapControl_EA.Overlays.Add(simulationOverlay);
+                    gMapControl_EA.Overlays.Add(cellToolTipOverlay);
+
+                    // Create a transparent bitmap for invisible markers
+                    Bitmap transparentBitmap = new Bitmap(16, 16);
+                    using (Graphics g = Graphics.FromImage(transparentBitmap))
+                    {
+                        g.Clear(Color.Transparent);
+                    }
+
+                    Dictionary<(double, double, string), GMarkerGoogle> markerDictionary = new Dictionary<(double, double, string), GMarkerGoogle>();
+
+                    foreach (DataRow row in veriTablosu.Rows)
+                    {
+                        if (row["Enlem"] != DBNull.Value && row["Boylam"] != DBNull.Value)
+                        {
+                            double enlem = Convert.ToDouble(row["Enlem"]);
+                            double boylam = Convert.ToDouble(row["Boylam"]);
+                            string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
+
+                            // Add an invisible marker for cell tooltips and selection
+                            var invisibleMarker = new GMarkerGoogle(new PointLatLng(enlem, boylam), transparentBitmap);
+                            invisibleMarker.ToolTipText = $"Cell: {cellId}";
+                            invisibleMarker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                            invisibleMarker.Tag = cellId; // Store the cell ID in the marker's Tag
+                            cellToolTipOverlay.Markers.Add(invisibleMarker);
+
+                            // Create simulation markers for EV points
+                            bool acHome = row["AC (Home)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Home)_count"]) != 0;
+                            bool acWork = row["AC (Work)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Work)_count"]) != 0;
+                            bool acPublic = row["AC (Public)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Public)_count"]) != 0;
+                            bool fastDc = row["Fast DC_count"] != DBNull.Value && Convert.ToInt32(row["Fast DC_count"]) != 0;
+
+                            if (acHome)
+                            {
+                                var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.green);
+                                marker.ToolTipText = $"Grid: {cellId}\nAC-Home";
+                                marker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                                marker.Tag = "AC-Home"; // Store marker type in Tag
+                                markerDictionary[(enlem, boylam, "AC-Home")] = marker;
+                            }
+                            if (acWork)
+                            {
+                                var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.blue);
+                                marker.ToolTipText = $"Grid: {cellId}\nAC-Work";
+                                marker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                                marker.Tag = "AC-Work"; // Store marker type in Tag
+                                markerDictionary[(enlem, boylam, "AC-Work")] = marker;
+                            }
+                            if (acPublic)
+                            {
+                                var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.yellow);
+                                marker.ToolTipText = $"Grid: {cellId}\nAC-Public";
+                                marker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                                marker.Tag = "AC-Public"; // Store marker type in Tag
+                                markerDictionary[(enlem, boylam, "AC-Public")] = marker;
+                            }
+                            if (fastDc)
+                            {
+                                var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.red);
+                                marker.ToolTipText = $"Grid: {cellId}\nDC-Fast";
+                                marker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                                marker.Tag = "DC-Fast"; // Store marker type in Tag
+                                markerDictionary[(enlem, boylam, "DC-Fast")] = marker;
+                            }
+                        }
+                    }
+
+                    foreach (var marker in markerDictionary.Values)
+                    {
+                        simulationOverlay.Markers.Add(marker);
+                    }
+
+                    Invoke(new Action(() =>
+                    {
+                        gMapControl_EA.Refresh();
+                    }));
+
+                    return Task.CompletedTask;
+                }*/
         /*        private Task HaritaUzerindeSimulasyonGosterimi(DataTable veriTablosu)
                 {
                     // Create overlays:

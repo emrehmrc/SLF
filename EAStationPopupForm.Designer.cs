@@ -198,7 +198,6 @@
             // 
             this.StartYear.HeaderText = "BASLANGIC_YILI";
             this.StartYear.Items.AddRange(new object[] {
-            "2024",
             "2025",
             "2026",
             "2027",
