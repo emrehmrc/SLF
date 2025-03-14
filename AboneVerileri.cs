@@ -420,39 +420,195 @@ namespace SLF
                 });
             }
         }
+        /*        private void ReportErrorLessThanZero()
+                {
+                    float nonPositivePercentage, nonLastYearPercentage;
+                    int totalRows = currentDataTable.Rows.Count;
+                    var column = currentDataTable.Columns[$"YIL_TUKETIM_{lastYear}"];
+                    var fallbackColumn = currentDataTable.Columns[$"YIL_TUKETIM_{penultimateYear}"];
+                    var nullRows = new List<int>();
+                    var imputableRows = new List<int>();
+
+                    int nonPositiveCount = 0;
+                    int nonLastYearCount = 0;
+
+                    foreach (DataRow row in currentDataTable.Rows)
+                    {
+                        int rowIndex = currentDataTable.Rows.IndexOf(row);
+                        string valueString = row[column]?.ToString();
+
+                        // Check for NULL or null-like strings
+                        if (row.IsNull(column) ||
+                            row[column] == DBNull.Value ||
+                            nullLikeStrings.Contains(valueString, StringComparer.OrdinalIgnoreCase))
+                        {
+                            nonPositiveCount++;
+                            nullRows.Add(rowIndex);
+                        }
+                        // Check for invalid formats (non-numeric values)
+                        else if (!float.TryParse(valueString, out float value))
+                        {
+                            nonPositiveCount++;
+                            nullRows.Add(rowIndex);
+                        }
+                        // Check for negative values
+                        else if (value < 0)
+                        {
+                            nonPositiveCount++;
+                            nullRows.Add(rowIndex);
+                        }
+
+                        // If the last year's consumption data is problematic, check the previous year's data
+                        if (nullRows.Contains(rowIndex)) // Row already flagged as non-positive
+                        {
+                            string fallbackValueString = row[fallbackColumn]?.ToString();
+                            if (row.IsNull(fallbackColumn) ||
+                                row[fallbackColumn] == DBNull.Value ||
+                                nullLikeStrings.Contains(fallbackValueString, StringComparer.OrdinalIgnoreCase) ||
+                                (float.TryParse(fallbackValueString, out float fallbackValue) && fallbackValue < 0))
+                            {
+                                // Already counted in nonPositiveCount above
+                            }
+                            else if (row["SOZLESME_DURUMU"].ToString() == SOZ_DVM)
+                            {
+                                nonLastYearCount++;
+                                imputableRows.Add(rowIndex);
+                            }
+                        }
+                    }
+
+                    columnNullRowsMap[column.ColumnName] = nullRows;
+                    imputableRowsMap[column.ColumnName] = imputableRows;
+                    nonPositivePercentage = (float)nonPositiveCount / totalRows;
+                    nonLastYearPercentage = (float)nonLastYearCount / totalRows;
+
+                    if (nonPositivePercentage > 0)
+                    {
+                        var thresholds = TUKETIM_ERROR_THRESHOLD;
+                        var datatableLevel = GetDataTableBasedOnThreshold(nonPositivePercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+
+                        // Customize message based on the type of issue
+                        string issueDetails = "";
+                        if (nonPositiveCount > 0)
+                        {
+                            // Collect counts and row indices for each issue type
+                            int nullCount = 0;
+                            int negativeCount = 0;
+                            int invalidCount = 0;
+                            var allInvalidRows = new List<int>(nullRows); // All rows with issues
+
+                            foreach (int r in nullRows)
+                            {
+                                var row = currentDataTable.Rows[r];
+                                string valueString = row[column]?.ToString();
+                                if (row.IsNull(column) || row[column] == DBNull.Value || nullLikeStrings.Contains(valueString, StringComparer.OrdinalIgnoreCase))
+                                {
+                                    nullCount++;
+                                }
+                                else if (float.TryParse(valueString, out float value) && value < 0)
+                                {
+                                    negativeCount++;
+                                }
+                                else if (!float.TryParse(valueString, out _))
+                                {
+                                    invalidCount++;
+                                }
+                            }
+
+                            // Build the issue details with counts and all row numbers
+                            issueDetails = $" (NULL: {nullCount}, Negatif: {negativeCount}, Geçersiz Format: {invalidCount}, Satır: {string.Join(", ", allInvalidRows)}";
+                            //if (allInvalidRows.Count > 5) issueDetails += "...";
+                            //issueDetails += ")";
+                        }
+
+                        // Differentiate message based on threshold level
+                        string message;
+                        if (nonPositivePercentage >= thresholds.errorThreshold) // >= 20%
+                        {
+                            message = $"Hata: {nonPositivePercentage:P1} oranında {column.ColumnName} değerleri eksik veya geçersiz{issueDetails}. Değerler sayısal ve sıfırdan büyük olmalıdır. Bu oran analizleri etkileyebilir, lütfen verileri kontrol edin.";
+                        }
+                        else // < 20%
+                        {
+                            message = $"Uyarı: {nonPositivePercentage:P1} oranında {column.ColumnName} değerleri eksik veya geçersiz{issueDetails}. Değerler sayısal ve sıfırdan büyük olmalıdır. Bu abonelerin verileri silinecek.";
+                        }
+
+                        datatableLevel.Rows.Add(new object[] {
+                    column.ColumnName,
+                            "Son yıl tüketim verisi",
+                            message
+                });
+                    }
+                    if (nonLastYearPercentage > 0)
+                    {
+                        warningDataTable.Rows.Add(new object[] {
+                    column.ColumnName, 
+                            "Son yıl tüketim verisi",
+                            $"{nonLastYearPercentage:P1}", 
+                            "Bu abonelerin son yıl tüketim verisi yok. Tüketim verileri geçmiş veriler ile doldurulacak."
+                });
+                    }
+                }*/
         private void ReportErrorLessThanZero()
         {
             float nonPositivePercentage, nonLastYearPercentage;
             int totalRows = currentDataTable.Rows.Count;
             var column = currentDataTable.Columns[$"YIL_TUKETIM_{lastYear}"];
             var fallbackColumn = currentDataTable.Columns[$"YIL_TUKETIM_{penultimateYear}"];
-            var nullRows = new List<int>();
-            var imputableRows = new List<int>();
+            var nullRows = new List<int>(); // Rows to be deleted
+            var imputableRows = new List<int>(); // Rows to be imputed
 
             int nonPositiveCount = 0;
             int nonLastYearCount = 0;
 
             foreach (DataRow row in currentDataTable.Rows)
             {
-                if (
-                    row.IsNull(column) ||
+                int rowIndex = currentDataTable.Rows.IndexOf(row);
+                string valueString = row[column]?.ToString();
+
+                // Check for problematic current year's data
+                bool isProblematic = false;
+                if (row.IsNull(column) ||
                     row[column] == DBNull.Value ||
-                    nullLikeStrings.Contains(row[column]?.ToString(), StringComparer.OrdinalIgnoreCase) ||
-                    float.TryParse(row[column]?.ToString(), out float value) && value < 0)
+                    nullLikeStrings.Contains(valueString, StringComparer.OrdinalIgnoreCase))
                 {
-                    // If the last year's consumption data is missing or less than or equal to zero, check the previous year's data
+                    isProblematic = true;
+                }
+                else if (!float.TryParse(valueString, out float value))
+                {
+                    // Invalid format (non-numeric value)
+                    isProblematic = true;
+                }
+                else if (value < 0)
+                {
+                    // Negative value
+                    isProblematic = true;
+                }
+
+                if (isProblematic)
+                {
+                    string fallbackValueString = row[fallbackColumn]?.ToString();
+
+                    // Check fallback data
                     if (row.IsNull(fallbackColumn) ||
                         row[fallbackColumn] == DBNull.Value ||
-                        nullLikeStrings.Contains(row[fallbackColumn]?.ToString(), StringComparer.OrdinalIgnoreCase) ||
-                        float.TryParse(row[fallbackColumn]?.ToString(), out float fallbackValue) && fallbackValue < 0
-                    )
+                        nullLikeStrings.Contains(fallbackValueString, StringComparer.OrdinalIgnoreCase) ||
+                        (float.TryParse(fallbackValueString, out float fallbackValue) && fallbackValue < 0))
                     {
+                        // Fallback data is invalid, mark for deletion
                         nonPositiveCount++;
-                        nullRows.Add(currentDataTable.Rows.IndexOf(row));
+                        nullRows.Add(rowIndex);
                     }
-                    else if (row["SOZLESME_DURUMU"].ToString() == SOZ_DVM) {
+                    else if (row["SOZLESME_DURUMU"].ToString() == SOZ_DVM)
+                    {
+                        // Fallback data is valid and contract allows imputation
                         nonLastYearCount++;
-                        imputableRows.Add(currentDataTable.Rows.IndexOf(row));
+                        imputableRows.Add(rowIndex);
+                    }
+                    else
+                    {
+                        // Fallback data is valid but contract doesn't allow imputation, mark for deletion
+                        nonPositiveCount++;
+                        nullRows.Add(rowIndex);
                     }
                 }
             }
@@ -467,20 +623,80 @@ namespace SLF
                 var thresholds = TUKETIM_ERROR_THRESHOLD;
                 var datatableLevel = GetDataTableBasedOnThreshold(nonPositivePercentage, thresholds.warningThreshold, thresholds.errorThreshold);
 
-                // Append the column name and null count to the report message
                 datatableLevel.Rows.Add(new object[] {
-                    column.ColumnName, "Son yıl tüketim verisi", $"{nonPositivePercentage:P1} abonenin tüketim verisi yok",
-                    "Bu abonelerin tüketim verileri silinecek."
-                });
+            column.ColumnName, "Son yıl tüketim verisi", $"{nonPositivePercentage:P1} abonenin tüketim verisi yok",
+            "Bu abonelerin tüketim verileri silinecek."
+        });
             }
             if (nonLastYearPercentage > 0)
             {
-                // Append the column name and null count to the report message
                 warningDataTable.Rows.Add(new object[] {
-                    column.ColumnName, "Son yıl tüketim verisi", $"{nonLastYearPercentage:P1}", "Bu abonelerin son yıl tüketim verisi yok. Tüketim verileri geçmiş veriler ile doldurulacak."
-                });
+            column.ColumnName, "Son yıl tüketim verisi", $"{nonLastYearPercentage:P1}", "Bu abonelerin son yıl tüketim verisi yok. Tüketim verileri geçmiş veriler ile doldurulacak."
+        });
             }
         }
+        /*        private void ReportErrorLessThanZero()
+                {
+                    float nonPositivePercentage, nonLastYearPercentage;
+                    int totalRows = currentDataTable.Rows.Count;
+                    var column = currentDataTable.Columns[$"YIL_TUKETIM_{lastYear}"];
+                    var fallbackColumn = currentDataTable.Columns[$"YIL_TUKETIM_{penultimateYear}"];
+                    var nullRows = new List<int>();
+                    var imputableRows = new List<int>();
+
+                    int nonPositiveCount = 0;
+                    int nonLastYearCount = 0;
+
+                    foreach (DataRow row in currentDataTable.Rows)
+                    {
+                        if (
+                            row.IsNull(column) ||
+                            row[column] == DBNull.Value ||
+                            nullLikeStrings.Contains(row[column]?.ToString(), StringComparer.OrdinalIgnoreCase) ||
+                            float.TryParse(row[column]?.ToString(), out float value) && value < 0)
+                        {
+                            // If the last year's consumption data is missing or less than or equal to zero, check the previous year's data
+                            if (row.IsNull(fallbackColumn) ||
+                                row[fallbackColumn] == DBNull.Value ||
+                                nullLikeStrings.Contains(row[fallbackColumn]?.ToString(), StringComparer.OrdinalIgnoreCase) ||
+                                float.TryParse(row[fallbackColumn]?.ToString(), out float fallbackValue) && fallbackValue < 0
+                            )
+                            {
+                                nonPositiveCount++;
+                                nullRows.Add(currentDataTable.Rows.IndexOf(row));
+                            }
+                            else if (row["SOZLESME_DURUMU"].ToString() == SOZ_DVM)
+                            {
+                                nonLastYearCount++;
+                                imputableRows.Add(currentDataTable.Rows.IndexOf(row));
+                            }
+                        }
+                    }
+
+                    columnNullRowsMap[column.ColumnName] = nullRows;
+                    imputableRowsMap[column.ColumnName] = imputableRows;
+                    nonPositivePercentage = (float)nonPositiveCount / totalRows;
+                    nonLastYearPercentage = (float)nonLastYearCount / totalRows;
+
+                    if (nonPositivePercentage > 0)
+                    {
+                        var thresholds = TUKETIM_ERROR_THRESHOLD;
+                        var datatableLevel = GetDataTableBasedOnThreshold(nonPositivePercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+
+                        // Append the column name and null count to the report message
+                        datatableLevel.Rows.Add(new object[] {
+                                            column.ColumnName, "Son yıl tüketim verisi", $"{nonPositivePercentage:P1} abonenin tüketim verisi yok",
+                                            "Bu abonelerin tüketim verileri silinecek."
+                                        });
+                    }
+                    if (nonLastYearPercentage > 0)
+                    {
+                        // Append the column name and null count to the report message
+                        warningDataTable.Rows.Add(new object[] {
+                                            column.ColumnName, "Son yıl tüketim verisi", $"{nonLastYearPercentage:P1}", "Bu abonelerin son yıl tüketim verisi yok. Tüketim verileri geçmiş veriler ile doldurulacak."
+                                        });
+                    }
+                }*/
         private void AboneKapasiteCheck()
         {
             // yillik tuketim / 8760 / baglanti gucu
@@ -726,13 +942,25 @@ namespace SLF
             Dictionary<string, double> trafoDictionary = new Dictionary<string, double>();
             Dictionary<string, double> aboneDictionary = new Dictionary<string, double>();
 
-            foreach(DataRow row in trafoDataTable.Rows)
+            foreach (DataRow row in trafoDataTable.Rows)
             {
                 // Get the key value (TRAFO_KODU)
                 string key = row["TRAFO_KODU"].ToString();
 
                 // Get the consumption value, ensuring proper type conversion and handling of DBNull
-                double consumption = (row[consumptionColumn] != DBNull.Value && row[consumptionColumn].ToString() != TO_BE_IMPUTED_STRING) ? Convert.ToDouble(row[consumptionColumn]) : 0;
+                double consumption = 0.0;
+                if (row[consumptionColumn] != DBNull.Value && row[consumptionColumn].ToString() != TO_BE_IMPUTED_STRING)
+                {
+                    if (double.TryParse(row[consumptionColumn].ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+                    {
+                        consumption = value;
+                    }
+                    else
+                    {
+                        // Log the invalid value for debugging
+                        Console.WriteLine($"Invalid format for {consumptionColumn} in trafo {key}: {row[consumptionColumn]}");
+                    }
+                }
 
                 // Add the consumption value to the corresponding key in the dictionary
                 if (trafoDictionary.ContainsKey(key))
@@ -752,7 +980,19 @@ namespace SLF
                 string key = row["BAGLANDIGI_TRAFO_KODU"].ToString();
 
                 // Get the consumption value, ensuring proper type conversion and handling of DBNull
-                double consumption = row[consumptionColumn] != DBNull.Value ? Convert.ToDouble(row[consumptionColumn]) : 0;
+                double consumption = 0.0;
+                if (row[consumptionColumn] != DBNull.Value)
+                {
+                    if (double.TryParse(row[consumptionColumn].ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+                    {
+                        consumption = value;
+                    }
+                    else
+                    {
+                        // Log the invalid value for debugging
+                        Console.WriteLine($"Invalid format for {consumptionColumn} in abone {key}: {row[consumptionColumn]}");
+                    }
+                }
 
                 // Add the consumption value to the corresponding key in the dictionary
                 if (aboneDictionary.ContainsKey(key))
@@ -779,7 +1019,70 @@ namespace SLF
             var connectivityPassPercentage = (float)connectivityPassCount / trafoDictionary.Count;
             aboneTrafoConnectivityPass = connectivityPassPercentage > 0.95;
         }
+        /*        private void CheckConnectivity()
+                {
+                    var trafoDataTable = dataTablesByType["DTR Verileri"];
+                    // Construct the column name for the last year consumption
+                    string consumptionColumn = $"YIL_TUKETIM_{lastYear}";
 
+                    // Create a dictionary to hold the grouped and summed results
+                    Dictionary<string, double> trafoDictionary = new Dictionary<string, double>();
+                    Dictionary<string, double> aboneDictionary = new Dictionary<string, double>();
+
+                    foreach(DataRow row in trafoDataTable.Rows)
+                    {
+                        // Get the key value (TRAFO_KODU)
+                        string key = row["TRAFO_KODU"].ToString();
+
+                        // Get the consumption value, ensuring proper type conversion and handling of DBNull
+                        double consumption = (row[consumptionColumn] != DBNull.Value && row[consumptionColumn].ToString() != TO_BE_IMPUTED_STRING) ? Convert.ToDouble(row[consumptionColumn]) : 0;
+
+                        // Add the consumption value to the corresponding key in the dictionary
+                        if (trafoDictionary.ContainsKey(key))
+                        {
+                            trafoDictionary[key] += consumption;
+                        }
+                        else
+                        {
+                            trafoDictionary[key] = consumption;
+                        }
+                    }
+
+                    // Iterate through each row in the DataTable
+                    foreach (DataRow row in currentDataTable.Rows)
+                    {
+                        // Get the key value (BAGLANDIGI_TRAFO_KODU)
+                        string key = row["BAGLANDIGI_TRAFO_KODU"].ToString();
+
+                        // Get the consumption value, ensuring proper type conversion and handling of DBNull
+                        double consumption = row[consumptionColumn] != DBNull.Value ? Convert.ToDouble(row[consumptionColumn]) : 0;
+
+                        // Add the consumption value to the corresponding key in the dictionary
+                        if (aboneDictionary.ContainsKey(key))
+                        {
+                            aboneDictionary[key] += consumption;
+                        }
+                        else
+                        {
+                            aboneDictionary[key] = consumption;
+                        }
+                    }
+
+                    int connectivityPassCount = 0;
+                    foreach (var kvp in trafoDictionary)
+                    {
+                        var totalKeyCount = trafoDictionary.Count;
+                        var trafoToplam = kvp.Value;
+                        var aboneToplam = aboneDictionary.ContainsKey(kvp.Key) ? aboneDictionary[kvp.Key] : 0;
+                        if (trafoToplam * 0.9 <= aboneToplam && aboneToplam <= trafoToplam)
+                        {
+                            connectivityPassCount++;
+                        }
+                    }
+                    var connectivityPassPercentage = (float)connectivityPassCount / trafoDictionary.Count;
+                    aboneTrafoConnectivityPass = connectivityPassPercentage > 0.95;
+                }
+        */
         public void DeferredImputeTrafoTuketimDemand()
         {
             var trafoDataTable = dataTablesByType["DTR Verileri"];
