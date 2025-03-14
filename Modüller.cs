@@ -169,14 +169,23 @@ namespace SLF
         // ------------------------------------------------------------------------------------------------------------ //
 
         // ------------------------------------------ EA MODÜLÜ DEĞİŞKENLER ------------------------------------------- //
-
+        private readonly Dictionary<string, List<string>> cityDistricts = new Dictionary<string, List<string>>
+{
+    { "İzmir", new List<string> { "Aliağa", "Balçova", "Bayındır", "Bayraklı", "Bergama", "Beydağ", "Bornova", "Buca", "Çeşme", "Çiğli", "Dikili", "Foça", "Gaziemir", "Güzelbahçe", "Karabağlar", "Karaburun", "Karşıyaka", "Kemalpaşa", "Kınık", "Kiraz", "Konak", "Menderes", "Menemen", "Narlıdere", "Ödemiş", "Seferihisar", "Selçuk", "Tire", "Torbalı" } },
+    { "Eskişehir", new List<string> { "Alpu", "Beylikova", "Çifteler", "Günyüzü", "Han", "İnönü", "Mahmudiye", "Mihalgazi", "Mihalıççık", "Odunpazarı", "Sarıcakaya", "Seyitgazi", "Sivrihisar", "Tepebaşı" } }
+};
+        private readonly Dictionary<string, string> districtIdMap = new Dictionary<string, string>
+{
+    { "Çiğli", "1" },
+    { "Karşıyaka", "2" }
+};
 
         private string SelectedSpeed = "";
         public bool isAddingChargingStation = false; // Sadece şarj istasyonu eklenirken true olacak.
         private bool isAddingDekPoint = false; // Sadece dek noktası eklenirken  true olacak.
         private int _selectedYear = -1;
         private string _selectedCity = null;
-
+        private string _selectedDistrict;
 
         // ------------------------------------------------------------------------------------------------------------ //
 
@@ -323,7 +332,10 @@ namespace SLF
             //this.DoubleBuffered = true;
             this.selectedMethod = selectedMethod;  // Store the method
             InitializeComboBoxes();
-
+            // Hook up event handlers
+            comboBox_ea_yıl_secimi.SelectedIndexChanged += yilSecimiMonteCarlo;
+            comboBox_ea_il_secimi.SelectedIndexChanged += ilSecimiMonteCarlo; // Ensure this is present
+            comboBox_ea_ilce_secimi.SelectedIndexChanged += ilceSecimiMonteCarlo;
             // initialize the instance of a CBS form
             cbs = new CBS(this);
 
@@ -347,22 +359,44 @@ namespace SLF
         // Initialize all form components (called in the constructors)
         private void InitializeComboBoxes()
         {
-            // Yıl aralığını ComboBox1'e ekleyin
             var yearList = new List<int>();
             for (int year = slfStartYear; year <= slfEndYear; year++)
             {
                 yearList.Add(year);
             }
-            comboBox_ea_yıl_secimi.DataSource = yearList; // Yıl seçimi için ComboBox1
-            comboBox_DEK_Yıl.DataSource = yearList; // DEK yılı seçimi için ComboBox3
-                                                    // Şehir isimlerini ComboBox2'ye ekleyin
-            comboBox_DEK_il.Items.Clear(); // dek
-            comboBox_ea_il_secimi.Items.Clear();   // ea 
+            comboBox_ea_yıl_secimi.DataSource = yearList;
+            comboBox_DEK_Yıl.DataSource = yearList;
+
+            comboBox_DEK_il.Items.Clear();
+            comboBox_ea_il_secimi.Items.Clear();
             comboBox_ea_il_secimi.Items.Add("İzmir");
             comboBox_ea_il_secimi.Items.Add("Eskişehir");
             comboBox_DEK_il.Items.Add("İzmir");
             comboBox_DEK_il.Items.Add("Eskişehir");
+
+            // Clear and disable district combo box initially
+            comboBox_ea_ilce_secimi.Items.Clear();
+            comboBox_ea_ilce_secimi.SelectedIndex = -1;
+            comboBox_ea_ilce_secimi.Enabled = false;
         }
+        /*        private void InitializeComboBoxes()
+                {
+                    // Yıl aralığını ComboBox1'e ekleyin
+                    var yearList = new List<int>();
+                    for (int year = slfStartYear; year <= slfEndYear; year++)
+                    {
+                        yearList.Add(year);
+                    }
+                    comboBox_ea_yıl_secimi.DataSource = yearList; // Yıl seçimi için ComboBox1
+                    comboBox_DEK_Yıl.DataSource = yearList; // DEK yılı seçimi için ComboBox3
+                                                            // Şehir isimlerini ComboBox2'ye ekleyin
+                    comboBox_DEK_il.Items.Clear(); // dek
+                    comboBox_ea_il_secimi.Items.Clear();   // ea 
+                    comboBox_ea_il_secimi.Items.Add("İzmir");
+                    comboBox_ea_il_secimi.Items.Add("Eskişehir");
+                    comboBox_DEK_il.Items.Add("İzmir");
+                    comboBox_DEK_il.Items.Add("Eskişehir");
+                }*/
 
         // Initialize all form components (called in the constructors)
         private void InitializeFormComponents()
@@ -1619,24 +1653,83 @@ namespace SLF
             // Refresh the map to reflect changes
             gMapControl_EA.Refresh();
         }
-
+        
         // Şehir seçimi yapıldığında çağrılan metot
         private void ilSecimiMonteCarlo(object sender, EventArgs e)
         {
-            if (comboBox_ea_il_secimi.SelectedItem != null)  // Geçerli bir seçim yapıldığında
+            // Always clear the district combo box and reset SelectedDistrict
+            comboBox_ea_ilce_secimi.Items.Clear();
+            comboBox_ea_ilce_secimi.SelectedIndex = -1; // Ensure no selection
+            comboBox_ea_ilce_secimi.Enabled = false; // Disable by default
+            SelectedDistrict = null;
+            SelectedCity = comboBox_ea_il_secimi.SelectedItem.ToString();
+            if (cityDistricts.TryGetValue(SelectedCity, out var districts))
             {
-                SelectedCity = comboBox_ea_il_secimi.SelectedItem.ToString();  // Şehir adını ayarla
-                CheckSelections();  // Seçim durumunu kontrol et
-
-                // Set map position based on selected city
-                if (cityCoordinates.TryGetValue(SelectedCity, out PointLatLng coordinates))
+                comboBox_ea_ilce_secimi.Invoke(new Action(() =>
                 {
-                    gMapControl_EA.Position = coordinates; // Set the map's position
-                    gMapControl_EA.Zoom = 12; // Adjust the zoom level as needed
-                }
+                    comboBox_ea_ilce_secimi.Items.Clear();
+                    comboBox_ea_ilce_secimi.Items.AddRange(districts.ToArray());
+                    comboBox_ea_ilce_secimi.SelectedIndex = -1;
+                    comboBox_ea_ilce_secimi.Enabled = true;
+                    comboBox_ea_ilce_secimi.Refresh();
+                }));
+            }
+            /*            // Update SelectedCity if a valid selection exists
+                        if (comboBox_ea_il_secimi.SelectedItem != null)
+                        {
+                            SelectedCity = comboBox_ea_il_secimi.SelectedItem.ToString();
+
+                            // Populate district combo box based on selected city
+                            if (cityDistricts.TryGetValue(SelectedCity, out var districts))
+                            {
+                                comboBox_ea_ilce_secimi.Items.AddRange(districts.ToArray());
+                                comboBox_ea_ilce_secimi.Enabled = true;
+                            }
+                        }*/
+            else
+            {
+                SelectedCity = null;
+            }
+
+            // Update button enablement and map position
+            CheckSelections();
+
+            if (SelectedCity != null && cityCoordinates.TryGetValue(SelectedCity, out PointLatLng coordinates))
+            {
+                gMapControl_EA.Position = coordinates;
+                gMapControl_EA.Zoom = 12;
             }
         }
+        /*        private void ilSecimiMonteCarlo(object sender, EventArgs e)
+                {
+                    if (comboBox_ea_il_secimi.SelectedItem != null)  // Geçerli bir seçim yapıldığında
+                    {
+                        SelectedCity = comboBox_ea_il_secimi.SelectedItem.ToString();  // Şehir adını ayarla
+                        CheckSelections();  // Seçim durumunu kontrol et
 
+                        // Set map position based on selected city
+                        if (cityCoordinates.TryGetValue(SelectedCity, out PointLatLng coordinates))
+                        {
+                            gMapControl_EA.Position = coordinates; // Set the map's position
+                            gMapControl_EA.Zoom = 12; // Adjust the zoom level as needed
+                        }
+                    }
+                }
+        */
+        private void ilceSecimiMonteCarlo(object sender, EventArgs e)
+        {
+            if (comboBox_ea_ilce_secimi.SelectedItem != null)
+            {
+                SelectedDistrict = comboBox_ea_ilce_secimi.SelectedItem.ToString();
+                Console.WriteLine($"Selected District: {SelectedDistrict}");
+            }
+            else
+            {
+                SelectedDistrict = null;
+                Console.WriteLine("District selection cleared.");
+            }
+            CheckSelections();
+        }
         // Yıl seçimi yapıldığında çağrılan metot
         private void yilSecimiMonteCarlo(object sender, EventArgs e)
         {
@@ -1794,42 +1887,45 @@ namespace SLF
                 Cursor = Cursors.Default;
             }
         }
-
-        // Assuming you have a status label on your form. If not, you can remove these lines.
         private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
         {
-            // Disable the button to prevent multiple clicks while processing
             EANewSimulationResultsButton.Enabled = false;
 
             try
             {
-                // Update UI to indicate process start
                 Cursor = Cursors.WaitCursor;
                 if (statusLabel != null)
+                {
                     statusLabel.Text = "Python script started. This may take a while. Please wait...";
-                statusLabel.Visible = true;
-
+                    statusLabel.Visible = true;
+                }
                 if (progressBar != null)
                 {
-
                     progressBar.Style = ProgressBarStyle.Marquee;
                     progressBar.Visible = true;
                 }
 
-                // Get the updated input file path (modify as needed)
                 string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\girdiler\new_buildings_2024_2035.xlsx";
+                string outputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\çıktı\evcs_monte_carlo_distribution_kumulatif3 - Copy.xlsx";
 
-                // Check if the file exists
-                if (File.Exists(inputFilePath))
-                {
-                    // Run the Python script asynchronously
-                    await RunPythonScriptAsync(inputFilePath);
-                }
-                else
+                if (!File.Exists(inputFilePath))
                 {
                     MessageBox.Show("Input file not found! Please ensure the file is saved correctly.",
                         "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
+
+                await RunPythonScriptAsync(inputFilePath);
+
+                if (!File.Exists(outputFilePath))
+                {
+                    MessageBox.Show("Output file not generated! Please check the Python script.",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Call SimilasyonSonucGoruntule to handle display
+                SimilasyonSonucGoruntule();
             }
             catch (Exception ex)
             {
@@ -1837,26 +1933,23 @@ namespace SLF
             }
             finally
             {
-                // Restore UI elements after processing
                 Cursor = Cursors.Default;
                 if (progressBar != null)
                     progressBar.Visible = false;
                 if (statusLabel != null)
-                    statusLabel.Text = "New simulation process is completed";
+                    statusLabel.Text = "New simulation process completed";
 
-                // Re-enable the button after the process completes
                 EANewSimulationResultsButton.Enabled = true;
             }
         }
-
+        // Updated RunPythonScriptAsync to match your paths
         private async Task RunPythonScriptAsync(string inputFilePath)
         {
             try
             {
-                string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V1\yedek_deneme\ea.py"; // Modify as needed
-                string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe"; // Modify as needed
+                string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\EA_kumulativ.py";
+                string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe";
 
-                // Build the process start information
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
                     FileName = pythonExePath,
@@ -1871,35 +1964,201 @@ namespace SLF
                 {
                     process.Start();
 
-                    // Asynchronously read the standard output and error streams
                     Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
                     Task<string> errorTask = process.StandardError.ReadToEndAsync();
 
-                    // Wait for the process to exit without blocking the UI thread
                     await Task.Run(() => process.WaitForExit());
 
                     string output = await outputTask;
                     string error = await errorTask;
 
-                    // Check for errors from the Python script
                     if (process.ExitCode != 0)
                     {
-                        MessageBox.Show($"Python script failed with exit code {process.ExitCode}.\nError:\n{error}",
-                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        throw new Exception($"Python script failed with exit code {process.ExitCode}.\nError: {error}");
                     }
-                    else
+                    else if (!string.IsNullOrEmpty(output))
                     {
-                        MessageBox.Show($"Python script executed successfully!\nOutput:\n{output}",
-                            "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        Console.WriteLine($"Python output: {output}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error running Python script: {ex.Message}",
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                throw new Exception($"Error running Python script: {ex.Message}");
             }
         }
+        private async void SimilasyonSonucGoruntule()
+        {
+            // Disable the button to prevent multiple clicks while processing
+            EAStationAddButton.Enabled = false;
+
+            try
+            {
+                string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\çıktı\evcs_monte_carlo_distribution_kumulatif3 - Copy.xlsx";
+                DataTable simulationData;
+                try
+                {
+                    // Excel dosyasını aç
+                    using (var package = new ExcelPackage(new FileInfo(filePath)))
+                    {
+                        // Yıl seçimine göre sayfayı seç (SelectedYear değeri, sayfa indeksini temsil eder)
+                        ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
+
+                        // Veriyi DataTable'a yükle
+                        simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
+                    return; // Hata durumunda işlemi sonlandır
+                }
+
+                /*                    using (var package = new ExcelPackage(new FileInfo(filePath)))
+                                    {
+                                        // Map SelectedYear index to actual year
+                                        int baseYear = slfStartYear; // e.g., 2024
+                                        string year = (SelectedYear != -1 && SelectedYear < (slfEndYear - slfStartYear + 1))
+                                            ? (baseYear + SelectedYear).ToString()
+                                            : "2025";
+
+                                        ExcelWorksheet worksheet = package.Workbook.Worksheets[year];
+                                        if (worksheet == null)
+                                        {
+                                            MessageBox.Show($"Worksheet for year {year} not found in output file.",
+                                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                            return;
+                                        }
+
+                                        simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
+                                }*/
+
+                // Log column names for debugging
+                Console.WriteLine("DataTable Columns: " + string.Join(", ", simulationData.Columns.Cast<DataColumn>().Select(c => c.ColumnName)));
+
+                gMapControl_EA.Overlays.Clear();
+                gMapControl_EA.Refresh();
+                // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
+                HesaplaMerkezNoktaVeEkle(simulationData);
+                await HaritaUzerindeSimulasyonGosterimi(simulationData);
+
+                MessageBox.Show("Veri başarıyla yüklendi.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
+            }
+            finally
+            {
+                EAStationAddButton.Enabled = true;
+            }
+        }
+
+        // Assuming you have a status label on your form. If not, you can remove these lines.
+        /*        private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
+                {
+                    // Disable the button to prevent multiple clicks while processing
+                    EANewSimulationResultsButton.Enabled = false;
+
+                    try
+                    {
+                        // Update UI to indicate process start
+                        Cursor = Cursors.WaitCursor;
+                        if (statusLabel != null)
+                            statusLabel.Text = "Python script started. This may take a while. Please wait...";
+                        statusLabel.Visible = true;
+
+                        if (progressBar != null)
+                        {
+
+                            progressBar.Style = ProgressBarStyle.Marquee;
+                            progressBar.Visible = true;
+                        }
+
+                        // Get the updated input file path (modify as needed)
+                        string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\girdiler\new_buildings_2024_2035.xlsx";
+
+                        // Check if the file exists
+                        if (File.Exists(inputFilePath))
+                        {
+                            // Run the Python script asynchronously
+                            await RunPythonScriptAsync(inputFilePath);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Input file not found! Please ensure the file is saved correctly.",
+                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        // Restore UI elements after processing
+                        Cursor = Cursors.Default;
+                        if (progressBar != null)
+                            progressBar.Visible = false;
+                        if (statusLabel != null)
+                            statusLabel.Text = "New simulation process is completed";
+
+                        // Re-enable the button after the process completes
+                        EANewSimulationResultsButton.Enabled = true;
+                    }
+                }
+
+                private async Task RunPythonScriptAsync(string inputFilePath)
+                {
+                    try
+                    {
+                        string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\EA_kumulativ.py"; // Modify as needed
+                        string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe"; // Modify as needed
+
+                        // Build the process start information
+                        ProcessStartInfo startInfo = new ProcessStartInfo
+                        {
+                            FileName = pythonExePath,
+                            Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        };
+
+                        using (Process process = new Process { StartInfo = startInfo })
+                        {
+                            process.Start();
+
+                            // Asynchronously read the standard output and error streams
+                            Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
+                            Task<string> errorTask = process.StandardError.ReadToEndAsync();
+
+                            // Wait for the process to exit without blocking the UI thread
+                            await Task.Run(() => process.WaitForExit());
+
+                            string output = await outputTask;
+                            string error = await errorTask;
+
+                            // Check for errors from the Python script
+                            if (process.ExitCode != 0)
+                            {
+                                MessageBox.Show($"Python script failed with exit code {process.ExitCode}.\nError:\n{error}",
+                                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                            else
+                            {
+                                MessageBox.Show($"Python script executed successfully!\nOutput:\n{output}",
+                                    "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error running Python script: {ex.Message}",
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }*/
 
         private async Task eaHaritayaVeriYukleAsync()
         {
@@ -1993,12 +2252,11 @@ namespace SLF
                 MessageBox.Show($"Bir hata oluştu: {ex.Message}");
             }
         }
-
         private async void gelecekSimilasyonGoruntule(object sender, EventArgs e)
         {
-
             // Disable the button to prevent multiple clicks while processing
             EAStationAddButton.Enabled = false;
+
             // Checkbox'ları görünür hale getir
             checkBox_AC_Home.Visible = true;
             checkBox_AC_Public.Visible = true;
@@ -2021,7 +2279,7 @@ namespace SLF
             }
             else if (SelectedCity == "İzmir" && SelectedSpeed == "Yavaş")
             {
-                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\çıktı\evcs_monte_carlo_distribution_kumulatif3 - Copy.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Düşük.xlsx";
             }
             else if (SelectedCity == "İzmir" && SelectedSpeed == "Varsayılan")
             {
@@ -2042,7 +2300,7 @@ namespace SLF
             else
             {
                 MessageBox.Show("Lütfen geçerli bir şehir ve senaryo seçiniz.");
-                return; // Geçerli bir şehir veya hız seçilmediyse işlemi sonlandır
+                return;
             }
 
             try
@@ -2050,47 +2308,72 @@ namespace SLF
                 // Excel dosyasını aç
                 using (var package = new ExcelPackage(new FileInfo(filePath)))
                 {
-                    // Yıl seçimine göre sayfayı seç (SelectedYear değeri, sayfa indeksini temsil eder)
-                    ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
+                    // Yıl seçimine göre sayfayı seç
+                    int baseYear = slfStartYear; // e.g., 2024
+                    string year = (SelectedYear != -1 && SelectedYear < (slfEndYear - slfStartYear + 1))
+                        ? (baseYear + SelectedYear).ToString()
+                        : "2025";
 
-                    // Veriyi DataTable'a yükle
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[year];
+                    if (worksheet == null)
+                    {
+                        MessageBox.Show($"Worksheet for year {year} not found in output file.",
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    // Load the DataTable
                     veriMonteCarlo = excelService.LoadWorksheetIntoDataTable(worksheet);
+
+                    // Filter DataTable based on SelectedDistrict and its ID
+                    if (SelectedDistrict != null)
+                    {
+                        if (districtIdMap.TryGetValue(SelectedDistrict, out string districtId))
+                        {
+                            var filteredRows = veriMonteCarlo.AsEnumerable()
+                                .Where(row => row.Field<string>("ilce") == districtId)
+                                .CopyToDataTable();
+                            veriMonteCarlo = filteredRows; // Update with filtered data
+                        }
+                        else
+                        {
+                            MessageBox.Show($"No ID mapping found for district: {SelectedDistrict}. No data will be displayed.",
+                                "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            veriMonteCarlo.Clear(); // Clear data to prevent displaying all districts
+                            return; // Exit the method
+                        }
+                    }
                 }
 
                 // Veri başarıyla yüklendiğinde bir bildirim gösterin
                 MessageBox.Show("Veri başarıyla yüklendi.");
-                // Disable the button to prevent multiple clicks while processing
                 EAStationAddButton.Enabled = true;
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
-                return; // Hata durumunda işlemi sonlandır
+                return;
             }
+
             DataTable cıktıPopup = FormatEATableForDisplay(veriMonteCarlo);
-            // Yeni bir DataGridView oluştur
             DataGridView dataGridView = new DataGridView
             {
-                DataSource = cıktıPopup,  // Bind the DataTable
-                Dock = DockStyle.Fill,     // Make sure it's filling the container/form
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells // Resize columns based on content
+                DataSource = cıktıPopup,
+                Dock = DockStyle.Fill,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells
             };
-
-
 
             // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
             HesaplaMerkezNoktaVeEkle(veriMonteCarlo);
-
             await HaritaUzerindeSimulasyonGosterimi(veriMonteCarlo);
 
             // Önceki popupForm varsa kapatın
             if (popupForm != null && !popupForm.IsDisposed)
             {
                 popupForm.Close();
-                popupForm.Dispose();  // Eski formu serbest bırak
+                popupForm.Dispose();
             }
 
-            // Yeni popupForm'u oluşturun ve açın
             popupForm = new Form
             {
                 Text = "Hücre Analizi",
@@ -2099,77 +2382,116 @@ namespace SLF
             };
 
             popupForm.Controls.Add(dataGridView);
-          //  popupForm.Show(); // Yeni pencereyi göster
+           // popupForm.Show();
         }
+        /*        private async void gelecekSimilasyonGoruntule(object sender, EventArgs e)
+                {
 
-        /*                private Task HaritaUzerindeSimulasyonGosterimi(DataTable veriTablosu)
+                    // Disable the button to prevent multiple clicks while processing
+                    EAStationAddButton.Enabled = false;
+                    // Checkbox'ları görünür hale getir
+                    checkBox_AC_Home.Visible = true;
+                    checkBox_AC_Public.Visible = true;
+                    checkBox_AC_Work.Visible = true;
+                    checkBox_DC_Fast.Visible = true;
+                    checkBox_AC_Public.Checked = true;
+                    checkBox_AC_Work.Checked = true;
+                    checkBox_AC_Home.Checked = true;
+                    checkBox_DC_Fast.Checked = true;
+
+                    gMapControl_EA.Overlays.Clear();
+                    gMapControl_EA.Refresh();
+
+                    // Şehir ve hız seçimine göre dosya yolunu ayarla
+                    string filePath = "";
+
+                    if (SelectedCity == "İzmir" && SelectedSpeed == "Hızlı")
+                    {
+                        filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Yüksek.xlsx";
+                    }
+                    else if (SelectedCity == "İzmir" && SelectedSpeed == "Yavaş")
+                    {
+                        filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Düşük.xlsx";
+                    }
+                    else if (SelectedCity == "İzmir" && SelectedSpeed == "Varsayılan")
+                    {
+                        filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_baz.xlsx";
+                    }
+                    else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Hızlı")
+                    {
+                        filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Yüksek.xlsx";
+                    }
+                    else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Yavaş")
+                    {
+                        filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Düşük.xlsx";
+                    }
+                    else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Varsayılan")
+                    {
+                        filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_esk_baz.xlsx";
+                    }
+                    else
+                    {
+                        MessageBox.Show("Lütfen geçerli bir şehir ve senaryo seçiniz.");
+                        return; // Geçerli bir şehir veya hız seçilmediyse işlemi sonlandır
+                    }
+
+                    try
+                    {
+                        // Excel dosyasını aç
+                        using (var package = new ExcelPackage(new FileInfo(filePath)))
                         {
-                            // Create a new overlay for simulation markers
-                            GMapOverlay simulationOverlay = new GMapOverlay("Simulasyon_Layer");
+                            // Yıl seçimine göre sayfayı seç (SelectedYear değeri, sayfa indeksini temsil eder)
+                            ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
 
-                            // Add a new overlay for simulation markers (No need to remove it if it's new)
-                            gMapControl_EA.Overlays.Clear(); // Optionally clear the previous overlays, if needed
-                            gMapControl_EA.Overlays.Add(simulationOverlay);
+                            // Veriyi DataTable'a yükle
+                            veriMonteCarlo = excelService.LoadWorksheetIntoDataTable(worksheet);
+                        }
 
-                            // Dictionary to hold markers based on their coordinates and types
-                            Dictionary<(double, double, string), GMarkerGoogle> markerDictionary = new Dictionary<(double, double, string), GMarkerGoogle>();
+                        // Veri başarıyla yüklendiğinde bir bildirim gösterin
+                        MessageBox.Show("Veri başarıyla yüklendi.");
+                        // Disable the button to prevent multiple clicks while processing
+                        EAStationAddButton.Enabled = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
+                        return; // Hata durumunda işlemi sonlandır
+                    }
+                    DataTable cıktıPopup = FormatEATableForDisplay(veriMonteCarlo);
+                    // Yeni bir DataGridView oluştur
+                    DataGridView dataGridView = new DataGridView
+                    {
+                        DataSource = cıktıPopup,  // Bind the DataTable
+                        Dock = DockStyle.Fill,     // Make sure it's filling the container/form
+                        AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells // Resize columns based on content
+                    };
 
-                            // Process the rows in the DataTable
-                            foreach (DataRow row in veriTablosu.Rows)
-                            {
-                                if (row["Enlem"] != DBNull.Value && row["Boylam"] != DBNull.Value)
-                                {
-                                    double enlem = Convert.ToDouble(row["Enlem"]);
-                                    double boylam = Convert.ToDouble(row["Boylam"]);
 
-                                    // Check the counts and add markers accordingly
-                                    bool acHome = row["AC (Home)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Home)_count"]) != 0;
-                                    bool acWork = row["AC (Work)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Work)_count"]) != 0;
-                                    bool acPublic = row["AC (Public)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Public)_count"]) != 0;
-                                    bool fastDc = row["Fast DC_count"] != DBNull.Value && Convert.ToInt32(row["Fast DC_count"]) != 0;
 
-                                    // Create markers based on the conditions
-                                    if (acHome)
-                                    {
-                                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.green);
-                                        marker.ToolTipText = "AC-Home";
-                                        markerDictionary[(enlem, boylam, "AC-Home")] = marker;
-                                    }
-                                    if (acWork)
-                                    {
-                                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.blue);
-                                        marker.ToolTipText = "AC-Work";
-                                        markerDictionary[(enlem, boylam, "AC-Work")] = marker;
-                                    }
-                                    if (acPublic)
-                                    {
-                                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.yellow);
-                                        marker.ToolTipText = "AC-Public";
-                                        markerDictionary[(enlem, boylam, "AC-Public")] = marker;
-                                    }
-                                    if (fastDc)
-                                    {
-                                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.red);
-                                        marker.ToolTipText = "DC-Fast";
-                                        markerDictionary[(enlem, boylam, "DC-Fast")] = marker;
-                                    }
-                                }
-                            }
+                    // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
+                    HesaplaMerkezNoktaVeEkle(veriMonteCarlo);
 
-                            // Add the created markers to the simulation overlay
-                            foreach (var marker in markerDictionary.Values)
-                            {
-                                simulationOverlay.Markers.Add(marker);
-                            }
+                    await HaritaUzerindeSimulasyonGosterimi(veriMonteCarlo);
 
-                            // Refresh the map control to show the new markers
-                            Invoke(new Action(() =>
-                            {
-                                gMapControl_EA.Refresh();
-                            }));
+                    // Önceki popupForm varsa kapatın
+                    if (popupForm != null && !popupForm.IsDisposed)
+                    {
+                        popupForm.Close();
+                        popupForm.Dispose();  // Eski formu serbest bırak
+                    }
 
-                            return Task.CompletedTask;
-                        }*/
+                    // Yeni popupForm'u oluşturun ve açın
+                    popupForm = new Form
+                    {
+                        Text = "Hücre Analizi",
+                        Width = 730,
+                        Height = 600
+                    };
+
+                    popupForm.Controls.Add(dataGridView);
+                  //  popupForm.Show(); // Yeni pencereyi göster
+                }*/
+
         GMapOverlay simulationOverlay = new GMapOverlay("Simulasyon_Layer");
         GMapOverlay cellToolTipOverlay = new GMapOverlay("CellToolTips");
         public static string SelectedCellId { get; set; }
@@ -3040,14 +3362,27 @@ namespace SLF
             }
         }
 
+        public string SelectedDistrict
+        {
+            get => _selectedDistrict;
+            set
+            {
+                _selectedDistrict = value;
+                CheckSelections();
+            }
+        }
+        /*        private void CheckSelections()
+                {
+                    // Seçimlerin yapıldığını kontrol ederek butonu etkinleştir
+                    EASimButton.Enabled = SelectedYear != -1 && SelectedCity != null; // ea modulu 
+                    DEKSimButton.Enabled = SelectedYear != -1 && SelectedCity != null; // dek modulu 
+                }
+        */
         private void CheckSelections()
         {
-            // Seçimlerin yapıldığını kontrol ederek butonu etkinleştir
-            EASimButton.Enabled = SelectedYear != -1 && SelectedCity != null; // ea modulu 
-            DEKSimButton.Enabled = SelectedYear != -1 && SelectedCity != null; // dek modulu 
+            EASimButton.Enabled = SelectedYear != -1 && SelectedCity != null && SelectedDistrict != null;
+            DEKSimButton.Enabled = SelectedYear != -1 && SelectedCity != null && SelectedDistrict != null;
         }
-
-
         private async Task dekHaritayaVeriYukleAsync()
         {
             try
