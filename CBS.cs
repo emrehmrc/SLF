@@ -24,9 +24,7 @@ namespace SLF
 
         // GMapOverlay arrays, one per map:
         public GMapOverlay[] tüm_katmanlar_array_imar = new GMapOverlay[15];
-        public GMapOverlay[] tüm_katmanlar_array_stokastik = new GMapOverlay[15];
         public GMapOverlay[] tüm_katmanlar_array_yuk = new GMapOverlay[15];
-        public GMapOverlay[] tüm_katmanlar_array_yga = new GMapOverlay[15];
 
         public string[] tüm_katmanlar_array_names = new string[15];
         public System.Data.DataTable[] tüm_katmanlar_datatable = new DataTable[15];
@@ -36,9 +34,7 @@ namespace SLF
 
         // see the attributes of a polygon when clicked on it on the map 
         public Dictionary<GMapPolygon, DataRow> polygonAttributes_imar;
-        public Dictionary<GMapPolygon, DataRow> polygonAttributes_yga;
         public Dictionary<GMapPolygon, DataRow> polygonAttributes_yuk;
-        public Dictionary<GMapPolygon, DataRow> polygonAttributes_stokastik;
 
         // variables that are to be used to export .kml files
         public Dictionary<GMapPolygon, DataRow> polygonAttributes_kml;
@@ -53,9 +49,8 @@ namespace SLF
         public bool isSelecting_grid = false;
         public PointLatLng starting_point;
         public PointLatLng ending_point;
-        // ------------------------------------//
 
-        public List<PointLatLng> polygonPoints_stokastik;
+        // ------------------------------------//
         private GMapPolygon selectedPolygon;
 
         public Dictionary<NetTopologySuite.Geometries.Polygon, DataRow> polygonAttributes_grid; // for polygons of grids
@@ -77,14 +72,8 @@ namespace SLF
             targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
 
             polygonAttributes_imar = new Dictionary<GMapPolygon, DataRow>();
-            polygonAttributes_yga = new Dictionary<GMapPolygon, DataRow>();
             polygonAttributes_yuk = new Dictionary<GMapPolygon, DataRow>();
-            polygonAttributes_stokastik = new Dictionary<GMapPolygon, DataRow>();
-
-
             polygonAttributes_grid = new Dictionary<NetTopologySuite.Geometries.Polygon, DataRow>();
-
-            polygonPoints_stokastik = new List<PointLatLng>();
         }
 
 
@@ -157,15 +146,14 @@ namespace SLF
 
 
         //-----------------------------------------------------------------------------//
-
         // helper method to find the first available slot in the arrays
+
         private int FindFirstFreeLayerIndex()
         {
             for (int i = 0; i < 15; i++)
             {
                 // If all four overlays at index i are null, that means it’s free
-                if (tüm_katmanlar_array_imar[i] == null && tüm_katmanlar_array_yuk[i] == null &&
-                    tüm_katmanlar_array_stokastik[i] == null && tüm_katmanlar_array_yga[i] == null)
+                if (tüm_katmanlar_array_imar[i] == null && tüm_katmanlar_array_yuk[i] == null)
                 {
                     return i;
                 }
@@ -200,13 +188,9 @@ namespace SLF
 
                 GMapOverlay overlay_imar = new GMapOverlay($"overlay_{layer_index + 1}_imar");
                 GMapOverlay overlay_yuk = new GMapOverlay($"overlay_{layer_index + 1}_yuk");
-                GMapOverlay overlay_stokastik = new GMapOverlay($"overlay_{layer_index + 1}_stokastik");
-                GMapOverlay overlay_yga = new GMapOverlay($"overlay_{layer_index + 1}_yga");
 
                 modülFormu.gMapControl_imar.Overlays.Add(overlay_imar);
                 modülFormu.gMapControl_yuk.Overlays.Add(overlay_yuk);
-                modülFormu.gMapControl_stokastik.Overlays.Add(overlay_stokastik);
-                modülFormu.gMapControl_yga.Overlays.Add(overlay_yga);
 
                 DataTable dt = new DataTable();
                 callingForm.Cursor = Cursors.WaitCursor;
@@ -219,22 +203,16 @@ namespace SLF
                         callingForm.Cursor = Cursors.Default;
 
                         CopyOverlayContents(overlay_imar, overlay_yuk, polygonAttributes_imar, polygonAttributes_yuk);
-                        CopyOverlayContents(overlay_imar, overlay_stokastik, polygonAttributes_imar, polygonAttributes_stokastik);
-                        CopyOverlayContents(overlay_imar, overlay_yga, polygonAttributes_imar, polygonAttributes_yga);
                     }
                     else if (extension == "kml")
                     {
                         await LoadKmlFile(filepath, overlay_imar, dt, callingMap);
 
                         CopyOverlayContents(overlay_imar, overlay_yuk, polygonAttributes_imar, polygonAttributes_yuk);
-                        CopyOverlayContents(overlay_imar, overlay_stokastik, polygonAttributes_imar, polygonAttributes_stokastik);
-                        CopyOverlayContents(overlay_imar, overlay_yga, polygonAttributes_imar, polygonAttributes_yga);
                     }
 
                     tüm_katmanlar_array_imar[layer_index] = overlay_imar;
                     tüm_katmanlar_array_yuk[layer_index] = overlay_yuk;
-                    tüm_katmanlar_array_stokastik[layer_index] = overlay_stokastik;
-                    tüm_katmanlar_array_yga[layer_index] = overlay_yga;
 
                     tüm_katmanlar_datatable[layer_index] = dt;
                     tüm_katmanlar_array_names[layer_index] = filename;
@@ -249,13 +227,9 @@ namespace SLF
 
                     // Mark all categories for update
                     modülFormu.pendingUpdates["imar"] = true;
-                    modülFormu.pendingUpdates["yga"] = true;
-                    modülFormu.pendingUpdates["stokastik"] = true;
 
                     // Update only the active tab immediately
                     modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_imar, "imar");
-                    modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_yga, "yga");
-                    modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_stokastik, "stokastik");
                 }
                 finally
                 {
@@ -264,11 +238,8 @@ namespace SLF
             }
 
             modülFormu.gMapControl_imar.Refresh();
-            modülFormu.gMapControl_yga.Refresh();
             modülFormu.gMapControl_yuk.Refresh();
-            modülFormu.gMapControl_stokastik.Refresh();
         }
-
 
         public void CopyOverlayContents(
             GMapOverlay sourceOverlay,
@@ -403,14 +374,7 @@ namespace SLF
             {
                 polygonAttributes_imar[gMapPolygon] = attributes;
             }
-            else if (overlay == modülFormu.gMapControl_stokastik.Overlays.FirstOrDefault(o => o == overlay))
-            {
-                polygonAttributes_stokastik[gMapPolygon] = attributes;
-            }
-            else if (overlay == modülFormu.gMapControl_yga.Overlays.FirstOrDefault(o => o == overlay))
-            {
-                polygonAttributes_yga[gMapPolygon] = attributes;
-            }
+
             else if (overlay == modülFormu.gMapControl_yuk.Overlays.FirstOrDefault(o => o == overlay))
             {
                 polygonAttributes_yuk[gMapPolygon] = attributes;
@@ -453,9 +417,7 @@ namespace SLF
             };
             overlay.Polygons.Add(polygon);
             polygonAttributes_imar[polygon] = attributes;
-            polygonAttributes_yga[polygon] = attributes;
             polygonAttributes_yuk[polygon] = attributes;
-            polygonAttributes_stokastik[polygon] = attributes;
         }
 
 
@@ -1187,17 +1149,19 @@ namespace SLF
             }
 
             gMapControl.Refresh();
-
+            
             // Find the first available slot in the array that holds shapefile overlay layers
             layer_index = Array.FindIndex(tüm_katmanlar_array_imar, s => s == null);
             tüm_katmanlar_array_imar[layer_index] = gridOverlay;
-            tüm_katmanlar_array_stokastik[layer_index] = gridOverlay;
-            tüm_katmanlar_array_yga[layer_index] = gridOverlay;
             tüm_katmanlar_array_yuk[layer_index] = gridOverlay;
 
             // add grid overlay to the specified gmapcontrol objects
             modülFormu.gMapControl_imar.Overlays.Add(gridOverlay);
-            modülFormu.gMapControl_stokastik.Overlays.Add(gridOverlay);
+
+            // copy the contents of the grid in the imar tab to the grid in the yuk tab
+            GMapOverlay grid_overlay_yuk = new GMapOverlay($"grid_overlay_{layer_index + 1}_yuk");
+            modülFormu.gMapControl_yuk.Overlays.Add(grid_overlay_yuk);
+            CopyOverlayContents(gridOverlay, grid_overlay_yuk, polygonAttributes_imar, polygonAttributes_yuk);
 
             tüm_katmanlar_array_names[layer_index] = "Grid_" + grid_size + "_" + (layer_index + 1).ToString();
             tüm_katmanlar_datatable[layer_index] = gridTable;
@@ -1207,23 +1171,22 @@ namespace SLF
             MapWinGIS.Shapefile myShapefile = ConvertOverlayToShapefile(gridOverlay);
             shapeFileArray_MapWinGIS[layer_index] = myShapefile;
 
-            // Get the list of associated checkboxes for the given layer_index
-            List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
 
-            if (associatedCheckBoxes != null)
+            List<CheckBox> associatedChecks = modülFormu.GetCheckBoxesByIndex(layer_index);
+            foreach (var chk in associatedChecks)
             {
-                // Loop through each checkbox in the list and apply the required settings
-                foreach (var checkBox in associatedCheckBoxes)
-                {
-                    checkBox.Checked = true;
-                    checkBox.Visible = true;
-                    checkBox.Text = tüm_katmanlar_array_names[layer_index];
-                }
+                chk.Text = tüm_katmanlar_array_names[layer_index];
+                chk.Visible = true;
+                chk.Checked = true;
             }
 
-            modülFormu.gMapControl_stokastik.Refresh();
-            modülFormu.gMapControl_imar.Refresh();
+            // Mark all categories for update
+            modülFormu.pendingUpdates["imar"] = true;
 
+            // Update only the active tab immediately
+            modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_imar, "imar");
+
+            modülFormu.gMapControl_imar.Refresh();
         }
 
 
@@ -1414,64 +1377,38 @@ namespace SLF
             gmap.Refresh();
         }
 
-        /*
         public System.Data.DataTable CreatePolygonDataTable(List<PointLatLng> polygonPoints, int polygonId)
         {
             System.Data.DataTable dt = new System.Data.DataTable();
-            dt.Columns.Add("PolygonID", typeof(int));
-            dt.Columns.Add("Coordinates", typeof(string));
-            dt.Columns.Add("Area_Size(m2)", typeof(string));
-
-            // Create a string representation of the coordinates
-            string coordinates = string.Join(", ", polygonPoints.Select(p => $"({p.Lat}, {p.Lng})"));
-
-            double area = CalculatePolygonArea(polygonPoints);
-
-            // Create a new row
-            DataRow row = dt.NewRow();
-            row["PolygonID"] = polygonId;
-            row["Coordinates"] = coordinates;
-            row["Area_Size(m2)"] = Math.Round(area, 0).ToString();
-            dt.Rows.Add(row);
-
-            return dt;
-        }*/
-
-        public System.Data.DataTable CreatePolygonDataTable(List<PointLatLng> polygonPoints, int polygonId)
-        {
-            System.Data.DataTable dt = new System.Data.DataTable();
-            dt.Columns.Add("PolygonID", typeof(int));
-            dt.Columns.Add("Coordinates", typeof(string));
-            dt.Columns.Add("Area_Size(m2)", typeof(string));
-            dt.Columns.Add("Mesken", typeof(string)); // Add custom fields
-            dt.Columns.Add("Sanayi", typeof(string));          // Add custom fields
-            dt.Columns.Add("Ticarethane", typeof(string));     // Add custom fields
-            dt.Columns.Add("start_year", typeof(string)); // Add custom fields
-            dt.Columns.Add("saturation_speed", typeof(string)); // Add custom fields
-            dt.Columns.Add("density", typeof(string));   // Add custom fields
+            dt.Columns.Add("Polygon_ID", typeof(int));
+            dt.Columns.Add("Koordinatlar", typeof(string));
+            dt.Columns.Add("Alansal Büyüklük (m2))", typeof(string));
+            dt.Columns.Add("Mesken", typeof(string)); 
+            dt.Columns.Add("Sanayi", typeof(string));          
+            dt.Columns.Add("Ticarethane", typeof(string));     
+            dt.Columns.Add("Başlangıç Yılı", typeof(string)); 
+            dt.Columns.Add("Satürasyon Hızı", typeof(string)); 
+            dt.Columns.Add("Yoğunluk", typeof(string));   
             dt.Columns.Add("Park, yol, kaldırım oranı (%)", typeof(string));         
             dt.Columns.Add("Sosyal yapı parsel oranı (%)", typeof(string));          
 
-
             // Create a string representation of the coordinates in WKT format
             string coordinates = $"Polygon (({string.Join(", ", polygonPoints.Select(p => $"{p.Lat} {p.Lng}"))}))";
-
             double area = CalculatePolygonArea(polygonPoints);
 
             // Create a new row
             DataRow row = dt.NewRow();
-            row["PolygonID"] = polygonId;
-            row["Coordinates"] = coordinates;  // Store as WKT format
-            row["Area_Size(m2)"] = Math.Round(area, 0).ToString();
-            row["Mesken"] = ""; // Default empty value
-            row["Sanayi"] = ""; // Default empty value
-            row["Ticarethane"] = ""; // Default empty value
-            row["start_year"] = ""; // Default empty value
-            row["saturation_speed"] = ""; // Default empty value
-            row["density"] = ""; // Default empty value
-                                 // row["taks"] = ""; // Default empty value
-            row["Park, yol, kaldırım oranı (%)"] = ""; // Default empty value
-            row["Sosyal yapı parsel oranı (%)"] = ""; // Default empty value
+            row["Polygon_ID"] = polygonId;
+            row["Koordinatlar"] = coordinates;  
+            row["Alansal Büyüklük (m2)"] = Math.Round(area, 0).ToString();
+            row["Mesken"] = ""; 
+            row["Sanayi"] = ""; 
+            row["Ticarethane"] = ""; 
+            row["Başlangıç Yılı"] = ""; 
+            row["Satürasyon Hızı"] = ""; 
+            row["Yoğunluk"] = ""; 
+            row["Park, yol, kaldırım oranı (%)"] = ""; 
+            row["Sosyal yapı parsel oranı (%)"] = ""; 
             dt.Rows.Add(row);
 
             return dt;
@@ -1752,7 +1689,6 @@ namespace SLF
         }
 
 
-
         // combine the attributes of the polygons which intersect one another
         private DataRow CombineAttributes(DataRow leftRow, DataRow rightRow)
         {
@@ -1791,7 +1727,6 @@ namespace SLF
 
             return combinedRow;
         }
-
         private DataRow CombineAttributesWithAggregations(
             DataRow leftRow, DataRow rightRow,
             Dictionary<string, double> counts, Dictionary<string, double> sums,
@@ -2040,7 +1975,6 @@ namespace SLF
 
             // add the resulting layer and its name to the specified arrays
             tüm_katmanlar_array_imar[layer_index] = resultingOverlay;
-            tüm_katmanlar_array_stokastik[layer_index] = resultingOverlay; 
 
             tüm_katmanlar_array_names[layer_index] = "Birleştirilmiş_Katman_" + layer_index.ToString();
 
@@ -2133,7 +2067,6 @@ namespace SLF
 
             // add the resulting layer and its name to the specified arrays
             tüm_katmanlar_array_imar[layer_index] = resultingOverlay;
-            tüm_katmanlar_array_stokastik[layer_index] = resultingOverlay;
 
             tüm_katmanlar_array_names[layer_index] = "Birleştirilmiş_Katman_" + layer_index.ToString();
 

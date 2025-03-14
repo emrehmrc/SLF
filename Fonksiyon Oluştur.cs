@@ -55,7 +55,6 @@ namespace SLF
 
             Cursor = Cursors.Default;
 
-            mod1.gMapControl_stokastik.Refresh();
             mod1.gMapControl_imar.Refresh();
         }
         
