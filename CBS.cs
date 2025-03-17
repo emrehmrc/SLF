@@ -227,9 +227,11 @@ namespace SLF
 
                     // Mark all categories for update
                     modülFormu.pendingUpdates["imar"] = true;
+                    modülFormu.pendingUpdates["yuk"] = true;
 
                     // Update only the active tab immediately
                     modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_imar, "imar");
+                    modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_yuk, "yuk");
                 }
                 finally
                 {
@@ -1182,9 +1184,11 @@ namespace SLF
 
             // Mark all categories for update
             modülFormu.pendingUpdates["imar"] = true;
+            modülFormu.pendingUpdates["yuk"] = true;
 
             // Update only the active tab immediately
             modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_imar, "imar");
+            modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_yuk, "yuk");
 
             modülFormu.gMapControl_imar.Refresh();
         }

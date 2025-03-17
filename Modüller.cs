@@ -99,6 +99,7 @@ namespace SLF
         // Initialize all checkboxes
         // Class-level declaration of checkbox arrays
         public System.Windows.Forms.CheckBox[] checkBoxes_imar;
+        public System.Windows.Forms.CheckBox[] checkBoxes_yuk;
 
         // nokta ekleme/çıkarma gibi opsiyonların olduğu sağ tık menüsü
         public ContextMenuStrip nokta_menüsü;
@@ -355,7 +356,7 @@ namespace SLF
 
             _excelService = new ExcelService();
             InitializeLogTextBox(); // Initialize logTextBox
-            //this.DoubleBuffered = true;
+
             this.selectedMethod = selectedMethod;  // Store the method
             InitializeComboBoxes();
 
@@ -382,6 +383,8 @@ namespace SLF
         {
             if (checkBoxes_imar[0] != null && checkBoxes_imar[0].Parent != null)
                 checkboxStartY["imar"] = checkBoxes_imar[0].Location.Y;
+            if (checkBoxes_yuk[0] != null && checkBoxes_yuk[0].Parent != null)
+                checkboxStartY["yuk"] = checkBoxes_yuk[0].Location.Y;
         }
 
         // Initialize all form components (called in the constructors)
@@ -607,6 +610,8 @@ namespace SLF
                 {
                     if (category == "imar")
                         UpdateCheckboxPositions(checkBoxes_imar, "imar");
+                    else if (category == "yuk")
+                        UpdateCheckboxPositions(checkBoxes_yuk, "yuk");
 
                     // Add "yuk" if applicable
                     pendingUpdates[category] = false;
@@ -738,6 +743,15 @@ namespace SLF
                     }
                 }
 
+                if (layerIndex < checkBoxes_yuk.Length)
+                {
+                    // Only set if it's a *different* reference to avoid re-triggering for the same box
+                    if (!ReferenceEquals(cb, checkBoxes_yuk[layerIndex]))
+                    {
+                        checkBoxes_yuk[layerIndex].Checked = isVisible;
+                    }
+                }
+
             }
             finally
             {
@@ -765,6 +779,7 @@ namespace SLF
             // Adjust these names based on your designer
             tabControlMain = Modül_Tabları; // The TabControl containing all tabs
             categoryTabPages["imar"] = tab_imar; // Tab page for "İmar Analizi"
+            categoryTabPages["yuk"] = tab_yükHaritası;
         }
 
         public void checkboxes_init()
@@ -773,6 +788,10 @@ namespace SLF
             checkBoxes_imar = new System.Windows.Forms.CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4,
         checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9,
         checkBox_imar_10, checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15 };
+
+            checkBoxes_yuk = new System.Windows.Forms.CheckBox[] { checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4,
+        checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9,
+        checkBox_yuk_10, checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15 };
 
             int[] tagValuesForCheckboxes = Enumerable.Range(1, 15).ToArray();
 
@@ -789,6 +808,7 @@ namespace SLF
             }
 
             initializeCheckBoxes(checkBoxes_imar, tagValuesForCheckboxes);
+            initializeCheckBoxes(checkBoxes_yuk, tagValuesForCheckboxes);
         }
 
         private const int CheckboxHeight = 27; // Height of each checkbox (adjust as needed)
@@ -796,7 +816,8 @@ namespace SLF
 
         public Dictionary<string, bool> pendingUpdates = new Dictionary<string, bool>
         {
-            { "imar", false }
+            { "imar", false },
+            { "yuk", false }
         };
 
         public void UpdateCheckboxPositions(CheckBox[] checkBoxes, string mapCategory)
@@ -849,12 +870,18 @@ namespace SLF
                 checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5,
                 checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
                 checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15,
+
+                checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4, checkBox_yuk_5,
+                checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9, checkBox_yuk_10,
+                checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15,
             };
 
             var categoryCheckboxes = new Dictionary<string, CheckBox[]>
             {
-                { "imar", checkBoxes_imar }
+                { "imar", checkBoxes_imar },
+                { "yuk", checkBoxes_yuk }
             };
+
 
             CheckBox targetCheckbox = null;
             string targetCategory = null;
@@ -866,6 +893,7 @@ namespace SLF
                     {
                         targetCheckbox = checkBox;
                         if (checkBox.Name.Contains("imar")) targetCategory = "imar";
+                        else if (checkBox.Name.Contains("yuk")) targetCategory = "yuk";
                         break;
                     }
                 }
@@ -3397,11 +3425,15 @@ namespace SLF
                 checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10, 
                 checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15 };
 
+            var yukCheckBoxes = new CheckBox[] { checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4,
+                checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9, checkBox_yuk_10,
+                checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15 };
+
             // Ensure the index is valid before accessing arrays
             if (index >= 0 && index < 15)
             {
                 // Return the checkboxes for the given index
-                return new List<CheckBox> { imarCheckBoxes[index]};
+                return new List<CheckBox> { imarCheckBoxes[index], yukCheckBoxes[index] };
             }
 
             // Return an empty list if index is out of range
@@ -3508,6 +3540,7 @@ namespace SLF
                     {
                         // Rename the layer in your underlying data structure
                         checkBoxes_imar[checkbox_index].Text = newName;
+                        checkBoxes_yuk[checkbox_index].Text = newName;
                         cbs.tüm_katmanlar_array_names[checkbox_index] = newName;
 
                         // Refresh the list/tree view
@@ -3708,6 +3741,7 @@ namespace SLF
 
                     // Recolor all three checkboxes associated with this layer index
                     checkBoxes_imar[layerIndex].ForeColor = selectedColor;
+                    checkBoxes_yuk[layerIndex].ForeColor = selectedColor;
 
                     // refresh each map
                     gMapControl_imar.Refresh();
