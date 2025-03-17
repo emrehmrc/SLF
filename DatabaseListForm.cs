@@ -24,7 +24,7 @@ namespace SLF
 
 
 {
-    { "OGAGTRF.TAB", new List<string> {
+    { "V_SBK_OGAGTRF.TAB", new List<string> {
         "ID",
         "KODU",
         "X_KOORDINAT",
@@ -41,7 +41,7 @@ namespace SLF
         "Demand Çekiş",
         "Demand Çekiş Tarihi"
     }},
-    { "TRAFOBINATIP.TAB", new List<string> {
+    { "V_SBK_TRAFOBINATIP.TAB", new List<string> {
         "TM_ID",
         "TM_FIDER_ID",
         "ADR_ILCE_ID"
@@ -83,9 +83,14 @@ namespace SLF
         public DatabaseListForm()
         {
             InitializeComponent();
-            
+            foreach (var modul in ModülFormu.girdiModülleri.Values)
+            {
+                modul.SlfStartYear = ModülFormu.Instance.slfStartYear;
+                modul.SlfEndYear = ModülFormu.Instance.slfEndYear;
+            }
+
         }
-    
+
         private List<(string ColumnName, string ColumnType)> ExtractColumnsFromTabFile(string filePath)
         {
             var columns = new List<(string ColumnName, string ColumnType)>();
@@ -223,7 +228,7 @@ namespace SLF
                 using (var adapter = new NpgsqlDataAdapter(cmd))
                 {
                     adapter.Fill(dataTable);
-                    
+
                     // Kolon isimlerini büyük harfe çevir
                     foreach (DataColumn col in dataTable.Columns)
                     {
@@ -233,7 +238,7 @@ namespace SLF
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Veritabanı tablosu yüklenirken hata: {ex.Message}", 
+                MessageBox.Show($"Veritabanı tablosu yüklenirken hata: {ex.Message}",
                     "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
@@ -355,7 +360,7 @@ namespace SLF
                     }
                 }
 
-                
+
             }
             catch (Exception ex)
             {
@@ -375,26 +380,26 @@ namespace SLF
                 {
                     // Veritabanı tablosunu yükle
                     dataTable = LoadDatabaseTable(source);
-                    
+
                     // GirdiModülü'nü oluştur ve veriyi işle
                     GirdiModülü module = new GirdiModülü();
                     module.importedDataTable = dataTable;
-                    
+
                     if (module.VEERProcess(dataType))
                     {
                         // Başarılı işlem sonrası ModülFormu'nu güncelle
                         ModülFormu modülFormu = new ModülFormu();
                         modülFormu.isİmportedModule(true, dataType);
-                        
-                        MessageBox.Show($"{dataType} başarıyla işlendi ve Girdi Modülü'ne aktarıldı.", 
+
+                        MessageBox.Show($"{dataType} başarıyla işlendi ve Girdi Modülü'ne aktarıldı.",
                             "Başarılı!", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        
+
                         // Ana form DataGridView'ı güncelle
                         dataGridViewTableData.DataSource = module.importedDataTable;
                     }
                     else
                     {
-                        MessageBox.Show($"{dataType} işleme sırasında hata oluştu.", 
+                        MessageBox.Show($"{dataType} işleme sırasında hata oluştu.",
                             "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
@@ -405,7 +410,7 @@ namespace SLF
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Veri işleme hatası: {ex.Message}", 
+                MessageBox.Show($"Veri işleme hatası: {ex.Message}",
                     "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -649,32 +654,32 @@ namespace SLF
         {
             if (listBoxCbsFiles.SelectedItems.Count < 2 || listBoxTables.SelectedItems.Count < 1)
             {
-                MessageBox.Show("Lütfen OGAGTRF.tab ve TRAFOBINATIP.tab dosyalarını, ayrıca DTR_ARIL_VERILERI tablosunu seçin.", "Eksik Veri", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Lütfen V_SBK_OGAGTRF.tab ve V_SBK_TRAFOBINATIP.tab dosyalarını, ayrıca DTR_ARIL_VERILERI tablosunu seçin.", "Eksik Veri", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            
+
             //string scriptPath = Path.Combine(Directory.GetParent(baseDir).Parent.Parent.FullName, "CBS", "PythonScript", "dtr_v4.py");
             // Dosya ve Tablo Seçimi
             string selectedTabFile1 = listBoxCbsFiles.SelectedItems.Cast<string>()
-                .FirstOrDefault(file => file.Equals("OGAGTRF.tab", StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefault(file => file.Equals("V_SBK_OGAGTRF.tab", StringComparison.OrdinalIgnoreCase));
             string selectedTabFile2 = listBoxCbsFiles.SelectedItems.Cast<string>()
-                .FirstOrDefault(file => file.Equals("TRAFOBINATIP.tab", StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefault(file => file.Equals("V_SBK_TRAFOBINATIP.tab", StringComparison.OrdinalIgnoreCase));
             string selectedDatabaseTable = listBoxTables.SelectedItems.Cast<string>()
                 .FirstOrDefault(table => table.Equals("dtr_aril_verileri_son", StringComparison.OrdinalIgnoreCase));
 
             if (string.IsNullOrEmpty(selectedTabFile1) || string.IsNullOrEmpty(selectedTabFile2) || string.IsNullOrEmpty(selectedDatabaseTable))
             {
-                MessageBox.Show("Gerekli dosya veya tablo seçilmedi! Lütfen OGAGTRF.tab, TRAFOBINATIP.tab dosyalarını ve dtr_aril_verileri tablosunu seçin.",
+                MessageBox.Show("Gerekli dosya veya tablo seçilmedi! Lütfen V_SBK_OGAGTRF.tab, V_SBK_TRAFOBINATIP.tab dosyalarını ve dtr_aril_verileri tablosunu seçin.",
                     "Eksik Veri", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-           
+
             // Dosya yolları
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             //string scriptPath = Path.Combine(baseDir,"cbs", "PythonScript", "dtr_v4.py");
             string scriptPath = Path.Combine(
             Directory.GetParent(baseDir).Parent.Parent.FullName,  // Proje kök dizinine git
-                   "cbs", "PythonScripts","kod", "dtr_v5_database.py"
+                   "cbs", "PythonScripts", "kod", "dtr_v6_database.py"
                 );
 
             //string scriptPath = @"C:\\Users\\batuhan.yetis\\source\\repos\\SLF\\cbs\\PythonScripts\\dtr_v4.py";
@@ -717,7 +722,7 @@ namespace SLF
 
             if (!ValidateColumns(selectedDatabaseTable, databaseTable)) return;
 
-            
+
 
             List<string> arguments = new List<string>
             {
@@ -731,7 +736,7 @@ namespace SLF
 
             try
             {
-                
+
 
                 girdiModülü = ModülFormu.girdiModülleri["DTR Verileri"];
                 if (girdiModülü.VEERProcess("dtr_verileri"))
@@ -783,7 +788,7 @@ namespace SLF
                 // DEBUG: Büyük harfe çevrilen kolonları göster
                 string updatedColumns = string.Join(", ", rawDataTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
                 MessageBox.Show($"Güncellenmiş Kolonlar: {updatedColumns}", "Debug: Kolonlar");
-                
+
 
                 // 3. Gerekli sütunları kontrol edin
                 var requiredColumns = new List<string>
@@ -808,12 +813,12 @@ namespace SLF
                 if (girdiModülü.VEERProcess(selectedTable))
                 {
 
-                    
+
                     string secilen_veri_tipi = "EA Sarj Verileri";
                     //var isImported = girdiModülü.VEERProcess("EA_Sarj_verileri");
                     ModülFormu modülFormu = new ModülFormu();
                     modülFormu.isİmportedModule(true, secilen_veri_tipi);
-                    
+
 
 
                     MessageBox.Show("Şarj istasyonu başarıyla eklendi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -882,7 +887,7 @@ namespace SLF
                 girdiModülü = ModülFormu.girdiModülleri["DEK Verileri"];
                 if (girdiModülü.VEERProcess(selectedTable))
                 {
-                    
+
 
                     // "DEK Verileri" olarak modu işaretle
                     string secilen_veri_tipi = "DEK Verileri";
@@ -1117,7 +1122,7 @@ namespace SLF
                     string secilen_veri_tipi = "Yeni Projelendirilmiş DTR Verileri";
                     ModülFormu modülFormu = new ModülFormu();
                     modülFormu.isİmportedModule(true, secilen_veri_tipi);
-                    
+
                     MessageBox.Show($"{selectedTable} başarıyla işlendi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
@@ -1135,7 +1140,186 @@ namespace SLF
         {
 
         }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e) // gdz dtr tablosu 
+        {
+            try
+            {
+                // Check if a table is selected
+                if (listBoxTables.SelectedItem == null)
+                {
+                    MessageBox.Show("Lütfen bir tablo seçin!", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                string selectedTable = listBoxTables.SelectedItem.ToString();
+
+                // Load the table from database
+                DataTable rawDataTable = DatabaseHelper.LoadTable(selectedTable);
+
+                // Debug: Show loaded columns
+                string originalColumns = string.Join(", ", rawDataTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
+                MessageBox.Show($"Orijinal Kolonlar: {originalColumns}", "Debug: Kolonlar");
+
+                // Validate required columns
+                var requiredColumns = new List<string>
+                    {
+                    "TRAFO_ID",
+                    "TRAFO_KODU",
+                    "TRAFO_ILCE_ADI",
+                    "TRAFO_MAHALLE_ADI",
+                    "TRAFO_MULKIYET",
+                    "FIDER_ADI",
+                    "TRAFO_KAPASITESI",
+                    "TM_ID",
+                    "TM_FIDER_ID",
+                    "TRAFO_X_KOORDINAT",
+                    "TRAFO_Y_KOORDINAT",
+                    "TRAFO_ADI",
+                    "TRAFO_KURULUM_TARIHI",
+                    "PRIMER_GERILIM",
+                    "SEKONDER_GERILIM",
+                    "YIL_DEMANT_2021",
+                    "YIL_TUKETIM_2021",
+                    "YIL_DEMANT_2022",
+                    "YIL_TUKETIM_2022",
+                    "YIL_DEMANT_2023",
+                    "YIL_TUKETIM_2023"
+                    };
+
+                if (!ValidateColumns(rawDataTable, requiredColumns))
+                {
+                    MessageBox.Show("Tablo gerekli sütunlara sahip değil!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Process DTR Module
+                //girdiModülü.SlfStartYear = ModülFormu.Instance.slfStartYear;
+                //girdiModülü.SlfEndYear = ModülFormu.Instance.slfEndYear;
+                girdiModülü = ModülFormu.girdiModülleri["DTR Verileri"];
+
+                if (girdiModülü.VEERProcess(selectedTable))
+                {
+                    string secilen_veri_tipi = "DTR Verileri";
+                    ModülFormu modülFormu = new ModülFormu();
+                    modülFormu.isİmportedModule(true, secilen_veri_tipi);
+
+                    MessageBox.Show("DTR Verileri başarıyla işlendi ve Girdi Modülü'ne aktarıldı.",
+                        "Başarılı!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show("DTR Verileri işleme sırasında hata oluştu.",
+                        "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"VEER süreci başlatılırken hata oluştu: {ex.Message}",
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void mevcut_Dtr_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Yıl kontrolü
+                //if (ModülFormu.Instance.slfStartYear == 0 || ModülFormu.Instance.slfEndYear == 0)
+                //{
+                //    MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin!", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                //    return;
+                //}
+
+                // Tablo seçimi kontrolü
+                if (listBoxTables.SelectedItem == null)
+                {
+                    MessageBox.Show("Lütfen bir tablo seçin!", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                string selectedTable = listBoxTables.SelectedItem.ToString();
+
+                // Önce Abone Modülünü al ve yılları set et
+                girdiModülü = ModülFormu.girdiModülleri["Abone Verileri"];
+                
+
+                // Veritabanından tabloyu yükle
+                DataTable rawDataTable = DatabaseHelper.LoadTable(selectedTable);
+
+                // Debug: Yüklenen kolonları göster
+                string originalColumns = string.Join(", ", rawDataTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
+                MessageBox.Show($"Orijinal Kolonlar: {originalColumns}", "Debug: Kolonlar");
+
+                // Gerekli sütunları kontrol et
+                var requiredColumns = new List<string>
+       {
+           "TESISAT_NO",
+           "ABONE_X_KOORDINAT",
+           "ABONE_Y_KOORDINAT",
+           "BINA_ID",
+           "BINA_TURU",
+           "ABONE_ILCE_ID",
+           "BAGLANDIGI_TRAFO_KODU",
+           "BAGLANTI_GUCU",
+           "SOZLESME_DURUMU",
+           "ABONE_GRUBU",
+           "GERILIM_SEVIYESI",
+           "ABONE_BASLANGIC_TARIHI",
+           "ABONE_BITIS_TARIHI",
+           "YIL_TUKETIM_2019",
+           "YIL_TUKETIM_2020",
+           "YIL_TUKETIM_2021",
+           "YIL_TUKETIM_2022",
+           "YIL_TUKETIM_2023",
+           "YIL_DEMANT_2019",
+           "YIL_DEMANT_2020",
+           "YIL_DEMANT_2021",
+           "YIL_DEMANT_2022",
+           "YIL_DEMANT_2023"
+       };
+
+                if (!ValidateColumns(rawDataTable, requiredColumns))
+                {
+                    MessageBox.Show("Tablo gerekli sütunlara sahip değil!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Abone verilerini işle
+                if (girdiModülü.VEERProcess(selectedTable))
+                {
+                    string secilen_veri_tipi = "Abone Verileri";
+                    ModülFormu modülFormu = new ModülFormu();
+                    modülFormu.isİmportedModule(true, secilen_veri_tipi);
+
+                    MessageBox.Show("Abone Verileri başarıyla işlendi ve Girdi Modülü'ne aktarıldı.",
+                        "Başarılı!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show("Abone Verileri işleme sırasında hata oluştu.",
+                        "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"VEER süreci başlatılırken hata oluştu: {ex.Message}\nStack Trace: {ex.StackTrace}",
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
     }
-    }
+}
+    
 // Initialize the DataTable columns
 // LoadShapefile metoduna eklenecek debug kodu
