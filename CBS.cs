@@ -367,6 +367,13 @@ namespace SLF
                 Fill = new SolidBrush(overlayColors[layer_index].FillColor)
             };
 
+            // Update the checkboxes for that layer in each 4 different map
+            List<CheckBox> associatedChecks = modülFormu.GetCheckBoxesByIndex(layer_index);
+            foreach (var chk in associatedChecks)
+            {
+                chk.ForeColor = overlayColors[layer_index].BorderColor;
+            }
+
             // Add the polygon to the overlay
             overlay.Polygons.Add(gMapPolygon);
 
@@ -1404,7 +1411,7 @@ namespace SLF
             DataRow row = dt.NewRow();
             row["Polygon_ID"] = polygonId;
             row["Koordinatlar"] = coordinates;  
-            row["Alansal Büyüklük (m2)"] = Math.Round(area, 0).ToString();
+            row["Alansal Büyüklük (m2))"] = Math.Round(area, 0).ToString();
             row["Mesken"] = ""; 
             row["Sanayi"] = ""; 
             row["Ticarethane"] = ""; 

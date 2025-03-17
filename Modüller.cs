@@ -3336,6 +3336,7 @@ namespace SLF
                     chk.Text = polygonOverlay.Id;   // display layer name
                     chk.Visible = true;
                     chk.Checked = true;
+                    chk.ForeColor = cbs.overlayColors[layer_index].BorderColor;
                 }
 
                 // Prepare a new overlay for future use
@@ -3347,6 +3348,9 @@ namespace SLF
                 gMapControl_EA.Refresh();
                 gMapControl_imar.Refresh();
                 gMapControl_yuk.Refresh();
+
+                mesafe_metre_imar.Text = "";
+                Mesafe_imar.Text = "";
 
                 MessageBox.Show("Poligon kaydedildi!");
             }
