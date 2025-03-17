@@ -30,16 +30,17 @@
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DEKCenterPopupForm));
             this.DEKCenterpanel2_Dek_Popup = new System.Windows.Forms.Panel();
             this.DEKTamamButton = new SLF.CustomButton();
             this.DEKCancelButton = new SLF.CustomButton();
             this.DEKCenterpanel1_Dek_Popup = new System.Windows.Forms.Panel();
             this.DEKCenterDataGridView = new System.Windows.Forms.DataGridView();
+            this.ILCE_ADI = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.KAYNAK_TIPI = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.DEK_KURULU_GUCU = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ILCE_ADI = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.CATI_ALANI = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DEK_X_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DEK_Y_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -120,7 +121,7 @@
             this.DEKCenterDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.DEKCenterDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
+            this.DEKCenterDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.DEKCenterDataGridView.BackgroundColor = System.Drawing.Color.Snow;
             this.DEKCenterDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.DEKCenterDataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
@@ -135,10 +136,10 @@
             this.DEKCenterDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.DEKCenterDataGridView.ColumnHeadersHeight = 25;
             this.DEKCenterDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.ILCE_ADI,
             this.ID,
             this.KAYNAK_TIPI,
             this.DEK_KURULU_GUCU,
-            this.ILCE_ADI,
             this.CATI_ALANI,
             this.DEK_X_KOORDINAT,
             this.DEK_Y_KOORDINAT,
@@ -159,11 +160,25 @@
             this.DEKCenterDataGridView.Location = new System.Drawing.Point(28, 31);
             this.DEKCenterDataGridView.Name = "DEKCenterDataGridView";
             this.DEKCenterDataGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.DEKCenterDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.DEKCenterDataGridView.RowHeadersVisible = false;
             this.DEKCenterDataGridView.RowHeadersWidth = 18;
             this.DEKCenterDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.DEKCenterDataGridView.Size = new System.Drawing.Size(972, 356);
             this.DEKCenterDataGridView.TabIndex = 7;
+            // 
+            // ILCE_ADI
+            // 
+            this.ILCE_ADI.HeaderText = "ILCE_ADI";
+            this.ILCE_ADI.Name = "ILCE_ADI";
+            this.ILCE_ADI.Width = 64;
             // 
             // ID
             // 
@@ -175,6 +190,10 @@
             // KAYNAK_TIPI
             // 
             this.KAYNAK_TIPI.HeaderText = "KAYNAK_TIPI";
+            this.KAYNAK_TIPI.Items.AddRange(new object[] {
+            "GES (Güneş)",
+            "RES (Rüzgar)",
+            "BES (Biokütle)"});
             this.KAYNAK_TIPI.Name = "KAYNAK_TIPI";
             this.KAYNAK_TIPI.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.KAYNAK_TIPI.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
@@ -187,12 +206,6 @@
             this.DEK_KURULU_GUCU.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.DEK_KURULU_GUCU.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.DEK_KURULU_GUCU.Width = 130;
-            // 
-            // ILCE_ADI
-            // 
-            this.ILCE_ADI.HeaderText = "ILCE_ADI";
-            this.ILCE_ADI.Name = "ILCE_ADI";
-            this.ILCE_ADI.Width = 64;
             // 
             // CATI_ALANI
             // 
@@ -268,10 +281,10 @@
         private CustomButton DEKCancelButton;
         private CustomButton DEKTamamButton;
         private System.Windows.Forms.DataGridView DEKCenterDataGridView;
+        private System.Windows.Forms.DataGridViewComboBoxColumn ILCE_ADI;
         private System.Windows.Forms.DataGridViewTextBoxColumn ID;
         private System.Windows.Forms.DataGridViewComboBoxColumn KAYNAK_TIPI;
         private System.Windows.Forms.DataGridViewTextBoxColumn DEK_KURULU_GUCU;
-        private System.Windows.Forms.DataGridViewComboBoxColumn ILCE_ADI;
         private System.Windows.Forms.DataGridViewTextBoxColumn CATI_ALANI;
         private System.Windows.Forms.DataGridViewTextBoxColumn DEK_X_KOORDINAT;
         private System.Windows.Forms.DataGridViewTextBoxColumn DEK_Y_KOORDINAT;

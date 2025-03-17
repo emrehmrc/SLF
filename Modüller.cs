@@ -3293,15 +3293,48 @@ namespace SLF
             isAddingDekPoint = false;
         }
 
-        private void gMapControl_Dek_OnMarkerClick(GMapMarker item, MouseEventArgs e)
+/*        private void gMapControl_Dek_OnMarkerClick(GMapMarker item, MouseEventArgs e)
         {
             if (item.Tag != null && item.Tag is NoktaVeri && Modül_Tabları.SelectedTab == tab_dek)
             {
                 NoktaVeri seçili_nokta = item.Tag as NoktaVeri;
                 NoktaBilgileriniGoster(seçili_nokta);
             }
-        }
+        }*/
+        private async void gMapControl_Dek_OnMarkerClick(GMapMarker item, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                // Check if the user is in "adding charging station" mode
+                if (isAddingDekPoint)
+                {
+                    // Use the selected CellId from ModülFormu
+                    string cellId = item.Tag?.ToString() ?? ModülFormu.SelectedCellId;
 
+                    // Create a temporary marker for the charging station at the clicked location
+                    GMapMarker marker = new GMarkerGoogle(item.Position, GMarkerGoogleType.yellow)
+                    {
+                        ToolTipText = "Yeni DEK Noktası",
+                        Tag = cellId // Store CellId in the marker's Tag temporarily
+                    };
+
+                    try
+                    {
+                        // Use the helper method to handle the popup form
+                        await HandleDEKPopupFormAsync(item.Position, cellId);
+                    }
+                    catch
+                    {
+                        RemoveDEKMarkerFromOverlays(marker);
+                    }
+
+                    // Reset the flag after adding the station
+                    isAddingDekPoint = false;
+
+                    return;
+                }
+            }
+        }
 
         private async void gMapControl_DEK_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
@@ -3311,6 +3344,7 @@ namespace SLF
 
             if (isAddingDekPoint)
             {
+                // Use the selected CellId from ModülFormu
                 // Yeni marker oluştur
                 GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green)
                 {
@@ -3345,8 +3379,57 @@ namespace SLF
                 return;
             }
         }
+        private async Task HandleDEKPopupFormAsync(PointLatLng point, string cellId)
+        {
+            NoktaVeri noktaVeri_marker = new NoktaVeri
+            {
+                Enlem = Math.Round(point.Lat, 4),
+                Boylam = Math.Round(point.Lng, 4),
+                CellId = cellId
+            };
 
+            using (DEKCenterPopupForm popupForm = new DEKCenterPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+            {
+                if (popupForm.ShowDialog() == DialogResult.OK)
+                {
+                    Console.WriteLine("Popup form closed with OK. Updating data...");
+                    // await eaHaritayaVeriYukleAsync();
 
+                    DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
+                    DataRow updatedRow = dataTable.Rows.Cast<DataRow>().FirstOrDefault(r => r["id"].ToString() == cellId);
+                    if (updatedRow != null)
+                    {
+                        Console.WriteLine($"Cell {cellId}: ");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"No row found for Cell {cellId} in DataTable.");
+                    }
+
+                    Console.WriteLine("Calling HaritaUzerindeSimulasyonGosterimi...");
+                    await HaritaUzerindeDEKSimulasyonGosterimi(dataTable);
+                    Console.WriteLine("HaritaUzerindeSimulasyonGosterimi completed.");
+                }
+            }
+        }
+        // Helper method to safely remove a marker from overlays
+        private void RemoveDEKMarkerFromOverlays(GMapMarker marker)
+        {
+/*            if (markerOverlay_ea.Markers.Contains(marker))
+            {
+                markerOverlay_ea.Markers.Remove(marker);
+            }*/
+
+            if (DEKSimulationOverlay.Markers.Contains(marker))
+            {
+                DEKSimulationOverlay.Markers.Remove(marker);
+            }
+
+            if (DEKCellToolTipOverlay.Markers.Contains(marker))
+            {
+                DEKCellToolTipOverlay.Markers.Remove(marker);
+            }
+        }
         // DEK şehri seçildiğinde çağrılan metot
         private void dek_city_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -3572,6 +3655,7 @@ namespace SLF
             EASimButton.Enabled = SelectedYear != -1 && SelectedCity != null && SelectedDistrict != null;
             DEKSimButton.Enabled = SelectedYear != -1 && SelectedCity != null; //&& SelectedDistrict != null;
         }
+        private GMapOverlay dekOverlay; // Add this as a class-level variable
         private async Task dekHaritayaVeriYukleAsync()
         {
             try
@@ -3642,7 +3726,12 @@ namespace SLF
                             }
                         }
 
-                        gMapControl_DEK.Overlays.Add(dekOverlay);
+                        //gMapControl_DEK.Overlays.Add(dekOverlay);
+                        // Only add overlay if checkbox is checked and it's not already added
+                        if (DEKPointsLayerCheckBox.Checked && !gMapControl_DEK.Overlays.Contains(dekOverlay))
+                        {
+                            gMapControl_DEK.Overlays.Add(dekOverlay);
+                        }
                         gMapControl_DEK.Refresh();
                     }));
                 }
@@ -3657,7 +3746,27 @@ namespace SLF
             }
         }
 
+        // Add this event handler for the checkbox
+        private void DEKPointsLayerCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (dekOverlay == null) return;
 
+            if (DEKPointsLayerCheckBox.Checked)
+            {
+                if (!gMapControl_DEK.Overlays.Contains(dekOverlay))
+                {
+                    gMapControl_DEK.Overlays.Add(dekOverlay);
+                }
+            }
+            else
+            {
+                if (gMapControl_DEK.Overlays.Contains(dekOverlay))
+                {
+                    gMapControl_DEK.Overlays.Remove(dekOverlay);
+                }
+            }
+            gMapControl_DEK.Refresh();
+        }
         private DataTable FormatDEKTableForDisplay(DataTable originalDEKTable)
         {
             // Yeni bir DataTable oluşturun
@@ -3697,62 +3806,152 @@ namespace SLF
 
             return formattedDEKTable;
         }
+        GMapOverlay DEKSimulationOverlay = new GMapOverlay("Simulasyon_Layer");
+        GMapOverlay DEKCellToolTipOverlay = new GMapOverlay("CellToolTips");
+        public static string DEKSelectedCellId { get; set; }
 
         private Task HaritaUzerindeDEKSimulasyonGosterimi(DataTable veriTablosu)
         {
-            // Create or get the overlay for DEK simulation markers
-            GMapOverlay dekOverlay = new GMapOverlay("DEK_Simulasyon_Layer");
+            // Clear existing overlays and re-add the global overlays
+            gMapControl_DEK.Overlays.Clear();
+            gMapControl_DEK.Overlays.Add(DEKSimulationOverlay);
+            gMapControl_DEK.Overlays.Add(DEKCellToolTipOverlay);
 
-            // Remove existing overlay if it exists
-            if (gMapControl_DEK.Overlays.Contains(dekOverlay))
-            {
-                gMapControl_DEK.Overlays.Remove(dekOverlay);
-                Console.WriteLine("Existing overlay removed.");
-            }
-
-            // Add a new overlay for DEK simulation markers
-            gMapControl_DEK.Overlays.Add(dekOverlay);
-
-            // Dictionary to hold markers based on their coordinates and types
-            Dictionary<(double, double, string), GMarkerGoogle> markerDictionary = new Dictionary<(double, double, string), GMarkerGoogle>();
-
-            // Process the rows in the DataTable
-            foreach (DataRow row in veriTablosu.Rows)
-            {
-                // Debug output for each row
-                Console.WriteLine($"Processing row with DEK_distributed: {row["DEK_distributed"]}");
-
-                // Only process rows where DEK_distributed value is greater than 0
-                if (row["DEK_distributed"] != DBNull.Value && Convert.ToDouble(row["DEK_distributed"]) > 0)
-                {
-                    // Get latitude and longitude values
-                    double enlem = Convert.ToDouble(row["Enlem"]);
-                    double boylam = Convert.ToDouble(row["Boylam"]);
-
-                    // Get ID and DEK_distributed values
-                    string id = row["id"].ToString();
-                    double dekValue = Convert.ToDouble(row["DEK_distributed"]);
-
-                    // Create a new marker and display it on the map
-                    var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.blue);
-                    marker.ToolTipText = $"ID: {id}\nDEK: {dekValue}";
-
-                    // Add the marker to the overlay
-                    dekOverlay.Markers.Add(marker);
-                    Console.WriteLine($"Marker added at ({enlem}, {boylam}) with ID: {id}");
-                }
-            }
-
-            // Refresh the map control to show the new markers
+            // Uncheck the DEKPointsLayerCheckBox since we're clearing all overlays
             Invoke(new Action(() =>
             {
-                gMapControl_DEK.Refresh(); // Update the map
+                DEKPointsLayerCheckBox.Checked = false;
+            }));
+
+            // Create a transparent bitmap for invisible markers (size can be adjusted as needed)
+            Bitmap transparentBitmap = new Bitmap(16, 16);
+            using (Graphics g = Graphics.FromImage(transparentBitmap))
+            {
+                g.Clear(Color.Transparent);
+            }
+
+            // Process each row in the DataTable
+            foreach (DataRow row in veriTablosu.Rows)
+            {
+                // Extract basic data: latitude, longitude, and cell id.
+                double enlem = Convert.ToDouble(row["Enlem"]);
+                double boylam = Convert.ToDouble(row["Boylam"]);
+                string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
+
+                // Get the DEK_distributed value and build the tooltip text
+                double dekValue = row["DEK_distributed"] != DBNull.Value ? Convert.ToDouble(row["DEK_distributed"]) : 0;
+                string tooltipText = $"ID: {cellId}\nDEK: {dekValue}";
+
+                // If DEK_distributed is zero, add an invisible marker to the tooltip overlay.
+                if (dekValue == 0)
+                {
+                    var invisibleMarker = new GMarkerGoogle(new PointLatLng(enlem, boylam), transparentBitmap)
+                    {
+                        ToolTipText = tooltipText,
+                        ToolTipMode = MarkerTooltipMode.OnMouseOver,
+                        Tag = cellId
+                    };
+                    DEKCellToolTipOverlay.Markers.Add(invisibleMarker);
+                }
+                else
+                {
+                    // Otherwise, create a visible marker. Here we're using a blue marker type.
+                    var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.blue)
+                    {
+                        ToolTipText = tooltipText,
+                        ToolTipMode = MarkerTooltipMode.OnMouseOver,
+                        Tag = cellId
+                    };
+                    DEKSimulationOverlay.Markers.Add(marker);
+                }
+
+                // Debug output per row (optional)
+                Console.WriteLine($"Processed cell {cellId} at ({enlem}, {boylam}) with DEK: {dekValue}");
+            }
+
+            // Refresh the map control to display the new markers
+            Invoke(new Action(() =>
+            {
+                gMapControl_DEK.Refresh();
                 Console.WriteLine("Map refreshed.");
             }));
 
             return Task.CompletedTask;
         }
 
+
+        /*        private Task HaritaUzerindeDEKSimulasyonGosterimi(DataTable veriTablosu)
+                {
+                    // Clear existing overlays and re-add them
+                    gMapControl_DEK.Overlays.Clear();
+                    gMapControl_DEK.Overlays.Add(DEKSimulationOverlay);
+                    gMapControl_DEK.Overlays.Add(DEKCellToolTipOverlay);
+                    // Uncheck the DEKPointsLayerCheckBox since we're clearing all overlays
+                    Invoke(new Action(() =>
+                    {
+                        DEKPointsLayerCheckBox.Checked = false;
+                    }));
+                    // Create a transparent bitmap for invisible markers
+                    Bitmap transparentBitmap = new Bitmap(16, 16);
+                    using (Graphics g = Graphics.FromImage(transparentBitmap))
+                    {
+                        g.Clear(Color.Transparent);
+                    }
+                    // Create or get the overlay for DEK simulation markers
+                    GMapOverlay dekOverlay = new GMapOverlay("DEK_Simulasyon_Layer");
+
+                    // Remove existing overlay if it exists
+                    if (gMapControl_DEK.Overlays.Contains(dekOverlay))
+                    {
+                        gMapControl_DEK.Overlays.Remove(dekOverlay);
+                        Console.WriteLine("Existing overlay removed.");
+                    }
+
+                    // Add a new overlay for DEK simulation markers
+                    gMapControl_DEK.Overlays.Add(dekOverlay);
+
+                    // Dictionary to hold markers based on their coordinates and types
+                    Dictionary<(double, double, string), GMarkerGoogle> markerDictionary = new Dictionary<(double, double, string), GMarkerGoogle>();
+
+                    // Process the rows in the DataTable
+                    foreach (DataRow row in veriTablosu.Rows)
+                    {
+                        // Debug output for each row
+                        Console.WriteLine($"Processing row with DEK_distributed: {row["DEK_distributed"]}");
+
+
+                        // Only process rows where DEK_distributed value is greater than 0
+                        if (row["DEK_distributed"] != DBNull.Value && Convert.ToDouble(row["DEK_distributed"]) > 0)
+                        {
+                            // Get latitude and longitude values
+                            double enlem = Convert.ToDouble(row["Enlem"]);
+                            double boylam = Convert.ToDouble(row["Boylam"]);
+                            string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
+                            // Get ID and DEK_distributed values
+                           // string id = row["id"].ToString();
+                            double dekValue = Convert.ToDouble(row["DEK_distributed"]);
+                            // Build the detailed tooltip text for all cells
+
+                            // Create a new marker and display it on the map
+                            var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.blue);
+                            marker.ToolTipText = $"ID: {cellId}\nDEK: {dekValue}";
+
+                            // Add the marker to the overlay
+                            dekOverlay.Markers.Add(marker);
+                            Console.WriteLine($"Marker added at ({enlem}, {boylam}) with ID: {cellId}");
+                        }
+                    }
+
+                    // Refresh the map control to show the new markers
+                    Invoke(new Action(() =>
+                    {
+                        gMapControl_DEK.Refresh(); // Update the map
+                        Console.WriteLine("Map refreshed.");
+                    }));
+
+                    return Task.CompletedTask;
+                }
+        */
 
 
 
