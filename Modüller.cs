@@ -171,7 +171,7 @@ namespace SLF
         // ------------------------------------------ EA MODÜLÜ DEĞİŞKENLER ------------------------------------------- //
         private readonly Dictionary<string, List<string>> cityDistricts = new Dictionary<string, List<string>>
 {
-    { "İzmir", new List<string> { "Aliağa", "Balçova", "Bayındır", "Bayraklı", "Bergama", "Beydağ", "Bornova", "Buca", "Çeşme", "Çiğli", "Dikili", "Foça", "Gaziemir", "Güzelbahçe", "Karabağlar", "Karaburun", "Karşıyaka", "Kemalpaşa", "Kınık", "Kiraz", "Konak", "Menderes", "Menemen", "Narlıdere", "Ödemiş", "Seferihisar", "Selçuk", "Tire", "Torbalı" } },
+    { "İzmir", new List<string> {/* "Aliağa", "Balçova", "Bayındır", "Bayraklı", "Bergama", "Beydağ", "Bornova", "Buca", "Çeşme", */ "Çiğli", /*"Dikili", "Foça", "Gaziemir", "Güzelbahçe", "Karabağlar", "Karaburun", */"Karşıyaka",/* "Kemalpaşa", "Kınık", "Kiraz", "Konak", "Menderes", "Menemen", "Narlıdere", "Ödemiş", "Seferihisar", "Selçuk", "Tire", "Torbalı"*/ } },
     { "Eskişehir", new List<string> { "Alpu", "Beylikova", "Çifteler", "Günyüzü", "Han", "İnönü", "Mahmudiye", "Mihalgazi", "Mihalıççık", "Odunpazarı", "Sarıcakaya", "Seyitgazi", "Sivrihisar", "Tepebaşı" } }
 };
         private readonly Dictionary<string, string> districtIdMap = new Dictionary<string, string>
@@ -375,6 +375,9 @@ namespace SLF
             comboBox_DEK_il.Items.Add("Eskişehir");
 
             // Clear and disable district combo box initially
+            comboBox_dek_ilce_secimi.Items.Clear();
+            comboBox_dek_ilce_secimi.SelectedIndex = -1;
+            comboBox_dek_ilce_secimi.Enabled = false;
             comboBox_ea_ilce_secimi.Items.Clear();
             comboBox_ea_ilce_secimi.SelectedIndex = -1;
             comboBox_ea_ilce_secimi.Enabled = false;
@@ -1889,7 +1892,11 @@ namespace SLF
         }
         private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
         {
+            // Disable buttons and TrackBar to prevent interaction while processing
+            EAStationAddButton.Enabled = false;
             EANewSimulationResultsButton.Enabled = false;
+            SimulasyonSonucGoruntule.Enabled = false;
+            EASimButton.Enabled = false;
 
             try
             {
@@ -1925,7 +1932,7 @@ namespace SLF
                 }
 
                 // Call SimilasyonSonucGoruntule to handle display
-                SimilasyonSonucGoruntule();
+                //SimilasyonSonucGoruntule();
             }
             catch (Exception ex)
             {
@@ -1940,6 +1947,9 @@ namespace SLF
                     statusLabel.Text = "New simulation process completed";
 
                 EANewSimulationResultsButton.Enabled = true;
+                EAStationAddButton.Enabled = true;
+                SimulasyonSonucGoruntule.Enabled = true;
+                EASimButton.Enabled = true;
             }
         }
         // Updated RunPythonScriptAsync to match your paths
@@ -1987,11 +1997,11 @@ namespace SLF
                 throw new Exception($"Error running Python script: {ex.Message}");
             }
         }
-        private async void SimilasyonSonucGoruntule()
+
+        private async void SimulasyonSonucGoruntule_Click(object sender, EventArgs e)
         {
             // Disable the button to prevent multiple clicks while processing
             EAStationAddButton.Enabled = false;
-
             try
             {
                 string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\çıktı\evcs_monte_carlo_distribution_kumulatif3 - Copy.xlsx";
@@ -2006,6 +2016,24 @@ namespace SLF
 
                         // Veriyi DataTable'a yükle
                         simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
+                        // Filter DataTable based on SelectedDistrict and its ID
+/*                        if (SelectedDistrict != null)
+                        {
+                            if (districtIdMap.TryGetValue(SelectedDistrict, out string districtId))
+                            {
+                                var filteredRows = veriMonteCarlo.AsEnumerable()
+                                    .Where(row => row.Field<string>("ilce") == districtId)
+                                    .CopyToDataTable();
+                                veriMonteCarlo = filteredRows; // Update with filtered data
+                            }
+                            else
+                            {
+                                MessageBox.Show($"No ID mapping found for district: {SelectedDistrict}. No data will be displayed.",
+                                    "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                veriMonteCarlo.Clear(); // Clear data to prevent displaying all districts
+                                return; // Exit the method
+                            }
+                        }*/
                     }
                 }
                 catch (Exception ex)
@@ -2159,6 +2187,7 @@ namespace SLF
                             "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }*/
+        private GMapOverlay eaOverlay; // Add this as a class-level variable
 
         private async Task eaHaritayaVeriYukleAsync()
         {
@@ -2167,7 +2196,11 @@ namespace SLF
 
             try
             {
-                GMapOverlay eaOverlay = new GMapOverlay("EA Layer");
+                // Initialize the overlay if not already created
+                if (eaOverlay == null)
+                {
+                    eaOverlay = new GMapOverlay("EA Layer");
+                }
 
                 if (dataGridView_girdi.DataSource == null)
                 {
@@ -2175,18 +2208,15 @@ namespace SLF
                     return;
                 }
 
-                if (gMapControl_EA.Overlays.Contains(eaOverlay))
-                {
-                    gMapControl_EA.Overlays.Remove(eaOverlay);
-                }
-
-
                 DataTable eaData = await Task.Run(() => GirdiModülü.dataTablesByType["EA Şarj Verileri"]);
 
                 if (eaData != null && eaData.Rows.Count > 0)
                 {
-                    greenAc = 0;  // Sayaçları sıfırla
+                    greenAc = 0;  // Reset counters
                     redDc = 0;
+
+                    // Clear existing markers
+                    eaOverlay.Markers.Clear();
 
                     Invoke(new Action(() =>
                     {
@@ -2200,7 +2230,7 @@ namespace SLF
                                 MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
                                 return;
                             }
-                            //Console.WriteLine(GirdiModülü.dataTablesByType);
+
                             if (!girdiModülü.IsNullLike(row["EA_X_KOORDINAT"]) &&
                                 !girdiModülü.IsNullLike(row["EA_Y_KOORDINAT"]))
                             {
@@ -2235,10 +2265,13 @@ namespace SLF
                             }
                         }
 
-                        gMapControl_EA.Overlays.Add(eaOverlay);
-                        gMapControl_EA.Refresh();
+                        // Only add overlay if checkbox is checked and it's not already added
+                        if (EAPointsLayerCheckBox.Checked && !gMapControl_EA.Overlays.Contains(eaOverlay))
+                        {
+                            gMapControl_EA.Overlays.Add(eaOverlay);
+                        }
 
-                        // Sayaç değerlerini sağ üst köşede göster
+                        gMapControl_EA.Refresh();
                         calculateChargeStation(greenAc, redDc);
                     }));
                 }
@@ -2252,12 +2285,126 @@ namespace SLF
                 MessageBox.Show($"Bir hata oluştu: {ex.Message}");
             }
         }
+
+        // Add this event handler for the checkbox
+        private void EAPointsLayerCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (eaOverlay == null) return;
+
+            if (EAPointsLayerCheckBox.Checked)
+            {
+                if (!gMapControl_EA.Overlays.Contains(eaOverlay))
+                {
+                    gMapControl_EA.Overlays.Add(eaOverlay);
+                }
+            }
+            else
+            {
+                if (gMapControl_EA.Overlays.Contains(eaOverlay))
+                {
+                    gMapControl_EA.Overlays.Remove(eaOverlay);
+                }
+            }
+            gMapControl_EA.Refresh();
+        }
+        /*        private async Task eaHaritayaVeriYukleAsync()
+                {
+                    int redDc = 0;
+                    int greenAc = 0;
+
+                    try
+                    {
+                        GMapOverlay eaOverlay = new GMapOverlay("EA Layer");
+
+                        if (dataGridView_girdi.DataSource == null)
+                        {
+                            MessageBox.Show("Veri kaynağı bulunamadı. Lütfen verileri kontrol edin.");
+                            return;
+                        }
+
+                        if (gMapControl_EA.Overlays.Contains(eaOverlay))
+                        {
+                            gMapControl_EA.Overlays.Remove(eaOverlay);
+                        }
+
+
+                        DataTable eaData = await Task.Run(() => GirdiModülü.dataTablesByType["EA Şarj Verileri"]);
+
+                        if (eaData != null && eaData.Rows.Count > 0)
+                        {
+                            greenAc = 0;  // Sayaçları sıfırla
+                            redDc = 0;
+
+                            Invoke(new Action(() =>
+                            {
+                                foreach (DataRow row in eaData.Rows)
+                                {
+                                    if (!eaData.Columns.Contains("EA_X_KOORDINAT") ||
+                                        !eaData.Columns.Contains("EA_Y_KOORDINAT") ||
+                                        !eaData.Columns.Contains("ISTASYON_GUCU") &&
+                                        !GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
+                                    {
+                                        MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
+                                        return;
+                                    }
+                                    //Console.WriteLine(GirdiModülü.dataTablesByType);
+                                    if (!girdiModülü.IsNullLike(row["EA_X_KOORDINAT"]) &&
+                                        !girdiModülü.IsNullLike(row["EA_Y_KOORDINAT"]))
+                                    {
+                                        if (double.TryParse(row["EA_X_KOORDINAT"].ToString(), out double x) &&
+                                            double.TryParse(row["EA_Y_KOORDINAT"].ToString(), out double y))
+                                        {
+                                            if (int.TryParse(row["ISTASYON_GUCU"].ToString(), out int istasyonGucu))
+                                            {
+                                                GMarkerGoogle marker;
+
+                                                if (istasyonGucu <= 22)
+                                                {
+                                                    marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.green);
+                                                    greenAc++;
+                                                }
+                                                else
+                                                {
+                                                    marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.red);
+                                                    redDc++;
+                                                }
+
+                                                if (eaData.Columns.Contains("ISTASYON_ADI") &&
+                                                    !girdiModülü.IsNullLike(row["ISTASYON_ADI"]))
+                                                {
+                                                    string istasyonAdi = row["ISTASYON_ADI"].ToString();
+                                                    marker.ToolTipText = istasyonAdi;
+                                                }
+
+                                                eaOverlay.Markers.Add(marker);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                gMapControl_EA.Overlays.Add(eaOverlay);
+                                gMapControl_EA.Refresh();
+
+                                // Sayaç değerlerini sağ üst köşede göster
+                                calculateChargeStation(greenAc, redDc);
+                            }));
+                        }
+                        else
+                        {
+                            MessageBox.Show("Lütfen Ea şarj noktalarını görebilmek için verilerinizi yükleyiniz.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Bir hata oluştu: {ex.Message}");
+                    }
+                }*/
         private async void gelecekSimilasyonGoruntule(object sender, EventArgs e)
         {
             // Disable the button to prevent multiple clicks while processing
             EAStationAddButton.Enabled = false;
 
-            // Checkbox'ları görünür hale getir
+/*            // Checkbox'ları görünür hale getir
             checkBox_AC_Home.Visible = true;
             checkBox_AC_Public.Visible = true;
             checkBox_AC_Work.Visible = true;
@@ -2265,7 +2412,7 @@ namespace SLF
             checkBox_AC_Public.Checked = true;
             checkBox_AC_Work.Checked = true;
             checkBox_AC_Home.Checked = true;
-            checkBox_DC_Fast.Checked = true;
+            checkBox_DC_Fast.Checked = true;*/
 
             gMapControl_EA.Overlays.Clear();
             gMapControl_EA.Refresh();
@@ -2382,7 +2529,7 @@ namespace SLF
             };
 
             popupForm.Controls.Add(dataGridView);
-           // popupForm.Show();
+            // popupForm.Show();
         }
         /*        private async void gelecekSimilasyonGoruntule(object sender, EventArgs e)
                 {
@@ -2489,7 +2636,7 @@ namespace SLF
                     };
 
                     popupForm.Controls.Add(dataGridView);
-                  //  popupForm.Show(); // Yeni pencereyi göster
+                    //  popupForm.Show(); // Yeni pencereyi göster
                 }*/
 
         GMapOverlay simulationOverlay = new GMapOverlay("Simulasyon_Layer");
@@ -2636,9 +2783,14 @@ namespace SLF
         {
             // Clear existing overlays and re-add them
             gMapControl_EA.Overlays.Clear();
+         //   EAPointsLayerCheckBox.Checked = false;
             gMapControl_EA.Overlays.Add(simulationOverlay);
             gMapControl_EA.Overlays.Add(cellToolTipOverlay);
-
+            // Uncheck the EAPointsLayerCheckBox since we're clearing all overlays
+            Invoke(new Action(() =>
+            {
+                EAPointsLayerCheckBox.Checked = false;
+            }));
             // Create a transparent bitmap for invisible markers
             Bitmap transparentBitmap = new Bitmap(16, 16);
             using (Graphics g = Graphics.FromImage(transparentBitmap))
@@ -3201,8 +3353,25 @@ namespace SLF
             if (comboBox_DEK_il.SelectedItem != null)  // Geçerli bir seçim yapıldığında
             {
                 SelectedCity = comboBox_DEK_il.SelectedItem.ToString();  // Şehir adını ayarla
-                CheckSelections();  // Seçim durumunu kontrol et
+                SelectedDistrict = null;
+                if (cityDistricts.TryGetValue(SelectedCity, out var districts))
+                {
+                    comboBox_dek_ilce_secimi.Invoke(new Action(() =>
+                    {
+                        comboBox_dek_ilce_secimi.Items.Clear();
+                        comboBox_dek_ilce_secimi.Items.AddRange(districts.ToArray());
+                        comboBox_dek_ilce_secimi.SelectedIndex = -1;
+                        comboBox_dek_ilce_secimi.Enabled = true;
+                        comboBox_dek_ilce_secimi.Refresh();
+                    }));
+                }
+                else
+                {
+                    SelectedCity = null;
+                }
 
+                // Update button enablement and map position
+                CheckSelections();
                 // Set map position based on selected city
                 if (cityCoordinates.TryGetValue(SelectedCity, out PointLatLng coordinates))
                 {
@@ -3211,8 +3380,28 @@ namespace SLF
                 }
             }
         }
-
-
+        private void ilceSecimiDEK(object sender, EventArgs e)
+        {
+            if (comboBox_dek_ilce_secimi.SelectedItem != null)
+            {
+                SelectedDistrict = comboBox_dek_ilce_secimi.SelectedItem.ToString();
+                Console.WriteLine($"Selected District: {SelectedDistrict}");
+            }
+            else
+            {
+                SelectedDistrict = null;
+                Console.WriteLine("District selection cleared.");
+            }
+            CheckSelections();
+        }
+        private void dek_list_years(object sender, EventArgs e) // 
+        {
+            if (comboBox_DEK_Yıl.SelectedIndex != -1)  // Geçerli bir seçim yapıldığında
+            {
+                SelectedYear = comboBox_DEK_Yıl.SelectedIndex;  // Yıl indeksini ayarla
+                CheckSelections();  // Seçim durumunu kontrol et
+            }
+        }
         private async void dekSimulasyonGoruntule(object sender, EventArgs e)
         {
             gMapControl_DEK.Overlays.Clear();
@@ -3306,7 +3495,7 @@ namespace SLF
             };
 
             popupForm.Controls.Add(dataGridView);
-            popupForm.Show(); // Yeni pencereyi göster
+           // popupForm.Show(); // Yeni pencereyi göster
         }
 
         private void dekSimMinBtn_CheckedChanged(object sender, EventArgs e)
@@ -3381,7 +3570,7 @@ namespace SLF
         private void CheckSelections()
         {
             EASimButton.Enabled = SelectedYear != -1 && SelectedCity != null && SelectedDistrict != null;
-            DEKSimButton.Enabled = SelectedYear != -1 && SelectedCity != null && SelectedDistrict != null;
+            DEKSimButton.Enabled = SelectedYear != -1 && SelectedCity != null; //&& SelectedDistrict != null;
         }
         private async Task dekHaritayaVeriYukleAsync()
         {
@@ -3564,14 +3753,7 @@ namespace SLF
             return Task.CompletedTask;
         }
 
-        private void dek_list_years(object sender, EventArgs e) // 
-        {
-            if (comboBox_DEK_Yıl.SelectedIndex != -1)  // Geçerli bir seçim yapıldığında
-            {
-                SelectedYear = comboBox_DEK_Yıl.SelectedIndex;  // Yıl indeksini ayarla
-                CheckSelections();  // Seçim durumunu kontrol et
-            }
-        }
+
 
 
 
@@ -5603,7 +5785,6 @@ namespace SLF
                 ContextMenuStrip_Fonksiyon.Show(Cursor.Position);
             }
         }
-
 
         // Show just the single row whenever a polygon is clicked on which corresponds to its row
         private void ShowAttributeRow(DataRow row)
