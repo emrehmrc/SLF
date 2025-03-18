@@ -16,6 +16,8 @@ using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Threading.Tasks;
 using OfficeOpenXml;
 using DrawingImage = System.Drawing.Image;
+using ClosedXML.Excel;
+using System.Reflection;
 
 
 namespace SLF
@@ -30,6 +32,9 @@ namespace SLF
         public readonly CBS cbs;
         public int slfStartYear = 0, slfEndYear = 0;
 
+        // point load degerlerini iceren Excel dosyası pathi.
+        public string polygonTypesExcelPath;
+
         System.Windows.Forms.TextBox logTextBox; // Declare logTextBox here --------------
         private ExcelService _excelService;
         private ExcelService excelService = new ExcelService();
@@ -38,6 +43,8 @@ namespace SLF
         public Fonksiyon_Oluştur fonksiyonFormu;
         public Tablo_Formu tablo_formu;
         private GirdiModülü girdiModülü;
+        public Nokta_Yuk_Bilgi_Formu noktaYukBilgiFormuObjesi;
+        public Poligon_Özellik_Tanımlama poligonOzellikFormu;
 
         public List<PointLatLng> rulerPoints_ea = new List<PointLatLng>();
         public List<PointLatLng> rulerPoints_yuk = new List<PointLatLng>();
@@ -56,12 +63,12 @@ namespace SLF
         public GMapOverlay markerOverlay_imar = new GMapOverlay("markerOverlay_imar");
         public GMapOverlay markerOverlay_DEK = new GMapOverlay("markerOverlay_DEK");
 
-        private List<PointLatLng> polygonPoints_ea = new List<PointLatLng>();
-        private List<PointLatLng> polygonPoints_imar = new List<PointLatLng>();
-        private List<PointLatLng> polygonPoints_yuk = new List<PointLatLng>();
-        private List<PointLatLng> polygonPoints_DEK = new List<PointLatLng>();
+        public List<PointLatLng> polygonPoints_ea = new List<PointLatLng>();
+        public List<PointLatLng> polygonPoints_imar = new List<PointLatLng>();
+        public List<PointLatLng> polygonPoints_yuk = new List<PointLatLng>();
+        public List<PointLatLng> polygonPoints_DEK = new List<PointLatLng>();
 
-        private GMapOverlay polygonOverlay_ea = new GMapOverlay("polygonOverlay_ea");
+        public GMapOverlay polygonOverlay_ea = new GMapOverlay("polygonOverlay_ea");
         public GMapOverlay polygonOverlay_imar = new GMapOverlay("polygonOverlay_imar");
         public GMapOverlay polygonOverlay_yuk = new GMapOverlay("polygonOverlay_yuk");
         public GMapOverlay polygonOverlay_DEK = new GMapOverlay("polygonOverlay_DEK");
@@ -73,6 +80,8 @@ namespace SLF
         public bool isRulerEnabled = false;
         public bool isRulerActive = false;
         public bool isSelecting_polygon = false;
+        public bool isSelecting_YGA = false;
+        public bool isSelecting_YUK = false;
         private bool isSelecting_marker = false;
 
         // X and Y coordinates of the center location of the gMapControl object to be used to create a sample
@@ -94,7 +103,6 @@ namespace SLF
 
         private string selectedMethod;  // Store the method
         public List<TabPage> hiddenTabs = new List<TabPage>();  // To store hidden tabs
-
 
         // Initialize all checkboxes
         // Class-level declaration of checkbox arrays
@@ -274,6 +282,54 @@ namespace SLF
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
 
+        // Main constructor of the Modüller Formu 
+        public ModülFormu(string selectedMethod = "", string tabToSelect = "")
+        {
+            // initialize the Modul Formu
+            InitializeComponent();
+            SetupLayout();
+
+            // Resolve the Excel file path relative to SLF.exe
+            string exeLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); // e.g., C:\Users\ehan0\source\repos\emrehmrc\SLF\bin\Debug
+            string projectRoot = Directory.GetParent(exeLocation)?.Parent?.FullName; // Move up two levels to SLF root (C:\Users\ehan0\source\repos\emrehmrc\SLF)
+            if (projectRoot != null)
+            {
+                polygonTypesExcelPath = Path.Combine(projectRoot, "Excel Files", "point_load.xlsx"); // e.g., C:\Users\ehan0\source\repos\emrehmrc\SLF\Excel Files\point_load.xlsx
+            }
+            else
+            {
+                // Fallback to a default path if resolution fails
+                polygonTypesExcelPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "point_load.xlsx");
+                MessageBox.Show($"Excel dosya yolu çözülemedi. Varsayılan yol kullanılıyor: {polygonTypesExcelPath}", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+
+            _excelService = new ExcelService();
+            InitializeLogTextBox(); // Initialize logTextBox
+
+            this.selectedMethod = selectedMethod;  // Store the method
+            InitializeComboBoxes();
+
+            // initialize the instance of a CBS form
+            cbs = new CBS(this);
+
+            this.selectedMethod = selectedMethod;  // Store the method
+            // Initialize the maps and other UI components
+            InitializeFormComponents();
+
+            if (!string.IsNullOrEmpty(tabToSelect))
+            {
+                InitializeTabs(tabToSelect);  // Select the specific tab and hide others
+            }
+            else
+            {
+                InitializeFormBasedOnMethod();  // Initialize based on the selected method
+            }
+
+            InitializeCheckboxStartPositions();
+            InitializeCategoryTabPages();
+        }
+
         private void InitializeGMap(GMap.NET.WindowsForms.GMapControl gmap)
         {
             gmap.MapProvider = GMapProviders.GoogleSatelliteMap;
@@ -347,38 +403,6 @@ namespace SLF
             gMapControl_imar.Refresh(); // Refresh GMapControl to handle rendering
         }
 
-        // Main constructor of the Modüller Formu 
-        public ModülFormu(string selectedMethod = "", string tabToSelect = "")
-        {
-            // initialize the Modul Formu
-            InitializeComponent();
-            SetupLayout();
-
-            _excelService = new ExcelService();
-            InitializeLogTextBox(); // Initialize logTextBox
-
-            this.selectedMethod = selectedMethod;  // Store the method
-            InitializeComboBoxes();
-
-            // initialize the instance of a CBS form
-            cbs = new CBS(this);
-
-            this.selectedMethod = selectedMethod;  // Store the method
-            // Initialize the maps and other UI components
-            InitializeFormComponents();
-
-            if (!string.IsNullOrEmpty(tabToSelect))
-            {
-                InitializeTabs(tabToSelect);  // Select the specific tab and hide others
-            }
-            else
-            {
-                InitializeFormBasedOnMethod();  // Initialize based on the selected method
-            }
-
-            InitializeCheckboxStartPositions();
-            InitializeCategoryTabPages();
-        }
         private void InitializeCheckboxStartPositions()
         {
             if (checkBoxes_imar[0] != null && checkBoxes_imar[0].Parent != null)
@@ -1358,8 +1382,8 @@ namespace SLF
                 // Nokta verisini oluştur
                 NoktaVeri noktaVeri_marker = new NoktaVeri
                 {
-                    Enlem = Math.Round(pointClick.Lat, 4),
-                    Boylam = Math.Round(pointClick.Lng, 4)
+                    Enlem = Math.Round(pointClick.Lat, 5),
+                    Boylam = Math.Round(pointClick.Lng, 5)
                 };
 
                 // Popup formu göster
@@ -1998,8 +2022,8 @@ namespace SLF
                 // Nokta verisini oluştur
                 NoktaVeri noktaVeri_marker = new NoktaVeri
                 {
-                    Enlem = Math.Round(pointClick.Lat, 4),
-                    Boylam = Math.Round(pointClick.Lng, 4)
+                    Enlem = Math.Round(pointClick.Lat, 5),
+                    Boylam = Math.Round(pointClick.Lng, 5)
                 };
 
                 // Popup formu göster
@@ -3101,18 +3125,6 @@ namespace SLF
             }
         }
 
-        private void Poligon_Çiz_Click(object sender, EventArgs e)
-        {
-            isSelecting_polygon = true;
-            isRulerEnabled = false;
-            isRulerActive = false;
-
-            // Determine the active map control and reset accordingly
-            if (cbs.GetActiveGMapControl() == gMapControl_imar)
-            {
-                ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar, rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
-            }
-        }
 
         private void Poligon_Sil_Click(object sender, EventArgs e)
         {
@@ -3128,12 +3140,15 @@ namespace SLF
 
         private void Poligon_Kaydet_Click(object sender, EventArgs e)
         {
-            if (cbs.GetActiveGMapControl() == gMapControl_imar)
+            if(isSelecting_YUK == true)
             {
-                PoligonKaydetEventi(sender, e, polygonOverlay_imar, polygonPoints_imar);
+                poligonOzellikFormu = new Poligon_Özellik_Tanımlama();
+                poligonOzellikFormu.Owner = this;
+                poligonOzellikFormu.ShowDialog();
+                poligonOzellikFormu.BringToFront();
+                poligonOzellikFormu.Focus();
 
             }
-
         }
 
         // Helper method to bring buttons to the front
@@ -3160,7 +3175,7 @@ namespace SLF
                 {
                     GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green)
                     {
-                        ToolTipText = $"Lat={pointClick.Lat}, Lng={pointClick.Lng}"
+                        ToolTipText = $"Lat={Math.Round(pointClick.Lat,5)}, Lng={Math.Round(pointClick.Lng, 5)}"
                     };
                     markerOverlay.Markers.Add(marker);
                     // Possibly store data in marker.Tag, etc.
@@ -3228,11 +3243,12 @@ namespace SLF
             }
         }
 
+
         public void PoligonKaydetEventi(
-                object sender,
-                EventArgs e,
-                GMapOverlay polygonOverlay,     // the overlay that user just drew the polygon(s) in
-                List<PointLatLng> polygonPoints)
+            object sender,
+            EventArgs e,
+            GMapOverlay polygonOverlay,     // the overlay that user just drew the polygon(s) in
+            List<PointLatLng> polygonPoints)
         {
             // make sure there's actually a polygon
             if (polygonOverlay == null || polygonOverlay.Polygons.Count == 0)
@@ -3247,7 +3263,7 @@ namespace SLF
                 markerOverlay_imar.Markers?.Clear();
                 markerOverlay_yuk.Markers?.Clear();
 
-               //Figure out which map array & layerIndex this overlay belongs to
+                //Figure out which map array & layerIndex this overlay belongs to
                 layer_index = FindLayerIndexFromOverlay(polygonOverlay);
 
                 if (layer_index < 0)
@@ -3277,7 +3293,7 @@ namespace SLF
                 }
 
                 // create a DataTable for the layer
-                DataTable polygonDataTable = cbs.CreatePolygonDataTable(polygonPoints, layer_index);
+                DataTable polygonDataTable = cbs.CreatePolygonDataTableYGA(polygonPoints, layer_index);
                 cbs.tüm_katmanlar_datatable[layer_index] = polygonDataTable;
 
                 // if you assume just one polygon => one row, store it in the dictionary
@@ -3344,8 +3360,6 @@ namespace SLF
                 polygonPoints.Clear();
                 isSelecting_polygon = false;
 
-                gMapControl_DEK.Refresh();
-                gMapControl_EA.Refresh();
                 gMapControl_imar.Refresh();
                 gMapControl_yuk.Refresh();
 
@@ -3832,7 +3846,7 @@ namespace SLF
         }
 
         // find the first open slot within the arrays
-        private int FindLayerIndexFromOverlay(GMapOverlay overlay)
+        public int FindLayerIndexFromOverlay(GMapOverlay overlay)
         {
             // Check each array for a match
             for (int i = 0; i < 15; i++)
@@ -3944,6 +3958,46 @@ namespace SLF
 
             // Noktayı silmek için enlem ve boylamdan PointLatLng oluşturuyoruz
             PointLatLng point = new PointLatLng(nokta.Enlem, nokta.Boylam);
+        }
+
+        private void İmar_Nokta_MouseDown(object sender, MouseEventArgs e)
+        {
+            /*if (e.Button == MouseButtons.Left)
+            {
+                ContextMenuStrip_Nokta.Show(Cursor.Position);
+            }*/
+        }
+
+        private void Point_Load_Çiz_Click(object sender, EventArgs e)
+        {
+            isSelecting_polygon = true;
+            isSelecting_YUK = true;
+
+            isRulerEnabled = false;
+            isRulerActive = false;
+
+            // Determine the active map control and reset accordingly
+            if (cbs.GetActiveGMapControl() == gMapControl_imar)
+            {
+                ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar, rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
+            }
+
+        }
+
+        private void YGA_Çiz_Click(object sender, EventArgs e)
+        {
+            isSelecting_polygon = true;
+            isSelecting_YGA = true;
+
+            isRulerEnabled = false;
+            isRulerActive = false;
+
+            // Determine the active map control and reset accordingly
+            if (cbs.GetActiveGMapControl() == gMapControl_imar)
+            {
+                ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar, rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
+            }
+
         }
 
 

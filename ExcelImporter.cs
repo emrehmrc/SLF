@@ -1,5 +1,4 @@
-﻿//using Excel = Microsoft.Office.Interop.Excel; // Alias for the Excel namespace
-using OfficeOpenXml; // Import the EPPlus library
+﻿using OfficeOpenXml; 
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -246,6 +245,7 @@ namespace SLF
             Console.WriteLine($"Excel file import took: {stopwatch.ElapsedMilliseconds} ms");
             return dataTable;
         }
+
         private void ValidateColumnHeaders(ExcelWorksheet worksheet, string seçilenVeriTipi)
         {
             int colCount = worksheet.Dimension.Columns;
@@ -273,24 +273,6 @@ namespace SLF
             if (headerMismatch)
             {
                 throw new InvalidColumnHeadersException(invalidColumnMessage.ToString());
-            }
-        }
-
-        private void ReleaseObject(object obj)
-        {
-            try
-            {
-                System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
-                obj = null;
-            }
-            catch (Exception ex)
-            {
-                obj = null;
-                Console.WriteLine("Exception Occured while releasing object " + ex.ToString());
-            }
-            finally
-            {
-                GC.Collect();
             }
         }
     }

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace SLF
@@ -61,14 +60,7 @@ namespace SLF
 
                     FileInfo file = new FileInfo(filePath);
 
-
-
-
-
                     package.SaveAs(file); // CHECK THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
 
                     MessageBox.Show("Dosya başarıyla kaydedildi.", "Dosya Kaydedildi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -192,23 +184,5 @@ namespace SLF
             }
         }
 
-
-        private void ReleaseObject(object obj)
-        {
-            try
-            {
-                System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
-                obj = null;
-            }
-            catch (Exception ex)
-            {
-                obj = null;
-                Console.WriteLine("Exception Occured while releasing object " + ex.ToString());
-            }
-            finally
-            {
-                GC.Collect();
-            }
-        }
     }
 }
