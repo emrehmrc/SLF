@@ -3148,6 +3148,8 @@ namespace SLF
                 poligonOzellikFormu.BringToFront();
                 poligonOzellikFormu.Focus();
 
+                PoligonKaydetEventi(sender, e, polygonOverlay_imar, polygonPoints_imar);
+
             }
         }
 
@@ -3293,7 +3295,7 @@ namespace SLF
                 }
 
                 // create a DataTable for the layer
-                DataTable polygonDataTable = cbs.CreatePolygonDataTableYGA(polygonPoints, layer_index);
+                DataTable polygonDataTable = poligonOzellikFormu.PolygonDataTable;
                 cbs.tüm_katmanlar_datatable[layer_index] = polygonDataTable;
 
                 // if you assume just one polygon => one row, store it in the dictionary

@@ -230,9 +230,12 @@ namespace SLF
             }
         }
 
+        // Add a public property to access the DataTable
+        public DataTable PolygonDataTable => dataTable;
+
         private void buton_poligon_ozellik_Click(object sender, EventArgs e)
         {
-            modül_formu.PoligonKaydetEventi(sender, e, modül_formu.polygonOverlay_imar, modül_formu.polygonPoints_imar);
+            this.Close();
         }
 
         private void buton_yük_tipleri_Click(object sender, EventArgs e)
