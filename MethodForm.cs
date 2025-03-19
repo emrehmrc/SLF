@@ -54,7 +54,23 @@ namespace SLF
         {
             if (MethodComboBox.SelectedItem != null)
             {
+                // Seçilen metodu kaydet
                 selectedMethod = MethodComboBox.SelectedItem.ToString();
+
+                // İl ve ilçe seçimlerini PathService'e kaydet (eğer seçilmişse)
+                if (IlComboBox.SelectedItem != null && IlceComboBox.SelectedItem != null)
+                {
+                    string selectedCity = IlComboBox.SelectedItem.ToString();
+                    string selectedDistrict = IlceComboBox.SelectedItem.ToString();
+
+                    // PathService'i güncelle
+                    PathService.UpdatePath(selectedCity, selectedDistrict);
+
+                    // Debug bilgisi
+                    Console.WriteLine($"İlerleme öncesi seçilen path: {PathService.FullPath}");
+                }
+
+                // Seçilen metoda göre modül formunu aç
                 OpenModülFormuBasedOnSelection(selectedMethod);
             }
             else
@@ -186,12 +202,12 @@ namespace SLF
                 // Geriye dönük uyumluluk için eski SelectedPath özelliğini de güncelle
                 SelectedPath = PathService.FullPath;
 
-                Console.WriteLine("Selected path: " + PathService.FullPath);
+                //Console.WriteLine("Selected path: " + PathService.FullPath);
 
                 // Örnek: Klasörün var olup olmadığını kontrol etme
                 if (PathService.DirectoryExists())
                 {
-                    Console.WriteLine("Bu il/ilçe için veri klasörü mevcut.");
+                    //Console.WriteLine("Bu il/ilçe için veri klasörü mevcut.");
                 }
                 else
                 {

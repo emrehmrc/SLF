@@ -9,17 +9,20 @@ using System.Windows.Forms;
 using System.IO;
 using SLF.services;
 using Microsoft.CodeAnalysis.FlowAnalysis;
+using SLF.Services;
 
 
 namespace SLF
 {
-    public class NoFileSelectedException : Exception // dosyanın yuklenme durumları mesajları
+    public class NoFileSelectedException : Exception
     {
         public NoFileSelectedException(string message) : base(message)
         {
+            MessageBox.Show(message, "Dosya Seçim Hatası",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
-
+    
     public class PrerequisiteException : Exception
     {
         public PrerequisiteException(string message) : base(message)
@@ -57,6 +60,7 @@ namespace SLF
             { "dtr_verileri", "DTR Verileri" },
             {"abone_final_tablosu","Abone Verileri" }
         };
+        protected virtual List<string> Prerequisites { get; } = new List<string>();
         protected readonly List<string> nullLikeStrings = new List<string> // doluluk bosluk check kısımları kontrolu yapılıyor
         {
             "",
@@ -65,6 +69,7 @@ namespace SLF
             "#N/A"
         };
         public string seçilenVeriTipi { get; set; }
+        public readonly YearService _yearService = YearService.GetInstance();
         public int slfStartYear;
         public int slfEndYear;
         public int SlfStartYear
@@ -73,27 +78,110 @@ namespace SLF
             set { slfStartYear = value; }
             
         }
-        
+
+
         public int SlfEndYear
         {
-            get { return slfEndYear; }
-            set { slfEndYear = value; }
+            get { return _yearService.SlfEndYear; }
+            set { _yearService.SlfEndYear = value; }
         }
-        protected virtual List<string> Prerequisites { get; } = new List<string>(); 
+
+        public int lastYear
+        {
+            get { return _yearService.LastYear; }
+        }
+
+        public int penultimateYear
+        {
+            get { return _yearService.PenultimateYear; }
+        }
+
+        public int horizonYear
+        {
+            get { return _yearService.HorizonYear; }
+        }
+        //public bool ExportToExcel(string customPath = null)
+        //{
+        //    try
+        //    {
+        //        // importedDataTable kontrolü
+        //        if (importedDataTable == null || importedDataTable.Rows.Count == 0)
+        //        {
+        //            MessageBox.Show("Aktarılacak veri bulunamadı.",
+        //                "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //            return false;
+        //        }
+
+        //        // Excel dosya yolunu oluştur
+        //        string exportPath = customPath ?? Path.Combine(PathService.BaseDirectory, PathService.FullPath);
+        //        Console.WriteLine("secilen_ilce_dizin: " + exportPath);
+
+        //        // Klasör yoksa oluştur
+        //        Directory.CreateDirectory(Path.GetDirectoryName(exportPath));
+
+        //        // Dosya adını oluştur (tarih-saat ile)
+        //        string fileName = $"{seçilenVeriTipi}_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+        //        string fullPath = Path.Combine(exportPath, fileName);
+
+        //        // EPPlus ile Excel oluştur
+        //        using (var package = new OfficeOpenXml.ExcelPackage())
+        //        {
+        //            var worksheet = package.Workbook.Worksheets.Add(seçilenVeriTipi);
+
+        //            // Sütun başlıklarını ekle
+        //            for (int col = 1; col <= importedDataTable.Columns.Count; col++)
+        //            {
+        //                worksheet.Cells[1, col].Value = importedDataTable.Columns[col - 1].ColumnName;
+        //                worksheet.Cells[1, col].Style.Font.Bold = true;
+        //            }
+
+        //            // Verileri ekle
+        //            for (int row = 0; row < importedDataTable.Rows.Count; row++)
+        //            {
+        //                for (int col = 0; col < importedDataTable.Columns.Count; col++)
+        //                {
+        //                    worksheet.Cells[row + 2, col + 1].Value = importedDataTable.Rows[row][col];
+        //                }
+        //            }
+
+        //            // Excel dosyasını kaydet
+        //            package.SaveAs(new FileInfo(fullPath));
+        //        }
+
+        //        // Kullanıcıya bilgi ver
+        //        MessageBox.Show($"Veri başarıyla aktarıldı ve {fullPath} konumuna kaydedildi.",
+        //            "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        //        return true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show($"Veri aktarma sırasında hata oluştu: {ex.Message}",
+        //            "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //        Console.WriteLine($"ExportToExcel Hata: {ex.Message}\n{ex.StackTrace}");
+        //        return false;
+        //    }
+        //}
+        //public int SlfEndYear
+        //{
+        //    get { return slfEndYear; }
+        //    set { slfEndYear = value; }
+        //}
+        //protected virtual List<string> Prerequisites { get; } = new List<string>(); 
 
         protected const int HoursInYear = 8760;
-        protected int lastYear
-        {
-            get { return slfStartYear - 1; }
-        }
-        protected int penultimateYear
-        {
-            get { return slfStartYear - 2; }
-        }
-        protected int horizonYear
-        {
-            get { return slfStartYear; }
-        }
+        //public int lastYear
+        //{
+        //    get { return slfStartYear - 1; }
+        //}
+        //public int penultimateYear
+        //{
+        //    get { return slfStartYear - 2; }
+        //}
+        //public int horizonYear
+        //{
+        //    get { return slfStartYear; }
+        //}
         //protected int lastYear; = DateTime.Now.Year - 1;
         //protected readonly int penultimateYear = DateTime.Now.Year - 2;
 
@@ -164,7 +252,7 @@ namespace SLF
             return roundedKapasite;
         }
 
-        public bool IsNullLike(object value, bool isZero=false)
+        public bool IsNullLike(object value, bool isZero=false) // 0 VE negatif kontrolu 
         {
             if (value == null || value == DBNull.Value)
             {
@@ -552,83 +640,179 @@ namespace SLF
             return updatedTable;
         }
 
+        //public void ProcessFileSelection(string seçilenVeriTipi)
+        //{
+        //    this.seçilenVeriTipi = seçilenVeriTipi;
+
+        //    var fileDialog1 = new OpenFileDialog
+        //    {
+        //        Title = FileDialogTitle
+        //    };
+
+        //    if (veri_listesi_requires_xlsx.Contains(seçilenVeriTipi))
+        //    {
+        //        fileDialog1.Filter = combinedExcelFilter;
+        //        if (fileDialog1.ShowDialog() == DialogResult.OK)
+        //        {
+        //            string selectedFileName = fileDialog1.FileName;
+        //            currentDataTable = ProcessExcelFile(selectedFileName, seçilenVeriTipi);
+        //        }
+        //        else throw new NoFileSelectedException("Dosya seçimi gerçekleştirilemedi.");
+        //    }
+        //    else if (veri_listesi_requires_csv.Contains(seçilenVeriTipi))
+        //    {
+        //        fileDialog1.Filter = combinedCsvFilter;
+        //        if (fileDialog1.ShowDialog() == DialogResult.OK)
+        //        {
+        //            string selectedFileName = fileDialog1.FileName;
+        //            currentDataTable = ProcessCsvFile(selectedFileName);
+        //        }
+        //        else throw new NoFileSelectedException("Dosya seçimi gerçekleştirilemedi.");
+        //    }
+        //    else if (veri_listesi_requires_tabular.Contains(seçilenVeriTipi))
+        //    {
+        //        fileDialog1.Filter = combinedTabularFilter;
+        //        if (fileDialog1.ShowDialog() == DialogResult.OK)
+        //        {
+        //            string selectedFileName = fileDialog1.FileName;
+        //            currentDataTable = ProcessTabularFile(selectedFileName);
+        //        }
+        //        else throw new NoFileSelectedException("Dosya seçimi gerçekleştirilemedi.");
+        //    }
+        //    else if (veri_listesi_requires_database.Keys.Contains(seçilenVeriTipi))
+        //    {
+        //        try
+        //        {
+
+        //            //currentDataTable = DatabaseHelper.LoadTable(seçilenVeriTipi);
+        //            currentDataTable = ProcesssqlFile(seçilenVeriTipi);
+        //            Console.WriteLine(seçilenVeriTipi);                    
+        //            if (currentDataTable.Columns.Contains("ID"))
+        //            {
+        //                currentDataTable.Columns.Remove("ID");
+        //                MessageBox.Show("ID kolonu kaldırıldı.", "Bilgilendirme", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //                Console.WriteLine("hi");
+        //            }
+        //            else
+        //            {
+        //                MessageBox.Show("ID kolonu bulunamadı.", "Bilgilendirme", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //            }
+        //            //if (seçilenVeriTipi == "EA_Sarj_verileri")
+        //            //{
+        //            //    //seçilenVeriTipi = "EA Şarj Verileri";
+        //            //    //dataTablesByType[seçilenVeriTipi] = importedDataTable;
+        //            //}
+
+        //            currentDataTable = ConvertColumnNamesToUpperCase(currentDataTable);
+        //            Console.WriteLine(seçilenVeriTipi);
+        //            Console.WriteLine(currentDataTable.Rows.Count);
+
+
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            throw new Exception($"Veritabanından veri alınırken hata oluştu: {ex.Message}");
+        //        }
+        //    }
+        //    else
+        //    {
+        //        throw new NoFileSelectedException("Bu veri tipi için atanmış bir dosya veya veritabanı seçimi prosedürü henüz yok.");
+        //    }
+        //}
         public void ProcessFileSelection(string seçilenVeriTipi)
         {
-            this.seçilenVeriTipi = seçilenVeriTipi;
+            try
+            {
+                this.seçilenVeriTipi = seçilenVeriTipi;
 
-            var fileDialog1 = new OpenFileDialog
-            {
-                Title = FileDialogTitle
-            };
+                // Veritabanı işlemleri için ayrı kontrol
+                if (veri_listesi_requires_database.Keys.Contains(seçilenVeriTipi))
+                {
+                    ProcessDatabaseSelection(seçilenVeriTipi);
+                    return;
+                }
 
-            if (veri_listesi_requires_xlsx.Contains(seçilenVeriTipi))
-            {
-                fileDialog1.Filter = combinedExcelFilter;
-                if (fileDialog1.ShowDialog() == DialogResult.OK)
+                // Dosya seçim işlemleri
+                using (var fileDialog1 = new OpenFileDialog { Title = FileDialogTitle })
                 {
-                    string selectedFileName = fileDialog1.FileName;
-                    currentDataTable = ProcessExcelFile(selectedFileName, seçilenVeriTipi);
-                }
-                else throw new NoFileSelectedException("Dosya seçimi gerçekleştirilemedi.");
-            }
-            else if (veri_listesi_requires_csv.Contains(seçilenVeriTipi))
-            {
-                fileDialog1.Filter = combinedCsvFilter;
-                if (fileDialog1.ShowDialog() == DialogResult.OK)
-                {
-                    string selectedFileName = fileDialog1.FileName;
-                    currentDataTable = ProcessCsvFile(selectedFileName);
-                }
-                else throw new NoFileSelectedException("Dosya seçimi gerçekleştirilemedi.");
-            }
-            else if (veri_listesi_requires_tabular.Contains(seçilenVeriTipi))
-            {
-                fileDialog1.Filter = combinedTabularFilter;
-                if (fileDialog1.ShowDialog() == DialogResult.OK)
-                {
-                    string selectedFileName = fileDialog1.FileName;
-                    currentDataTable = ProcessTabularFile(selectedFileName);
-                }
-                else throw new NoFileSelectedException("Dosya seçimi gerçekleştirilemedi.");
-            }
-            else if (veri_listesi_requires_database.Keys.Contains(seçilenVeriTipi))
-            {
-                try
-                {
-
-                    //currentDataTable = DatabaseHelper.LoadTable(seçilenVeriTipi);
-                    currentDataTable = ProcesssqlFile(seçilenVeriTipi);
-                    Console.WriteLine(seçilenVeriTipi);                    
-                    if (currentDataTable.Columns.Contains("ID"))
+                    string filter = GetFileFilter(seçilenVeriTipi);
+                    if (string.IsNullOrEmpty(filter))
                     {
-                        currentDataTable.Columns.Remove("ID");
-                        MessageBox.Show("ID kolonu kaldırıldı.", "Bilgilendirme", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        Console.WriteLine("hi");
+                        MessageBox.Show("Bu veri tipi için atanmış bir dosya veya veritabanı seçimi prosedürü henüz yok.",
+                            "Prosedür Bulunamadı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    fileDialog1.Filter = filter;
+                    if (fileDialog1.ShowDialog() == DialogResult.OK)
+                    {
+                        ProcessSelectedFile(fileDialog1.FileName, seçilenVeriTipi);
                     }
                     else
                     {
-                        MessageBox.Show("ID kolonu bulunamadı.", "Bilgilendirme", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Dosya seçimi gerçekleştirilemedi.",
+                            "Dosya Seçim Hatası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
-                    //if (seçilenVeriTipi == "EA_Sarj_verileri")
-                    //{
-                    //    //seçilenVeriTipi = "EA Şarj Verileri";
-                    //    //dataTablesByType[seçilenVeriTipi] = importedDataTable;
-                    //}
-
-                    currentDataTable = ConvertColumnNamesToUpperCase(currentDataTable);
-                    Console.WriteLine(seçilenVeriTipi);
-                    Console.WriteLine(currentDataTable.Rows.Count);
-
-
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception($"Veritabanından veri alınırken hata oluştu: {ex.Message}");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                throw new NoFileSelectedException("Bu veri tipi için atanmış bir dosya veya veritabanı seçimi prosedürü henüz yok.");
+                MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}",
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private string GetFileFilter(string seçilenVeriTipi)
+        {
+            if (veri_listesi_requires_xlsx.Contains(seçilenVeriTipi))
+                return combinedExcelFilter;
+            else if (veri_listesi_requires_csv.Contains(seçilenVeriTipi))
+                return combinedCsvFilter;
+            else if (veri_listesi_requires_tabular.Contains(seçilenVeriTipi))
+                return combinedTabularFilter;
+            return null;
+        }
+
+        private void ProcessSelectedFile(string fileName, string seçilenVeriTipi)
+        {
+            if (veri_listesi_requires_xlsx.Contains(seçilenVeriTipi))
+            {
+                currentDataTable = ProcessExcelFile(fileName, seçilenVeriTipi);
+            }
+            else if (veri_listesi_requires_csv.Contains(seçilenVeriTipi))
+            {
+                currentDataTable = ProcessCsvFile(fileName);
+            }
+            else if (veri_listesi_requires_tabular.Contains(seçilenVeriTipi))
+            {
+                currentDataTable = ProcessTabularFile(fileName);
+            }
+        }
+
+        private void ProcessDatabaseSelection(string seçilenVeriTipi)
+        {
+            try
+            {
+                currentDataTable = ProcesssqlFile(seçilenVeriTipi);
+
+                // ID kolonunu kontrol et ve kaldır
+                if (currentDataTable.Columns.Contains("ID"))
+                {
+                    currentDataTable.Columns.Remove("ID");
+                    MessageBox.Show("ID kolonu kaldırıldı.",
+                        "Bilgilendirme", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+                // Kolon isimlerini büyük harfe çevir
+                currentDataTable = ConvertColumnNamesToUpperCase(currentDataTable);
+
+                Console.WriteLine($"Veri tipi: {seçilenVeriTipi}");
+                Console.WriteLine($"Satır sayısı: {currentDataTable.Rows.Count}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Veritabanından veri alınırken hata oluştu: {ex.Message}",
+                    "Veritabanı Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

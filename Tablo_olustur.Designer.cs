@@ -31,13 +31,8 @@
             this.listBoxCsvFiles = new System.Windows.Forms.ListBox();
             this.listBoxCbsFiles = new System.Windows.Forms.ListBox();
             this.dtrVeriTabloOlustur = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
             this.aboneVeriOlustur = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
-            this.button6 = new System.Windows.Forms.Button();
-            this.button7 = new System.Windows.Forms.Button();
+            this.tablo_label = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // listBoxCsvFiles
@@ -54,49 +49,34 @@
             // 
             // listBoxCbsFiles
             // 
+            this.listBoxCbsFiles.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.listBoxCbsFiles.FormattingEnabled = true;
             this.listBoxCbsFiles.ItemHeight = 16;
             this.listBoxCbsFiles.Location = new System.Drawing.Point(333, 13);
             this.listBoxCbsFiles.Margin = new System.Windows.Forms.Padding(4);
             this.listBoxCbsFiles.Name = "listBoxCbsFiles";
-            this.listBoxCbsFiles.Size = new System.Drawing.Size(271, 516);
+            this.listBoxCbsFiles.Size = new System.Drawing.Size(271, 514);
             this.listBoxCbsFiles.TabIndex = 12;
             this.listBoxCbsFiles.SelectedIndexChanged += new System.EventHandler(this.listBoxCbsFiles_SelectedIndexChanged);
             // 
             // dtrVeriTabloOlustur
             // 
-            this.dtrVeriTabloOlustur.Location = new System.Drawing.Point(863, 52);
+            this.dtrVeriTabloOlustur.Font = new System.Drawing.Font("Comic Sans MS", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dtrVeriTabloOlustur.ForeColor = System.Drawing.Color.DarkOrange;
+            this.dtrVeriTabloOlustur.Location = new System.Drawing.Point(699, 115);
             this.dtrVeriTabloOlustur.Margin = new System.Windows.Forms.Padding(4);
             this.dtrVeriTabloOlustur.Name = "dtrVeriTabloOlustur";
             this.dtrVeriTabloOlustur.Size = new System.Drawing.Size(163, 53);
             this.dtrVeriTabloOlustur.TabIndex = 13;
-            this.dtrVeriTabloOlustur.Text = "DTR Tablolarını Oluştur";
+            this.dtrVeriTabloOlustur.Text = "DTR Veri Tablosu Oluştur";
             this.dtrVeriTabloOlustur.UseVisualStyleBackColor = true;
             this.dtrVeriTabloOlustur.Click += new System.EventHandler(this.dtrVeriTabloOlustur_Click);
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(1071, 139);
-            this.button1.Margin = new System.Windows.Forms.Padding(4);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(163, 53);
-            this.button1.TabIndex = 14;
-            this.button1.Text = "Ea Sarj Verileri Tablosu Oluştur";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(863, 139);
-            this.button2.Margin = new System.Windows.Forms.Padding(4);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(163, 53);
-            this.button2.TabIndex = 15;
-            this.button2.Text = "DEK Veri  Tablosu Oluştur";
-            this.button2.UseVisualStyleBackColor = true;
-            // 
             // aboneVeriOlustur
             // 
-            this.aboneVeriOlustur.Location = new System.Drawing.Point(1071, 52);
+            this.aboneVeriOlustur.Font = new System.Drawing.Font("Comic Sans MS", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.aboneVeriOlustur.ForeColor = System.Drawing.Color.DarkOrange;
+            this.aboneVeriOlustur.Location = new System.Drawing.Point(699, 195);
             this.aboneVeriOlustur.Margin = new System.Windows.Forms.Padding(4);
             this.aboneVeriOlustur.Name = "aboneVeriOlustur";
             this.aboneVeriOlustur.Size = new System.Drawing.Size(163, 53);
@@ -105,58 +85,25 @@
             this.aboneVeriOlustur.UseVisualStyleBackColor = true;
             this.aboneVeriOlustur.Click += new System.EventHandler(this.aboneVeriOlustur_Click);
             // 
-            // button4
+            // tablo_label
             // 
-            this.button4.Location = new System.Drawing.Point(863, 224);
-            this.button4.Margin = new System.Windows.Forms.Padding(4);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(163, 53);
-            this.button4.TabIndex = 17;
-            this.button4.Text = "Fider Verileri Tablosu Oluştur";
-            this.button4.UseVisualStyleBackColor = true;
-            // 
-            // button5
-            // 
-            this.button5.Location = new System.Drawing.Point(1087, 224);
-            this.button5.Margin = new System.Windows.Forms.Padding(4);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(163, 53);
-            this.button5.TabIndex = 18;
-            this.button5.Text = "Enerji Müsaadeleri Veri Tablosu Oluştur";
-            this.button5.UseVisualStyleBackColor = true;
-            // 
-            // button6
-            // 
-            this.button6.Location = new System.Drawing.Point(863, 327);
-            this.button6.Margin = new System.Windows.Forms.Padding(4);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(163, 53);
-            this.button6.TabIndex = 19;
-            this.button6.Text = "Yeni Projelendirilmiş DTR Verileri Tablosu Oluştur";
-            this.button6.UseVisualStyleBackColor = true;
-            // 
-            // button7
-            // 
-            this.button7.Location = new System.Drawing.Point(1087, 327);
-            this.button7.Margin = new System.Windows.Forms.Padding(4);
-            this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(163, 53);
-            this.button7.TabIndex = 20;
-            this.button7.Text = "İmar Verileri Tablosu Oluştur";
-            this.button7.UseVisualStyleBackColor = true;
+            this.tablo_label.AutoSize = true;
+            this.tablo_label.Font = new System.Drawing.Font("Comic Sans MS", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tablo_label.ForeColor = System.Drawing.Color.DarkOrange;
+            this.tablo_label.Location = new System.Drawing.Point(664, 26);
+            this.tablo_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.tablo_label.Name = "tablo_label";
+            this.tablo_label.Size = new System.Drawing.Size(246, 48);
+            this.tablo_label.TabIndex = 21;
+            this.tablo_label.Text = "Tablo Oluştur";
             // 
             // Tablo_olustur
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1324, 554);
-            this.Controls.Add(this.button7);
-            this.Controls.Add(this.button6);
-            this.Controls.Add(this.button5);
-            this.Controls.Add(this.button4);
+            this.ClientSize = new System.Drawing.Size(1039, 554);
+            this.Controls.Add(this.tablo_label);
             this.Controls.Add(this.aboneVeriOlustur);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.dtrVeriTabloOlustur);
             this.Controls.Add(this.listBoxCbsFiles);
             this.Controls.Add(this.listBoxCsvFiles);
@@ -164,6 +111,7 @@
             this.Name = "Tablo_olustur";
             this.Text = "Tablo_olustur";
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -172,12 +120,7 @@
         private System.Windows.Forms.ListBox listBoxCsvFiles;
         private System.Windows.Forms.ListBox listBoxCbsFiles;
         private System.Windows.Forms.Button dtrVeriTabloOlustur;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button aboneVeriOlustur;
-        private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Button button5;
-        private System.Windows.Forms.Button button6;
-        private System.Windows.Forms.Button button7;
+        private System.Windows.Forms.Label tablo_label;
     }
 }

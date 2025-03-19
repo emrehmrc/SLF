@@ -23,9 +23,9 @@ namespace SLF
         }
         private readonly Dictionary<string, List<string>> requiredColumns = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
     {
-    { "OGAGTRF", new List<string> { "ID", "KODU", "X_KOORDINAT", "Y_KOORDINAT", "PRIMER_GERILIM", "GUCU" } },
+    { "V_SBK_OGAGTRF", new List<string> { "ID", "KODU", "X_KOORDINAT", "Y_KOORDINAT", "PRIMER_GERILIM", "GUCU" } },
     { "dtr_aril_verileri_son", new List<string> { "Tanım Numarası", "SBS - CBS Kodu", "Çarpan", "Aktif Çekiş", "Demand Çekiş", "Demand Çekiş Tarihi" } },
-    { "TRAFOBINATIP", new List<string> { "TM_ID", "TM_FIDER_ID", "ADR_ILCE_ID" } }
+    { "V_SBK_TRAFOBINATIP", new List<string> { "TM_ID", "TM_FIDER_ID", "ADR_ILCE_ID" } }
     };
         private void listBoxCsvFiles_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -98,25 +98,25 @@ namespace SLF
 
             try
             {
-                // CSV dosyasını satır satır oku
-                var lines = File.ReadAllLines(filePath);
+                //// CSV dosyasını satır satır oku
+                ////var lines = File.ReadAllLines(filePath);
 
-                if (lines.Length > 0)
-                {
-                    // İlk satır kolon isimleri
-                    var columns = lines[0].Split(',');
-                    foreach (var column in columns)
-                    {
-                        dataTable.Columns.Add(column.Trim());
-                    }
+                //if (lines.Length > 0)
+                //{
+                //    // İlk satır kolon isimleri
+                //    var columns = lines[0].Split(',');
+                //    foreach (var column in columns)
+                //    {
+                //        dataTable.Columns.Add(column.Trim());
+                //    }
 
-                    // Diğer satırları veri olarak ekle
-                    for (int i = 1; i < lines.Length; i++)
-                    {
-                        var row = lines[i].Split(',');
-                        dataTable.Rows.Add(row);
-                    }
-                }
+                //    // Diğer satırları veri olarak ekle
+                //    for (int i = 1; i < lines.Length; i++)
+                //    {
+                //        var row = lines[i].Split(',');
+                //        dataTable.Rows.Add(row);
+                //    }
+                //}
             }
             catch (Exception ex)
             {
@@ -508,8 +508,8 @@ namespace SLF
                 // 4. Python script argümanlarını hazırla
                 List<string> arguments = new List<string>
         {
-            Path.Combine(rootDir, "CBS", "SLF", selectedFiles.First(f => f.Equals("OGAGTRF.TAB", StringComparison.OrdinalIgnoreCase))),
-            Path.Combine(rootDir, "CBS", "SLF", selectedFiles.First(f => f.Equals("TRAFOBINATIP.TAB", StringComparison.OrdinalIgnoreCase))),
+            Path.Combine(rootDir, "CBS", "SLF", selectedFiles.First(f => f.Equals("V_SBK_OGAGTRF.TAB", StringComparison.OrdinalIgnoreCase))),
+            Path.Combine(rootDir, "CBS", "SLF", selectedFiles.First(f => f.Equals("V_SBK_TRAFOBINATIP.TAB", StringComparison.OrdinalIgnoreCase))),
             Path.Combine(rootDir, "CBS", "csv_tablolari", "girdiler", arilCsvFile),
             outputFolder
         };
