@@ -1695,7 +1695,7 @@ namespace SLF
             }
 
             // Update button enablement and map position
-            CheckSelections();
+           // CheckSelections();
 
             if (SelectedCity != null && cityCoordinates.TryGetValue(SelectedCity, out PointLatLng coordinates))
             {
@@ -1731,7 +1731,7 @@ namespace SLF
                 SelectedDistrict = null;
                 Console.WriteLine("District selection cleared.");
             }
-            CheckSelections();
+         //   CheckSelections();
         }
         // Yıl seçimi yapıldığında çağrılan metot
         private void yilSecimiMonteCarlo(object sender, EventArgs e)
@@ -1739,7 +1739,7 @@ namespace SLF
             if (comboBox_ea_yıl_secimi.SelectedIndex != -1)  // Geçerli bir seçim yapıldığında
             {
                 SelectedYear = comboBox_ea_yıl_secimi.SelectedIndex;  // Yıl indeksini ayarla
-                CheckSelections();  // Seçim durumunu kontrol et
+              //  CheckSelections();  // Seçim durumunu kontrol et
             }
         }
 
@@ -1893,10 +1893,9 @@ namespace SLF
         private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
         {
             // Disable buttons and TrackBar to prevent interaction while processing
-            EAStationAddButton.Enabled = false;
+           // EAStationAddButton.Enabled = false;
             EANewSimulationResultsButton.Enabled = false;
             SimulasyonSonucGoruntule.Enabled = false;
-            EASimButton.Enabled = false;
 
             try
             {
@@ -1947,9 +1946,8 @@ namespace SLF
                     statusLabel.Text = "New simulation process completed";
 
                 EANewSimulationResultsButton.Enabled = true;
-                EAStationAddButton.Enabled = true;
+               // EAStationAddButton.Enabled = true;
                 SimulasyonSonucGoruntule.Enabled = true;
-                EASimButton.Enabled = true;
             }
         }
         // Updated RunPythonScriptAsync to match your paths
@@ -2002,6 +2000,8 @@ namespace SLF
         {
             // Disable the button to prevent multiple clicks while processing
             EAStationAddButton.Enabled = false;
+            EASimButton.Enabled = false;
+
             try
             {
                 string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\çıktı\evcs_monte_carlo_distribution_kumulatif3 - Copy.xlsx";
@@ -2079,6 +2079,8 @@ namespace SLF
             finally
             {
                 EAStationAddButton.Enabled = true;
+                EASimButton.Enabled = true;
+
             }
         }
 
@@ -2889,6 +2891,7 @@ namespace SLF
                 return GMarkerGoogleType.orange; // Fallback
             }
         }
+
         /*        private Task HaritaUzerindeSimulasyonGosterimi(DataTable veriTablosu)
                 {
                     // Clear existing overlays and re-add them
@@ -3292,13 +3295,15 @@ namespace SLF
             // Reset the flag after adding the station
             isAddingDekPoint = false;
         }
+
+
+
         private async void DEKRunSimulationButton_Click(object sender, EventArgs e)
         {
             // Disable buttons and TrackBar to prevent interaction while processing
-            DEKCenterAddButton.Enabled = false;
             DEKRunSimulationButton.Enabled = false;
             DEKSimulasyonSonucGoruntule.Enabled = false;
-            DEKSimButton.Enabled = false;
+            //DEKSimButton.Enabled = false;
 
             try
             {
@@ -3349,9 +3354,8 @@ namespace SLF
                     DEKStatusLabel.Text = "New simulation process completed";
 
                 DEKRunSimulationButton.Enabled = true;
-                DEKCenterAddButton.Enabled = true;
                 DEKSimulasyonSonucGoruntule.Enabled = true;
-                DEKSimButton.Enabled = true;
+                //DEKSimButton.Enabled = true;
             }
         }
         // Updated RunPythonScriptAsync to match your paths
@@ -3404,6 +3408,7 @@ namespace SLF
         {
             // Disable the button to prevent multiple clicks while processing
             DEKCenterAddButton.Enabled = false;
+            DEKSimButton.Enabled = false;
             try
             {
                 string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek_distribution_2024_2030_İzmir_düşük.xlsx";
@@ -3481,6 +3486,7 @@ namespace SLF
             finally
             {
                 DEKCenterAddButton.Enabled = true;
+                DEKSimButton.Enabled = true;
             }
         }
         /*        private void gMapControl_Dek_OnMarkerClick(GMapMarker item, MouseEventArgs e)
@@ -3493,6 +3499,7 @@ namespace SLF
                 }*/
         private async void gMapControl_Dek_OnMarkerClick(GMapMarker item, MouseEventArgs e)
         {
+
             if (e.Button == MouseButtons.Left)
             {
                 // Check if the user is in "adding charging station" mode
@@ -3644,7 +3651,7 @@ namespace SLF
                 }
 
                 // Update button enablement and map position
-                CheckSelections();
+               // CheckSelections();
                 // Set map position based on selected city
                 if (cityCoordinates.TryGetValue(SelectedCity, out PointLatLng coordinates))
                 {
@@ -3665,18 +3672,19 @@ namespace SLF
                 SelectedDistrict = null;
                 Console.WriteLine("District selection cleared.");
             }
-            CheckSelections();
+           // CheckSelections();
         }
         private void dek_list_years(object sender, EventArgs e) // 
         {
             if (comboBox_DEK_Yıl.SelectedIndex != -1)  // Geçerli bir seçim yapıldığında
             {
                 SelectedYear = comboBox_DEK_Yıl.SelectedIndex;  // Yıl indeksini ayarla
-                CheckSelections();  // Seçim durumunu kontrol et
+                //CheckSelections();  // Seçim durumunu kontrol et
             }
         }
         private async void dekSimulasyonGoruntule(object sender, EventArgs e)
         {
+            DEKCenterAddButton.Enabled = false;
             gMapControl_DEK.Overlays.Clear();
             gMapControl_DEK.Refresh();
 
@@ -3779,6 +3787,7 @@ namespace SLF
 
                 // Veri başarıyla yüklendiğinde bir bildirim gösterin
                 MessageBox.Show("Veri başarıyla yüklendi.");
+                
                 DEKCenterAddButton.Enabled = true;
             }
             catch (Exception ex)
@@ -3818,7 +3827,7 @@ namespace SLF
             };
 
             popupForm.Controls.Add(dataGridView);
-           // popupForm.Show(); // Yeni pencereyi göster
+            popupForm.Show(); // Yeni pencereyi göster
         }
 
         private void dekSimMinBtn_CheckedChanged(object sender, EventArgs e)
@@ -3860,7 +3869,7 @@ namespace SLF
             set
             {
                 _selectedYear = value;
-                CheckSelections();
+               // CheckSelections();
             }
         }
 
@@ -3870,7 +3879,7 @@ namespace SLF
             set
             {
                 _selectedCity = value;
-                CheckSelections();
+               // CheckSelections();
             }
         }
 
@@ -3880,7 +3889,7 @@ namespace SLF
             set
             {
                 _selectedDistrict = value;
-                CheckSelections();
+               // CheckSelections();
             }
         }
         /*        private void CheckSelections()
