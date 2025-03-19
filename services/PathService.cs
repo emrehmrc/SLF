@@ -13,7 +13,7 @@ namespace SLF.Services
         private const string RELATIVE_DATA_PATH = @"il_ilce_kırılımları";
 
         // Temel dizin - ilk çalıştırmada hesaplanır
-        private static string _baseDirectory;
+        public static string _baseDirectory;
 
         // Seçilen il
         public static string SelectedCity { get; set; }
@@ -53,7 +53,8 @@ namespace SLF.Services
         {
             SelectedCity = city;
             SelectedDistrict = district;
-            Debug.WriteLine($"Path güncellendi: {FullPath}");
+            //Debug.WriteLine($"Path güncellendi: {FullPath}");
+            
         }
 
         /// <summary>
@@ -121,7 +122,7 @@ namespace SLF.Services
                     Debug.WriteLine($"Veri klasörü bulunamadı, yeni klasör oluşturuldu: {_baseDirectory}");
                 }
 
-                Debug.WriteLine($"Veri klasörü yolu: {_baseDirectory}");
+                //Debug.WriteLine($"Veri klasörü yolu: {_baseDirectory}");
             }
             catch (Exception ex)
             {
