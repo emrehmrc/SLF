@@ -1609,7 +1609,7 @@ namespace SLF
         private void gMapControl_stokastik_OnMapClick(object sender, MouseEventArgs e)
         {
             // GMapControl üzerinden tıklama koordinatlarını elde et
-            if (!(sender is GMap.NET.WindowsForms.GMapControl gMapControl))
+            if (!(sender is GMapControl gMapControl))
             {
                 Console.WriteLine("gMapControl instance is null.");
                 return;
@@ -1650,7 +1650,7 @@ namespace SLF
             try
             {
                 // GMapControl üzerinden tıklama koordinatlarını elde et
-                if (!(sender is GMap.NET.WindowsForms.GMapControl gMapControl))
+                if (!(sender is GMapControl gMapControl))
                 {
                     Console.WriteLine("gMapControl instance is null.");
                     return;
@@ -1889,7 +1889,7 @@ namespace SLF
         private async void gMapControl_Ea_OnMapClick(object sender, MouseEventArgs e)
         {
             // GMapControl üzerinden tıklama koordinatlarını elde et
-            if (!(sender is GMap.NET.WindowsForms.GMapControl gMapControl))
+            if (!(sender is GMapControl gMapControl))
             {
                 Console.WriteLine("gMapControl instance is null.");
                 return;
@@ -3523,7 +3523,7 @@ namespace SLF
         private async void gMapControl_DEK_OnMapClick(object sender, MouseEventArgs e)
         {
             // GMapControl üzerinden tıklama koordinatlarını elde et
-            if (!(sender is GMap.NET.WindowsForms.GMapControl gMapControl))
+            if (!(sender is GMapControl gMapControl))
             {
                 Console.WriteLine("gMapControl instance is null.");
                 return;
@@ -4156,7 +4156,7 @@ namespace SLF
             try
             {
                 // GMapControl üzerinden tıklama koordinatlarını elde et
-                var gMapControl = sender as GMap.NET.WindowsForms.GMapControl;
+                var gMapControl = sender as GMapControl;
                 if (gMapControl == null)
                 {
                     Console.WriteLine("gMapControl instance is null.");
@@ -4381,7 +4381,8 @@ namespace SLF
         private void gMapControl_imar_OnMapClick(object sender, MouseEventArgs e)
         {
             // GMapControl üzerinden tıklama koordinatlarını elde et
-            if (!(sender is GMap.NET.WindowsForms.GMapControl gMapControl))
+            if (!(sender is GMapControl gMapControl))
+
             {
                 Console.WriteLine("gMapControl instance is null.");
                 return;
@@ -4428,7 +4429,7 @@ namespace SLF
             try
             {
                 // GMapControl üzerinden tıklama koordinatlarını elde et
-                if (!(sender is GMap.NET.WindowsForms.GMapControl gMapControl))
+                if (!(sender is GMapControl gMapControl))
                 {
                     Console.WriteLine("gMapControl instance is null.");
                     return;
@@ -4599,7 +4600,7 @@ namespace SLF
         private void gMapControl_yuk_OnMapClick(object sender, MouseEventArgs e)
         {
             // GMapControl üzerinden tıklama koordinatlarını elde et
-            if (!(sender is GMap.NET.WindowsForms.GMapControl gMapControl))
+            if (!(sender is GMapControl gMapControl))
             {
                 Console.WriteLine("gMapControl instance is null.");
                 return;

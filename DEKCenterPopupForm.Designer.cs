@@ -43,7 +43,6 @@
             this.DEK_Y_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DEK_TM_ADI = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DEK_KURULUM_YERI = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.DEKCenterpanel2_Dek_Popup.SuspendLayout();
             this.DEKCenterpanel1_Dek_Popup.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DEKCenterDataGridView)).BeginInit();
             this.SuspendLayout();
@@ -51,8 +50,6 @@
             // DEKCenterpanel2_Dek_Popup
             // 
             this.DEKCenterpanel2_Dek_Popup.BackColor = System.Drawing.Color.NavajoWhite;
-            this.DEKCenterpanel2_Dek_Popup.Controls.Add(this.DEKTamamButton);
-            this.DEKCenterpanel2_Dek_Popup.Controls.Add(this.DEKCancelButton);
             this.DEKCenterpanel2_Dek_Popup.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.DEKCenterpanel2_Dek_Popup.Location = new System.Drawing.Point(0, 393);
             this.DEKCenterpanel2_Dek_Popup.Name = "DEKCenterpanel2_Dek_Popup";
@@ -210,7 +207,6 @@
             this.Name = "DEKCenterPopupForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "DEK Merkezi Bilgileri";
-            this.DEKCenterpanel2_Dek_Popup.ResumeLayout(false);
             this.DEKCenterpanel1_Dek_Popup.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.DEKCenterDataGridView)).EndInit();
             this.ResumeLayout(false);
