@@ -495,6 +495,73 @@ namespace SLF
                     importedDataTable = currentDataTable.Copy();
                     dataTablesByType[seçilenVeriTipi] = importedDataTable;
                 }*/
+        //public void ImportProcessedData()
+        //{
+        //    try
+        //    {
+        //        Cursor.Current = Cursors.WaitCursor;
+
+        //        Console.WriteLine("\n=== ImportProcessedData Başlıyor ===");
+
+        //        // CurrentDataTable kontrolü
+        //        if (currentDataTable == null)
+        //        {
+        //            throw new ArgumentNullException("currentDataTable", "CurrentDataTable null olamaz");
+        //        }
+
+        //        // Veriyi kopyala
+        //        importedDataTable = currentDataTable.Copy();
+        //        Console.WriteLine($"Veri kopyalandı - Satır sayısı: {importedDataTable.Rows.Count}");
+        //        Console.WriteLine($"Orijinal seçilenVeriTipi: {seçilenVeriTipi}");
+
+        //        // Key dönüşümü
+        //        if (veri_listesi_requires_database.TryGetValue(seçilenVeriTipi, out string displayKey))
+        //        {
+        //            Console.WriteLine($"Key dönüşümü: {seçilenVeriTipi} -> {displayKey}");
+        //            seçilenVeriTipi = displayKey;
+        //        }
+
+        //        // dataTablesByType null kontrolü
+        //        if (dataTablesByType == null)
+        //        {
+        //            Console.WriteLine("dataTablesByType null, yeni instance oluşturuluyor");
+        //            dataTablesByType = new Dictionary<string, DataTable>();
+        //        }
+
+        //        // Dictionary'e ekle
+        //        if (!dataTablesByType.ContainsKey(seçilenVeriTipi))
+        //        {
+        //            Console.WriteLine($"Yeni veri ekleniyor: {seçilenVeriTipi}");
+        //        }
+        //        else
+        //        {
+        //            Console.WriteLine($"Mevcut veri güncelleniyor: {seçilenVeriTipi}");
+        //        }
+
+        //        dataTablesByType[seçilenVeriTipi] = importedDataTable;
+        //        Console.WriteLine($"Veri eklendi/güncellendi - Key: {seçilenVeriTipi}, Satır sayısı: {importedDataTable.Rows.Count}");
+
+        //        // Mevcut durumu logla
+        //        Console.WriteLine("\nMevcut Dictionary durumu:");
+        //        foreach (var kvp in dataTablesByType)
+        //        {
+        //            Console.WriteLine($"Key: {kvp.Key}, Satır: {kvp.Value?.Rows.Count}");
+        //        }
+
+        //        Console.WriteLine("=== ImportProcessedData Tamamlandı ===\n");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"\n!!! ImportProcessedData HATA !!!");
+        //        Console.WriteLine($"Hata Mesajı: {ex.Message}");
+        //        Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+        //        throw;
+        //    }
+        //    finally
+        //    {
+        //        Cursor.Current = Cursors.Default;
+        //    }
+        //}
         public void ImportProcessedData()
         {
             try
@@ -541,6 +608,9 @@ namespace SLF
                 dataTablesByType[seçilenVeriTipi] = importedDataTable;
                 Console.WriteLine($"Veri eklendi/güncellendi - Key: {seçilenVeriTipi}, Satır sayısı: {importedDataTable.Rows.Count}");
 
+                // Veriyi modül için doğru klasöre kaydet
+                SaveDataToCorrectFolder();
+
                 // Mevcut durumu logla
                 Console.WriteLine("\nMevcut Dictionary durumu:");
                 foreach (var kvp in dataTablesByType)
@@ -562,8 +632,65 @@ namespace SLF
                 Cursor.Current = Cursors.Default;
             }
         }
+        private void SaveDataToCorrectFolder()
+        {
+            try
+            {
+                // Veri tipi için doğru klasör yolunu al
+                string folderPath = PathService.GetGirdilerPathForDataType(seçilenVeriTipi);
 
+                if (string.IsNullOrEmpty(folderPath))
+                {
+                    Console.WriteLine("Geçerli bir klasör yolu alınamadı, veri kaydedilemedi.");
+                    return;
+                }
 
+                // Dosya adını oluştur (veri tipi ve zaman damgası ile)
+                string fileName = $"{seçilenVeriTipi.Replace(" ", "_")}_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+                string fullPath = Path.Combine(folderPath, fileName);
+
+                // Veriyi CSV olarak kaydet
+                SaveDataTableToCsv(importedDataTable, fullPath);
+
+                Console.WriteLine($"Veri başarıyla kaydedildi: {fullPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Veri kaydetme hatası: {ex.Message}");
+            }
+        }
+        private void SaveDataTableToCsv(DataTable dt, string filePath)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            // Sütun başlıklarını ekle
+            List<string> columnNames = new List<string>();
+            foreach (DataColumn column in dt.Columns)
+            {
+                columnNames.Add(column.ColumnName);
+            }
+            sb.AppendLine(string.Join(",", columnNames));
+
+            // Verileri ekle
+            foreach (DataRow row in dt.Rows)
+            {
+                List<string> fields = new List<string>();
+                foreach (var item in row.ItemArray)
+                {
+                    // Virgülleri ve tırnak işaretlerini düzgün biçimlendir
+                    string field = item?.ToString() ?? "";
+                    if (field.Contains(",") || field.Contains("\"") || field.Contains("\n"))
+                    {
+                        field = "\"" + field.Replace("\"", "\"\"") + "\"";
+                    }
+                    fields.Add(field);
+                }
+                sb.AppendLine(string.Join(",", fields));
+            }
+
+            // Dosyayı kaydet
+            System.IO.File.WriteAllText(filePath, sb.ToString());
+        }
         private void RunRScript(string excelFilePath)
         {
             try

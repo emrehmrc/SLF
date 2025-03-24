@@ -18,20 +18,30 @@ namespace SLF
         public string selectedMethod { get; private set; }
         private HomePageForm homePageForm; // Reference to HomePageForm
         public string SelectedPath { get; private set; }
+
+        // İl ve ilçe seçimlerini geçici olarak saklama
+        private string tempSelectedCity;
+        private string tempSelectedDistrict;
+
         private void InitializeComboBoxes()
         {
-            // Add cities to the first combo box
+            // Önce ComboBox'ları temizle
+            IlComboBox.Items.Clear();
+            IlceComboBox.Items.Clear();
+
+            // "Lütfen seçin" varsayılan maddelerini ekle
+            IlComboBox.Items.Add("Lütfen il seçin");
+            IlceComboBox.Items.Add("Lütfen ilçe seçin");
+
+            // Şehirleri ekle
             IlComboBox.Items.Add("İzmir");
             IlComboBox.Items.Add("Eskişehir");
 
-            // Pre-select the first item if needed
-            if (IlComboBox.Items.Count > 0)
-            {
-                IlComboBox.SelectedIndex = 0;
-            }
-            
+            // Varsayılan olarak "Lütfen seçin" seçeneklerini seç
+            IlComboBox.SelectedIndex = 0;
+            IlceComboBox.SelectedIndex = 0;
         }
-        
+
         public MethodForm(HomePageForm homePageForm)
         {
             InitializeComponent();
@@ -50,33 +60,35 @@ namespace SLF
         {
             ForwardButton.Focus();
         }
+
         private void ForwardButton_Click(object sender, EventArgs e)
         {
-            if (MethodComboBox.SelectedItem != null)
-            {
-                // Seçilen metodu kaydet
-                selectedMethod = MethodComboBox.SelectedItem.ToString();
-
-                // İl ve ilçe seçimlerini PathService'e kaydet (eğer seçilmişse)
-                if (IlComboBox.SelectedItem != null && IlceComboBox.SelectedItem != null)
-                {
-                    string selectedCity = IlComboBox.SelectedItem.ToString();
-                    string selectedDistrict = IlceComboBox.SelectedItem.ToString();
-
-                    // PathService'i güncelle
-                    PathService.UpdatePath(selectedCity, selectedDistrict);
-
-                    // Debug bilgisi
-                    Console.WriteLine($"İlerleme öncesi seçilen path: {PathService.FullPath}");
-                }
-
-                // Seçilen metoda göre modül formunu aç
-                OpenModülFormuBasedOnSelection(selectedMethod);
-            }
-            else
+            if (MethodComboBox.SelectedItem == null)
             {
                 MessageBox.Show("İlerlemek için bir metot seçiniz");
+                return;
             }
+
+            selectedMethod = MethodComboBox.SelectedItem.ToString();
+
+            // "Lütfen seçin" seçeneklerinin seçili olup olmadığını kontrol et
+            if (IlComboBox.SelectedIndex == 0 || IlceComboBox.SelectedIndex == 0)
+            {
+                MessageBox.Show("Lütfen il ve ilçe seçiniz");
+                return;
+            }
+
+            string selectedCity = IlComboBox.SelectedItem.ToString();
+            string selectedDistrict = IlceComboBox.SelectedItem.ToString();
+
+            // Sadece burada, kullanıcı onayladığında PathService'i güncelle ve klasör oluştur
+            PathService.UpdatePath(selectedCity, selectedDistrict);
+
+            // Debug bilgisi
+            Console.WriteLine($"İlerleme öncesi seçilen path: {PathService.FullPath}");
+
+            // Seçilen metoda göre modül formunu aç
+            OpenModülFormuBasedOnSelection(selectedMethod);
         }
 
         private void OpenModülFormuBasedOnSelection(string method)
@@ -90,7 +102,6 @@ namespace SLF
             mod1.ShowDialog();  // Show the new form as a dialog
 
             // Optionally, you can show both forms again if needed
-
             homePageForm.Show(); // Show HomePageForm again if it needs to be visible
             this.Show();  // Show MethodForm again after ModülFormu is closed
         }
@@ -115,16 +126,23 @@ namespace SLF
 
         private void IlComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // Clear the districts combo box
+            // Önceki ilçeleri temizle
             IlceComboBox.Items.Clear();
 
-            // Depending on the selected city, fill the districts
-            if (IlComboBox.SelectedItem != null)
-                
+            // Eğer "Lütfen seçin" seçeneği seçiliyse işlem yapma
+            if (IlComboBox.SelectedIndex == 0)
+            {
+                IlceComboBox.Items.Add("Lütfen ilçe seçin");
+                IlceComboBox.SelectedIndex = 0;
+                tempSelectedCity = null; // Reset the temporary city
+                return;
+            }
+
             {
                 if (IlComboBox.SelectedItem.ToString() == "İzmir")
                 {
                     // Add İzmir districts in alphabetical order
+                    IlceComboBox.Items.Add("Lütfen ilçe seçin");
                     IlceComboBox.Items.Add("Aliağa");
                     IlceComboBox.Items.Add("Balçova");
                     IlceComboBox.Items.Add("Bayındır");
@@ -157,11 +175,12 @@ namespace SLF
                     IlceComboBox.Items.Add("Urla");
 
                     // Geriye dönük uyumluluk için eski SelectedPath özelliğini de güncelle
-                    SelectedPath = PathService.FullPath;
+                    //SelectedPath = PathService.FullPath;
                 }
                 else if (IlComboBox.SelectedItem.ToString() == "Eskişehir")
                 {
                     // Add Eskişehir districts in alphabetical order
+                    IlceComboBox.Items.Add("Lütfen ilçe seçin");
                     IlceComboBox.Items.Add("Alpu");
                     IlceComboBox.Items.Add("Beylikova");
                     IlceComboBox.Items.Add("Çifteler");
@@ -191,30 +210,23 @@ namespace SLF
 
         private void IlceComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (IlComboBox.SelectedItem != null && IlceComboBox.SelectedItem != null)
+            // Eğer "Lütfen seçin" seçenekleri seçiliyse işlem yapma
+            if (IlComboBox.SelectedIndex == 0 || IlceComboBox.SelectedIndex == 0)
             {
-                string selectedCity = IlComboBox.SelectedItem.ToString();
-                string selectedDistrict = IlceComboBox.SelectedItem.ToString();
-
-                // Servis metodunu kullanarak path bilgisini güncelle
-                PathService.UpdatePath(selectedCity, selectedDistrict);
-
-                // Geriye dönük uyumluluk için eski SelectedPath özelliğini de güncelle
-                SelectedPath = PathService.FullPath;
-
-                //Console.WriteLine("Selected path: " + PathService.FullPath);
-
-                // Örnek: Klasörün var olup olmadığını kontrol etme
-                if (PathService.DirectoryExists())
-                {
-                    //Console.WriteLine("Bu il/ilçe için veri klasörü mevcut.");
-                }
-                else
-                {
-                    Console.WriteLine("Bu il/ilçe için veri klasörü henüz oluşturulmamış.");
-                }
+                return;
             }
-        }
 
+            // İlçe seçimini geçici olarak sakla
+            tempSelectedDistrict = IlceComboBox.SelectedItem.ToString();
+
+            // İl değişkeninin null olup olmadığını kontrol et
+            if (tempSelectedCity != null && tempSelectedDistrict != null)
+            {
+                // Yolu göstermek için güncelle ama klasör oluşturma
+                SelectedPath = System.IO.Path.Combine(tempSelectedCity, tempSelectedDistrict);
+            }
+
+            // NOT: Burada PathService.UpdatePath() çağrılmıyor
+        }
     }
 }

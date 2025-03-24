@@ -21,7 +21,8 @@ using MapWinGIS;
 using System.Text;
 using SLF.services;
 using OSGeo.OGR;
-
+using SLF.Services;
+using System.Windows.Forms;
 
 namespace SLF
 {
@@ -44,7 +45,7 @@ namespace SLF
         private readonly double startX = 0;
         private readonly double startY = 0;
         public int slfStartYear = 0, slfEndYear = 0;
-
+        
         TextBox logTextBox; // Declare logTextBox here --------------
         private ExcelService _excelService;
         private ExcelService excelService = new ExcelService();
@@ -55,6 +56,7 @@ namespace SLF
         private string _selectedCity = null;
         private Form popupForm; // easim ekran popup 
         private DataTable veriMonteCarlo;
+        
         public static List<string> modulescheck = new List<string>();
         private bool isDtrLoaded = false;
         private Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
@@ -289,6 +291,9 @@ namespace SLF
         private void InitializeComboBoxes()
         {
             // Yıl aralığını ComboBox1'e ekleyin
+
+
+            Console.WriteLine("secilen_ilce_dizin: " + Path.Combine(PathService.BaseDirectory, PathService.FullPath));
             var yearList = new List<int>();
             for (int year = slfStartYear; year <= slfEndYear; year++)
             {
@@ -568,7 +573,7 @@ namespace SLF
             {
                 // Logic for SLF selection
                 // MessageBox.Show("SLF method selected, prerequisites are required.");
-            }
+             }
             else
             {
                 // Handle other cases or invalid selection
@@ -576,10 +581,11 @@ namespace SLF
             }
 
 
-            girdiModülü = girdiModülleri[seçilenVeriTipi];
-            Console.WriteLine("girdimodulusecilenveritipi" + seçilenVeriTipi);
+            //girdiModülü = girdiModülleri[seçilenVeriTipi];
+            //Console.WriteLine("girdimodulusecilenveritipi" + seçilenVeriTipi);
             girdiModülü.SlfStartYear = slfStartYear;
             girdiModülü.SlfEndYear = slfEndYear;
+
 
             InitializeComboBoxes(); // yılların guncellenmesi 
                                     // Check if "ELF" is selected to skip prerequisites
@@ -680,15 +686,296 @@ namespace SLF
 
             try
             {
+                // Geçici klasörleri temizle
+                bool cleaned = CleanupTemporaryFolders();
+
+                if (cleaned)
+                {
+                    Debug.WriteLine("Geçici klasörler başarıyla temizlendi.");
+                }
+                else
+                {
+                    Debug.WriteLine("Geçici klasör temizleme işlemi gerçekleşmedi.");
+                }
+
                 // Veritabanı bağlantısını kapat
                 DatabaseManager.GetInstance("").CloseConnection();
-                MessageBox.Show("Veritabanı bağlantısı kapatıldı.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Bağlantı kapatma sırasında hata: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Kapanış sırasında hata: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        private bool CleanupTemporaryFolders()
+        {
+            try
+            {
+                // Eğer PathService mevcut bir geçici klasöre sahipse ve geçici moddaysa
+                if (PathService.CurrentMode == PathService.WorkingMode.Temporary &&
+                    !string.IsNullOrEmpty(PathService.CurrentWorkingFolder))
+                {
+                    string tempPath = Path.Combine(PathService.BaseDirectory, PathService.FullPath, PathService.CurrentWorkingFolder);
+
+                    // Klasör varsa sil
+                    if (Directory.Exists(tempPath))
+                    {
+                        // Klasörde içerik olup olmadığını kontrol et
+                        bool hasContent = DirectoryHasContent(tempPath);
+
+                        if (hasContent)
+                        {
+                            DialogResult saveResult = MessageBox.Show(
+                                "Geçici çalışma klasöründe veriler var. Çıkmadan önce bir proje olarak kaydetmek ister misiniz?",
+                                "Kaydedilmemiş Veriler",
+                                MessageBoxButtons.YesNoCancel,
+                                MessageBoxIcon.Question);
+
+                            if (saveResult == DialogResult.Yes)
+                            {
+                                // Projeyi kaydet
+                                //SaveCurrentProject();
+                                return true;
+                            }
+                            else if (saveResult == DialogResult.Cancel)
+                            {
+                                return false;
+                            }
+                        }
+
+                        try
+                        {
+                            // Tüm dosyaları ve alt klasörlerin salt okunur bayrağını kaldır
+                            RemoveReadOnlyAttributesRecursive(tempPath);
+
+                            // Geçici klasörü sil
+                            Directory.Delete(tempPath, true);
+                            Debug.WriteLine($"Geçici klasör silindi: {tempPath}");
+
+                            // Ayrıca diğer eski geçici klasörleri de temizle
+                            CleanupOldTempFolders();
+                            return true;
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Klasör silinirken hata: {ex.Message}");
+                            MessageBox.Show($"Geçici klasör silinirken hata oluştu: {ex.Message}",
+                                "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return false;
+                        }
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Geçici klasör temizlenirken hata: {ex.Message}");
+                return false;
+            }
+        }
+        private void RemoveReadOnlyAttributesRecursive(string path)
+        {
+            try
+            {
+                // Tüm dosyalar için salt okunur özniteliğini kaldır
+                string[] files = Directory.GetFiles(path);
+                foreach (string file in files)
+                {
+                    FileInfo fileInfo = new FileInfo(file);
+                    if ((fileInfo.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                    {
+                        fileInfo.Attributes &= ~FileAttributes.ReadOnly;
+                    }
+                }
+
+                // Alt klasörler için de aynı işlemi yap
+                string[] directories = Directory.GetDirectories(path);
+                foreach (string directory in directories)
+                {
+                    RemoveReadOnlyAttributesRecursive(directory);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Salt okunur özniteliği kaldırılırken hata: {ex.Message}");
+            }
+        }
+        // Eski geçici klasörleri temizleme metodu
+        //private void CleanupOldTempFolders()
+        //{
+        //    try
+        //    {
+        //        if (string.IsNullOrEmpty(PathService.SelectedCity) ||
+        //            string.IsNullOrEmpty(PathService.SelectedDistrict))
+        //            return;
+
+        //        string districtPath = Path.Combine(PathService.BaseDirectory, PathService.FullPath);
+
+        //        if (!Directory.Exists(districtPath))
+        //            return;
+
+        //        // "temp_" ile başlayan tüm klasörleri bul
+        //        string[] tempFolders = Directory.GetDirectories(districtPath, "temp_*");
+
+        //        foreach (string folder in tempFolders)
+        //        {
+        //            // Aktif klasör değilse sil
+        //            if (PathService.CurrentMode != PathService.WorkingMode.Temporary ||
+        //                !folder.EndsWith(PathService.CurrentWorkingFolder))
+        //            {
+        //                try
+        //                {
+        //                    // Salt okunur özniteliklerini kaldır
+        //                    RemoveReadOnlyAttributesRecursive(folder);
+
+        //                    // Klasörü sil
+        //                    Directory.Delete(folder, true);
+        //                    Debug.WriteLine($"Eski geçici klasör silindi: {folder}");
+        //                }
+        //                catch (Exception ex)
+        //                {
+        //                    Debug.WriteLine($"Klasör silinirken hata: {ex.Message}");
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine($"Eski klasörler temizlenirken hata: {ex.Message}");
+        //    }
+        //}
+        //private void SaveCurrentProject()
+        //{
+        //    try
+        //    {
+        //        using (var inputDialog = new InputDialog("Proje Adı", "Lütfen projenin adını girin:"))
+        //        {
+        //            if (inputDialog.ShowDialog() == DialogResult.OK)
+        //            {
+        //                string projectName = inputDialog.InputText;
+
+        //                if (string.IsNullOrWhiteSpace(projectName))
+        //                {
+        //                    MessageBox.Show("Geçerli bir proje adı girmelisiniz.",
+        //                        "Geçersiz İsim", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //                    return;
+        //                }
+
+        //                // Projeyi kaydet
+        //                string projectPath = PathService.SaveAsProject(projectName);
+
+        //                MessageBox.Show($"Proje '{projectName}' adıyla başarıyla kaydedildi.\n" +
+        //                    $"Klasör: {projectPath}",
+        //                    "Proje Kaydedildi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show($"Proje kaydedilirken hata oluştu: {ex.Message}",
+        //            "Kayıt Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
+        //}
+        private bool DirectoryHasContent(string path)
+        {
+            if (!Directory.Exists(path))
+                return false;
+
+            int fileCount = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories).Length;
+            return fileCount > 0;
+        }
+
+        // Eski geçici klasörleri temizleme metodu
+        private void CleanupOldTempFolders()
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(PathService.SelectedCity) ||
+                    string.IsNullOrEmpty(PathService.SelectedDistrict))
+                    return;
+
+                string districtPath = Path.Combine(PathService.BaseDirectory, PathService.FullPath);
+
+                if (!Directory.Exists(districtPath))
+                    return;
+
+                // "temp_" ile başlayan tüm klasörleri bul
+                string[] tempFolders = Directory.GetDirectories(districtPath, "temp_*");
+
+                foreach (string folder in tempFolders)
+                {
+                    // Aktif klasör değilse sil
+                    if (PathService.CurrentMode != PathService.WorkingMode.Temporary ||
+                        !folder.EndsWith(PathService.CurrentWorkingFolder))
+                    {
+                        try
+                        {
+                            Directory.Delete(folder, true);
+                            Debug.WriteLine($"Eski geçici klasör silindi: {folder}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Klasör silinirken hata: {ex.Message}");
+                        }
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Eski klasörler temizlenirken hata: {ex.Message}");
+            }
+        }
+
+        // Projeyi kaydetme metodu
+        //private void SaveCurrentProject()
+        //{
+        //    try
+        //    {
+        //        string projectName = "";
+
+        //        // Kullanıcıdan proje adını iste
+        //        using (var inputDialog = new InputDialog("Proje Adı", "Lütfen projenin adını girin:"))
+        //        {
+        //            if (inputDialog.ShowDialog() == DialogResult.OK)
+        //            {
+        //                projectName = inputDialog.InputText;
+        //            }
+        //            else
+        //            {
+        //                return; // İptal edildi
+        //            }
+        //        }
+
+        //        if (string.IsNullOrWhiteSpace(projectName))
+        //        {
+        //            MessageBox.Show(
+        //                "Geçerli bir proje adı girmelisiniz.",
+        //                "Geçersiz İsim",
+        //                MessageBoxButtons.OK,
+        //                MessageBoxIcon.Warning);
+        //            return;
+        //        }
+
+        //        // Projeyi kaydet
+        //        string projectPath = PathService.SaveAsProject(projectName);
+
+        //        MessageBox.Show(
+        //            $"Proje '{projectName}' adıyla başarıyla kaydedildi.\n" +
+        //            $"Klasör: {projectPath}",
+        //            "Proje Kaydedildi",
+        //            MessageBoxButtons.OK,
+        //            MessageBoxIcon.Information);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(
+        //            $"Proje kaydedilirken hata: {ex.Message}",
+        //            "Kayıt Hatası",
+        //            MessageBoxButtons.OK,
+        //            MessageBoxIcon.Error);
+        //    }
+        //}
         public class ExcelService
         {
             // Load the worksheet into a DataTable for displaying in DataGridView
@@ -1505,44 +1792,67 @@ namespace SLF
 
         private void yearApproveButton_Click(object sender, EventArgs e)
         {
+            // Yıl servisi referansını al
+            var yearService = YearService.GetInstance();
+
             if (endYearComboBox.SelectedIndex == -1)
             {
-                // if the end year is not chosen, it means we are still in selection process
+                // Eğer bitiş yılı seçilmediyse, hala seçim sürecindeyiz
                 MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             else if (startYearComboBox.Enabled == false && endYearComboBox.Enabled == false)
             {
-                // but if both combobox are disabled, it means the selection process is already done
-                // Check if any DataTable in girdiModülleri has rows
+                // Eğer her iki combobox da devre dışı bırakıldıysa, seçim işlemi zaten tamamlanmış demektir
+                // girdiModülleri içindeki herhangi bir DataTable'ın satırları olup olmadığını kontrol et
                 bool anyTableHasRows = girdiModülleri.Values.Any(girdiModülü =>
                     girdiModülü.importedDataTable != null && girdiModülü.importedDataTable.Rows.Count > 0);
+
                 if (anyTableHasRows)
                 {
-                    var dialogResult = MessageBox.Show("Yılları değiştirirseniz verileri tekrardan içeri aktarmanız gerekecek, devam etmek istiyor musunuz?", "Uyarı!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    var dialogResult = MessageBox.Show("Yılları değiştirirseniz verileri tekrardan içeri aktarmanız gerekecek, devam etmek istiyor musunuz?",
+                        "Uyarı!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
                     if (dialogResult != DialogResult.Yes)
                     {
                         return;
                     }
                 }
+
+                // Yıl seçimini sıfırla
                 ResetYearSelectionProcessGirdiModulu();
+
+                // Her bir girdiModülü için importedDataTable'ı temizle
                 foreach (var girdiModülü in girdiModülleri.Values)
                 {
-                    //girdiModülü.importedDataTable?.Clear(); // Clear the DataTable if it is not null
                     girdiModülü.importedDataTable = new DataTable();
                 }
+
+                // YearService'deki değerleri sıfırla
+                yearService.SetYears(0, 0);
+
                 dataGridView_girdi.DataSource = null;
             }
             else
             {
-                // selections are completed
+                // Seçimler tamamlandı
                 startYearComboBox.Enabled = false;
                 endYearComboBox.Enabled = false;
-                //veri_listesi_seçimi.Enabled = true;
-                slfStartYear = (int)startYearComboBox.SelectedItem;
-                slfEndYear = (int)endYearComboBox.SelectedItem;
-                MessageBox.Show($"Başlangıç yılı: {slfStartYear}, Bitiş yılı: {slfEndYear}", "Yıllar belirlendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                //yearApproveButton.Enabled = false;
+
+                // Seçilen değerleri al
+                int selectedStartYear = (int)startYearComboBox.SelectedItem;
+                int selectedEndYear = (int)endYearComboBox.SelectedItem;
+
+                // YearService'e değerleri ayarla
+                yearService.SetYears(selectedStartYear, selectedEndYear);
+
+                // Geriye dönük uyumluluk için sınıf değişkenlerini de güncelle
+                slfStartYear = selectedStartYear;
+                slfEndYear = selectedEndYear;
+
+                MessageBox.Show($"Başlangıç yılı: {selectedStartYear}, Bitiş yılı: {selectedEndYear}",
+                    "Yıllar belirlendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
                 yearApproveButton.Text = "Sıfırla";
             }
         }
@@ -4435,6 +4745,10 @@ namespace SLF
             }
             girdiModülü.SlfStartYear = slfStartYear;
             girdiModülü.SlfEndYear = slfEndYear;
+
+            Console.WriteLine($"LastYear: {girdiModülü.lastYear}");
+            Console.WriteLine($"PenultimateYear: {girdiModülü.penultimateYear}");
+            Console.WriteLine($"HorizonYear: {girdiModülü.horizonYear}");
             if (DatabaseManager.GetInstance().IsConnected())
             {
                 try
@@ -4496,6 +4810,18 @@ namespace SLF
             tabloForm.Show();
         }
 
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ProjeEkleButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+
         // ------------------------------------------------------------------------------------- //
 
 
@@ -4526,6 +4852,61 @@ namespace SLF
         }
 
 
+
+        //public class InputDialog : Form
+        //{
+        //    private TextBox textBox;
+        //    private Button buttonOK;
+        //    private Button buttonCancel;
+        //    private Label label;
+
+        //    public string InputText => textBox.Text;
+
+        //    public InputDialog(string title, string promptText)
+        //    {
+        //        this.Text = title;
+
+        //        label = new Label
+        //        {
+        //            Text = promptText,
+        //            AutoSize = true,
+        //            Location = new System.Drawing.Point(12, 9)
+        //        };
+
+        //        textBox = new TextBox
+        //        {
+        //            Location = new System.Drawing.Point(12, 32),
+        //            Size = new System.Drawing.Size(260, 23)
+        //        };
+
+        //        buttonOK = new Button
+        //        {
+        //            Text = "Tamam",
+        //            DialogResult = DialogResult.OK,
+        //            Location = new System.Drawing.Point(116, 70)
+        //        };
+
+        //        buttonCancel = new Button
+        //        {
+        //            Text = "İptal",
+        //            DialogResult = DialogResult.Cancel,
+        //            Location = new System.Drawing.Point(197, 70)
+        //        };
+
+        //        this.Controls.Add(label);
+        //        this.Controls.Add(textBox);
+        //        this.Controls.Add(buttonOK);
+        //        this.Controls.Add(buttonCancel);
+
+        //        this.AcceptButton = buttonOK;
+        //        this.CancelButton = buttonCancel;
+        //        this.ClientSize = new System.Drawing.Size(284, 107);
+        //        this.FormBorderStyle = FormBorderStyle.FixedDialog;
+        //        this.MaximizeBox = false;
+        //        this.MinimizeBox = false;
+        //        this.StartPosition = FormStartPosition.CenterParent;
+        //    }
+        //}
         // -------------------------------------------------------------------------------------------------- //
         // -------------------------------------------------------------------------------------------------- //
 

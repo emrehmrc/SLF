@@ -607,6 +607,8 @@
     <Compile Include="services\DatabaseHelpers.cs" />
     <Compile Include="services\DatabaseManager .cs" />
     <Compile Include="services\IsImportedModule.cs" />
+    <Compile Include="services\PathService.cs" />
+    <Compile Include="services\YearSet.cs" />
     <Compile Include="Tablo_olustur.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -796,6 +798,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="rounded_button.resx">
       <DependentUpon>rounded_button.cs</DependentUpon>
@@ -911,6 +914,7 @@
     <None Include="Pictures\Exterior1.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Pictures\oedaş.jpg" />
     <None Include="Pictures\Next page2.png" />
     <None Include="Pictures\Next page.png" />
     <None Include="Pictures\homepage %281%29.png" />
@@ -931,6 +935,9 @@
     <None Include="Pictures\Double Right.png" />
     <None Include="Pictures\Double Left.png" />
     <None Include="Pictures\gdz.jpg" />
+    <None Include="Pictures\database_icon_yeni.jpg" />
+    <None Include="Pictures\database_deneme_icon.png" />
+    <None Include="Pictures\database-table-icon-11.jpg" />
     <Content Include="Pictures\Home3.png" />
   </ItemGroup>
   <ItemGroup>
