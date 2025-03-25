@@ -275,7 +275,7 @@ namespace SLF
             this.DoubleBuffered = true;
             this.selectedMethod = selectedMethod;  // Store the method
             InitializeComboBoxes();
-
+            CleanupTemporaryFolders();
             // initialize the instance of a CBS form
             cbs = new CBS(this);
 
