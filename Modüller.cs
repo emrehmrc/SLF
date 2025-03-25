@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using System.Data.OleDb;
 using GMap.NET;
 using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
@@ -39,6 +40,8 @@ namespace SLF
         public Tablo_Formu tablo_formu;
         private GirdiModülü girdiModülü;
 
+        private List<DataTable> _yearlyDataTables;
+        private List<int> _years = new List<int> { 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035 };
 
         public List<PointLatLng> rulerPoints_yga = new List<PointLatLng>();
         public List<PointLatLng> rulerPoints_stokastik = new List<PointLatLng>();
@@ -172,13 +175,15 @@ namespace SLF
         private readonly Dictionary<string, List<string>> cityDistricts = new Dictionary<string, List<string>>
 {
     { "İzmir", new List<string> {/* "Aliağa", "Balçova", "Bayındır", "Bayraklı", "Bergama", "Beydağ", "Bornova", "Buca", "Çeşme", */ "Çiğli", /*"Dikili", "Foça", "Gaziemir", "Güzelbahçe", "Karabağlar", "Karaburun", */"Karşıyaka",/* "Kemalpaşa", "Kınık", "Kiraz", "Konak", "Menderes", "Menemen", "Narlıdere", "Ödemiş", "Seferihisar", "Selçuk", "Tire", "Torbalı"*/ } },
-    { "Eskişehir", new List<string> { "Alpu", "Beylikova", "Çifteler", "Günyüzü", "Han", "İnönü", "Mahmudiye", "Mihalgazi", "Mihalıççık", "Odunpazarı", "Sarıcakaya", "Seyitgazi", "Sivrihisar", "Tepebaşı" } }
+    { "Eskişehir", new List<string> { /*"Alpu", "Beylikova", "Çifteler", "Günyüzü", "Han", "İnönü", "Mahmudiye", "Mihalgazi", "Mihalıççık", "Odunpazarı", "Sarıcakaya", "Seyitgazi", "Sivrihisar", */ "Tepebaşı" } }
 };
         private readonly Dictionary<string, string> districtIdMap = new Dictionary<string, string>
 {
     { "Çiğli", "1" },
-    { "Karşıyaka", "2" }
+    { "Karşıyaka", "2" },
+    { "Tepebaşı", "1" }
 };
+
 
         private string SelectedSpeed = "";
         public bool isAddingChargingStation = false; // Sadece şarj istasyonu eklenirken true olacak.
@@ -329,6 +334,9 @@ namespace SLF
             gMapControl_EA.OnMapClick -= gMapControl_Ea_OnMapClick;
             _excelService = new ExcelService();
             InitializeLogTextBox(); // Initialize logTextBox
+
+            _yearlyDataTables = LoadExcelSheets(@"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\çıktı\evcs_monte_carlo_distribution_kumulatif3 - Copy.xlsx"); // From earlier example
+
             //this.DoubleBuffered = true;
             this.selectedMethod = selectedMethod;  // Store the method
             InitializeComboBoxes();
@@ -355,7 +363,36 @@ namespace SLF
 
         }
 
+        private List<DataTable> LoadExcelSheets(string filePath)
+        {
+            List<DataTable> dataTables = new List<DataTable>();
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial; // For EPPlus free use
 
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                foreach (var worksheet in package.Workbook.Worksheets)
+                {
+                    DataTable dt = new DataTable(worksheet.Name);
+                    var headerRow = worksheet.Cells[1, 1, 1, worksheet.Dimension.End.Column];
+                    foreach (var cell in headerRow)
+                    {
+                        dt.Columns.Add(cell.Text);
+                    }
+
+                    for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+                    {
+                        var dataRow = dt.NewRow();
+                        for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+                        {
+                            dataRow[col - 1] = worksheet.Cells[row, col].Text;
+                        }
+                        dt.Rows.Add(dataRow);
+                    }
+                    dataTables.Add(dt);
+                }
+            }
+            return dataTables;
+        }
         // Initialize all form components (called in the constructors)
         private void InitializeComboBoxes()
         {
@@ -1846,7 +1883,7 @@ namespace SLF
                 }
 
                 gMapControl_EA.OnMarkerClick -= gMapControl_EA_OnMarkerClick;
-             //   gMapControl_EA.OnMapClick -= gMapControl_Ea_OnMapClick;
+                //   gMapControl_EA.OnMapClick -= gMapControl_Ea_OnMapClick;
 
                 // Use dataGridView1.DataSource as the DataTable instead of eaDataTable
                 DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
@@ -1856,11 +1893,11 @@ namespace SLF
                     return;
                 }
 
-/*                if (!gMapControl_EA.Overlays.Contains(simulationOverlay) || !gMapControl_EA.Overlays.Contains(cellToolTipOverlay))
-                {
-                    gMapControl_EA.OnMapClick += gMapControl_Ea_OnMapClick;
-                }
-*/
+                /*                if (!gMapControl_EA.Overlays.Contains(simulationOverlay) || !gMapControl_EA.Overlays.Contains(cellToolTipOverlay))
+                                {
+                                    gMapControl_EA.OnMapClick += gMapControl_Ea_OnMapClick;
+                                }
+                */
                 // Check if we are in the process of adding a charging station
                 if (!isAddingChargingStation)
                 {
@@ -1890,10 +1927,11 @@ namespace SLF
                 Cursor = Cursors.Default;
             }
         }
+
         private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
         {
             // Disable buttons and TrackBar to prevent interaction while processing
-           // EAStationAddButton.Enabled = false;
+            // EAStationAddButton.Enabled = false;
             EANewSimulationResultsButton.Enabled = false;
             SimulasyonSonucGoruntule.Enabled = false;
 
@@ -1932,6 +1970,10 @@ namespace SLF
 
                 // Call SimilasyonSonucGoruntule to handle display
                 //SimilasyonSonucGoruntule();
+
+                // Add info message box to inform user of completion
+                MessageBox.Show("Simulation process completed successfully!",
+                    "Process Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -1943,13 +1985,73 @@ namespace SLF
                 if (progressBar != null)
                     progressBar.Visible = false;
                 if (statusLabel != null)
-                    statusLabel.Text = "New simulation process completed";
+                    statusLabel.Text = "Simulation process completed";
 
                 EANewSimulationResultsButton.Enabled = true;
-               // EAStationAddButton.Enabled = true;
+                // EAStationAddButton.Enabled = true;
                 SimulasyonSonucGoruntule.Enabled = true;
             }
         }
+        /*        private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
+                {
+                    // Disable buttons and TrackBar to prevent interaction while processing
+                   // EAStationAddButton.Enabled = false;
+                    EANewSimulationResultsButton.Enabled = false;
+                    SimulasyonSonucGoruntule.Enabled = false;
+
+                    try
+                    {
+                        Cursor = Cursors.WaitCursor;
+                        if (statusLabel != null)
+                        {
+                            statusLabel.Text = "Python script started. This may take a while. Please wait...";
+                            statusLabel.Visible = true;
+                        }
+                        if (progressBar != null)
+                        {
+                            progressBar.Style = ProgressBarStyle.Marquee;
+                            progressBar.Visible = true;
+                        }
+
+                        string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\girdiler\new_buildings_2024_2035.xlsx";
+                        string outputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\çıktı\evcs_monte_carlo_distribution_kumulatif3 - Copy.xlsx";
+
+                        if (!File.Exists(inputFilePath))
+                        {
+                            MessageBox.Show("Input file not found! Please ensure the file is saved correctly.",
+                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        await RunPythonScriptAsync(inputFilePath);
+
+                        if (!File.Exists(outputFilePath))
+                        {
+                            MessageBox.Show("Output file not generated! Please check the Python script.",
+                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        // Call SimilasyonSonucGoruntule to handle display
+                        //SimilasyonSonucGoruntule();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        Cursor = Cursors.Default;
+                        if (progressBar != null)
+                            progressBar.Visible = false;
+                        if (statusLabel != null)
+                            statusLabel.Text = "Simulation process completed";
+
+                        EANewSimulationResultsButton.Enabled = true;
+                       // EAStationAddButton.Enabled = true;
+                        SimulasyonSonucGoruntule.Enabled = true;
+                    }
+                }*/
         // Updated RunPythonScriptAsync to match your paths
         private async Task RunPythonScriptAsync(string inputFilePath)
         {
@@ -2069,6 +2171,9 @@ namespace SLF
                 // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
                 HesaplaMerkezNoktaVeEkle(simulationData);
                 await HaritaUzerindeSimulasyonGosterimi(simulationData);
+                // Assuming you have a DataTable named 'veriTablosu' and a year (e.g., 2023)
+               // await HaritaUzerindeSimulasyonGosterimiWithNewPoints(veriTablosu, 2023);
+
 
                 MessageBox.Show("Veri başarıyla yüklendi.");
             }
@@ -2424,7 +2529,7 @@ namespace SLF
 
             if (SelectedCity == "İzmir" && SelectedSpeed == "Hızlı")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Yüksek.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Yüksek.xlsx";
             }
             else if (SelectedCity == "İzmir" && SelectedSpeed == "Yavaş")
             {
@@ -2432,19 +2537,19 @@ namespace SLF
             }
             else if (SelectedCity == "İzmir" && SelectedSpeed == "Varsayılan")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_baz.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_baz.xlsx";
             }
             else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Hızlı")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Yüksek.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Yüksek.xlsx";
             }
             else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Yavaş")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Düşük.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Düşük.xlsx";
             }
             else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Varsayılan")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_esk_baz.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_esk_baz.xlsx";
             }
             else
             {
@@ -2891,7 +2996,258 @@ namespace SLF
                 return GMarkerGoogleType.orange; // Fallback
             }
         }
+        private Task HaritaUzerindeSimulasyonGosterimiWithNewPoints(DataTable veriTablosu, int year)
+        {
+            // Clear existing overlays and re-add them
+            gMapControl_EA.Overlays.Clear();
+            gMapControl_EA.Overlays.Add(simulationOverlay);
+            gMapControl_EA.Overlays.Add(cellToolTipOverlay);
 
+            Invoke(new Action(() =>
+            {
+                EAPointsLayerCheckBox.Checked = false;
+            }));
+
+            // Create a transparent bitmap for invisible markers
+            Bitmap transparentBitmap = new Bitmap(16, 16);
+            using (Graphics g = Graphics.FromImage(transparentBitmap))
+            {
+                g.Clear(Color.Transparent);
+            }
+
+            foreach (DataRow row in veriTablosu.Rows)
+            {
+                if (row["Enlem"] == DBNull.Value || row["Boylam"] == DBNull.Value) continue;
+
+                double enlem = Convert.ToDouble(row["Enlem"]);
+                double boylam = Convert.ToDouble(row["Boylam"]);
+                string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
+
+                // Get counts for each EV type, defaulting to 0 if null.
+                // The base counts are for the overall EV stations.
+                int acHomeCount = row["AC (Home)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Home)_count"]) : 0;
+                int acWorkCount = row["AC (Work)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Work)_count"]) : 0;
+                int acPublicCount = row["AC (Public)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Public)_count"]) : 0;
+                int fastDcCount = row["Fast DC_count"] != DBNull.Value ? Convert.ToInt32(row["Fast DC_count"]) : 0;
+
+                int totalCount = acHomeCount + acWorkCount + acPublicCount + fastDcCount;
+
+                // Build the detailed tooltip text for all cells
+                string tooltipText = $"Cell: {cellId}\n" +
+                                     $"AC (Home): {acHomeCount}\n" +
+                                     $"AC (Work): {acWorkCount}\n" +
+                                     $"AC (Public): {acPublicCount}\n" +
+                                     $"Fast DC: {fastDcCount}";
+
+                // Determine if there is an increase in EV points for the specified year.
+                // For this example, we assume you have columns that indicate the increase,
+                // e.g., "AC (Home)_increase", "AC (Work)_increase", etc.
+                // You might need to adjust this logic based on your data structure.
+                bool hasNewPoints = false;
+                int newAcHome = row["AC (Home)_increase"] != DBNull.Value ? Convert.ToInt32(row["AC (Home)_increase"]) : 0;
+                int newAcWork = row["AC (Work)_increase"] != DBNull.Value ? Convert.ToInt32(row["AC (Work)_increase"]) : 0;
+                int newAcPublic = row["AC (Public)_increase"] != DBNull.Value ? Convert.ToInt32(row["AC (Public)_increase"]) : 0;
+                int newFastDc = row["Fast DC_increase"] != DBNull.Value ? Convert.ToInt32(row["Fast DC_increase"]) : 0;
+
+                // If any of these are greater than zero, we assume there’s an increase.
+                if (newAcHome > 0 || newAcWork > 0 || newAcPublic > 0 || newFastDc > 0)
+                {
+                    hasNewPoints = true;
+                    // You could also update the tooltip to reflect the new additions.
+                    tooltipText += "\n(New EV points added in " + year + ")";
+                }
+
+                // Choose marker based on if new points were added.
+                if (totalCount == 0)
+                {
+                    // Invisible marker for cells with no overall EV stations.
+                    var invisibleMarker = new GMarkerGoogle(new PointLatLng(enlem, boylam), transparentBitmap)
+                    {
+                        ToolTipText = tooltipText,
+                        ToolTipMode = MarkerTooltipMode.OnMouseOver,
+                        Tag = cellId
+                    };
+                    cellToolTipOverlay.Markers.Add(invisibleMarker);
+                }
+                else
+                {
+                    GMarkerGoogleType markerType;
+                    if (hasNewPoints)
+                    {
+                        // Set a distinct color for new EV points. 
+                        // (Assuming GMarkerGoogleType.purple exists or replace with your custom marker type)
+                        markerType = GMarkerGoogleType.purple;
+                    }
+                    else
+                    {
+                        // Otherwise, use the helper method to determine marker type as before.
+                        markerType = DetermineMarkerType(acHomeCount, acWorkCount, acPublicCount, fastDcCount);
+                    }
+                    var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), markerType)
+                    {
+                        ToolTipMode = MarkerTooltipMode.OnMouseOver,
+                        Tag = cellId,
+                        ToolTipText = tooltipText
+                    };
+                    simulationOverlay.Markers.Add(marker);
+                }
+            }
+
+            // Refresh the map on the UI thread
+            Invoke(new Action(() => gMapControl_EA.Refresh()));
+
+            return Task.CompletedTask;
+        }
+
+        private Task HaritaUzerindeSonYilVeArtisGosterimi(List<DataTable> yillikVeriTablolari, List<int> yillar)
+        {
+            // Validate input
+            if (yillikVeriTablolari.Count != yillar.Count || yillikVeriTablolari.Count == 0)
+                throw new ArgumentException("Number of DataTables must match number of years and be non-empty.");
+
+            // Clear existing overlays
+            gMapControl_EA.Overlays.Clear();
+            gMapControl_EA.Overlays.Add(simulationOverlay);
+            gMapControl_EA.Overlays.Add(cellToolTipOverlay);
+
+            // Uncheck the checkbox on the UI thread
+            Invoke(new Action(() => EAPointsLayerCheckBox.Checked = false));
+
+            // Transparent bitmap for invisible markers
+            Bitmap transparentBitmap = new Bitmap(16, 16);
+            using (Graphics g = Graphics.FromImage(transparentBitmap))
+            {
+                g.Clear(Color.Transparent);
+            }
+
+            // Dictionary to track EV counts per cell across years
+            Dictionary<string, List<int>> cellEvCountsByYear = new Dictionary<string, List<int>>();
+
+            // Process all DataTables to populate cell data for comparison
+            for (int i = 0; i < yillikVeriTablolari.Count; i++)
+            {
+                DataTable veriTablosu = yillikVeriTablolari[i];
+                foreach (DataRow row in veriTablosu.Rows)
+                {
+                    if (row["Enlem"] == DBNull.Value || row["Boylam"] == DBNull.Value) continue;
+
+                    string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
+                    int totalCount = CalculateTotalCount(row);
+
+                    if (!cellEvCountsByYear.ContainsKey(cellId))
+                    {
+                        cellEvCountsByYear[cellId] = new List<int>(new int[yillikVeriTablolari.Count]); // Initialize with zeros
+                    }
+                    cellEvCountsByYear[cellId][i] = totalCount;
+                }
+            }
+
+            // Plot only the latest year's data
+            DataTable latestData = yillikVeriTablolari.Last();
+            int latestYear = yillar.Last();
+
+            foreach (DataRow row in latestData.Rows)
+            {
+                if (row["Enlem"] == DBNull.Value || row["Boylam"] == DBNull.Value) continue;
+
+                double enlem = Convert.ToDouble(row["Enlem"]);
+                double boylam = Convert.ToDouble(row["Boylam"]);
+                string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
+
+                int acHomeCount = row["AC (Home)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Home)_count"]) : 0;
+                int acWorkCount = row["AC (Work)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Work)_count"]) : 0;
+                int acPublicCount = row["AC (Public)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Public)_count"]) : 0;
+                int fastDcCount = row["Fast DC_count"] != DBNull.Value ? Convert.ToInt32(row["Fast DC_count"]) : 0;
+                int totalCount = acHomeCount + acWorkCount + acPublicCount + fastDcCount;
+
+                string tooltipText = $"Cell: {cellId}\n" +
+                                    $"Year: {latestYear}\n" +
+                                    $"AC (Home): {acHomeCount}\n" +
+                                    $"AC (Work): {acWorkCount}\n" +
+                                    $"AC (Public): {acPublicCount}\n" +
+                                    $"Fast DC: {fastDcCount}";
+
+                bool isNewStation = false;
+                int increaseAmount = 0;
+                if (yillikVeriTablolari.Count > 1 && cellEvCountsByYear.ContainsKey(cellId))
+                {
+                    int currentYearIndex = yillikVeriTablolari.Count - 1;
+                    int previousYearIndex = currentYearIndex - 1;
+                    int currentCount = cellEvCountsByYear[cellId][currentYearIndex];
+                    int previousCount = cellEvCountsByYear[cellId][previousYearIndex];
+                    isNewStation = currentCount > previousCount;
+                    increaseAmount = isNewStation ? currentCount - previousCount : 0;
+                    if (isNewStation)
+                    {
+                        tooltipText += $"\nNew Stations Added in {latestYear}: {increaseAmount}";
+                    }
+                }
+
+                if (totalCount == 0)
+                {
+                    // Invisible marker for empty cells
+                    var invisibleMarker = new GMarkerGoogle(new PointLatLng(enlem, boylam), transparentBitmap)
+                    {
+                        ToolTipText = tooltipText,
+                        ToolTipMode = MarkerTooltipMode.OnMouseOver,
+                        Tag = cellId
+                    };
+                    cellToolTipOverlay.Markers.Add(invisibleMarker);
+                }
+                else
+                {
+                    // Use purple for increases, otherwise determine by dominant type
+                    GMarkerGoogleType markerType = isNewStation
+                        ? GMarkerGoogleType.purple_dot // Highlight new stations
+                        : DetermineYearMarkerType(acHomeCount, acWorkCount, acPublicCount, fastDcCount);
+
+                    var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), markerType)
+                    {
+                        ToolTipMode = MarkerTooltipMode.OnMouseOver,
+                        Tag = cellId,
+                        ToolTipText = tooltipText
+                    };
+                    simulationOverlay.Markers.Add(marker);
+                }
+            }
+
+            // Refresh the map on the UI thread
+            Invoke(new Action(() => gMapControl_EA.Refresh()));
+
+            return Task.CompletedTask; // Instead of Task.FromResult(Task.CompletedTask)
+        }
+
+        // Helper method to calculate total count (unchanged)
+        private int CalculateTotalCount(DataRow row)
+        {
+            int acHomeCount = row["AC (Home)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Home)_count"]) : 0;
+            int acWorkCount = row["AC (Work)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Work)_count"]) : 0;
+            int acPublicCount = row["AC (Public)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Public)_count"]) : 0;
+            int fastDcCount = row["Fast DC_count"] != DBNull.Value ? Convert.ToInt32(row["Fast DC_count"]) : 0;
+            return acHomeCount + acWorkCount + acPublicCount + fastDcCount;
+        }
+
+        // Helper method to determine marker type (unchanged from your original)
+        private GMarkerGoogleType DetermineYearMarkerType(int acHomeCount, int acWorkCount, int acPublicCount, int fastDcCount)
+        {
+            int totalCount = acHomeCount + acWorkCount + acPublicCount + fastDcCount;
+            if (totalCount == 0) return GMarkerGoogleType.gray_small; // Not used, but kept for consistency
+
+            var counts = new[]
+            {
+                new { Type = "AC (Home)", Count = acHomeCount },
+                new { Type = "AC (Work)", Count = acWorkCount },
+                new { Type = "AC (Public)", Count = acPublicCount },
+                new { Type = "Fast DC", Count = fastDcCount }
+            };
+            var dominantType = counts.OrderByDescending(c => c.Count).First().Type;
+
+            if (dominantType == "AC (Home)") return GMarkerGoogleType.green;
+            else if (dominantType == "AC (Work)") return GMarkerGoogleType.blue;
+            else if (dominantType == "AC (Public)") return GMarkerGoogleType.yellow;
+            else if (dominantType == "Fast DC") return GMarkerGoogleType.red;
+            else return GMarkerGoogleType.orange; // Fallback
+        }
         /*        private Task HaritaUzerindeSimulasyonGosterimi(DataTable veriTablosu)
                 {
                     // Clear existing overlays and re-add them
@@ -3296,8 +3652,6 @@ namespace SLF
             isAddingDekPoint = false;
         }
 
-
-
         private async void DEKRunSimulationButton_Click(object sender, EventArgs e)
         {
             // Disable buttons and TrackBar to prevent interaction while processing
@@ -3340,6 +3694,10 @@ namespace SLF
 
                 // Call SimilasyonSonucGoruntule to handle display
                 //SimilasyonSonucGoruntule();
+
+                // Add info message box to inform user of completion
+                MessageBox.Show("Simulation process completed successfully!",
+                    "Process Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -3351,13 +3709,74 @@ namespace SLF
                 if (DEKProgressBar != null)
                     DEKProgressBar.Visible = false;
                 if (DEKStatusLabel != null)
-                    DEKStatusLabel.Text = "New simulation process completed";
+                    DEKStatusLabel.Text = "Simulation process completed";
 
                 DEKRunSimulationButton.Enabled = true;
                 DEKSimulasyonSonucGoruntule.Enabled = true;
                 //DEKSimButton.Enabled = true;
             }
         }
+        /*
+                private async void DEKRunSimulationButton_Click(object sender, EventArgs e)
+                {
+                    // Disable buttons and TrackBar to prevent interaction while processing
+                    DEKRunSimulationButton.Enabled = false;
+                    DEKSimulasyonSonucGoruntule.Enabled = false;
+                    //DEKSimButton.Enabled = false;
+
+                    try
+                    {
+                        Cursor = Cursors.WaitCursor;
+                        if (DEKStatusLabel != null)
+                        {
+                            DEKStatusLabel.Text = "Python script started. This may take a while. Please wait...";
+                            DEKStatusLabel.Visible = true;
+                        }
+                        if (DEKProgressBar != null)
+                        {
+                            DEKProgressBar.Style = ProgressBarStyle.Marquee;
+                            DEKProgressBar.Visible = true;
+                        }
+
+                        string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\DELTA_EA_DENEME_IMAR.xlsx";
+                        string outputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek_distribution_2024_2030_İzmir_düşük.xlsx";
+
+                        if (!File.Exists(inputFilePath))
+                        {
+                            MessageBox.Show("Input file not found! Please ensure the file is saved correctly.",
+                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        await RunPythonDEKScriptAsync(inputFilePath);
+
+                        if (!File.Exists(outputFilePath))
+                        {
+                            MessageBox.Show("Output file not generated! Please check the Python script.",
+                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        // Call SimilasyonSonucGoruntule to handle display
+                        //SimilasyonSonucGoruntule();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        Cursor = Cursors.Default;
+                        if (DEKProgressBar != null)
+                            DEKProgressBar.Visible = false;
+                        if (DEKStatusLabel != null)
+                            DEKStatusLabel.Text = "New simulation process completed";
+
+                        DEKRunSimulationButton.Enabled = true;
+                        DEKSimulasyonSonucGoruntule.Enabled = true;
+                        //DEKSimButton.Enabled = true;
+                    }
+                }*/
         // Updated RunPythonScriptAsync to match your paths
         private async Task RunPythonDEKScriptAsync(string inputFilePath)
         {
@@ -3693,27 +4112,27 @@ namespace SLF
 
             if (SelectedCity == "İzmir" && SelectedSpeed == "Hızlı")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\İzmir\dek_distribution_2024_2030_İzmir_yüksek.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\DEK\İzmir\dek_distribution_2024_2030_İzmir_yüksek.xlsx";
             }
             else if (SelectedCity == "İzmir" && SelectedSpeed == "Yavaş")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\99_Free Work Area\ArdaS\senaryolar\DEK\İzmir\dek_distribution_2024_2030_İzmir_düşük.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\DEK\İzmir\dek_distribution_2024_2030_İzmir_düşük.xlsx";
             }
             else if (SelectedCity == "İzmir" && SelectedSpeed == "varsayılan")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\DEK\İzmir\dek_distribution_2024_2030_3_İzmir_baz.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\DEK\İzmir\dek_distribution_2024_2030_3_İzmir_baz.xlsx";
             }
             else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Hızlı")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_baz.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_yüksek.xlsx";
             }
             else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Yavaş")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_düşük.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_düşük.xlsx";
             }
             else if (SelectedCity == "Eskişehir" && SelectedSpeed == "varsayılan")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_yüksek.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_baz.xlsx";
             }
             else
             {
@@ -3827,7 +4246,7 @@ namespace SLF
             };
 
             popupForm.Controls.Add(dataGridView);
-            popupForm.Show(); // Yeni pencereyi göster
+           // popupForm.Show(); // Yeni pencereyi göster
         }
 
         private void dekSimMinBtn_CheckedChanged(object sender, EventArgs e)

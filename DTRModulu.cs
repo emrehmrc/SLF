@@ -658,7 +658,7 @@ namespace SLF
                     bool isInvalid = false;
 
                     // Special handling for TRAFO_KURULUM_TARIHI
-                    if (column.ColumnName == "TRAFO_KURULUM_TARIHI")
+/*                    if (column.ColumnName == "TRAFO_KURULUM_TARIHI")
                     {
                         if (string.IsNullOrEmpty(value) || row.IsNull(column) || !DateTime.TryParseExact(value, "dd.MM.yyyy", null, System.Globalization.DateTimeStyles.None, out _))
                         {
@@ -670,7 +670,7 @@ namespace SLF
                     else if (IsNullLike(value) || (isZeroCheck && float.TryParse(value, out float numValue) && numValue == 0))
                     {
                         isInvalid = true;
-                    }
+                    }*/
 
                     if (isInvalid)
                     {
@@ -1726,10 +1726,10 @@ namespace SLF
                             : $"geçersiz format (non-numeric: '{demand_value}')";
                         errorDataTable.Rows.Add(new object[]
                         {
-                    tuketimColumn,
-                    "Imputation Uyarısı",
-                    "0%",
-                    $"Satır {missingIndex} için {demandColumn} {errorDetail}; {tuketimColumn} sıfıra ayarlandı."
+                            tuketimColumn,
+                            "Imputation Uyarısı",
+                            "0%",
+                            $"Satır {missingIndex} için {demandColumn} {errorDetail}; {tuketimColumn} sıfıra ayarlandı."
                         });
                     }
                     else
@@ -1740,10 +1740,10 @@ namespace SLF
                             imputedValue = 0; // Ensure final value is non-negative
                             errorDataTable.Rows.Add(new object[]
                             {
-                        tuketimColumn,
-                        "Imputation Uyarısı",
-                        "0%",
-                        $"Satır {missingIndex} için hesaplanan {tuketimColumn} değeri negatif ({imputedValue}); sıfıra ayarlandı."
+                                tuketimColumn,
+                                "Imputation Uyarısı",
+                                "0%",
+                                $"Satır {missingIndex} için hesaplanan {tuketimColumn} değeri negatif ({imputedValue}); sıfıra ayarlandı."
                             });
                         }
                     }
@@ -1753,10 +1753,10 @@ namespace SLF
                 {
                     errorDataTable.Rows.Add(new object[]
                     {
-                tuketimColumn,
-                "Geçersiz İndeks",
-                "0%",
-                $"İndeks {missingIndex} geçerli aralıkta değil; {tuketimColumn} için imputation uygulanamadı."
+                        tuketimColumn,
+                        "Geçersiz İndeks",
+                        "0%",
+                        $"İndeks {missingIndex} geçerli aralıkta değil; {tuketimColumn} için imputation uygulanamadı."
                     });
                 }
             }

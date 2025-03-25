@@ -89,7 +89,7 @@ namespace SLF
             // Add row indices from different columns to the combined list
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["TESISAT_NO"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["TESISAT_DUPLICATE"]);
-            if(trafoKoduRemoveFlag)
+            if (trafoKoduRemoveFlag)
             {
                 combinedRowsToRemoveList.AddRange(columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"]);
             }
@@ -207,10 +207,9 @@ namespace SLF
                 }
             }
         }
-
         private void ReportNullCounts()
         {
-            float nullPercentage = 0.0f;
+            float percentage = 0.0f;
             int totalRows = currentDataTable.Rows.Count;
 
             foreach (DataColumn column in currentDataTable.Columns)
@@ -220,35 +219,430 @@ namespace SLF
                     continue;
                 }
 
-                List<int> nullRows = new List<int>();
+                List<int> invalidRows = new List<int>();
+                int invalidCount = 0;
 
-                int nullCount = 0;
-
-                for (int i = 0; i < totalRows; i++)
+                // Delegate to specialized functions for specific columns
+                if (column.ColumnName == "BAGLANDIGI_TRAFO_KODU")
                 {
-                    var row = currentDataTable.Rows[i];
-                    if (IsNullLike(row[column]))
+                    TrafoKoduImpute(); // Handle BAGLANDIGI_TRAFO_KODU separately
+                    continue;
+                }
+                else if (column.ColumnName == "BAGLANTI_GUCU")
+                {
+                    for (int i = 0; i < totalRows; i++)
                     {
-                        nullCount++;
-                        // Add the row number and the null-like value to the nullRows
-                        nullRows.Add(i);
+                        var row = currentDataTable.Rows[i];
+                        if (IsNullLike(row[column]))
+                        {
+                            invalidCount++;
+                            invalidRows.Add(i);
+                        }
+                        else
+                        {
+                            if (double.TryParse(row[column].ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+                            {
+                                if (value <= 0)
+                                {
+                                    invalidCount++;
+                                    invalidRows.Add(i);
+                                }
+                            }
+                            else
+                            {
+                                invalidCount++;
+                                invalidRows.Add(i);
+                            }
+                        }
+                    }
+
+                    columnNullRowsMap[column.ColumnName] = invalidRows;
+
+                    percentage = (float)invalidCount / totalRows;
+
+                    if (percentage > 0)
+                    {
+                        const float errorThreshold = 0.4f; // 40%
+
+                        if (percentage > errorThreshold)
+                        {
+                            string errorMessage = $"Hata Mesajı: Kullanıcıya %40’dan fazla oranda Abone Bağlantı Gücü yok veya 0’dan küçük hatası. (Satır: {string.Join(", ", invalidRows)})";
+                            errorDataTable.Rows.Add(new object[]
+                            {
+                        column.ColumnName,
+                        "Bağlantı Gücü",
+                        $"{percentage:P1}",
+                        errorMessage
+                            });
+                        }
+                        else
+                        {
+                            string warningMessage = $"Düzeltilecekler Mesajı: Kullanıcıya Abone Bağlantı Gücü NULL veya geçersiz olan verilere imputasyon uygulanacaktır. (Satır: {string.Join(", ", invalidRows)})";
+                            warningDataTable.Rows.Add(new object[]
+                            {
+                        column.ColumnName,
+                        "Bağlantı Gücü",
+                        $"{percentage:P1}",
+                        warningMessage
+                            });
+                        }
                     }
                 }
-
-                columnNullRowsMap[column.ColumnName] = nullRows;
-
-                nullPercentage = (float)nullCount / totalRows;
-
-                if (nullPercentage > 0)
+                else if (column.ColumnName == "TESISAT_NO")
                 {
-                    var thresholds = nullFieldsCheckWithLevel[column.ColumnName];
-                    var datatableLevel = GetDataTableBasedOnThreshold(nullPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
-                    datatableLevel.Rows.Add(new object[] {
-                        column.ColumnName, "Null değer", $"{nullPercentage:P1}"
-                    });
+                    for (int i = 0; i < totalRows; i++)
+                    {
+                        var row = currentDataTable.Rows[i];
+                        var tesisatNo = Convert.ToString(row[column]);
+                        if (IsNullLike(tesisatNo) || tesisatNo == "0")
+                        {
+                            invalidCount++;
+                            invalidRows.Add(i);
+                        }
+                        else
+                        {
+                            if (!int.TryParse(tesisatNo, out int value) || value <= 0)
+                            {
+                                invalidCount++;
+                                invalidRows.Add(i);
+                            }
+                        }
+                    }
+
+                    columnNullRowsMap[column.ColumnName] = invalidRows;
+
+                    percentage = (float)invalidCount / totalRows;
+
+                    if (percentage > 0)
+                    {
+                        const float errorThreshold = 0.2f; // 20%
+
+                        if (percentage >= errorThreshold)
+                        {
+                            string errorMessage = $"Hata Mesajı: Kullanıcıya %20’den fazla oranda Abone Bağlantı Grubu verisi yok, hatalı veri. (Satır: {string.Join(", ", invalidRows)})";
+                            errorDataTable.Rows.Add(new object[]
+                            {
+                        column.ColumnName,
+                        "Tesisat No",
+                        $"{percentage:P1}",
+                        errorMessage
+                            });
+                        }
+                        else
+                        {
+                            string warningMessage = $"Silinecekler Mesajı: Kullanıcıya Tesisat No 0, NULL veya geçersiz formatta olan veriler silindi uyarısı verilir. (Satır: {string.Join(", ", invalidRows)})";
+                            warningDataTable.Rows.Add(new object[]
+                            {
+                        column.ColumnName,
+                        "Geçersiz Tesisat No",
+                        $"{percentage:P1}",
+                        warningMessage
+                            });
+                        }
+                    }
+                }
+                else if (column.ColumnName == "ABONE_GRUBU")
+                {
+                    for (int i = 0; i < totalRows; i++)
+                    {
+                        var row = currentDataTable.Rows[i];
+                        if (IsNullLike(row[column]))
+                        {
+                            invalidCount++;
+                            invalidRows.Add(i);
+                        }
+                    }
+
+                    columnNullRowsMap[column.ColumnName] = invalidRows;
+
+                    percentage = (float)invalidCount / totalRows;
+
+                    if (percentage > 0)
+                    {
+                        const float errorThreshold = 0.2f; // 20%
+
+                        if (percentage > errorThreshold)
+                        {
+                            string errorMessage = $"Hata Mesajı: Kullanıcıya %20’den fazla oranda {column.ColumnName} verisi yok. hatalı veri. (Satır: {string.Join(", ", invalidRows)})";
+                            errorDataTable.Rows.Add(new object[]
+                            {
+                        column.ColumnName,
+                        "Abone Grubu",
+                        $"{percentage:P1}",
+                        errorMessage
+                            });
+                        }
+                        else
+                        {
+                            string warningMessage = $"Düzeltilecekler Mesajı: Kullanıcıya Abone Grubu NULL olan verilerin oranı uygun yöntemlerle doldurulacaktır. (Satır: {string.Join(", ", invalidRows)})";
+                            warningDataTable.Rows.Add(new object[]
+                            {
+                        column.ColumnName,
+                        "Abone Grubu",
+                        $"{percentage:P1}",
+                        warningMessage
+                            });
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < totalRows; i++)
+                    {
+                        var row = currentDataTable.Rows[i];
+                        if (IsNullLike(row[column]))
+                        {
+                            invalidCount++;
+                            invalidRows.Add(i);
+                        }
+                    }
+
+                    columnNullRowsMap[column.ColumnName] = invalidRows;
+
+                    percentage = (float)invalidCount / totalRows;
+
+                    if (percentage > 0)
+                    {
+                        var thresholds = nullFieldsCheckWithLevel[column.ColumnName];
+                        var datatableLevel = GetDataTableBasedOnThreshold(percentage, thresholds.warningThreshold, thresholds.errorThreshold);
+                        datatableLevel.Rows.Add(new object[] {
+                    column.ColumnName, "Null değer", $"{percentage:P1}"
+                });
+                    }
                 }
             }
         }
+        /*        private void ReportNullCounts()
+                {
+                    float percentage = 0.0f;
+                    int totalRows = currentDataTable.Rows.Count;
+
+                    foreach (DataColumn column in currentDataTable.Columns)
+                    {
+                        if (!nullFieldsCheckWithLevel.ContainsKey(column.ColumnName))
+                        {
+                            continue;
+                        }
+
+                        List<int> invalidRows = new List<int>();
+                        int invalidCount = 0;
+
+                        if (column.ColumnName == "BAGLANTI_GUCU")
+                        {
+                            for (int i = 0; i < totalRows; i++)
+                            {
+                                var row = currentDataTable.Rows[i];
+                                if (IsNullLike(row[column]))
+                                {
+                                    invalidCount++;
+                                    invalidRows.Add(i);
+                                }
+                                else
+                                {
+                                    if (double.TryParse(row[column].ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+                                    {
+                                        if (value <= 0)
+                                        {
+                                            invalidCount++;
+                                            invalidRows.Add(i);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        invalidCount++;
+                                        invalidRows.Add(i);
+                                    }
+                                }
+                            }
+
+                            columnNullRowsMap[column.ColumnName] = invalidRows;
+
+                            percentage = (float)invalidCount / totalRows;
+
+                            if (percentage > 0)
+                            {
+                                const float errorThreshold = 0.4f; // 40%
+
+                                if (percentage > errorThreshold)
+                                {
+                                    string errorMessage = $"Hata Mesajı: Kullanıcıya %40’dan fazla oranda Abone Bağlantı Gücü yok veya 0’dan küçük hatası. (Satır: {string.Join(", ", invalidRows)})";
+                                    errorDataTable.Rows.Add(new object[]
+                                    {
+                                        column.ColumnName,
+                                        "Bağlantı Gücü",
+                                        $"{percentage:P1}",
+                                        errorMessage
+                                    });
+                                }
+                                else
+                                {
+                                    string warningMessage = $"Düzeltilecekler Mesajı: Kullanıcıya Abone Bağlantı Gücü NULL veya geçersiz olan verilere imputasyon uygulanacaktır. (Satır: {string.Join(", ", invalidRows)})";
+                                    warningDataTable.Rows.Add(new object[]
+                                    {
+                                        column.ColumnName,
+                                        "Bağlantı Gücü",
+                                        $"{percentage:P1}",
+                                        warningMessage
+                                    });
+                                }
+                            }
+                        }
+                        else if (column.ColumnName == "TESISAT_NO")
+                        {
+                            // Special handling for TESISAT_NO to check for NULL, "0", or invalid format
+                            for (int i = 0; i < totalRows; i++)
+                            {
+                                var row = currentDataTable.Rows[i];
+                                var tesisatNo = row[column]?.ToString();
+                                if (IsNullLike(tesisatNo) || tesisatNo == "0")
+                                {
+                                    invalidCount++;
+                                    invalidRows.Add(i);
+                                }
+                                else
+                                {
+                                    // Check for invalid format: must be a positive integer
+                                    if (!int.TryParse(tesisatNo, out int value) || value <= 0)
+                                    {
+                                        invalidCount++;
+                                        invalidRows.Add(i);
+                                    }
+                                }
+                            }
+
+                            columnNullRowsMap[column.ColumnName] = invalidRows;
+
+                            percentage = (float)invalidCount / totalRows;
+
+                            if (percentage > 0)
+                            {
+                                const float errorThreshold = 0.2f; // 20%
+
+                                if (percentage >= errorThreshold)
+                                {
+                                    string errorMessage = $"Hata Mesajı: Kullanıcıya %20’den fazla oranda Tesisat No verisi yok, hatalı veri. (Satır: {string.Join(", ", invalidRows)})";
+                                    errorDataTable.Rows.Add(new object[]
+                                    {
+                                        column.ColumnName,
+                                        "Tesisat No",
+                                        $"{percentage:P1}",
+                                        errorMessage
+                                    });
+                                }
+                                else
+                                {
+                                    string warningMessage = $"Silinecekler Mesajı: Kullanıcıya Tesisat No 0, NULL veya geçersiz formatta olan veriler silinecektir. (Satır: {string.Join(", ", invalidRows)})";
+                                    warningDataTable.Rows.Add(new object[]
+                                    {
+                                        column.ColumnName,
+                                        "Geçersiz Tesisat No", // Changed description to indicate invalidity
+                                        $"{percentage:P1}",
+                                        warningMessage
+                                    });
+                                    // Rows are already added to columnNullRowsMap["TESISAT_NO"], which will be deleted in Remove
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Existing logic for other columns (including ABONE_GRUBU)
+                            for (int i = 0; i < totalRows; i++)
+                            {
+                                var row = currentDataTable.Rows[i];
+                                if (IsNullLike(row[column]))
+                                {
+                                    invalidCount++;
+                                    invalidRows.Add(i);
+                                }
+                            }
+
+                            columnNullRowsMap[column.ColumnName] = invalidRows;
+
+                            percentage = (float)invalidCount / totalRows;
+
+                            if (percentage > 0)
+                            {
+                                if (column.ColumnName == "ABONE_GRUBU")
+                                {
+                                    const float errorThreshold = 0.2f; // 20%
+
+                                    if (percentage > errorThreshold)
+                                    {
+                                        string errorMessage = $"Hata Mesajı: Kullanıcıya %20’den fazla oranda {column.ColumnName} verisi yok. hatalı veri. (Satır: {string.Join(", ", invalidRows)})";
+                                        errorDataTable.Rows.Add(new object[]
+                                        {
+                                            column.ColumnName,
+                                            "Abone Grubu",
+                                            $"{percentage:P1}",
+                                            errorMessage
+                                        });
+                                    }
+                                    else
+                                    {
+                                        string warningMessage = $"Düzeltilecekler Mesajı: Kullanıcıya Abone Grubu NULL olan verilerin oranı uygun yöntemlerle doldurulacaktır. (Satır: {string.Join(", ", invalidRows)})";
+                                        warningDataTable.Rows.Add(new object[]
+                                        {
+                                            column.ColumnName,
+                                            "Abone Grubu",
+                                            $"{percentage:P1}",
+                                            warningMessage
+                                        });
+                                    }
+                                }
+                                else
+                                {
+                                    var thresholds = nullFieldsCheckWithLevel[column.ColumnName];
+                                    var datatableLevel = GetDataTableBasedOnThreshold(percentage, thresholds.warningThreshold, thresholds.errorThreshold);
+                                    datatableLevel.Rows.Add(new object[] {
+                                        column.ColumnName, "Null değer", $"{percentage:P1}"
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }*/
+
+        /*        private void ReportNullCounts()
+                {
+                    float nullPercentage = 0.0f;
+                    int totalRows = currentDataTable.Rows.Count;
+
+                    foreach (DataColumn column in currentDataTable.Columns)
+                    {
+                        if (!nullFieldsCheckWithLevel.ContainsKey(column.ColumnName))
+                        {
+                            continue;
+                        }
+
+                        List<int> nullRows = new List<int>();
+
+                        int nullCount = 0;
+
+                        for (int i = 0; i < totalRows; i++)
+                        {
+                            var row = currentDataTable.Rows[i];
+                            if (IsNullLike(row[column]))
+                            {
+                                nullCount++;
+                                // Add the row number and the null-like value to the nullRows
+                                nullRows.Add(i);
+                            }
+                        }
+
+                        columnNullRowsMap[column.ColumnName] = nullRows;
+
+                        nullPercentage = (float)nullCount / totalRows;
+
+                        if (nullPercentage > 0)
+                        {
+                            var thresholds = nullFieldsCheckWithLevel[column.ColumnName];
+                            var datatableLevel = GetDataTableBasedOnThreshold(nullPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+                            datatableLevel.Rows.Add(new object[] {
+                                column.ColumnName, "Null değer", $"{nullPercentage:P1}"
+                            });
+                        }
+                    }
+                }*/
         private void ReportSanalCounts()
         {
             float nullPercentage = 0.0f;
@@ -352,11 +746,20 @@ namespace SLF
                 // HashSet to store unique values in the current column
                 var uniqueValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 var duplicateRowIndices = new List<int>();
+                int nonNullOrEmptyCount = 0; // Count of rows with non-NULL, non-empty values
 
                 for (int i = 0; i < currentDataTable.Rows.Count; i++)
                 {
                     var row = currentDataTable.Rows[i];
-                    var value = row[column]?.ToString() ?? string.Empty;
+                    var value = row[column]?.ToString();
+
+                    // Skip NULL or empty values
+                    if (IsNullLike(value))
+                    {
+                        continue;
+                    }
+
+                    nonNullOrEmptyCount++; // Increment count of valid rows
 
                     if (uniqueValues.Contains(value))
                     {
@@ -368,21 +771,109 @@ namespace SLF
 
                 columnNullRowsMap["TESISAT_DUPLICATE"] = duplicateRowIndices;
 
-                // Calculate the number of unique values and duplicates
-                int totalCount = currentDataTable.Rows.Count;
+                // Calculate the number of unique values and duplicates among non-NULL, non-empty rows
                 int uniqueCount = uniqueValues.Count;
-                int duplicateCount = totalCount - uniqueCount;
-                duplicatePercentage = (float)duplicateCount / totalCount;
+                int duplicateCount = nonNullOrEmptyCount - uniqueCount;
+                duplicatePercentage = nonNullOrEmptyCount > 0 ? (float)duplicateCount / nonNullOrEmptyCount : 0.0f;
 
                 if (duplicateCount > 0)
                 {
                     // Append the column name and unique count to the report message
+                    string warningMessage = $"Silinecekler Mesajı: {column.ColumnName} sütununda mükerrer veriler silinecektir. (Satır: {string.Join(", ", duplicateRowIndices)})";
                     warningDataTable.Rows.Add(new object[] {
-                        column.ColumnName, "Mükerrer hücre değerleri", $"{duplicatePercentage:P1}"
-                    });
+                column.ColumnName, "Mükerrer hücre değerleri", $"{duplicatePercentage:P1}", warningMessage
+            });
                 }
             }
         }
+        /*        private void ReportDuplicateCounts()
+                {
+                    float duplicatePercentage;
+                    foreach (DataColumn column in currentDataTable.Columns)
+                    {
+                        if (!duplicateFieldsGivingError.Contains(column.ColumnName))
+                        {
+                            continue;
+                        }
+                        // HashSet to store unique values in the current column
+                        var uniqueValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        var duplicateRowIndices = new List<int>();
+
+                        for (int i = 0; i < currentDataTable.Rows.Count; i++)
+                        {
+                            var row = currentDataTable.Rows[i];
+                            var value = row[column]?.ToString() ?? string.Empty;
+
+                            if (uniqueValues.Contains(value))
+                            {
+                                duplicateRowIndices.Add(i);
+                            }
+
+                            uniqueValues.Add(value);
+                        }
+
+                        columnNullRowsMap["TESISAT_DUPLICATE"] = duplicateRowIndices;
+
+                        // Calculate the number of unique values and duplicates
+                        int totalCount = currentDataTable.Rows.Count;
+                        int uniqueCount = uniqueValues.Count;
+                        int duplicateCount = totalCount - uniqueCount;
+                        duplicatePercentage = (float)duplicateCount / totalCount;
+
+                        if (duplicateCount > 0)
+                        {
+                            // Append the column name and unique count to the report message
+                            string warningMessage = $"Silinecekler Mesajı:  {column.ColumnName} sütununda mükerrer veriler silinecektir. (Satır: {string.Join(", ", duplicateRowIndices)})";
+                            warningDataTable.Rows.Add(new object[] {
+                        column.ColumnName, "Mükerrer hücre değerleri", $"{duplicatePercentage:P1}", warningMessage
+                    });
+                        }
+                    }
+                }*/
+
+        /*        private void ReportDuplicateCounts()
+                {
+                    float duplicatePercentage;
+                    foreach (DataColumn column in currentDataTable.Columns)
+                    {
+                        if (!duplicateFieldsGivingError.Contains(column.ColumnName))
+                        {
+                            continue;
+                        }
+                        // HashSet to store unique values in the current column
+                        var uniqueValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        var duplicateRowIndices = new List<int>();
+
+                        for (int i = 0; i < currentDataTable.Rows.Count; i++)
+                        {
+                            var row = currentDataTable.Rows[i];
+                            var value = row[column]?.ToString() ?? string.Empty;
+
+                            if (uniqueValues.Contains(value))
+                            {
+                                duplicateRowIndices.Add(i);
+                            }
+
+                            uniqueValues.Add(value);
+                        }
+
+                        columnNullRowsMap["TESISAT_DUPLICATE"] = duplicateRowIndices;
+
+                        // Calculate the number of unique values and duplicates
+                        int totalCount = currentDataTable.Rows.Count;
+                        int uniqueCount = uniqueValues.Count;
+                        int duplicateCount = totalCount - uniqueCount;
+                        duplicatePercentage = (float)duplicateCount / totalCount;
+
+                        if (duplicateCount > 0)
+                        {
+                            // Append the column name and unique count to the report message
+                            warningDataTable.Rows.Add(new object[] {
+                                column.ColumnName, "Mükerrer hücre değerleri", $"{duplicatePercentage:P1}"
+                            });
+                        }
+                    }
+                }*/
 
         private void ReportCoordinatesOutOfLimits()
         {
@@ -420,134 +911,7 @@ namespace SLF
                 });
             }
         }
-        /*        private void ReportErrorLessThanZero()
-                {
-                    float nonPositivePercentage, nonLastYearPercentage;
-                    int totalRows = currentDataTable.Rows.Count;
-                    var column = currentDataTable.Columns[$"YIL_TUKETIM_{lastYear}"];
-                    var fallbackColumn = currentDataTable.Columns[$"YIL_TUKETIM_{penultimateYear}"];
-                    var nullRows = new List<int>();
-                    var imputableRows = new List<int>();
 
-                    int nonPositiveCount = 0;
-                    int nonLastYearCount = 0;
-
-                    foreach (DataRow row in currentDataTable.Rows)
-                    {
-                        int rowIndex = currentDataTable.Rows.IndexOf(row);
-                        string valueString = row[column]?.ToString();
-
-                        // Check for NULL or null-like strings
-                        if (row.IsNull(column) ||
-                            row[column] == DBNull.Value ||
-                            nullLikeStrings.Contains(valueString, StringComparer.OrdinalIgnoreCase))
-                        {
-                            nonPositiveCount++;
-                            nullRows.Add(rowIndex);
-                        }
-                        // Check for invalid formats (non-numeric values)
-                        else if (!float.TryParse(valueString, out float value))
-                        {
-                            nonPositiveCount++;
-                            nullRows.Add(rowIndex);
-                        }
-                        // Check for negative values
-                        else if (value < 0)
-                        {
-                            nonPositiveCount++;
-                            nullRows.Add(rowIndex);
-                        }
-
-                        // If the last year's consumption data is problematic, check the previous year's data
-                        if (nullRows.Contains(rowIndex)) // Row already flagged as non-positive
-                        {
-                            string fallbackValueString = row[fallbackColumn]?.ToString();
-                            if (row.IsNull(fallbackColumn) ||
-                                row[fallbackColumn] == DBNull.Value ||
-                                nullLikeStrings.Contains(fallbackValueString, StringComparer.OrdinalIgnoreCase) ||
-                                (float.TryParse(fallbackValueString, out float fallbackValue) && fallbackValue < 0))
-                            {
-                                // Already counted in nonPositiveCount above
-                            }
-                            else if (row["SOZLESME_DURUMU"].ToString() == SOZ_DVM)
-                            {
-                                nonLastYearCount++;
-                                imputableRows.Add(rowIndex);
-                            }
-                        }
-                    }
-
-                    columnNullRowsMap[column.ColumnName] = nullRows;
-                    imputableRowsMap[column.ColumnName] = imputableRows;
-                    nonPositivePercentage = (float)nonPositiveCount / totalRows;
-                    nonLastYearPercentage = (float)nonLastYearCount / totalRows;
-
-                    if (nonPositivePercentage > 0)
-                    {
-                        var thresholds = TUKETIM_ERROR_THRESHOLD;
-                        var datatableLevel = GetDataTableBasedOnThreshold(nonPositivePercentage, thresholds.warningThreshold, thresholds.errorThreshold);
-
-                        // Customize message based on the type of issue
-                        string issueDetails = "";
-                        if (nonPositiveCount > 0)
-                        {
-                            // Collect counts and row indices for each issue type
-                            int nullCount = 0;
-                            int negativeCount = 0;
-                            int invalidCount = 0;
-                            var allInvalidRows = new List<int>(nullRows); // All rows with issues
-
-                            foreach (int r in nullRows)
-                            {
-                                var row = currentDataTable.Rows[r];
-                                string valueString = row[column]?.ToString();
-                                if (row.IsNull(column) || row[column] == DBNull.Value || nullLikeStrings.Contains(valueString, StringComparer.OrdinalIgnoreCase))
-                                {
-                                    nullCount++;
-                                }
-                                else if (float.TryParse(valueString, out float value) && value < 0)
-                                {
-                                    negativeCount++;
-                                }
-                                else if (!float.TryParse(valueString, out _))
-                                {
-                                    invalidCount++;
-                                }
-                            }
-
-                            // Build the issue details with counts and all row numbers
-                            issueDetails = $" (NULL: {nullCount}, Negatif: {negativeCount}, Geçersiz Format: {invalidCount}, Satır: {string.Join(", ", allInvalidRows)}";
-                            //if (allInvalidRows.Count > 5) issueDetails += "...";
-                            //issueDetails += ")";
-                        }
-
-                        // Differentiate message based on threshold level
-                        string message;
-                        if (nonPositivePercentage >= thresholds.errorThreshold) // >= 20%
-                        {
-                            message = $"Hata: {nonPositivePercentage:P1} oranında {column.ColumnName} değerleri eksik veya geçersiz{issueDetails}. Değerler sayısal ve sıfırdan büyük olmalıdır. Bu oran analizleri etkileyebilir, lütfen verileri kontrol edin.";
-                        }
-                        else // < 20%
-                        {
-                            message = $"Uyarı: {nonPositivePercentage:P1} oranında {column.ColumnName} değerleri eksik veya geçersiz{issueDetails}. Değerler sayısal ve sıfırdan büyük olmalıdır. Bu abonelerin verileri silinecek.";
-                        }
-
-                        datatableLevel.Rows.Add(new object[] {
-                    column.ColumnName,
-                            "Son yıl tüketim verisi",
-                            message
-                });
-                    }
-                    if (nonLastYearPercentage > 0)
-                    {
-                        warningDataTable.Rows.Add(new object[] {
-                    column.ColumnName, 
-                            "Son yıl tüketim verisi",
-                            $"{nonLastYearPercentage:P1}", 
-                            "Bu abonelerin son yıl tüketim verisi yok. Tüketim verileri geçmiş veriler ile doldurulacak."
-                });
-                    }
-                }*/
         private void ReportErrorLessThanZero()
         {
             float nonPositivePercentage, nonLastYearPercentage;
@@ -624,7 +988,7 @@ namespace SLF
                 var datatableLevel = GetDataTableBasedOnThreshold(nonPositivePercentage, thresholds.warningThreshold, thresholds.errorThreshold);
 
                 datatableLevel.Rows.Add(new object[] {
-            column.ColumnName, "Son yıl tüketim verisi", $"{nonPositivePercentage:P1} abonenin tüketim verisi yok",
+            column.ColumnName, "Son yıl tüketim verisi", $"{nonPositivePercentage:P1} abonenin tüketim ve imputasyon verisi yok",
             "Bu abonelerin tüketim verileri silinecek."
         });
             }
@@ -635,69 +999,63 @@ namespace SLF
         });
             }
         }
-        /*        private void ReportErrorLessThanZero()
+                private void AboneKapasiteCheck()
                 {
-                    float nonPositivePercentage, nonLastYearPercentage;
+                    // yillik tuketim / 8760 / baglanti gucu
+                    int overCapacityCount = 0;
                     int totalRows = currentDataTable.Rows.Count;
-                    var column = currentDataTable.Columns[$"YIL_TUKETIM_{lastYear}"];
-                    var fallbackColumn = currentDataTable.Columns[$"YIL_TUKETIM_{penultimateYear}"];
+                    var lastYearTuketim = currentDataTable.Columns[$"YIL_TUKETIM_{lastYear}"];
                     var nullRows = new List<int>();
-                    var imputableRows = new List<int>();
-
-                    int nonPositiveCount = 0;
-                    int nonLastYearCount = 0;
+                    var invalidKapasiteRows = new List<int>(); // To track rows with invalid kapasite values
 
                     foreach (DataRow row in currentDataTable.Rows)
                     {
-                        if (
-                            row.IsNull(column) ||
-                            row[column] == DBNull.Value ||
-                            nullLikeStrings.Contains(row[column]?.ToString(), StringComparer.OrdinalIgnoreCase) ||
-                            float.TryParse(row[column]?.ToString(), out float value) && value < 0)
+                        if (float.TryParse(row[lastYearTuketim]?.ToString(), out float tuketim) && tuketim > 0)
                         {
-                            // If the last year's consumption data is missing or less than or equal to zero, check the previous year's data
-                            if (row.IsNull(fallbackColumn) ||
-                                row[fallbackColumn] == DBNull.Value ||
-                                nullLikeStrings.Contains(row[fallbackColumn]?.ToString(), StringComparer.OrdinalIgnoreCase) ||
-                                float.TryParse(row[fallbackColumn]?.ToString(), out float fallbackValue) && fallbackValue < 0
-                            )
+                            var baglantiGucu = row["BAGLANTI_GUCU"];
+                            if (float.TryParse(baglantiGucu?.ToString(), out float guc) && guc > 0)
                             {
-                                nonPositiveCount++;
-                                nullRows.Add(currentDataTable.Rows.IndexOf(row));
-                            }
-                            else if (row["SOZLESME_DURUMU"].ToString() == SOZ_DVM)
-                            {
-                                nonLastYearCount++;
-                                imputableRows.Add(currentDataTable.Rows.IndexOf(row));
+                                float kapasite = (tuketim / HoursInYear) / guc;
+
+                                // Format check for kapasite
+                                if (float.IsNaN(kapasite) || float.IsInfinity(kapasite) || kapasite > 10.0f) // 1000% sanity check
+                                {
+                                    invalidKapasiteRows.Add(currentDataTable.Rows.IndexOf(row));
+                                    continue;
+                                }
+
+                                if (kapasite > ABONE_KAPASITE_LIMIT)
+                                {
+                                    overCapacityCount++;
+                                    nullRows.Add(currentDataTable.Rows.IndexOf(row));
+                                }
                             }
                         }
                     }
 
-                    columnNullRowsMap[column.ColumnName] = nullRows;
-                    imputableRowsMap[column.ColumnName] = imputableRows;
-                    nonPositivePercentage = (float)nonPositiveCount / totalRows;
-                    nonLastYearPercentage = (float)nonLastYearCount / totalRows;
-
-                    if (nonPositivePercentage > 0)
+                    // Log rows with invalid kapasite values
+                    if (invalidKapasiteRows.Any())
                     {
-                        var thresholds = TUKETIM_ERROR_THRESHOLD;
-                        var datatableLevel = GetDataTableBasedOnThreshold(nonPositivePercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+                        infoDataTable.Rows.Add(new object[]
+                        {
+                    "", "Abone kapasitesi", "Geçersiz Değer",
+                    $"Abone kapasitesi geçersiz veya aşırı büyük (>{10.0f:P0}) olduğu için bazı satırlar atlandı. (Satır: {string.Join(", ", invalidKapasiteRows)})"
+                        });
+                    }
 
-                        // Append the column name and null count to the report message
-                        datatableLevel.Rows.Add(new object[] {
-                                            column.ColumnName, "Son yıl tüketim verisi", $"{nonPositivePercentage:P1} abonenin tüketim verisi yok",
-                                            "Bu abonelerin tüketim verileri silinecek."
-                                        });
-                    }
-                    if (nonLastYearPercentage > 0)
+                    columnNullRowsMap["KAPASITE"] = nullRows;
+                    float overCapacityPercentage = (float)overCapacityCount / totalRows;
+
+                    if (overCapacityPercentage > 0)
                     {
-                        // Append the column name and null count to the report message
-                        warningDataTable.Rows.Add(new object[] {
-                                            column.ColumnName, "Son yıl tüketim verisi", $"{nonLastYearPercentage:P1}", "Bu abonelerin son yıl tüketim verisi yok. Tüketim verileri geçmiş veriler ile doldurulacak."
-                                        });
+                        infoDataTable.Rows.Add(new object[]
+                        {
+                    "", "Abone kapasitesi", $"{overCapacityPercentage:P1}",
+                    $"Abone kapasitesi {ABONE_KAPASITE_LIMIT:P1}'den büyük olan abonelerin tüketim verileri silinecek."
+                        });
                     }
-                }*/
-        private void AboneKapasiteCheck()
+                }
+/*        private void AboneKapasiteCheck()
         {
             // yillik tuketim / 8760 / baglanti gucu
             int overCapacityCount = 0;
@@ -728,12 +1086,11 @@ namespace SLF
             {
                 infoDataTable.Rows.Add(new object[]
                 {
-                 "", "Abone kapasitesi", $"{overCapacityPercentage:P1}",
-                 $"Abone kapasitesi {ABONE_KAPASITE_LIMIT:P1}'den büyük olan abonelerin tüketim verileri silinecek."
+                                         "", "Abone kapasitesi", $"{overCapacityPercentage:P1}",
+                                         $"Abone kapasitesi {ABONE_KAPASITE_LIMIT:P1}'den büyük olan abonelerin tüketim verileri silinecek."
                 });
             }
-
-        }
+        }*/
         private void BinaKoordinatMatchCheck()
         {
             var grouped = currentDataTable.AsEnumerable().GroupBy(row => row["BINA_ID"]);
@@ -792,116 +1149,425 @@ namespace SLF
                 });
             }
         }
+        /*        private void AboneGrubuImpute()
+                {
+                    var grouped = currentDataTable.AsEnumerable().GroupBy(row => row["BINA_ID"]);
+
+                    aboneGrubuMostFrequent.Clear();
+
+                    foreach (var group in grouped)
+                    {
+                        // Group by original coordinates to determine the most frequent coordinate
+                        var mostFrequentAboneGrubu = group
+                            .GroupBy(row => row["ABONE_GRUBU"].ToString())
+                            .OrderByDescending(g => g.Count())
+                            .FirstOrDefault();
+
+                        if (mostFrequentAboneGrubu != null)
+                        {
+                            aboneGrubuMostFrequent[(string)group.Key] = mostFrequentAboneGrubu.Key;
+                        }
+                    }
+
+                    foreach (DataRow row in currentDataTable.Rows)
+                    {
+                        string aboneGrubu = row["ABONE_GRUBU"].ToString();
+                        string binaId = row["BINA_ID"].ToString();
+                        if (IsNullLike(aboneGrubu))
+                        {
+                            var imputedGrup = aboneGrubuMostFrequent[binaId];
+                            row["ABONE_GRUBU"] = imputedGrup;
+                        }
+                    }
+                }*/
+
         private void AboneGrubuImpute()
         {
-            var grouped = currentDataTable.AsEnumerable().GroupBy(row => row["BINA_ID"]);
+            string columnName = "ABONE_GRUBU";
+            int totalRows = currentDataTable.Rows.Count;
+            var nullRows = new List<int>();
+            int nullCount = 0;
 
-            aboneGrubuMostFrequent.Clear();
-
-            foreach (var group in grouped)
-            {
-                // Group by original coordinates to determine the most frequent coordinate
-                var mostFrequentAboneGrubu = group
-                    .GroupBy(row => row["ABONE_GRUBU"].ToString())
-                    .OrderByDescending(g => g.Count())
-                    .FirstOrDefault();
-
-                if (mostFrequentAboneGrubu != null)
-                {
-                    aboneGrubuMostFrequent[(string)group.Key] = mostFrequentAboneGrubu.Key;
-                }
-            }
-
+            // Step 1: Identify NULL rows in ABONE_GRUBU
             foreach (DataRow row in currentDataTable.Rows)
             {
-                string aboneGrubu = row["ABONE_GRUBU"].ToString();
-                string binaId = row["BINA_ID"].ToString();
+                int rowIndex = currentDataTable.Rows.IndexOf(row);
+                string aboneGrubu = row[columnName]?.ToString();
                 if (IsNullLike(aboneGrubu))
                 {
-                    var imputedGrup = aboneGrubuMostFrequent[binaId];
-                    row["ABONE_GRUBU"] = imputedGrup;
+                    nullCount++;
+                    nullRows.Add(rowIndex);
+                }
+            }
+
+            // Step 2: Calculate the percentage of NULL rows
+            float nullPercentage = (float)nullCount / totalRows;
+
+            // Step 3: Proceed with imputation if there are NULL values
+            if (nullPercentage > 0)
+            {
+                // Imputation logic
+                var grouped = currentDataTable.AsEnumerable().GroupBy(row => row["BINA_ID"]);
+
+                aboneGrubuMostFrequent.Clear();
+
+                foreach (var group in grouped)
+                {
+                    var mostFrequentAboneGrubu = group
+                        .GroupBy(row => row["ABONE_GRUBU"].ToString())
+                        .Where(g => !IsNullLike(g.Key))
+                        .OrderByDescending(g => g.Count())
+                        .FirstOrDefault();
+
+                    if (mostFrequentAboneGrubu != null)
+                    {
+                        aboneGrubuMostFrequent[(string)group.Key] = mostFrequentAboneGrubu.Key;
+                    }
+                }
+
+                foreach (DataRow row in currentDataTable.Rows)
+                {
+                    string aboneGrubu = row["ABONE_GRUBU"].ToString();
+                    string binaId = row["BINA_ID"].ToString();
+                    if (IsNullLike(aboneGrubu))
+                    {
+                        if (aboneGrubuMostFrequent.ContainsKey(binaId))
+                        {
+                            var imputedGrup = aboneGrubuMostFrequent[binaId];
+                            row["ABONE_GRUBU"] = imputedGrup;
+                        }
+                        else
+                        {
+                            row["ABONE_GRUBU"] = "Unknown";
+                        }
+                    }
                 }
             }
         }
+        /*        private void AboneGrubuImpute()
+                {
+                    string columnName = "ABONE_GRUBU";
+                    int totalRows = currentDataTable.Rows.Count;
+                    var nullRows = new List<int>();
+                    int nullCount = 0;
+
+                    // Step 1: Identify NULL rows in ABONE_GRUBU
+                    foreach (DataRow row in currentDataTable.Rows)
+                    {
+                        int rowIndex = currentDataTable.Rows.IndexOf(row);
+                        string aboneGrubu = row[columnName]?.ToString();
+                        if (IsNullLike(aboneGrubu))
+                        {
+                            nullCount++;
+                            nullRows.Add(rowIndex);
+                        }
+                    }
+
+                    // Step 2: Calculate the percentage of NULL rows
+                    float nullPercentage = (float)nullCount / totalRows;
+
+                    // Step 3: Check the 20% threshold
+                    const float threshold = 0.2f; // 20%
+                    var datatableLevel = GetDataTableBasedOnThreshold(nullPercentage, threshold, threshold);
+
+                    if (nullPercentage > threshold)
+                    {
+                        // Error: More than 20% NULL
+                        string errorMessage = $"Kullanıcıya Mesaj: Kullanıcıya %20’den fazla oranda {columnName} verisi yok. hatalı veri. (Satır: {string.Join(", ", nullRows)})";
+                        datatableLevel.Rows.Add(new object[]
+                        {
+                    columnName,
+                    "Abone Grubu",
+                    $"{nullPercentage:P1}",
+                    errorMessage
+                        });
+                        throw new Exception(errorMessage); // Stop processing
+                    }
+                    else if (nullPercentage > 0)
+                    {
+                        // Warning: ≤20% NULL, proceed with imputation
+                        string warningMessage = $"Düzeltilecekler Mesajı: Kullanıcıya Abone Grubu NULL olan verilerin oranı uygun yöntemlerle doldurularacak. (Satır: {string.Join(", ", nullRows)})";
+                        datatableLevel.Rows.Add(new object[]
+                        {
+                    columnName,
+                    "Abone Grubu",
+                    $"{nullPercentage:P1}",
+                    warningMessage
+                        });
+
+                        // Step 4: Perform imputation
+                        var grouped = currentDataTable.AsEnumerable().GroupBy(row => row["BINA_ID"]);
+
+                        aboneGrubuMostFrequent.Clear();
+
+                        foreach (var group in grouped)
+                        {
+                            var mostFrequentAboneGrubu = group
+                                .GroupBy(row => row["ABONE_GRUBU"].ToString())
+                                .Where(g => !IsNullLike(g.Key)) // Exclude NULL-like values from frequency count
+                                .OrderByDescending(g => g.Count())
+                                .FirstOrDefault();
+
+                            if (mostFrequentAboneGrubu != null)
+                            {
+                                aboneGrubuMostFrequent[(string)group.Key] = mostFrequentAboneGrubu.Key;
+                            }
+                        }
+
+                        foreach (DataRow row in currentDataTable.Rows)
+                        {
+                            string aboneGrubu = row["ABONE_GRUBU"].ToString();
+                            string binaId = row["BINA_ID"].ToString();
+                            if (IsNullLike(aboneGrubu))
+                            {
+                                if (aboneGrubuMostFrequent.ContainsKey(binaId))
+                                {
+                                    var imputedGrup = aboneGrubuMostFrequent[binaId];
+                                    row["ABONE_GRUBU"] = imputedGrup;
+                                }
+                                else
+                                {
+                                    // Fallback if no valid ABONE_GRUBU for this BINA_ID
+                                    row["ABONE_GRUBU"] = "Unknown"; // Or another default value
+                                }
+                            }
+                        }
+                    }
+                }*/
+
         private void BaglantiGucuImpute()
         {
-            // Dictionary to hold the most frequent BAGLANTI_GUCU for each combination of ADR_BINA_ID and ABONE_GRUBU
-            var baglantiGucuMostFrequent = new Dictionary<string, string>();
+            var grouped = currentDataTable.AsEnumerable().GroupBy(row => new { binaId = row["BINA_ID"].ToString(), aboneGrubu = row["ABONE_GRUBU"].ToString() });
 
-            // Group by ADR_BINA_ID and ABONE_GRUBU
-            var grouped = currentDataTable.AsEnumerable()
-                .GroupBy(row => new
-                {
-                    AdrBinaId = row["BINA_ID"].ToString(),
-                    AboneGrubu = row["ABONE_GRUBU"].ToString()
-                });
+            var mostFrequentBaglantiGucu = new Dictionary<(string, string), double>();
 
-            // Find the most frequent BAGLANTI_GUCU for each combination of ADR_BINA_ID and ABONE_GRUBU
+            // Step 1: Find the most frequent BAGLANTI_GUCU for each (BINA_ID, ABONE_GRUBU) pair
             foreach (var group in grouped)
             {
-                var mostFrequentBaglantiGucu = group
-                    .GroupBy(row => row["BAGLANTI_GUCU"].ToString())
+                var mostFrequent = group
+                    .Where(row => row["BAGLANTI_GUCU"] != DBNull.Value)
+                    .Select(row =>
+                    {
+                        if (double.TryParse(row["BAGLANTI_GUCU"].ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double value) && value > 0)
+                        {
+                            return (Value: value, Valid: true);
+                        }
+                        return (Value: 0.0, Valid: false);
+                    })
+                    .Where(x => x.Valid)
+                    .GroupBy(x => x.Value)
                     .OrderByDescending(g => g.Count())
                     .FirstOrDefault();
 
-                if (mostFrequentBaglantiGucu != null)
+                if (mostFrequent != null)
                 {
-                    var key = $"{group.Key.AdrBinaId}_{group.Key.AboneGrubu}";
-                    baglantiGucuMostFrequent[key] = mostFrequentBaglantiGucu.Key;
+                    mostFrequentBaglantiGucu[(group.Key.binaId, group.Key.aboneGrubu)] = mostFrequent.Key;
                 }
             }
 
-            // Impute the missing BAGLANTI_GUCU values in the DataTable
+            // Step 2: Impute BAGLANTI_GUCU for rows where it's ≤0 or NULL
             foreach (DataRow row in currentDataTable.Rows)
             {
-                string aboneGrubu = row["ABONE_GRUBU"].ToString();
-                string binaId = row["BINA_ID"].ToString();
-                string baglantiGucu = row["BAGLANTI_GUCU"].ToString();
-                var key = $"{binaId}_{aboneGrubu}";
+                bool needsImputation = false;
 
-                if (IsNullLike(baglantiGucu) && baglantiGucuMostFrequent.ContainsKey(key))
+                if (IsNullLike(row["BAGLANTI_GUCU"]))
                 {
-                    row["BAGLANTI_GUCU"] = baglantiGucuMostFrequent[key];
+                    needsImputation = true;
+                }
+                else if (double.TryParse(row["BAGLANTI_GUCU"].ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+                {
+                    if (value <= 0)
+                    {
+                        needsImputation = true;
+                    }
+                }
+                else
+                {
+                    // If parsing fails, treat as invalid and impute
+                    needsImputation = true;
+                }
+
+                if (needsImputation)
+                {
+                    string binaId = row["BINA_ID"].ToString();
+                    string aboneGrubu = row["ABONE_GRUBU"].ToString();
+                    var key = (binaId, aboneGrubu);
+
+                    if (mostFrequentBaglantiGucu.ContainsKey(key))
+                    {
+                        row["BAGLANTI_GUCU"] = mostFrequentBaglantiGucu[key];
+                    }
+                    else
+                    {
+                        // Fallback: Use a default value (e.g., the BAGLANTI_GUCU_THRESHOLD or a reasonable default)
+                        row["BAGLANTI_GUCU"] = BAGLANTI_GUCU_THRESHOLD; // 30.0 as defined in the class
+                    }
                 }
             }
         }
+        /*        private void BaglantiGucuImpute()
+                {
+                    // Dictionary to hold the most frequent BAGLANTI_GUCU for each combination of ADR_BINA_ID and ABONE_GRUBU
+                    var baglantiGucuMostFrequent = new Dictionary<string, string>();
+
+                    // Group by ADR_BINA_ID and ABONE_GRUBU
+                    var grouped = currentDataTable.AsEnumerable()
+                        .GroupBy(row => new
+                        {
+                            AdrBinaId = row["BINA_ID"].ToString(),
+                            AboneGrubu = row["ABONE_GRUBU"].ToString()
+                        });
+
+                    // Find the most frequent BAGLANTI_GUCU for each combination of ADR_BINA_ID and ABONE_GRUBU
+                    foreach (var group in grouped)
+                    {
+                        var mostFrequentBaglantiGucu = group
+                            .GroupBy(row => row["BAGLANTI_GUCU"].ToString())
+                            .OrderByDescending(g => g.Count())
+                            .FirstOrDefault();
+
+                        if (mostFrequentBaglantiGucu != null)
+                        {
+                            var key = $"{group.Key.AdrBinaId}_{group.Key.AboneGrubu}";
+                            baglantiGucuMostFrequent[key] = mostFrequentBaglantiGucu.Key;
+                        }
+                    }
+
+                    // Impute the missing BAGLANTI_GUCU values in the DataTable
+                    foreach (DataRow row in currentDataTable.Rows)
+                    {
+                        string aboneGrubu = row["ABONE_GRUBU"].ToString();
+                        string binaId = row["BINA_ID"].ToString();
+                        string baglantiGucu = row["BAGLANTI_GUCU"].ToString();
+                        var key = $"{binaId}_{aboneGrubu}";
+
+                        if (IsNullLike(baglantiGucu) && baglantiGucuMostFrequent.ContainsKey(key))
+                        {
+                            row["BAGLANTI_GUCU"] = baglantiGucuMostFrequent[key];
+                        }
+                    }
+                }*/
         private void TrafoKoduImpute()
         {
-            nullFieldsCheckWithLevel["BAGLANDIGI_TRAFO_KODU"] = InfoErrorBoundary(0.01f);  // Stricter threshold for TrafoKodu
+            nullFieldsCheckWithLevel["BAGLANDIGI_TRAFO_KODU"] = InfoErrorBoundary(0.01f);
             trafoKoduRemoveFlag = true;
-            // 0.001 is the 2d distance of the delta of x and y coordinates. Roughly equal to 100m.
 
-            // Create a list of non-null rows with their coordinates
+            // Step 1: Identify invalid BAGLANDIGI_TRAFO_KODU rows
+            List<int> invalidRows = new List<int>();
+            int invalidCount = 0;
+            int totalRows = currentDataTable.Rows.Count;
+
+            for (int i = 0; i < totalRows; i++)
+            {
+                var row = currentDataTable.Rows[i];
+                var trafoKodu = Convert.ToString(row["BAGLANDIGI_TRAFO_KODU"]);
+                // Debug: Log the value to understand what's being encountered
+                Console.WriteLine($"Row {i}: BAGLANDIGI_TRAFO_KODU = '{trafoKodu}'");
+                if (IsNullLike(trafoKodu, true) || trafoKodu == "0" || trafoKodu == "#N/A")
+                {
+                    invalidCount++;
+                    invalidRows.Add(i);
+                }
+            }
+
+            columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"] = invalidRows;
+
+            float percentage = (float)invalidCount / totalRows;
+
+            // Debug: Log the results
+            Console.WriteLine($"BAGLANDIGI_TRAFO_KODU: Found {invalidCount} invalid rows out of {totalRows}, percentage = {percentage:P1}, rows = {string.Join(", ", invalidRows)}");
+
+            if (percentage > 0)
+            {
+                const float errorThreshold = 0.1f; // 10% as per the flowchart
+
+                if (percentage > errorThreshold)
+                {
+                    string errorMessage = $"Hata Mesajı: Kullanıcıya %10’dan fazla oranda Enerji Tablo Kodu (BAGLANDIGI_TRAFO_KODU) olmayan abone mevcut uyarısı verilir. (Satır: {string.Join(", ", invalidRows)})";
+                    errorDataTable.Rows.Add(new object[]
+                    {
+                "BAGLANDIGI_TRAFO_KODU",
+                "Enerji Tablo Kodu",
+                $"{percentage:P1}",
+                errorMessage
+                    });
+                    // If percentage > 10%, we can return early since imputation won't proceed
+                    return;
+                }
+                else
+                {
+                    string warningMessage = $"Düzeltilecekler Mesajı: Kullanıcıya Enerji Tablo Kodu (BAGLANDIGI_TRAFO_KODU) NULL veya 0 olan verilere en yakın trafonun kodu atanacaktır. (Satır: {string.Join(", ", invalidRows)})";
+                    // Debug: Log the message to confirm content
+                    Console.WriteLine($"Düzeltilecekler Message: {warningMessage}");
+                    warningDataTable.Rows.Add(new object[]
+                    {
+                "BAGLANDIGI_TRAFO_KODU",
+                "Enerji Tablo Kodu",
+                $"{percentage:P1}",
+                warningMessage
+                    });
+                }
+            }
+            else
+            {
+                // If no invalid rows, clear the map and return
+                columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"] = new List<int>();
+                Console.WriteLine("TrafoKoduImpute: No invalid BAGLANDIGI_TRAFO_KODU rows found, skipping imputation.");
+                return;
+            }
+
+            // Step 2: Perform imputation on invalid rows
             var nonNullRows = currentDataTable.AsEnumerable()
                                               .Where(row => !IsNullLike(row["BAGLANDIGI_TRAFO_KODU"], true))
                                               .Select(row => new
                                               {
                                                   Row = row,
-                                                  X = Convert.ToDouble(row["ABONE_X_KOORDINAT"]),
-                                                  Y = Convert.ToDouble(row["ABONE_Y_KOORDINAT"])
+                                                  X = row["ABONE_X_KOORDINAT"] != DBNull.Value ? Convert.ToDouble(row["ABONE_X_KOORDINAT"]) : double.NaN,
+                                                  Y = row["ABONE_Y_KOORDINAT"] != DBNull.Value ? Convert.ToDouble(row["ABONE_Y_KOORDINAT"]) : double.NaN
                                               })
+                                              .Where(item => !double.IsNaN(item.X) && !double.IsNaN(item.Y))
                                               .ToList();
 
-            // Sort non-null rows by X coordinate
             nonNullRows.Sort((a, b) => a.X.CompareTo(b.X));
 
-            foreach (int missingIndex in columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"])
+            // Track rows that fail imputation
+            var failedImputationRows = new List<int>();
+
+            // Perform imputation on flagged rows
+            foreach (int missingIndex in invalidRows)
             {
                 var missingRow = currentDataTable.Rows[missingIndex];
-                double missingX = Convert.ToDouble(missingRow["ABONE_X_KOORDINAT"]);
-                double missingY = Convert.ToDouble(missingRow["ABONE_Y_KOORDINAT"]);
+
+                // Check for NULL values in ABONE_X_KOORDINAT and ABONE_Y_KOORDINAT
+                if (missingRow["ABONE_X_KOORDINAT"] == DBNull.Value || missingRow["ABONE_Y_KOORDINAT"] == DBNull.Value)
+                {
+                    Console.WriteLine($"Row {missingIndex}: Failed to impute BAGLANDIGI_TRAFO_KODU due to NULL ABONE_X_KOORDINAT or ABONE_Y_KOORDINAT");
+                    failedImputationRows.Add(missingIndex);
+                    continue;
+                }
+
+                double missingX, missingY;
+                try
+                {
+                    missingX = Convert.ToDouble(missingRow["ABONE_X_KOORDINAT"]);
+                    missingY = Convert.ToDouble(missingRow["ABONE_Y_KOORDINAT"]);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Row {missingIndex}: Failed to convert ABONE_X_KOORDINAT or ABONE_Y_KOORDINAT to double: {ex.Message}");
+                    failedImputationRows.Add(missingIndex);
+                    continue;
+                }
 
                 double closestDistance = double.MaxValue;
                 var closestRow = default(dynamic);
 
-                // Use binary search to find the position of the missing row by X coordinate
                 int position = nonNullRows.BinarySearch(new { Row = (DataRow)null, X = missingX, Y = 0.0 },
                                                         Comparer<dynamic>.Create((a, b) => a.X.CompareTo(b.X)));
 
                 if (position < 0) position = ~position;
 
-                // Search in the neighborhood of the found position
-                int left = Math.Max(0, position - 100);  // Adjust the range as necessary
+                int left = Math.Max(0, position - 100);
                 int right = Math.Min(nonNullRows.Count - 1, position + 100);
 
                 for (int i = left; i <= right; i++)
@@ -918,20 +1584,353 @@ namespace SLF
                     }
                 }
 
+                bool imputationSuccessful = false;
                 if (closestRow != null)
                 {
-                    double baglantiGucu = Convert.ToDouble(missingRow["BAGLANTI_GUCU"]);
+                    // Check for NULL value in BAGLANTI_GUCU
+                    if (missingRow["BAGLANTI_GUCU"] == DBNull.Value)
+                    {
+                        Console.WriteLine($"Row {missingIndex}: Failed to impute BAGLANDIGI_TRAFO_KODU due to NULL BAGLANTI_GUCU");
+                        failedImputationRows.Add(missingIndex);
+                        continue;
+                    }
+
+                    double baglantiGucu;
+                    try
+                    {
+                        baglantiGucu = Convert.ToDouble(missingRow["BAGLANTI_GUCU"]);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Row {missingIndex}: Failed to convert BAGLANTI_GUCU to double: {ex.Message}");
+                        failedImputationRows.Add(missingIndex);
+                        continue;
+                    }
+
                     if (baglantiGucu < BAGLANTI_GUCU_THRESHOLD)
                     {
                         missingRow["BAGLANDIGI_TRAFO_KODU"] = closestRow["BAGLANDIGI_TRAFO_KODU"];
+                        imputationSuccessful = true;
+                        // Debug: Log successful imputation
+                        Console.WriteLine($"Row {missingIndex}: Successfully imputed BAGLANDIGI_TRAFO_KODU = {missingRow["BAGLANDIGI_TRAFO_KODU"]}");
+                    }
+                    else
+                    {
+                        // Debug: Log why imputation failed
+                        Console.WriteLine($"Row {missingIndex}: Failed to impute BAGLANDIGI_TRAFO_KODU due to BAGLANTI_GUCU ({baglantiGucu}) >= {BAGLANTI_GUCU_THRESHOLD}");
                     }
                 }
                 else
                 {
-                    //missingRow["BAGLANDIGI_TRAFO_KODU"] = "Fider Bulunamadı";
+                    // Debug: Log why imputation failed
+                    Console.WriteLine($"Row {missingIndex}: Failed to impute BAGLANDIGI_TRAFO_KODU, no close row found within {MAX_DISTANCE_IN_DEGREES} degrees");
+                }
+
+                if (!imputationSuccessful)
+                {
+                    failedImputationRows.Add(missingIndex);
                 }
             }
+
+            // Step 3: After imputation, check all rows for any that are still empty
+            var remainingEmptyRows = new List<int>();
+            for (int i = 0; i < currentDataTable.Rows.Count; i++)
+            {
+                var row = currentDataTable.Rows[i];
+                var trafoKodu = Convert.ToString(row["BAGLANDIGI_TRAFO_KODU"]);
+                // Debug: Log the value after imputation
+                // Console.WriteLine($"Post-Imputation Check - Row {i}: BAGLANDIGI_TRAFO_KODU = '{trafoKodu}'");
+                if (IsNullLike(trafoKodu, true) || trafoKodu == "0" || trafoKodu == "#N/A")
+                {
+                    remainingEmptyRows.Add(i);
+                    Console.WriteLine($"Row {i}: Still empty after imputation, will be deleted");
+                }
+            }
+
+            // Step 4: Combine failed imputation rows with remaining empty rows
+            var rowsToDelete = failedImputationRows.Union(remainingEmptyRows).Distinct().ToList();
+
+            // Step 5: Log and flag for deletion
+            if (rowsToDelete.Any())
+            {
+                float failedPercentage = (float)rowsToDelete.Count / currentDataTable.Rows.Count;
+                string warningMessage = $"Silinecekler Mesajı: Kullanıcıya Enerji Tablo Kodu (BAGLANDIGI_TRAFO_KODU) verileri doldurulamadı, silinecek. (Satır: {string.Join(", ", rowsToDelete)})";
+                infoDataTable.Rows.Add(new object[]
+                {
+            "BAGLANDIGI_TRAFO_KODU",
+            "Enerji Tablo Kodu",
+            $"{failedPercentage:P1}",
+            warningMessage
+                });
+                // Debug: Confirm the message was logged
+                Console.WriteLine($"Logged Silinecekler Mesajı: {warningMessage}");
+
+                // Update columnNullRowsMap for deletion by Remove
+                columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"] = rowsToDelete;
+            }
+            else
+            {
+                // If no rows remain empty, clear the list to prevent deletion
+                columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"] = new List<int>();
+                Console.WriteLine("TrafoKoduImpute: All rows successfully imputed, no deletions needed.");
+            }
         }
+        /*        private void TrafoKoduImpute()
+                {
+                    nullFieldsCheckWithLevel["BAGLANDIGI_TRAFO_KODU"] = InfoErrorBoundary(0.01f);
+                    trafoKoduRemoveFlag = true;
+
+                    // Step 1: Identify invalid BAGLANDIGI_TRAFO_KODU rows
+                    List<int> invalidRows = new List<int>();
+                    int invalidCount = 0;
+                    int totalRows = currentDataTable.Rows.Count;
+
+                    for (int i = 0; i < totalRows; i++)
+                    {
+                        var row = currentDataTable.Rows[i];
+                        var trafoKodu = Convert.ToString(row["BAGLANDIGI_TRAFO_KODU"]);
+                        // Debug: Log the value to understand what's being encountered
+                        Console.WriteLine($"Row {i}: BAGLANDIGI_TRAFO_KODU = '{trafoKodu}'");
+                        if (IsNullLike(trafoKodu, true) || trafoKodu == "0" || trafoKodu == "#N/A")
+                        {
+                            invalidCount++;
+                            invalidRows.Add(i);
+                        }
+                    }
+
+                    columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"] = invalidRows;
+
+                    float percentage = (float)invalidCount / totalRows;
+
+                    // Debug: Log the results
+                    Console.WriteLine($"BAGLANDIGI_TRAFO_KODU: Found {invalidCount} invalid rows out of {totalRows}, percentage = {percentage:P1}, rows = {string.Join(", ", invalidRows)}");
+
+                    if (percentage > 0)
+                    {
+                        const float errorThreshold = 0.1f; // 10% as per the flowchart
+
+                        if (percentage > errorThreshold)
+                        {
+                            string errorMessage = $"Hata Mesajı: Kullanıcıya %10’dan fazla oranda Enerji Tablo Kodu (BAGLANDIGI_TRAFO_KODU) olmayan abone mevcut uyarısı verilir. (Satır: {string.Join(", ", invalidRows)})";
+                            errorDataTable.Rows.Add(new object[]
+                            {
+                        "BAGLANDIGI_TRAFO_KODU",
+                        "Enerji Tablo Kodu",
+                        $"{percentage:P1}",
+                        errorMessage
+                            });
+                            // If percentage > 10%, we can return early since imputation won't proceed
+                            return;
+                        }
+                        else
+                        {
+                            string warningMessage = $"Düzeltilecekler Mesajı: Kullanıcıya Enerji Tablo Kodu (BAGLANDIGI_TRAFO_KODU) NULL veya 0 olan verilere en yakın trafonun kodu atanacaktır. (Satır: {string.Join(", ", invalidRows)})";
+                            // Debug: Log the message to confirm content
+                            Console.WriteLine($"Düzeltilecekler Message: {warningMessage}");
+                            warningDataTable.Rows.Add(new object[]
+                            {
+                        "BAGLANDIGI_TRAFO_KODU",
+                        "Enerji Tablo Kodu",
+                        $"{percentage:P1}",
+                        warningMessage
+                            });
+                        }
+                    }
+                    else
+                    {
+                        // If no invalid rows, clear the map and return
+                        columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"] = new List<int>();
+                        Console.WriteLine("TrafoKoduImpute: No invalid BAGLANDIGI_TRAFO_KODU rows found, skipping imputation.");
+                        return;
+                    }
+
+                    // Step 2: Perform imputation on invalid rows
+                    var nonNullRows = currentDataTable.AsEnumerable()
+                                                      .Where(row => !IsNullLike(row["BAGLANDIGI_TRAFO_KODU"], true))
+                                                      .Select(row => new
+                                                      {
+                                                          Row = row,
+                                                          X = Convert.ToDouble(row["ABONE_X_KOORDINAT"]),
+                                                          Y = Convert.ToDouble(row["ABONE_Y_KOORDINAT"])
+                                                      })
+                                                      .ToList();
+
+                    nonNullRows.Sort((a, b) => a.X.CompareTo(b.X));
+
+                    // Track rows that fail imputation
+                    var failedImputationRows = new List<int>();
+
+                    // Perform imputation on flagged rows
+                    foreach (int missingIndex in invalidRows)
+                    {
+                        var missingRow = currentDataTable.Rows[missingIndex];
+                        double missingX = Convert.ToDouble(missingRow["ABONE_X_KOORDINAT"]);
+                        double missingY = Convert.ToDouble(missingRow["ABONE_Y_KOORDINAT"]);
+
+                        double closestDistance = double.MaxValue;
+                        var closestRow = default(dynamic);
+
+                        int position = nonNullRows.BinarySearch(new { Row = (DataRow)null, X = missingX, Y = 0.0 },
+                                                                Comparer<dynamic>.Create((a, b) => a.X.CompareTo(b.X)));
+
+                        if (position < 0) position = ~position;
+
+                        int left = Math.Max(0, position - 100);
+                        int right = Math.Min(nonNullRows.Count - 1, position + 100);
+
+                        for (int i = left; i <= right; i++)
+                        {
+                            var row = nonNullRows[i];
+                            double x = row.X;
+                            double y = row.Y;
+                            double distance = Math.Sqrt(Math.Pow(missingX - x, 2) + Math.Pow(missingY - y, 2));
+
+                            if (distance < closestDistance && distance < MAX_DISTANCE_IN_DEGREES)
+                            {
+                                closestDistance = distance;
+                                closestRow = row.Row;
+                            }
+                        }
+
+                        bool imputationSuccessful = false;
+                        if (closestRow != null)
+                        {
+                            double baglantiGucu = Convert.ToDouble(missingRow["BAGLANTI_GUCU"]);
+                            if (baglantiGucu < BAGLANTI_GUCU_THRESHOLD)
+                            {
+                                missingRow["BAGLANDIGI_TRAFO_KODU"] = closestRow["BAGLANDIGI_TRAFO_KODU"];
+                                imputationSuccessful = true;
+                                // Debug: Log successful imputation
+                                Console.WriteLine($"Row {missingIndex}: Successfully imputed BAGLANDIGI_TRAFO_KODU = {missingRow["BAGLANDIGI_TRAFO_KODU"]}");
+                            }
+                            else
+                            {
+                                // Debug: Log why imputation failed
+                                Console.WriteLine($"Row {missingIndex}: Failed to impute BAGLANDIGI_TRAFO_KODU due to BAGLANTI_GUCU ({baglantiGucu}) >= {BAGLANTI_GUCU_THRESHOLD}");
+                            }
+                        }
+                        else
+                        {
+                            // Debug: Log why imputation failed
+                            Console.WriteLine($"Row {missingIndex}: Failed to impute BAGLANDIGI_TRAFO_KODU, no close row found within {MAX_DISTANCE_IN_DEGREES} degrees");
+                        }
+
+                        if (!imputationSuccessful)
+                        {
+                            failedImputationRows.Add(missingIndex);
+                        }
+                    }
+
+                    // Step 3: After imputation, check all rows for any that are still empty
+                    var remainingEmptyRows = new List<int>();
+                    for (int i = 0; i < currentDataTable.Rows.Count; i++)
+                    {
+                        var row = currentDataTable.Rows[i];
+                        var trafoKodu = Convert.ToString(row["BAGLANDIGI_TRAFO_KODU"]);
+                        // Debug: Log the value after imputation
+                       // Console.WriteLine($"Post-Imputation Check - Row {i}: BAGLANDIGI_TRAFO_KODU = '{trafoKodu}'");
+                        if (IsNullLike(trafoKodu, true) || trafoKodu == "0" || trafoKodu == "#N/A")
+                        {
+                            remainingEmptyRows.Add(i);
+                            Console.WriteLine($"Row {i}: Still empty after imputation, will be deleted");
+                        }
+                    }
+
+                    // Step 4: Combine failed imputation rows with remaining empty rows
+                    var rowsToDelete = failedImputationRows.Union(remainingEmptyRows).Distinct().ToList();
+
+                    // Step 5: Log and flag for deletion
+                    if (rowsToDelete.Any())
+                    {
+                        float failedPercentage = (float)rowsToDelete.Count / currentDataTable.Rows.Count;
+                        string warningMessage = $"Silinecekler Mesajı: Kullanıcıya Enerji Tablo Kodu (BAGLANDIGI_TRAFO_KODU) verileri doldurulamadı, silinecek. (Satır: {string.Join(", ", rowsToDelete)})";
+                        infoDataTable.Rows.Add(new object[]
+                        {
+                    "BAGLANDIGI_TRAFO_KODU",
+                    "Enerji Tablo Kodu",
+                    $"{failedPercentage:P1}",
+                    warningMessage
+                        });
+                        // Debug: Confirm the message was logged
+                        Console.WriteLine($"Logged Silinecekler Mesajı: {warningMessage}");
+
+                        // Update columnNullRowsMap for deletion by Remove
+                        columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"] = rowsToDelete;
+                    }
+                    else
+                    {
+                        // If no rows remain empty, clear the list to prevent deletion
+                        columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"] = new List<int>();
+                        Console.WriteLine("TrafoKoduImpute: All rows successfully imputed, no deletions needed.");
+                    }
+                }*/
+        /*        private void TrafoKoduImpute()
+                {
+                    nullFieldsCheckWithLevel["BAGLANDIGI_TRAFO_KODU"] = InfoErrorBoundary(0.01f);  // Stricter threshold for TrafoKodu
+                    trafoKoduRemoveFlag = true;
+                    // 0.001 is the 2d distance of the delta of x and y coordinates. Roughly equal to 100m.
+
+                    // Create a list of non-null rows with their coordinates
+                    var nonNullRows = currentDataTable.AsEnumerable()
+                                                      .Where(row => !IsNullLike(row["BAGLANDIGI_TRAFO_KODU"], true))
+                                                      .Select(row => new
+                                                      {
+                                                          Row = row,
+                                                          X = Convert.ToDouble(row["ABONE_X_KOORDINAT"]),
+                                                          Y = Convert.ToDouble(row["ABONE_Y_KOORDINAT"])
+                                                      })
+                                                      .ToList();
+
+                    // Sort non-null rows by X coordinate
+                    nonNullRows.Sort((a, b) => a.X.CompareTo(b.X));
+
+                    foreach (int missingIndex in columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"])
+                    {
+                        var missingRow = currentDataTable.Rows[missingIndex];
+                        double missingX = Convert.ToDouble(missingRow["ABONE_X_KOORDINAT"]);
+                        double missingY = Convert.ToDouble(missingRow["ABONE_Y_KOORDINAT"]);
+
+                        double closestDistance = double.MaxValue;
+                        var closestRow = default(dynamic);
+
+                        // Use binary search to find the position of the missing row by X coordinate
+                        int position = nonNullRows.BinarySearch(new { Row = (DataRow)null, X = missingX, Y = 0.0 },
+                                                                Comparer<dynamic>.Create((a, b) => a.X.CompareTo(b.X)));
+
+                        if (position < 0) position = ~position;
+
+                        // Search in the neighborhood of the found position
+                        int left = Math.Max(0, position - 100);  // Adjust the range as necessary
+                        int right = Math.Min(nonNullRows.Count - 1, position + 100);
+
+                        for (int i = left; i <= right; i++)
+                        {
+                            var row = nonNullRows[i];
+                            double x = row.X;
+                            double y = row.Y;
+                            double distance = Math.Sqrt(Math.Pow(missingX - x, 2) + Math.Pow(missingY - y, 2));
+
+                            if (distance < closestDistance && distance < MAX_DISTANCE_IN_DEGREES)
+                            {
+                                closestDistance = distance;
+                                closestRow = row.Row;
+                            }
+                        }
+
+                        if (closestRow != null)
+                        {
+                            double baglantiGucu = Convert.ToDouble(missingRow["BAGLANTI_GUCU"]);
+                            if (baglantiGucu < BAGLANTI_GUCU_THRESHOLD)
+                            {
+                                missingRow["BAGLANDIGI_TRAFO_KODU"] = closestRow["BAGLANDIGI_TRAFO_KODU"];
+                            }
+                        }
+                        else
+                        {
+                            //missingRow["BAGLANDIGI_TRAFO_KODU"] = "Fider Bulunamadı";
+                        }
+                    }
+                }*/
         private void CheckConnectivity()
         {
             var trafoDataTable = dataTablesByType["DTR Verileri"];
