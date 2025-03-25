@@ -610,6 +610,8 @@ namespace SLF
 
             // Call VEERProcess with skipPrerequisites flag
             var isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
+            //dataGridView_girdi.DataSource = GirdiModülü.dataTablesByType[seçilenVeriTipi];
+            //dataGridView_girdi.Refresh();
             //Console.WriteLine(isImported.ToString());
             //isİmportedModule(isImported, seçilenVeriTipi);
             //if (isImported)
@@ -995,67 +997,107 @@ namespace SLF
         {
             try
             {
-                // Eğer PathService mevcut bir geçici klasöre sahipse ve geçici moddaysa
-                if (PathService.CurrentMode == PathService.WorkingMode.Temporary &&
-                    !string.IsNullOrEmpty(PathService.CurrentWorkingFolder))
+                string districtPath = Path.Combine(PathService.BaseDirectory, PathService.FullPath);
+
+                if (!Directory.Exists(districtPath))
+                    return false;
+
+                Console.WriteLine($"Geçici klasörler aranıyor: {districtPath}");
+
+                // "temp_" ile başlayan tüm klasörleri bul
+                string[] tempFolders = Directory.GetDirectories(districtPath, "temp_*");
+                Console.WriteLine($"Bulunan geçici klasör sayısı: {tempFolders.Length}");
+
+                foreach (string folder in tempFolders)
                 {
-                    string tempPath = Path.Combine(PathService.BaseDirectory, PathService.FullPath, PathService.CurrentWorkingFolder);
-
-                    // Klasör varsa sil
-                    if (Directory.Exists(tempPath))
+                    try
                     {
-                        // Klasörde içerik olup olmadığını kontrol et
-                        bool hasContent = DirectoryHasContent(tempPath);
-
-                        if (hasContent)
+                        // Mevcut klasör aktif çalışma klasörü mü? Öyleyse atlayın.
+                        if (PathService.CurrentMode == PathService.WorkingMode.Temporary &&
+                            !string.IsNullOrEmpty(PathService.CurrentWorkingFolder) &&
+                            folder.EndsWith(PathService.CurrentWorkingFolder))
                         {
-                            DialogResult saveResult = MessageBox.Show(
-                                "Geçici çalışma klasöründe veriler var. Çıkmadan önce bir proje olarak kaydetmek ister misiniz?",
-                                "Kaydedilmemiş Veriler",
-                                MessageBoxButtons.YesNoCancel,
-                                MessageBoxIcon.Question);
-
-                            if (saveResult == DialogResult.Yes)
-                            {
-                                // Projeyi kaydet
-                                //SaveCurrentProject();
-                                return true;
-                            }
-                            else if (saveResult == DialogResult.Cancel)
-                            {
-                                return false;
-                            }
+                            Console.WriteLine($"Aktif çalışma klasörü atlanıyor: {folder}");
+                            continue;
                         }
 
+                        Console.WriteLine($"Geçici klasör siliniyor: {folder}");
+
+                        // 1. Tüm klasördeki salt okunur özniteliklerini kaldır
+                        RemoveReadOnlyAttributesRecursive(folder);
+
+                        // 2. GC.Collect çağrısıyla açık dosya tanıtıcılarını temizlemeyi dene
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+
+                        // 3. Silmeyi dene, olmazsa zorla sil
                         try
                         {
-                            // Tüm dosyaları ve alt klasörlerin salt okunur bayrağını kaldır
-                            RemoveReadOnlyAttributesRecursive(tempPath);
-
-                            // Geçici klasörü sil
-                            Directory.Delete(tempPath, true);
-                            Debug.WriteLine($"Geçici klasör silindi: {tempPath}");
-
-                            // Ayrıca diğer eski geçici klasörleri de temizle
-                            CleanupOldTempFolders();
-                            return true;
+                            Directory.Delete(folder, true);
+                            Console.WriteLine($"Geçici klasör başarıyla silindi: {folder}");
                         }
-                        catch (Exception ex)
+                        catch (IOException)
                         {
-                            Debug.WriteLine($"Klasör silinirken hata: {ex.Message}");
-                            MessageBox.Show($"Geçici klasör silinirken hata oluştu: {ex.Message}",
-                                "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            return false;
+                            // Dosya işlemi hatası - zorla silmeyi dene
+                            ForceDeleteDirectory(folder);
                         }
+                        catch (UnauthorizedAccessException)
+                        {
+                            // Yetki hatası - zorla silmeyi dene
+                            ForceDeleteDirectory(folder);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Geçici klasör silinirken hata: {ex.Message}");
+                        // Hata olsa bile devam et
                     }
                 }
 
-                return false;
+                return true;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Geçici klasör temizlenirken hata: {ex.Message}");
+                Debug.WriteLine($"Geçici klasörleri temizlerken genel hata: {ex.Message}");
                 return false;
+            }
+        }
+
+        // Zorla silme işlemi - Command line kullanarak sil
+        private void ForceDeleteDirectory(string path)
+        {
+            try
+            {
+                Console.WriteLine($"Zorla silme deneniyor: {path}");
+
+                // Command kullanarak silme
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "cmd.exe",
+                        Arguments = $"/C rd /S /Q \"{path}\"",
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        CreateNoWindow = true,
+                        UseShellExecute = false
+                    }
+                };
+
+                process.Start();
+                process.WaitForExit();
+
+                if (process.ExitCode == 0)
+                {
+                    Console.WriteLine($"Klasör başarıyla zorla silindi: {path}");
+                }
+                else
+                {
+                    Console.WriteLine($"Zorla silme başarısız: {path}, Çıkış kodu: {process.ExitCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Zorla silme sırasında hata: {ex.Message}");
             }
         }
         private void RemoveReadOnlyAttributesRecursive(string path)
@@ -1085,6 +1127,33 @@ namespace SLF
                 Debug.WriteLine($"Salt okunur özniteliği kaldırılırken hata: {ex.Message}");
             }
         }
+
+        // Read-Only özniteliğini kaldıran yardımcı metot
+        private void RemoveReadOnlyAttributes(string path)
+        {
+            // Dosyaların özniteliklerini değiştir
+            string[] files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
+            foreach (string file in files)
+            {
+                FileInfo fileInfo = new FileInfo(file);
+                if ((fileInfo.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                {
+                    fileInfo.Attributes &= ~FileAttributes.ReadOnly;
+                }
+            }
+
+            // Alt klasörlerin özniteliklerini değiştir
+            string[] directories = Directory.GetDirectories(path);
+            foreach (string directory in directories)
+            {
+                DirectoryInfo dirInfo = new DirectoryInfo(directory);
+                if ((dirInfo.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                {
+                    dirInfo.Attributes &= ~FileAttributes.ReadOnly;
+                }
+            }
+        }
+
         // Eski geçici klasörleri temizleme metodu
         //private void CleanupOldTempFolders()
         //{
@@ -1905,6 +1974,7 @@ namespace SLF
                 if (girdiModülleri[text].importedDataTable.Rows.Count > 0)
                 {
                     textColor = Color.Green;
+                    
                     
                 }
             }
@@ -5502,7 +5572,6 @@ namespace SLF
                                     "Veri Kaybı Uyarısı",
                                     MessageBoxButtons.YesNo,
                                     MessageBoxIcon.Warning);
-
                                 if (result != DialogResult.Yes)
                                     return;
                             }
@@ -5524,6 +5593,22 @@ namespace SLF
 
                             MessageBox.Show($"Proje '{projectName}' başarıyla açıldı.",
                                 "Proje Açıldı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                            // Son çalışılan projeyi ayarlar dosyasına kaydet
+                            try
+                            {
+                                //Properties.Settings.Default.LastProjectName = projectName;
+                                //Properties.Settings.Default.LastProjectCity = PathService.SelectedCity;
+                                //Properties.Settings.Default.LastProjectDistrict = PathService.SelectedDistrict;
+                                //Properties.Settings.Default.Save();
+
+                                Console.WriteLine($"Son proje bilgileri kaydedildi: {projectName}");
+                            }
+                            catch (Exception settingsEx)
+                            {
+                                Console.WriteLine($"Ayarlar kaydedilirken hata: {settingsEx.Message}");
+                                // Ayarlar kaydedilemediğinde ana işlevi etkilememesi için hatayı yut
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -5541,25 +5626,29 @@ namespace SLF
             }
         }
 
+
         // Yeni metot: Varsayılan geçici klasörü temizle
-        private void CleanupDefaultTempFolder()
+        private bool CleanupDefaultTempFolder()
         {
             try
             {
-                // Eğer mevcut bir geçici klasör varsa ve proje moduna geçtiyse
-                if (PathService.CurrentMode == PathService.WorkingMode.Project)
-                {
-                    string tempPath = Path.Combine(
-                        PathService.BaseDirectory,
-                        PathService.FullPath,
-                        "temp_default"); // Varsayılan geçici klasör adı
+                string districtPath = Path.Combine(PathService.BaseDirectory, PathService.FullPath);
 
-                    if (Directory.Exists(tempPath))
+                if (Directory.Exists(districtPath))
+                {
+                    // "temp_" ile başlayan tüm klasörleri bul
+                    string[] tempFolders = Directory.GetDirectories(districtPath, "temp_*");
+
+                    foreach (string folder in tempFolders)
                     {
                         try
                         {
-                            Directory.Delete(tempPath, true);
-                            Console.WriteLine($"Varsayılan geçici klasör silindi: {tempPath}");
+                            // Salt okunur özniteliklerini kaldır
+                            RemoveReadOnlyAttributesRecursive(folder);
+
+                            // Klasörü sil
+                            Directory.Delete(folder, true);
+                            Console.WriteLine($"Geçici klasör silindi: {folder}");
                         }
                         catch (Exception ex)
                         {
@@ -5567,10 +5656,13 @@ namespace SLF
                         }
                     }
                 }
+
+                return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Geçici klasör temizlenirken hata: {ex.Message}");
+                Debug.WriteLine($"Geçici klasörleri temizlerken hata: {ex.Message}");
+                return false;
             }
         }
         private void LoadProjectState()
