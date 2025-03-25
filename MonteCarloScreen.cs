@@ -20,8 +20,8 @@ namespace SLF
             InitializeComponent();
 
             // GirdiModülü nesnesinden yıl değerlerini al
-            slfStartYear = girdiModülü.SlfStartYear;
-            slfEndYear = girdiModülü.SlfEndYear;
+            slfStartYear = girdiModülü.slfStartYear;
+            slfEndYear = girdiModülü.slfEndYear;
 
             Console.WriteLine("Başlangıç Yılı: " + slfStartYear);  // Kontrol için başlangıç yılını yazdır
             Console.WriteLine("Bitiş Yılı: " + slfEndYear);        // Kontrol için bitiş yılını yazdır

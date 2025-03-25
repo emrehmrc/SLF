@@ -98,7 +98,16 @@ namespace SLF.Services
             Debug.WriteLine($"Path güncellendi: {FullWorkingPath}");
             return result;
         }
+        public static void SetMode(WorkingMode mode)
+        {
+            // This method can access the private setter
+            CurrentMode = mode;
+        }
 
+        // Then in your ProjeEkleButton_Click method, change:
+        // PathService.CurrentMode = PathService.WorkingMode.Project;
+        // to:
+        //PathService.SetMode(PathService.WorkingMode.Project);
         /// <summary>
         /// Yeni bir geçici çalışma klasörü oluşturur
         /// </summary>
@@ -241,31 +250,95 @@ namespace SLF.Services
             CurrentWorkingFolder = projectFolderName;
             CurrentMode = WorkingMode.Project;
 
+            // Proje durum dosyasını oluştur
+            SaveProjectState(newPath);
+
             Debug.WriteLine($"Proje kaydedildi: {projectFolderName}");
 
             return newPath;
         }
 
+        private static void SaveProjectState(string projectPath)
+        {
+            try
+            {
+                // Tamamlanan modülleri GirdiModülü.dataTablesByType'dan al
+                var completedModules = GirdiModülü.dataTablesByType.Keys.ToList();
+
+                var projectState = new Dictionary<string, object>
+                {
+                    ["CompletedModules"] = completedModules,
+                    ["LastSaved"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    ["CreatedBy"] = Environment.UserName
+                };
+
+                string json = System.Text.Json.JsonSerializer.Serialize(projectState,
+                    new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+
+                string statePath = Path.Combine(projectPath, "project_state.json");
+                File.WriteAllText(statePath, json);
+
+                Debug.WriteLine($"Proje durumu kaydedildi: {statePath}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Proje durumu kaydedilirken hata: {ex.Message}");
+            }
+        }
+        private static void CreateProjectSubfolders(string projectPath)
+        {
+            // Create standard subfolders for projects
+            Directory.CreateDirectory(Path.Combine(projectPath, "Girdiler"));
+            Directory.CreateDirectory(Path.Combine(projectPath, "Sonuçlar"));
+            Directory.CreateDirectory(Path.Combine(projectPath, "Raporlar"));
+
+            // Create module-specific folders in the Girdiler folder
+            string girdilerPath = Path.Combine(projectPath, "Girdiler");
+            Directory.CreateDirectory(Path.Combine(girdilerPath, "DTR_Verileri"));
+            Directory.CreateDirectory(Path.Combine(girdilerPath, "Abone_Verileri"));
+            Directory.CreateDirectory(Path.Combine(girdilerPath, "DEK_Verileri"));
+            Directory.CreateDirectory(Path.Combine(girdilerPath, "EA_Sarj_Verileri"));
+            // Add other module folders as needed
+        }
         /// <summary>
         /// Mevcut bir projeyi açar
         /// </summary>
         /// <param name="projectName">Açılacak proje adı</param>
-        public static void OpenProject(string projectName)
+        public static string OpenProject(string projectName)
         {
-            string projectFolder = $"proje_{projectName}";
-            string projectPath = Path.Combine(BaseDirectory, FullPath, projectFolder);
-
-            if (!Directory.Exists(projectPath))
+            try
             {
-                throw new DirectoryNotFoundException($"Proje klasörü bulunamadı: {projectName}");
+                // Proje klasör adını oluştur
+                string projectFolderName = $"proje_{projectName}";
+                string projectPath = Path.Combine(BaseDirectory, FullPath, projectFolderName);
+
+                // Proje klasörü yoksa oluştur
+                if (!Directory.Exists(projectPath))
+                {
+                    Directory.CreateDirectory(projectPath);
+
+                    // Directly create folders here instead of calling CreateProjectSubfolders
+                    Directory.CreateDirectory(Path.Combine(projectPath, "Girdiler"));
+                    Directory.CreateDirectory(Path.Combine(projectPath, "Sonuçlar"));
+                    // Add other folders as needed
+                }
+
+                // Use our new method to set the mode
+                SetMode(WorkingMode.Project);
+                CurrentWorkingFolder = projectFolderName;
+
+                Console.WriteLine($"Proje açıldı: {projectName}");
+                Console.WriteLine($"Çalışma modu: {CurrentMode}");
+                Console.WriteLine($"Çalışma klasörü: {CurrentWorkingFolder}");
+
+                return projectPath;
             }
-
-            CurrentWorkingFolder = projectFolder;
-            CurrentMode = WorkingMode.Project;
-
-            Debug.WriteLine($"Proje açıldı: {projectFolder}");
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Proje açılırken hata: {ex.Message}");
+                throw;
+            }
         }
-
         /// <summary>
         /// İlçe için mevcut proje listesini döndürür
         /// </summary>

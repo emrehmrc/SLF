@@ -85,8 +85,8 @@ namespace SLF
             InitializeComponent();
             foreach (var modul in ModülFormu.girdiModülleri.Values)
             {
-                modul.SlfStartYear = ModülFormu.Instance.slfStartYear;
-                modul.SlfEndYear = ModülFormu.Instance.slfEndYear;
+                modul.slfStartYear = ModülFormu.Instance.slfStartYear;
+                modul.slfEndYear = ModülFormu.Instance.slfEndYear;
             }
 
         }
@@ -1199,8 +1199,8 @@ namespace SLF
                 }
 
                 // Process DTR Module
-                //girdiModülü.SlfStartYear = ModülFormu.Instance.slfStartYear;
-                //girdiModülü.SlfEndYear = ModülFormu.Instance.slfEndYear;
+                //girdiModülü.slfStartYear = ModülFormu.Instance.slfStartYear;
+                //girdiModülü.slfEndYear = ModülFormu.Instance.slfEndYear;
                 girdiModülü = ModülFormu.girdiModülleri["DTR Verileri"];
 
                 if (girdiModülü.VEERProcess(selectedTable))

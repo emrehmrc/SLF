@@ -32,6 +32,7 @@ namespace SLF
   
     public class GirdiModülü
     {
+         
         protected Önizleme onizleme1 = new Önizleme();
         protected Raporlama raporlama1 = new Raporlama(); // excel sayfası için yapılmıs calısma excelexporter ve excel importer için bakılabilir ileri durumlarda 
         protected readonly List<string> veri_listesi_requires_xlsx = new List<string> {  
@@ -45,6 +46,7 @@ namespace SLF
             "Enerji Müsaadeleri Verileri",
             "Yeni Projelendirilmiş DTR Verileri"
         };
+        
         protected static readonly List<int> TRAFO_KAPASITE_LISTESI = new List<int> // trafo yakınsama için kullanılan list
         {
             15, 25, 40, 50, 63, 100, 160, 200, 250, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500
@@ -69,23 +71,21 @@ namespace SLF
             "#N/A"
         };
         public string seçilenVeriTipi { get; set; }
-        public readonly YearService _yearService = YearService.GetInstance();
-        public int slfStartYear;
-        public int slfEndYear;
-        public int SlfStartYear
+        protected readonly YearService _yearService;
+
+        public int slfStartYear
         {
-            get { return slfStartYear; }
-            set { slfStartYear = value; }
-            
+            get { return _yearService.slfStartYear; }
+            set { _yearService.slfStartYear = value; }
         }
 
-
-        public int SlfEndYear
+        public int slfEndYear
         {
-            get { return _yearService.SlfEndYear; }
-            set { _yearService.SlfEndYear = value; }
+            get { return _yearService.slfEndYear; }
+            set { _yearService.slfEndYear = value; }
         }
 
+        // Diğer ilgili yıl property'leri - bunların YearService'den alınması önemli
         public int lastYear
         {
             get { return _yearService.LastYear; }
@@ -100,6 +100,7 @@ namespace SLF
         {
             get { return _yearService.HorizonYear; }
         }
+
         //public bool ExportToExcel(string customPath = null)
         //{
         //    try
@@ -162,7 +163,7 @@ namespace SLF
         //        return false;
         //    }
         //}
-        //public int SlfEndYear
+        //public int slfEndYear
         //{
         //    get { return slfEndYear; }
         //    set { slfEndYear = value; }
@@ -443,6 +444,7 @@ namespace SLF
             raporlama1.Onizleme_DataGrid3.AllowUserToAddRows = false;
             raporlama1.Onizleme_DataGrid4.AllowUserToAddRows = false;
             raporlama1.Onizleme_DataGrid5.AllowUserToAddRows = false;
+            _yearService = YearService.GetInstance();
             //raporlama1.Onizleme_DataGrid6.AllowUserToAddRows = false;
         }
 
@@ -608,17 +610,24 @@ namespace SLF
                 dataTablesByType[seçilenVeriTipi] = importedDataTable;
                 Console.WriteLine($"Veri eklendi/güncellendi - Key: {seçilenVeriTipi}, Satır sayısı: {importedDataTable.Rows.Count}");
 
-                // Veriyi modül için doğru klasöre kaydet
-                SaveDataToCorrectFolder();
+                // Veriyi klasöre CSV olarak kaydet
+                SaveModuleDataToCSV();
 
-                // Mevcut durumu logla
-                Console.WriteLine("\nMevcut Dictionary durumu:");
-                foreach (var kvp in dataTablesByType)
+                // Geçici klasörün proje durumunu güncelle 
+                if (PathService.CurrentMode == PathService.WorkingMode.Temporary)
                 {
-                    Console.WriteLine($"Key: {kvp.Key}, Satır: {kvp.Value?.Rows.Count}");
+                    string tempPath = Path.Combine(
+                        PathService.BaseDirectory,
+                        PathService.FullPath,
+                        PathService.CurrentWorkingFolder);
+
+                    SaveTempProjectState(tempPath);
                 }
 
                 Console.WriteLine("=== ImportProcessedData Tamamlandı ===\n");
+
+                // Kullanıcıya bilgi göster
+                ShowImportedMessage();
             }
             catch (Exception ex)
             {
@@ -630,6 +639,101 @@ namespace SLF
             finally
             {
                 Cursor.Current = Cursors.Default;
+            }
+        }
+        private void SaveModuleDataToCSV()
+        {
+            try
+            {
+                // Veri tipi için doğru klasör yolunu al
+                string folderPath = PathService.GetGirdilerPathForDataType(seçilenVeriTipi);
+
+                if (string.IsNullOrEmpty(folderPath))
+                {
+                    Console.WriteLine("Geçerli bir klasör yolu alınamadı, veri kaydedilemedi.");
+                    return;
+                }
+
+                // Klasör yoksa oluştur
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+
+                // Dosya adını oluştur (veri tipi ve zaman damgası ile)
+                string fileName = $"{seçilenVeriTipi.Replace(" ", "_")}_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+                string fullPath = Path.Combine(folderPath, fileName);
+
+                // CSV olarak kaydet
+                using (StreamWriter sw = new StreamWriter(fullPath, false, Encoding.UTF8))
+                {
+                    // Başlık satırı
+                    int columnCount = importedDataTable.Columns.Count;
+                    for (int i = 0; i < columnCount; i++)
+                    {
+                        sw.Write(importedDataTable.Columns[i].ColumnName);
+                        if (i < columnCount - 1)
+                        {
+                            sw.Write(",");
+                        }
+                    }
+                    sw.WriteLine();
+
+                    // Veri satırları
+                    foreach (DataRow row in importedDataTable.Rows)
+                    {
+                        for (int i = 0; i < columnCount; i++)
+                        {
+                            // Null değerleri boş string olarak yaz
+                            string value = row[i]?.ToString() ?? "";
+
+                            // Virgül içeren değerleri çift tırnak içine al
+                            if (value.Contains(",") || value.Contains("\"") || value.Contains("\n"))
+                            {
+                                value = "\"" + value.Replace("\"", "\"\"") + "\"";
+                            }
+
+                            sw.Write(value);
+                            if (i < columnCount - 1)
+                            {
+                                sw.Write(",");
+                            }
+                        }
+                        sw.WriteLine();
+                    }
+                }
+
+                Console.WriteLine($"Veri CSV olarak kaydedildi: {fullPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"CSV kaydetme hatası: {ex.Message}");
+            }
+        }
+        private void SaveTempProjectState(string tempPath)
+        {
+            try
+            {
+                // Tamamlanan modül listesini doğrudan dataTablesByType'dan al
+                var completedModules = dataTablesByType.Keys.ToList();
+
+                var projectState = new Dictionary<string, object>
+                {
+                    ["CompletedModules"] = completedModules,
+                    ["LastUpdated"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                };
+
+                string json = System.Text.Json.JsonSerializer.Serialize(projectState,
+                    new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+
+                string statePath = Path.Combine(tempPath, "temp_state.json");
+                File.WriteAllText(statePath, json);
+
+                Console.WriteLine($"Geçici proje durumu kaydedildi: {statePath}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Geçici proje durumu kaydedilirken hata: {ex.Message}");
             }
         }
         private void SaveDataToCorrectFolder()

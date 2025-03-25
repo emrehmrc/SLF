@@ -45,7 +45,7 @@ namespace SLF
         private readonly double startX = 0;
         private readonly double startY = 0;
         public int slfStartYear = 0, slfEndYear = 0;
-        
+
         TextBox logTextBox; // Declare logTextBox here --------------
         private ExcelService _excelService;
         private ExcelService excelService = new ExcelService();
@@ -56,7 +56,7 @@ namespace SLF
         private string _selectedCity = null;
         private Form popupForm; // easim ekran popup 
         private DataTable veriMonteCarlo;
-        
+
         public static List<string> modulescheck = new List<string>();
         private bool isDtrLoaded = false;
         private Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
@@ -260,7 +260,18 @@ namespace SLF
 
             _excelService = new ExcelService();
             InitializeLogTextBox(); // Initialize logTextBox
-
+            var yearService = YearService.GetInstance();
+            if (this.slfStartYear > 0 && this.slfEndYear > 0)
+            {
+                // ModülFormu'na dışarıdan atanan değerleri YearService'e aktarma
+                yearService.SetYears(this.slfStartYear, this.slfEndYear);
+            }
+            else
+            {
+                // YearService'ten değerleri alma
+                this.slfStartYear = yearService.slfStartYear;
+                this.slfEndYear = yearService.slfEndYear;
+            }
             this.DoubleBuffered = true;
             this.selectedMethod = selectedMethod;  // Store the method
             InitializeComboBoxes();
@@ -561,7 +572,14 @@ namespace SLF
             if (!girdiModülleri.ContainsKey(seçilenVeriTipi))
             {
                 MessageBox.Show("Geçersiz veri tipi seçildi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return; // Exit if the selected data type is not valid
+                return; // Metodu sonlandır
+            }
+
+            girdiModülü = girdiModülleri[seçilenVeriTipi];
+            if (girdiModülü == null)
+            {
+                MessageBox.Show($"{seçilenVeriTipi} için girdi modülü oluşturulamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return; // Metodu sonlandır
             }
             // Use the selectedMethod here
             if (selectedMethod == "ELF (Ekonometrik)")
@@ -573,18 +591,17 @@ namespace SLF
             {
                 // Logic for SLF selection
                 // MessageBox.Show("SLF method selected, prerequisites are required.");
-             }
+            }
             else
             {
                 // Handle other cases or invalid selection
                 MessageBox.Show("No valid method selected.");
             }
+            //string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
 
 
-            //girdiModülü = girdiModülleri[seçilenVeriTipi];
-            //Console.WriteLine("girdimodulusecilenveritipi" + seçilenVeriTipi);
-            girdiModülü.SlfStartYear = slfStartYear;
-            girdiModülü.SlfEndYear = slfEndYear;
+            girdiModülü.slfStartYear = slfStartYear;
+            girdiModülü.slfEndYear = slfEndYear;
 
 
             InitializeComboBoxes(); // yılların guncellenmesi 
@@ -594,7 +611,7 @@ namespace SLF
             // Call VEERProcess with skipPrerequisites flag
             var isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
             //Console.WriteLine(isImported.ToString());
-            isİmportedModule(isImported, seçilenVeriTipi);
+            //isİmportedModule(isImported, seçilenVeriTipi);
             //if (isImported)
             //{
             //    modulescheck.Add(seçilenVeriTipi);
@@ -618,7 +635,7 @@ namespace SLF
             }
             //girdiModülü = girdiModülleri[seçilenVeriTipi];
             var importedDataTable = GirdiModülü.dataTablesByType[seçilenVeriTipi];
-            
+
 
             if (!isImported)
             {
@@ -670,42 +687,310 @@ namespace SLF
 
         private void ModülFormu_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // Kapanış onayı al
-            DialogResult result = MessageBox.Show(
-                "Programı kapatmak istediğinize emin misiniz? Kaydedilmeyen veriler kaybolacaktır!",
-                "Çıkış",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning
-            );
+            // Değişiklikler var mı kontrol et
+            bool hasChanges = false;
 
-            if (result == DialogResult.No)
+            // Son kaydedilen modül listesi ile mevcut modül listesini karşılaştır
+            if (PathService.CurrentMode == PathService.WorkingMode.Project)
             {
-                e.Cancel = true; // Kapanış iptal edilir
-                return;
+                // Proje zaten açık, değişiklik var mı kontrol et
+                string statePath = Path.Combine(
+                    PathService.BaseDirectory,
+                    PathService.FullPath,
+                    PathService.CurrentWorkingFolder,
+                    "project_state.json");
+
+                if (File.Exists(statePath))
+                {
+                    try
+                    {
+                        string json = File.ReadAllText(statePath);
+                        var projectState = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+
+                        if (projectState.TryGetValue("CompletedModules", out object modulesObj))
+                        {
+                            string modulesJson = modulesObj.ToString();
+                            List<string> savedModules = System.Text.Json.JsonSerializer.Deserialize<List<string>>(modulesJson);
+
+                            // Mevcut modüller
+                            var currentModules = GirdiModülü.dataTablesByType.Keys.ToList();
+
+                            // Değişiklik var mı?
+                            if (currentModules.Count != savedModules.Count ||
+                                !currentModules.All(m => savedModules.Contains(m)))
+                            {
+                                hasChanges = true;
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // Hata olduğunda değişiklikler olduğunu varsay
+                        hasChanges = true;
+                    }
+                }
+                else if (GirdiModülü.dataTablesByType.Count > 0)
+                {
+                    // Hiç kayıt yoksa ama veriler varsa değişiklikler var demektir
+                    hasChanges = true;
+                }
+            }
+            else if (PathService.CurrentMode == PathService.WorkingMode.Temporary && GirdiModülü.dataTablesByType.Count > 0)
+            {
+                // Geçici moddayız ve veri var, değişiklik var demektir
+                hasChanges = true;
             }
 
+            // Değişiklikler varsa kaydetme seçeneği sun
+            if (hasChanges)
+            {
+                DialogResult result = MessageBox.Show(
+                    "Kaydedilmemiş değişiklikler var. Çıkmadan önce kaydetmek ister misiniz?",
+                    "Değişiklikler Kaydedilsin mi?",
+                    MessageBoxButtons.YesNoCancel,
+                    MessageBoxIcon.Question);
+
+                if (result == DialogResult.Cancel)
+                {
+                    e.Cancel = true; // Çıkışı iptal et
+                    return;
+                }
+                else if (result == DialogResult.Yes)
+                {
+                    // Projeyi kaydet - moduna göre işlem yap
+                    bool saveSuccess = false;
+
+                    if (PathService.CurrentMode == PathService.WorkingMode.Project)
+                    {
+                        // Mevcut projeyi güncelle - doğrudan mevcut projeye kaydet
+                        saveSuccess = UpdateExistingProject();
+                    }
+                    else
+                    {
+                        // Geçici moddayız, yeni proje adı sor
+                        string projectName = ProjectFolderPicker.ShowNewProjectDialog(
+                            Path.Combine(PathService.BaseDirectory, PathService.FullPath));
+
+                        if (!string.IsNullOrEmpty(projectName))
+                        {
+                            // PathService.OpenProject kullanarak projeyi oluştur
+                            PathService.OpenProject(projectName);
+
+                            // Verileri kaydet
+                            saveSuccess = UpdateExistingProject();
+                        }
+                        else
+                        {
+                            // Kullanıcı iptal etti veya geçersiz isim
+                            DialogResult continueResult = MessageBox.Show(
+                                "Proje kaydedilmedi. Yine de çıkmak istiyor musunuz?",
+                                "Kaydetme İptal Edildi",
+                                MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Question);
+
+                            if (continueResult == DialogResult.No)
+                            {
+                                e.Cancel = true; // Çıkışı iptal et
+                                return;
+                            }
+                        }
+                    }
+
+                    if (!saveSuccess)
+                    {
+                        // Kaydetme başarısız olduysa tekrar sor
+                        DialogResult retryResult = MessageBox.Show(
+                            "Proje kaydedilemedi. Yine de çıkmak istiyor musunuz?",
+                            "Kaydetme Başarısız",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Warning);
+
+                        if (retryResult == DialogResult.No)
+                        {
+                            e.Cancel = true; // Çıkışı iptal et
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // Çıkış işlemine devam et
             try
             {
                 // Geçici klasörleri temizle
-                bool cleaned = CleanupTemporaryFolders();
-
-                if (cleaned)
-                {
-                    Debug.WriteLine("Geçici klasörler başarıyla temizlendi.");
-                }
-                else
-                {
-                    Debug.WriteLine("Geçici klasör temizleme işlemi gerçekleşmedi.");
-                }
+                CleanupTemporaryFolders();
 
                 // Veritabanı bağlantısını kapat
                 DatabaseManager.GetInstance("").CloseConnection();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Kapanış sırasında hata: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Kapanış sırasında hata: " + ex.Message);
             }
         }
+
+        // Yeni proje oluştur ve verileri kaydet
+        private bool CreateAndSaveProject(string projectName)
+        {
+            try
+            {
+                // PathService.OpenProject kullanarak hem project mode'a geç hem de klasörleri oluştur
+                string projectPath = PathService.OpenProject(projectName);
+
+                // Proje durumu ve verileri kaydet
+                SaveProjectState(projectPath);
+                SaveAllModuleDataToCSV(projectPath);
+
+                Console.WriteLine($"Yeni proje oluşturuldu ve kaydedildi: {projectName}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Proje oluşturulurken hata oluştu: {ex.Message}", "Oluşturma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+        // Proje durumunu kaydetme metodu
+        // Proje durumunu kaydetme metodu - ProjectState.cs dosyasında benzeri var ancak burada kendi versiyonumuzu kullanıyoruz
+        private void SaveProjectState(string projectPath)
+        {
+            try
+            {
+                var yearService = YearService.GetInstance();
+
+                // Proje durumunu hazırla
+                var projectState = new Dictionary<string, object>
+                {
+                    ["CompletedModules"] = GirdiModülü.dataTablesByType.Keys.ToList(),
+                    ["SLFStartYear"] = yearService.slfStartYear,
+                    ["SLFEndYear"] = yearService.slfEndYear,
+                    ["LastSaved"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    ["CreatedBy"] = Environment.UserName
+                };
+
+                // JSON olarak kaydet
+                string json = System.Text.Json.JsonSerializer.Serialize(projectState,
+                    new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+
+                string statePath = Path.Combine(projectPath, "project_state.json");
+                File.WriteAllText(statePath, json);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Proje durumu kaydedilirken hata: {ex.Message}");
+                throw;
+            }
+        }
+        // Modül verilerini CSV olarak kaydet
+
+
+        // Mevcut projeyi güncelleme metodu
+        private bool UpdateExistingProject()
+        {
+            try
+            {
+                // Proje yolunu al
+                string projectPath = Path.Combine(
+                    PathService.BaseDirectory,
+                    PathService.FullPath,
+                    PathService.CurrentWorkingFolder);
+
+                // Proje durumunu kaydet
+                SaveProjectState(projectPath);
+
+                // Modül verilerini kaydet
+                SaveAllModuleDataToCSV(projectPath);
+
+                // Proje adını al (proje_ önekini çıkar)
+                string projectName = PathService.CurrentWorkingFolder.StartsWith("proje_")
+                    ? PathService.CurrentWorkingFolder.Substring(6)
+                    : PathService.CurrentWorkingFolder;
+
+                Console.WriteLine($"Mevcut proje güncellendi: {projectName}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Proje güncellenirken hata oluştu: {ex.Message}", "Güncelleme Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+        private bool SaveAsProject()
+        {
+            try
+            {
+                // Proje klasörünün ana dizini
+                string projectsBaseDir = Path.Combine(PathService.BaseDirectory, PathService.FullPath);
+
+                // Proje Ekle dialogunu göster
+                using (var folderBrowser = new ProjectFolderPicker(projectsBaseDir))
+                {
+                    // Sadece mevcut projeleri seçmeye izin ver - bu seçeneği istemiyorsanız kaldırabilirsiniz
+                    folderBrowser.EnableCreateProject = true;
+
+                    if (folderBrowser.ShowDialog() == DialogResult.OK)
+                    {
+                        string selectedPath = folderBrowser.SelectedPath;
+                        string projectName = folderBrowser.SelectedProjectName;
+
+                        // Projeyi aç
+                        PathService.OpenProject(projectName);
+
+                        // Proje durumunu kaydet ve verileri ekle
+                        return UpdateCurrentProject();
+                    }
+                }
+
+                // Kullanıcı iptal etti
+                return false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Proje kaydedilirken hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+        private bool UpdateCurrentProject()
+        {
+            try
+            {
+                // YearService'ten yılları al
+                var yearService = YearService.GetInstance();
+
+                // Proje yolunu al
+                string projectPath = Path.Combine(
+                    PathService.BaseDirectory,
+                    PathService.FullPath,
+                    PathService.CurrentWorkingFolder);
+
+                // Proje durumunu hazırla
+                var projectState = new Dictionary<string, object>();
+                projectState["CompletedModules"] = GirdiModülü.dataTablesByType.Keys.ToList();
+                projectState["SLFStartYear"] = yearService.slfStartYear;
+                projectState["SLFEndYear"] = yearService.slfEndYear;
+                projectState["LastSaved"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                // Durum dosyasını güncelle
+                string statePath = Path.Combine(projectPath, "project_state.json");
+                string json = System.Text.Json.JsonSerializer.Serialize(projectState,
+                    new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+
+                File.WriteAllText(statePath, json);
+
+                // Modül verilerini kaydet
+                SaveAllModuleDataToCSV(projectPath);
+
+                // Başarılı
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Proje güncellenirken hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+        // Geçici klasörü proje olarak kaydet
+
         private bool CleanupTemporaryFolders()
         {
             try
@@ -1559,10 +1844,31 @@ namespace SLF
 
         private void veri_listesi_seçimi_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
-            girdiModülü = girdiModülleri[seçilenVeriTipi];
-            Console.WriteLine("veri_listesi_secimi"+girdiModülü.importedDataTable.Rows.Count);
-            dataGridView_girdi.DataSource = girdiModülü.importedDataTable;
+            if (veri_listesi_seçimi.SelectedItem != null)
+            {
+                string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+
+                // dataTablesByType'ta bu veri var mı kontrol et
+                if (GirdiModülü.dataTablesByType.ContainsKey(seçilenVeriTipi))
+                {
+                    // GirdiModülü'nü güncelle
+                    if (girdiModülleri.ContainsKey(seçilenVeriTipi))
+                    {
+                        girdiModülleri[seçilenVeriTipi].importedDataTable = GirdiModülü.dataTablesByType[seçilenVeriTipi];
+                    }
+
+                    // DataGridView'ı güncelle
+                    dataGridView_girdi.DataSource = GirdiModülü.dataTablesByType[seçilenVeriTipi];
+                    dataGridView_girdi.Refresh();
+
+                    Debug.WriteLine($"Seçilen veri tipi: {seçilenVeriTipi}, Satır sayısı: {GirdiModülü.dataTablesByType[seçilenVeriTipi].Rows.Count}");
+                }
+                else
+                {
+                    Debug.WriteLine($"Seçilen veri tipi için yüklenmiş veri yok: {seçilenVeriTipi}");
+                    dataGridView_girdi.DataSource = null;
+                }
+            }
         }
 
         private void SortTabPagesAlphabetically(TabControl tabControl, bool ascending = true)
@@ -1791,71 +2097,64 @@ namespace SLF
         }
 
         private void yearApproveButton_Click(object sender, EventArgs e)
+{
+    try {
+        // Yıl servisi referansını al - DOĞRU
+        var yearService = YearService.GetInstance();
+
+                // Debug için mevcut değerlere bakalım
+        Debug.WriteLine($"YearService değerleri değişti mi? - Başlangıç: {yearService.slfStartYear}, Bitiş: {yearService.slfEndYear}");
+
+                if (endYearComboBox.SelectedIndex == -1)
         {
-            // Yıl servisi referansını al
-            var yearService = YearService.GetInstance();
-
-            if (endYearComboBox.SelectedIndex == -1)
-            {
-                // Eğer bitiş yılı seçilmediyse, hala seçim sürecindeyiz
-                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            else if (startYearComboBox.Enabled == false && endYearComboBox.Enabled == false)
-            {
-                // Eğer her iki combobox da devre dışı bırakıldıysa, seçim işlemi zaten tamamlanmış demektir
-                // girdiModülleri içindeki herhangi bir DataTable'ın satırları olup olmadığını kontrol et
-                bool anyTableHasRows = girdiModülleri.Values.Any(girdiModülü =>
-                    girdiModülü.importedDataTable != null && girdiModülü.importedDataTable.Rows.Count > 0);
-
-                if (anyTableHasRows)
-                {
-                    var dialogResult = MessageBox.Show("Yılları değiştirirseniz verileri tekrardan içeri aktarmanız gerekecek, devam etmek istiyor musunuz?",
-                        "Uyarı!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-                    if (dialogResult != DialogResult.Yes)
-                    {
-                        return;
-                    }
-                }
-
-                // Yıl seçimini sıfırla
-                ResetYearSelectionProcessGirdiModulu();
-
-                // Her bir girdiModülü için importedDataTable'ı temizle
-                foreach (var girdiModülü in girdiModülleri.Values)
-                {
-                    girdiModülü.importedDataTable = new DataTable();
-                }
-
-                // YearService'deki değerleri sıfırla
-                yearService.SetYears(0, 0);
-
-                dataGridView_girdi.DataSource = null;
-            }
-            else
-            {
-                // Seçimler tamamlandı
-                startYearComboBox.Enabled = false;
-                endYearComboBox.Enabled = false;
-
-                // Seçilen değerleri al
-                int selectedStartYear = (int)startYearComboBox.SelectedItem;
-                int selectedEndYear = (int)endYearComboBox.SelectedItem;
-
-                // YearService'e değerleri ayarla
-                yearService.SetYears(selectedStartYear, selectedEndYear);
-
-                // Geriye dönük uyumluluk için sınıf değişkenlerini de güncelle
-                slfStartYear = selectedStartYear;
-                slfEndYear = selectedEndYear;
-
-                MessageBox.Show($"Başlangıç yılı: {selectedStartYear}, Bitiş yılı: {selectedEndYear}",
-                    "Yıllar belirlendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                yearApproveButton.Text = "Sıfırla";
-            }
+            // Doğru işlem - hata mesajı
         }
+        else if (startYearComboBox.Enabled == false && endYearComboBox.Enabled == false)
+        {
+            // Yıl sıfırlama kodu - doğru
+        }
+        else
+        {
+            // Seçimler tamamlandı
+            startYearComboBox.Enabled = false;
+            endYearComboBox.Enabled = false;
+            
+            // Seçilen değerleri al
+            int selectedStartYear = (int)startYearComboBox.SelectedItem;
+            int selectedEndYear = (int)endYearComboBox.SelectedItem;
+            
+            Debug.WriteLine($"Seçilen yıllar - Başlangıç: {selectedStartYear}, Bitiş: {selectedEndYear}");
+            
+            // YearService'e değerleri ayarla
+            yearService.SetYears(selectedStartYear, selectedEndYear);
+            
+            // Değerler başarıyla ayarlandı mı kontrol edelim
+            Debug.WriteLine($"YearService değerleri değişti mi? - Başlangıç: {yearService.slfStartYear}, Bitiş: {yearService.slfEndYear}");
+            
+            // Geriye dönük uyumluluk için sınıf değişkenlerini de güncelle
+            slfStartYear = selectedStartYear;
+            slfEndYear = selectedEndYear;
+            
+            // GirdiModülleri dictionary'sindeki bir örneği kontrol edelim
+            if (girdiModülleri != null && girdiModülleri.Count > 0)
+            {
+                var firstModule = girdiModülleri.FirstOrDefault();
+                if (firstModule.Value != null)
+                {
+                    Debug.WriteLine($"Örnek GirdiModülü değerleri - Modül: {firstModule.Key}, Başlangıç: {firstModule.Value.slfStartYear}, Bitiş: {firstModule.Value.slfEndYear}");
+                }
+            }
+            
+            MessageBox.Show($"Başlangıç yılı: {selectedStartYear}, Bitiş yılı: {selectedEndYear}",
+                "Yıllar belirlendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            yearApproveButton.Text = "Sıfırla";
+        }
+    }
+    catch (Exception ex) {
+        Debug.WriteLine($"yearApproveButton_Click hata: {ex.Message}");
+        MessageBox.Show($"Yıl ayarlama sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+    }
+}
 
 
         /* -------------------------------------------------------------------------------------------*/
@@ -4743,8 +5042,8 @@ namespace SLF
                 MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            girdiModülü.SlfStartYear = slfStartYear;
-            girdiModülü.SlfEndYear = slfEndYear;
+            girdiModülü.slfStartYear = slfStartYear;
+            girdiModülü.slfEndYear = slfEndYear;
 
             Console.WriteLine($"LastYear: {girdiModülü.lastYear}");
             Console.WriteLine($"PenultimateYear: {girdiModülü.penultimateYear}");
@@ -4815,14 +5114,1041 @@ namespace SLF
 
         }
 
+        //private void ProjeEkleButton_Click(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        // İl/ilçe bilgilerini kontrol et
+        //        if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
+        //        {
+        //            MessageBox.Show("Lütfen önce il ve ilçe seçimi yapın.",
+        //                "İl/İlçe Seçilmedi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //            return;
+        //        }
+
+        //        // Proje klasörünün ana dizini
+        //        string projectsBaseDir = Path.Combine(PathService.BaseDirectory, PathService.SelectedCity, PathService.SelectedDistrict);
+
+        //        // Klasör picker dialog'unu göster
+        //        using (var folderBrowser = new ProjectFolderPicker(projectsBaseDir))
+        //        {
+        //            if (folderBrowser.ShowDialog() == DialogResult.OK)
+        //            {
+        //                string selectedPath = folderBrowser.SelectedPath;
+        //                string folderName = new DirectoryInfo(selectedPath).Name;
+
+        //                // Klasör adının "proje_" ile başladığını kontrol et
+        //                if (!folderName.StartsWith("proje_"))
+        //                {
+        //                    MessageBox.Show("Geçerli bir proje klasörü seçmelisiniz.\nKlasör adı 'proje_' ile başlamalıdır.",
+        //                        "Geçersiz Klasör", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //                    return;
+        //                }
+
+        //                // Proje adını çıkar
+        //                string projectName = folderName.Substring(6); // "proje_" kısmını çıkar
+
+        //                // PathService'i güncelle
+        //                PathService.OpenProject(projectName);
+
+        //                // Proje durumunu yükle
+        //                LoadProjectState();
+
+        //                // UI'ı güncelle
+        //                UpdateUIForLoadedProject();
+
+        //                MessageBox.Show($"Proje '{projectName}' başarıyla yüklendi.",
+        //                    "Proje Yüklendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show($"Proje yüklenirken hata oluştu: {ex.Message}",
+        //            "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
+        //}
+        //// ProjectFolderPicker sınıfı
+        //public class ProjectFolderPicker : Form
+        //{
+        //    private ListView projectListView;
+        //    private Button selectButton;
+        //    private Button cancelButton;
+        //    private string baseDirectory;
+
+        //    public string SelectedPath { get; private set; }
+
+        //    public ProjectFolderPicker(string baseDir)
+        //    {
+        //        baseDirectory = baseDir;
+        //        InitializeComponents();
+        //        LoadProjectFolders();
+        //    }
+
+        //    private void InitializeComponents()
+        //    {
+        //        // Form ayarları
+        //        this.Text = "Proje Seçimi";
+        //        this.Width = 500;
+        //        this.Height = 400;
+        //        this.StartPosition = FormStartPosition.CenterParent;
+        //        this.FormBorderStyle = FormBorderStyle.FixedDialog;
+        //        this.MaximizeBox = false;
+        //        this.MinimizeBox = false;
+
+        //        // ListView oluştur
+        //        projectListView = new ListView
+        //        {
+        //            View = View.Details,
+        //            FullRowSelect = true,
+        //            MultiSelect = false,
+        //            Dock = DockStyle.Fill,
+        //            Margin = new Padding(10),
+        //            GridLines = true
+        //        };
+
+        //        // Sütunlar ekle
+        //        projectListView.Columns.Add("Proje Adı", 150);
+        //        projectListView.Columns.Add("Oluşturulma Tarihi", 150);
+        //        projectListView.Columns.Add("Son Değişiklik", 150);
+
+        //        // Buton paneli
+        //        var buttonPanel = new Panel
+        //        {
+        //            Dock = DockStyle.Bottom,
+        //            Height = 50
+        //        };
+
+        //        // Seç butonu
+        //        selectButton = new Button
+        //        {
+        //            Text = "Seç",
+        //            DialogResult = DialogResult.OK,
+        //            Enabled = false,
+        //            Width = 100,
+        //            Height = 30,
+        //            Location = new Point(this.Width - 230, 10)
+        //        };
+        //        selectButton.Click += (s, e) => {
+        //            if (projectListView.SelectedItems.Count > 0)
+        //            {
+        //                this.SelectedPath = projectListView.SelectedItems[0].Tag.ToString();
+        //                this.DialogResult = DialogResult.OK;
+        //                this.Close();
+        //            }
+        //        };
+
+        //        // İptal butonu
+        //        cancelButton = new Button
+        //        {
+        //            Text = "İptal",
+        //            DialogResult = DialogResult.Cancel,
+        //            Width = 100,
+        //            Height = 30,
+        //            Location = new Point(this.Width - 120, 10)
+        //        };
+        //        cancelButton.Click += (s, e) => {
+        //            this.DialogResult = DialogResult.Cancel;
+        //            this.Close();
+        //        };
+
+        //        // ListView'a öğe seçildiğinde Seç butonunu etkinleştir
+        //        projectListView.SelectedIndexChanged += (s, e) => {
+        //            selectButton.Enabled = projectListView.SelectedItems.Count > 0;
+        //        };
+
+        //        // DoubleClick ile seçim
+        //        projectListView.DoubleClick += (s, e) => {
+        //            if (projectListView.SelectedItems.Count > 0)
+        //            {
+        //                this.SelectedPath = projectListView.SelectedItems[0].Tag.ToString();
+        //                this.DialogResult = DialogResult.OK;
+        //                this.Close();
+        //            }
+        //        };
+
+        //        // Kontrolleri form'a ekle
+        //        buttonPanel.Controls.Add(selectButton);
+        //        buttonPanel.Controls.Add(cancelButton);
+        //        this.Controls.Add(projectListView);
+        //        this.Controls.Add(buttonPanel);
+        //    }
+
+        //    private void LoadProjectFolders()
+        //    {
+        //        try
+        //        {
+        //            // Proje klasörlerini bul
+        //            if (Directory.Exists(baseDirectory))
+        //            {
+        //                string[] projectFolders = Directory.GetDirectories(baseDirectory, "proje_*");
+
+        //                foreach (string folder in projectFolders)
+        //                {
+        //                    DirectoryInfo dirInfo = new DirectoryInfo(folder);
+        //                    string projectName = dirInfo.Name.Substring(6); // "proje_" çıkar
+
+        //                    // Proje state dosyasını kontrol et
+        //                    string statePath = Path.Combine(folder, "project_state.json");
+        //                    string lastSaved = "-";
+
+        //                    if (File.Exists(statePath))
+        //                    {
+        //                        try
+        //                        {
+        //                            string json = File.ReadAllText(statePath);
+        //                            var projectState = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+
+        //                            if (projectState.TryGetValue("LastSaved", out object lastSavedObj))
+        //                            {
+        //                                lastSaved = lastSavedObj.ToString();
+        //                            }
+        //                        }
+        //                        catch { /* Hata durumunda varsayılan değeri kullan */ }
+        //                    }
+
+        //                    // ListView'a ekle
+        //                    var item = new ListViewItem(projectName);
+        //                    item.SubItems.Add(dirInfo.CreationTime.ToString("yyyy-MM-dd HH:mm:ss"));
+        //                    item.SubItems.Add(lastSaved);
+        //                    item.Tag = folder; // tam yolu sakla
+
+        //                    projectListView.Items.Add(item);
+        //                }
+        //            }
+        //            else
+        //            {
+        //                MessageBox.Show($"Proje dizini bulunamadı: {baseDirectory}",
+        //                    "Dizin Bulunamadı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            MessageBox.Show($"Proje klasörleri yüklenirken hata: {ex.Message}",
+        //                "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //        }
+        //    }
+        //}
+
+        //// Bu metodlar ModülFormu sınıfının içine eklenmelidir
+        //private void LoadProjectState()
+        //{
+        //    try
+        //    {
+        //        string statePath = Path.Combine(
+        //            PathService.BaseDirectory,
+        //            PathService.FullPath,
+        //            PathService.CurrentWorkingFolder,
+        //            "project_state.json");
+
+        //        if (File.Exists(statePath))
+        //        {
+        //            string json = File.ReadAllText(statePath);
+        //            var projectState = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+
+        //            // Tamamlanan modülleri yükle
+        //            if (projectState.TryGetValue("CompletedModules", out object modulesObj))
+        //            {
+        //                // Json'dan List<string> olarak dönüştür
+        //                string modulesJson = modulesObj.ToString();
+        //                List<string> completedModules = System.Text.Json.JsonSerializer.Deserialize<List<string>>(modulesJson);
+
+        //                // Modül verilerini yükle
+        //                foreach (string module in completedModules)
+        //                {
+        //                    LoadModuleData(module);
+        //                }
+        //            }
+
+        //            Debug.WriteLine($"Proje durumu yüklendi: {statePath}");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine($"Proje durumu yüklenirken hata: {ex.Message}");
+        //    }
+        //}
+
+        //// Modül verilerini yükle
+        //private void LoadModuleData(string moduleName)
+        //{
+        //    try
+        //    {
+        //        // Modül için girdiler klasörünü bul
+        //        string modulePath = PathService.GetGirdilerPathForDataType(moduleName);
+
+        //        // Klasördeki en son dosyayı bul (en güncel veri)
+        //        var directory = new DirectoryInfo(modulePath);
+        //        var latestFile = directory.GetFiles("*.csv")
+        //            .OrderByDescending(f => f.LastWriteTime)
+        //            .FirstOrDefault();
+
+        //        if (latestFile != null)
+        //        {
+        //            // CSV'yi yükle
+        //            var csvHandler = new CsvHandler();
+        //            DataTable moduleData = csvHandler.ImportCsvFile(latestFile.FullName);
+
+        //            // GirdiModülü.dataTablesByType'a ekle
+        //            if (moduleData != null && moduleData.Rows.Count > 0)
+        //            {
+        //                GirdiModülü.dataTablesByType[moduleName] = moduleData;
+        //                Debug.WriteLine($"Modül verisi yüklendi: {moduleName}, Satır sayısı: {moduleData.Rows.Count}");
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine($"Modül verisi yüklenirken hata: {ex.Message}");
+        //    }
+        //}
+
+        //// UI'ı güncelle
+        //private void UpdateUIForLoadedProject()
+        //{
+        //    try
+        //    {
+        //        // veri_listesi_seçimi ComboBox'ını güncelle
+        //        if (veri_listesi_seçimi != null)
+        //        {
+        //            veri_listesi_seçimi.Refresh();
+        //        }
+
+        //        // Modül butonlarını etkinleştir/devre dışı bırak
+        //        // Örneğin, aşağıdaki butonlar varsayımsal, gerçek buton adlarınıza göre değiştirin
+        //        UpdateModuleButtonsState();
+
+        //        // DataGridView'ı güncelle 
+        //        if (dataGridView_girdi != null && dataGridView_girdi.DataSource == null && GirdiModülü.dataTablesByType.Count > 0)
+        //        {
+        //            // İlk veri tipini göster
+        //            var firstModule = GirdiModülü.dataTablesByType.Keys.FirstOrDefault();
+        //            if (!string.IsNullOrEmpty(firstModule))
+        //            {
+        //                dataGridView_girdi.DataSource = GirdiModülü.dataTablesByType[firstModule];
+
+        //                // ComboBox'ta da seç
+        //                if (veri_listesi_seçimi != null)
+        //                {
+        //                    for (int i = 0; i < veri_listesi_seçimi.Items.Count; i++)
+        //                    {
+        //                        if (veri_listesi_seçimi.Items[i].ToString() == firstModule)
+        //                        {
+        //                            veri_listesi_seçimi.SelectedIndex = i;
+        //                            break;
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+
+        //        Debug.WriteLine("UI yüklenen projeye göre güncellendi");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine($"UI güncellenirken hata: {ex.Message}");
+        //    }
+        //}
+
+        //// Modül butonlarının durumunu güncelle
+        //private void UpdateModuleButtonsState()
+        //{
+        //    // Burada gerçek buton adlarınıza göre butonların etkinliğini kontrol edin
+        //    // Örnek: Bazı butonlar belirli modüllerin yüklenmiş olmasını gerektirebilir
+
+        //    // DTR verisi yüklenmişse EA Şarj ve DEK modülleri etkinleştir
+        //    bool dtrLoaded = GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri");
+
+        //    // Bu kısımda gerçek buton adlarınızı kullanmalısınız
+        //    // Örnek:
+        //    /*
+        //    if (EA_Şarj_Modülü_Button != null)
+        //        EA_Şarj_Modülü_Button.Enabled = dtrLoaded;
+
+        //    if (DEK_Modülü_Button != null)
+        //        DEK_Modülü_Button.Enabled = dtrLoaded;
+        //    */
+        //}
         private void ProjeEkleButton_Click(object sender, EventArgs e)
         {
+            try
+            {
+                // İl/ilçe bilgilerini kontrol et
+                if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
+                {
+                    MessageBox.Show("Lütfen önce il ve ilçe seçimi yapın.",
+                        "İl/İlçe Seçilmedi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
+                // Proje klasörünün ana dizini
+                string projectsBaseDir = Path.Combine(PathService.BaseDirectory, PathService.FullPath);
+
+                // Burada sadece mevcut projeleri listeleme ve seçme işlemi
+                using (var folderBrowser = new ProjectFolderPicker(projectsBaseDir))
+                {
+                    if (folderBrowser.ShowDialog() == DialogResult.OK)
+                    {
+                        try
+                        {
+                            string selectedPath = folderBrowser.SelectedPath;
+                            string projectName = folderBrowser.SelectedProjectName;
+
+                            // Geçici klasörden yüklü veri kontrolü
+                            if (PathService.CurrentMode == PathService.WorkingMode.Temporary && GirdiModülü.dataTablesByType.Count > 0)
+                            {
+                                var result = MessageBox.Show(
+                                    "Geçici çalışma klasöründeki veriler kaydedilmemiş. Proje açmak geçici verilerin kaybına neden olacaktır. Devam etmek istiyor musunuz?",
+                                    "Veri Kaybı Uyarısı",
+                                    MessageBoxButtons.YesNo,
+                                    MessageBoxIcon.Warning);
+
+                                if (result != DialogResult.Yes)
+                                    return;
+                            }
+
+                            // Projeyi aç
+                            PathService.OpenProject(projectName);
+
+                            // Varsayılan geçici klasörü temizle
+                            CleanupDefaultTempFolder();
+
+                            // Proje durumunu yükle
+                            LoadProjectState();
+
+                            // UI'ı güncelle
+                            UpdateUIForLoadedProject();
+
+                            // Form başlığını güncelle
+                            this.Text = $"SLF Yazılımı - {PathService.SelectedCity}/{PathService.SelectedDistrict} - Proje: {projectName}";
+
+                            MessageBox.Show($"Proje '{projectName}' başarıyla açıldı.",
+                                "Proje Açıldı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Proje açılırken hata oluştu: {ex.Message}",
+                                "Proje Açma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Proje işlemi sırasında hata oluştu: {ex.Message}",
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Debug.WriteLine($"Proje işlem hatası: {ex}");
+            }
         }
 
+        // Yeni metot: Varsayılan geçici klasörü temizle
+        private void CleanupDefaultTempFolder()
+        {
+            try
+            {
+                // Eğer mevcut bir geçici klasör varsa ve proje moduna geçtiyse
+                if (PathService.CurrentMode == PathService.WorkingMode.Project)
+                {
+                    string tempPath = Path.Combine(
+                        PathService.BaseDirectory,
+                        PathService.FullPath,
+                        "temp_default"); // Varsayılan geçici klasör adı
+
+                    if (Directory.Exists(tempPath))
+                    {
+                        try
+                        {
+                            Directory.Delete(tempPath, true);
+                            Console.WriteLine($"Varsayılan geçici klasör silindi: {tempPath}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Geçici klasör silinirken hata: {ex.Message}");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Geçici klasör temizlenirken hata: {ex.Message}");
+            }
+        }
+        private void LoadProjectState()
+        {
+            try
+            {
+                string statePath = Path.Combine(
+                    PathService.BaseDirectory,
+                    PathService.FullPath,
+                    PathService.CurrentWorkingFolder,
+                    "project_state.json");
+
+                Console.WriteLine($"Proje durum dosyası: {statePath}");
+
+                if (File.Exists(statePath))
+                {
+                    string json = File.ReadAllText(statePath);
+                    Console.WriteLine($"Okunan JSON: {json}");
+
+                    // JSON'ı deserialize et
+                    var options = new System.Text.Json.JsonSerializerOptions
+                    {
+                        AllowTrailingCommas = true,
+                        ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip,
+                        PropertyNameCaseInsensitive = true
+                    };
+
+                    var projectState = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json, options);
+
+                    // JSON deserialize edildi mi kontrol et
+                    if (projectState == null)
+                    {
+                        Console.WriteLine("HATA: JSON deserialize edilemedi!");
+                        return;
+                    }
+
+                    // JSON içeriğini yazdır
+                    Console.WriteLine("JSON içeriği:");
+                    foreach (var key in projectState.Keys)
+                    {
+                        Console.WriteLine($"- {key}: {projectState[key]}");
+                    }
+
+                    // Yıl bilgilerini yükle
+                    if (projectState.TryGetValue("SLFStartYear", out object startYearObj) &&
+                        projectState.TryGetValue("SLFEndYear", out object endYearObj))
+                    {
+                        try
+                        {
+                            // JSON.NET ile JsonElement tipindeki değeri int'e çevir
+                            int startYear = Convert.ToInt32(startYearObj.ToString());
+                            int endYear = Convert.ToInt32(endYearObj.ToString());
+
+                            Console.WriteLine($"Yüklenecek yıllar: Başlangıç {startYear}, Bitiş {endYear}");
+
+                            // YearService'i güncelle
+                            var yearService = YearService.GetInstance();
+                            yearService.SetYears(startYear, endYear);
+
+                            // ModülFormu değişkenlerini güncelle
+                            this.slfStartYear = startYear;
+                            this.slfEndYear = endYear;
+
+                            Console.WriteLine($"Yıllar başarıyla yüklendi ve setlendi");
+
+                            // ComboBox'ları güncelle
+                            UpdateYearComboBoxes();
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Yılları setlerken hata: {ex.Message}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("UYARI: JSON dosyasında yıl bilgileri bulunamadı!");
+                    }
+
+                    // Tamamlanan modülleri yükle
+                    if (projectState.TryGetValue("CompletedModules", out object modulesObj))
+                    {
+                        try
+                        {
+                            // Modül listesini al
+                            var modulesElement = (System.Text.Json.JsonElement)modulesObj;
+                            List<string> completedModules = new List<string>();
+
+                            // JsonElement dizisini List<string>'e dönüştür
+                            if (modulesElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                            {
+                                foreach (var element in modulesElement.EnumerateArray())
+                                {
+                                    if (element.ValueKind == System.Text.Json.JsonValueKind.String)
+                                    {
+                                        completedModules.Add(element.GetString());
+                                    }
+                                }
+                            }
+
+                            // Konsola kaydedilmiş modülleri yazdır
+                            Console.WriteLine($"Kaydedilmiş {completedModules.Count} modül bulundu:");
+                            foreach (var module in completedModules)
+                            {
+                                Console.WriteLine($"- {module}");
+                            }
+
+                            // Modül verilerini yükle
+                            foreach (string module in completedModules)
+                            {
+                                LoadModuleData(module);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Modül listesi yüklenirken hata: {ex.Message}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("UYARI: JSON dosyasında modül listesi bulunamadı!");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"UYARI: Proje durum dosyası bulunamadı: {statePath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Proje durumu yüklenirken hata: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+            }
+        }
+
+        // ComboBox'ları yüklenen yıllara göre güncelle
+        private void UpdateYearComboBoxes()
+        {
+            try
+            {
+                // ComboBox'ları bul ve yılları set et (buradaki isimler projenizdeki gerçek adlara göre değiştirilmeli)
+                if (startYearComboBox != null && endYearComboBox != null)
+                {
+                    // YearService'ten yılları al
+                    var yearService = YearService.GetInstance();
+                    int startYear = yearService.slfStartYear;
+                    int endYear = yearService.slfEndYear;
+
+                    // ComboBox'lara yılları seç
+                    for (int i = 0; i < startYearComboBox.Items.Count; i++)
+                    {
+                        if (startYearComboBox.Items[i].ToString() == startYear.ToString())
+                        {
+                            startYearComboBox.SelectedIndex = i;
+                            break;
+                        }
+                    }
+
+                    for (int i = 0; i < endYearComboBox.Items.Count; i++)
+                    {
+                        if (endYearComboBox.Items[i].ToString() == endYear.ToString())
+                        {
+                            endYearComboBox.SelectedIndex = i;
+                            break;
+                        }
+                    }
+
+                    // "Onayla" butonunun metnini güncelle (eğer bu butonu kullanıyorsanız)
+                    if (yearApproveButton != null)
+                    {
+                        yearApproveButton.Text = "Sıfırla"; // Yıllar setlenmiş durumda
+                    }
+
+                    Console.WriteLine($"ComboBox'lar yüklenen yıllara göre güncellendi");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ComboBox'lar güncellenirken hata: {ex.Message}");
+            }
+        }
+        /// <summary>
+        /// Modül verilerini yükler
+        /// </summary>
+        private void LoadModuleData(string moduleName)
+        {
+            try
+            {
+                Console.WriteLine($"Modül verisi yükleniyor: {moduleName}");
+
+                // Modül için girdiler klasörünü bul
+                string modulePath = PathService.GetGirdilerPathForDataType(moduleName);
+                Console.WriteLine($"Modül yolu: {modulePath}");
+
+                if (!Directory.Exists(modulePath))
+                {
+                    Console.WriteLine($"Modül klasörü bulunamadı: {modulePath}");
+                    return;
+                }
+
+                // Klasördeki tüm CSV dosyalarını göster
+                var directory = new DirectoryInfo(modulePath);
+                var csvFiles = directory.GetFiles("*.csv");
+                Console.WriteLine($"{csvFiles.Length} adet CSV dosyası bulundu.");
+
+                foreach (var file in csvFiles)
+                {
+                    Console.WriteLine($"- {file.Name} ({file.LastWriteTime})");
+                }
+
+                // Klasördeki en son dosyayı bul
+                var latestFile = csvFiles.OrderByDescending(f => f.LastWriteTime).FirstOrDefault();
+
+                if (latestFile != null)
+                {
+                    Console.WriteLine($"En son dosya: {latestFile.Name}");
+
+                    // CSV'yi yükle
+                    var csvHandler = new CsvHandler();
+                    DataTable moduleData = csvHandler.ImportCsvFile(latestFile.FullName);
+
+                    if (moduleData != null)
+                    {
+                        Console.WriteLine($"CSV başarıyla yüklendi: {moduleData.Rows.Count} satır, {moduleData.Columns.Count} sütun");
+
+                        // GirdiModülü.dataTablesByType'a ekle
+                        if (moduleData.Rows.Count > 0)
+                        {
+                            GirdiModülü.dataTablesByType[moduleName] = moduleData;
+
+                            // GirdiModülleri sözlüğünü güncelle
+                            if (girdiModülleri.ContainsKey(moduleName))
+                            {
+                                girdiModülleri[moduleName].importedDataTable = moduleData;
+                                Console.WriteLine($"GirdiModülleri sözlüğü güncellendi: {moduleName}");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"UYARI: {moduleName} girdiModülleri sözlüğünde bulunamadı!");
+                            }
+
+                            Console.WriteLine($"Modül verisi yüklendi: {moduleName}, Satır sayısı: {moduleData.Rows.Count}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"UYARI: {moduleName} için CSV dosyası boş!");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"HATA: {latestFile.FullName} dosyası DataTable'a yüklenemedi!");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"UYARI: {modulePath} klasöründe CSV dosyası bulunamadı!");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Modül verisi yüklenirken hata: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+            }
+        }
+        //private void LoadProjectState()
+        //{
+        //    try
+        //    {
+        //        string statePath = Path.Combine(
+        //            PathService.BaseDirectory,
+        //            PathService.FullPath,
+        //            PathService.CurrentWorkingFolder,
+        //            "project_state.json");
+
+        //        if (File.Exists(statePath))
+        //        {
+        //            string json = File.ReadAllText(statePath);
+        //            var projectState = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+
+        //            // Tamamlanan modülleri yükle
+        //            if (projectState.TryGetValue("CompletedModules", out object modulesObj))
+        //            {
+        //                // Json'dan List<string> olarak dönüştür
+        //                string modulesJson = modulesObj.ToString();
+        //                List<string> completedModules = System.Text.Json.JsonSerializer.Deserialize<List<string>>(modulesJson);
+
+        //                // Modül verilerini yükle
+        //                foreach (string module in completedModules)
+        //                {
+        //                    LoadModuleData(module);
+        //                }
+        //            }
+
+        //            Debug.WriteLine($"Proje durumu yüklendi: {statePath}");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine($"Proje durumu yüklenirken hata: {ex.Message}");
+        //    }
+        //}
+        //private void LoadModuleData(string moduleName)
+        //{
+        //    try
+        //    {
+        //        // Modül için girdiler klasörünü bul
+        //        string modulePath = PathService.GetGirdilerPathForDataType(moduleName);
+
+        //        // Klasördeki en son dosyayı bul (en güncel veri)
+        //        var directory = new DirectoryInfo(modulePath);
+        //        var latestFile = directory.GetFiles("*.csv")
+        //            .OrderByDescending(f => f.LastWriteTime)
+        //            .FirstOrDefault();
+
+        //        if (latestFile != null)
+        //        {
+        //            // CSV'yi yükle
+        //            var csvHandler = new CsvHandler();
+        //            DataTable moduleData = csvHandler.ImportCsvFile(latestFile.FullName);
+
+        //            // GirdiModülü.dataTablesByType'a ekle
+        //            if (moduleData != null && moduleData.Rows.Count > 0)
+        //            {
+        //                GirdiModülü.dataTablesByType[moduleName] = moduleData;
+        //                Debug.WriteLine($"Modül verisi yüklendi: {moduleName}, Satır sayısı: {moduleData.Rows.Count}");
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine($"Modül verisi yüklenirken hata: {ex.Message}");
+        //    }
+        //}
+        private void UpdateUIForLoadedProject()
+        {
+            try
+            {
+                // veri_listesi_seçimi ComboBox'ını güncelle
+                if (veri_listesi_seçimi != null)
+                {
+                    veri_listesi_seçimi.Refresh();
+                }
+
+                // Modül butonlarını etkinleştir/devre dışı bırak
+                UpdateModuleButtonsState();
+
+                // DataGridView'ı güncelle
+                if (dataGridView_girdi != null && GirdiModülü.dataTablesByType.Count > 0)
+                {
+                    // İlk veri tipini göster
+                    var firstModule = GirdiModülü.dataTablesByType.Keys.FirstOrDefault();
+                    if (!string.IsNullOrEmpty(firstModule))
+                    {
+                        // GirdiModülü'nü güncelle
+                        if (girdiModülleri.ContainsKey(firstModule))
+                        {
+                            girdiModülleri[firstModule].importedDataTable = GirdiModülü.dataTablesByType[firstModule];
+                        }
+
+                        // DataGridView'ı güncelle
+                        dataGridView_girdi.DataSource = GirdiModülü.dataTablesByType[firstModule];
+                        dataGridView_girdi.Refresh();
+
+                        // ComboBox'ta da seç
+                        if (veri_listesi_seçimi != null)
+                        {
+                            for (int i = 0; i < veri_listesi_seçimi.Items.Count; i++)
+                            {
+                                if (veri_listesi_seçimi.Items[i].ToString() == firstModule)
+                                {
+                                    veri_listesi_seçimi.SelectedIndex = i;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Form başlığını güncelle
+                if (PathService.CurrentWorkingFolder != null && PathService.CurrentWorkingFolder.StartsWith("proje_"))
+                {
+                    string projectName = PathService.CurrentWorkingFolder.Substring(6); // "proje_" çıkar
+                    this.Text = $"SLF Yazılımı - {PathService.SelectedCity}/{PathService.SelectedDistrict} - Proje: {projectName}";
+                }
+
+                Debug.WriteLine("UI yüklenen projeye göre güncellendi");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"UI güncellenirken hata: {ex.Message}");
+            }
+        }
+        private void ClearLoadedData()
+        {
+            // GirdiModülü'ndeki veri tablolarını temizle
+            GirdiModülü.dataTablesByType.Clear();
+
+            // DataGridView'daki verileri temizle
+            if (dataGridView_girdi != null)
+            {
+                dataGridView_girdi.DataSource = null;
+            }
+
+            // UI durumunu sıfırla
+            if (veri_listesi_seçimi != null)
+            {
+                veri_listesi_seçimi.SelectedIndex = -1;
+            }
+
+            // Diğer UI elemanlarını sıfırla
+            UpdateModuleButtonsState();
+        }
+        private void UpdateModuleButtonsState()
+        {
+            // Burada gerçek buton adlarınıza göre butonların etkinliğini kontrol edin
+            // Örnek: Bazı butonlar belirli modüllerin yüklenmiş olmasını gerektirebilir
+
+            // DTR verisi yüklenmişse EA Şarj ve DEK modülleri etkinleştir
+            bool dtrLoaded = GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri");
+
+            // Bu kısımda gerçek buton adlarınızı kullanmalısınız
+            // Örnek:
+            if (dtrLoaded)
+            {
+                // EA Şarj ve DEK modülleri için butonları etkinleştir
+                if (OpenModuleButton != null)
+                    OpenModuleButton.Enabled = true;
+
+                if (GelecekSimButton != null)
+                    GelecekSimButton.Enabled = dtrLoaded;
+
+                if (DEKSimButton != null)
+                    DEKSimButton.Enabled = dtrLoaded;
+            }
+
+            // Diğer modüller için benzer kontroller eklenebilir
+        }
+        /// <summary>
+        /// Mevcut verileri proje olarak kaydet
+        /// </summary>
+        // ModülFormu sınıfında mevcut SaveCurrentProject metodunu şu şekilde değiştirin:
+        private bool SaveCurrentProject()
+        {
+            try
+            {
+                // YearService'ten yılları al
+                var yearService = YearService.GetInstance();
+
+                // Proje durumunu hazırla
+                var projectState = new Dictionary<string, object>();
+                projectState["CompletedModules"] = GirdiModülü.dataTablesByType.Keys.ToList();
+                projectState["SLFStartYear"] = yearService.slfStartYear;
+                projectState["SLFEndYear"] = yearService.slfEndYear;
+                projectState["LastSaved"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                // Mevcut çalışma moduna göre işlem yap
+                if (PathService.CurrentMode == PathService.WorkingMode.Project)
+                {
+                    // Projenin tam yolunu al
+                    string projectPath = Path.Combine(
+                        PathService.BaseDirectory,
+                        PathService.FullPath,
+                        PathService.CurrentWorkingFolder);
+
+                    // Proje durum dosyasını güncelle
+                    string statePath = Path.Combine(projectPath, "project_state.json");
+                    string json = System.Text.Json.JsonSerializer.Serialize(projectState,
+                        new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+
+                    File.WriteAllText(statePath, json);
+
+                    // Tüm modül verilerini CSV olarak kaydet
+                    SaveAllModuleDataToCSV(projectPath);
+
+                    // Projenin adını al (proje_ ön ekini çıkar)
+                    string projectName = PathService.CurrentWorkingFolder.StartsWith("proje_")
+                        ? PathService.CurrentWorkingFolder.Substring(6)
+                        : PathService.CurrentWorkingFolder;
+
+                    MessageBox.Show($"Proje '{projectName}' başarıyla güncellendi.",
+                        "Proje Güncellendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    return true;
+                }
+                else // Temporary mode - yeni proje oluşturma
+                {
+                    // Bu kısmı yine var olan ProjeEkleButton_Click metoduna yönlendirebilirsiniz
+                    MessageBox.Show("Kaydedilecek bir proje açılmamış. Lütfen önce 'Proje Ekle' butonu ile bir proje açın.",
+                        "Proje Bulunamadı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Proje kaydedilirken hata oluştu: {ex.Message}",
+                    "Kayıt Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+        // Modül verilerini CSV olarak kaydet
+        private void SaveAllModuleDataToCSV(string projectPath)
+        {
+            string girdilerPath = Path.Combine(projectPath, "Girdiler");
+
+            // Klasör yoksa oluştur
+            if (!Directory.Exists(girdilerPath))
+            {
+                Directory.CreateDirectory(girdilerPath);
+            }
+
+            foreach (var kvp in GirdiModülü.dataTablesByType)
+            {
+                string moduleKey = kvp.Key;
+                DataTable moduleData = kvp.Value;
+
+                string moduleFolderName = moduleKey.Replace(" ", "_");
+                string moduleFolder = Path.Combine(girdilerPath, moduleFolderName);
+
+                // Modül klasörü yoksa oluştur
+                if (!Directory.Exists(moduleFolder))
+                {
+                    Directory.CreateDirectory(moduleFolder);
+                }
+
+                // Dosya adı oluştur
+                string fileName = $"{moduleFolderName}_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+                string filePath = Path.Combine(moduleFolder, fileName);
+
+                // CSV olarak kaydet
+                using (StreamWriter sw = new StreamWriter(filePath, false, Encoding.UTF8))
+                {
+                    // Başlık satırı
+                    int columnCount = moduleData.Columns.Count;
+                    for (int i = 0; i < columnCount; i++)
+                    {
+                        sw.Write(moduleData.Columns[i].ColumnName);
+                        if (i < columnCount - 1)
+                        {
+                            sw.Write(",");
+                        }
+                    }
+                    sw.WriteLine();
+
+                    // Veri satırları
+                    foreach (DataRow row in moduleData.Rows)
+                    {
+                        for (int i = 0; i < columnCount; i++)
+                        {
+                            // Null değerleri boş string olarak yaz
+                            string value = row[i]?.ToString() ?? "";
+
+                            // Virgül içeren değerleri çift tırnak içine al
+                            if (value.Contains(",") || value.Contains("\"") || value.Contains("\n"))
+                            {
+                                value = "\"" + value.Replace("\"", "\"\"") + "\"";
+                            }
+
+                            sw.Write(value);
+                            if (i < columnCount - 1)
+                            {
+                                sw.Write(",");
+                            }
+                        }
+                        sw.WriteLine();
+                    }
+                }
+            }
+        }
+        // ComboBox'ları yüklenen yıllara göre güncelle
+
+        /// <summary>
+        /// Yüklü modül verilerini temizler
+        /// </summary>
 
 
-        // ------------------------------------------------------------------------------------- //
+        /// <summary>
+        /// Yeni proje için UI'ı günceller
+        /// </summary>
+        //------------------------------------------------------------------------------------ //
 
 
         private void Poligon_Sil_Click(object sender, EventArgs e)
