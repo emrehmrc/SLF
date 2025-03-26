@@ -5277,57 +5277,88 @@ namespace SLF
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e) // database login butonu
         {
-            
-            if (slfStartYear == 0 || slfEndYear == 0)
+            try
             {
-                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            girdiModülü.slfStartYear = slfStartYear;
-            girdiModülü.slfEndYear = slfEndYear;
+                // Yıl kontrolü
+                if (slfStartYear == 0 || slfEndYear == 0)
+                {
+                    MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
-            Console.WriteLine($"LastYear: {girdiModülü.lastYear}");
-            Console.WriteLine($"PenultimateYear: {girdiModülü.penultimateYear}");
-            Console.WriteLine($"HorizonYear: {girdiModülü.horizonYear}");
-            if (DatabaseManager.GetInstance().IsConnected())
-            {
-                try
+                // YearService'i başlangıçta güncelle - bu her zaman çalışacak
+                var yearService = YearService.GetInstance();
+                yearService.SetYears(slfStartYear, slfEndYear);
+
+                Console.WriteLine($"YearService başarıyla güncellendi - Başlangıç: {yearService.slfStartYear}, Bitiş: {yearService.slfEndYear}");
+                Console.WriteLine($"LastYear: {yearService.LastYear}");
+                Console.WriteLine($"PenultimateYear: {yearService.PenultimateYear}");
+                Console.WriteLine($"HorizonYear: {yearService.HorizonYear}");
+
+                // Veri tipi kontrolü
+                if (veri_listesi_seçimi.SelectedItem == null)
                 {
-                    
-                    using (var databaseListForm = new DatabaseListForm())
-                    {
-                        databaseListForm.Owner = this;
-                        databaseListForm.FormClosed += (s, args) => {
-                            // Form kapandığında gerekli güncellemeleri yap
-                            if (dataGridView_girdi.DataSource != null)
-                            {
-                                dataGridView_girdi.Refresh();
-                            }
-                        };
-                        databaseListForm.ShowDialog();
-                    }
+                    MessageBox.Show("Lütfen önce bir veri tipi seçin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
-                catch (Exception ex)
+
+                string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+
+                // girdiModülleri Dictionary'si kontrolü ve girdiModülü atama
+                if (!girdiModülleri.ContainsKey(seçilenVeriTipi))
                 {
-                    MessageBox.Show($"Veritabanı listesi gösterilirken hata oluştu: {ex.Message}",
-                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"'{seçilenVeriTipi}' için uygun bir modül bulunamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
-            }
-            else
-            {
-                using (var loginForm = new LoginForm())
+
+                // Güvenli erişim ve girdiModülü yıl değerlerini atama
+                girdiModülü = girdiModülleri[seçilenVeriTipi];
+
+                // Veritabanı işlemleri
+                if (DatabaseManager.GetInstance().IsConnected())
                 {
-                    if (loginForm.ShowDialog() == DialogResult.OK)
+                    try
                     {
                         using (var databaseListForm = new DatabaseListForm())
                         {
                             databaseListForm.Owner = this;
+                            databaseListForm.FormClosed += (s, args) => {
+                                // Form kapandığında gerekli güncellemeleri yap
+                                if (dataGridView_girdi.DataSource != null)
+                                {
+                                    dataGridView_girdi.Refresh();
+                                }
+                            };
                             databaseListForm.ShowDialog();
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Veritabanı listesi gösterilirken hata oluştu: {ex.Message}",
+                            "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
+                else
+                {
+                    using (var loginForm = new LoginForm())
+                    {
+                        if (loginForm.ShowDialog() == DialogResult.OK)
+                        {
+                            using (var databaseListForm = new DatabaseListForm())
+                            {
+                                databaseListForm.Owner = this;
+                                databaseListForm.ShowDialog();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"İşlem sırasında beklenmeyen bir hata oluştu: {ex.Message}\n\nStack Trace: {ex.StackTrace}",
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void LogDataTableInfo(DataTable dt, string source)
