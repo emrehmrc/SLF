@@ -198,7 +198,8 @@ namespace SLF
             // Olaylar
 
             // ListView'a öğe seçildiğinde Seç butonunu etkinleştir
-            projectListView.SelectedIndexChanged += (s, e) => {
+            projectListView.SelectedIndexChanged += (s, e) =>
+            {
                 if (selectExistingRadio.Checked)
                 {
                     bool validSelection = projectListView.SelectedItems.Count > 0 &&
@@ -209,7 +210,8 @@ namespace SLF
             };
 
             // DoubleClick ile seçim
-            projectListView.DoubleClick += (s, e) => {
+            projectListView.DoubleClick += (s, e) =>
+            {
                 if (projectListView.SelectedItems.Count > 0 &&
                     projectListView.SelectedItems[0].Tag != null &&
                     projectListView.SelectedItems[0].Tag.ToString() != "empty")
@@ -223,7 +225,8 @@ namespace SLF
             };
 
             // Radio buton değişim olayları
-            selectExistingRadio.CheckedChanged += (s, e) => {
+            selectExistingRadio.CheckedChanged += (s, e) =>
+            {
                 if (selectExistingRadio.Checked)
                 {
                     projectListView.Enabled = true;
@@ -238,7 +241,8 @@ namespace SLF
                 }
             };
 
-            createNewRadio.CheckedChanged += (s, e) => {
+            createNewRadio.CheckedChanged += (s, e) =>
+            {
                 if (createNewRadio.Checked)
                 {
                     projectListView.Enabled = false;
@@ -248,13 +252,15 @@ namespace SLF
                     selectButton.Text = "Oluştur";
                 }
             };
-            newProjectTextBox.TextChanged += (s, e) => {
+            newProjectTextBox.TextChanged += (s, e) =>
+            {
                 if (createNewRadio.Checked)
                     selectButton.Enabled = !string.IsNullOrWhiteSpace(newProjectTextBox.Text);
             };
 
             // Seç butonu ile işlem
-            selectButton.Click += (s, e) => {
+            selectButton.Click += (s, e) =>
+            {
                 if (selectExistingRadio.Checked)
                 {
                     // Mevcut projeyi seçme kodu
@@ -443,7 +449,7 @@ namespace SLF
         /// <summary>
         /// Yeni proje oluşturma formunu gösterir
         /// </summary>
-        public static string ShowNewProjectDialog(string baseDir)
+            public static string ShowNewProjectDialog(string baseDir)
         {
             using (var inputDialog = new InputDialog("Yeni Proje", "Lütfen projenin adını girin:"))
             {
@@ -488,66 +494,66 @@ namespace SLF
             return null;
         }
     }
-   
 
-    /// <summary>
-    /// Basit bir metin giriş dialog'u
-    /// </summary>
-    public class InputDialog : Form
-    {
-        private TextBox textBox;
-        private Button buttonOK;
-        private Button buttonCancel;
-        private Label label;
 
-        public string InputText => textBox.Text;
-
-        public InputDialog(string title, string promptText)
+        /// <summary>
+        /// Basit bir metin giriş dialog'u
+        /// </summary>
+        public class InputDialog : Form
         {
-            this.Text = title;
+            private TextBox textBox;
+            private Button buttonOK;
+            private Button buttonCancel;
+            private Label label;
 
-            label = new Label
+            public string InputText => textBox.Text;
+
+            public InputDialog(string title, string promptText)
             {
-                Text = promptText,
-                AutoSize = true,
-                Location = new Point(12, 9)
-            };
+                this.Text = title;
 
-            textBox = new TextBox
-            {
-                Location = new Point(12, 32),
-                Size = new Size(260, 23)
-            };
+                label = new Label
+                {
+                    Text = promptText,
+                    AutoSize = true,
+                    Location = new Point(12, 9)
+                };
 
-            buttonOK = new Button
-            {
-                Text = "Tamam",
-                DialogResult = DialogResult.OK,
-                Location = new Point(116, 70),
-                Width = 75
-            };
+                textBox = new TextBox
+                {
+                    Location = new Point(12, 32),
+                    Size = new Size(260, 23)
+                };
 
-            buttonCancel = new Button
-            {
-                Text = "İptal",
-                DialogResult = DialogResult.Cancel,
-                Location = new Point(197, 70),
-                Width = 75
-            };
+                buttonOK = new Button
+                {
+                    Text = "Tamam",
+                    DialogResult = DialogResult.OK,
+                    Location = new Point(116, 70),
+                    Width = 75
+                };
+
+                buttonCancel = new Button
+                {
+                    Text = "İptal",
+                    DialogResult = DialogResult.Cancel,
+                    Location = new Point(197, 70),
+                    Width = 75
+                };
 
 
-            this.Controls.Add(label);
-            this.Controls.Add(textBox);
-            this.Controls.Add(buttonOK);
-            this.Controls.Add(buttonCancel);
+                this.Controls.Add(label);
+                this.Controls.Add(textBox);
+                this.Controls.Add(buttonOK);
+                this.Controls.Add(buttonCancel);
 
-            this.AcceptButton = buttonOK;
-            this.CancelButton = buttonCancel;
-            this.ClientSize = new Size(284, 107);
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.StartPosition = FormStartPosition.CenterParent;
+                this.AcceptButton = buttonOK;
+                this.CancelButton = buttonCancel;
+                this.ClientSize = new Size(284, 107);
+                this.FormBorderStyle = FormBorderStyle.FixedDialog;
+                this.MaximizeBox = false;
+                this.MinimizeBox = false;
+                this.StartPosition = FormStartPosition.CenterParent;
+            }
         }
     }
-}

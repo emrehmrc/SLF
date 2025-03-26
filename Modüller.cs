@@ -257,7 +257,7 @@ namespace SLF
         {
             // initialize the Modul Formu
             InitializeComponent();
-
+            
             _excelService = new ExcelService();
             InitializeLogTextBox(); // Initialize logTextBox
             var yearService = YearService.GetInstance();
@@ -319,6 +319,7 @@ namespace SLF
             comboBox_ea_il_secimi.Items.Add("Eskişehir");
             comboBox_DEK_il.Items.Add("İzmir");
             comboBox_DEK_il.Items.Add("Eskişehir");
+            
         }
 
         // Initialize all form components (called in the constructors)
@@ -759,27 +760,24 @@ namespace SLF
                 }
                 else if (result == DialogResult.Yes)
                 {
-                    // Projeyi kaydet - moduna göre işlem yap
+                    // Projeyi kaydet
                     bool saveSuccess = false;
 
                     if (PathService.CurrentMode == PathService.WorkingMode.Project)
                     {
-                        // Mevcut projeyi güncelle - doğrudan mevcut projeye kaydet
+                        // Mevcut projeyi güncelle
                         saveSuccess = UpdateExistingProject();
                     }
                     else
                     {
-                        // Geçici moddayız, yeni proje adı sor
+                        //// Geçici moddayız, yeni proje adı sor
                         string projectName = ProjectFolderPicker.ShowNewProjectDialog(
                             Path.Combine(PathService.BaseDirectory, PathService.FullPath));
 
                         if (!string.IsNullOrEmpty(projectName))
                         {
-                            // PathService.OpenProject kullanarak projeyi oluştur
-                            PathService.OpenProject(projectName);
-
-                            // Verileri kaydet
-                            saveSuccess = UpdateExistingProject();
+                            // Projeyi oluştur
+                            saveSuccess = CreateAndSaveProject(projectName);
                         }
                         else
                         {
@@ -819,38 +817,212 @@ namespace SLF
             // Çıkış işlemine devam et
             try
             {
-                // Geçici klasörleri temizle
-                CleanupTemporaryFolders();
+                // UI durumunu temizle - yeni eklenen metot
+                ClearUserInterfaceState();
+
+                // Global veri yapılarını temizle
+                ClearGlobalData();
+
+                // Geçici klasörleri temizle - tümünü temizle
+                CleanupTemporaryFolders(true);
 
                 // Veritabanı bağlantısını kapat
-                DatabaseManager.GetInstance("").CloseConnection();
+                try
+                {
+                    DatabaseManager.GetInstance("").CloseConnection();
+                }
+                catch (Exception dbEx)
+                {
+                    Console.WriteLine($"Veritabanı kapatılırken hata: {dbEx.Message}");
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Kapanış sırasında hata: " + ex.Message);
             }
         }
+        private void ClearGlobalData()
+        {
+            try
+            {
+                // GirdiModülü veri tablolarını temizle
+                GirdiModülü.dataTablesByType.Clear();
 
+                // Diğer statik koleksiyonları veya değişkenleri de temizle
+                // ModülFormu.modulescheck?.Clear();
+                // CBS sınıfındaki global değişkenler varsa onları da temizleyebilirsiniz
+
+                Console.WriteLine("Global veri yapıları temizlendi");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Global veri temizleme hatası: {ex.Message}");
+            }
+        }
         // Yeni proje oluştur ve verileri kaydet
+        // Yeni proje oluşturma ve kaydetme metodu - düzeltilmiş versiyon
         private bool CreateAndSaveProject(string projectName)
         {
             try
             {
-                // PathService.OpenProject kullanarak hem project mode'a geç hem de klasörleri oluştur
-                string projectPath = PathService.OpenProject(projectName);
+                Console.WriteLine($"Proje oluşturma başladı: {projectName}");
 
-                // Proje durumu ve verileri kaydet
+                // Mevcut geçici klasörün yolunu al (kaydetmeden önce)
+                string tempFolderPath = Path.Combine(
+                    PathService.BaseDirectory,
+                    PathService.FullPath,
+                    PathService.CurrentWorkingFolder);
+
+                // Proje klasör adını oluştur
+                string projectFolderName = $"proje_{projectName}";
+                string projectPath = Path.Combine(
+                    PathService.BaseDirectory,
+                    PathService.FullPath,
+                    projectFolderName);
+
+                // Eğer proje klasörü zaten varsa, kullanıcıya sor
+                if (Directory.Exists(projectPath))
+                {
+                    var result = MessageBox.Show(
+                        $"'{projectName}' adında bir proje zaten var. Üzerine yazmak istiyor musunuz?",
+                        "Proje Zaten Var",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning);
+
+                    if (result == DialogResult.No)
+                        return false;
+
+                    // Var olan klasörü tamamen silmek yerine, project_state.json'ı güncelle
+                    try
+                    {
+                        // project_state.json dışındaki dosyaları güncelle
+                        // Eğer aynı isimde bir dosya varsa, üzerine yazacak
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Var olan proje dosyası güncellenirken hata: {ex.Message}");
+                        // Devam et
+                    }
+                }
+                else
+                {
+                    // Proje klasörü yoksa oluştur
+                    Directory.CreateDirectory(projectPath);
+                }
+
+                // Önemli: Klasör yapısını koru
+                // Eğer geçici klasörde mevcut bir yapı varsa, onu doğrudan kopyala
+                if (Directory.Exists(tempFolderPath))
+                {
+                    try
+                    {
+                        // Geçici klasördeki klasör yapısını kontrol et
+                        bool hasGirdiler = Directory.Exists(Path.Combine(tempFolderPath, "Girdiler"));
+                        bool hasSonuclar = Directory.Exists(Path.Combine(tempFolderPath, "Sonuçlar"));
+                        bool hasImarAnalizi = Directory.Exists(Path.Combine(tempFolderPath, "imar_analizi_sonuclari"));
+
+                        if (hasGirdiler || hasSonuclar || hasImarAnalizi)
+                        {
+                            // Mevcut klasör yapısını doğrudan kopyala
+                            CopyDirectoryStructure(tempFolderPath, projectPath);
+                            Console.WriteLine("Mevcut klasör yapısı korundu ve kopyalandı");
+                        }
+                        else
+                        {
+                            // Standart klasör yapısını oluştur
+                            CreateStandardFolderStructure(projectPath);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Klasör yapısı kopyalanırken hata: {ex.Message}");
+                        // Standart klasör yapısını oluştur
+                        CreateStandardFolderStructure(projectPath);
+                    }
+                }
+                else
+                {
+                    // Standart klasör yapısını oluştur
+                    CreateStandardFolderStructure(projectPath);
+                }
+
+                // PathService'i güncelle
+                PathService.OpenProject(projectName);
+
+                // Proje durumunu kaydet
                 SaveProjectState(projectPath);
+
+                // Modül verilerini kaydet
                 SaveAllModuleDataToCSV(projectPath);
 
-                Console.WriteLine($"Yeni proje oluşturuldu ve kaydedildi: {projectName}");
+                Console.WriteLine($"Proje başarıyla oluşturuldu ve kaydedildi: {projectName}");
                 return true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Proje oluşturulurken hata oluştu: {ex.Message}", "Oluşturma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Proje oluşturulurken hata oluştu: {ex.Message}",
+                                "Oluşturma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine($"Proje oluşturma hatası: {ex.Message}\n{ex.StackTrace}");
                 return false;
             }
+        }
+
+        // Klasör yapısını doğrudan kopyala - sadece klasör yapısını korur
+        private void CopyDirectoryStructure(string sourceDir, string targetDir)
+        {
+            try
+            {
+                // Target dizinini oluştur (yoksa)
+                if (!Directory.Exists(targetDir))
+                {
+                    Directory.CreateDirectory(targetDir);
+                }
+
+                // Kaynak klasördeki tüm alt klasörleri kopyala
+                foreach (string sourceSubDir in Directory.GetDirectories(sourceDir))
+                {
+                    DirectoryInfo dirInfo = new DirectoryInfo(sourceSubDir);
+                    string targetSubDir = Path.Combine(targetDir, dirInfo.Name);
+
+                    // Alt klasörü oluştur
+                    if (!Directory.Exists(targetSubDir))
+                    {
+                        Directory.CreateDirectory(targetSubDir);
+                    }
+
+                    // Rekürsif olarak alt klasörleri kopyala
+                    CopyDirectoryStructure(sourceSubDir, targetSubDir);
+                }
+
+                // Dosyaları kopyalamak istemiyorsak bu kısmı yorum yapabiliriz
+                // Burada sadece klasör yapısını koruyoruz, dosyaları SaveAllModuleDataToCSV ile kaydedeceğiz
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Klasör yapısı kopyalanırken hata: {ex.Message}");
+                throw; // Üst metoda hatayı ilet
+            }
+        }
+
+        // Standart klasör yapısını oluştur
+        private void CreateStandardFolderStructure(string projectPath)
+        {
+            // Standart klasörleri oluştur
+            string girdilerPath = Path.Combine(projectPath, "Girdiler");
+            string sonuclarPath = Path.Combine(projectPath, "Sonuçlar");
+            string imarAnalysiPath = Path.Combine(projectPath, "imar_analizi_sonuclari");
+
+            // Klasörleri oluştur (yoksa)
+            if (!Directory.Exists(girdilerPath))
+                Directory.CreateDirectory(girdilerPath);
+
+            if (!Directory.Exists(sonuclarPath))
+                Directory.CreateDirectory(sonuclarPath);
+
+            if (!Directory.Exists(imarAnalysiPath))
+                Directory.CreateDirectory(imarAnalysiPath);
+
+            Console.WriteLine("Standart klasör yapısı oluşturuldu");
         }
         // Proje durumunu kaydetme metodu
         // Proje durumunu kaydetme metodu - ProjectState.cs dosyasında benzeri var ancak burada kendi versiyonumuzu kullanıyoruz
@@ -993,7 +1165,7 @@ namespace SLF
         }
         // Geçici klasörü proje olarak kaydet
 
-        private bool CleanupTemporaryFolders()
+        private bool CleanupTemporaryFolders(bool cleanupAll = false)
         {
             try
             {
@@ -1012,8 +1184,9 @@ namespace SLF
                 {
                     try
                     {
-                        // Mevcut klasör aktif çalışma klasörü mü? Öyleyse atlayın.
-                        if (PathService.CurrentMode == PathService.WorkingMode.Temporary &&
+                        // Mevcut klasör aktif çalışma klasörü mü ve tümünü temizleme modu aktif değil mi?
+                        if (!cleanupAll &&
+                            PathService.CurrentMode == PathService.WorkingMode.Temporary &&
                             !string.IsNullOrEmpty(PathService.CurrentWorkingFolder) &&
                             folder.EndsWith(PathService.CurrentWorkingFolder))
                         {
@@ -1023,14 +1196,14 @@ namespace SLF
 
                         Console.WriteLine($"Geçici klasör siliniyor: {folder}");
 
-                        // 1. Tüm klasördeki salt okunur özniteliklerini kaldır
+                        // Tüm salt okunur özniteliklerini kaldır
                         RemoveReadOnlyAttributesRecursive(folder);
 
-                        // 2. GC.Collect çağrısıyla açık dosya tanıtıcılarını temizlemeyi dene
+                        // GC.Collect çağrısıyla açık dosya tanıtıcılarını temizle
                         GC.Collect();
                         GC.WaitForPendingFinalizers();
 
-                        // 3. Silmeyi dene, olmazsa zorla sil
+                        // Silmeyi dene, olmazsa zorla sil
                         try
                         {
                             Directory.Delete(folder, true);
@@ -5539,6 +5712,288 @@ namespace SLF
         //        DEK_Modülü_Button.Enabled = dtrLoaded;
         //    */
         //}
+        // ModülFormu sınıfına eklenecek yeni metot
+        private void ClearUserInterfaceState()
+        {
+            try
+            {
+                // Panel, ComboBox ve diğer kontrolleri başlangıç durumuna geri getir
+
+                // ComboBox'ları sıfırla
+                if (veri_listesi_seçimi != null)
+                {
+                    veri_listesi_seçimi.SelectedIndex = -1;
+                }
+
+                if (comboBox_ea_il_secimi != null)
+                {
+                    comboBox_ea_il_secimi.SelectedIndex = -1;
+                }
+
+                if (comboBox_ea_yıl_secimi != null)
+                {
+                    comboBox_ea_yıl_secimi.SelectedIndex = -1;
+                }
+
+                if (comboBox_DEK_il != null)
+                {
+                    comboBox_DEK_il.SelectedIndex = -1;
+                }
+
+                if (comboBox_DEK_Yıl != null)
+                {
+                    comboBox_DEK_Yıl.SelectedIndex = -1;
+                }
+
+                // DataGridView'ları temizle
+                if (dataGridView_girdi != null)
+                {
+                    dataGridView_girdi.DataSource = null;
+                }
+
+                // Tüm harita overlaylerini temizle
+                ClearAllMapOverlays();
+
+                // Haritaların renklerini sıfırla
+                ResetMapColors();
+
+                // CheckBox'ları sıfırla
+                ResetAllCheckBoxes();
+
+                // Form başlığını varsayılana çevir
+                this.Text = "SLF Yazılımı";
+
+                Console.WriteLine("UI durumu temizlendi");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"UI durumu temizlenirken hata: {ex.Message}");
+                // Hatayı yut ve devam et
+            }
+        }
+
+        // Tüm harita overlay'lerini temizleyen yardımcı metot
+        private void ClearAllMapOverlays()
+        {
+            try
+            {
+                // Tüm GMapControl'lerdeki overlay'leri temizle
+                if (gMapControl_EA != null && gMapControl_EA.Overlays != null)
+                {
+                    gMapControl_EA.Overlays.Clear();
+                    gMapControl_EA.Refresh();
+                }
+
+                if (gMapControl_DEK != null && gMapControl_DEK.Overlays != null)
+                {
+                    gMapControl_DEK.Overlays.Clear();
+                    gMapControl_DEK.Refresh();
+                }
+
+                if (gMapControl_stokastik != null && gMapControl_stokastik.Overlays != null)
+                {
+                    gMapControl_stokastik.Overlays.Clear();
+                    gMapControl_stokastik.Refresh();
+                }
+
+                if (gMapControl_yuk != null && gMapControl_yuk.Overlays != null)
+                {
+                    gMapControl_yuk.Overlays.Clear();
+                    gMapControl_yuk.Refresh();
+                }
+
+                if (gMapControl_imar != null && gMapControl_imar.Overlays != null)
+                {
+                    gMapControl_imar.Overlays.Clear();
+                    gMapControl_imar.Refresh();
+                }
+
+                if (gMapControl_yga != null && gMapControl_yga.Overlays != null)
+                {
+                    gMapControl_yga.Overlays.Clear();
+                    gMapControl_yga.Refresh();
+                }
+
+                if (gMapControl_optimalDTR != null && gMapControl_optimalDTR.Overlays != null)
+                {
+                    gMapControl_optimalDTR.Overlays.Clear();
+                    gMapControl_optimalDTR.Refresh();
+                }
+
+                // CBS sınıfındaki overlay dizisini de sıfırla
+                if (cbs != null)
+                {
+                    for (int i = 0; i < cbs.tüm_katmanlar_array.Length; i++)
+                    {
+                        cbs.tüm_katmanlar_array[i] = null;
+                        cbs.tüm_katmanlar_array_names[i] = null;
+
+                        if (cbs.tüm_katmanlar_datatable[i] != null)
+                        {
+                            cbs.tüm_katmanlar_datatable[i].Dispose();
+                            cbs.tüm_katmanlar_datatable[i] = null;
+                        }
+
+                        if (cbs.shapeFileArray_MapWinGIS[i] != null)
+                        {
+                            cbs.shapeFileArray_MapWinGIS[i].Close();
+                            cbs.shapeFileArray_MapWinGIS[i] = null;
+                        }
+                    }
+                }
+
+                // Poligon noktalarını da temizle
+                polygonPoints_yga?.Clear();
+                polygonPoints_stokastik?.Clear();
+                polygonPoints_imar?.Clear();
+                polygonPoints_yuk?.Clear();
+                polygonPoints_ea?.Clear();
+                polygonPoints_DEK?.Clear();
+
+                // Ruler noktalarını da temizle
+                rulerPoints_yga?.Clear();
+                rulerPoints_stokastik?.Clear();
+                rulerPoints_imar?.Clear();
+                rulerPoints_yuk?.Clear();
+                rulerPoints_ea?.Clear();
+                rulerPoints_DEK?.Clear();
+
+                Console.WriteLine("Tüm harita overlay'leri temizlendi");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Harita overlay'leri temizlenirken hata: {ex.Message}");
+            }
+        }
+
+        // Haritaların renklerini sıfırlayan yardımcı metot
+        private void ResetMapColors()
+        {
+            try
+            {
+                // Haritaların renklerini varsayılana çevir
+                if (gMapControl_EA != null)
+                {
+                    gMapControl_EA.MapProvider = GMapProviders.GoogleSatelliteMap;
+                }
+
+                if (gMapControl_DEK != null)
+                {
+                    gMapControl_DEK.MapProvider = GMapProviders.GoogleSatelliteMap;
+                }
+
+                if (gMapControl_stokastik != null)
+                {
+                    gMapControl_stokastik.MapProvider = GMapProviders.GoogleSatelliteMap;
+                }
+
+                if (gMapControl_yuk != null)
+                {
+                    gMapControl_yuk.MapProvider = GMapProviders.GoogleSatelliteMap;
+                }
+
+                if (gMapControl_imar != null)
+                {
+                    gMapControl_imar.MapProvider = GMapProviders.GoogleSatelliteMap;
+                }
+
+                if (gMapControl_yga != null)
+                {
+                    gMapControl_yga.MapProvider = GMapProviders.GoogleSatelliteMap;
+                }
+
+                if (gMapControl_optimalDTR != null)
+                {
+                    gMapControl_optimalDTR.MapProvider = GMapProviders.GoogleSatelliteMap;
+                }
+
+                Console.WriteLine("Harita renkleri sıfırlandı");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Harita renkleri sıfırlanırken hata: {ex.Message}");
+            }
+        }
+
+        // Tüm CheckBox'ları sıfırlayan yardımcı metot
+        private void ResetAllCheckBoxes()
+        {
+            try
+            {
+                // Checkbox kontrol dizileri
+                var checkBoxes_yga = new CheckBox[] { checkBox_yga_1, checkBox_yga_2, checkBox_yga_3, checkBox_yga_4, checkBox_yga_5,
+                                             checkBox_yga_6, checkBox_yga_7, checkBox_yga_8, checkBox_yga_9, checkBox_yga_10,
+                                             checkBox_yga_11, checkBox_yga_12, checkBox_yga_13 };
+
+                var checkBoxes_imar = new CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5,
+                                              checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
+                                              checkBox_imar_11, checkBox_imar_12, checkBox_imar_13 };
+
+                var checkBoxes_stokastik = new CheckBox[] { checkBox_stokastik_1, checkBox_stokastik_2, checkBox_stokastik_3, checkBox_stokastik_4,
+                                                   checkBox_stokastik_5, checkBox_stokastik_6, checkBox_stokastik_7, checkBox_stokastik_8,
+                                                   checkBox_stokastik_9, checkBox_stokastik_10, checkBox_stokastik_11, checkBox_stokastik_12,
+                                                   checkBox_stokastik_13 };
+
+                // EA modülü checkboxlarını sıfırla
+                if (checkBox_AC_Home != null) checkBox_AC_Home.Checked = false;
+                if (checkBox_AC_Public != null) checkBox_AC_Public.Checked = false;
+                if (checkBox_AC_Work != null) checkBox_AC_Work.Checked = false;
+                if (checkBox_DC_Fast != null) checkBox_DC_Fast.Checked = false;
+
+                // EA modülü radio buttonlarını sıfırla
+                if (EaSimMaxBtn != null) EaSimMaxBtn.Checked = false;
+                if (EaSimMinBtn != null) EaSimMinBtn.Checked = false;
+                if (EaSimDefBtn != null) EaSimDefBtn.Checked = false;
+
+                // DEK modülü radio buttonlarını sıfırla
+                if (dekSimMaxBtn != null) dekSimMaxBtn.Checked = false;
+                if (dekSimMinBtn != null) dekSimMinBtn.Checked = false;
+                if (dekSimDefBtn != null) dekSimDefBtn.Checked = false;
+
+                // YGA, İmar ve Stokastik checkboxlarını sıfırla
+                foreach (var cb in checkBoxes_yga)
+                {
+                    if (cb != null)
+                    {
+                        cb.Checked = false;
+                        cb.Visible = false;
+                        cb.Text = "";
+                        cb.ForeColor = SystemColors.ControlText; // Rengi varsayılana çevir
+                    }
+                }
+
+                foreach (var cb in checkBoxes_imar)
+                {
+                    if (cb != null)
+                    {
+                        cb.Checked = false;
+                        cb.Visible = false;
+                        cb.Text = "";
+                        cb.ForeColor = SystemColors.ControlText; // Rengi varsayılana çevir
+                    }
+                }
+
+                foreach (var cb in checkBoxes_stokastik)
+                {
+                    if (cb != null)
+                    {
+                        cb.Checked = false;
+                        cb.Visible = false;
+                        cb.Text = "";
+                        cb.ForeColor = SystemColors.ControlText; // Rengi varsayılana çevir
+                    }
+                }
+
+                // Last clicked checkbox'ı sıfırla
+                lastClickedCheckbox = null;
+
+                Console.WriteLine("Tüm CheckBox'lar sıfırlandı");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"CheckBox'lar sıfırlanırken hata: {ex.Message}");
+            }
+        }
         private void ProjeEkleButton_Click(object sender, EventArgs e)
         {
             try
