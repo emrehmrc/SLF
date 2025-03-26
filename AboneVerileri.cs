@@ -59,6 +59,7 @@ namespace SLF
         {
             trafoKoduRemoveFlag = false;
             PreprocessMismatchedTrafoKodu();
+            BinaKoordinatMatchCheck(); // Moved here
             CheckConnectivity();
         }
         public override void Postprocess()
@@ -72,11 +73,11 @@ namespace SLF
             base.Validate();
 
             ReportErrorLessThanZero();
-            BinaKoordinatMatchCheck();
+           // BinaKoordinatMatchCheck(); // Removed from here
             ReportNullCounts();
             ReportDuplicateRowCounts();
             ReportDuplicateCounts();
-            ReportCoordinatesOutOfLimits();
+           // ReportCoordinatesOutOfLimits();
             AboneKapasiteCheck();
             ReportDateFormatErrors();
             ReportSanalCounts();
@@ -138,19 +139,54 @@ namespace SLF
 
         public override void Impute()
         {
-            if(!trafoKoduRemoveFlag)
+            if (!trafoKoduRemoveFlag)
             {
                 TrafoKoduImpute();
             }
-            ImputeCoordinates();
-            ImputeOutOfLimitCoordinates("COORDINATE_LIMITS");
-            ImputeOutOfLimitCoordinates("ABONE_X_KOORDINAT");
-            ImputeOutOfLimitCoordinates("ABONE_Y_KOORDINAT");
+            //ImputeCoordinates();
+            //ImputeOutOfLimitCoordinates("COORDINATE_LIMITS");
+            //ImputeOutOfLimitCoordinates("ABONE_X_KOORDINAT");
+            //ImputeOutOfLimitCoordinates("ABONE_Y_KOORDINAT");
             AboneGrubuImpute();
             BaglantiGucuImpute();
             ImputeLastYearTuketim();
         }
+        /*        public override void Impute()
+                {
+                    if (!trafoKoduRemoveFlag)
+                    {
+                        TrafoKoduImpute();
+                    }
+                    ImputeCoordinates();
 
+                    // Recheck for remaining invalid coordinates
+                    var remainingInvalidRows = new List<int>();
+                    foreach (DataRow row in currentDataTable.Rows)
+                    {
+                        int rowIndex = currentDataTable.Rows.IndexOf(row);
+                        if (!columnNullRowsMap["COORDINATE_LIMITS"].Contains(rowIndex) && // Not already flagged
+                            (!float.TryParse(row["ABONE_X_KOORDINAT"]?.ToString(), out float valueX) ||
+                             !float.TryParse(row["ABONE_Y_KOORDINAT"]?.ToString(), out float valueY)))
+                        {
+                            remainingInvalidRows.Add(rowIndex);
+                        }
+                    }
+                    columnNullRowsMap["COORDINATE_LIMITS"].AddRange(remainingInvalidRows);
+                    if (remainingInvalidRows.Any())
+                    {
+                        infoDataTable.Rows.Add(new object[] {
+                    "ABONE_X_KOORDINAT & ABONE_Y_KOORDINAT",
+                    "Koordinat Kontrolü",
+                    $"{remainingInvalidRows.Count} satır",
+                    $"Bina koordinatları ile doldurulduktan sonra hala geçersiz koordinatlar tespit edildi. (Satır: {string.Join(", ", remainingInvalidRows)})"
+                });
+                    }
+
+                    ImputeOutOfLimitCoordinates("COORDINATE_LIMITS");
+                    AboneGrubuImpute();
+                    BaglantiGucuImpute();
+                    ImputeLastYearTuketim();
+                }*/
         private void ImputeLastYearTuketim() {
             var column = $"YIL_TUKETIM_{lastYear}";
             var fallbackColumn = $"YIL_TUKETIM_{penultimateYear}";
@@ -164,49 +200,126 @@ namespace SLF
         }
         private void ImputeOutOfLimitCoordinates(string column)
         {
-            //var column = "COORDINATE_LIMITS";
+            var imputedRows = new List<int>();
+            var failedRows = new List<int>();
 
             foreach (int missingIndex in columnNullRowsMap[column])
             {
                 var missingRow = currentDataTable.Rows[missingIndex];
-                if(aboneTrafoConnectivityPass)
+                var trafoKodu = missingRow["BAGLANDIGI_TRAFO_KODU"]?.ToString();
+                if (!IsNullLike(trafoKodu) && trafoKodu != "TO_BE_IMPUTED")
                 {
-                    var trafoKodu = missingRow["BAGLANDIGI_TRAFO_KODU"].ToString();
-                    if (!IsNullLike(trafoKodu) && trafoKodu != "TO_BE_IMPUTED")
+                    var trafoRow = dataTablesByType["DTR Verileri"].AsEnumerable().FirstOrDefault(r => r["TRAFO_KODU"].ToString() == trafoKodu);
+                    if (trafoRow != null)
                     {
-                        var trafoRow = dataTablesByType["DTR Verileri"].AsEnumerable().FirstOrDefault(r => r["TRAFO_KODU"].ToString() == trafoKodu);
-                        if (trafoRow != null)
+                        if (float.TryParse(trafoRow["TRAFO_X_KOORDINAT"]?.ToString(), out float trafoX) &&
+                            float.TryParse(trafoRow["TRAFO_Y_KOORDINAT"]?.ToString(), out float trafoY))
                         {
-                            missingRow["ABONE_X_KOORDINAT"] = trafoRow["TRAFO_X_KOORDINAT"];
-                            missingRow["ABONE_Y_KOORDINAT"] = trafoRow["TRAFO_Y_KOORDINAT"];
-                        }
-                        else
-                        {
-                            throw new ArgumentException($"Abone verileri için koordinatlar impute edilirken hata oluştu. Trafo kodu: {trafoKodu}");
+                            missingRow["ABONE_X_KOORDINAT"] = trafoX;
+                            missingRow["ABONE_Y_KOORDINAT"] = trafoY;
+                            imputedRows.Add(missingIndex);
+                            continue;
                         }
                     }
                 }
-                else
-                {
-                    missingRow["ABONE_X_KOORDINAT"] = "KOORDINATI_YOK";
-                    missingRow["ABONE_Y_KOORDINAT"] = "KOORDINATI_YOK";
-                }
+                missingRow["ABONE_X_KOORDINAT"] = "KOORDINATI_YOK";
+                missingRow["ABONE_Y_KOORDINAT"] = "KOORDINATI_YOK";
+                failedRows.Add(missingIndex);
+            }
+
+            if (imputedRows.Any())
+            {
+                infoDataTable.Rows.Add(new object[] {
+            "ABONE_X_KOORDINAT & ABONE_Y_KOORDINAT",
+            "Koordinat Imputasyonu",
+            $"{imputedRows.Count} satır",
+            $"DTR koordinatları kullanılarak abone koordinatları dolduruldu. (Satır: {string.Join(", ", imputedRows)})"
+        });
+            }
+            if (failedRows.Any())
+            {
+                infoDataTable.Rows.Add(new object[] {
+            "ABONE_X_KOORDINAT & ABONE_Y_KOORDINAT",
+            "Koordinat Imputasyonu Başarısız",
+            $"{failedRows.Count} satır",
+            $"Abone koordinatları doldurulamadı, 'KOORDINATI_YOK' olarak işaretlendi. (Satır: {string.Join(", ", failedRows)})"
+        });
             }
         }
+        /*        private void ImputeOutOfLimitCoordinates(string column)
+                {
+                    //var column = "COORDINATE_LIMITS";
 
+                    foreach (int missingIndex in columnNullRowsMap[column])
+                    {
+                        var missingRow = currentDataTable.Rows[missingIndex];
+                        if(aboneTrafoConnectivityPass)
+                        {
+                            var trafoKodu = missingRow["BAGLANDIGI_TRAFO_KODU"].ToString();
+                            if (!IsNullLike(trafoKodu) && trafoKodu != "TO_BE_IMPUTED")
+                            {
+                                var trafoRow = dataTablesByType["DTR Verileri"].AsEnumerable().FirstOrDefault(r => r["TRAFO_KODU"].ToString() == trafoKodu);
+                                if (trafoRow != null)
+                                {
+                                    missingRow["ABONE_X_KOORDINAT"] = trafoRow["TRAFO_X_KOORDINAT"];
+                                    missingRow["ABONE_Y_KOORDINAT"] = trafoRow["TRAFO_Y_KOORDINAT"];
+                                }
+                                else
+                                {
+                                    throw new ArgumentException($"Abone verileri için koordinatlar impute edilirken hata oluştu. Trafo kodu: {trafoKodu}");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            missingRow["ABONE_X_KOORDINAT"] = "KOORDINATI_YOK";
+                            missingRow["ABONE_Y_KOORDINAT"] = "KOORDINATI_YOK";
+                        }
+                    }
+                }*/
         private void ImputeCoordinates()
         {
+            var imputedRows = new List<int>();
             foreach (DataRow row in currentDataTable.Rows)
             {
-                string adrBinaId = row["BINA_ID"].ToString();
-                if (binaIdToMostFrequentCoordinates.ContainsKey(adrBinaId))
+                int rowIndex = currentDataTable.Rows.IndexOf(row);
+                string adrBinaId = row["BINA_ID"]?.ToString();
+                if (!string.IsNullOrEmpty(adrBinaId) && binaIdToMostFrequentCoordinates.ContainsKey(adrBinaId))
                 {
-                    var coordinates = binaIdToMostFrequentCoordinates[adrBinaId];
-                    row["ABONE_X_KOORDINAT"] = coordinates.X;
-                    row["ABONE_Y_KOORDINAT"] = coordinates.Y;
+                    bool isInvalid = !float.TryParse(row["ABONE_X_KOORDINAT"]?.ToString(), out float valueX) ||
+                                     !float.TryParse(row["ABONE_Y_KOORDINAT"]?.ToString(), out float valueY);
+                    if (isInvalid)
+                    {
+                        var coordinates = binaIdToMostFrequentCoordinates[adrBinaId];
+                        row["ABONE_X_KOORDINAT"] = coordinates.X;
+                        row["ABONE_Y_KOORDINAT"] = coordinates.Y;
+                        imputedRows.Add(rowIndex);
+                    }
                 }
             }
+            if (imputedRows.Any())
+            {
+                infoDataTable.Rows.Add(new object[] {
+            "ABONE_X_KOORDINAT & ABONE_Y_KOORDINAT",
+            "Koordinat Imputasyonu",
+            $"{imputedRows.Count} satır",
+            $"Bina koordinatları kullanılarak abone koordinatları dolduruldu. (Satır: {string.Join(", ", imputedRows)})"
+        });
+            }
         }
+        /*        private void ImputeCoordinates()
+                {
+                    foreach (DataRow row in currentDataTable.Rows)
+                    {
+                        string adrBinaId = row["BINA_ID"].ToString();
+                        if (binaIdToMostFrequentCoordinates.ContainsKey(adrBinaId))
+                        {
+                            var coordinates = binaIdToMostFrequentCoordinates[adrBinaId];
+                            row["ABONE_X_KOORDINAT"] = coordinates.X;
+                            row["ABONE_Y_KOORDINAT"] = coordinates.Y;
+                        }
+                    }
+                }*/
         private void ReportNullCounts()
         {
             float percentage = 0.0f;
@@ -319,7 +432,7 @@ namespace SLF
 
                         if (percentage >= errorThreshold)
                         {
-                            string errorMessage = $"Hata Mesajı: Kullanıcıya %20’den fazla oranda Abone Bağlantı Grubu verisi yok, hatalı veri. (Satır: {string.Join(", ", invalidRows)})";
+                            string errorMessage = $"Hata Mesajı: %20’den fazla oranda Abone Bağlantı Grubu verisi yok, hatalı veri. (Satır: {string.Join(", ", invalidRows)})";
                             errorDataTable.Rows.Add(new object[]
                             {
                         column.ColumnName,
@@ -330,7 +443,7 @@ namespace SLF
                         }
                         else
                         {
-                            string warningMessage = $"Silinecekler Mesajı: Kullanıcıya Tesisat No 0, NULL veya geçersiz formatta olan veriler silindi uyarısı verilir. (Satır: {string.Join(", ", invalidRows)})";
+                            string warningMessage = $"Silinecekler Mesajı: Tesisat No 0, NULL veya geçersiz formatta olan veriler silinecektir. (Satır: {string.Join(", ", invalidRows)})";
                             warningDataTable.Rows.Add(new object[]
                             {
                         column.ColumnName,
@@ -385,6 +498,52 @@ namespace SLF
                         }
                     }
                 }
+                // Handle coordinate columns (ABONE_X_KOORDINAT and ABONE_Y_KOORDINAT) together
+                else if (column.ColumnName == "ABONE_X_KOORDINAT" || column.ColumnName == "ABONE_Y_KOORDINAT")
+                {
+                    // Validate coordinates and populate columnNullRowsMap["COORDINATE_LIMITS"]
+                    ReportCoordinatesOutOfLimits();
+
+                    // Check the percentage of invalid coordinates
+                    invalidCount = columnNullRowsMap["COORDINATE_LIMITS"].Count;
+                    percentage = totalRows > 0 ? (float)invalidCount / totalRows : 0.0f;
+
+                    // If the percentage of invalid coordinates is 10% or less, proceed with imputation
+                    if (percentage <= COORDINATE_ERROR_THRESHOLD.errorThreshold)
+                    {
+                        // Impute using building coordinates first
+                        ImputeCoordinates();
+
+                        // Recheck for remaining invalid coordinates after building imputation
+                        var remainingInvalidRows = new List<int>();
+                        foreach (DataRow row in currentDataTable.Rows)
+                        {
+                            int rowIndex = currentDataTable.Rows.IndexOf(row);
+                            if (!columnNullRowsMap["COORDINATE_LIMITS"].Contains(rowIndex) &&
+                                (!float.TryParse(row["ABONE_X_KOORDINAT"]?.ToString(), out float valueX) ||
+                                 !float.TryParse(row["ABONE_Y_KOORDINAT"]?.ToString(), out float valueY)))
+                            {
+                                remainingInvalidRows.Add(rowIndex);
+                            }
+                        }
+                        columnNullRowsMap["COORDINATE_LIMITS"].AddRange(remainingInvalidRows);
+                        if (remainingInvalidRows.Any())
+                        {
+                            infoDataTable.Rows.Add(new object[] {
+                        "ABONE_X_KOORDINAT & ABONE_Y_KOORDINAT",
+                        "Koordinat Kontrolü",
+                        $"{remainingInvalidRows.Count} satır",
+                        $"Bina koordinatları ile doldurulduktan sonra hala geçersiz koordinatlar tespit edildi. (Satır: {string.Join(", ", remainingInvalidRows)})"
+                    });
+                        }
+
+                        // Impute using DTR coordinates as a fallback
+                        ImputeOutOfLimitCoordinates("COORDINATE_LIMITS");
+                    }
+
+                    // Skip further processing of the other coordinate column
+                    continue;
+                }
                 else
                 {
                     for (int i = 0; i < totalRows; i++)
@@ -412,6 +571,211 @@ namespace SLF
                 }
             }
         }
+        /*        private void ReportNullCounts()
+                {
+                    float percentage = 0.0f;
+                    int totalRows = currentDataTable.Rows.Count;
+
+                    foreach (DataColumn column in currentDataTable.Columns)
+                    {
+                        if (!nullFieldsCheckWithLevel.ContainsKey(column.ColumnName))
+                        {
+                            continue;
+                        }
+
+                        List<int> invalidRows = new List<int>();
+                        int invalidCount = 0;
+
+                        // Delegate to specialized functions for specific columns
+                        if (column.ColumnName == "BAGLANDIGI_TRAFO_KODU")
+                        {
+                            TrafoKoduImpute(); // Handle BAGLANDIGI_TRAFO_KODU separately
+                            continue;
+                        }
+                        else if (column.ColumnName == "BAGLANTI_GUCU")
+                        {
+                            for (int i = 0; i < totalRows; i++)
+                            {
+                                var row = currentDataTable.Rows[i];
+                                if (IsNullLike(row[column]))
+                                {
+                                    invalidCount++;
+                                    invalidRows.Add(i);
+                                }
+                                else
+                                {
+                                    if (double.TryParse(row[column].ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+                                    {
+                                        if (value <= 0)
+                                        {
+                                            invalidCount++;
+                                            invalidRows.Add(i);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        invalidCount++;
+                                        invalidRows.Add(i);
+                                    }
+                                }
+                            }
+
+                            columnNullRowsMap[column.ColumnName] = invalidRows;
+
+                            percentage = (float)invalidCount / totalRows;
+
+                            if (percentage > 0)
+                            {
+                                const float errorThreshold = 0.4f; // 40%
+
+                                if (percentage > errorThreshold)
+                                {
+                                    string errorMessage = $"Hata Mesajı: Kullanıcıya %40’dan fazla oranda Abone Bağlantı Gücü yok veya 0’dan küçük hatası. (Satır: {string.Join(", ", invalidRows)})";
+                                    errorDataTable.Rows.Add(new object[]
+                                    {
+                                column.ColumnName,
+                                "Bağlantı Gücü",
+                                $"{percentage:P1}",
+                                errorMessage
+                                    });
+                                }
+                                else
+                                {
+                                    string warningMessage = $"Düzeltilecekler Mesajı: Kullanıcıya Abone Bağlantı Gücü NULL veya geçersiz olan verilere imputasyon uygulanacaktır. (Satır: {string.Join(", ", invalidRows)})";
+                                    warningDataTable.Rows.Add(new object[]
+                                    {
+                                column.ColumnName,
+                                "Bağlantı Gücü",
+                                $"{percentage:P1}",
+                                warningMessage
+                                    });
+                                }
+                            }
+                        }
+                        else if (column.ColumnName == "TESISAT_NO")
+                        {
+                            for (int i = 0; i < totalRows; i++)
+                            {
+                                var row = currentDataTable.Rows[i];
+                                var tesisatNo = Convert.ToString(row[column]);
+                                if (IsNullLike(tesisatNo) || tesisatNo == "0")
+                                {
+                                    invalidCount++;
+                                    invalidRows.Add(i);
+                                }
+                                else
+                                {
+                                    if (!int.TryParse(tesisatNo, out int value) || value <= 0)
+                                    {
+                                        invalidCount++;
+                                        invalidRows.Add(i);
+                                    }
+                                }
+                            }
+
+                            columnNullRowsMap[column.ColumnName] = invalidRows;
+
+                            percentage = (float)invalidCount / totalRows;
+
+                            if (percentage > 0)
+                            {
+                                const float errorThreshold = 0.2f; // 20%
+
+                                if (percentage >= errorThreshold)
+                                {
+                                    string errorMessage = $"Hata Mesajı: Kullanıcıya %20’den fazla oranda Abone Bağlantı Grubu verisi yok, hatalı veri. (Satır: {string.Join(", ", invalidRows)})";
+                                    errorDataTable.Rows.Add(new object[]
+                                    {
+                                column.ColumnName,
+                                "Tesisat No",
+                                $"{percentage:P1}",
+                                errorMessage
+                                    });
+                                }
+                                else
+                                {
+                                    string warningMessage = $"Silinecekler Mesajı: Kullanıcıya Tesisat No 0, NULL veya geçersiz formatta olan veriler silindi uyarısı verilir. (Satır: {string.Join(", ", invalidRows)})";
+                                    warningDataTable.Rows.Add(new object[]
+                                    {
+                                column.ColumnName,
+                                "Geçersiz Tesisat No",
+                                $"{percentage:P1}",
+                                warningMessage
+                                    });
+                                }
+                            }
+                        }
+                        else if (column.ColumnName == "ABONE_GRUBU")
+                        {
+                            for (int i = 0; i < totalRows; i++)
+                            {
+                                var row = currentDataTable.Rows[i];
+                                if (IsNullLike(row[column]))
+                                {
+                                    invalidCount++;
+                                    invalidRows.Add(i);
+                                }
+                            }
+
+                            columnNullRowsMap[column.ColumnName] = invalidRows;
+
+                            percentage = (float)invalidCount / totalRows;
+
+                            if (percentage > 0)
+                            {
+                                const float errorThreshold = 0.2f; // 20%
+
+                                if (percentage > errorThreshold)
+                                {
+                                    string errorMessage = $"Hata Mesajı: Kullanıcıya %20’den fazla oranda {column.ColumnName} verisi yok. hatalı veri. (Satır: {string.Join(", ", invalidRows)})";
+                                    errorDataTable.Rows.Add(new object[]
+                                    {
+                                column.ColumnName,
+                                "Abone Grubu",
+                                $"{percentage:P1}",
+                                errorMessage
+                                    });
+                                }
+                                else
+                                {
+                                    string warningMessage = $"Düzeltilecekler Mesajı: Kullanıcıya Abone Grubu NULL olan verilerin oranı uygun yöntemlerle doldurulacaktır. (Satır: {string.Join(", ", invalidRows)})";
+                                    warningDataTable.Rows.Add(new object[]
+                                    {
+                                column.ColumnName,
+                                "Abone Grubu",
+                                $"{percentage:P1}",
+                                warningMessage
+                                    });
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for (int i = 0; i < totalRows; i++)
+                            {
+                                var row = currentDataTable.Rows[i];
+                                if (IsNullLike(row[column]))
+                                {
+                                    invalidCount++;
+                                    invalidRows.Add(i);
+                                }
+                            }
+
+                            columnNullRowsMap[column.ColumnName] = invalidRows;
+
+                            percentage = (float)invalidCount / totalRows;
+
+                            if (percentage > 0)
+                            {
+                                var thresholds = nullFieldsCheckWithLevel[column.ColumnName];
+                                var datatableLevel = GetDataTableBasedOnThreshold(percentage, thresholds.warningThreshold, thresholds.errorThreshold);
+                                datatableLevel.Rows.Add(new object[] {
+                            column.ColumnName, "Null değer", $"{percentage:P1}"
+                        });
+                            }
+                        }
+                    }
+                }*/
         /*        private void ReportNullCounts()
                 {
                     float percentage = 0.0f;
@@ -881,37 +1245,86 @@ namespace SLF
             var (minYValue, maxYValue) = minMaxCheckMap["ABONE_Y_KOORDINAT"];
 
             var nullRows = new List<int>();
-
             int countOutOfThresholdCoordinates = 0;
 
             foreach (DataRow row in currentDataTable.Rows)
             {
-                if (float.TryParse(row["ABONE_X_KOORDINAT"]?.ToString(), out float valueX) && float.TryParse(row["ABONE_Y_KOORDINAT"]?.ToString(), out float valueY))
+                int rowIndex = currentDataTable.Rows.IndexOf(row);
+                bool isInvalid = false;
+
+                if (!float.TryParse(row["ABONE_X_KOORDINAT"]?.ToString(), out float valueX) ||
+                    !float.TryParse(row["ABONE_Y_KOORDINAT"]?.ToString(), out float valueY))
                 {
-                    if (valueX < minXValue || valueX > maxXValue || valueY < minYValue || valueY > maxYValue)
-                    {
-                        countOutOfThresholdCoordinates++;
-                        nullRows.Add(currentDataTable.Rows.IndexOf(row));
-                    }
+                    isInvalid = true; // Non-numeric or null values
+                }
+                else if (valueX < minXValue || valueX > maxXValue || valueY < minYValue || valueY > maxYValue)
+                {
+                    isInvalid = true; // Out of bounds
+                }
+
+                if (isInvalid)
+                {
+                    countOutOfThresholdCoordinates++;
+                    nullRows.Add(rowIndex);
                 }
             }
 
             columnNullRowsMap["COORDINATE_LIMITS"] = nullRows;
 
-            float outOfThresholdPercentage = (float)countOutOfThresholdCoordinates / currentDataTable.Rows.Count;
+            float outOfThresholdPercentage = currentDataTable.Rows.Count > 0
+                ? (float)countOutOfThresholdCoordinates / currentDataTable.Rows.Count
+                : 0.0f;
 
             if (outOfThresholdPercentage > 0)
             {
                 var thresholds = COORDINATE_ERROR_THRESHOLD;
                 var datatableLevel = GetDataTableBasedOnThreshold(outOfThresholdPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
 
-                // Add the warning to the DataTable
                 datatableLevel.Rows.Add(new object[] {
-                    "ABONE_X_KOORDINAT & ABONE_Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}", "%10'dan fazla abonede konum bilgisi doğru değildir."
-                });
+            "ABONE_X_KOORDINAT & ABONE_Y_KOORDINAT",
+            "Koordinat Sınırları",
+            $"{outOfThresholdPercentage:P1}",
+            $"Bazı konum bilgileri yanlış veya eksiktir. Bu durumda o bina için en çok tekrar eden koordinatlar kullanılacaktır. (Satır: {string.Join(", ", nullRows)})"
+        });
             }
         }
+        /*        private void ReportCoordinatesOutOfLimits()
+                {
+                    var (minXValue, maxXValue) = minMaxCheckMap["ABONE_X_KOORDINAT"];
+                    var (minYValue, maxYValue) = minMaxCheckMap["ABONE_Y_KOORDINAT"];
 
+                    var nullRows = new List<int>();
+
+                    int countOutOfThresholdCoordinates = 0;
+
+                    foreach (DataRow row in currentDataTable.Rows)
+                    {
+                        if (float.TryParse(row["ABONE_X_KOORDINAT"]?.ToString(), out float valueX) && float.TryParse(row["ABONE_Y_KOORDINAT"]?.ToString(), out float valueY))
+                        {
+                            if (valueX < minXValue || valueX > maxXValue || valueY < minYValue || valueY > maxYValue)
+                            {
+                                countOutOfThresholdCoordinates++;
+                                nullRows.Add(currentDataTable.Rows.IndexOf(row));
+                            }
+                        }
+                    }
+
+                    columnNullRowsMap["COORDINATE_LIMITS"] = nullRows;
+
+                    float outOfThresholdPercentage = (float)countOutOfThresholdCoordinates / currentDataTable.Rows.Count;
+
+                    if (outOfThresholdPercentage > 0)
+                    {
+                        var thresholds = COORDINATE_ERROR_THRESHOLD;
+                        var datatableLevel = GetDataTableBasedOnThreshold(outOfThresholdPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+
+                        // Add the warning to the DataTable
+                        datatableLevel.Rows.Add(new object[] {
+                            "ABONE_X_KOORDINAT & ABONE_Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}", "%10'dan fazla abonede konum bilgisi doğru değildir."
+                        });
+                    }
+                }
+        */
         private void ReportErrorLessThanZero()
         {
             float nonPositivePercentage, nonLastYearPercentage;
@@ -1055,53 +1468,58 @@ namespace SLF
                         });
                     }
                 }
-/*        private void AboneKapasiteCheck()
-        {
-            // yillik tuketim / 8760 / baglanti gucu
-            int overCapacityCount = 0;
-            int totalRows = currentDataTable.Rows.Count;
-            var lastYearTuketim = currentDataTable.Columns[$"YIL_TUKETIM_{lastYear}"];
-            var nullRows = new List<int>();
-            foreach (DataRow row in currentDataTable.Rows)
-            {
-                if (float.TryParse(row[lastYearTuketim]?.ToString(), out float tuketim) && tuketim > 0)
+        /*        private void AboneKapasiteCheck()
                 {
-                    var baglantiGucu = row["BAGLANTI_GUCU"];
-                    if (float.TryParse(baglantiGucu?.ToString(), out float guc) && guc > 0)
+                    // yillik tuketim / 8760 / baglanti gucu
+                    int overCapacityCount = 0;
+                    int totalRows = currentDataTable.Rows.Count;
+                    var lastYearTuketim = currentDataTable.Columns[$"YIL_TUKETIM_{lastYear}"];
+                    var nullRows = new List<int>();
+                    foreach (DataRow row in currentDataTable.Rows)
                     {
-                        float kapasite = (tuketim / HoursInYear) / guc;
-                        if (kapasite > ABONE_KAPASITE_LIMIT)
+                        if (float.TryParse(row[lastYearTuketim]?.ToString(), out float tuketim) && tuketim > 0)
                         {
-                            overCapacityCount++;
-                            nullRows.Add(currentDataTable.Rows.IndexOf(row));
+                            var baglantiGucu = row["BAGLANTI_GUCU"];
+                            if (float.TryParse(baglantiGucu?.ToString(), out float guc) && guc > 0)
+                            {
+                                float kapasite = (tuketim / HoursInYear) / guc;
+                                if (kapasite > ABONE_KAPASITE_LIMIT)
+                                {
+                                    overCapacityCount++;
+                                    nullRows.Add(currentDataTable.Rows.IndexOf(row));
+                                }
+                            }
                         }
                     }
-                }
-            }
 
-            columnNullRowsMap["KAPASITE"] = nullRows;
-            float overCapacityPercentage = (float)overCapacityCount / totalRows;
+                    columnNullRowsMap["KAPASITE"] = nullRows;
+                    float overCapacityPercentage = (float)overCapacityCount / totalRows;
 
-            if (overCapacityPercentage > 0)
-            {
-                infoDataTable.Rows.Add(new object[]
-                {
-                                         "", "Abone kapasitesi", $"{overCapacityPercentage:P1}",
-                                         $"Abone kapasitesi {ABONE_KAPASITE_LIMIT:P1}'den büyük olan abonelerin tüketim verileri silinecek."
-                });
-            }
-        }*/
+                    if (overCapacityPercentage > 0)
+                    {
+                        infoDataTable.Rows.Add(new object[]
+                        {
+                                                 "", "Abone kapasitesi", $"{overCapacityPercentage:P1}",
+                                                 $"Abone kapasitesi {ABONE_KAPASITE_LIMIT:P1}'den büyük olan abonelerin tüketim verileri silinecek."
+                        });
+                    }
+                }*/
+       // private const int COORDINATE_ROUNDING_PRECISION = 4; // ~11 meters precision
+
         private void BinaKoordinatMatchCheck()
         {
-            var grouped = currentDataTable.AsEnumerable().GroupBy(row => row["BINA_ID"]);
+            var grouped = currentDataTable.AsEnumerable()
+                .Where(row => !IsNullLike(row["BINA_ID"]?.ToString()))
+                .GroupBy(row => row["BINA_ID"].ToString());
 
             int nonUniqueCount = 0;
+            var inconsistentBinaIds = new List<string>();
+            var binaIdsWithNoValidCoordinates = new List<string>();
 
             binaIdToMostFrequentCoordinates.Clear();
 
             foreach (var group in grouped)
             {
-                // Group by original coordinates to determine the most frequent coordinate
                 var coordinateGroups = group
                     .Select(row => new
                     {
@@ -1115,13 +1533,14 @@ namespace SLF
 
                 if (coordinateGroups.Count == 0)
                 {
+                    binaIdsWithNoValidCoordinates.Add((string)group.Key);
                     continue;
                 }
 
                 var mostFrequentGroup = coordinateGroups.First();
                 var mostFrequentPair = mostFrequentGroup.Key;
+                binaIdToMostFrequentCoordinates[(string)group.Key] = ((float)mostFrequentPair.X.Value, (float)mostFrequentPair.Y.Value);
 
-                // Check for distinct coordinates based on precision
                 var distinctCoordinates = coordinateGroups
                     .Select(g => new
                     {
@@ -1134,21 +1553,94 @@ namespace SLF
                 if (distinctCoordinates.Count > 1)
                 {
                     nonUniqueCount++;
-                    binaIdToMostFrequentCoordinates[(string)group.Key] = (mostFrequentPair.X.Value, mostFrequentPair.Y.Value);
+                    inconsistentBinaIds.Add((string)group.Key);
                 }
             }
 
+            float nonUniquePercentage = grouped.Any()
+                ? (float)nonUniqueCount / grouped.Count()
+                : 0.0f;
 
-            float nonUniquePercentage = (float)nonUniqueCount / grouped.Count();
             if (nonUniquePercentage > 0)
             {
                 warningDataTable.Rows.Add(new object[]
                 {
-                 "X & Y KOORDINAT", "Bina koordinatları", $"{nonUniquePercentage:P1}",
-                 "Bazı bina koordinatları farklıdır. Bu durumda o bina için en çok tekrar eden koordinatlar kullanılacaktır."
+            "X & Y KOORDINAT",
+            "Bina koordinatları",
+            $"{nonUniquePercentage:P1}",
+            $"Bazı bina koordinatları farklıdır. Bu durumda o bina için en çok tekrar eden koordinatlar kullanılacaktır. (Bina ID'leri: {string.Join(", ", inconsistentBinaIds)})"
+                });
+            }
+
+            if (binaIdsWithNoValidCoordinates.Any())
+            {
+                infoDataTable.Rows.Add(new object[]
+                {
+            "BINA_ID",
+            "Bina koordinatları",
+            $"{binaIdsWithNoValidCoordinates.Count} bina",
+            $"Bazı binaların hiçbir abonesinde geçerli koordinat bulunamadı. (Bina ID'leri: {string.Join(", ", binaIdsWithNoValidCoordinates)})"
                 });
             }
         }
+        /*        private void BinaKoordinatMatchCheck()
+                {
+                    var grouped = currentDataTable.AsEnumerable().GroupBy(row => row["BINA_ID"]);
+
+                    int nonUniqueCount = 0;
+
+                    binaIdToMostFrequentCoordinates.Clear();
+
+                    foreach (var group in grouped)
+                    {
+                        // Group by original coordinates to determine the most frequent coordinate
+                        var coordinateGroups = group
+                            .Select(row => new
+                            {
+                                X = double.TryParse(row["ABONE_X_KOORDINAT"].ToString(), out double x) ? (double?)x : null,
+                                Y = double.TryParse(row["ABONE_Y_KOORDINAT"].ToString(), out double y) ? (double?)y : null
+                            })
+                            .Where(coord => coord.X.HasValue && coord.Y.HasValue)
+                            .GroupBy(coord => new { coord.X, coord.Y })
+                            .OrderByDescending(g => g.Count())
+                            .ToList();
+
+                        if (coordinateGroups.Count == 0)
+                        {
+                            continue;
+                        }
+
+                        var mostFrequentGroup = coordinateGroups.First();
+                        var mostFrequentPair = mostFrequentGroup.Key;
+
+                        // Check for distinct coordinates based on precision
+                        var distinctCoordinates = coordinateGroups
+                            .Select(g => new
+                            {
+                                X = Math.Round(g.Key.X.Value, COORDINATE_ROUNDING_PRECISION),
+                                Y = Math.Round(g.Key.Y.Value, COORDINATE_ROUNDING_PRECISION)
+                            })
+                            .Distinct()
+                            .ToList();
+
+                        if (distinctCoordinates.Count > 1)
+                        {
+                            nonUniqueCount++;
+                            binaIdToMostFrequentCoordinates[(string)group.Key] = (mostFrequentPair.X.Value, mostFrequentPair.Y.Value);
+                        }
+                    }
+
+
+                    float nonUniquePercentage = (float)nonUniqueCount / grouped.Count();
+                    if (nonUniquePercentage > 0)
+                    {
+                        warningDataTable.Rows.Add(new object[]
+                        {
+                         "X & Y KOORDINAT", "Bina koordinatları", $"{nonUniquePercentage:P1}",
+                         "Bazı bina koordinatları farklıdır. Bu durumda o bina için en çok tekrar eden koordinatlar kullanılacaktır."
+                        });
+                    }
+                }*/
         /*        private void AboneGrubuImpute()
                 {
                     var grouped = currentDataTable.AsEnumerable().GroupBy(row => row["BINA_ID"]);
@@ -1483,7 +1975,7 @@ namespace SLF
 
                 if (percentage > errorThreshold)
                 {
-                    string errorMessage = $"Hata Mesajı: Kullanıcıya %10’dan fazla oranda Enerji Tablo Kodu (BAGLANDIGI_TRAFO_KODU) olmayan abone mevcut uyarısı verilir. (Satır: {string.Join(", ", invalidRows)})";
+                    string errorMessage = $"Hata Mesajı: %10’dan fazla oranda Enerji Tablo Kodu (BAGLANDIGI_TRAFO_KODU) olmayan abone mevcut uyarısı verilir. (Satır: {string.Join(", ", invalidRows)})";
                     errorDataTable.Rows.Add(new object[]
                     {
                 "BAGLANDIGI_TRAFO_KODU",
@@ -1496,7 +1988,7 @@ namespace SLF
                 }
                 else
                 {
-                    string warningMessage = $"Düzeltilecekler Mesajı: Kullanıcıya Enerji Tablo Kodu (BAGLANDIGI_TRAFO_KODU) NULL veya 0 olan verilere en yakın trafonun kodu atanacaktır. (Satır: {string.Join(", ", invalidRows)})";
+                    string warningMessage = $"Düzeltilecekler Mesajı: Enerji Tablo Kodu (BAGLANDIGI_TRAFO_KODU) NULL veya 0 olan verilere en yakın trafonun kodu atanacaktır. (Satır: {string.Join(", ", invalidRows)})";
                     // Debug: Log the message to confirm content
                     Console.WriteLine($"Düzeltilecekler Message: {warningMessage}");
                     warningDataTable.Rows.Add(new object[]
@@ -1654,7 +2146,7 @@ namespace SLF
             if (rowsToDelete.Any())
             {
                 float failedPercentage = (float)rowsToDelete.Count / currentDataTable.Rows.Count;
-                string warningMessage = $"Silinecekler Mesajı: Kullanıcıya Enerji Tablo Kodu (BAGLANDIGI_TRAFO_KODU) verileri doldurulamadı, silinecek. (Satır: {string.Join(", ", rowsToDelete)})";
+                string warningMessage = $"Silinecekler Mesajı: Enerji Tablo Kodu (BAGLANDIGI_TRAFO_KODU) verileri doldurulamadı, silinecek. (Satır: {string.Join(", ", rowsToDelete)})";
                 infoDataTable.Rows.Add(new object[]
                 {
             "BAGLANDIGI_TRAFO_KODU",
