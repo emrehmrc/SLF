@@ -70,14 +70,14 @@
             dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.PoligonDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            this.PoligonDataGridView.ColumnHeadersHeight = 30;
+            this.PoligonDataGridView.ColumnHeadersHeight = 70;
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
             dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
             dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.SeaShell;
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.PoligonDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
             this.PoligonDataGridView.EnableHeadersVisualStyles = false;
             this.PoligonDataGridView.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(204)))), ((int)(((byte)(213)))));
@@ -93,7 +93,7 @@
             dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.ControlText;
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.PoligonDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
-            this.PoligonDataGridView.RowHeadersWidth = 20;
+            this.PoligonDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
             this.PoligonDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.PoligonDataGridView.Size = new System.Drawing.Size(1063, 453);
             this.PoligonDataGridView.TabIndex = 1;
@@ -121,8 +121,10 @@
             this.Controls.Add(this.PoligonDataGridView);
             this.Controls.Add(this.buton_poligon_ozellik);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximumSize = new System.Drawing.Size(1100, 600);
             this.Name = "Poligon_Özellik_Tanımlama";
             this.Text = "Poligon_Özellik_Tanımlama";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Poligon_Özellik_Tanımlama_FormClosed);
             ((System.ComponentModel.ISupportInitialize)(this.PoligonDataGridView)).EndInit();
             this.ResumeLayout(false);
 
@@ -132,6 +134,6 @@
 
         private System.Windows.Forms.Button buton_poligon_ozellik;
         private System.Windows.Forms.DataGridView PoligonDataGridView;
-        private System.Windows.Forms.Button buton_yük_tipleri;
+        public System.Windows.Forms.Button buton_yük_tipleri;
     }
 }

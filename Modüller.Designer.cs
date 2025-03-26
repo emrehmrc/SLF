@@ -21,6 +21,7 @@ namespace SLF
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ModülFormu));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -32,16 +33,18 @@ namespace SLF
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ModülFormu));
             this.Modül_Tabları = new System.Windows.Forms.TabControl();
             this.tab_girdi = new System.Windows.Forms.TabPage();
             this.buton_proje_sec = new System.Windows.Forms.Button();
             this.label_girdi_veri_onizleme = new System.Windows.Forms.Label();
             this.panel_girdi_rapor_olustur = new System.Windows.Forms.Panel();
             this.label_girdi_rapor = new System.Windows.Forms.Label();
+            this.raporGoruntuleButonu = new System.Windows.Forms.Button();
             this.dataGridView_girdi = new System.Windows.Forms.DataGridView();
             this.panel_girdi_dısa_aktar = new System.Windows.Forms.Panel();
             this.label_dısa_aktar = new System.Windows.Forms.Label();
+            this.ExcelDownloadButton = new System.Windows.Forms.Button();
+            this.csvExportButton = new System.Windows.Forms.Button();
             this.panel_girdi_yıl_secimi = new System.Windows.Forms.Panel();
             this.startYearComboBox = new System.Windows.Forms.ComboBox();
             this.yearApproveButton = new System.Windows.Forms.Button();
@@ -50,6 +53,7 @@ namespace SLF
             this.veri_listesi_seçimi = new System.Windows.Forms.ComboBox();
             this.label_girdi_veri_tipi_secimi = new System.Windows.Forms.Label();
             this.label_girdi_dosya_secimi = new System.Windows.Forms.Label();
+            this.SelectFolderButton = new System.Windows.Forms.Button();
             this.tab_dek = new System.Windows.Forms.TabPage();
             this.gMapControl_DEK = new GMap.NET.WindowsForms.GMapControl();
             this.panel_DEK = new System.Windows.Forms.Panel();
@@ -97,18 +101,36 @@ namespace SLF
             this.ELFMaxResultsTable = new System.Windows.Forms.DataGridView();
             this.ELFGraphicOutputsTabPage = new System.Windows.Forms.TabPage();
             this.panel_ELF_Grafikler = new System.Windows.Forms.Panel();
+            this.pictureBox_ELF_5 = new System.Windows.Forms.PictureBox();
+            this.pictureBox_ELF_4 = new System.Windows.Forms.PictureBox();
+            this.pictureBox_ELF_3 = new System.Windows.Forms.PictureBox();
+            this.pictureBox_ELF_2 = new System.Windows.Forms.PictureBox();
+            this.pictureBox_ELF_1 = new System.Windows.Forms.PictureBox();
             this.ELFTablePanel = new System.Windows.Forms.Panel();
             this.ELFGraphicsPanel = new System.Windows.Forms.Panel();
             this.SenaryoResultsLabel = new System.Windows.Forms.Label();
             this.tab_imar = new System.Windows.Forms.TabPage();
             this.panel_imar = new System.Windows.Forms.Panel();
             this.Mesafe_imar = new System.Windows.Forms.Label();
+            this.buton_imar_katmanlar = new System.Windows.Forms.Button();
             this.harita_katmanları_right_click = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.Arazi = new System.Windows.Forms.ToolStripMenuItem();
+            this.Google_Earth = new System.Windows.Forms.ToolStripMenuItem();
+            this.Google_Earth_Desktop = new System.Windows.Forms.ToolStripMenuItem();
+            this.Harita = new System.Windows.Forms.ToolStripMenuItem();
+            this.OSM = new System.Windows.Forms.ToolStripMenuItem();
+            this.Sokak_Görünümü = new System.Windows.Forms.ToolStripMenuItem();
+            this.Uydu = new System.Windows.Forms.ToolStripMenuItem();
             this.mesafe_metre_imar = new System.Windows.Forms.Label();
             this.gMapControl_imar = new GMap.NET.WindowsForms.GMapControl();
             this.webView_imar = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.checkBox_imar_15 = new System.Windows.Forms.CheckBox();
             this.katmanlar_right_click = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.tabloyuGörToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rengiDeğiştirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.temizleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.yenidenAdlandırToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.kaydetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkBox_imar_14 = new System.Windows.Forms.CheckBox();
             this.checkBox_imar_1 = new System.Windows.Forms.CheckBox();
             this.checkBox_imar_2 = new System.Windows.Forms.CheckBox();
@@ -126,10 +148,15 @@ namespace SLF
             this.label_imar_katmanlar = new System.Windows.Forms.Label();
             this.imar_dosya_seçimi = new System.Windows.Forms.Button();
             this.toolStrip_imar = new System.Windows.Forms.ToolStrip();
+            this.İmar_Mesafe_Ölç = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator11 = new System.Windows.Forms.ToolStripSeparator();
+            this.İmar_Poligon = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator12 = new System.Windows.Forms.ToolStripSeparator();
+            this.İmar_Nokta = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator13 = new System.Windows.Forms.ToolStripSeparator();
+            this.İmar_Grid_Oluştur = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator14 = new System.Windows.Forms.ToolStripSeparator();
+            this.İmar_Fonksiyonlar = new System.Windows.Forms.ToolStripButton();
             this.tab_optDTR = new System.Windows.Forms.TabPage();
             this.gMapControl_optimalDTR = new GMap.NET.WindowsForms.GMapControl();
             this.webView_optimalDTR = new Microsoft.Web.WebView2.WinForms.WebView2();
@@ -179,12 +206,21 @@ namespace SLF
             this.Mesafe_yuk = new System.Windows.Forms.Label();
             this.mesafe_metre_yuk = new System.Windows.Forms.Label();
             this.toolStrip_yuk = new System.Windows.Forms.ToolStrip();
+            this.Yuk_Seç = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.Yuk_Kaydır = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
+            this.Yuk_Mesafe_Ölç = new System.Windows.Forms.ToolStripButton();
             this.gMapControl_yuk = new GMap.NET.WindowsForms.GMapControl();
+            this.buton_yuk_haritası_katmanlar = new System.Windows.Forms.Button();
             this.tab_rapor = new System.Windows.Forms.TabPage();
             this.imageList = new System.Windows.Forms.ImageList(this.components);
             this.Toolbox_EA = new System.Windows.Forms.ToolStrip();
+            this.EA_Seç = new System.Windows.Forms.ToolStripButton();
+            this.EA_Kaydır = new System.Windows.Forms.ToolStripButton();
+            this.EA_Mesafe_Ölç = new System.Windows.Forms.ToolStripButton();
+            this.EA_Poligon = new System.Windows.Forms.ToolStripButton();
+            this.EA_Nokta = new System.Windows.Forms.ToolStripButton();
             this.ButtonKml = new System.Windows.Forms.Button();
             this.oznitelikAc = new System.Windows.Forms.Button();
             this.EA_list_box = new System.Windows.Forms.ListBox();
@@ -192,8 +228,17 @@ namespace SLF
             this.ELFPredictionButton = new System.Windows.Forms.Button();
             this.SenaryoSelectionButton = new System.Windows.Forms.Button();
             this.ContextMenuStrip_Nokta = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.Nokta_Ekle = new System.Windows.Forms.ToolStripMenuItem();
+            this.Nokta_Sil = new System.Windows.Forms.ToolStripMenuItem();
+            this.Kaydet = new System.Windows.Forms.ToolStripMenuItem();
             this.ContextMenuStrip_Poligon = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.Point_Load_Çiz = new System.Windows.Forms.ToolStripMenuItem();
+            this.YGA_Çiz = new System.Windows.Forms.ToolStripMenuItem();
+            this.Poligon_Sil = new System.Windows.Forms.ToolStripMenuItem();
+            this.Poligon_Kaydet = new System.Windows.Forms.ToolStripMenuItem();
             this.ContextMenuStrip_Fonksiyon = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.katman_birleştir = new System.Windows.Forms.ToolStripMenuItem();
+            this.overlap_analizi = new System.Windows.Forms.ToolStripMenuItem();
             this.ModuleTabPanel = new System.Windows.Forms.Panel();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.gMapControl_optimal_dtr = new GMap.NET.WindowsForms.GMapControl();
@@ -201,6 +246,8 @@ namespace SLF
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
             this.HeaderPanel = new System.Windows.Forms.Panel();
             this.miniToolStrip = new System.Windows.Forms.ToolStrip();
+            this.buton_ea_harita_katmanlar = new System.Windows.Forms.Button();
+            this.ELFMinSenaryoGraphPicBox = new System.Windows.Forms.PictureBox();
             this.OpenModuleButton = new SLF.CustomButton();
             this.DEKCenterAddButton = new SLF.CustomButton();
             this.DEKSimButton = new SLF.CustomButton();
@@ -211,54 +258,7 @@ namespace SLF
             this.ShowResultsButton = new SLF.CustomButton();
             this.ELFPredictionShowResultsButton = new SLF.CustomButton();
             this.ELFScenerioSaveButton = new SLF.CustomButton();
-            this.raporGoruntuleButonu = new System.Windows.Forms.Button();
-            this.ExcelDownloadButton = new System.Windows.Forms.Button();
-            this.csvExportButton = new System.Windows.Forms.Button();
-            this.SelectFolderButton = new System.Windows.Forms.Button();
-            this.pictureBox_ELF_5 = new System.Windows.Forms.PictureBox();
-            this.pictureBox_ELF_4 = new System.Windows.Forms.PictureBox();
-            this.pictureBox_ELF_3 = new System.Windows.Forms.PictureBox();
-            this.pictureBox_ELF_2 = new System.Windows.Forms.PictureBox();
-            this.pictureBox_ELF_1 = new System.Windows.Forms.PictureBox();
-            this.buton_imar_katmanlar = new System.Windows.Forms.Button();
-            this.tabloyuGörToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.rengiDeğiştirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.temizleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.yenidenAdlandırToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.kaydetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.İmar_Mesafe_Ölç = new System.Windows.Forms.ToolStripButton();
-            this.İmar_Poligon = new System.Windows.Forms.ToolStripButton();
-            this.İmar_Nokta = new System.Windows.Forms.ToolStripButton();
-            this.İmar_Grid_Oluştur = new System.Windows.Forms.ToolStripButton();
-            this.İmar_Fonksiyonlar = new System.Windows.Forms.ToolStripButton();
-            this.Yuk_Seç = new System.Windows.Forms.ToolStripButton();
-            this.Yuk_Kaydır = new System.Windows.Forms.ToolStripButton();
-            this.Yuk_Mesafe_Ölç = new System.Windows.Forms.ToolStripButton();
-            this.buton_yuk_haritası_katmanlar = new System.Windows.Forms.Button();
             this.HomePageButton = new SLF.CustomButton();
-            this.Arazi = new System.Windows.Forms.ToolStripMenuItem();
-            this.Google_Earth = new System.Windows.Forms.ToolStripMenuItem();
-            this.Google_Earth_Desktop = new System.Windows.Forms.ToolStripMenuItem();
-            this.Harita = new System.Windows.Forms.ToolStripMenuItem();
-            this.OSM = new System.Windows.Forms.ToolStripMenuItem();
-            this.Sokak_Görünümü = new System.Windows.Forms.ToolStripMenuItem();
-            this.Uydu = new System.Windows.Forms.ToolStripMenuItem();
-            this.EA_Seç = new System.Windows.Forms.ToolStripButton();
-            this.EA_Kaydır = new System.Windows.Forms.ToolStripButton();
-            this.EA_Mesafe_Ölç = new System.Windows.Forms.ToolStripButton();
-            this.EA_Poligon = new System.Windows.Forms.ToolStripButton();
-            this.EA_Nokta = new System.Windows.Forms.ToolStripButton();
-            this.Nokta_Ekle = new System.Windows.Forms.ToolStripMenuItem();
-            this.Nokta_Sil = new System.Windows.Forms.ToolStripMenuItem();
-            this.Kaydet = new System.Windows.Forms.ToolStripMenuItem();
-            this.Point_Load_Çiz = new System.Windows.Forms.ToolStripMenuItem();
-            this.YGA_Çiz = new System.Windows.Forms.ToolStripMenuItem();
-            this.Poligon_Sil = new System.Windows.Forms.ToolStripMenuItem();
-            this.Poligon_Kaydet = new System.Windows.Forms.ToolStripMenuItem();
-            this.katman_birleştir = new System.Windows.Forms.ToolStripMenuItem();
-            this.overlap_analizi = new System.Windows.Forms.ToolStripMenuItem();
-            this.buton_ea_harita_katmanlar = new System.Windows.Forms.Button();
-            this.ELFMinSenaryoGraphPicBox = new System.Windows.Forms.PictureBox();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
             this.panel_girdi_rapor_olustur.SuspendLayout();
@@ -286,6 +286,11 @@ namespace SLF
             ((System.ComponentModel.ISupportInitialize)(this.ELFMaxResultsTable)).BeginInit();
             this.ELFGraphicOutputsTabPage.SuspendLayout();
             this.panel_ELF_Grafikler.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_5)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_1)).BeginInit();
             this.ELFGraphicsPanel.SuspendLayout();
             this.tab_imar.SuspendLayout();
             this.panel_imar.SuspendLayout();
@@ -323,11 +328,6 @@ namespace SLF
             this.ContextMenuStrip_Fonksiyon.SuspendLayout();
             this.ModuleTabPanel.SuspendLayout();
             this.HeaderPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_5)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_4)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ELFMinSenaryoGraphPicBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -424,6 +424,21 @@ namespace SLF
             this.label_girdi_rapor.TabIndex = 7;
             this.label_girdi_rapor.Text = "Rapor Oluştur:";
             // 
+            // raporGoruntuleButonu
+            // 
+            this.raporGoruntuleButonu.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.raporGoruntuleButonu.BackColor = System.Drawing.Color.White;
+            this.raporGoruntuleButonu.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("raporGoruntuleButonu.BackgroundImage")));
+            this.raporGoruntuleButonu.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.raporGoruntuleButonu.ForeColor = System.Drawing.Color.Transparent;
+            this.raporGoruntuleButonu.Location = new System.Drawing.Point(131, 14);
+            this.raporGoruntuleButonu.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.raporGoruntuleButonu.Name = "raporGoruntuleButonu";
+            this.raporGoruntuleButonu.Size = new System.Drawing.Size(43, 36);
+            this.raporGoruntuleButonu.TabIndex = 6;
+            this.raporGoruntuleButonu.UseVisualStyleBackColor = false;
+            this.raporGoruntuleButonu.Click += new System.EventHandler(this.raporGoruntuleButonu_Click);
+            // 
             // dataGridView_girdi
             // 
             this.dataGridView_girdi.AllowUserToAddRows = false;
@@ -476,6 +491,36 @@ namespace SLF
             this.label_dısa_aktar.Size = new System.Drawing.Size(91, 23);
             this.label_dısa_aktar.TabIndex = 16;
             this.label_dısa_aktar.Text = "Dışa Aktar:";
+            // 
+            // ExcelDownloadButton
+            // 
+            this.ExcelDownloadButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ExcelDownloadButton.BackColor = System.Drawing.Color.White;
+            this.ExcelDownloadButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("ExcelDownloadButton.BackgroundImage")));
+            this.ExcelDownloadButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.ExcelDownloadButton.ForeColor = System.Drawing.Color.Transparent;
+            this.ExcelDownloadButton.Location = new System.Drawing.Point(105, 14);
+            this.ExcelDownloadButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.ExcelDownloadButton.Name = "ExcelDownloadButton";
+            this.ExcelDownloadButton.Size = new System.Drawing.Size(43, 36);
+            this.ExcelDownloadButton.TabIndex = 7;
+            this.ExcelDownloadButton.UseVisualStyleBackColor = false;
+            this.ExcelDownloadButton.Click += new System.EventHandler(this.ExcelDownloadButton_Click);
+            // 
+            // csvExportButton
+            // 
+            this.csvExportButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.csvExportButton.BackColor = System.Drawing.Color.White;
+            this.csvExportButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("csvExportButton.BackgroundImage")));
+            this.csvExportButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.csvExportButton.ForeColor = System.Drawing.Color.Transparent;
+            this.csvExportButton.Location = new System.Drawing.Point(153, 14);
+            this.csvExportButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.csvExportButton.Name = "csvExportButton";
+            this.csvExportButton.Size = new System.Drawing.Size(43, 36);
+            this.csvExportButton.TabIndex = 8;
+            this.csvExportButton.UseVisualStyleBackColor = true;
+            this.csvExportButton.Click += new System.EventHandler(this.csvExportButton_Click);
             // 
             // panel_girdi_yıl_secimi
             // 
@@ -584,6 +629,20 @@ namespace SLF
             this.label_girdi_dosya_secimi.TabIndex = 3;
             this.label_girdi_dosya_secimi.Text = "Dosya Seçimi:";
             // 
+            // SelectFolderButton
+            // 
+            this.SelectFolderButton.BackColor = System.Drawing.Color.White;
+            this.SelectFolderButton.BackgroundImage = global::SLF.Properties.Resources.download_folder_file_icon_219533;
+            this.SelectFolderButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.SelectFolderButton.ForeColor = System.Drawing.Color.Transparent;
+            this.SelectFolderButton.Location = new System.Drawing.Point(385, 15);
+            this.SelectFolderButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.SelectFolderButton.Name = "SelectFolderButton";
+            this.SelectFolderButton.Size = new System.Drawing.Size(47, 44);
+            this.SelectFolderButton.TabIndex = 2;
+            this.SelectFolderButton.UseVisualStyleBackColor = false;
+            this.SelectFolderButton.Click += new System.EventHandler(this.SelectFolderButton_Click);
+            // 
             // tab_dek
             // 
             this.tab_dek.Controls.Add(this.gMapControl_DEK);
@@ -625,7 +684,7 @@ namespace SLF
             this.gMapControl_DEK.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_DEK.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_DEK.ShowTileGridLines = false;
-            this.gMapControl_DEK.Size = new System.Drawing.Size(1337, 3069);
+            this.gMapControl_DEK.Size = new System.Drawing.Size(1337, 3173);
             this.gMapControl_DEK.TabIndex = 38;
             this.gMapControl_DEK.Zoom = 0D;
             this.gMapControl_DEK.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_DEK_OnMapClick);
@@ -646,7 +705,7 @@ namespace SLF
             this.panel_DEK.Location = new System.Drawing.Point(1337, 0);
             this.panel_DEK.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel_DEK.Name = "panel_DEK";
-            this.panel_DEK.Size = new System.Drawing.Size(248, 694);
+            this.panel_DEK.Size = new System.Drawing.Size(248, 668);
             this.panel_DEK.TabIndex = 37;
             // 
             // dekSimMaxBtn
@@ -755,7 +814,7 @@ namespace SLF
             this.EAStationsLegendPanel.Controls.Add(this.ACHomeLegendLabel);
             this.EAStationsLegendPanel.Controls.Add(this.AddStationLabel);
             this.EAStationsLegendPanel.Controls.Add(this.EAStationAddButton);
-            this.EAStationsLegendPanel.Location = new System.Drawing.Point(1313, 5567);
+            this.EAStationsLegendPanel.Location = new System.Drawing.Point(1313, 5671);
             this.EAStationsLegendPanel.Margin = new System.Windows.Forms.Padding(4);
             this.EAStationsLegendPanel.Name = "EAStationsLegendPanel";
             this.EAStationsLegendPanel.Size = new System.Drawing.Size(268, 326);
@@ -1154,7 +1213,7 @@ namespace SLF
             this.ELFLowResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFLowResultsTable.Name = "ELFLowResultsTable";
             this.ELFLowResultsTable.RowHeadersWidth = 51;
-            this.ELFLowResultsTable.Size = new System.Drawing.Size(1441, 252);
+            this.ELFLowResultsTable.Size = new System.Drawing.Size(1441, 231);
             this.ELFLowResultsTable.TabIndex = 1;
             // 
             // ELFBaseResultsTabPage
@@ -1182,7 +1241,7 @@ namespace SLF
             this.ELFBaseResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFBaseResultsTable.Name = "ELFBaseResultsTable";
             this.ELFBaseResultsTable.RowHeadersWidth = 51;
-            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1440, 252);
+            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1440, 231);
             this.ELFBaseResultsTable.TabIndex = 1;
             // 
             // ELFHighResultsTabPage
@@ -1210,7 +1269,7 @@ namespace SLF
             this.ELFHighResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFHighResultsTable.Name = "ELFHighResultsTable";
             this.ELFHighResultsTable.RowHeadersWidth = 51;
-            this.ELFHighResultsTable.Size = new System.Drawing.Size(1435, 252);
+            this.ELFHighResultsTable.Size = new System.Drawing.Size(1435, 231);
             this.ELFHighResultsTable.TabIndex = 1;
             // 
             // ELFMaxResultsTabPage
@@ -1239,7 +1298,7 @@ namespace SLF
             this.ELFMaxResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFMaxResultsTable.Name = "ELFMaxResultsTable";
             this.ELFMaxResultsTable.RowHeadersWidth = 51;
-            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1445, 256);
+            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1445, 235);
             this.ELFMaxResultsTable.TabIndex = 1;
             // 
             // ELFGraphicOutputsTabPage
@@ -1268,8 +1327,58 @@ namespace SLF
             this.panel_ELF_Grafikler.Location = new System.Drawing.Point(3, 2);
             this.panel_ELF_Grafikler.Margin = new System.Windows.Forms.Padding(4);
             this.panel_ELF_Grafikler.Name = "panel_ELF_Grafikler";
-            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1440, 176);
+            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1440, 155);
             this.panel_ELF_Grafikler.TabIndex = 6;
+            // 
+            // pictureBox_ELF_5
+            // 
+            this.pictureBox_ELF_5.Location = new System.Drawing.Point(699, 135);
+            this.pictureBox_ELF_5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pictureBox_ELF_5.Name = "pictureBox_ELF_5";
+            this.pictureBox_ELF_5.Size = new System.Drawing.Size(341, 282);
+            this.pictureBox_ELF_5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox_ELF_5.TabIndex = 4;
+            this.pictureBox_ELF_5.TabStop = false;
+            // 
+            // pictureBox_ELF_4
+            // 
+            this.pictureBox_ELF_4.Location = new System.Drawing.Point(351, 290);
+            this.pictureBox_ELF_4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pictureBox_ELF_4.Name = "pictureBox_ELF_4";
+            this.pictureBox_ELF_4.Size = new System.Drawing.Size(341, 282);
+            this.pictureBox_ELF_4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox_ELF_4.TabIndex = 3;
+            this.pictureBox_ELF_4.TabStop = false;
+            // 
+            // pictureBox_ELF_3
+            // 
+            this.pictureBox_ELF_3.Location = new System.Drawing.Point(351, 2);
+            this.pictureBox_ELF_3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pictureBox_ELF_3.Name = "pictureBox_ELF_3";
+            this.pictureBox_ELF_3.Size = new System.Drawing.Size(341, 282);
+            this.pictureBox_ELF_3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox_ELF_3.TabIndex = 2;
+            this.pictureBox_ELF_3.TabStop = false;
+            // 
+            // pictureBox_ELF_2
+            // 
+            this.pictureBox_ELF_2.Location = new System.Drawing.Point(3, 290);
+            this.pictureBox_ELF_2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pictureBox_ELF_2.Name = "pictureBox_ELF_2";
+            this.pictureBox_ELF_2.Size = new System.Drawing.Size(341, 282);
+            this.pictureBox_ELF_2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox_ELF_2.TabIndex = 1;
+            this.pictureBox_ELF_2.TabStop = false;
+            // 
+            // pictureBox_ELF_1
+            // 
+            this.pictureBox_ELF_1.Location = new System.Drawing.Point(3, 2);
+            this.pictureBox_ELF_1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pictureBox_ELF_1.Name = "pictureBox_ELF_1";
+            this.pictureBox_ELF_1.Size = new System.Drawing.Size(341, 282);
+            this.pictureBox_ELF_1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox_ELF_1.TabIndex = 0;
+            this.pictureBox_ELF_1.TabStop = false;
             // 
             // ELFTablePanel
             // 
@@ -1279,7 +1388,7 @@ namespace SLF
             this.ELFTablePanel.Location = new System.Drawing.Point(307, 2);
             this.ELFTablePanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFTablePanel.Name = "ELFTablePanel";
-            this.ELFTablePanel.Size = new System.Drawing.Size(965, 7477);
+            this.ELFTablePanel.Size = new System.Drawing.Size(965, 7581);
             this.ELFTablePanel.TabIndex = 21;
             // 
             // ELFGraphicsPanel
@@ -1352,7 +1461,7 @@ namespace SLF
             this.panel_imar.Location = new System.Drawing.Point(302, 43);
             this.panel_imar.Margin = new System.Windows.Forms.Padding(3, 3, 3, 50);
             this.panel_imar.Name = "panel_imar";
-            this.panel_imar.Size = new System.Drawing.Size(1236, 949);
+            this.panel_imar.Size = new System.Drawing.Size(1236, 1053);
             this.panel_imar.TabIndex = 63;
             // 
             // Mesafe_imar
@@ -1364,6 +1473,20 @@ namespace SLF
             this.Mesafe_imar.TabIndex = 57;
             this.Mesafe_imar.Text = "Mesafe:";
             this.Mesafe_imar.Visible = false;
+            // 
+            // buton_imar_katmanlar
+            // 
+            this.buton_imar_katmanlar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buton_imar_katmanlar.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buton_imar_katmanlar.BackgroundImage")));
+            this.buton_imar_katmanlar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.buton_imar_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
+            this.buton_imar_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.buton_imar_katmanlar.Location = new System.Drawing.Point(3, 993);
+            this.buton_imar_katmanlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.buton_imar_katmanlar.Name = "buton_imar_katmanlar";
+            this.buton_imar_katmanlar.Size = new System.Drawing.Size(59, 52);
+            this.buton_imar_katmanlar.TabIndex = 62;
+            this.buton_imar_katmanlar.UseVisualStyleBackColor = true;
             // 
             // harita_katmanları_right_click
             // 
@@ -1378,6 +1501,62 @@ namespace SLF
             this.Uydu});
             this.harita_katmanları_right_click.Name = "harita_katmanları_right_click";
             this.harita_katmanları_right_click.Size = new System.Drawing.Size(196, 186);
+            // 
+            // Arazi
+            // 
+            this.Arazi.Image = ((System.Drawing.Image)(resources.GetObject("Arazi.Image")));
+            this.Arazi.Name = "Arazi";
+            this.Arazi.Size = new System.Drawing.Size(195, 26);
+            this.Arazi.Text = "Arazi";
+            this.Arazi.Click += new System.EventHandler(this.Arazi_Click);
+            // 
+            // Google_Earth
+            // 
+            this.Google_Earth.Image = ((System.Drawing.Image)(resources.GetObject("Google_Earth.Image")));
+            this.Google_Earth.Name = "Google_Earth";
+            this.Google_Earth.Size = new System.Drawing.Size(195, 26);
+            this.Google_Earth.Text = "GE Online";
+            this.Google_Earth.Click += new System.EventHandler(this.Google_Earth_Click);
+            // 
+            // Google_Earth_Desktop
+            // 
+            this.Google_Earth_Desktop.Image = ((System.Drawing.Image)(resources.GetObject("Google_Earth_Desktop.Image")));
+            this.Google_Earth_Desktop.Name = "Google_Earth_Desktop";
+            this.Google_Earth_Desktop.Size = new System.Drawing.Size(195, 26);
+            this.Google_Earth_Desktop.Text = "GE Pro Desktop";
+            this.Google_Earth_Desktop.Click += new System.EventHandler(this.Google_Earth_Desktop_Click);
+            // 
+            // Harita
+            // 
+            this.Harita.Image = ((System.Drawing.Image)(resources.GetObject("Harita.Image")));
+            this.Harita.Name = "Harita";
+            this.Harita.Size = new System.Drawing.Size(195, 26);
+            this.Harita.Text = "Harita";
+            this.Harita.Click += new System.EventHandler(this.Harita_Click);
+            // 
+            // OSM
+            // 
+            this.OSM.Image = ((System.Drawing.Image)(resources.GetObject("OSM.Image")));
+            this.OSM.Name = "OSM";
+            this.OSM.Size = new System.Drawing.Size(195, 26);
+            this.OSM.Text = "Open Street Map";
+            this.OSM.Click += new System.EventHandler(this.OSM_Click);
+            // 
+            // Sokak_Görünümü
+            // 
+            this.Sokak_Görünümü.Image = ((System.Drawing.Image)(resources.GetObject("Sokak_Görünümü.Image")));
+            this.Sokak_Görünümü.Name = "Sokak_Görünümü";
+            this.Sokak_Görünümü.Size = new System.Drawing.Size(195, 26);
+            this.Sokak_Görünümü.Text = "Sokak Görünümü";
+            this.Sokak_Görünümü.Click += new System.EventHandler(this.Sokak_Görünümü_Click);
+            // 
+            // Uydu
+            // 
+            this.Uydu.Image = ((System.Drawing.Image)(resources.GetObject("Uydu.Image")));
+            this.Uydu.Name = "Uydu";
+            this.Uydu.Size = new System.Drawing.Size(195, 26);
+            this.Uydu.Text = "Uydu";
+            this.Uydu.Click += new System.EventHandler(this.Uydu_Click);
             // 
             // mesafe_metre_imar
             // 
@@ -1413,7 +1592,7 @@ namespace SLF
             this.gMapControl_imar.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_imar.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_imar.ShowTileGridLines = false;
-            this.gMapControl_imar.Size = new System.Drawing.Size(1236, 946);
+            this.gMapControl_imar.Size = new System.Drawing.Size(1236, 1050);
             this.gMapControl_imar.TabIndex = 60;
             this.gMapControl_imar.Zoom = 0D;
             this.gMapControl_imar.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_imar_OnMapClick);
@@ -1430,7 +1609,7 @@ namespace SLF
             this.webView_imar.Dock = System.Windows.Forms.DockStyle.Fill;
             this.webView_imar.Location = new System.Drawing.Point(0, 0);
             this.webView_imar.Name = "webView_imar";
-            this.webView_imar.Size = new System.Drawing.Size(1236, 949);
+            this.webView_imar.Size = new System.Drawing.Size(1236, 1053);
             this.webView_imar.Source = new System.Uri("https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu", System.UriKind.Absolute);
             this.webView_imar.TabIndex = 61;
             this.webView_imar.Visible = false;
@@ -1462,6 +1641,47 @@ namespace SLF
             this.katmanlar_right_click.Name = "katmanlar_right_click";
             this.katmanlar_right_click.Size = new System.Drawing.Size(196, 134);
             this.katmanlar_right_click.Opening += new System.ComponentModel.CancelEventHandler(this.katmanlar_right_click_Opening);
+            // 
+            // tabloyuGörToolStripMenuItem
+            // 
+            this.tabloyuGörToolStripMenuItem.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.tabloyuGörToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("tabloyuGörToolStripMenuItem.Image")));
+            this.tabloyuGörToolStripMenuItem.Name = "tabloyuGörToolStripMenuItem";
+            this.tabloyuGörToolStripMenuItem.Size = new System.Drawing.Size(195, 26);
+            this.tabloyuGörToolStripMenuItem.Text = "Tabloyu Gör";
+            this.tabloyuGörToolStripMenuItem.Click += new System.EventHandler(this.tabloyuGörToolStripMenuItem_Click);
+            // 
+            // rengiDeğiştirToolStripMenuItem
+            // 
+            this.rengiDeğiştirToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("rengiDeğiştirToolStripMenuItem.Image")));
+            this.rengiDeğiştirToolStripMenuItem.Name = "rengiDeğiştirToolStripMenuItem";
+            this.rengiDeğiştirToolStripMenuItem.Size = new System.Drawing.Size(195, 26);
+            this.rengiDeğiştirToolStripMenuItem.Text = "Rengi Değiştir";
+            this.rengiDeğiştirToolStripMenuItem.Click += new System.EventHandler(this.rengiDeğiştirToolStripMenuItem_Click);
+            // 
+            // temizleToolStripMenuItem
+            // 
+            this.temizleToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("temizleToolStripMenuItem.Image")));
+            this.temizleToolStripMenuItem.Name = "temizleToolStripMenuItem";
+            this.temizleToolStripMenuItem.Size = new System.Drawing.Size(195, 26);
+            this.temizleToolStripMenuItem.Text = "Temizle";
+            this.temizleToolStripMenuItem.Click += new System.EventHandler(this.temizleToolStripMenuItem_Click);
+            // 
+            // yenidenAdlandırToolStripMenuItem
+            // 
+            this.yenidenAdlandırToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("yenidenAdlandırToolStripMenuItem.Image")));
+            this.yenidenAdlandırToolStripMenuItem.Name = "yenidenAdlandırToolStripMenuItem";
+            this.yenidenAdlandırToolStripMenuItem.Size = new System.Drawing.Size(195, 26);
+            this.yenidenAdlandırToolStripMenuItem.Text = "Yeniden Adlandır";
+            this.yenidenAdlandırToolStripMenuItem.Click += new System.EventHandler(this.yenidenAdlandırToolStripMenuItem_Click);
+            // 
+            // kaydetToolStripMenuItem
+            // 
+            this.kaydetToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("kaydetToolStripMenuItem.Image")));
+            this.kaydetToolStripMenuItem.Name = "kaydetToolStripMenuItem";
+            this.kaydetToolStripMenuItem.Size = new System.Drawing.Size(195, 26);
+            this.kaydetToolStripMenuItem.Text = "Kaydet";
+            this.kaydetToolStripMenuItem.Click += new System.EventHandler(this.kaydetToolStripMenuItem_Click);
             // 
             // checkBox_imar_14
             // 
@@ -1687,12 +1907,54 @@ namespace SLF
             this.toolStrip_imar.TabIndex = 40;
             this.toolStrip_imar.Text = "toolStrip1";
             // 
+            // İmar_Mesafe_Ölç
+            // 
+            this.İmar_Mesafe_Ölç.AccessibleDescription = "";
+            this.İmar_Mesafe_Ölç.AccessibleName = "";
+            this.İmar_Mesafe_Ölç.BackColor = System.Drawing.Color.Honeydew;
+            this.İmar_Mesafe_Ölç.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.İmar_Mesafe_Ölç.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.İmar_Mesafe_Ölç.Image = ((System.Drawing.Image)(resources.GetObject("İmar_Mesafe_Ölç.Image")));
+            this.İmar_Mesafe_Ölç.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.İmar_Mesafe_Ölç.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.İmar_Mesafe_Ölç.Margin = new System.Windows.Forms.Padding(300, 1, 0, 2);
+            this.İmar_Mesafe_Ölç.Name = "İmar_Mesafe_Ölç";
+            this.İmar_Mesafe_Ölç.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.İmar_Mesafe_Ölç.Size = new System.Drawing.Size(134, 29);
+            this.İmar_Mesafe_Ölç.Tag = "";
+            this.İmar_Mesafe_Ölç.Text = "Mesafe Ölç";
+            this.İmar_Mesafe_Ölç.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.İmar_Mesafe_Ölç.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.İmar_Mesafe_Ölç.ToolTipText = "Noktalar arası doğrusal uzaklığı hesaplar.";
+            this.İmar_Mesafe_Ölç.Click += new System.EventHandler(this.İmar_Mesafe_Ölç_Click);
+            // 
             // toolStripSeparator11
             // 
             this.toolStripSeparator11.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator11.Name = "toolStripSeparator11";
             this.toolStripSeparator11.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
             this.toolStripSeparator11.Size = new System.Drawing.Size(6, 32);
+            // 
+            // İmar_Poligon
+            // 
+            this.İmar_Poligon.AccessibleDescription = "";
+            this.İmar_Poligon.AccessibleName = "";
+            this.İmar_Poligon.BackColor = System.Drawing.Color.Thistle;
+            this.İmar_Poligon.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.İmar_Poligon.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.İmar_Poligon.Image = ((System.Drawing.Image)(resources.GetObject("İmar_Poligon.Image")));
+            this.İmar_Poligon.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.İmar_Poligon.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.İmar_Poligon.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.İmar_Poligon.Name = "İmar_Poligon";
+            this.İmar_Poligon.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.İmar_Poligon.Size = new System.Drawing.Size(106, 29);
+            this.İmar_Poligon.Tag = "";
+            this.İmar_Poligon.Text = "Poligon";
+            this.İmar_Poligon.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.İmar_Poligon.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.İmar_Poligon.ToolTipText = "Poligon çizme, silme veya kaydetme fonksiyonlarını yerine getirir.";
+            this.İmar_Poligon.MouseDown += new System.Windows.Forms.MouseEventHandler(this.İmar_Poligon_MouseDown);
             // 
             // toolStripSeparator12
             // 
@@ -1701,6 +1963,27 @@ namespace SLF
             this.toolStripSeparator12.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
             this.toolStripSeparator12.Size = new System.Drawing.Size(6, 32);
             // 
+            // İmar_Nokta
+            // 
+            this.İmar_Nokta.AccessibleDescription = "";
+            this.İmar_Nokta.AccessibleName = "";
+            this.İmar_Nokta.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
+            this.İmar_Nokta.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.İmar_Nokta.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.İmar_Nokta.Image = ((System.Drawing.Image)(resources.GetObject("İmar_Nokta.Image")));
+            this.İmar_Nokta.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.İmar_Nokta.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.İmar_Nokta.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.İmar_Nokta.Name = "İmar_Nokta";
+            this.İmar_Nokta.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.İmar_Nokta.Size = new System.Drawing.Size(94, 29);
+            this.İmar_Nokta.Tag = "";
+            this.İmar_Nokta.Text = "Nokta";
+            this.İmar_Nokta.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.İmar_Nokta.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.İmar_Nokta.ToolTipText = "Haritaya tıklanarak nokta/marker eklemeye veya silmeye yarar.";
+            this.İmar_Nokta.MouseDown += new System.Windows.Forms.MouseEventHandler(this.İmar_Nokta_MouseDown);
+            // 
             // toolStripSeparator13
             // 
             this.toolStripSeparator13.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
@@ -1708,12 +1991,54 @@ namespace SLF
             this.toolStripSeparator13.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
             this.toolStripSeparator13.Size = new System.Drawing.Size(6, 32);
             // 
+            // İmar_Grid_Oluştur
+            // 
+            this.İmar_Grid_Oluştur.AccessibleDescription = "";
+            this.İmar_Grid_Oluştur.AccessibleName = "";
+            this.İmar_Grid_Oluştur.BackColor = System.Drawing.Color.Beige;
+            this.İmar_Grid_Oluştur.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.İmar_Grid_Oluştur.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.İmar_Grid_Oluştur.Image = ((System.Drawing.Image)(resources.GetObject("İmar_Grid_Oluştur.Image")));
+            this.İmar_Grid_Oluştur.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.İmar_Grid_Oluştur.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.İmar_Grid_Oluştur.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.İmar_Grid_Oluştur.Name = "İmar_Grid_Oluştur";
+            this.İmar_Grid_Oluştur.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.İmar_Grid_Oluştur.Size = new System.Drawing.Size(142, 29);
+            this.İmar_Grid_Oluştur.Tag = "";
+            this.İmar_Grid_Oluştur.Text = "Grid Oluştur";
+            this.İmar_Grid_Oluştur.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.İmar_Grid_Oluştur.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.İmar_Grid_Oluştur.ToolTipText = "Belirli bir alan seçilip bu alanda mxn şeklinde bir grid (ızgara) tanımlar.";
+            this.İmar_Grid_Oluştur.Click += new System.EventHandler(this.İmar_Grid_Oluştur_Click);
+            // 
             // toolStripSeparator14
             // 
             this.toolStripSeparator14.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator14.Name = "toolStripSeparator14";
             this.toolStripSeparator14.Padding = new System.Windows.Forms.Padding(22, 0, 22, 0);
             this.toolStripSeparator14.Size = new System.Drawing.Size(6, 32);
+            // 
+            // İmar_Fonksiyonlar
+            // 
+            this.İmar_Fonksiyonlar.AccessibleDescription = "";
+            this.İmar_Fonksiyonlar.AccessibleName = "";
+            this.İmar_Fonksiyonlar.BackColor = System.Drawing.Color.LightBlue;
+            this.İmar_Fonksiyonlar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.İmar_Fonksiyonlar.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.İmar_Fonksiyonlar.Image = ((System.Drawing.Image)(resources.GetObject("İmar_Fonksiyonlar.Image")));
+            this.İmar_Fonksiyonlar.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.İmar_Fonksiyonlar.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.İmar_Fonksiyonlar.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.İmar_Fonksiyonlar.Name = "İmar_Fonksiyonlar";
+            this.İmar_Fonksiyonlar.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.İmar_Fonksiyonlar.Size = new System.Drawing.Size(146, 29);
+            this.İmar_Fonksiyonlar.Tag = "";
+            this.İmar_Fonksiyonlar.Text = "Fonksiyonlar";
+            this.İmar_Fonksiyonlar.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.İmar_Fonksiyonlar.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.İmar_Fonksiyonlar.ToolTipText = "Çeşitli vektörel veya tabular algoritmaları içerir.";
+            this.İmar_Fonksiyonlar.MouseDown += new System.Windows.Forms.MouseEventHandler(this.İmar_Fonksiyonlar_MouseDown);
             // 
             // tab_optDTR
             // 
@@ -1757,7 +2082,7 @@ namespace SLF
             this.gMapControl_optimalDTR.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_optimalDTR.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_optimalDTR.ShowTileGridLines = false;
-            this.gMapControl_optimalDTR.Size = new System.Drawing.Size(1033, 3533);
+            this.gMapControl_optimalDTR.Size = new System.Drawing.Size(1033, 3637);
             this.gMapControl_optimalDTR.TabIndex = 42;
             this.gMapControl_optimalDTR.Zoom = 0D;
             // 
@@ -1773,7 +2098,7 @@ namespace SLF
             this.webView_optimalDTR.Location = new System.Drawing.Point(8, 2);
             this.webView_optimalDTR.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.webView_optimalDTR.Name = "webView_optimalDTR";
-            this.webView_optimalDTR.Size = new System.Drawing.Size(1033, 3186);
+            this.webView_optimalDTR.Size = new System.Drawing.Size(1033, 3290);
             this.webView_optimalDTR.Source = new System.Uri("https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu", System.UriKind.Absolute);
             this.webView_optimalDTR.TabIndex = 40;
             this.webView_optimalDTR.Visible = false;
@@ -2448,17 +2773,78 @@ namespace SLF
             this.toolStrip_yuk.TabIndex = 36;
             this.toolStrip_yuk.Text = "toolStrip1";
             // 
+            // Yuk_Seç
+            // 
+            this.Yuk_Seç.AccessibleDescription = "";
+            this.Yuk_Seç.AccessibleName = "";
+            this.Yuk_Seç.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(250)))), ((int)(((byte)(249)))));
+            this.Yuk_Seç.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.Yuk_Seç.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.Yuk_Seç.Image = ((System.Drawing.Image)(resources.GetObject("Yuk_Seç.Image")));
+            this.Yuk_Seç.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.Yuk_Seç.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.Yuk_Seç.Margin = new System.Windows.Forms.Padding(300, 1, 0, 2);
+            this.Yuk_Seç.Name = "Yuk_Seç";
+            this.Yuk_Seç.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.Yuk_Seç.Size = new System.Drawing.Size(73, 29);
+            this.Yuk_Seç.Tag = "";
+            this.Yuk_Seç.Text = "Seç";
+            this.Yuk_Seç.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.Yuk_Seç.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.Yuk_Seç.ToolTipText = "Harita üzerinde seçim yapar.";
+            this.Yuk_Seç.Click += new System.EventHandler(this.Yuk_Seç_Click);
+            // 
             // toolStripSeparator7
             // 
             this.toolStripSeparator7.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator7.Name = "toolStripSeparator7";
             this.toolStripSeparator7.Size = new System.Drawing.Size(6, 32);
             // 
+            // Yuk_Kaydır
+            // 
+            this.Yuk_Kaydır.AccessibleDescription = "";
+            this.Yuk_Kaydır.AccessibleName = "";
+            this.Yuk_Kaydır.BackColor = System.Drawing.Color.LightGoldenrodYellow;
+            this.Yuk_Kaydır.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.Yuk_Kaydır.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.Yuk_Kaydır.Image = ((System.Drawing.Image)(resources.GetObject("Yuk_Kaydır.Image")));
+            this.Yuk_Kaydır.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.Yuk_Kaydır.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.Yuk_Kaydır.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.Yuk_Kaydır.Name = "Yuk_Kaydır";
+            this.Yuk_Kaydır.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.Yuk_Kaydır.Size = new System.Drawing.Size(95, 29);
+            this.Yuk_Kaydır.Tag = "";
+            this.Yuk_Kaydır.Text = "Kaydır";
+            this.Yuk_Kaydır.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.Yuk_Kaydır.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.Yuk_Kaydır.ToolTipText = "Harita üzerine basılı tutup farklı yönlerde hareketi sağlar.";
+            // 
             // toolStripSeparator8
             // 
             this.toolStripSeparator8.Margin = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.toolStripSeparator8.Name = "toolStripSeparator8";
             this.toolStripSeparator8.Size = new System.Drawing.Size(6, 32);
+            // 
+            // Yuk_Mesafe_Ölç
+            // 
+            this.Yuk_Mesafe_Ölç.AccessibleDescription = "";
+            this.Yuk_Mesafe_Ölç.AccessibleName = "";
+            this.Yuk_Mesafe_Ölç.BackColor = System.Drawing.Color.Honeydew;
+            this.Yuk_Mesafe_Ölç.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.Yuk_Mesafe_Ölç.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.Yuk_Mesafe_Ölç.Image = ((System.Drawing.Image)(resources.GetObject("Yuk_Mesafe_Ölç.Image")));
+            this.Yuk_Mesafe_Ölç.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.Yuk_Mesafe_Ölç.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.Yuk_Mesafe_Ölç.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.Yuk_Mesafe_Ölç.Name = "Yuk_Mesafe_Ölç";
+            this.Yuk_Mesafe_Ölç.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.Yuk_Mesafe_Ölç.Size = new System.Drawing.Size(134, 29);
+            this.Yuk_Mesafe_Ölç.Tag = "";
+            this.Yuk_Mesafe_Ölç.Text = "Mesafe Ölç";
+            this.Yuk_Mesafe_Ölç.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.Yuk_Mesafe_Ölç.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.Yuk_Mesafe_Ölç.ToolTipText = "Noktalar arası doğrusal uzaklığı hesaplar.";
             // 
             // gMapControl_yuk
             // 
@@ -2495,6 +2881,21 @@ namespace SLF
             this.gMapControl_yuk.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_yuk_MouseDown);
             this.gMapControl_yuk.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_yuk_MouseMove);
             this.gMapControl_yuk.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gMapControl_yuk_MouseUp);
+            // 
+            // buton_yuk_haritası_katmanlar
+            // 
+            this.buton_yuk_haritası_katmanlar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buton_yuk_haritası_katmanlar.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buton_yuk_haritası_katmanlar.BackgroundImage")));
+            this.buton_yuk_haritası_katmanlar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.buton_yuk_haritası_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
+            this.buton_yuk_haritası_katmanlar.Cursor = System.Windows.Forms.Cursors.Default;
+            this.buton_yuk_haritası_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.buton_yuk_haritası_katmanlar.Location = new System.Drawing.Point(263, 578);
+            this.buton_yuk_haritası_katmanlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.buton_yuk_haritası_katmanlar.Name = "buton_yuk_haritası_katmanlar";
+            this.buton_yuk_haritası_katmanlar.Size = new System.Drawing.Size(59, 52);
+            this.buton_yuk_haritası_katmanlar.TabIndex = 35;
+            this.buton_yuk_haritası_katmanlar.UseVisualStyleBackColor = true;
             // 
             // tab_rapor
             // 
@@ -2539,6 +2940,107 @@ namespace SLF
             this.Toolbox_EA.Size = new System.Drawing.Size(1312, 32);
             this.Toolbox_EA.TabIndex = 32;
             this.Toolbox_EA.Text = "toolStrip2";
+            // 
+            // EA_Seç
+            // 
+            this.EA_Seç.AccessibleDescription = "";
+            this.EA_Seç.AccessibleName = "";
+            this.EA_Seç.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(250)))), ((int)(((byte)(249)))));
+            this.EA_Seç.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.EA_Seç.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.EA_Seç.Image = ((System.Drawing.Image)(resources.GetObject("EA_Seç.Image")));
+            this.EA_Seç.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.EA_Seç.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.EA_Seç.Margin = new System.Windows.Forms.Padding(204, 1, 0, 2);
+            this.EA_Seç.Name = "EA_Seç";
+            this.EA_Seç.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.EA_Seç.Size = new System.Drawing.Size(73, 29);
+            this.EA_Seç.Tag = "";
+            this.EA_Seç.Text = "Seç";
+            this.EA_Seç.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.EA_Seç.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.EA_Seç.ToolTipText = "Harita üzerinde seçim yapar.";
+            // 
+            // EA_Kaydır
+            // 
+            this.EA_Kaydır.AccessibleDescription = "";
+            this.EA_Kaydır.AccessibleName = "";
+            this.EA_Kaydır.BackColor = System.Drawing.Color.LightGoldenrodYellow;
+            this.EA_Kaydır.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.EA_Kaydır.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.EA_Kaydır.Image = ((System.Drawing.Image)(resources.GetObject("EA_Kaydır.Image")));
+            this.EA_Kaydır.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.EA_Kaydır.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.EA_Kaydır.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.EA_Kaydır.Name = "EA_Kaydır";
+            this.EA_Kaydır.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.EA_Kaydır.Size = new System.Drawing.Size(95, 29);
+            this.EA_Kaydır.Tag = "";
+            this.EA_Kaydır.Text = "Kaydır";
+            this.EA_Kaydır.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.EA_Kaydır.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.EA_Kaydır.ToolTipText = "Harita üzerine basılı tutup farklı yönlerde hareketi sağlar.";
+            // 
+            // EA_Mesafe_Ölç
+            // 
+            this.EA_Mesafe_Ölç.AccessibleDescription = "";
+            this.EA_Mesafe_Ölç.AccessibleName = "";
+            this.EA_Mesafe_Ölç.BackColor = System.Drawing.Color.Honeydew;
+            this.EA_Mesafe_Ölç.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.EA_Mesafe_Ölç.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.EA_Mesafe_Ölç.Image = ((System.Drawing.Image)(resources.GetObject("EA_Mesafe_Ölç.Image")));
+            this.EA_Mesafe_Ölç.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.EA_Mesafe_Ölç.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.EA_Mesafe_Ölç.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.EA_Mesafe_Ölç.Name = "EA_Mesafe_Ölç";
+            this.EA_Mesafe_Ölç.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.EA_Mesafe_Ölç.Size = new System.Drawing.Size(134, 29);
+            this.EA_Mesafe_Ölç.Tag = "";
+            this.EA_Mesafe_Ölç.Text = "Mesafe Ölç";
+            this.EA_Mesafe_Ölç.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.EA_Mesafe_Ölç.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.EA_Mesafe_Ölç.ToolTipText = "Noktalar arası doğrusal uzaklığı hesaplar.";
+            // 
+            // EA_Poligon
+            // 
+            this.EA_Poligon.AccessibleDescription = "";
+            this.EA_Poligon.AccessibleName = "";
+            this.EA_Poligon.BackColor = System.Drawing.Color.Thistle;
+            this.EA_Poligon.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.EA_Poligon.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.EA_Poligon.Image = ((System.Drawing.Image)(resources.GetObject("EA_Poligon.Image")));
+            this.EA_Poligon.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.EA_Poligon.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.EA_Poligon.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.EA_Poligon.Name = "EA_Poligon";
+            this.EA_Poligon.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.EA_Poligon.Size = new System.Drawing.Size(106, 29);
+            this.EA_Poligon.Tag = "";
+            this.EA_Poligon.Text = "Poligon";
+            this.EA_Poligon.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.EA_Poligon.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.EA_Poligon.ToolTipText = "Poligon çizme, silme veya kaydetme fonksiyonlarını yerine getirir.";
+            // 
+            // EA_Nokta
+            // 
+            this.EA_Nokta.AccessibleDescription = "";
+            this.EA_Nokta.AccessibleName = "";
+            this.EA_Nokta.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
+            this.EA_Nokta.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.EA_Nokta.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.EA_Nokta.Image = ((System.Drawing.Image)(resources.GetObject("EA_Nokta.Image")));
+            this.EA_Nokta.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.EA_Nokta.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.EA_Nokta.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.EA_Nokta.Name = "EA_Nokta";
+            this.EA_Nokta.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
+            this.EA_Nokta.Size = new System.Drawing.Size(94, 29);
+            this.EA_Nokta.Tag = "";
+            this.EA_Nokta.Text = "Nokta";
+            this.EA_Nokta.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.EA_Nokta.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.EA_Nokta.ToolTipText = "Haritaya tıklanarak nokta/marker eklemeye veya silmeye yarar.";
+            this.EA_Nokta.MouseDown += new System.Windows.Forms.MouseEventHandler(this.EA_Nokta_MouseDown);
             // 
             // ButtonKml
             // 
@@ -2610,6 +3112,28 @@ namespace SLF
             this.ContextMenuStrip_Nokta.Name = "EA_ContextMenuStrip_Nokta";
             this.ContextMenuStrip_Nokta.Size = new System.Drawing.Size(154, 82);
             // 
+            // Nokta_Ekle
+            // 
+            this.Nokta_Ekle.Image = ((System.Drawing.Image)(resources.GetObject("Nokta_Ekle.Image")));
+            this.Nokta_Ekle.Name = "Nokta_Ekle";
+            this.Nokta_Ekle.Size = new System.Drawing.Size(153, 26);
+            this.Nokta_Ekle.Text = "Nokta Ekle";
+            this.Nokta_Ekle.Click += new System.EventHandler(this.Nokta_Ekle_Click);
+            // 
+            // Nokta_Sil
+            // 
+            this.Nokta_Sil.Image = ((System.Drawing.Image)(resources.GetObject("Nokta_Sil.Image")));
+            this.Nokta_Sil.Name = "Nokta_Sil";
+            this.Nokta_Sil.Size = new System.Drawing.Size(153, 26);
+            this.Nokta_Sil.Text = "Nokta Sil";
+            // 
+            // Kaydet
+            // 
+            this.Kaydet.Image = ((System.Drawing.Image)(resources.GetObject("Kaydet.Image")));
+            this.Kaydet.Name = "Kaydet";
+            this.Kaydet.Size = new System.Drawing.Size(153, 26);
+            this.Kaydet.Text = "Kaydet";
+            // 
             // ContextMenuStrip_Poligon
             // 
             this.ContextMenuStrip_Poligon.ImageScalingSize = new System.Drawing.Size(20, 20);
@@ -2619,7 +3143,39 @@ namespace SLF
             this.Poligon_Sil,
             this.Poligon_Kaydet});
             this.ContextMenuStrip_Poligon.Name = "ContextMenuStrip_Poligon";
-            this.ContextMenuStrip_Poligon.Size = new System.Drawing.Size(245, 136);
+            this.ContextMenuStrip_Poligon.Size = new System.Drawing.Size(245, 108);
+            // 
+            // Point_Load_Çiz
+            // 
+            this.Point_Load_Çiz.Image = ((System.Drawing.Image)(resources.GetObject("Point_Load_Çiz.Image")));
+            this.Point_Load_Çiz.Name = "Point_Load_Çiz";
+            this.Point_Load_Çiz.Size = new System.Drawing.Size(244, 26);
+            this.Point_Load_Çiz.Text = "Nokta Yük Ekle";
+            this.Point_Load_Çiz.Click += new System.EventHandler(this.Point_Load_Çiz_Click);
+            // 
+            // YGA_Çiz
+            // 
+            this.YGA_Çiz.Image = ((System.Drawing.Image)(resources.GetObject("YGA_Çiz.Image")));
+            this.YGA_Çiz.Name = "YGA_Çiz";
+            this.YGA_Çiz.Size = new System.Drawing.Size(244, 26);
+            this.YGA_Çiz.Text = "Yeni Genişleme Alanı Çiz";
+            this.YGA_Çiz.Click += new System.EventHandler(this.YGA_Çiz_Click);
+            // 
+            // Poligon_Sil
+            // 
+            this.Poligon_Sil.Image = ((System.Drawing.Image)(resources.GetObject("Poligon_Sil.Image")));
+            this.Poligon_Sil.Name = "Poligon_Sil";
+            this.Poligon_Sil.Size = new System.Drawing.Size(244, 26);
+            this.Poligon_Sil.Text = "Poligon Sil";
+            this.Poligon_Sil.Click += new System.EventHandler(this.Poligon_Sil_Click);
+            // 
+            // Poligon_Kaydet
+            // 
+            this.Poligon_Kaydet.Image = ((System.Drawing.Image)(resources.GetObject("Poligon_Kaydet.Image")));
+            this.Poligon_Kaydet.Name = "Poligon_Kaydet";
+            this.Poligon_Kaydet.Size = new System.Drawing.Size(244, 26);
+            this.Poligon_Kaydet.Text = "Poligon Kaydet";
+            this.Poligon_Kaydet.Click += new System.EventHandler(this.Poligon_Kaydet_Click);
             // 
             // ContextMenuStrip_Fonksiyon
             // 
@@ -2629,6 +3185,21 @@ namespace SLF
             this.overlap_analizi});
             this.ContextMenuStrip_Fonksiyon.Name = "ContextMenuStrip_Fonksiyon";
             this.ContextMenuStrip_Fonksiyon.Size = new System.Drawing.Size(188, 56);
+            // 
+            // katman_birleştir
+            // 
+            this.katman_birleştir.Image = ((System.Drawing.Image)(resources.GetObject("katman_birleştir.Image")));
+            this.katman_birleştir.Name = "katman_birleştir";
+            this.katman_birleştir.Size = new System.Drawing.Size(187, 26);
+            this.katman_birleştir.Text = "Katman Birleştir";
+            this.katman_birleştir.Click += new System.EventHandler(this.katman_birleştir_Click);
+            // 
+            // overlap_analizi
+            // 
+            this.overlap_analizi.Image = ((System.Drawing.Image)(resources.GetObject("overlap_analizi.Image")));
+            this.overlap_analizi.Name = "overlap_analizi";
+            this.overlap_analizi.Size = new System.Drawing.Size(187, 26);
+            this.overlap_analizi.Text = "Overlap Analizi";
             // 
             // ModuleTabPanel
             // 
@@ -2712,6 +3283,30 @@ namespace SLF
             this.miniToolStrip.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.miniToolStrip.Size = new System.Drawing.Size(1437, 32);
             this.miniToolStrip.TabIndex = 36;
+            // 
+            // buton_ea_harita_katmanlar
+            // 
+            this.buton_ea_harita_katmanlar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buton_ea_harita_katmanlar.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buton_ea_harita_katmanlar.BackgroundImage")));
+            this.buton_ea_harita_katmanlar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.buton_ea_harita_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
+            this.buton_ea_harita_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.buton_ea_harita_katmanlar.Location = new System.Drawing.Point(373, 654);
+            this.buton_ea_harita_katmanlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.buton_ea_harita_katmanlar.Name = "buton_ea_harita_katmanlar";
+            this.buton_ea_harita_katmanlar.Size = new System.Drawing.Size(61, 52);
+            this.buton_ea_harita_katmanlar.TabIndex = 31;
+            this.buton_ea_harita_katmanlar.UseVisualStyleBackColor = true;
+            // 
+            // ELFMinSenaryoGraphPicBox
+            // 
+            this.ELFMinSenaryoGraphPicBox.Location = new System.Drawing.Point(809, 58);
+            this.ELFMinSenaryoGraphPicBox.Margin = new System.Windows.Forms.Padding(4);
+            this.ELFMinSenaryoGraphPicBox.Name = "ELFMinSenaryoGraphPicBox";
+            this.ELFMinSenaryoGraphPicBox.Size = new System.Drawing.Size(308, 210);
+            this.ELFMinSenaryoGraphPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.ELFMinSenaryoGraphPicBox.TabIndex = 22;
+            this.ELFMinSenaryoGraphPicBox.TabStop = false;
             // 
             // OpenModuleButton
             // 
@@ -2926,351 +3521,6 @@ namespace SLF
             this.ELFScenerioSaveButton.UseVisualStyleBackColor = false;
             this.ELFScenerioSaveButton.Click += new System.EventHandler(this.ELFScenerioSaveButton_Click);
             // 
-            // raporGoruntuleButonu
-            // 
-            this.raporGoruntuleButonu.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.raporGoruntuleButonu.BackColor = System.Drawing.Color.White;
-            this.raporGoruntuleButonu.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("raporGoruntuleButonu.BackgroundImage")));
-            this.raporGoruntuleButonu.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.raporGoruntuleButonu.ForeColor = System.Drawing.Color.Transparent;
-            this.raporGoruntuleButonu.Location = new System.Drawing.Point(131, 14);
-            this.raporGoruntuleButonu.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.raporGoruntuleButonu.Name = "raporGoruntuleButonu";
-            this.raporGoruntuleButonu.Size = new System.Drawing.Size(43, 36);
-            this.raporGoruntuleButonu.TabIndex = 6;
-            this.raporGoruntuleButonu.UseVisualStyleBackColor = false;
-            this.raporGoruntuleButonu.Click += new System.EventHandler(this.raporGoruntuleButonu_Click);
-            // 
-            // ExcelDownloadButton
-            // 
-            this.ExcelDownloadButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ExcelDownloadButton.BackColor = System.Drawing.Color.White;
-            this.ExcelDownloadButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("ExcelDownloadButton.BackgroundImage")));
-            this.ExcelDownloadButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.ExcelDownloadButton.ForeColor = System.Drawing.Color.Transparent;
-            this.ExcelDownloadButton.Location = new System.Drawing.Point(105, 14);
-            this.ExcelDownloadButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ExcelDownloadButton.Name = "ExcelDownloadButton";
-            this.ExcelDownloadButton.Size = new System.Drawing.Size(43, 36);
-            this.ExcelDownloadButton.TabIndex = 7;
-            this.ExcelDownloadButton.UseVisualStyleBackColor = false;
-            this.ExcelDownloadButton.Click += new System.EventHandler(this.ExcelDownloadButton_Click);
-            // 
-            // csvExportButton
-            // 
-            this.csvExportButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.csvExportButton.BackColor = System.Drawing.Color.White;
-            this.csvExportButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("csvExportButton.BackgroundImage")));
-            this.csvExportButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.csvExportButton.ForeColor = System.Drawing.Color.Transparent;
-            this.csvExportButton.Location = new System.Drawing.Point(153, 14);
-            this.csvExportButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.csvExportButton.Name = "csvExportButton";
-            this.csvExportButton.Size = new System.Drawing.Size(43, 36);
-            this.csvExportButton.TabIndex = 8;
-            this.csvExportButton.UseVisualStyleBackColor = true;
-            this.csvExportButton.Click += new System.EventHandler(this.csvExportButton_Click);
-            // 
-            // SelectFolderButton
-            // 
-            this.SelectFolderButton.BackColor = System.Drawing.Color.White;
-            this.SelectFolderButton.BackgroundImage = global::SLF.Properties.Resources.download_folder_file_icon_219533;
-            this.SelectFolderButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.SelectFolderButton.ForeColor = System.Drawing.Color.Transparent;
-            this.SelectFolderButton.Location = new System.Drawing.Point(385, 15);
-            this.SelectFolderButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.SelectFolderButton.Name = "SelectFolderButton";
-            this.SelectFolderButton.Size = new System.Drawing.Size(47, 44);
-            this.SelectFolderButton.TabIndex = 2;
-            this.SelectFolderButton.UseVisualStyleBackColor = false;
-            this.SelectFolderButton.Click += new System.EventHandler(this.SelectFolderButton_Click);
-            // 
-            // pictureBox_ELF_5
-            // 
-            this.pictureBox_ELF_5.Location = new System.Drawing.Point(699, 135);
-            this.pictureBox_ELF_5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pictureBox_ELF_5.Name = "pictureBox_ELF_5";
-            this.pictureBox_ELF_5.Size = new System.Drawing.Size(341, 282);
-            this.pictureBox_ELF_5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox_ELF_5.TabIndex = 4;
-            this.pictureBox_ELF_5.TabStop = false;
-            // 
-            // pictureBox_ELF_4
-            // 
-            this.pictureBox_ELF_4.Location = new System.Drawing.Point(351, 290);
-            this.pictureBox_ELF_4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pictureBox_ELF_4.Name = "pictureBox_ELF_4";
-            this.pictureBox_ELF_4.Size = new System.Drawing.Size(341, 282);
-            this.pictureBox_ELF_4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox_ELF_4.TabIndex = 3;
-            this.pictureBox_ELF_4.TabStop = false;
-            // 
-            // pictureBox_ELF_3
-            // 
-            this.pictureBox_ELF_3.Location = new System.Drawing.Point(351, 2);
-            this.pictureBox_ELF_3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pictureBox_ELF_3.Name = "pictureBox_ELF_3";
-            this.pictureBox_ELF_3.Size = new System.Drawing.Size(341, 282);
-            this.pictureBox_ELF_3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox_ELF_3.TabIndex = 2;
-            this.pictureBox_ELF_3.TabStop = false;
-            // 
-            // pictureBox_ELF_2
-            // 
-            this.pictureBox_ELF_2.Location = new System.Drawing.Point(3, 290);
-            this.pictureBox_ELF_2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pictureBox_ELF_2.Name = "pictureBox_ELF_2";
-            this.pictureBox_ELF_2.Size = new System.Drawing.Size(341, 282);
-            this.pictureBox_ELF_2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox_ELF_2.TabIndex = 1;
-            this.pictureBox_ELF_2.TabStop = false;
-            // 
-            // pictureBox_ELF_1
-            // 
-            this.pictureBox_ELF_1.Location = new System.Drawing.Point(3, 2);
-            this.pictureBox_ELF_1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pictureBox_ELF_1.Name = "pictureBox_ELF_1";
-            this.pictureBox_ELF_1.Size = new System.Drawing.Size(341, 282);
-            this.pictureBox_ELF_1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox_ELF_1.TabIndex = 0;
-            this.pictureBox_ELF_1.TabStop = false;
-            // 
-            // buton_imar_katmanlar
-            // 
-            this.buton_imar_katmanlar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.buton_imar_katmanlar.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buton_imar_katmanlar.BackgroundImage")));
-            this.buton_imar_katmanlar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.buton_imar_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
-            this.buton_imar_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_imar_katmanlar.Location = new System.Drawing.Point(3, 889);
-            this.buton_imar_katmanlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.buton_imar_katmanlar.Name = "buton_imar_katmanlar";
-            this.buton_imar_katmanlar.Size = new System.Drawing.Size(59, 52);
-            this.buton_imar_katmanlar.TabIndex = 62;
-            this.buton_imar_katmanlar.UseVisualStyleBackColor = true;
-            // 
-            // tabloyuGörToolStripMenuItem
-            // 
-            this.tabloyuGörToolStripMenuItem.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.tabloyuGörToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("tabloyuGörToolStripMenuItem.Image")));
-            this.tabloyuGörToolStripMenuItem.Name = "tabloyuGörToolStripMenuItem";
-            this.tabloyuGörToolStripMenuItem.Size = new System.Drawing.Size(195, 26);
-            this.tabloyuGörToolStripMenuItem.Text = "Tabloyu Gör";
-            this.tabloyuGörToolStripMenuItem.Click += new System.EventHandler(this.tabloyuGörToolStripMenuItem_Click);
-            // 
-            // rengiDeğiştirToolStripMenuItem
-            // 
-            this.rengiDeğiştirToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("rengiDeğiştirToolStripMenuItem.Image")));
-            this.rengiDeğiştirToolStripMenuItem.Name = "rengiDeğiştirToolStripMenuItem";
-            this.rengiDeğiştirToolStripMenuItem.Size = new System.Drawing.Size(195, 26);
-            this.rengiDeğiştirToolStripMenuItem.Text = "Rengi Değiştir";
-            this.rengiDeğiştirToolStripMenuItem.Click += new System.EventHandler(this.rengiDeğiştirToolStripMenuItem_Click);
-            // 
-            // temizleToolStripMenuItem
-            // 
-            this.temizleToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("temizleToolStripMenuItem.Image")));
-            this.temizleToolStripMenuItem.Name = "temizleToolStripMenuItem";
-            this.temizleToolStripMenuItem.Size = new System.Drawing.Size(195, 26);
-            this.temizleToolStripMenuItem.Text = "Temizle";
-            this.temizleToolStripMenuItem.Click += new System.EventHandler(this.temizleToolStripMenuItem_Click);
-            // 
-            // yenidenAdlandırToolStripMenuItem
-            // 
-            this.yenidenAdlandırToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("yenidenAdlandırToolStripMenuItem.Image")));
-            this.yenidenAdlandırToolStripMenuItem.Name = "yenidenAdlandırToolStripMenuItem";
-            this.yenidenAdlandırToolStripMenuItem.Size = new System.Drawing.Size(195, 26);
-            this.yenidenAdlandırToolStripMenuItem.Text = "Yeniden Adlandır";
-            this.yenidenAdlandırToolStripMenuItem.Click += new System.EventHandler(this.yenidenAdlandırToolStripMenuItem_Click);
-            // 
-            // kaydetToolStripMenuItem
-            // 
-            this.kaydetToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("kaydetToolStripMenuItem.Image")));
-            this.kaydetToolStripMenuItem.Name = "kaydetToolStripMenuItem";
-            this.kaydetToolStripMenuItem.Size = new System.Drawing.Size(195, 26);
-            this.kaydetToolStripMenuItem.Text = "Kaydet";
-            this.kaydetToolStripMenuItem.Click += new System.EventHandler(this.kaydetToolStripMenuItem_Click);
-            // 
-            // İmar_Mesafe_Ölç
-            // 
-            this.İmar_Mesafe_Ölç.AccessibleDescription = "";
-            this.İmar_Mesafe_Ölç.AccessibleName = "";
-            this.İmar_Mesafe_Ölç.BackColor = System.Drawing.Color.Honeydew;
-            this.İmar_Mesafe_Ölç.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.İmar_Mesafe_Ölç.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.İmar_Mesafe_Ölç.Image = ((System.Drawing.Image)(resources.GetObject("İmar_Mesafe_Ölç.Image")));
-            this.İmar_Mesafe_Ölç.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.İmar_Mesafe_Ölç.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.İmar_Mesafe_Ölç.Margin = new System.Windows.Forms.Padding(300, 1, 0, 2);
-            this.İmar_Mesafe_Ölç.Name = "İmar_Mesafe_Ölç";
-            this.İmar_Mesafe_Ölç.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.İmar_Mesafe_Ölç.Size = new System.Drawing.Size(134, 29);
-            this.İmar_Mesafe_Ölç.Tag = "";
-            this.İmar_Mesafe_Ölç.Text = "Mesafe Ölç";
-            this.İmar_Mesafe_Ölç.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.İmar_Mesafe_Ölç.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.İmar_Mesafe_Ölç.ToolTipText = "Noktalar arası doğrusal uzaklığı hesaplar.";
-            this.İmar_Mesafe_Ölç.Click += new System.EventHandler(this.İmar_Mesafe_Ölç_Click);
-            // 
-            // İmar_Poligon
-            // 
-            this.İmar_Poligon.AccessibleDescription = "";
-            this.İmar_Poligon.AccessibleName = "";
-            this.İmar_Poligon.BackColor = System.Drawing.Color.Thistle;
-            this.İmar_Poligon.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.İmar_Poligon.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.İmar_Poligon.Image = ((System.Drawing.Image)(resources.GetObject("İmar_Poligon.Image")));
-            this.İmar_Poligon.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.İmar_Poligon.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.İmar_Poligon.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
-            this.İmar_Poligon.Name = "İmar_Poligon";
-            this.İmar_Poligon.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.İmar_Poligon.Size = new System.Drawing.Size(106, 29);
-            this.İmar_Poligon.Tag = "";
-            this.İmar_Poligon.Text = "Poligon";
-            this.İmar_Poligon.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.İmar_Poligon.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.İmar_Poligon.ToolTipText = "Poligon çizme, silme veya kaydetme fonksiyonlarını yerine getirir.";
-            this.İmar_Poligon.MouseDown += new System.Windows.Forms.MouseEventHandler(this.İmar_Poligon_MouseDown);
-            // 
-            // İmar_Nokta
-            // 
-            this.İmar_Nokta.AccessibleDescription = "";
-            this.İmar_Nokta.AccessibleName = "";
-            this.İmar_Nokta.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
-            this.İmar_Nokta.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.İmar_Nokta.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.İmar_Nokta.Image = ((System.Drawing.Image)(resources.GetObject("İmar_Nokta.Image")));
-            this.İmar_Nokta.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.İmar_Nokta.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.İmar_Nokta.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
-            this.İmar_Nokta.Name = "İmar_Nokta";
-            this.İmar_Nokta.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.İmar_Nokta.Size = new System.Drawing.Size(94, 29);
-            this.İmar_Nokta.Tag = "";
-            this.İmar_Nokta.Text = "Nokta";
-            this.İmar_Nokta.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.İmar_Nokta.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.İmar_Nokta.ToolTipText = "Haritaya tıklanarak nokta/marker eklemeye veya silmeye yarar.";
-            this.İmar_Nokta.MouseDown += new System.Windows.Forms.MouseEventHandler(this.İmar_Nokta_MouseDown);
-            // 
-            // İmar_Grid_Oluştur
-            // 
-            this.İmar_Grid_Oluştur.AccessibleDescription = "";
-            this.İmar_Grid_Oluştur.AccessibleName = "";
-            this.İmar_Grid_Oluştur.BackColor = System.Drawing.Color.Beige;
-            this.İmar_Grid_Oluştur.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.İmar_Grid_Oluştur.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.İmar_Grid_Oluştur.Image = ((System.Drawing.Image)(resources.GetObject("İmar_Grid_Oluştur.Image")));
-            this.İmar_Grid_Oluştur.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.İmar_Grid_Oluştur.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.İmar_Grid_Oluştur.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
-            this.İmar_Grid_Oluştur.Name = "İmar_Grid_Oluştur";
-            this.İmar_Grid_Oluştur.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.İmar_Grid_Oluştur.Size = new System.Drawing.Size(142, 29);
-            this.İmar_Grid_Oluştur.Tag = "";
-            this.İmar_Grid_Oluştur.Text = "Grid Oluştur";
-            this.İmar_Grid_Oluştur.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.İmar_Grid_Oluştur.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.İmar_Grid_Oluştur.ToolTipText = "Belirli bir alan seçilip bu alanda mxn şeklinde bir grid (ızgara) tanımlar.";
-            this.İmar_Grid_Oluştur.Click += new System.EventHandler(this.İmar_Grid_Oluştur_Click);
-            // 
-            // İmar_Fonksiyonlar
-            // 
-            this.İmar_Fonksiyonlar.AccessibleDescription = "";
-            this.İmar_Fonksiyonlar.AccessibleName = "";
-            this.İmar_Fonksiyonlar.BackColor = System.Drawing.Color.LightBlue;
-            this.İmar_Fonksiyonlar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.İmar_Fonksiyonlar.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.İmar_Fonksiyonlar.Image = ((System.Drawing.Image)(resources.GetObject("İmar_Fonksiyonlar.Image")));
-            this.İmar_Fonksiyonlar.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.İmar_Fonksiyonlar.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.İmar_Fonksiyonlar.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
-            this.İmar_Fonksiyonlar.Name = "İmar_Fonksiyonlar";
-            this.İmar_Fonksiyonlar.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.İmar_Fonksiyonlar.Size = new System.Drawing.Size(146, 29);
-            this.İmar_Fonksiyonlar.Tag = "";
-            this.İmar_Fonksiyonlar.Text = "Fonksiyonlar";
-            this.İmar_Fonksiyonlar.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.İmar_Fonksiyonlar.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.İmar_Fonksiyonlar.ToolTipText = "Çeşitli vektörel veya tabular algoritmaları içerir.";
-            this.İmar_Fonksiyonlar.MouseDown += new System.Windows.Forms.MouseEventHandler(this.İmar_Fonksiyonlar_MouseDown);
-            // 
-            // Yuk_Seç
-            // 
-            this.Yuk_Seç.AccessibleDescription = "";
-            this.Yuk_Seç.AccessibleName = "";
-            this.Yuk_Seç.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(250)))), ((int)(((byte)(249)))));
-            this.Yuk_Seç.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.Yuk_Seç.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.Yuk_Seç.Image = ((System.Drawing.Image)(resources.GetObject("Yuk_Seç.Image")));
-            this.Yuk_Seç.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.Yuk_Seç.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.Yuk_Seç.Margin = new System.Windows.Forms.Padding(300, 1, 0, 2);
-            this.Yuk_Seç.Name = "Yuk_Seç";
-            this.Yuk_Seç.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.Yuk_Seç.Size = new System.Drawing.Size(73, 29);
-            this.Yuk_Seç.Tag = "";
-            this.Yuk_Seç.Text = "Seç";
-            this.Yuk_Seç.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.Yuk_Seç.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.Yuk_Seç.ToolTipText = "Harita üzerinde seçim yapar.";
-            this.Yuk_Seç.Click += new System.EventHandler(this.Yuk_Seç_Click);
-            // 
-            // Yuk_Kaydır
-            // 
-            this.Yuk_Kaydır.AccessibleDescription = "";
-            this.Yuk_Kaydır.AccessibleName = "";
-            this.Yuk_Kaydır.BackColor = System.Drawing.Color.LightGoldenrodYellow;
-            this.Yuk_Kaydır.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.Yuk_Kaydır.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.Yuk_Kaydır.Image = ((System.Drawing.Image)(resources.GetObject("Yuk_Kaydır.Image")));
-            this.Yuk_Kaydır.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.Yuk_Kaydır.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.Yuk_Kaydır.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
-            this.Yuk_Kaydır.Name = "Yuk_Kaydır";
-            this.Yuk_Kaydır.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.Yuk_Kaydır.Size = new System.Drawing.Size(95, 29);
-            this.Yuk_Kaydır.Tag = "";
-            this.Yuk_Kaydır.Text = "Kaydır";
-            this.Yuk_Kaydır.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.Yuk_Kaydır.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.Yuk_Kaydır.ToolTipText = "Harita üzerine basılı tutup farklı yönlerde hareketi sağlar.";
-            // 
-            // Yuk_Mesafe_Ölç
-            // 
-            this.Yuk_Mesafe_Ölç.AccessibleDescription = "";
-            this.Yuk_Mesafe_Ölç.AccessibleName = "";
-            this.Yuk_Mesafe_Ölç.BackColor = System.Drawing.Color.Honeydew;
-            this.Yuk_Mesafe_Ölç.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.Yuk_Mesafe_Ölç.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.Yuk_Mesafe_Ölç.Image = ((System.Drawing.Image)(resources.GetObject("Yuk_Mesafe_Ölç.Image")));
-            this.Yuk_Mesafe_Ölç.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.Yuk_Mesafe_Ölç.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.Yuk_Mesafe_Ölç.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
-            this.Yuk_Mesafe_Ölç.Name = "Yuk_Mesafe_Ölç";
-            this.Yuk_Mesafe_Ölç.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.Yuk_Mesafe_Ölç.Size = new System.Drawing.Size(134, 29);
-            this.Yuk_Mesafe_Ölç.Tag = "";
-            this.Yuk_Mesafe_Ölç.Text = "Mesafe Ölç";
-            this.Yuk_Mesafe_Ölç.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.Yuk_Mesafe_Ölç.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.Yuk_Mesafe_Ölç.ToolTipText = "Noktalar arası doğrusal uzaklığı hesaplar.";
-            // 
-            // buton_yuk_haritası_katmanlar
-            // 
-            this.buton_yuk_haritası_katmanlar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.buton_yuk_haritası_katmanlar.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buton_yuk_haritası_katmanlar.BackgroundImage")));
-            this.buton_yuk_haritası_katmanlar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.buton_yuk_haritası_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
-            this.buton_yuk_haritası_katmanlar.Cursor = System.Windows.Forms.Cursors.Default;
-            this.buton_yuk_haritası_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_yuk_haritası_katmanlar.Location = new System.Drawing.Point(263, 578);
-            this.buton_yuk_haritası_katmanlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.buton_yuk_haritası_katmanlar.Name = "buton_yuk_haritası_katmanlar";
-            this.buton_yuk_haritası_katmanlar.Size = new System.Drawing.Size(59, 52);
-            this.buton_yuk_haritası_katmanlar.TabIndex = 35;
-            this.buton_yuk_haritası_katmanlar.UseVisualStyleBackColor = true;
-            // 
             // HomePageButton
             // 
             this.HomePageButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -3292,256 +3542,6 @@ namespace SLF
             this.HomePageButton.TextColor = System.Drawing.Color.White;
             this.HomePageButton.UseVisualStyleBackColor = false;
             this.HomePageButton.Click += new System.EventHandler(this.HomePageButton_Click);
-            // 
-            // Arazi
-            // 
-            this.Arazi.Image = ((System.Drawing.Image)(resources.GetObject("Arazi.Image")));
-            this.Arazi.Name = "Arazi";
-            this.Arazi.Size = new System.Drawing.Size(195, 26);
-            this.Arazi.Text = "Arazi";
-            this.Arazi.Click += new System.EventHandler(this.Arazi_Click);
-            // 
-            // Google_Earth
-            // 
-            this.Google_Earth.Image = ((System.Drawing.Image)(resources.GetObject("Google_Earth.Image")));
-            this.Google_Earth.Name = "Google_Earth";
-            this.Google_Earth.Size = new System.Drawing.Size(195, 26);
-            this.Google_Earth.Text = "GE Online";
-            this.Google_Earth.Click += new System.EventHandler(this.Google_Earth_Click);
-            // 
-            // Google_Earth_Desktop
-            // 
-            this.Google_Earth_Desktop.Image = ((System.Drawing.Image)(resources.GetObject("Google_Earth_Desktop.Image")));
-            this.Google_Earth_Desktop.Name = "Google_Earth_Desktop";
-            this.Google_Earth_Desktop.Size = new System.Drawing.Size(195, 26);
-            this.Google_Earth_Desktop.Text = "GE Pro Desktop";
-            this.Google_Earth_Desktop.Click += new System.EventHandler(this.Google_Earth_Desktop_Click);
-            // 
-            // Harita
-            // 
-            this.Harita.Image = ((System.Drawing.Image)(resources.GetObject("Harita.Image")));
-            this.Harita.Name = "Harita";
-            this.Harita.Size = new System.Drawing.Size(195, 26);
-            this.Harita.Text = "Harita";
-            this.Harita.Click += new System.EventHandler(this.Harita_Click);
-            // 
-            // OSM
-            // 
-            this.OSM.Image = ((System.Drawing.Image)(resources.GetObject("OSM.Image")));
-            this.OSM.Name = "OSM";
-            this.OSM.Size = new System.Drawing.Size(195, 26);
-            this.OSM.Text = "Open Street Map";
-            this.OSM.Click += new System.EventHandler(this.OSM_Click);
-            // 
-            // Sokak_Görünümü
-            // 
-            this.Sokak_Görünümü.Image = ((System.Drawing.Image)(resources.GetObject("Sokak_Görünümü.Image")));
-            this.Sokak_Görünümü.Name = "Sokak_Görünümü";
-            this.Sokak_Görünümü.Size = new System.Drawing.Size(195, 26);
-            this.Sokak_Görünümü.Text = "Sokak Görünümü";
-            this.Sokak_Görünümü.Click += new System.EventHandler(this.Sokak_Görünümü_Click);
-            // 
-            // Uydu
-            // 
-            this.Uydu.Image = ((System.Drawing.Image)(resources.GetObject("Uydu.Image")));
-            this.Uydu.Name = "Uydu";
-            this.Uydu.Size = new System.Drawing.Size(195, 26);
-            this.Uydu.Text = "Uydu";
-            this.Uydu.Click += new System.EventHandler(this.Uydu_Click);
-            // 
-            // EA_Seç
-            // 
-            this.EA_Seç.AccessibleDescription = "";
-            this.EA_Seç.AccessibleName = "";
-            this.EA_Seç.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(250)))), ((int)(((byte)(249)))));
-            this.EA_Seç.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.EA_Seç.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.EA_Seç.Image = ((System.Drawing.Image)(resources.GetObject("EA_Seç.Image")));
-            this.EA_Seç.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.EA_Seç.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.EA_Seç.Margin = new System.Windows.Forms.Padding(204, 1, 0, 2);
-            this.EA_Seç.Name = "EA_Seç";
-            this.EA_Seç.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.EA_Seç.Size = new System.Drawing.Size(73, 29);
-            this.EA_Seç.Tag = "";
-            this.EA_Seç.Text = "Seç";
-            this.EA_Seç.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.EA_Seç.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.EA_Seç.ToolTipText = "Harita üzerinde seçim yapar.";
-            // 
-            // EA_Kaydır
-            // 
-            this.EA_Kaydır.AccessibleDescription = "";
-            this.EA_Kaydır.AccessibleName = "";
-            this.EA_Kaydır.BackColor = System.Drawing.Color.LightGoldenrodYellow;
-            this.EA_Kaydır.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.EA_Kaydır.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.EA_Kaydır.Image = ((System.Drawing.Image)(resources.GetObject("EA_Kaydır.Image")));
-            this.EA_Kaydır.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.EA_Kaydır.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.EA_Kaydır.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
-            this.EA_Kaydır.Name = "EA_Kaydır";
-            this.EA_Kaydır.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.EA_Kaydır.Size = new System.Drawing.Size(95, 29);
-            this.EA_Kaydır.Tag = "";
-            this.EA_Kaydır.Text = "Kaydır";
-            this.EA_Kaydır.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.EA_Kaydır.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.EA_Kaydır.ToolTipText = "Harita üzerine basılı tutup farklı yönlerde hareketi sağlar.";
-            // 
-            // EA_Mesafe_Ölç
-            // 
-            this.EA_Mesafe_Ölç.AccessibleDescription = "";
-            this.EA_Mesafe_Ölç.AccessibleName = "";
-            this.EA_Mesafe_Ölç.BackColor = System.Drawing.Color.Honeydew;
-            this.EA_Mesafe_Ölç.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.EA_Mesafe_Ölç.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.EA_Mesafe_Ölç.Image = ((System.Drawing.Image)(resources.GetObject("EA_Mesafe_Ölç.Image")));
-            this.EA_Mesafe_Ölç.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.EA_Mesafe_Ölç.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.EA_Mesafe_Ölç.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
-            this.EA_Mesafe_Ölç.Name = "EA_Mesafe_Ölç";
-            this.EA_Mesafe_Ölç.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.EA_Mesafe_Ölç.Size = new System.Drawing.Size(134, 29);
-            this.EA_Mesafe_Ölç.Tag = "";
-            this.EA_Mesafe_Ölç.Text = "Mesafe Ölç";
-            this.EA_Mesafe_Ölç.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.EA_Mesafe_Ölç.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.EA_Mesafe_Ölç.ToolTipText = "Noktalar arası doğrusal uzaklığı hesaplar.";
-            // 
-            // EA_Poligon
-            // 
-            this.EA_Poligon.AccessibleDescription = "";
-            this.EA_Poligon.AccessibleName = "";
-            this.EA_Poligon.BackColor = System.Drawing.Color.Thistle;
-            this.EA_Poligon.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.EA_Poligon.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.EA_Poligon.Image = ((System.Drawing.Image)(resources.GetObject("EA_Poligon.Image")));
-            this.EA_Poligon.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.EA_Poligon.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.EA_Poligon.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
-            this.EA_Poligon.Name = "EA_Poligon";
-            this.EA_Poligon.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.EA_Poligon.Size = new System.Drawing.Size(106, 29);
-            this.EA_Poligon.Tag = "";
-            this.EA_Poligon.Text = "Poligon";
-            this.EA_Poligon.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.EA_Poligon.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.EA_Poligon.ToolTipText = "Poligon çizme, silme veya kaydetme fonksiyonlarını yerine getirir.";
-            // 
-            // EA_Nokta
-            // 
-            this.EA_Nokta.AccessibleDescription = "";
-            this.EA_Nokta.AccessibleName = "";
-            this.EA_Nokta.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
-            this.EA_Nokta.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.EA_Nokta.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.EA_Nokta.Image = ((System.Drawing.Image)(resources.GetObject("EA_Nokta.Image")));
-            this.EA_Nokta.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.EA_Nokta.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.EA_Nokta.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
-            this.EA_Nokta.Name = "EA_Nokta";
-            this.EA_Nokta.Padding = new System.Windows.Forms.Padding(30, 0, 0, 0);
-            this.EA_Nokta.Size = new System.Drawing.Size(94, 29);
-            this.EA_Nokta.Tag = "";
-            this.EA_Nokta.Text = "Nokta";
-            this.EA_Nokta.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.EA_Nokta.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
-            this.EA_Nokta.ToolTipText = "Haritaya tıklanarak nokta/marker eklemeye veya silmeye yarar.";
-            this.EA_Nokta.MouseDown += new System.Windows.Forms.MouseEventHandler(this.EA_Nokta_MouseDown);
-            // 
-            // Nokta_Ekle
-            // 
-            this.Nokta_Ekle.Image = ((System.Drawing.Image)(resources.GetObject("Nokta_Ekle.Image")));
-            this.Nokta_Ekle.Name = "Nokta_Ekle";
-            this.Nokta_Ekle.Size = new System.Drawing.Size(153, 26);
-            this.Nokta_Ekle.Text = "Nokta Ekle";
-            this.Nokta_Ekle.Click += new System.EventHandler(this.Nokta_Ekle_Click);
-            // 
-            // Nokta_Sil
-            // 
-            this.Nokta_Sil.Image = ((System.Drawing.Image)(resources.GetObject("Nokta_Sil.Image")));
-            this.Nokta_Sil.Name = "Nokta_Sil";
-            this.Nokta_Sil.Size = new System.Drawing.Size(153, 26);
-            this.Nokta_Sil.Text = "Nokta Sil";
-            // 
-            // Kaydet
-            // 
-            this.Kaydet.Image = ((System.Drawing.Image)(resources.GetObject("Kaydet.Image")));
-            this.Kaydet.Name = "Kaydet";
-            this.Kaydet.Size = new System.Drawing.Size(153, 26);
-            this.Kaydet.Text = "Kaydet";
-            // 
-            // Point_Load_Çiz
-            // 
-            this.Point_Load_Çiz.Image = ((System.Drawing.Image)(resources.GetObject("Point_Load_Çiz.Image")));
-            this.Point_Load_Çiz.Name = "Point_Load_Çiz";
-            this.Point_Load_Çiz.Size = new System.Drawing.Size(244, 26);
-            this.Point_Load_Çiz.Text = "Nokta Yük Ekle";
-            this.Point_Load_Çiz.Click += new System.EventHandler(this.Point_Load_Çiz_Click);
-            // 
-            // YGA_Çiz
-            // 
-            this.YGA_Çiz.Image = ((System.Drawing.Image)(resources.GetObject("YGA_Çiz.Image")));
-            this.YGA_Çiz.Name = "YGA_Çiz";
-            this.YGA_Çiz.Size = new System.Drawing.Size(244, 26);
-            this.YGA_Çiz.Text = "Yeni Genişleme Alanı Çiz";
-            this.YGA_Çiz.Click += new System.EventHandler(this.YGA_Çiz_Click);
-            // 
-            // Poligon_Sil
-            // 
-            this.Poligon_Sil.Image = ((System.Drawing.Image)(resources.GetObject("Poligon_Sil.Image")));
-            this.Poligon_Sil.Name = "Poligon_Sil";
-            this.Poligon_Sil.Size = new System.Drawing.Size(244, 26);
-            this.Poligon_Sil.Text = "Poligon Sil";
-            this.Poligon_Sil.Click += new System.EventHandler(this.Poligon_Sil_Click);
-            // 
-            // Poligon_Kaydet
-            // 
-            this.Poligon_Kaydet.Image = ((System.Drawing.Image)(resources.GetObject("Poligon_Kaydet.Image")));
-            this.Poligon_Kaydet.Name = "Poligon_Kaydet";
-            this.Poligon_Kaydet.Size = new System.Drawing.Size(244, 26);
-            this.Poligon_Kaydet.Text = "Poligon Kaydet";
-            this.Poligon_Kaydet.Click += new System.EventHandler(this.Poligon_Kaydet_Click);
-            // 
-            // katman_birleştir
-            // 
-            this.katman_birleştir.Image = ((System.Drawing.Image)(resources.GetObject("katman_birleştir.Image")));
-            this.katman_birleştir.Name = "katman_birleştir";
-            this.katman_birleştir.Size = new System.Drawing.Size(187, 26);
-            this.katman_birleştir.Text = "Katman Birleştir";
-            this.katman_birleştir.Click += new System.EventHandler(this.katman_birleştir_Click);
-            // 
-            // overlap_analizi
-            // 
-            this.overlap_analizi.Image = ((System.Drawing.Image)(resources.GetObject("overlap_analizi.Image")));
-            this.overlap_analizi.Name = "overlap_analizi";
-            this.overlap_analizi.Size = new System.Drawing.Size(187, 26);
-            this.overlap_analizi.Text = "Overlap Analizi";
-            // 
-            // buton_ea_harita_katmanlar
-            // 
-            this.buton_ea_harita_katmanlar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.buton_ea_harita_katmanlar.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buton_ea_harita_katmanlar.BackgroundImage")));
-            this.buton_ea_harita_katmanlar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.buton_ea_harita_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
-            this.buton_ea_harita_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_ea_harita_katmanlar.Location = new System.Drawing.Point(373, 654);
-            this.buton_ea_harita_katmanlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.buton_ea_harita_katmanlar.Name = "buton_ea_harita_katmanlar";
-            this.buton_ea_harita_katmanlar.Size = new System.Drawing.Size(61, 52);
-            this.buton_ea_harita_katmanlar.TabIndex = 31;
-            this.buton_ea_harita_katmanlar.UseVisualStyleBackColor = true;
-            // 
-            // ELFMinSenaryoGraphPicBox
-            // 
-            this.ELFMinSenaryoGraphPicBox.Location = new System.Drawing.Point(809, 58);
-            this.ELFMinSenaryoGraphPicBox.Margin = new System.Windows.Forms.Padding(4);
-            this.ELFMinSenaryoGraphPicBox.Name = "ELFMinSenaryoGraphPicBox";
-            this.ELFMinSenaryoGraphPicBox.Size = new System.Drawing.Size(308, 210);
-            this.ELFMinSenaryoGraphPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.ELFMinSenaryoGraphPicBox.TabIndex = 22;
-            this.ELFMinSenaryoGraphPicBox.TabStop = false;
             // 
             // ModülFormu
             // 
@@ -3599,6 +3599,11 @@ namespace SLF
             ((System.ComponentModel.ISupportInitialize)(this.ELFMaxResultsTable)).EndInit();
             this.ELFGraphicOutputsTabPage.ResumeLayout(false);
             this.panel_ELF_Grafikler.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_5)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_1)).EndInit();
             this.ELFGraphicsPanel.ResumeLayout(false);
             this.ELFGraphicsPanel.PerformLayout();
             this.tab_imar.ResumeLayout(false);
@@ -3645,11 +3650,6 @@ namespace SLF
             this.ContextMenuStrip_Fonksiyon.ResumeLayout(false);
             this.ModuleTabPanel.ResumeLayout(false);
             this.HeaderPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_5)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_4)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ELFMinSenaryoGraphPicBox)).EndInit();
             this.ResumeLayout(false);
 

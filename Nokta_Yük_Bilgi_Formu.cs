@@ -29,7 +29,7 @@ namespace SLF
 
             // Define columns based on your table
             dataTable.Columns.Add("Tipi", typeof(string));
-            dataTable.Columns.Add("Kapladığı Alan (m2)", typeof(string));
+            dataTable.Columns.Add("Ortalama Kapladığı Alan (m2)", typeof(string));
             dataTable.Columns.Add("Tüketim Sınıfı", typeof(string));
             dataTable.Columns.Add("Kurulu Güç", typeof(string));
             dataTable.Columns.Add("Pik Yüklenme (%)", typeof(string));
@@ -59,7 +59,7 @@ namespace SLF
                         {
                             var newRow = dataTable.NewRow();
                             newRow["Tipi"] = row["Tipi"]?.ToString();
-                            newRow["Kapladığı Alan (m2)"] = row["Kapladığı Alan (m2)"]?.ToString();
+                            newRow["Ortalama Kapladığı Alan (m2)"] = row["Ortalama Kapladığı Alan (m2)"]?.ToString();
                             newRow["Tüketim Sınıfı"] = row["Tüketim Sınıfı"]?.ToString();
                             newRow["Kurulu Güç"] = row["Kurulu Güç"]?.ToString();
                             newRow["Pik Yüklenme (%)"] = row["Pik Yüklenme (%)"]?.ToString();
@@ -152,7 +152,7 @@ namespace SLF
             {
                 var row = dataTable.NewRow();
                 row["Tipi"] = rowData[0];
-                row["Kapladığı Alan (m2)"] = rowData[1];
+                row["Ortalama Kapladığı Alan (m2)"] = rowData[1];
                 row["Tüketim Sınıfı"] = rowData[2];
                 row["Kurulu Güç"] = rowData[3];
                 row["Pik Yüklenme (%)"] = rowData[4];

@@ -80,6 +80,7 @@ namespace SLF
         public bool isRulerEnabled = false;
         public bool isRulerActive = false;
         public bool isSelecting_polygon = false;
+
         public bool isSelecting_YGA = false;
         public bool isSelecting_YUK = false;
         private bool isSelecting_marker = false;
@@ -3142,14 +3143,22 @@ namespace SLF
         {
             if(isSelecting_YUK == true)
             {
-                poligonOzellikFormu = new Poligon_Özellik_Tanımlama();
-                poligonOzellikFormu.Owner = this;
-                poligonOzellikFormu.ShowDialog();
-                poligonOzellikFormu.BringToFront();
-                poligonOzellikFormu.Focus();
+                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(true,false, polygonPoints_imar);
 
+            } else if (isSelecting_YGA == true)
+            {
+                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, true, polygonPoints_imar);
+                poligonOzellikFormu.buton_yük_tipleri.Visible = false;
+            }
+
+            poligonOzellikFormu.Owner = this;
+            poligonOzellikFormu.ShowDialog();
+            poligonOzellikFormu.BringToFront();
+            poligonOzellikFormu.Focus();
+
+            if (poligonOzellikFormu.is_poligon_saved == true)
+            {
                 PoligonKaydetEventi(sender, e, polygonOverlay_imar, polygonPoints_imar);
-
             }
         }
 
@@ -3244,7 +3253,6 @@ namespace SLF
                 }
             }
         }
-
 
         public void PoligonKaydetEventi(
             object sender,
@@ -3369,6 +3377,9 @@ namespace SLF
                 Mesafe_imar.Text = "";
 
                 MessageBox.Show("Poligon kaydedildi!");
+
+                isSelecting_YGA = false;
+                isSelecting_YUK = false;
             }
         }
 
