@@ -82,21 +82,113 @@ namespace SLF.Services
         /// <returns>İşlem başarılı olduysa true, değilse false</returns>
         public static bool UpdatePath(string city, string district)
         {
-            // Parametre kontrolü
-            if (string.IsNullOrEmpty(city) || string.IsNullOrEmpty(district))
+            try
             {
-                Debug.WriteLine("Path güncellenemedi: Geçersiz il veya ilçe.");
+                // Parametre kontrolü
+                if (string.IsNullOrEmpty(city) || string.IsNullOrEmpty(district))
+                {
+                    Debug.WriteLine("Path güncellenemedi: Geçersiz il veya ilçe.");
+                    return false;
+                }
+
+                // Mevcut verileri temizle
+                if (CurrentMode == WorkingMode.Temporary && !string.IsNullOrEmpty(CurrentWorkingFolder))
+                {
+                    CleanupCurrentFolder();
+                }
+
+                // Değişkenleri güncelle
+                SelectedCity = city;
+                SelectedDistrict = district;
+                CurrentMode = WorkingMode.Temporary;
+                CurrentWorkingFolder = null;
+
+                // Yeni geçici çalışma klasörü oluştur
+                bool result = CreateNewTempFolder();
+
+                Debug.WriteLine($"Path güncellendi: {FullWorkingPath}");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Path güncellenirken hata: {ex.Message}");
                 return false;
             }
+        }
+        /// <summary>
+        /// Mevcut çalışma klasörünü temizler (önceki klasörü siler)
+        /// </summary>
+        private static void CleanupCurrentFolder()
+        {
+            try
+            {
+                string oldFolderPath = Path.Combine(BaseDirectory, FullPath, CurrentWorkingFolder);
 
-            SelectedCity = city;
-            SelectedDistrict = district;
+                if (Directory.Exists(oldFolderPath))
+                {
+                    // Klasörü silebilmek için dosya tanıtıcılarını temizle
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
 
-            // Yeni geçici çalışma klasörü oluştur
-            bool result = CreateNewTempFolder();
+                    try
+                    {
+                        Directory.Delete(oldFolderPath, true);
+                        Debug.WriteLine($"Eski klasör temizlendi: {oldFolderPath}");
+                    }
+                    catch (IOException)
+                    {
+                        // Dosya işlemleri nedeniyle silemiyorsak, zorla silmeyi dene
+                        ForceDeleteFolder(oldFolderPath);
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        // İzin sorunu varsa, zorla silmeyi dene
+                        ForceDeleteFolder(oldFolderPath);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Mevcut klasör temizlenirken hata: {ex.Message}");
+            }
+        }
 
-            Debug.WriteLine($"Path güncellendi: {FullWorkingPath}");
-            return result;
+        /// <summary>
+        /// Komut satırı kullanarak klasörü zorla siler
+        /// </summary>
+        /// <param name="folderPath">Silinecek klasör yolu</param>
+        private static void ForceDeleteFolder(string folderPath)
+        {
+            try
+            {
+                using (var process = new System.Diagnostics.Process())
+                {
+                    var startInfo = new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = "cmd.exe",
+                        Arguments = $"/C rd /s /q \"{folderPath}\"",
+                        CreateNoWindow = true,
+                        UseShellExecute = false
+                    };
+
+                    process.StartInfo = startInfo;
+                    process.Start();
+                    process.WaitForExit();
+
+                    if (process.ExitCode == 0)
+                    {
+                        Debug.WriteLine($"Klasör başarıyla zorla silindi: {folderPath}");
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"Klasör zorla silinemedi, çıkış kodu: {process.ExitCode}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Klasör zorla silinirken hata: {ex.Message}");
+            }
         }
         public static void SetMode(WorkingMode mode)
         {
@@ -593,7 +685,48 @@ namespace SLF.Services
 
             return typePath;
         }
+        /// <summary>
+        /// Çalışma ortamını sıfırlar ve tüm değişkenleri temizler.
+        /// Yeni bir il/ilçe seçildiğinde kullanılır.
+        /// </summary>
+        public static void ResetWorkingEnvironment()
+        {
+            try
+            {
+                // Geçici bir klasörde çalışılıyorsa ve klasör varsa
+                if (CurrentMode == WorkingMode.Temporary && !string.IsNullOrEmpty(CurrentWorkingFolder))
+                {
+                    string tempPath = Path.Combine(BaseDirectory, FullPath, CurrentWorkingFolder);
 
+                    try
+                    {
+                        // Klasör var mı kontrol et ve içeriğini temizle
+                        if (Directory.Exists(tempPath))
+                        {
+                            Directory.Delete(tempPath, true);
+                            Console.WriteLine($"Eski çalışma ortamı temizlendi: {tempPath}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Eski çalışma klasörü temizlenirken hata: {ex.Message}");
+                        // Hatayı yut ve devam et
+                    }
+                }
+
+                // Değişkenleri temizle
+                SelectedCity = null;
+                SelectedDistrict = null;
+                CurrentWorkingFolder = null;
+                CurrentMode = WorkingMode.Temporary;
+
+                Console.WriteLine("Çalışma ortamı sıfırlandı");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Çalışma ortamı sıfırlanırken hata: {ex.Message}");
+            }
+        }
         /// <summary>
         /// Sonuçlar için tam klasör yolunu döndürür
         /// </summary>
