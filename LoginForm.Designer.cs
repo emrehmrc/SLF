@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LoginForm));
             this.txtKullaniciAdi = new System.Windows.Forms.Label();
             this.txtSifre = new System.Windows.Forms.Label();
             this.textBoxUsername = new System.Windows.Forms.TextBox();
@@ -66,7 +67,7 @@
             // textBoxUsername
             // 
             this.textBoxUsername.Location = new System.Drawing.Point(545, 53);
-            this.textBoxUsername.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxUsername.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxUsername.Name = "textBoxUsername";
             this.textBoxUsername.Size = new System.Drawing.Size(132, 22);
             this.textBoxUsername.TabIndex = 2;
@@ -74,7 +75,7 @@
             // textBoxPassword
             // 
             this.textBoxPassword.Location = new System.Drawing.Point(545, 89);
-            this.textBoxPassword.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxPassword.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxPassword.Name = "textBoxPassword";
             this.textBoxPassword.Size = new System.Drawing.Size(132, 22);
             this.textBoxPassword.TabIndex = 3;
@@ -82,7 +83,7 @@
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(415, 321);
-            this.button1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button1.Margin = new System.Windows.Forms.Padding(4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(144, 28);
             this.button1.TabIndex = 4;
@@ -123,7 +124,7 @@
             // textBoxPort
             // 
             this.textBoxPort.Location = new System.Drawing.Point(545, 145);
-            this.textBoxPort.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxPort.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxPort.Name = "textBoxPort";
             this.textBoxPort.Size = new System.Drawing.Size(132, 22);
             this.textBoxPort.TabIndex = 9;
@@ -131,7 +132,7 @@
             // textBoxDatabase
             // 
             this.textBoxDatabase.Location = new System.Drawing.Point(545, 187);
-            this.textBoxDatabase.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxDatabase.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxDatabase.Name = "textBoxDatabase";
             this.textBoxDatabase.Size = new System.Drawing.Size(132, 22);
             this.textBoxDatabase.TabIndex = 10;
@@ -139,20 +140,19 @@
             // textBoxServer
             // 
             this.textBoxServer.Location = new System.Drawing.Point(545, 231);
-            this.textBoxServer.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxServer.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxServer.Name = "textBoxServer";
             this.textBoxServer.Size = new System.Drawing.Size(132, 22);
             this.textBoxServer.TabIndex = 11;
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Image = global::SLF.Properties.Resources.database_deneme_icon2;
-            this.pictureBox1.Location = new System.Drawing.Point(76, 57);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
+            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
+            this.pictureBox1.Location = new System.Drawing.Point(51, 53);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(292, 293);
+            this.pictureBox1.Size = new System.Drawing.Size(306, 285);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 5;
+            this.pictureBox1.TabIndex = 12;
             this.pictureBox1.TabStop = false;
             // 
             // LoginForm
@@ -172,7 +172,7 @@
             this.Controls.Add(this.textBoxUsername);
             this.Controls.Add(this.txtSifre);
             this.Controls.Add(this.txtKullaniciAdi);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "LoginForm";
             this.Text = "loginForm";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();

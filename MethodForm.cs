@@ -71,7 +71,7 @@ namespace SLF
             }
 
             selectedMethod = MethodComboBox.SelectedItem.ToString();
-
+            
             // "Lütfen seçin" seçeneklerinin seçili olup olmadığını kontrol et
             if (IlComboBox.SelectedIndex == 0 || IlceComboBox.SelectedIndex == 0)
             {
