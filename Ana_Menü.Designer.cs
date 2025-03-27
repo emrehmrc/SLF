@@ -1,4 +1,6 @@
-﻿namespace SLF
+﻿using System.Web.UI.WebControls;
+
+namespace SLF
 {
     partial class HomePageForm
     {
@@ -36,8 +38,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.roundButton1 = new RoundButton();
-            this.roundButton2 = new RoundButton();
+            this.roundButton1 = new Button();
+            this.roundButton2 = new Button();
             this.panel2 = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
@@ -136,8 +138,8 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.Moccasin;
-            this.panel1.Controls.Add(this.roundButton1);
-            this.panel1.Controls.Add(this.roundButton2);
+            //this.panel1.Controls.Add(this.roundButton1);
+            //this.panel1.Controls.Add(this.roundButton2);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
@@ -148,32 +150,17 @@
             // 
             // roundButton1
             // 
-            this.roundButton1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.roundButton1.BackColor = System.Drawing.Color.White;
-            this.roundButton1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.roundButton1.Font = new System.Drawing.Font("Verdana", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.roundButton1.ForeColor = System.Drawing.Color.DarkCyan;
-            this.roundButton1.Location = new System.Drawing.Point(914, 19);
-            this.roundButton1.Name = "roundButton1";
-            this.roundButton1.Size = new System.Drawing.Size(126, 73);
             this.roundButton1.TabIndex = 4;
             this.roundButton1.Text = "Hakkında";
-            this.roundButton1.UseVisualStyleBackColor = false;
             this.roundButton1.Click += new System.EventHandler(this.roundButton1_Click);
             // 
             // roundButton2
             // 
-            this.roundButton2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.roundButton2.BackColor = System.Drawing.Color.White;
-            this.roundButton2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.roundButton2.Font = new System.Drawing.Font("Verdana", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.roundButton2.ForeColor = System.Drawing.Color.Tomato;
-            this.roundButton2.Location = new System.Drawing.Point(1059, 19);
-            this.roundButton2.Name = "roundButton2";
-            this.roundButton2.Size = new System.Drawing.Size(126, 73);
             this.roundButton2.TabIndex = 5;
             this.roundButton2.Text = "Yardım";
-            this.roundButton2.UseVisualStyleBackColor = false;
             this.roundButton2.Click += new System.EventHandler(this.roundButton2_Click);
             // 
             // panel2
@@ -223,8 +210,8 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.Label label2;
-        private RoundButton roundButton1;
-        private RoundButton roundButton2;
+        private Button roundButton1;
+        private Button roundButton2;
         private System.Windows.Forms.Button StartButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox pictureBox3;

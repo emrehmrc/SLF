@@ -36,7 +36,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.MethodComboBox = new System.Windows.Forms.ComboBox();
-            this.ForwardButton = new SLF.CustomButton();
+            this.ForwardButton = new System.Windows.Forms.Button();
             this.MethodPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -148,10 +148,6 @@
             // ForwardButton
             // 
             this.ForwardButton.BackColor = System.Drawing.Color.DarkOrange;
-            this.ForwardButton.BackgroundColor = System.Drawing.Color.DarkOrange;
-            this.ForwardButton.BorderColor = System.Drawing.Color.PaleVioletRed;
-            this.ForwardButton.BorderRadius = 0;
-            this.ForwardButton.BorderSize = 0;
             this.ForwardButton.FlatAppearance.BorderSize = 0;
             this.ForwardButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ForwardButton.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
@@ -161,7 +157,6 @@
             this.ForwardButton.Size = new System.Drawing.Size(150, 40);
             this.ForwardButton.TabIndex = 3;
             this.ForwardButton.Text = "İLERLE";
-            this.ForwardButton.TextColor = System.Drawing.Color.White;
             this.ForwardButton.UseVisualStyleBackColor = false;
             this.ForwardButton.Click += new System.EventHandler(this.ForwardButton_Click);
             // 
@@ -193,7 +188,7 @@
         private System.Windows.Forms.Panel MethodPanel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox MethodComboBox;
-        private CustomButton ForwardButton;
+        private System.Windows.Forms.Button ForwardButton;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox IlceComboBox;

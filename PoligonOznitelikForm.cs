@@ -8,10 +8,10 @@ namespace SLF
         {
         }
 
-        internal void SetPoligon(ModülFormu.PoligonVeri selectedPoligon)
+        /*internal void SetPoligon(ModülFormu.PoligonVeri selectedPoligon)
         {
             throw new NotImplementedException();
-        }
+        }*/
 
         internal void Show()
         {
