@@ -39,36 +39,43 @@ namespace SLF.Services
         /// <summary>
         /// Uygulama tarafından kullanılacak temel veri dizini
         /// </summary>
-        /// 
-
-        /// <summary>
-        /// Otomasyon klasörü yolu
-        /// </summary>
-        public static string OtomasyonDirectory
+        public static string BaseDirectory
         {
             get
             {
-                // İl-ilçe yolu ile aynı seviyede otomasyon klasörü
-                string parentDir = Path.GetDirectoryName(Path.Combine(BaseDirectory, FullPath));
-                string otomasyonPath = Path.Combine(parentDir, "otomasyon");
+                if (string.IsNullOrEmpty(_baseDirectory))
+                {
+                    InitializeBaseDirectory();
+                }
+                return _baseDirectory;
+            }
+        }
+
+        /// <summary>
+        /// Python kod klasörü yolu - SLF kök dizini altında
+        /// </summary>
+        public static string PythonKodDirectory
+        {
+            get
+            {
+                // SLF ana dizininde python_kod klasörü
+                string slftRootDir = GetSLFRootDirectory();
+                string pythonKodPath = Path.Combine(slftRootDir, "python_kod");
 
                 // Klasör yoksa oluştur
-                if (!Directory.Exists(otomasyonPath))
+                if (!Directory.Exists(pythonKodPath))
                 {
-                    Directory.CreateDirectory(otomasyonPath);
-
-                    // Alt klasörleri de oluştur
-                    EnsureOtomasyonSubDirectories(otomasyonPath);
+                    Directory.CreateDirectory(pythonKodPath);
                 }
 
-                return otomasyonPath;
+                return pythonKodPath;
             }
         }
 
         /// <summary>
         /// Deep Learning klasör yolu
         /// </summary>
-        public static string DeepLearningDirectory => Path.Combine(OtomasyonDirectory, "deep_learning");
+        public static string DeepLearningDirectory => Path.Combine(PythonKodDirectory, "deep_learning");
 
         /// <summary>
         /// Deep Learning kod klasör yolu
@@ -81,13 +88,56 @@ namespace SLF.Services
         public static string DeepLearningTrainDirectory => Path.Combine(DeepLearningDirectory, "ml_train");
 
         /// <summary>
-        /// Otomasyon alt klasör yapısını oluşturur
+        /// SLF kök dizinini döndürür
         /// </summary>
-        private static void EnsureOtomasyonSubDirectories(string otomasyonPath)
+        private static string GetSLFRootDirectory()
         {
             try
             {
-                string deepLearningPath = Path.Combine(otomasyonPath, "deep_learning");
+                // Uygulama dizini (exe'nin bulunduğu yer)
+                string exeDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+                // Bir üst dizine çık (genellikle bin/Debug veya bin/Release içindedir)
+                DirectoryInfo parentDir = Directory.GetParent(exeDirectory);
+                if (parentDir == null) return exeDirectory;
+
+                // İki üst dizine çık (bin klasörünün üstüne)
+                DirectoryInfo projectDir = parentDir.Parent;
+                if (projectDir == null) return parentDir.FullName;
+
+                // SLF ana dizinine ulaşana kadar yukarı çık
+                DirectoryInfo currentDir = projectDir;
+                for (int i = 0; i < 5; i++) // En fazla 5 seviye yukarı çık
+                {
+                    // Eğer python_kod klasörü bu seviyede varsa, bu SLF kök dizinidir
+                    if (Directory.Exists(Path.Combine(currentDir.FullName, "python_kod")))
+                    {
+                        return currentDir.FullName;
+                    }
+
+                    // Bir üst dizine çık
+                    if (currentDir.Parent == null) break;
+                    currentDir = currentDir.Parent;
+                }
+
+                // Bulunamadıysa, proje dizinini döndür
+                return projectDir.FullName;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SLF kök dizini belirlenirken hata: {ex.Message}");
+                return AppDomain.CurrentDomain.BaseDirectory;
+            }
+        }
+
+        /// <summary>
+        /// Python kod klasörü yapısını oluşturur
+        /// </summary>
+        private static void EnsurePythonKodStructure()
+        {
+            try
+            {
+                string deepLearningPath = Path.Combine(PythonKodDirectory, "deep_learning");
                 string deepLearningCodePath = Path.Combine(deepLearningPath, "kod");
                 string deepLearningTrainPath = Path.Combine(deepLearningPath, "ml_train");
 
@@ -103,7 +153,7 @@ namespace SLF.Services
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Otomasyon alt klasörleri oluşturulurken hata: {ex.Message}");
+                Debug.WriteLine($"Python kod alt klasörleri oluşturulurken hata: {ex.Message}");
             }
         }
 
@@ -121,17 +171,6 @@ namespace SLF.Services
         public static string GetTrainingDataPath(string datasetName)
         {
             return Path.Combine(DeepLearningTrainDirectory, datasetName);
-        }
-        public static string BaseDirectory
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_baseDirectory))
-                {
-                    InitializeBaseDirectory();
-                }
-                return _baseDirectory;
-            }
         }
 
         // İl/İlçe formatında tam yol
@@ -152,11 +191,6 @@ namespace SLF.Services
         public static string ImarAnaliziPath => Path.Combine(BaseDirectory, FullWorkingPath, "imar_analizi_sonuclari");
         public static string SonuclarPath => Path.Combine(BaseDirectory, FullWorkingPath, "sonuclar");
 
-        /// <summary>
-        /// Path bilgisini günceller ve yeni bir geçici çalışma klasörü oluşturur
-        /// </summary>
-        /// <param name="city">İl adı</param>
-        /// <param name="district">İlçe adı</param>
         /// <summary>
         /// Path bilgisini günceller ve yeni bir geçici çalışma klasörü oluşturur
         /// </summary>
@@ -189,6 +223,9 @@ namespace SLF.Services
                 // Yeni geçici çalışma klasörü oluştur
                 bool result = CreateNewTempFolder();
 
+                // Python kod yapısını oluştur
+                EnsurePythonKodStructure();
+
                 Debug.WriteLine($"Path güncellendi: {FullWorkingPath}");
                 return result;
             }
@@ -198,6 +235,7 @@ namespace SLF.Services
                 return false;
             }
         }
+
         /// <summary>
         /// Mevcut çalışma klasörünü temizler (önceki klasörü siler)
         /// </summary>
@@ -273,19 +311,15 @@ namespace SLF.Services
                 Debug.WriteLine($"Klasör zorla silinirken hata: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Çalışma modunu güvenli şekilde değiştirir
+        /// </summary>
         public static void SetMode(WorkingMode mode)
         {
-            // This method can access the private setter
             CurrentMode = mode;
         }
 
-        // Then in your ProjeEkleButton_Click method, change:
-        // PathService.CurrentMode = PathService.WorkingMode.Project;
-        // to:
-        //PathService.SetMode(PathService.WorkingMode.Project);
-        /// <summary>
-        /// Yeni bir geçici çalışma klasörü oluşturur
-        /// </summary>
         /// <summary>
         /// Yeni bir geçici çalışma klasörü oluşturur
         /// </summary>
@@ -324,11 +358,6 @@ namespace SLF.Services
         }
 
         /// <summary>
-        /// Belirtilen isme sahip bir proje klasörü oluşturur ve geçici klasörden verileri kopyalar
-        /// </summary>
-        /// <param name="projectName">Proje adı</param>
-        /// <returns>Yeni oluşturulan proje klasörünün tam yolu</returns>
-        /// /// <summary>
         /// Aktif geçici klasörü temizler
         /// </summary>
         /// <returns>İşlem başarılı olduysa true, değilse false</returns>
@@ -396,6 +425,12 @@ namespace SLF.Services
 
             return true;
         }
+
+        /// <summary>
+        /// Belirtilen isme sahip bir proje klasörü oluşturur ve geçici klasörden verileri kopyalar
+        /// </summary>
+        /// <param name="projectName">Proje adı</param>
+        /// <returns>Yeni oluşturulan proje klasörünün tam yolu</returns>
         public static string SaveAsProject(string projectName)
         {
             if (CurrentMode == WorkingMode.Project)
@@ -433,6 +468,9 @@ namespace SLF.Services
             return newPath;
         }
 
+        /// <summary>
+        /// Proje durumunu kaydeder
+        /// </summary>
         private static void SaveProjectState(string projectPath)
         {
             try
@@ -460,6 +498,10 @@ namespace SLF.Services
                 Debug.WriteLine($"Proje durumu kaydedilirken hata: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Proje alt klasörlerini oluşturur
+        /// </summary>
         private static void CreateProjectSubfolders(string projectPath)
         {
             // Create standard subfolders for projects
@@ -475,6 +517,7 @@ namespace SLF.Services
             Directory.CreateDirectory(Path.Combine(girdilerPath, "EA_Sarj_Verileri"));
             // Add other module folders as needed
         }
+
         /// <summary>
         /// Mevcut bir projeyi açar
         /// </summary>
@@ -514,6 +557,7 @@ namespace SLF.Services
                 throw;
             }
         }
+
         /// <summary>
         /// İlçe için mevcut proje listesini döndürür
         /// </summary>
@@ -733,7 +777,6 @@ namespace SLF.Services
         /// </summary>
         /// <param name="dataType">Veri tipi (örn. "DTR_Verileri")</param>
         /// <returns>Tam klasör yolu</returns>
-        /// 
         public static string GetGirdilerPathForDataType(string dataType)
         {
             string dataTypeFolder = dataType.Replace(" ", "_");
@@ -759,6 +802,27 @@ namespace SLF.Services
                 return ImarAnaliziPath;
 
             string typePath = Path.Combine(ImarAnaliziPath, analysisType.Replace(" ", "_"));
+
+            // Klasör yoksa oluştur
+            if (!Directory.Exists(typePath))
+            {
+                Directory.CreateDirectory(typePath);
+            }
+
+            return typePath;
+        }
+
+        /// <summary>
+        /// Sonuç tipi için sonuçlar klasör yolunu döndürür
+        /// </summary>
+        /// <param name="resultType">Sonuç tipi (opsiyonel)</param>
+        /// <returns>Tam klasör yolu</returns>
+        public static string GetSonuclarPathForType(string resultType = null)
+        {
+            if (string.IsNullOrEmpty(resultType))
+                return SonuclarPath;
+
+            string typePath = Path.Combine(SonuclarPath, resultType.Replace(" ", "_"));
 
             // Klasör yoksa oluştur
             if (!Directory.Exists(typePath))
@@ -811,27 +875,5 @@ namespace SLF.Services
                 Console.WriteLine($"Çalışma ortamı sıfırlanırken hata: {ex.Message}");
             }
         }
-        /// <summary>
-        /// Sonuçlar için tam klasör yolunu döndürür
-        /// </summary>
-        /// <param name="resultType">Sonuç tipi (opsiyonel)</param>
-        /// <returns>Tam klasör yolu</returns>
-        public static string GetSonuclarPathForType(string resultType = null)
-        {
-            if (string.IsNullOrEmpty(resultType))
-                return SonuclarPath;
-
-            string typePath = Path.Combine(SonuclarPath, resultType.Replace(" ", "_"));
-
-            // Klasör yoksa oluştur
-            if (!Directory.Exists(typePath))
-            {
-                Directory.CreateDirectory(typePath);
-            }
-
-            return typePath;
-        }
     }
-
-
 }

@@ -6412,75 +6412,7 @@ namespace SLF
                 Console.WriteLine($"Stack Trace: {ex.StackTrace}");
             }
         }
-        //private void LoadProjectState()
-        //{
-        //    try
-        //    {
-        //        string statePath = Path.Combine(
-        //            PathService.BaseDirectory,
-        //            PathService.FullPath,
-        //            PathService.CurrentWorkingFolder,
-        //            "project_state.json");
-
-        //        if (File.Exists(statePath))
-        //        {
-        //            string json = File.ReadAllText(statePath);
-        //            var projectState = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-
-        //            // Tamamlanan modülleri yükle
-        //            if (projectState.TryGetValue("CompletedModules", out object modulesObj))
-        //            {
-        //                // Json'dan List<string> olarak dönüştür
-        //                string modulesJson = modulesObj.ToString();
-        //                List<string> completedModules = System.Text.Json.JsonSerializer.Deserialize<List<string>>(modulesJson);
-
-        //                // Modül verilerini yükle
-        //                foreach (string module in completedModules)
-        //                {
-        //                    LoadModuleData(module);
-        //                }
-        //            }
-
-        //            Debug.WriteLine($"Proje durumu yüklendi: {statePath}");
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine($"Proje durumu yüklenirken hata: {ex.Message}");
-        //    }
-        //}
-        //private void LoadModuleData(string moduleName)
-        //{
-        //    try
-        //    {
-        //        // Modül için girdiler klasörünü bul
-        //        string modulePath = PathService.GetGirdilerPathForDataType(moduleName);
-
-        //        // Klasördeki en son dosyayı bul (en güncel veri)
-        //        var directory = new DirectoryInfo(modulePath);
-        //        var latestFile = directory.GetFiles("*.csv")
-        //            .OrderByDescending(f => f.LastWriteTime)
-        //            .FirstOrDefault();
-
-        //        if (latestFile != null)
-        //        {
-        //            // CSV'yi yükle
-        //            var csvHandler = new CsvHandler();
-        //            DataTable moduleData = csvHandler.ImportCsvFile(latestFile.FullName);
-
-        //            // GirdiModülü.dataTablesByType'a ekle
-        //            if (moduleData != null && moduleData.Rows.Count > 0)
-        //            {
-        //                GirdiModülü.dataTablesByType[moduleName] = moduleData;
-        //                Debug.WriteLine($"Modül verisi yüklendi: {moduleName}, Satır sayısı: {moduleData.Rows.Count}");
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine($"Modül verisi yüklenirken hata: {ex.Message}");
-        //    }
-        //}
+        
         private void UpdateUIForLoadedProject()
         {
             try
@@ -6716,6 +6648,49 @@ namespace SLF
                 }
             }
         }
+
+        private void DeepLearningModelButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // İşlem sırasında imleç görünümünü değiştir
+                Cursor.Current = Cursors.WaitCursor;
+
+                // Gerekli kontroller (Abone verisi yüklü mü, il-ilçe seçilmiş mi)
+                if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
+                {
+                    MessageBox.Show("Lütfen önce il ve ilçe seçimini yapın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (!GirdiModülü.dataTablesByType.ContainsKey("Abone Verileri"))
+                {
+                    MessageBox.Show("Lütfen önce Abone Verileri'ni yükleyin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Deep Learning modelini çalıştır
+                string result = PythonHelper.RunDeepLearningModel();
+
+                // İşlem tamamlandığında başarı mesajı göster
+                MessageBox.Show("İmar analizi başarıyla tamamlandı.\nSonuçlar 'imar_analizi_sonuclari/deep_learning_modeli' klasöründe kaydedildi.",
+                                "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // İsteğe bağlı olarak sonuç klasörünü aç
+                string imarAnaliziPath = PathService.GetImarAnaliziPathForType("deep_learning_modeli");
+                System.Diagnostics.Process.Start("explorer.exe", imarAnaliziPath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // İşlem bittiğinde imleci normal duruma getir
+                Cursor.Current = Cursors.Default;
+            }
+        }
+
         // ComboBox'ları yüklenen yıllara göre güncelle
 
         /// <summary>
