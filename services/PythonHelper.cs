@@ -59,8 +59,8 @@ namespace SLF.services
                 }
 
                 // Çıktı dosya yolları
-                string meskenSonucYolu = Path.Combine(imarAnaliziPath, $"mesken_data_{selectedCity}.csv");
-                string otherSonucYolu = Path.Combine(imarAnaliziPath, $"other_data_{selectedCity}.csv");
+                string meskenSonucYolu = Path.Combine(imarAnaliziPath, $"mesken_data_{selectedCity}_{selectedDistrict}.csv");
+                string otherSonucYolu = Path.Combine(imarAnaliziPath, $"other_data_{selectedCity}_{selectedDistrict}.csv");
 
                 // Log mesajı oluştur
                 Console.WriteLine($"Python kod klasörü: {PathService.PythonKodDirectory}");
@@ -68,8 +68,8 @@ namespace SLF.services
                 Console.WriteLine($"Abone verisi: {aboneVeriYolu}");
                 Console.WriteLine($"Çıktı klasörü: {imarAnaliziPath}");
 
-                // Python argümanlarını oluştur
-                string arguments = $"\"{pythonScriptPath}\" \"{aboneVeriYolu}\" \"{meskenSonucYolu}\" \"{otherSonucYolu}\" \"{selectedCity}\" \"{lastYear}\"";
+                // Python argümanlarını oluştur - İlçe parametresi eklendi
+                string arguments = $"\"{pythonScriptPath}\" \"{aboneVeriYolu}\" \"{meskenSonucYolu}\" \"{otherSonucYolu}\" \"{selectedCity}\" \"{selectedDistrict}\" \"{lastYear}\"";
 
                 // Python betiğini çalıştır
                 ProcessStartInfo processInfo = new ProcessStartInfo("python")
