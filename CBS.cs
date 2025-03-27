@@ -237,10 +237,10 @@ namespace SLF
                 {
                     callingForm.Cursor = Cursors.Default;
                 }
-            }
 
-            modülFormu.gMapControl_imar.Refresh();
-            modülFormu.gMapControl_yuk.Refresh();
+                modülFormu.gMapControl_imar.Refresh();
+                modülFormu.gMapControl_yuk.Refresh();
+            }
         }
 
         public void CopyOverlayContents(
