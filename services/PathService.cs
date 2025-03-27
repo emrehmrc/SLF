@@ -39,6 +39,89 @@ namespace SLF.Services
         /// <summary>
         /// Uygulama tarafından kullanılacak temel veri dizini
         /// </summary>
+        /// 
+
+        /// <summary>
+        /// Otomasyon klasörü yolu
+        /// </summary>
+        public static string OtomasyonDirectory
+        {
+            get
+            {
+                // İl-ilçe yolu ile aynı seviyede otomasyon klasörü
+                string parentDir = Path.GetDirectoryName(Path.Combine(BaseDirectory, FullPath));
+                string otomasyonPath = Path.Combine(parentDir, "otomasyon");
+
+                // Klasör yoksa oluştur
+                if (!Directory.Exists(otomasyonPath))
+                {
+                    Directory.CreateDirectory(otomasyonPath);
+
+                    // Alt klasörleri de oluştur
+                    EnsureOtomasyonSubDirectories(otomasyonPath);
+                }
+
+                return otomasyonPath;
+            }
+        }
+
+        /// <summary>
+        /// Deep Learning klasör yolu
+        /// </summary>
+        public static string DeepLearningDirectory => Path.Combine(OtomasyonDirectory, "deep_learning");
+
+        /// <summary>
+        /// Deep Learning kod klasör yolu
+        /// </summary>
+        public static string DeepLearningCodeDirectory => Path.Combine(DeepLearningDirectory, "kod");
+
+        /// <summary>
+        /// Deep Learning eğitim veri seti klasör yolu
+        /// </summary>
+        public static string DeepLearningTrainDirectory => Path.Combine(DeepLearningDirectory, "ml_train");
+
+        /// <summary>
+        /// Otomasyon alt klasör yapısını oluşturur
+        /// </summary>
+        private static void EnsureOtomasyonSubDirectories(string otomasyonPath)
+        {
+            try
+            {
+                string deepLearningPath = Path.Combine(otomasyonPath, "deep_learning");
+                string deepLearningCodePath = Path.Combine(deepLearningPath, "kod");
+                string deepLearningTrainPath = Path.Combine(deepLearningPath, "ml_train");
+
+                // Alt klasörleri oluştur
+                if (!Directory.Exists(deepLearningPath))
+                    Directory.CreateDirectory(deepLearningPath);
+
+                if (!Directory.Exists(deepLearningCodePath))
+                    Directory.CreateDirectory(deepLearningCodePath);
+
+                if (!Directory.Exists(deepLearningTrainPath))
+                    Directory.CreateDirectory(deepLearningTrainPath);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Otomasyon alt klasörleri oluşturulurken hata: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Python script dosyasının tam yolunu döndürür
+        /// </summary>
+        public static string GetPythonScriptPath(string scriptName)
+        {
+            return Path.Combine(DeepLearningCodeDirectory, scriptName);
+        }
+
+        /// <summary>
+        /// Eğitim veri setinin tam yolunu döndürür
+        /// </summary>
+        public static string GetTrainingDataPath(string datasetName)
+        {
+            return Path.Combine(DeepLearningTrainDirectory, datasetName);
+        }
         public static string BaseDirectory
         {
             get
@@ -685,6 +768,7 @@ namespace SLF.Services
 
             return typePath;
         }
+
         /// <summary>
         /// Çalışma ortamını sıfırlar ve tüm değişkenleri temizler.
         /// Yeni bir il/ilçe seçildiğinde kullanılır.
@@ -748,4 +832,6 @@ namespace SLF.Services
             return typePath;
         }
     }
+
+
 }
