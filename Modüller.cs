@@ -27,7 +27,6 @@ namespace SLF
     {
         private static ModülFormu instance;
 
-
         public static ModülFormu Instance
         {
             get
@@ -40,11 +39,7 @@ namespace SLF
             }
         }
 
-
         private bool isDtrLoaded = false;
-
-
-
 
 
 
@@ -151,50 +146,10 @@ namespace SLF
 
 
         // ------------------------------------------------------------------------------------------------------------ //
-        // ------------------------------------------ GİRDİ MODÜLÜ DEĞİŞKENLER ---------------------------------------- //
-
-        public static Dictionary<string, GirdiModülü> girdiModülleri = new Dictionary<string, GirdiModülü> {
-            {"Abone Verileri", new AboneVerileri()},
-            {"DEK Verileri", new DEKModulu()},
-            {"DTR Verileri", new DTRModulu()},
-            {"EA Şarj Verileri", new EASarjModulu()},
-            {"Ekonometrik Yük Tahmini Verileri", new EkonometrikYukTahminiModulu()},
-            {"Fider Verileri", new FiderVerileri()},
-            {"İmar Verileri", new GirdiModülü()},
-            {"Enerji Müsaadeleri Verileri", new EnerjiMusaadeleri()},
-            {"Yeni Projelendirilmiş DTR Verileri", new YeniProjelendirilmisDTR()},
-        };
-
-
         // ------------------------------------------------------------------------------------------------------------ //
-        // ------------------------------------------ DEK MODÜLÜ DEĞİŞKENLER ------------------------------------------ //
-
-
-        private DataTable veriMonteCarlo;
-
-        private Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
-        {
-            { "İzmir", new PointLatLng(38.4192, 27.1287) }, // Example coordinates for İzmir
-            { "Eskişehir", new PointLatLng(39.7768, 30.5206) }, // Example coordinates for Eskişehir
-            // Add more cities and their coordinates as needed
-        };
-
-
+        // ------------------------------------------ INITIALIZATION & GENERAL METHODS ------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
-        // ------------------------------------------ EA MODÜLÜ DEĞİŞKENLER ------------------------------------------- //
-
-        private string SelectedSpeed = "";
-        public bool isAddingChargingStation = false; // Sadece şarj istasyonu eklenirken true olacak.
-        private bool isAddingDekPoint = false; // Sadece dek noktası eklenirken  true olacak.
-        private int _selectedYear = -1;
-        private string _selectedCity = null;
-
-        private bool aboneVerisiYuklendi = false;
-        private bool dtrVerisiYuklendi = false;
-        private bool eaVerisiYuklendi = false;
-
-        private DTRModulu dtrmod = new DTRModulu();
-
+        // ------------------------------------------------------------------------------------------------------------ //
 
         // Main constructor of the Modüller Formu 
         public ModülFormu(string selectedMethod = "", string tabToSelect = "")
@@ -267,6 +222,1003 @@ namespace SLF
         public ModülFormu() : this("", "")
         {
         }
+
+        private void InitializeGMap(GMap.NET.WindowsForms.GMapControl gmap)
+        {
+            gmap.MapProvider = GMapProviders.GoogleSatelliteMap;
+            gmap.ShowCenter = false;
+            gmap.MinZoom = 8;
+            gmap.Manager.Mode = AccessMode.ServerAndCache;
+            gmap.MaxZoom = 20;
+            gmap.Zoom = 13;
+            gmap.DragButton = MouseButtons.Left;
+            gmap.Position = new PointLatLng(38.4644, 27.1114);
+        }
+
+        private const float PanelWidthRatio = 0.840f; // 1335/1585 ≈ 84.2% of tab_imar width
+        private const float PanelHeightRatio = 0.850f; // 649/677 ≈ 95.9% of tab_imar height
+        private const float PanelXOffsetRatio = 0.128f; // 203/1585 ≈ 12.8% (unchanged)
+        private const float PanelYOffsetRatio = 0.0635f; // 43/677 ≈ 6.35% (unchanged)
+
+        private void UpdatePanelSize()
+        {
+            // Get tab_imar client size (accounting for padding/margins if any)
+            Rectangle tabClientArea = tab_imar.ClientRectangle;
+            int tabWidth = tabClientArea.Width;
+            int tabHeight = tabClientArea.Height;
+
+            // Calculate panel size based on ratios
+            int targetWidth = (int)(tabWidth * PanelWidthRatio);
+            int targetHeight = (int)(tabHeight * PanelHeightRatio);
+
+            // Calculate panel position based on ratios
+            int targetX = (int)(tabWidth * PanelXOffsetRatio);
+            int targetY = (int)(tabHeight * PanelYOffsetRatio);
+
+            // Apply size to panel_imar
+            //panel_imar.Size = new Size(targetWidth, targetHeight);
+
+            // Boundary check: Ensure panel stays within tab_imar and form boundaries
+            int margin = 10; // Small margin to prevent touching edges
+            int maxX = tabWidth - targetWidth - margin; // Maximum X position to keep panel inside tab_imar
+            int maxY = tabHeight - targetHeight - margin; // Maximum Y position to keep panel inside tab_imar
+
+            // Further constrain by form's client size (to prevent overflow outside form)
+            Rectangle formClientArea = this.ClientRectangle;
+            int formMaxX = formClientArea.Width - targetWidth - margin - (this.Width - this.ClientSize.Width); // Account for form borders
+            int formMaxY = formClientArea.Height - targetHeight - margin - (this.Height - this.ClientSize.Height);
+
+            // Use the more restrictive boundary (tab_imar or form)
+            maxX = Math.Min(maxX, formMaxX - tab_imar.Location.X); // Adjust for tab_imar's offset in form
+            maxY = Math.Min(maxY, formMaxY - tab_imar.Location.Y);
+
+            // Ensure position doesn't go negative
+            targetX = Math.Max(0, Math.Min(targetX, maxX));
+            targetY = Math.Max(0, Math.Min(targetY, maxY));
+
+            // Apply the constrained position
+            //panel_imar.Location = new Point(targetX, targetY);
+
+            // Refresh GMapControl to handle rendering
+            gMapControl_imar.Refresh();
+        }
+        private void SetupLayout()
+        {
+            // Set initial size based on form size
+            UpdatePanelSize();
+
+            // Handle form resize to update constraints
+            this.Resize += Form1_Resize;
+        }
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            UpdatePanelSize();
+            gMapControl_imar.Refresh(); // Refresh GMapControl to handle rendering
+        }
+
+        private void InitializeCheckboxStartPositions()
+        {
+            if (checkBoxes_imar[0] != null && checkBoxes_imar[0].Parent != null)
+                checkboxStartY["imar"] = checkBoxes_imar[0].Location.Y;
+            if (checkBoxes_yuk[0] != null && checkBoxes_yuk[0].Parent != null)
+                checkboxStartY["yuk"] = checkBoxes_yuk[0].Location.Y;
+        }
+
+
+        // Initialize all form components (called in the constructors)
+        private void InitializeFormComponents()
+        {
+            // Initialize GMap Controls
+            InitializeGMap(gMapControl_EA);
+            InitializeGMap(gMapControl_yuk);
+            InitializeGMap(gMapControl_imar);
+            InitializeGMap(gMapControl_optimalDTR);
+            InitializeGMap(gMapControl_DEK);
+
+            // Sort TabPages Alphabetically
+            SortTabPagesAlphabetically(Modül_Tabları, true);
+
+            // Enable double buffering to reduce flickering
+            // this.DoubleBuffered = true;
+
+            // Set Default Selected Tab
+            Modül_Tabları.SelectedTab = tab_girdi;
+
+            // Bring certain buttons to the front
+            BringButtonsToFront();
+
+            // Add overlays to the maps
+            AddOverlaysToMaps();
+
+            // Initialize checkboxes
+            checkboxes_init();
+
+            // Set process priority to High
+            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+
+            // Set default selection for veri_listesi_seçimi
+            veri_listesi_seçimi.SelectedIndex = 2;
+
+            // Initialize the tablo_formu instance
+            tablo_formu = new Tablo_Formu();
+        }
+
+        // Helper method to add overlays to the maps
+        private void AddOverlaysToMaps()
+        {
+            // Create a dictionary of overlays for each map control
+            var overlays = new Dictionary<GMapControl, List<GMapOverlay>>()
+            {
+                { gMapControl_DEK, new List<GMapOverlay> { markerOverlay_DEK} },
+                { gMapControl_EA, new List<GMapOverlay> { rulerOverlay_ea, markerOverlay_ea} },
+                { gMapControl_yuk, new List<GMapOverlay> { polygonOverlay_yuk, rulerOverlay_yuk, markerOverlay_yuk } },
+                { gMapControl_imar, new List<GMapOverlay> { polygonOverlay_imar, rulerOverlay_imar, markerOverlay_imar} }
+            };
+
+            // Iterate through each map control and add overlays
+            foreach (var mapControl in overlays)
+            {
+                foreach (var overlay in mapControl.Value)
+                {
+                    mapControl.Key.Overlays.Add(overlay);
+                }
+            }
+        }
+
+        // Initialize specific tabs and hide others
+        // Method to hide a specific item from the ComboBox
+        private void HideComboBoxItem(string itemToHide)
+        {
+            // Create a new list excluding the item you want to hide
+            var filteredItems = new List<string>();
+            foreach (var item in veri_listesi_seçimi.Items)
+            {
+                if (item.ToString() != itemToHide) // Check if the item is not the one to hide
+                {
+                    filteredItems.Add(item.ToString());
+                }
+            }
+
+            // Clear existing items and add the filtered list
+            veri_listesi_seçimi.Items.Clear();
+            veri_listesi_seçimi.Items.AddRange(filteredItems.ToArray());
+
+            // Set the default selection, if applicable
+            if (filteredItems.Count > 0)
+            {
+                veri_listesi_seçimi.SelectedIndex = 2; // Select the first item or another index as needed
+                veri_listesi_seçimi.SelectedIndex = 2; // Select the first item or another index as needed
+            }
+        }
+
+        private void InitializeTabs(params string[] tabsToSelect)
+        {
+            foreach (string tabToSelect in tabsToSelect)
+            {
+                if (Modül_Tabları.TabPages.ContainsKey(tabToSelect))
+                {
+                    // Make sure the tab is selected in Modül_Tabları
+                    Modül_Tabları.SelectedTab = Modül_Tabları.TabPages[tabToSelect];
+                    // Custom logic for specific tabs in Modül_Tabları
+                    if (tabToSelect == "tab_girdi")
+                    {
+                        veri_listesi_seçimi.Text = "Ekonometrik Yük Tahmini Verileri";
+                        veri_listesi_seçimi.Enabled = false;
+                    }
+                }
+                else if (SenaryoModuleTabControl.TabPages.ContainsKey(tabToSelect))
+                {
+                    // Make sure the tab is selected in SenaryoModuleTabControl
+                    SenaryoModuleTabControl.SelectedTab = SenaryoModuleTabControl.TabPages[tabToSelect];
+                    // Custom logic for specific tabs in SenaryoModuleTabControl
+                }
+                else
+                {
+                    throw new ArgumentException($"Tab '{tabToSelect}' does not exist in either TabControl.");
+                }
+            }
+
+            // Hide all other tabs except the specified ones
+            HideOtherTabs(tabsToSelect);
+        }
+
+        // Hide all tabs except the ones specified
+        private void HideOtherTabs(params string[] tabsToKeep)
+        {
+            // Handle Modül_Tabları
+            foreach (TabPage tabPage in Modül_Tabları.TabPages.Cast<TabPage>().ToList())
+            {
+                if (!tabsToKeep.Contains(tabPage.Name) && !hiddenTabs.Contains(tabPage))  // Ensure tab isn't already hidden
+                {
+                    hiddenTabs.Add(tabPage);
+                    Modül_Tabları.TabPages.Remove(tabPage);
+                }
+            }
+
+            // Handle SenaryoModuleTabControl
+            foreach (TabPage tabPage in SenaryoModuleTabControl.TabPages.Cast<TabPage>().ToList())
+            {
+                if (!tabsToKeep.Contains(tabPage.Name) && !hiddenTabs.Contains(tabPage))  // Ensure tab isn't already hidden
+                {
+                    hiddenTabs.Add(tabPage);
+                    SenaryoModuleTabControl.TabPages.Remove(tabPage);
+                }
+            }
+        }
+
+        private void SortTabPagesAlphabetically(TabControl tabControl, bool ascending = true)
+        {
+            // Get the list of TabPages
+            List<TabPage> tabPages = new List<TabPage>();
+            foreach (TabPage tabPage in tabControl.TabPages)
+            {
+                tabPages.Add(tabPage);
+            }
+
+            // Sort the list of TabPages based on the Text property
+            tabPages.Sort((x, y) =>
+            {
+                return ascending ? string.Compare(x.Text, y.Text) : -string.Compare(x.Text, y.Text);
+            });
+
+            // Clear the current TabPages and add the sorted TabPages
+            tabControl.TabPages.Clear();
+            tabControl.TabPages.AddRange(tabPages.ToArray());
+        }
+
+        // Initialize form based on the selected method
+        private void InitializeFormBasedOnMethod()
+        {
+            if (selectedMethod == "ELF (Ekonometrik)")
+            {
+                // Show both the "tab_girdi" and "tab_ekonometrik" tabs and hide others
+                InitializeTabs("tab_girdi", "tab_ekonometrik", "tab_senaryo", "EkonometrikSenaryoTabPage");
+                Modül_Tabları.SelectedTab = tab_girdi;
+            }
+            else if (selectedMethod == "SLF (Jeo-Uzamsal)")
+            {
+                // Hide the specific item you want to remove
+                HideComboBoxItem("Ekonometrik Yük Tahmini Verileri"); // Replace with the actual item you want to hide
+                // For SLF, do not hide any tabs. Add logic here if needed.
+                // List of tab names to hide
+                string[] tabsToHide = { "EkonometrikSenaryoTabPage", "tab_ekonometrik" };
+
+                // Loop through each tab name and remove it if it exists
+                foreach (string tabName in tabsToHide)
+                {
+                    if (SenaryoModuleTabControl.TabPages.ContainsKey(tabName))
+                    {
+                        SenaryoModuleTabControl.TabPages.RemoveByKey(tabName);
+                    }
+                    if (Modül_Tabları.TabPages.ContainsKey(tabName))
+                    {
+                        Modül_Tabları.TabPages.RemoveByKey(tabName);
+                    }
+                }
+            }
+        }
+
+
+        private void SenaryoNewSelectionButton_Click(object sender, EventArgs e)
+        {
+            Modül_Tabları.SelectedTab = tab_senaryo;
+        }
+
+        private void checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            // Prevent infinite recursion if we're programmatically changing checkboxes
+            if (_isSynchronizingCheckboxes) return;
+
+            CheckBox cb = sender as CheckBox;
+            if (cb == null) return;
+
+            // The layer index is stored in cb.Tag (1-based from your code)
+            if (!int.TryParse(cb.Tag?.ToString(), out int oneBasedLayerIndex))
+                return; // invalid Tag
+
+            // Convert to 0-based
+            int layerIndex = oneBasedLayerIndex - 1;
+            if (layerIndex < 0) return;
+
+            bool isVisible = cb.Checked;
+
+            // toggle overlay visibility across all four arrays ---
+            SetOverlayVisibility(cbs.tüm_katmanlar_array_imar[layerIndex], isVisible);
+            SetOverlayVisibility(cbs.tüm_katmanlar_array_yuk[layerIndex], isVisible);
+
+            // refresh all maps ---
+            gMapControl_imar.Refresh();
+            gMapControl_yuk.Refresh();
+
+            // programmatically change the other two checkboxes in the same slot so that they match the newly toggled state.    
+            _isSynchronizingCheckboxes = true;  // guard on
+
+            try
+            {
+                // We want to find the "sibling" checkboxes at the same index across each map array:
+                // e.g. checkBoxes_imar[layerIndex], checkBoxes_yga[layerIndex], etc.
+                // But we only do it if they exist (i.e. within bounds).
+
+                // If 'cb' is from the imar array, we set the yga and stokastik arrays' checkboxes.
+                // If 'cb' is from the stokastik array, we set the imar and yga arrays' checkboxes, etc.
+                // We can do it more generically by always syncing all three.
+
+                if (layerIndex < checkBoxes_imar.Length)
+                {
+                    // Only set if it's a *different* reference to avoid re-triggering for the same box
+                    if (!ReferenceEquals(cb, checkBoxes_imar[layerIndex]))
+                    {
+                        checkBoxes_imar[layerIndex].Checked = isVisible;
+                    }
+                }
+
+                if (layerIndex < checkBoxes_yuk.Length)
+                {
+                    // Only set if it's a *different* reference to avoid re-triggering for the same box
+                    if (!ReferenceEquals(cb, checkBoxes_yuk[layerIndex]))
+                    {
+                        checkBoxes_yuk[layerIndex].Checked = isVisible;
+                    }
+                }
+
+            }
+            finally
+            {
+                _isSynchronizingCheckboxes = false;  // guard off
+            }
+        }
+
+        // Helper to toggle polygons/routes/markers
+        private void SetOverlayVisibility(GMapOverlay overlay, bool visible)
+        {
+            if (overlay == null) return;
+
+            foreach (var poly in overlay.Polygons)
+                poly.IsVisible = visible;
+
+            foreach (var route in overlay.Routes)
+                route.IsVisible = visible;
+
+            foreach (var marker in overlay.Markers)
+                marker.IsVisible = visible;
+        }
+
+        private void InitializeCategoryTabPages()
+        {
+            // Adjust these names based on your designer
+            tabControlMain = Modül_Tabları; // The TabControl containing all tabs
+            categoryTabPages["imar"] = tab_imar; // Tab page for "İmar Analizi"
+            categoryTabPages["yuk"] = tab_yükHaritası;
+        }
+
+        public void checkboxes_init()
+        {
+
+            checkBoxes_imar = new System.Windows.Forms.CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4,
+        checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9,
+        checkBox_imar_10, checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15 };
+
+            checkBoxes_yuk = new System.Windows.Forms.CheckBox[] { checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4,
+        checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9,
+        checkBox_yuk_10, checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15 };
+
+            int[] tagValuesForCheckboxes = Enumerable.Range(1, 15).ToArray();
+
+            void initializeCheckBoxes(System.Windows.Forms.CheckBox[] checkBoxes, int[] tagValues)
+            {
+                for (int i = 0; i < checkBoxes.Length; i++)
+                {
+                    checkBoxes[i].Tag = tagValues[i];
+                    checkBoxes[i].CheckedChanged += checkBox_CheckedChanged;
+                    checkBoxes[i].MouseDown += checkBox_MouseDown;
+                    checkBoxes[i].ForeColor = cbs.overlayColors[i].BorderColor;
+                    checkBoxes[i].Visible = false;
+                }
+            }
+
+            initializeCheckBoxes(checkBoxes_imar, tagValuesForCheckboxes);
+            initializeCheckBoxes(checkBoxes_yuk, tagValuesForCheckboxes);
+        }
+
+        private const int CheckboxHeight = 27; // Height of each checkbox (adjust as needed)
+        private const int CheckboxSpacing = 8; // Space between checkboxes
+
+        public Dictionary<string, bool> pendingUpdates = new Dictionary<string, bool>
+        {
+            { "imar", false },
+            { "yuk", false }
+        };
+
+        public void UpdateCheckboxPositions(CheckBox[] checkBoxes, string mapCategory)
+        {
+            if (!checkboxStartY.ContainsKey(mapCategory) || !categoryTabPages.ContainsKey(mapCategory))
+                return;
+
+            TabPage tabPage = categoryTabPages[mapCategory];
+
+            // If the tab is not currently visible, mark it for a pending update
+            if (tabControlMain.SelectedTab != tabPage)
+            {
+                pendingUpdates[mapCategory] = true;
+                return;
+            }
+
+            int currentY = checkboxStartY[mapCategory];
+
+            tabControlMain.SuspendLayout();
+            tabPage.SuspendLayout();
+
+            for (int i = 0; i < checkBoxes.Length; i++)
+            {
+                if (checkBoxes[i] != null && checkBoxes[i].Visible)
+                {
+                    checkBoxes[i].Location = new Point(checkBoxes[i].Location.X, currentY);
+                    currentY += CheckboxHeight + CheckboxSpacing;
+                }
+            }
+
+            tabPage.ResumeLayout(false);
+            tabControlMain.ResumeLayout(true);
+
+            foreach (Control control in tabPage.Controls)
+            {
+                control.Invalidate();
+                control.Update();
+            }
+
+            tabControlMain.Invalidate();
+            tabControlMain.Update();
+            this.Invalidate();
+            this.Update();
+        }
+
+        private void ClearCheckboxesForAllMaps(int checkboxIndex)
+        {
+            var allCheckBoxes = new List<CheckBox>
+            {
+                checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5,
+                checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
+                checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15,
+
+                checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4, checkBox_yuk_5,
+                checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9, checkBox_yuk_10,
+                checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15,
+            };
+
+            var categoryCheckboxes = new Dictionary<string, CheckBox[]>
+            {
+                { "imar", checkBoxes_imar },
+                { "yuk", checkBoxes_yuk }
+            };
+
+
+            CheckBox targetCheckbox = null;
+            string targetCategory = null;
+            foreach (var checkBox in allCheckBoxes)
+            {
+                if (checkBox.Tag != null && int.TryParse(checkBox.Tag.ToString(), out int tagIndex))
+                {
+                    if (tagIndex - 1 == checkboxIndex)
+                    {
+                        targetCheckbox = checkBox;
+                        if (checkBox.Name.Contains("imar")) targetCategory = "imar";
+                        else if (checkBox.Name.Contains("yuk")) targetCategory = "yuk";
+                        break;
+                    }
+                }
+            }
+
+            if (targetCheckbox == null || targetCategory == null)
+                return;
+
+            foreach (var category in categoryCheckboxes.Keys)
+            {
+                if (categoryCheckboxes[category][checkboxIndex] != null)
+                {
+                    categoryCheckboxes[category][checkboxIndex].Checked = false;
+                    categoryCheckboxes[category][checkboxIndex].Visible = false;
+                    categoryCheckboxes[category][checkboxIndex].Refresh();
+                }
+            }
+
+            foreach (var category in categoryCheckboxes.Keys)
+            {
+                UpdateCheckboxPositions(categoryCheckboxes[category], category);
+            }
+        }
+
+
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------ GİRDİ MODÜLÜ DEĞİŞKENLER ---------------------------------------- //
+
+        public static Dictionary<string, GirdiModülü> girdiModülleri = new Dictionary<string, GirdiModülü> {
+            {"Abone Verileri", new AboneVerileri()},
+            {"DEK Verileri", new DEKModulu()},
+            {"DTR Verileri", new DTRModulu()},
+            {"EA Şarj Verileri", new EASarjModulu()},
+            {"Ekonometrik Yük Tahmini Verileri", new EkonometrikYukTahminiModulu()},
+            {"Fider Verileri", new FiderVerileri()},
+            {"İmar Verileri", new GirdiModülü()},
+            {"Enerji Müsaadeleri Verileri", new EnerjiMusaadeleri()},
+            {"Yeni Projelendirilmiş DTR Verileri", new YeniProjelendirilmisDTR()},
+        };
+
+
+        private void SelectFolderButton_Click(object sender, EventArgs e)
+        {
+            // Handle file loading logic for the "Girdi" module
+            if (slfStartYear == 0 || slfEndYear == 0)
+            {
+                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            // Check if an item is selected in the ComboBox before accessing it
+            if (veri_listesi_seçimi.SelectedItem == null)
+            {
+                MessageBox.Show("Lütfen bir veri tipi seçin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return; // Exit if no valid data type is selected
+            }
+
+            // Perform file selection based on the selected data type
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+
+            if (seçilenVeriTipi == "İmar Verileri")
+            {
+                using (imarFileSelectionPopup fileSelectionPopup = new imarFileSelectionPopup(dataGridView_girdi))
+                {
+                    if (fileSelectionPopup.ShowDialog() == DialogResult.OK)
+                    {
+                        string csvFilePath = fileSelectionPopup.CsvFilePath;
+                        string kmlFilePath = fileSelectionPopup.KmlFilePath;
+
+                        if (!File.Exists(csvFilePath) || !File.Exists(kmlFilePath))
+                        {
+                            MessageBox.Show("Geçerli dosyalar seçilmedi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // Ensure girdiModülü is properly initialized
+            if (!girdiModülleri.ContainsKey(seçilenVeriTipi))
+            {
+                MessageBox.Show("Geçersiz veri tipi seçildi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return; // Metodu sonlandır
+            }
+
+            girdiModülü = girdiModülleri[seçilenVeriTipi];
+            if (girdiModülü == null)
+            {
+                MessageBox.Show($"{seçilenVeriTipi} için girdi modülü oluşturulamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return; // Metodu sonlandır
+            }
+            // Use the selectedMethod here
+            if (selectedMethod == "ELF (Ekonometrik)")
+            {
+                // Logic for ELF selection
+                // MessageBox.Show("ELF method selected, skipping prerequisites.");
+            }
+            else if (selectedMethod == "SLF (Jeo-Uzamsal)")
+            {
+                // Logic for SLF selection
+                // MessageBox.Show("SLF method selected, prerequisites are required.");
+            }
+            else
+            {
+                // Handle other cases or invalid selection
+                MessageBox.Show("No valid method selected.");
+            }
+            //string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+
+
+            girdiModülü.slfStartYear = slfStartYear;
+            girdiModülü.slfEndYear = slfEndYear;
+
+
+            InitializeComboBoxes(); // yılların guncellenmesi 
+                                    // Check if "ELF" is selected to skip prerequisites
+            bool skipPrerequisites = (selectedMethod == "ELF (Ekonometrik)");
+
+            // Call VEERProcess with skipPrerequisites flag
+            var isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
+            //dataGridView_girdi.DataSource = GirdiModülü.dataTablesByType[seçilenVeriTipi];
+            //dataGridView_girdi.Refresh();
+            //Console.WriteLine(isImported.ToString());
+            //isİmportedModule(isImported, seçilenVeriTipi);
+            //if (isImported)
+            //{
+            //    modulescheck.Add(seçilenVeriTipi);
+            //    veri_listesi_seçimi.Refresh();
+            //    Console.WriteLine(modulescheck.Count);
+            //    dataGridView_girdi.DataSource = girdiModülü.CurrentDataTable;
+
+
+            //}
+
+        }
+
+        private async void OpenModuleButton_Click(object sender, EventArgs e)
+        {
+            // Disable the button initially
+            OpenModuleButton.Enabled = false;
+
+            string filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+
+            // Load the data table for the selected type
+            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
+
+            // Check if the data table has any rows
+            if (dataTable == null || dataTable.Rows.Count == 0)
+            {
+                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından modüle gidilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                OpenModuleButton.Enabled = true; // Re-enable the button before returning
+                return;
+            }
+
+            // Check if the selected data type is "Ekonometrik Yük Tahmini Verileri"
+            if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
+            {
+                // Asynchronous task to load the Excel package
+                await Task.Run(() =>
+                {
+                    using (var package = new ExcelPackage(new FileInfo(filePath)))
+                    {
+                        Invoke(new Action(() =>
+                        {
+                            // Clear previous data
+                            ELFMinSenaryoTable.DataSource = null;
+                            ELFLowSenaryoTable.DataSource = null;
+                            ELFBaseSenaryoTable.DataSource = null;
+                            ELFHighSenaryoTable.DataSource = null;
+                            ELFMaxSenaryoTable.DataSource = null;
+                        }));
+
+                        // Ensure there are at least 6 worksheets
+                        int totalSheets = package.Workbook.Worksheets.Count;
+                        for (int i = 1; i <= 5; i++)
+                        {
+                            if (i < totalSheets)
+                            {
+                                var worksheet = package.Workbook.Worksheets[i];
+                                DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
+
+                                Invoke(new Action(() =>
+                                {
+                                    var dataGrids = new[] { ELFMinSenaryoTable, ELFLowSenaryoTable, ELFBaseSenaryoTable, ELFHighSenaryoTable, ELFMaxSenaryoTable };
+                                    dataGrids[i - 1].DataSource = dt;
+                                }));
+                            }
+                            else
+                            {
+                                // If there are fewer than 6 sheets, show a message or handle as needed
+                                MessageBox.Show("Eksik sayfalar bulundu. Lütfen dosyayı kontrol edin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                break;
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Based on the selected data type, switch to the corresponding tab
+            if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
+            {
+                Modül_Tabları.SelectedTab = tab_senaryo;
+            }
+            else if (seçilenVeriTipi == "EA Şarj Verileri")
+            {
+                Modül_Tabları.SelectedTab = tab_ea;
+            }
+            else if (seçilenVeriTipi == "DEK Verileri")
+            {
+                Modül_Tabları.SelectedTab = tab_dek;
+            }
+
+            // After loading the data, enable the button
+            OpenModuleButton.Enabled = true;
+        }
+
+        private void veri_listesi_seçimi_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (veri_listesi_seçimi.SelectedItem != null)
+            {
+                string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+
+                // dataTablesByType'ta bu veri var mı kontrol et
+                if (GirdiModülü.dataTablesByType.ContainsKey(seçilenVeriTipi))
+                {
+                    // GirdiModülü'nü güncelle
+                    if (girdiModülleri.ContainsKey(seçilenVeriTipi))
+                    {
+                        girdiModülleri[seçilenVeriTipi].importedDataTable = GirdiModülü.dataTablesByType[seçilenVeriTipi];
+                    }
+
+                    // DataGridView'ı güncelle
+                    dataGridView_girdi.DataSource = GirdiModülü.dataTablesByType[seçilenVeriTipi];
+                    dataGridView_girdi.Refresh();
+
+                    Debug.WriteLine($"Seçilen veri tipi: {seçilenVeriTipi}, Satır sayısı: {GirdiModülü.dataTablesByType[seçilenVeriTipi].Rows.Count}");
+                }
+                else
+                {
+                    Debug.WriteLine($"Seçilen veri tipi için yüklenmiş veri yok: {seçilenVeriTipi}");
+                    dataGridView_girdi.DataSource = null;
+                }
+            }
+        }
+
+        private void veri_listesi_seçimi_DrawItem(object sender, DrawItemEventArgs e)
+        {
+
+            // Check if the index is valid
+            if (e.Index < 0)
+                return;
+
+            // Get the current item to be drawn
+            string text = veri_listesi_seçimi.Items[e.Index].ToString();
+
+            // Determine the color based on some condition
+            Color textColor = Color.Red;
+            var girdiModülü = girdiModülleri[text];
+            if (girdiModülü.importedDataTable.Rows.Count > 0)
+            {
+                textColor = Color.Green;
+            }
+
+            e.DrawBackground();
+            // Draw the text with the determined color
+            using (Brush brush = new SolidBrush(textColor))
+            {
+                e.Graphics.DrawString(text, e.Font, brush, e.Bounds);
+            }
+
+            // Draw the focus rectangle if the item is selected
+            e.DrawFocusRectangle();
+        }
+
+        private void raporGoruntuleButonu_Click(object sender, EventArgs e)
+        {
+            // Girdi modülündeki dosya yükleme butonuna tıklandığında çalışacak kodlar
+            if (slfStartYear == 0 || slfEndYear == 0)
+            {
+                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            // Veri listesinde seçilen veri tipine göre dosya seçme işlemi yapılacak
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+            girdiModülü = girdiModülleri[seçilenVeriTipi];
+            girdiModülü.VEERReport(seçilenVeriTipi);
+        }
+
+        private void ExcelDownloadButton_Click(object sender, EventArgs e)
+        {
+            if (slfStartYear == 0 || slfEndYear == 0)
+            {
+                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            const string FilterExcelFiles = "Excel dosyaları (*.xlsx)|*.xlsx";
+            const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
+            if (dataTable.Rows.Count == 0)
+            {
+                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Excel dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            else if (dataTable.Rows.Count > 50000)
+            {
+                MessageBox.Show($"{seçilenVeriTipi} için veri boyutu çok büyük. CSV olarak dışa aktarmayı deneyebilirsiniz.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            var fileDialog = new SaveFileDialog
+            {
+                Title = "Kaydedeceğiniz dosyanın adını giriniz.",
+                Filter = $"{FilterExcelFiles}|{FilterAllFiles}"
+            };
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var filePath = fileDialog.FileName;
+                var excelExporter = new ExcelExporter();
+                excelExporter.ExportExcelFile(
+                    filePath,
+                    dataTable,
+                    seçilenVeriTipi
+                );
+            }
+            else
+            {
+                MessageBox.Show("Dosya seçilmedi.");
+            }
+
+        }
+
+        private void csvExportButton_Click(object sender, EventArgs e)
+        {
+            if (slfStartYear == 0 || slfEndYear == 0)
+            {
+                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            const string FilterCsvFiles = "Csv dosyaları (*.csv)|*.csv";
+            const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
+            if (dataTable.Rows.Count == 0)
+            {
+                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Csv dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            var fileDialog = new SaveFileDialog
+            {
+                Title = "Kaydedeceğiniz dosyanın adını giriniz.",
+                Filter = $"{FilterCsvFiles}|{FilterAllFiles}"
+            };
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var filePath = fileDialog.FileName;
+                var csvHandler = new CsvHandler();
+                csvHandler.ExportCsvFile(
+                    filePath,
+                    dataTable
+                );
+            }
+            else
+            {
+                MessageBox.Show("Dosya seçilmedi.");
+            }
+        }
+
+
+        private void ResetYearSelectionProcessGirdiModulu()
+        {
+            slfStartYear = slfEndYear = 0;
+            int currentYear = DateTime.Now.Year;
+            int lastYear = currentYear - 1;
+            int lastYear2 = currentYear - 2;
+            startYearComboBox.SelectedIndex = -1;
+            startYearComboBox.Text = "Yıl seçiniz";
+            endYearComboBox.SelectedIndex = -1;
+            endYearComboBox.Text = "Yıl seçiniz";
+            yearApproveButton.Text = "Onayla";
+
+            //// Clear any existing items in the ComboBox
+            startYearComboBox.Items.Clear();
+
+            // Add the years to the ComboBox
+            startYearComboBox.Items.Add(lastYear2);
+            startYearComboBox.Items.Add(lastYear);
+            startYearComboBox.Items.Add(currentYear);
+
+            // Disable the endYearComboBox initially
+            startYearComboBox.Enabled = true;
+            endYearComboBox.Enabled = false;
+            yearApproveButton.Enabled = false;
+            // veri_listesi_seçimi.Enabled = false;
+        }
+
+        private void startYearComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startYearComboBox.SelectedIndex == -1)
+            {
+                return;
+            }
+            // Get the selected year
+            int selectedYear = (int)startYearComboBox.SelectedItem;
+
+
+            // Enable the endYearComboBox
+            endYearComboBox.Enabled = true;
+
+            // Clear any existing items in the ComboBox
+            endYearComboBox.Items.Clear();
+
+            // Add years from selectedYear + 4 to selectedYear + 14
+            for (int year = selectedYear + 4; year <= selectedYear + 14; year++)
+            {
+                endYearComboBox.Items.Add(year);
+            }
+
+            // Optionally, set the first year as the selected item
+            //endYearComboBox.SelectedIndex = 0;
+        }
+
+        private void endYearComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            yearApproveButton.Enabled = true;
+        }
+
+        private void HomePageButton_Click(object sender, EventArgs e)
+        {
+            // Show the confirmation dialog for navigating to the home page
+            DialogResult result = MessageBox.Show(
+                "Ana sayfaya dönmek istediğinize emin misiniz? Kaydedilmeyen veriler kaybolacaktır!",
+                "Ana Sayfaya Dön",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                // Unsubscribe from the FormClosing event only if the user clicks 'Yes'
+                this.FormClosing -= ModülFormu_FormClosing;
+                this.Hide(); // Hide the current form (ModülFormu)
+            }
+            // If the user clicks 'No', do nothing and stay on the current form
+        }
+
+        private void yearApproveButton_Click(object sender, EventArgs e)
+        {
+            if (endYearComboBox.SelectedIndex == -1)
+            {
+                // if the end year is not chosen, it means we are still in selection process
+                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            else if (startYearComboBox.Enabled == false && endYearComboBox.Enabled == false)
+            {
+                // but if both combobox are disabled, it means the selection process is already done
+                // Check if any DataTable in girdiModülleri has rows
+                bool anyTableHasRows = girdiModülleri.Values.Any(girdiModülü =>
+                    girdiModülü.importedDataTable != null && girdiModülü.importedDataTable.Rows.Count > 0);
+                if (anyTableHasRows)
+                {
+                    var dialogResult = MessageBox.Show("Yılları değiştirirseniz verileri tekrardan içeri aktarmanız gerekecek, devam etmek istiyor musunuz?", "Uyarı!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (dialogResult != DialogResult.Yes)
+                    {
+                        return;
+                    }
+                }
+                ResetYearSelectionProcessGirdiModulu();
+                foreach (var girdiModülü in girdiModülleri.Values)
+                {
+                    //girdiModülü.importedDataTable?.Clear(); // Clear the DataTable if it is not null
+                    girdiModülü.importedDataTable = new DataTable();
+                }
+                dataGridView_girdi.DataSource = null;
+            }
+            else
+            {
+                // selections are completed
+                startYearComboBox.Enabled = false;
+                endYearComboBox.Enabled = false;
+                //veri_listesi_seçimi.Enabled = true;
+                slfStartYear = (int)startYearComboBox.SelectedItem;
+                slfEndYear = (int)endYearComboBox.SelectedItem;
+                MessageBox.Show($"Başlangıç yılı: {slfStartYear}, Bitiş yılı: {slfEndYear}", "Yıllar belirlendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                //yearApproveButton.Enabled = false;
+                yearApproveButton.Text = "Sıfırla";
+            }
+        }
+
+
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------ DEK MODÜLÜ DEĞİŞKENLER ------------------------------------------ //
+
+
+        private DataTable veriMonteCarlo;
+
+        private Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
+        {
+            { "İzmir", new PointLatLng(38.4192, 27.1287) }, // Example coordinates for İzmir
+            { "Eskişehir", new PointLatLng(39.7768, 30.5206) }, // Example coordinates for Eskişehir
+            // Add more cities and their coordinates as needed
+        };
+
+
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------ EA MODÜLÜ DEĞİŞKENLER ------------------------------------------- //
+
+        private string SelectedSpeed = "";
+        public bool isAddingChargingStation = false; // Sadece şarj istasyonu eklenirken true olacak.
+        private bool isAddingDekPoint = false; // Sadece dek noktası eklenirken  true olacak.
+        private int _selectedYear = -1;
+        private string _selectedCity = null;
+
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+
 
         // Initialize all form components (called in the constructors)
         private void InitializeComboBoxes()
@@ -1000,80 +1952,7 @@ namespace SLF
                 return false;
             }
         }
-        private bool SaveAsProject()
-        {
-            try
-            {
-                // Proje klasörünün ana dizini
-                string projectsBaseDir = Path.Combine(PathService.BaseDirectory, PathService.FullPath);
 
-                // Proje Ekle dialogunu göster
-                using (var folderBrowser = new ProjectFolderPicker(projectsBaseDir))
-                {
-                    // Sadece mevcut projeleri seçmeye izin ver - bu seçeneği istemiyorsanız kaldırabilirsiniz
-                    folderBrowser.EnableCreateProject = true;
-
-                    if (folderBrowser.ShowDialog() == DialogResult.OK)
-                    {
-                        string selectedPath = folderBrowser.SelectedPath;
-                        string projectName = folderBrowser.SelectedProjectName;
-
-                        // Projeyi aç
-                        PathService.OpenProject(projectName);
-
-                        // Proje durumunu kaydet ve verileri ekle
-                        return UpdateCurrentProject();
-                    }
-                }
-
-                // Kullanıcı iptal etti
-                return false;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Proje kaydedilirken hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-        }
-        private bool UpdateCurrentProject()
-        {
-            try
-            {
-                // YearService'ten yılları al
-                var yearService = YearService.GetInstance();
-
-                // Proje yolunu al
-                string projectPath = Path.Combine(
-                    PathService.BaseDirectory,
-                    PathService.FullPath,
-                    PathService.CurrentWorkingFolder);
-
-                // Proje durumunu hazırla
-                var projectState = new Dictionary<string, object>();
-                projectState["CompletedModules"] = GirdiModülü.dataTablesByType.Keys.ToList();
-                projectState["SLFStartYear"] = yearService.slfStartYear;
-                projectState["SLFEndYear"] = yearService.slfEndYear;
-                projectState["LastSaved"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-                // Durum dosyasını güncelle
-                string statePath = Path.Combine(projectPath, "project_state.json");
-                string json = System.Text.Json.JsonSerializer.Serialize(projectState,
-                    new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
-
-                File.WriteAllText(statePath, json);
-
-                // Modül verilerini kaydet
-                SaveAllModuleDataToCSV(projectPath);
-
-                // Başarılı
-                return true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Proje güncellenirken hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-        }
 
         // Geçici klasörü proje olarak kaydet
         private bool CleanupTemporaryFolders(bool cleanupAll = false)
@@ -1209,83 +2088,6 @@ namespace SLF
             catch (Exception ex)
             {
                 Debug.WriteLine($"Salt okunur özniteliği kaldırılırken hata: {ex.Message}");
-            }
-        }
-
-        // Read-Only özniteliğini kaldıran yardımcı metot
-        private void RemoveReadOnlyAttributes(string path)
-        {
-            // Dosyaların özniteliklerini değiştir
-            string[] files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
-            foreach (string file in files)
-            {
-                FileInfo fileInfo = new FileInfo(file);
-                if ((fileInfo.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
-                {
-                    fileInfo.Attributes &= ~FileAttributes.ReadOnly;
-                }
-            }
-
-            // Alt klasörlerin özniteliklerini değiştir
-            string[] directories = Directory.GetDirectories(path);
-            foreach (string directory in directories)
-            {
-                DirectoryInfo dirInfo = new DirectoryInfo(directory);
-                if ((dirInfo.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
-                {
-                    dirInfo.Attributes &= ~FileAttributes.ReadOnly;
-                }
-            }
-        }
-
-        private bool DirectoryHasContent(string path)
-        {
-            if (!Directory.Exists(path))
-                return false;
-
-            int fileCount = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories).Length;
-            return fileCount > 0;
-        }
-
-        // Eski geçici klasörleri temizleme metodu
-        private void CleanupOldTempFolders()
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(PathService.SelectedCity) ||
-                    string.IsNullOrEmpty(PathService.SelectedDistrict))
-                    return;
-
-                string districtPath = Path.Combine(PathService.BaseDirectory, PathService.FullPath);
-
-                if (!Directory.Exists(districtPath))
-                    return;
-
-                // "temp_" ile başlayan tüm klasörleri bul
-                string[] tempFolders = Directory.GetDirectories(districtPath, "temp_*");
-
-                foreach (string folder in tempFolders)
-                {
-                    // Aktif klasör değilse sil
-                    if (PathService.CurrentMode != PathService.WorkingMode.Temporary ||
-                        !folder.EndsWith(PathService.CurrentWorkingFolder))
-                    {
-                        try
-                        {
-                            Directory.Delete(folder, true);
-                            Debug.WriteLine($"Eski geçici klasör silindi: {folder}");
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine($"Klasör silinirken hata: {ex.Message}");
-                        }
-
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Eski klasörler temizlenirken hata: {ex.Message}");
             }
         }
 
@@ -1447,29 +2249,6 @@ namespace SLF
         }
 
 
-        private void LogDataTableInfo(DataTable dt, string source)
-        {
-            if (dt != null)
-            {
-                LogOutput($"Veri Kaynağı: {source}");
-                LogOutput($"Satır Sayısı: {dt.Rows.Count}");
-                LogOutput($"Kolon Sayısı: {dt.Columns.Count}");
-                LogOutput($"Kolonlar: {string.Join(", ", dt.Columns.Cast<DataColumn>().Select(c => c.ColumnName))}");
-            }
-            else
-            {
-                LogOutput($"Veri Kaynağı {source}: DataTable null");
-            }
-        }
-
-        // TABLO OLUSTUR BUTONU
-        private void button2_Click(object sender, EventArgs e)
-        {
-            // Tablonun bulunduğu formu oluştur ve göster
-            Tablo_olustur tabloForm = new Tablo_olustur();
-            tabloForm.Show();
-        }
-
         public void ProjeEkleButton_Click(object sender, EventArgs e)
         {
             try
@@ -1528,10 +2307,6 @@ namespace SLF
                             // Son çalışılan projeyi ayarlar dosyasına kaydet
                             try
                             {
-                                //Properties.Settings.Default.LastProjectName = projectName;
-                                //Properties.Settings.Default.LastProjectCity = PathService.SelectedCity;
-                                //Properties.Settings.Default.LastProjectDistrict = PathService.SelectedDistrict;
-                                //Properties.Settings.Default.Save();
 
                                 Console.WriteLine($"Son proje bilgileri kaydedildi: {projectName}");
                             }
@@ -1915,26 +2690,7 @@ namespace SLF
                 Debug.WriteLine($"UI güncellenirken hata: {ex.Message}");
             }
         }
-        private void ClearLoadedData()
-        {
-            // GirdiModülü'ndeki veri tablolarını temizle
-            GirdiModülü.dataTablesByType.Clear();
 
-            // DataGridView'daki verileri temizle
-            if (dataGridView_girdi != null)
-            {
-                dataGridView_girdi.DataSource = null;
-            }
-
-            // UI durumunu sıfırla
-            if (veri_listesi_seçimi != null)
-            {
-                veri_listesi_seçimi.SelectedIndex = -1;
-            }
-
-            // Diğer UI elemanlarını sıfırla
-            UpdateModuleButtonsState();
-        }
         private void UpdateModuleButtonsState()
         {
             // Burada gerçek buton adlarınıza göre butonların etkinliğini kontrol edin
@@ -1962,65 +2718,6 @@ namespace SLF
         }
 
 
-        /// Mevcut verileri proje olarak kaydet
-        private bool SaveCurrentProject()
-        {
-            try
-            {
-                // YearService'ten yılları al
-                var yearService = YearService.GetInstance();
-
-                // Proje durumunu hazırla
-                var projectState = new Dictionary<string, object>();
-                projectState["CompletedModules"] = GirdiModülü.dataTablesByType.Keys.ToList();
-                projectState["SLFStartYear"] = yearService.slfStartYear;
-                projectState["SLFEndYear"] = yearService.slfEndYear;
-                projectState["LastSaved"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-                // Mevcut çalışma moduna göre işlem yap
-                if (PathService.CurrentMode == PathService.WorkingMode.Project)
-                {
-                    // Projenin tam yolunu al
-                    string projectPath = Path.Combine(
-                        PathService.BaseDirectory,
-                        PathService.FullPath,
-                        PathService.CurrentWorkingFolder);
-
-                    // Proje durum dosyasını güncelle
-                    string statePath = Path.Combine(projectPath, "project_state.json");
-                    string json = System.Text.Json.JsonSerializer.Serialize(projectState,
-                        new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
-
-                    File.WriteAllText(statePath, json);
-
-                    // Tüm modül verilerini CSV olarak kaydet
-                    SaveAllModuleDataToCSV(projectPath);
-
-                    // Projenin adını al (proje_ ön ekini çıkar)
-                    string projectName = PathService.CurrentWorkingFolder.StartsWith("proje_")
-                        ? PathService.CurrentWorkingFolder.Substring(6)
-                        : PathService.CurrentWorkingFolder;
-
-                    MessageBox.Show($"Proje '{projectName}' başarıyla güncellendi.",
-                        "Proje Güncellendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    return true;
-                }
-                else // Temporary mode - yeni proje oluşturma
-                {
-                    // Bu kısmı yine var olan ProjeEkleButton_Click metoduna yönlendirebilirsiniz
-                    MessageBox.Show("Kaydedilecek bir proje açılmamış. Lütfen önce 'Proje Ekle' butonu ile bir proje açın.",
-                        "Proje Bulunamadı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Proje kaydedilirken hata oluştu: {ex.Message}",
-                    "Kayıt Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-        }
         // Modül verilerini CSV olarak kaydet
         private void SaveAllModuleDataToCSV(string projectPath)
         {
@@ -2091,48 +2788,6 @@ namespace SLF
             }
         }
 
-        private void DeepLearningModelButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                // İşlem sırasında imleç görünümünü değiştir
-                Cursor.Current = Cursors.WaitCursor;
-
-                // Gerekli kontroller (Abone verisi yüklü mü, il-ilçe seçilmiş mi)
-                if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
-                {
-                    MessageBox.Show("Lütfen önce il ve ilçe seçimini yapın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                if (!GirdiModülü.dataTablesByType.ContainsKey("Abone Verileri"))
-                {
-                    MessageBox.Show("Lütfen önce Abone Verileri'ni yükleyin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                // Deep Learning modelini çalıştır
-                string result = PythonHelper.RunDeepLearningModel();
-
-                // İşlem tamamlandığında başarı mesajı göster
-                MessageBox.Show("İmar analizi başarıyla tamamlandı.\nSonuçlar 'imar_analizi_sonuclari/deep_learning_modeli' klasöründe kaydedildi.",
-                                "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                // İsteğe bağlı olarak sonuç klasörünü aç
-                string imarAnaliziPath = PathService.GetImarAnaliziPathForType("deep_learning_modeli");
-                System.Diagnostics.Process.Start("explorer.exe", imarAnaliziPath);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                // İşlem bittiğinde imleci normal duruma getir
-                Cursor.Current = Cursors.Default;
-            }
-        }
-
 
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
@@ -2175,969 +2830,6 @@ namespace SLF
                 prompt.AcceptButton = confirmation;
 
                 return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
-            }
-        }
-
-        // ------------------------------------------------------------------------------------------------------------ //
-        // ------------------------------------------------------------------------------------------------------------ //
-        // ------------------------------------------ INITIALIZATION & GENERAL METHODS ------------------------------------------ //
-        // ------------------------------------------------------------------------------------------------------------ //
-        // ------------------------------------------------------------------------------------------------------------ //
-
-        private void InitializeGMap(GMap.NET.WindowsForms.GMapControl gmap)
-        {
-            gmap.MapProvider = GMapProviders.GoogleSatelliteMap;
-            gmap.ShowCenter = false;
-            gmap.MinZoom = 8;
-            gmap.Manager.Mode = AccessMode.ServerAndCache;
-            gmap.MaxZoom = 20;
-            gmap.Zoom = 13;
-            gmap.DragButton = MouseButtons.Left;
-            gmap.Position = new PointLatLng(38.4644, 27.1114);
-        }
-
-        private const float PanelWidthRatio = 0.840f; // 1335/1585 ≈ 84.2% of tab_imar width
-        private const float PanelHeightRatio = 0.850f; // 649/677 ≈ 95.9% of tab_imar height
-        private const float PanelXOffsetRatio = 0.128f; // 203/1585 ≈ 12.8% (unchanged)
-        private const float PanelYOffsetRatio = 0.0635f; // 43/677 ≈ 6.35% (unchanged)
-
-        private void UpdatePanelSize()
-        {
-            // Get tab_imar client size (accounting for padding/margins if any)
-            Rectangle tabClientArea = tab_imar.ClientRectangle;
-            int tabWidth = tabClientArea.Width;
-            int tabHeight = tabClientArea.Height;
-
-            // Calculate panel size based on ratios
-            int targetWidth = (int)(tabWidth * PanelWidthRatio);
-            int targetHeight = (int)(tabHeight * PanelHeightRatio);
-
-            // Calculate panel position based on ratios
-            int targetX = (int)(tabWidth * PanelXOffsetRatio);
-            int targetY = (int)(tabHeight * PanelYOffsetRatio);
-
-            // Apply size to panel_imar
-            panel_imar.Size = new Size(targetWidth, targetHeight);
-
-            // Boundary check: Ensure panel stays within tab_imar and form boundaries
-            int margin = 10; // Small margin to prevent touching edges
-            int maxX = tabWidth - targetWidth - margin; // Maximum X position to keep panel inside tab_imar
-            int maxY = tabHeight - targetHeight - margin; // Maximum Y position to keep panel inside tab_imar
-
-            // Further constrain by form's client size (to prevent overflow outside form)
-            Rectangle formClientArea = this.ClientRectangle;
-            int formMaxX = formClientArea.Width - targetWidth - margin - (this.Width - this.ClientSize.Width); // Account for form borders
-            int formMaxY = formClientArea.Height - targetHeight - margin - (this.Height - this.ClientSize.Height);
-
-            // Use the more restrictive boundary (tab_imar or form)
-            maxX = Math.Min(maxX, formMaxX - tab_imar.Location.X); // Adjust for tab_imar's offset in form
-            maxY = Math.Min(maxY, formMaxY - tab_imar.Location.Y);
-
-            // Ensure position doesn't go negative
-            targetX = Math.Max(0, Math.Min(targetX, maxX));
-            targetY = Math.Max(0, Math.Min(targetY, maxY));
-
-            // Apply the constrained position
-            panel_imar.Location = new Point(targetX, targetY);
-
-            // Refresh GMapControl to handle rendering
-            gMapControl_imar.Refresh();
-        }
-        private void SetupLayout()
-        {
-            // Set initial size based on form size
-            UpdatePanelSize();
-
-            // Handle form resize to update constraints
-            this.Resize += Form1_Resize;
-        }
-        private void Form1_Resize(object sender, EventArgs e)
-        {
-            UpdatePanelSize();
-            gMapControl_imar.Refresh(); // Refresh GMapControl to handle rendering
-        }
-
-        private void InitializeCheckboxStartPositions()
-        {
-            if (checkBoxes_imar[0] != null && checkBoxes_imar[0].Parent != null)
-                checkboxStartY["imar"] = checkBoxes_imar[0].Location.Y;
-            if (checkBoxes_yuk[0] != null && checkBoxes_yuk[0].Parent != null)
-                checkboxStartY["yuk"] = checkBoxes_yuk[0].Location.Y;
-        }
-
-
-        // Initialize all form components (called in the constructors)
-        private void InitializeFormComponents()
-        {
-            // Initialize GMap Controls
-            InitializeGMap(gMapControl_EA);
-            InitializeGMap(gMapControl_yuk);
-            InitializeGMap(gMapControl_imar);
-            InitializeGMap(gMapControl_optimalDTR);
-            InitializeGMap(gMapControl_DEK);
-
-            // Sort TabPages Alphabetically
-            SortTabPagesAlphabetically(Modül_Tabları, true);
-
-            // Enable double buffering to reduce flickering
-            // this.DoubleBuffered = true;
-
-            // Set Default Selected Tab
-            Modül_Tabları.SelectedTab = tab_girdi;
-
-            // Bring certain buttons to the front
-            BringButtonsToFront();
-
-            // Add overlays to the maps
-            AddOverlaysToMaps();
-
-            // Initialize checkboxes
-            checkboxes_init();
-
-            // Set process priority to High
-            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
-
-            // Set default selection for veri_listesi_seçimi
-            veri_listesi_seçimi.SelectedIndex = 2;
-
-            // Initialize the tablo_formu instance
-            tablo_formu = new Tablo_Formu();
-        }
-
-        // Helper method to add overlays to the maps
-        private void AddOverlaysToMaps()
-        {
-            // Create a dictionary of overlays for each map control
-            var overlays = new Dictionary<GMapControl, List<GMapOverlay>>()
-            {
-                { gMapControl_DEK, new List<GMapOverlay> { markerOverlay_DEK} },
-                { gMapControl_EA, new List<GMapOverlay> { rulerOverlay_ea, markerOverlay_ea} },
-                { gMapControl_yuk, new List<GMapOverlay> { polygonOverlay_yuk, rulerOverlay_yuk, markerOverlay_yuk } },
-                { gMapControl_imar, new List<GMapOverlay> { polygonOverlay_imar, rulerOverlay_imar, markerOverlay_imar} }
-            };
-
-            // Iterate through each map control and add overlays
-            foreach (var mapControl in overlays)
-            {
-                foreach (var overlay in mapControl.Value)
-                {
-                    mapControl.Key.Overlays.Add(overlay);
-                }
-            }
-        }
-
-        // Initialize specific tabs and hide others
-        // Method to hide a specific item from the ComboBox
-        private void HideComboBoxItem(string itemToHide)
-        {
-            // Create a new list excluding the item you want to hide
-            var filteredItems = new List<string>();
-            foreach (var item in veri_listesi_seçimi.Items)
-            {
-                if (item.ToString() != itemToHide) // Check if the item is not the one to hide
-                {
-                    filteredItems.Add(item.ToString());
-                }
-            }
-
-            // Clear existing items and add the filtered list
-            veri_listesi_seçimi.Items.Clear();
-            veri_listesi_seçimi.Items.AddRange(filteredItems.ToArray());
-
-            // Set the default selection, if applicable
-            if (filteredItems.Count > 0)
-            {
-                veri_listesi_seçimi.SelectedIndex = 2; // Select the first item or another index as needed
-                veri_listesi_seçimi.SelectedIndex = 2; // Select the first item or another index as needed
-            }
-        }
-        private void InitializeTabs(params string[] tabsToSelect)
-        {
-            foreach (string tabToSelect in tabsToSelect)
-            {
-                if (Modül_Tabları.TabPages.ContainsKey(tabToSelect))
-                {
-                    // Make sure the tab is selected in Modül_Tabları
-                    Modül_Tabları.SelectedTab = Modül_Tabları.TabPages[tabToSelect];
-                    // Custom logic for specific tabs in Modül_Tabları
-                    if (tabToSelect == "tab_girdi")
-                    {
-                        veri_listesi_seçimi.Text = "Ekonometrik Yük Tahmini Verileri";
-                        veri_listesi_seçimi.Enabled = false;
-                    }
-                }
-                else if (SenaryoModuleTabControl.TabPages.ContainsKey(tabToSelect))
-                {
-                    // Make sure the tab is selected in SenaryoModuleTabControl
-                    SenaryoModuleTabControl.SelectedTab = SenaryoModuleTabControl.TabPages[tabToSelect];
-                    // Custom logic for specific tabs in SenaryoModuleTabControl
-                }
-                else
-                {
-                    throw new ArgumentException($"Tab '{tabToSelect}' does not exist in either TabControl.");
-                }
-            }
-
-            // Hide all other tabs except the specified ones
-            HideOtherTabs(tabsToSelect);
-        }
-
-        // Hide all tabs except the ones specified
-        private void HideOtherTabs(params string[] tabsToKeep)
-        {
-            // Handle Modül_Tabları
-            foreach (TabPage tabPage in Modül_Tabları.TabPages.Cast<TabPage>().ToList())
-            {
-                if (!tabsToKeep.Contains(tabPage.Name) && !hiddenTabs.Contains(tabPage))  // Ensure tab isn't already hidden
-                {
-                    hiddenTabs.Add(tabPage);
-                    Modül_Tabları.TabPages.Remove(tabPage);
-                }
-            }
-
-            // Handle SenaryoModuleTabControl
-            foreach (TabPage tabPage in SenaryoModuleTabControl.TabPages.Cast<TabPage>().ToList())
-            {
-                if (!tabsToKeep.Contains(tabPage.Name) && !hiddenTabs.Contains(tabPage))  // Ensure tab isn't already hidden
-                {
-                    hiddenTabs.Add(tabPage);
-                    SenaryoModuleTabControl.TabPages.Remove(tabPage);
-                }
-            }
-        }
-
-        private void SortTabPagesAlphabetically(TabControl tabControl, bool ascending = true)
-        {
-            // Get the list of TabPages
-            List<TabPage> tabPages = new List<TabPage>();
-            foreach (TabPage tabPage in tabControl.TabPages)
-            {
-                tabPages.Add(tabPage);
-            }
-
-            // Sort the list of TabPages based on the Text property
-            tabPages.Sort((x, y) =>
-            {
-                return ascending ? string.Compare(x.Text, y.Text) : -string.Compare(x.Text, y.Text);
-            });
-
-            // Clear the current TabPages and add the sorted TabPages
-            tabControl.TabPages.Clear();
-            tabControl.TabPages.AddRange(tabPages.ToArray());
-        }
-
-        // Initialize form based on the selected method
-        private void InitializeFormBasedOnMethod()
-        {
-            if (selectedMethod == "ELF (Ekonometrik)")
-            {
-                // Show both the "tab_girdi" and "tab_ekonometrik" tabs and hide others
-                InitializeTabs("tab_girdi", "tab_ekonometrik", "tab_senaryo", "EkonometrikSenaryoTabPage");
-                Modül_Tabları.SelectedTab = tab_girdi;
-            }
-            else if (selectedMethod == "SLF (Jeo-Uzamsal)")
-            {
-                // Hide the specific item you want to remove
-                HideComboBoxItem("Ekonometrik Yük Tahmini Verileri"); // Replace with the actual item you want to hide
-                // For SLF, do not hide any tabs. Add logic here if needed.
-                // List of tab names to hide
-                string[] tabsToHide = { "EkonometrikSenaryoTabPage", "tab_ekonometrik" };
-
-                // Loop through each tab name and remove it if it exists
-                foreach (string tabName in tabsToHide)
-                {
-                    if (SenaryoModuleTabControl.TabPages.ContainsKey(tabName))
-                    {
-                        SenaryoModuleTabControl.TabPages.RemoveByKey(tabName);
-                    }
-                    if (Modül_Tabları.TabPages.ContainsKey(tabName))
-                    {
-                        Modül_Tabları.TabPages.RemoveByKey(tabName);
-                    }
-                }
-            }
-        }
-
-
-        private void SenaryoNewSelectionButton_Click(object sender, EventArgs e)
-        {
-            Modül_Tabları.SelectedTab = tab_senaryo;
-        }
-
-        private void checkBox_CheckedChanged(object sender, EventArgs e)
-        {
-            // Prevent infinite recursion if we're programmatically changing checkboxes
-            if (_isSynchronizingCheckboxes) return;
-
-            CheckBox cb = sender as CheckBox;
-            if (cb == null) return;
-
-            // The layer index is stored in cb.Tag (1-based from your code)
-            if (!int.TryParse(cb.Tag?.ToString(), out int oneBasedLayerIndex))
-                return; // invalid Tag
-
-            // Convert to 0-based
-            int layerIndex = oneBasedLayerIndex - 1;
-            if (layerIndex < 0) return;
-
-            bool isVisible = cb.Checked;
-
-            // toggle overlay visibility across all four arrays ---
-            SetOverlayVisibility(cbs.tüm_katmanlar_array_imar[layerIndex], isVisible);
-            SetOverlayVisibility(cbs.tüm_katmanlar_array_yuk[layerIndex], isVisible);
-
-            // refresh all maps ---
-            gMapControl_imar.Refresh();
-            gMapControl_yuk.Refresh();
-
-            // programmatically change the other two checkboxes in the same slot so that they match the newly toggled state.    
-            _isSynchronizingCheckboxes = true;  // guard on
-
-            try
-            {
-                // We want to find the "sibling" checkboxes at the same index across each map array:
-                // e.g. checkBoxes_imar[layerIndex], checkBoxes_yga[layerIndex], etc.
-                // But we only do it if they exist (i.e. within bounds).
-
-                // If 'cb' is from the imar array, we set the yga and stokastik arrays' checkboxes.
-                // If 'cb' is from the stokastik array, we set the imar and yga arrays' checkboxes, etc.
-                // We can do it more generically by always syncing all three.
-
-                if (layerIndex < checkBoxes_imar.Length)
-                {
-                    // Only set if it's a *different* reference to avoid re-triggering for the same box
-                    if (!ReferenceEquals(cb, checkBoxes_imar[layerIndex]))
-                    {
-                        checkBoxes_imar[layerIndex].Checked = isVisible;
-                    }
-                }
-
-                if (layerIndex < checkBoxes_yuk.Length)
-                {
-                    // Only set if it's a *different* reference to avoid re-triggering for the same box
-                    if (!ReferenceEquals(cb, checkBoxes_yuk[layerIndex]))
-                    {
-                        checkBoxes_yuk[layerIndex].Checked = isVisible;
-                    }
-                }
-
-            }
-            finally
-            {
-                _isSynchronizingCheckboxes = false;  // guard off
-            }
-        }
-
-        // Helper to toggle polygons/routes/markers
-        private void SetOverlayVisibility(GMapOverlay overlay, bool visible)
-        {
-            if (overlay == null) return;
-
-            foreach (var poly in overlay.Polygons)
-                poly.IsVisible = visible;
-
-            foreach (var route in overlay.Routes)
-                route.IsVisible = visible;
-
-            foreach (var marker in overlay.Markers)
-                marker.IsVisible = visible;
-        }
-
-        private void InitializeCategoryTabPages()
-        {
-            // Adjust these names based on your designer
-            tabControlMain = Modül_Tabları; // The TabControl containing all tabs
-            categoryTabPages["imar"] = tab_imar; // Tab page for "İmar Analizi"
-            categoryTabPages["yuk"] = tab_yükHaritası;
-        }
-
-        public void checkboxes_init()
-        {
-
-            checkBoxes_imar = new System.Windows.Forms.CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4,
-        checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9,
-        checkBox_imar_10, checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15 };
-
-            checkBoxes_yuk = new System.Windows.Forms.CheckBox[] { checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4,
-        checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9,
-        checkBox_yuk_10, checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15 };
-
-            int[] tagValuesForCheckboxes = Enumerable.Range(1, 15).ToArray();
-
-            void initializeCheckBoxes(System.Windows.Forms.CheckBox[] checkBoxes, int[] tagValues)
-            {
-                for (int i = 0; i < checkBoxes.Length; i++)
-                {
-                    checkBoxes[i].Tag = tagValues[i];
-                    checkBoxes[i].CheckedChanged += checkBox_CheckedChanged;
-                    checkBoxes[i].MouseDown += checkBox_MouseDown;
-                    checkBoxes[i].ForeColor = cbs.overlayColors[i].BorderColor;
-                    checkBoxes[i].Visible = false;
-                }
-            }
-
-            initializeCheckBoxes(checkBoxes_imar, tagValuesForCheckboxes);
-            initializeCheckBoxes(checkBoxes_yuk, tagValuesForCheckboxes);
-        }
-
-        private const int CheckboxHeight = 27; // Height of each checkbox (adjust as needed)
-        private const int CheckboxSpacing = 8; // Space between checkboxes
-
-        public Dictionary<string, bool> pendingUpdates = new Dictionary<string, bool>
-        {
-            { "imar", false },
-            { "yuk", false }
-        };
-
-        public void UpdateCheckboxPositions(CheckBox[] checkBoxes, string mapCategory)
-        {
-            if (!checkboxStartY.ContainsKey(mapCategory) || !categoryTabPages.ContainsKey(mapCategory))
-                return;
-
-            TabPage tabPage = categoryTabPages[mapCategory];
-
-            // If the tab is not currently visible, mark it for a pending update
-            if (tabControlMain.SelectedTab != tabPage)
-            {
-                pendingUpdates[mapCategory] = true;
-                return;
-            }
-
-            int currentY = checkboxStartY[mapCategory];
-
-            tabControlMain.SuspendLayout();
-            tabPage.SuspendLayout();
-
-            for (int i = 0; i < checkBoxes.Length; i++)
-            {
-                if (checkBoxes[i] != null && checkBoxes[i].Visible)
-                {
-                    checkBoxes[i].Location = new Point(checkBoxes[i].Location.X, currentY);
-                    currentY += CheckboxHeight + CheckboxSpacing;
-                }
-            }
-
-            tabPage.ResumeLayout(false);
-            tabControlMain.ResumeLayout(true);
-
-            foreach (Control control in tabPage.Controls)
-            {
-                control.Invalidate();
-                control.Update();
-            }
-
-            tabControlMain.Invalidate();
-            tabControlMain.Update();
-            this.Invalidate();
-            this.Update();
-        }
-
-        private void ClearCheckboxesForAllMaps(int checkboxIndex)
-        {
-            var allCheckBoxes = new List<CheckBox>
-            {
-                checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5,
-                checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
-                checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15,
-
-                checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4, checkBox_yuk_5,
-                checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9, checkBox_yuk_10,
-                checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15,
-            };
-
-            var categoryCheckboxes = new Dictionary<string, CheckBox[]>
-            {
-                { "imar", checkBoxes_imar },
-                { "yuk", checkBoxes_yuk }
-            };
-
-
-            CheckBox targetCheckbox = null;
-            string targetCategory = null;
-            foreach (var checkBox in allCheckBoxes)
-            {
-                if (checkBox.Tag != null && int.TryParse(checkBox.Tag.ToString(), out int tagIndex))
-                {
-                    if (tagIndex - 1 == checkboxIndex)
-                    {
-                        targetCheckbox = checkBox;
-                        if (checkBox.Name.Contains("imar")) targetCategory = "imar";
-                        else if (checkBox.Name.Contains("yuk")) targetCategory = "yuk";
-                        break;
-                    }
-                }
-            }
-
-            if (targetCheckbox == null || targetCategory == null)
-                return;
-
-            foreach (var category in categoryCheckboxes.Keys)
-            {
-                if (categoryCheckboxes[category][checkboxIndex] != null)
-                {
-                    categoryCheckboxes[category][checkboxIndex].Checked = false;
-                    categoryCheckboxes[category][checkboxIndex].Visible = false;
-                    categoryCheckboxes[category][checkboxIndex].Refresh();
-                }
-            }
-
-            foreach (var category in categoryCheckboxes.Keys)
-            {
-                UpdateCheckboxPositions(categoryCheckboxes[category], category);
-            }
-        }
-
-        // ------------------------------------------------------------------------------------------------------------ //
-        // ------------------------------------------------------------------------------------------------------------ //
-        // -------------------------------------------- GİRDİ MODÜLÜ --------------------------------------------------- //
-        // ------------------------------------------------------------------------------------------------------------ //
-        // ------------------------------------------------------------------------------------------------------------ //
-
-        private void SelectFolderButton_Click(object sender, EventArgs e)
-        {
-            // Handle file loading logic for the "Girdi" module
-            if (slfStartYear == 0 || slfEndYear == 0)
-            {
-                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            // Check if an item is selected in the ComboBox before accessing it
-            if (veri_listesi_seçimi.SelectedItem == null)
-            {
-                MessageBox.Show("Lütfen bir veri tipi seçin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return; // Exit if no valid data type is selected
-            }
-
-            // Perform file selection based on the selected data type
-            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
-
-            if (seçilenVeriTipi == "İmar Verileri")
-            {
-                using (imarFileSelectionPopup fileSelectionPopup = new imarFileSelectionPopup(dataGridView_girdi))
-                {
-                    if (fileSelectionPopup.ShowDialog() == DialogResult.OK)
-                    {
-                        string csvFilePath = fileSelectionPopup.CsvFilePath;
-                        string kmlFilePath = fileSelectionPopup.KmlFilePath;
-
-                        if (!File.Exists(csvFilePath) || !File.Exists(kmlFilePath))
-                        {
-                            MessageBox.Show("Geçerli dosyalar seçilmedi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
-                        }
-                    }
-                }
-            }
-
-            // Ensure girdiModülü is properly initialized
-            if (!girdiModülleri.ContainsKey(seçilenVeriTipi))
-            {
-                MessageBox.Show("Geçersiz veri tipi seçildi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return; // Metodu sonlandır
-            }
-
-            girdiModülü = girdiModülleri[seçilenVeriTipi];
-            if (girdiModülü == null)
-            {
-                MessageBox.Show($"{seçilenVeriTipi} için girdi modülü oluşturulamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return; // Metodu sonlandır
-            }
-            // Use the selectedMethod here
-            if (selectedMethod == "ELF (Ekonometrik)")
-            {
-                // Logic for ELF selection
-                // MessageBox.Show("ELF method selected, skipping prerequisites.");
-            }
-            else if (selectedMethod == "SLF (Jeo-Uzamsal)")
-            {
-                // Logic for SLF selection
-                // MessageBox.Show("SLF method selected, prerequisites are required.");
-            }
-            else
-            {
-                // Handle other cases or invalid selection
-                MessageBox.Show("No valid method selected.");
-            }
-            //string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
-
-
-            girdiModülü.slfStartYear = slfStartYear;
-            girdiModülü.slfEndYear = slfEndYear;
-
-
-            InitializeComboBoxes(); // yılların guncellenmesi 
-                                    // Check if "ELF" is selected to skip prerequisites
-            bool skipPrerequisites = (selectedMethod == "ELF (Ekonometrik)");
-
-            // Call VEERProcess with skipPrerequisites flag
-            var isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
-            //dataGridView_girdi.DataSource = GirdiModülü.dataTablesByType[seçilenVeriTipi];
-            //dataGridView_girdi.Refresh();
-            //Console.WriteLine(isImported.ToString());
-            //isİmportedModule(isImported, seçilenVeriTipi);
-            //if (isImported)
-            //{
-            //    modulescheck.Add(seçilenVeriTipi);
-            //    veri_listesi_seçimi.Refresh();
-            //    Console.WriteLine(modulescheck.Count);
-            //    dataGridView_girdi.DataSource = girdiModülü.CurrentDataTable;
-
-
-            //}
-
-        }
-
-        private async void OpenModuleButton_Click(object sender, EventArgs e)
-        {
-            // Disable the button initially
-            OpenModuleButton.Enabled = false;
-
-            string filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
-            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
-
-            // Load the data table for the selected type
-            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
-
-            // Check if the data table has any rows
-            if (dataTable == null || dataTable.Rows.Count == 0)
-            {
-                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından modüle gidilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                OpenModuleButton.Enabled = true; // Re-enable the button before returning
-                return;
-            }
-
-            // Check if the selected data type is "Ekonometrik Yük Tahmini Verileri"
-            if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
-            {
-                // Asynchronous task to load the Excel package
-                await Task.Run(() =>
-                {
-                    using (var package = new ExcelPackage(new FileInfo(filePath)))
-                    {
-                        Invoke(new Action(() =>
-                        {
-                            // Clear previous data
-                            ELFMinSenaryoTable.DataSource = null;
-                            ELFLowSenaryoTable.DataSource = null;
-                            ELFBaseSenaryoTable.DataSource = null;
-                            ELFHighSenaryoTable.DataSource = null;
-                            ELFMaxSenaryoTable.DataSource = null;
-                        }));
-
-                        // Ensure there are at least 6 worksheets
-                        int totalSheets = package.Workbook.Worksheets.Count;
-                        for (int i = 1; i <= 5; i++)
-                        {
-                            if (i < totalSheets)
-                            {
-                                var worksheet = package.Workbook.Worksheets[i];
-                                DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
-
-                                Invoke(new Action(() =>
-                                {
-                                    var dataGrids = new[] { ELFMinSenaryoTable, ELFLowSenaryoTable, ELFBaseSenaryoTable, ELFHighSenaryoTable, ELFMaxSenaryoTable };
-                                    dataGrids[i - 1].DataSource = dt;
-                                }));
-                            }
-                            else
-                            {
-                                // If there are fewer than 6 sheets, show a message or handle as needed
-                                MessageBox.Show("Eksik sayfalar bulundu. Lütfen dosyayı kontrol edin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                break;
-                            }
-                        }
-                    }
-                });
-            }
-
-            // Based on the selected data type, switch to the corresponding tab
-            if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
-            {
-                Modül_Tabları.SelectedTab = tab_senaryo;
-            }
-            else if (seçilenVeriTipi == "EA Şarj Verileri")
-            {
-                Modül_Tabları.SelectedTab = tab_ea;
-            }
-            else if (seçilenVeriTipi == "DEK Verileri")
-            {
-                Modül_Tabları.SelectedTab = tab_dek;
-            }
-
-            // After loading the data, enable the button
-            OpenModuleButton.Enabled = true;
-        }
-
-        private void veri_listesi_seçimi_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (veri_listesi_seçimi.SelectedItem != null)
-            {
-                string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
-
-                // dataTablesByType'ta bu veri var mı kontrol et
-                if (GirdiModülü.dataTablesByType.ContainsKey(seçilenVeriTipi))
-                {
-                    // GirdiModülü'nü güncelle
-                    if (girdiModülleri.ContainsKey(seçilenVeriTipi))
-                    {
-                        girdiModülleri[seçilenVeriTipi].importedDataTable = GirdiModülü.dataTablesByType[seçilenVeriTipi];
-                    }
-
-                    // DataGridView'ı güncelle
-                    dataGridView_girdi.DataSource = GirdiModülü.dataTablesByType[seçilenVeriTipi];
-                    dataGridView_girdi.Refresh();
-
-                    Debug.WriteLine($"Seçilen veri tipi: {seçilenVeriTipi}, Satır sayısı: {GirdiModülü.dataTablesByType[seçilenVeriTipi].Rows.Count}");
-                }
-                else
-                {
-                    Debug.WriteLine($"Seçilen veri tipi için yüklenmiş veri yok: {seçilenVeriTipi}");
-                    dataGridView_girdi.DataSource = null;
-                }
-            }
-        }
-
-        private void veri_listesi_seçimi_DrawItem(object sender, DrawItemEventArgs e)
-        {
-
-            // Check if the index is valid
-            if (e.Index < 0)
-                return;
-
-            // Get the current item to be drawn
-            string text = veri_listesi_seçimi.Items[e.Index].ToString();
-
-            // Determine the color based on some condition
-            Color textColor = Color.Red;
-            var girdiModülü = girdiModülleri[text];
-            if (girdiModülü.importedDataTable.Rows.Count > 0)
-            {
-                textColor = Color.Green;
-            }
-
-            e.DrawBackground();
-            // Draw the text with the determined color
-            using (Brush brush = new SolidBrush(textColor))
-            {
-                e.Graphics.DrawString(text, e.Font, brush, e.Bounds);
-            }
-
-            // Draw the focus rectangle if the item is selected
-            e.DrawFocusRectangle();
-        }
-
-        private void raporGoruntuleButonu_Click(object sender, EventArgs e)
-        {
-            // Girdi modülündeki dosya yükleme butonuna tıklandığında çalışacak kodlar
-            if (slfStartYear == 0 || slfEndYear == 0)
-            {
-                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            // Veri listesinde seçilen veri tipine göre dosya seçme işlemi yapılacak
-            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
-            girdiModülü = girdiModülleri[seçilenVeriTipi];
-            girdiModülü.VEERReport(seçilenVeriTipi);
-        }
-
-        private void ExcelDownloadButton_Click(object sender, EventArgs e)
-        {
-            if (slfStartYear == 0 || slfEndYear == 0)
-            {
-                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            const string FilterExcelFiles = "Excel dosyaları (*.xlsx)|*.xlsx";
-            const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
-            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
-            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
-            if (dataTable.Rows.Count == 0)
-            {
-                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Excel dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            else if (dataTable.Rows.Count > 50000)
-            {
-                MessageBox.Show($"{seçilenVeriTipi} için veri boyutu çok büyük. CSV olarak dışa aktarmayı deneyebilirsiniz.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            var fileDialog = new SaveFileDialog
-            {
-                Title = "Kaydedeceğiniz dosyanın adını giriniz.",
-                Filter = $"{FilterExcelFiles}|{FilterAllFiles}"
-            };
-            if (fileDialog.ShowDialog() == DialogResult.OK)
-            {
-                var filePath = fileDialog.FileName;
-                var excelExporter = new ExcelExporter();
-                excelExporter.ExportExcelFile(
-                    filePath,
-                    dataTable,
-                    seçilenVeriTipi
-                );
-            }
-            else
-            {
-                MessageBox.Show("Dosya seçilmedi.");
-            }
-
-        }
-
-        private void csvExportButton_Click(object sender, EventArgs e)
-        {
-            if (slfStartYear == 0 || slfEndYear == 0)
-            {
-                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            const string FilterCsvFiles = "Csv dosyaları (*.csv)|*.csv";
-            const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
-            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
-            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
-            if (dataTable.Rows.Count == 0)
-            {
-                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Csv dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            var fileDialog = new SaveFileDialog
-            {
-                Title = "Kaydedeceğiniz dosyanın adını giriniz.",
-                Filter = $"{FilterCsvFiles}|{FilterAllFiles}"
-            };
-            if (fileDialog.ShowDialog() == DialogResult.OK)
-            {
-                var filePath = fileDialog.FileName;
-                var csvHandler = new CsvHandler();
-                csvHandler.ExportCsvFile(
-                    filePath,
-                    dataTable
-                );
-            }
-            else
-            {
-                MessageBox.Show("Dosya seçilmedi.");
-            }
-        }
-
-
-        private void ResetYearSelectionProcessGirdiModulu()
-        {
-            slfStartYear = slfEndYear = 0;
-            int currentYear = DateTime.Now.Year;
-            int lastYear = currentYear - 1;
-            int lastYear2 = currentYear - 2;
-            startYearComboBox.SelectedIndex = -1;
-            startYearComboBox.Text = "Yıl seçiniz";
-            endYearComboBox.SelectedIndex = -1;
-            endYearComboBox.Text = "Yıl seçiniz";
-            yearApproveButton.Text = "Onayla";
-
-            //// Clear any existing items in the ComboBox
-            startYearComboBox.Items.Clear();
-
-            // Add the years to the ComboBox
-            startYearComboBox.Items.Add(lastYear2);
-            startYearComboBox.Items.Add(lastYear);
-            startYearComboBox.Items.Add(currentYear);
-
-            // Disable the endYearComboBox initially
-            startYearComboBox.Enabled = true;
-            endYearComboBox.Enabled = false;
-            yearApproveButton.Enabled = false;
-            // veri_listesi_seçimi.Enabled = false;
-        }
-
-        private void startYearComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (startYearComboBox.SelectedIndex == -1)
-            {
-                return;
-            }
-            // Get the selected year
-            int selectedYear = (int)startYearComboBox.SelectedItem;
-
-
-            // Enable the endYearComboBox
-            endYearComboBox.Enabled = true;
-
-            // Clear any existing items in the ComboBox
-            endYearComboBox.Items.Clear();
-
-            // Add years from selectedYear + 4 to selectedYear + 14
-            for (int year = selectedYear + 4; year <= selectedYear + 14; year++)
-            {
-                endYearComboBox.Items.Add(year);
-            }
-
-            // Optionally, set the first year as the selected item
-            //endYearComboBox.SelectedIndex = 0;
-        }
-
-        private void endYearComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            yearApproveButton.Enabled = true;
-        }
-
-        private void HomePageButton_Click(object sender, EventArgs e)
-        {
-            // Show the confirmation dialog for navigating to the home page
-            DialogResult result = MessageBox.Show(
-                "Ana sayfaya dönmek istediğinize emin misiniz? Kaydedilmeyen veriler kaybolacaktır!",
-                "Ana Sayfaya Dön",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning
-            );
-
-            if (result == DialogResult.Yes)
-            {
-                // Unsubscribe from the FormClosing event only if the user clicks 'Yes'
-                this.FormClosing -= ModülFormu_FormClosing;
-                this.Hide(); // Hide the current form (ModülFormu)
-            }
-            // If the user clicks 'No', do nothing and stay on the current form
-        }
-
-        private void yearApproveButton_Click(object sender, EventArgs e)
-        {
-            if (endYearComboBox.SelectedIndex == -1)
-            {
-                // if the end year is not chosen, it means we are still in selection process
-                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            else if (startYearComboBox.Enabled == false && endYearComboBox.Enabled == false)
-            {
-                // but if both combobox are disabled, it means the selection process is already done
-                // Check if any DataTable in girdiModülleri has rows
-                bool anyTableHasRows = girdiModülleri.Values.Any(girdiModülü =>
-                    girdiModülü.importedDataTable != null && girdiModülü.importedDataTable.Rows.Count > 0);
-                if (anyTableHasRows)
-                {
-                    var dialogResult = MessageBox.Show("Yılları değiştirirseniz verileri tekrardan içeri aktarmanız gerekecek, devam etmek istiyor musunuz?", "Uyarı!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                    if (dialogResult != DialogResult.Yes)
-                    {
-                        return;
-                    }
-                }
-                ResetYearSelectionProcessGirdiModulu();
-                foreach (var girdiModülü in girdiModülleri.Values)
-                {
-                    //girdiModülü.importedDataTable?.Clear(); // Clear the DataTable if it is not null
-                    girdiModülü.importedDataTable = new DataTable();
-                }
-                dataGridView_girdi.DataSource = null;
-            }
-            else
-            {
-                // selections are completed
-                startYearComboBox.Enabled = false;
-                endYearComboBox.Enabled = false;
-                //veri_listesi_seçimi.Enabled = true;
-                slfStartYear = (int)startYearComboBox.SelectedItem;
-                slfEndYear = (int)endYearComboBox.SelectedItem;
-                MessageBox.Show($"Başlangıç yılı: {slfStartYear}, Bitiş yılı: {slfEndYear}", "Yıllar belirlendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                //yearApproveButton.Enabled = false;
-                yearApproveButton.Text = "Sıfırla";
             }
         }
 
@@ -3187,8 +2879,8 @@ namespace SLF
                 return;
             }
 
-            OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
-                ref polygonOverlay_ea, Mesafe_yuk, mesafe_metre_yuk);
+            /*OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
+                ref polygonOverlay_ea, Mesafe_ea, mesafe_metre_yuk);*/
 
         }
 
@@ -4401,74 +4093,6 @@ namespace SLF
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
 
-        private void Yuk_Seç_Click(object sender, EventArgs e)
-        {
-            cbs.CBS_sec(markerOverlay_yuk, rulerRoute_yuk, gMapControl_yuk,
-                mesafe_metre_yuk, Mesafe_yuk);
-        }
-
-
-        private void gMapControl_yuk_MouseDown(object sender, MouseEventArgs e)
-        {
-            MouseDownEvent(sender, e, gMapControl_yuk, Mesafe_yuk, mesafe_metre_yuk,
-                rulerPoints_yuk, markerOverlay_yuk, rulerOverlay_yuk, ref rulerRoute_yuk,
-                polygonPoints_yuk, polygonOverlay_yuk);
-        }
-
-        private void gMapControl_yuk_MouseMove(object sender, MouseEventArgs e)
-        {
-            // Get the current position of the center of the map
-            PointLatLng centerPosition = gMapControl_yuk.Position;
-
-            // Update the strings with the center position coordinates
-            centerX = centerPosition.Lng.ToString();
-            centerY = centerPosition.Lat.ToString();
-
-            // boolean controlu ile grid oluşturulacak alan seçimine başlanması
-            if (e.Button == MouseButtons.Left && cbs.isSelecting_grid == true)
-            {
-                cbs.ending_point = gMapControl_yuk.FromLocalToLatLng(e.X, e.Y);
-                cbs.UpdateSelectionPolygon(gMapControl_yuk);
-            }
-
-            // eğer sadece 1 adet nokta seçilmişse, ve ikinci nokta dinamik olarak farklı yerlere
-            // tıklanarak seçiliyorsa, mesafeyi de buna göre güncelle.
-            if (isRulerActive && rulerPoints_yuk.Count == 1 && isRulerEnabled == true)
-            {
-
-                var point = gMapControl_yuk.FromLocalToLatLng(e.X, e.Y);
-                if (rulerRoute_yuk != null)
-                {
-                    rulerOverlay_yuk.Routes.Remove(rulerRoute_yuk);
-                }
-                rulerRoute_yuk = new GMapRoute(new List<PointLatLng> { rulerPoints_yuk[0], point }, "rulerRoute_yuk");
-                rulerRoute_yuk.Stroke = new Pen(Color.Red, 3);
-                rulerOverlay_yuk.Routes.Add(rulerRoute_yuk);
-                gMapControl_yuk.Refresh();
-            }
-        }
-
-
-        private void gMapControl_yuk_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left && cbs.isSelecting_grid)
-            {
-                // grid oluşturmak için seçilen alan (bounding box) ın son noktası
-                cbs.ending_point = gMapControl_yuk.FromLocalToLatLng(e.X, e.Y);
-                cbs.isSelecting_grid = false;
-                gMapControl_yuk.CanDragMap = true;
-
-                // Clear the selection polygon and refresh the map
-                gMapControl_yuk.Overlays.Remove(cbs.bounding_box_overlay);
-                gMapControl_yuk.Refresh();
-            }
-        }
-
-        private void gMapControl_yuk_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
-        {
-            OnMapClickEventi(pointClick, e, markerOverlay_yuk, ref polygonPoints_yuk,
-        ref polygonOverlay_yuk, Mesafe_yuk, mesafe_metre_yuk);
-        }
 
 
         private void trackBar_Yıllar_ValueChanged(object sender, EventArgs e)
@@ -5510,11 +5134,6 @@ namespace SLF
             }
 
             int layerIndex = zeroBasedIndex - 1;
-            if (layerIndex < 0 || layerIndex >= 15)
-            {
-                MessageBox.Show("Geçersiz katman endeksi.");
-                return;
-            }
 
             // retrieve the four overlay arrays 
             GMapOverlay overlayImar = cbs.tüm_katmanlar_array_imar[layerIndex];
@@ -5546,7 +5165,6 @@ namespace SLF
                 }
             }
         }
-
 
         private void tabloyuGörToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -5739,46 +5357,6 @@ namespace SLF
             PointLatLng point = new PointLatLng(nokta.Enlem, nokta.Boylam);
         }
 
-        private void İmar_Nokta_MouseDown(object sender, MouseEventArgs e)
-        {
-            /*if (e.Button == MouseButtons.Left)
-            {
-                ContextMenuStrip_Nokta.Show(Cursor.Position);
-            }*/
-        }
-
-        private void Point_Load_Çiz_Click(object sender, EventArgs e)
-        {
-            isSelecting_polygon = true;
-            isSelecting_YUK = true;
-
-            isRulerEnabled = false;
-            isRulerActive = false;
-
-            // Determine the active map control and reset accordingly
-            if (cbs.GetActiveGMapControl() == gMapControl_imar)
-            {
-                ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar, rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
-            }
-
-        }
-
-        private void YGA_Çiz_Click(object sender, EventArgs e)
-        {
-            isSelecting_polygon = true;
-            isSelecting_YGA = true;
-
-            isRulerEnabled = false;
-            isRulerActive = false;
-
-            // Determine the active map control and reset accordingly
-            if (cbs.GetActiveGMapControl() == gMapControl_imar)
-            {
-                ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar, rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
-            }
-
-        }
-
         private void buton_database_giris_Click(object sender, EventArgs e)
         {
             try
@@ -5864,6 +5442,78 @@ namespace SLF
         {
             Tablo_olustur tablo_olustur_formu = new Tablo_olustur();
             tablo_olustur_formu.Show();
+        }
+
+        private void YGA_Ekle_Click(object sender, EventArgs e)
+        {
+            isSelecting_polygon = true;
+            isSelecting_YGA = true;
+
+            isRulerEnabled = false;
+            isRulerActive = false;
+
+            // Determine the active map control and reset accordingly
+            if (cbs.GetActiveGMapControl() == gMapControl_imar)
+            {
+                ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar, rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
+            }
+        }
+
+        private void Point_Load_Ekle_Click(object sender, EventArgs e)
+        {
+            isSelecting_polygon = true;
+            isSelecting_YUK = true;
+
+            isRulerEnabled = false;
+            isRulerActive = false;
+
+            // Determine the active map control and reset accordingly
+            if (cbs.GetActiveGMapControl() == gMapControl_imar)
+            {
+                ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar, rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
+            }
+        }
+
+        private void buton_DL_calıstır_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // İşlem sırasında imleç görünümünü değiştir
+                Cursor.Current = Cursors.WaitCursor;
+
+                // Gerekli kontroller (Abone verisi yüklü mü, il-ilçe seçilmiş mi)
+                if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
+                {
+                    MessageBox.Show("Lütfen önce il ve ilçe seçimini yapın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (!GirdiModülü.dataTablesByType.ContainsKey("Abone Verileri"))
+                {
+                    MessageBox.Show("Lütfen önce Abone Verileri'ni yükleyin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Deep Learning modelini çalıştır
+                string result = PythonHelper.RunDeepLearningModel();
+
+                // İşlem tamamlandığında başarı mesajı göster
+                MessageBox.Show("İmar analizi başarıyla tamamlandı.\nSonuçlar 'imar_analizi_sonuclari/deep_learning_modeli' klasöründe kaydedildi.",
+                                "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // İsteğe bağlı olarak sonuç klasörünü aç
+                string imarAnaliziPath = PathService.GetImarAnaliziPathForType("deep_learning_modeli");
+                System.Diagnostics.Process.Start("explorer.exe", imarAnaliziPath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // İşlem bittiğinde imleci normal duruma getir
+                Cursor.Current = Cursors.Default;
+            }
         }
 
 

@@ -44,7 +44,7 @@
             this.buton_poligon_ozellik.BackColor = System.Drawing.Color.DarkOliveGreen;
             this.buton_poligon_ozellik.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.buton_poligon_ozellik.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.buton_poligon_ozellik.Location = new System.Drawing.Point(923, 462);
+            this.buton_poligon_ozellik.Location = new System.Drawing.Point(1135, 485);
             this.buton_poligon_ozellik.Name = "buton_poligon_ozellik";
             this.buton_poligon_ozellik.Size = new System.Drawing.Size(135, 56);
             this.buton_poligon_ozellik.TabIndex = 0;
@@ -59,12 +59,11 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.PoligonDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
             this.PoligonDataGridView.BackgroundColor = System.Drawing.Color.Snow;
-            this.PoligonDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.PoligonDataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
+            this.PoligonDataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.RaisedVertical;
             this.PoligonDataGridView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(89)))), ((int)(((byte)(13)))), ((int)(((byte)(34)))));
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(164)))), ((int)(((byte)(19)))), ((int)(((byte)(60)))));
             dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
@@ -95,15 +94,16 @@
             this.PoligonDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.PoligonDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
             this.PoligonDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.PoligonDataGridView.Size = new System.Drawing.Size(1063, 453);
+            this.PoligonDataGridView.Size = new System.Drawing.Size(1275, 476);
             this.PoligonDataGridView.TabIndex = 1;
             this.PoligonDataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.PoligonDataGridView_CellValueChanged_1);
+            this.PoligonDataGridView.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.PoligonDataGridView_EditingControlShowing);
             // 
             // buton_yük_tipleri
             // 
             this.buton_yük_tipleri.BackColor = System.Drawing.Color.Azure;
             this.buton_yük_tipleri.Font = new System.Drawing.Font("Microsoft YaHei UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.buton_yük_tipleri.Location = new System.Drawing.Point(4, 462);
+            this.buton_yük_tipleri.Location = new System.Drawing.Point(4, 485);
             this.buton_yük_tipleri.Name = "buton_yük_tipleri";
             this.buton_yük_tipleri.Size = new System.Drawing.Size(135, 56);
             this.buton_yük_tipleri.TabIndex = 2;
@@ -116,12 +116,11 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.ClientSize = new System.Drawing.Size(1070, 530);
+            this.ClientSize = new System.Drawing.Size(1282, 553);
             this.Controls.Add(this.buton_yük_tipleri);
             this.Controls.Add(this.PoligonDataGridView);
             this.Controls.Add(this.buton_poligon_ozellik);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MaximumSize = new System.Drawing.Size(1100, 600);
             this.Name = "Poligon_Özellik_Tanımlama";
             this.Text = "Poligon_Özellik_Tanımlama";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Poligon_Özellik_Tanımlama_FormClosed);

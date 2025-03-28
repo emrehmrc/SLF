@@ -14,23 +14,16 @@ namespace SLF
     {
 
         public HomePageForm gir2;
+
         public Hakkında()
         {
             InitializeComponent();
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            gir2 = (HomePageForm)Tag;
-            gir2.Show();
-            this.Hide();
-        }
 
         private void Hakkında_FormClosed(object sender, FormClosedEventArgs e)
         {
-            this.Close();
-            HomePageForm hakkında_to_giris = new HomePageForm();
-            hakkında_to_giris.Show();
+            this.Hide();
         }
     }
 }

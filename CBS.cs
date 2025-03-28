@@ -225,13 +225,20 @@ namespace SLF
                         chk.Checked = true;
                     }
 
+                    // Update the checkboxes for that layer in each 4 different map
+                    associatedChecks = modülFormu.GetCheckBoxesByIndex(layer_index);
+                    foreach (var chk in associatedChecks)
+                    {
+                        chk.ForeColor = overlayColors[layer_index].BorderColor;
+                    }
+
                     // Mark all categories for update
-                    //modülFormu.pendingUpdates["imar"] = true;
-                    //modülFormu.pendingUpdates["yuk"] = true;
+                    modülFormu.pendingUpdates["imar"] = true;
+                    modülFormu.pendingUpdates["yuk"] = true;
 
                     // Update only the active tab immediately
-                    //modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_imar, "imar"); ////////////////////////////////////////////
-                    //modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_yuk, "yuk");
+                    modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_imar, "imar"); 
+                    modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_yuk, "yuk");
                 }
                 finally
                 {

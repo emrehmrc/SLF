@@ -70,22 +70,6 @@ namespace SLF
 
         }
 
-        /*
-        private void PoligonDataGridView_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
-        {
-            // Check if the current cell is a ComboBox cell and get the underlying ComboBox control.
-            if (PoligonDataGridView.CurrentCell is DataGridViewComboBoxCell && e.Control is ComboBox comboBox)
-            {
-                // Allow user to type custom text.
-                comboBox.DropDownStyle = ComboBoxStyle.DropDown;
-
-                // Optionally, enable auto-complete for better UX.
-                comboBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
-            }
-        }*/
-
-
         private int FindFirstFreeLayerIndex()
         {
             for (int i = 0; i < 15; i++)
@@ -147,12 +131,20 @@ namespace SLF
                 dataTable.Columns.Add("Polygon ID", typeof(string));
                 dataTable.Columns.Add("Koordinatlar", typeof(string));
                 dataTable.Columns.Add("Çizilen Alan (m2)", typeof(string));
-                dataTable.Columns.Add("Arazi Oranı - Mesken (%)", typeof(string));
-                dataTable.Columns.Add("Arazi Oranı - Sanayi (%)", typeof(string));
-                dataTable.Columns.Add("Arazi Oranı - Ticarethane (%)", typeof(string));
+                dataTable.Columns.Add("1-2 KATLI MESKEN", typeof(string));
+                dataTable.Columns.Add("3-4 KATLI MESKEN", typeof(string));
+                dataTable.Columns.Add("5-7 KATLI MESKEN", typeof(string));
+                dataTable.Columns.Add("8 USTU KATLI MESKEN", typeof(string));
+                dataTable.Columns.Add("AYDINLATMA", typeof(string));
+                dataTable.Columns.Add("BUYUK SANAYI", typeof(string));
+                dataTable.Columns.Add("BUYUK TICARETHANE", typeof(string));
+                dataTable.Columns.Add("KUCUK SANAYI", typeof(string));
+                dataTable.Columns.Add("KUCUK TICARETHANE", typeof(string));
+                dataTable.Columns.Add("ORTA SANAYI", typeof(string));
+                dataTable.Columns.Add("ORTA TICARETHANE", typeof(string));
+                dataTable.Columns.Add("TARIMSAL SULAMA", typeof(string));
                 dataTable.Columns.Add("Başlangıç Yılı", typeof(string));
                 dataTable.Columns.Add("Satürasyon Hızı", typeof(string));
-                dataTable.Columns.Add("Yoğunluk", typeof(string));
                 dataTable.Columns.Add("Park, Yol, Kaldırım Oranı (%)", typeof(string));
                 dataTable.Columns.Add("Sosyal Yapı Parsel Oranı (%)", typeof(string));
 
@@ -234,11 +226,11 @@ namespace SLF
         {
             // Define the columns that should remain manually defined.
             var manualColumns = new HashSet<string>
-            {
-                "Polygon ID",
-                "Koordinatlar",
-                "Çizilen Alan (m2)"
-            };
+    {
+        "Polygon ID",
+        "Koordinatlar",
+        "Çizilen Alan (m2)"
+    };
 
             // Store current cell values for dropdown columns (from the first non-new row).
             var currentValues = new Dictionary<string, object>();
@@ -299,14 +291,8 @@ namespace SLF
                         var cell = row.Cells[kvp.Key];
                         if (cell is DataGridViewComboBoxCell comboBoxCell && kvp.Value != null)
                         {
-                            if (columnValues[kvp.Key].Contains(kvp.Value.ToString()))
-                            {
-                                cell.Value = kvp.Value; // Restore original value if still valid.
-                            }
-                            else
-                            {
-                                cell.Value = columnValues[kvp.Key].FirstOrDefault(); // Otherwise, set first available value.
-                            }
+                            // Allow the original value even if it's not in the dropdown list
+                            cell.Value = kvp.Value; // Restore original value
                         }
                     }
                     break; // Only process the first non-new row.
@@ -367,12 +353,30 @@ namespace SLF
 
         }
 
+
         private void Poligon_Özellik_Tanımlama_FormClosed(object sender, FormClosedEventArgs e)
         {
             // Only update is_poligon_saved if the form wasn't closed via the Kaydet button.
             if (!isKaydetClicked)
             {
                 is_poligon_saved = false;
+            } else
+            {
+                isSelecting_YUK = false;
+                isSelecting_YGA = false;
+            }
+        }
+
+        private void PoligonDataGridView_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            if (e.Control is ComboBox comboBox)
+            {
+                // Set the ComboBox to allow manual input
+                comboBox.DropDownStyle = ComboBoxStyle.DropDown;
+
+                // Optional: Enable autocomplete for better UX
+                comboBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
             }
         }
     }
