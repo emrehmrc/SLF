@@ -920,6 +920,8 @@
     <None Include="python_kod\deep_learning\kod\config.conf" />
     <None Include="python_kod\deep_learning\kod\IMAR_ID_Forecast_Model_emre.pkl" />
     <None Include="python_kod\deep_learning\kod\mesken_data_analiz.csv" />
+    <None Include="python_kod\deep_learning\ml_train\241004_WORKING_NIZAM_v6.xlsx" />
+    <None Include="python_kod\deep_learning\ml_train\ML_TRAIN_DATA.xlsx" />
     <None Include="python_kod\deep_learning\Modeller\config.conf" />
     <None Include="python_kod\deep_learning\Modeller\IMAR_ID_Forecast_Model_emre.pkl" />
     <None Include="python_kod\deep_learning\Modeller\mesken_data_analiz.csv" />

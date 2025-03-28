@@ -125,25 +125,7 @@ namespace SLF
 
             return dataTable;
         }
-        //private void ShowDataTableInGrid(DataTable dataTable)
-        //{
-        //    try
-        //    {
-        //        // DataGridView oluştur veya varsa temizle
-        //        DataGridView dataGridView = Controls.OfType<DataGridView>().FirstOrDefault();
-        //        if (dataGridView == null)
-        //        {
-        //            dataGridView = new DataGridView { Dock = DockStyle.Fill };
-        //            Controls.Add(dataGridView);
-        //        }
 
-        //        dataGridView.DataSource = dataTable;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show($"Tabloyu gösterirken hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //    }
-        //}
         private void listBoxCbsFiles_SelectedIndexChanged(object sender, EventArgs e)
         {
             try
@@ -164,6 +146,7 @@ namespace SLF
                 MessageBox.Show($"Hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         private void LoadCbsFiles()
         {
             try
@@ -200,6 +183,7 @@ namespace SLF
                 MessageBox.Show("Hata: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         private void RunPythonScript(string scriptPath, List<string> arguments)
         {
             try
@@ -349,6 +333,7 @@ namespace SLF
 
             return dataTable;
         }
+
         private List<(string ColumnName, string ColumnType)> ExtractColumnsFromTabFile(string filePath)
         {
             var columns = new List<(string ColumnName, string ColumnType)>();
@@ -417,59 +402,7 @@ namespace SLF
 
             return columns;
         }
-        private bool ValidateFilesAndColumns(Dictionary<string, List<string>> requiredColumns, List<string> selectedFiles)
-        {
-            try
-            {
-                foreach (var file in selectedFiles)
-                {
-                    // Dosya adını al (uzantısı olmadan)
-                    string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(file);
 
-                    // Gerekli sütunlar sözlüğünde bu dosya var mı?
-                    if (requiredColumns.TryGetValue(fileNameWithoutExtension, out List<string> requiredCols))
-                    {
-                        // Dosyanın tam yolunu oluştur
-                        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-                        string filePath = Path.Combine(Directory.GetParent(baseDir).Parent.Parent.FullName, "CBS", "SLF", file);
-
-                        // Tab veya CSV dosyasını yükle
-                        DataTable dataTable = file.EndsWith(".tab", StringComparison.OrdinalIgnoreCase)
-                            ? LoadTabFile(filePath)
-                            : LoadCsvFile(filePath);
-
-                        if (dataTable == null || dataTable.Columns.Count == 0)
-                        {
-                            MessageBox.Show($"Dosya boş veya okunamadı: {file}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return false;
-                        }
-
-                        // Gerekli sütunlar dosyada mevcut mu?
-                        foreach (var requiredColumn in requiredCols)
-                        {
-                            if (!dataTable.Columns.Contains(requiredColumn))
-                            {
-                                MessageBox.Show($"'{file}' dosyasında gerekli sütun eksik: {requiredColumn}",
-                                                "Eksik Sütun Hatası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                return false;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show($"'{file}' dosyası kontrol listesinde değil.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return false;
-                    }
-                }
-
-                return true; // Tüm kontroller başarılıysa
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Kontrol sırasında bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-        }
         private void dtrVeriTabloOlustur_Click(object sender, EventArgs e)
         {
             try
@@ -579,12 +512,12 @@ namespace SLF
 
                 // 4. Python script argümanlarını hazırla
                 List<string> arguments = new List<string>
-        {
-            tabFilePath,
-            aboneBilgilerPath,
-            tuketimPath,
-            outputFolder
-        };
+                {
+                    tabFilePath,
+                    aboneBilgilerPath,
+                    tuketimPath,
+                    outputFolder
+                };
 
                 // Dosyaların varlığını kontrol et
                 foreach (string path in new[] { tabFilePath, aboneBilgilerPath, tuketimPath })

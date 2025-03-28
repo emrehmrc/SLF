@@ -1389,7 +1389,7 @@ namespace SLF
                         Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
                         return;
                     }
-                    else if (selectedTabText == "İmar Analizleri" && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")))
+                    /*else if (selectedTabText == "İmar Analizleri" && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")))
                     {
                         // Sekme geçişini tamamen iptal et
                         MessageBox.Show("İmar planı verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
@@ -1397,7 +1397,7 @@ namespace SLF
                         Modül_Tabları.SelectedTab = tab_girdi;
                         Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
                         return;
-                    }
+                    }*/
                     else if (selectedTabText == "Optimal DTR Konumlandırma"
                                && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")
                                && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri")))
@@ -2870,9 +2870,31 @@ namespace SLF
 
         private void veri_listesi_seçimi_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
-            girdiModülü = girdiModülleri[seçilenVeriTipi];
-            dataGridView_girdi.DataSource = girdiModülü.importedDataTable;
+            if (veri_listesi_seçimi.SelectedItem != null)
+            {
+                string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+
+                // dataTablesByType'ta bu veri var mı kontrol et
+                if (GirdiModülü.dataTablesByType.ContainsKey(seçilenVeriTipi))
+                {
+                    // GirdiModülü'nü güncelle
+                    if (girdiModülleri.ContainsKey(seçilenVeriTipi))
+                    {
+                        girdiModülleri[seçilenVeriTipi].importedDataTable = GirdiModülü.dataTablesByType[seçilenVeriTipi];
+                    }
+
+                    // DataGridView'ı güncelle
+                    dataGridView_girdi.DataSource = GirdiModülü.dataTablesByType[seçilenVeriTipi];
+                    dataGridView_girdi.Refresh();
+
+                    Debug.WriteLine($"Seçilen veri tipi: {seçilenVeriTipi}, Satır sayısı: {GirdiModülü.dataTablesByType[seçilenVeriTipi].Rows.Count}");
+                }
+                else
+                {
+                    Debug.WriteLine($"Seçilen veri tipi için yüklenmiş veri yok: {seçilenVeriTipi}");
+                    dataGridView_girdi.DataSource = null;
+                }
+            }
         }
 
         private void veri_listesi_seçimi_DrawItem(object sender, DrawItemEventArgs e)
@@ -5836,6 +5858,12 @@ namespace SLF
                 MessageBox.Show($"İşlem sırasında beklenmeyen bir hata oluştu: {ex.Message}\n\nStack Trace: {ex.StackTrace}",
                     "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void buton_tablo_olustur_Click(object sender, EventArgs e)
+        {
+            Tablo_olustur tablo_olustur_formu = new Tablo_olustur();
+            tablo_olustur_formu.Show();
         }
 
 
