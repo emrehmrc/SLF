@@ -31,7 +31,6 @@ def excel_to_single_kml(excel_file_path):
                          'Mesken', 'Sanayi', 'Ticarethane', 'Tarımsal Sulama', 'Aydınlatma', 
                          'TOPLAM_YÜK', 'Yük_Yoğunluğu']
         int_columns = ['id']
-        string_columns = ['geometry']
         
         # Initialize a dictionary to store data
         combined_data = {}
@@ -59,7 +58,7 @@ def excel_to_single_kml(excel_file_path):
         # Create a DataFrame from the combined data
         final_df = pd.DataFrame(combined_data)
         
-        # Ensure correct data types for common columns
+        # Ensure correct data types
         for col in float_columns:
             if col in final_df.columns:
                 final_df[col] = final_df[col].astype('float64')
@@ -67,10 +66,6 @@ def excel_to_single_kml(excel_file_path):
         for col in int_columns:
             if col in final_df.columns:
                 final_df[col] = final_df[col].astype('int64')
-        
-        for col in string_columns:
-            if col in final_df.columns:
-                final_df[col] = final_df[col].astype('string')
         
         # Check if 'geometry' column exists and convert to GeoDataFrame
         if 'geometry' not in final_df.columns:
@@ -83,22 +78,26 @@ def excel_to_single_kml(excel_file_path):
             geometry=gpd.GeoSeries.from_wkt(final_df['geometry'])
         )
         
-        # Set CRS to WGS84 (EPSG:4326), as required for KML
-        gdf.set_crs(epsg=4326, inplace=True)
+        # Drop the 'geometry' column from the attributes (but keep the geometry itself)
+        gdf = gdf.drop(columns=['geometry'])
+        
+        # Set CRS to WGS84 (EPSG:4326), using the older method for compatibility
+        gdf.crs = "EPSG:4326"
         
         # Convert string columns to UTF-8 for KML compatibility
         for col in gdf.columns:
-            if gdf[col].dtype == 'object' and col != 'geometry':
+            if gdf[col].dtype == 'object':
                 gdf[col] = gdf[col].apply(
                     lambda x: x.encode('cp1254', errors='replace').decode('utf-8', errors='replace') 
                     if pd.notna(x) else x
                 )
         
         # Sort columns for consistent output
-        # Common columns first, then variable columns sorted by name, geometry last
-        sorted_columns = common_columns + sorted(
-            [col for col in gdf.columns if col not in common_columns and col != 'geometry']
-        ) + ['geometry']
+        # Common columns (excluding geometry) first, then variable columns sorted by name
+        common_columns_without_geometry = [col for col in common_columns if col != 'geometry']
+        sorted_columns = common_columns_without_geometry + sorted(
+            [col for col in gdf.columns if col not in common_columns_without_geometry]
+        )
         gdf = gdf[sorted_columns]
         
         # Define the output KML file path
@@ -119,6 +118,10 @@ def excel_to_single_kml(excel_file_path):
         print("Column data types:")
         for col in gdf.columns:
             print(f"{col}: {gdf[col].dtype}")
+        
+        # Print first few rows to verify data
+        print("\nFirst few rows of the GeoDataFrame:")
+        print(gdf.head())
         
     except Exception as e:
         print(f"An error occurred: {str(e)}")

@@ -4041,6 +4041,50 @@ namespace SLF
             }
         }
 
+        private void gMapControl_yuk_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && lastClickedCheckbox != null)
+            {
+                try
+                {
+                    int checkbox_index = int.Parse(lastClickedCheckbox.Tag.ToString()) - 1;
+
+                    // Ensure checkbox_index is within valid range
+                    if (checkbox_index < 0 || checkbox_index >= cbs.tüm_katmanlar_array_yuk.Length)
+                    {
+                        Console.WriteLine("Invalid checkbox index.");
+                        return;
+                    }
+
+                    foreach (var polygon in cbs.tüm_katmanlar_array_yuk[checkbox_index].Polygons)
+                    {
+                        if (cbs.IsPointInPolygon(pointClick, polygon))
+                        {
+                            // Highlight the polygon and update the layer index
+                            cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
+                            layer_index = checkbox_index;  // Update the current layer index to the clicked polygon's layer
+
+                            // Try to get the attributes of the clicked polygon
+                            if (cbs.polygonAttributes_yuk.TryGetValue(polygon, out DataRow row))
+                            {
+                                ShowAttributeRow(row);  // Show the row attributes
+                                tablo_formu.Show();     // Display the table form
+                            }
+                            else
+                            {
+                                Console.WriteLine("Polygon attributes not found.");
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Handle any exceptions to prevent the app from crashing
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
+            }
+        }
+
 
         private void gMapControl_imar_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
         {
