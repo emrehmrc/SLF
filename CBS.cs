@@ -14,6 +14,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GMap.NET.WindowsForms.Markers;
+using System.Globalization;
+using System.Diagnostics;
 
 namespace SLF
 {
@@ -1379,7 +1381,6 @@ namespace SLF
 
         }
 
-
         public void Draw_Polygon(List<PointLatLng> polygonPoints, GMapOverlay polygonOverlay, GMapControl gmap)
         {
             // bu noktalar arasında poligon çiz, mavi ile işaretle, ve de 
@@ -1419,54 +1420,65 @@ namespace SLF
         }
 
 
-        public System.Drawing.Color GetHeatmapColor(double value, double min, double max)
+
+        public void CreateHeatmap(GMapOverlay overlay, DataTable dataTable, string columnName)
         {
-            double ratio = (value - min) / (max - min);
-            int red = (int)(255 * ratio);
-            int blue = (int)(255 * (1 - ratio));
-            return System.Drawing.Color.FromArgb(100, red, 0, blue); // Semi-transparent color
-        }
 
+            double[] brackets = { 0, 3, 5, 10, 25, 50, 75, 100, 200, 400, double.PositiveInfinity };
+            int bracketCount = brackets.Length - 1; // 10 intervals
 
-        public void CreateHeatmap(GMapOverlay overlay, System.Data.DataTable dataTable, string columnName)
-        {
-            // Step 1: Find the min and max values for normalization
-            double min = double.MaxValue;
-            double max = double.MinValue;
-
-            foreach (DataRow row in dataTable.Rows)
-            {
-                if (row[columnName] != DBNull.Value && double.TryParse(row[columnName].ToString(),
-                    out double value))
-                {
-                    if (value < min) min = value;
-                    if (value > max) max = value;
-                }
-            }
-
-            // Step 2: Apply heatmap color to each polygon based on the column value
+            // Now continue with your original logic:
             foreach (GMapPolygon polygon in overlay.Polygons)
             {
-                // Get the corresponding DataRow for the polygon
                 if (polygonAttributes_imar.TryGetValue(polygon, out DataRow attributes))
                 {
 
-                    if (attributes[columnName] != DBNull.Value && double.TryParse(attributes[columnName].ToString(),
-                        out double value))
+                    // Check if the DataRow contains the specified column.
+                    if (!attributes.Table.Columns.Contains(columnName))
                     {
+                        MessageBox.Show("Seçilen yıla ait veri bulunamadı.");
+                        break;
+                    }
 
-                        System.Drawing.Color heatColor = GetHeatmapColor(value, min, max);
-                        polygon.Stroke = new Pen(heatColor, 1);
-                        polygon.Fill = new SolidBrush(heatColor);
+                    string rawValue = attributes[columnName].ToString();
+
+                    // Attempt to parse the string using InvariantCulture
+                    if (!string.IsNullOrWhiteSpace(rawValue) &&
+                        double.TryParse(rawValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+                    {
+                        // Determine which bracket the value falls into
+                        int bracketIndex = -1;
+                        for (int i = 0; i < bracketCount; i++)
+                        {
+                            if (value >= brackets[i] && value < brackets[i + 1])
+                            {
+                                bracketIndex = i;
+                                break;
+                            }
+                        }
+
+                        if (bracketIndex >= 0)
+                        {
+                            // Normalize the bracket index to a value between 0 and 1 for color mapping
+                            double normalizedValue = (double)bracketIndex / (bracketCount - 1);
+                            Color heatColor = GetHeatmapColor(normalizedValue);
+                            polygon.Stroke = new Pen(heatColor, 1);
+                            polygon.Fill = new SolidBrush(heatColor);
+                            continue;
+                        }
                     }
                 }
+
+                // If parsing fails or no value is provided, color the polygon with a default gray.
+                polygon.Stroke = new Pen(Color.Gray, 1);
+                polygon.Fill = new SolidBrush(Color.Gray);
             }
 
-            // Refresh the map control to show updated colors
+            // Refresh the map control to show updated colors.
             modülFormu.gMapControl_yuk.Refresh();
         }
 
-        public void CreateHeatmapLegend(double min, double max)
+        public void CreateHeatmapLegend(Panel colorBox, System.Windows.Forms.Label rangeLabel, System.Windows.Forms.Label unitLabel)
         {
             // Clear previous legend if it exists
             if (modülFormu.Controls.ContainsKey("heatmapLegend"))
@@ -1474,49 +1486,79 @@ namespace SLF
                 modülFormu.Controls.RemoveByKey("heatmapLegend");
             }
 
-            // Divide the range into 10 equal brackets
-            double range = max - min;
-            double bracketSize = range / 10;
+            // Define the fixed brackets
+            double[] brackets = { 0, 3, 5, 10, 25, 50, 75, 100, 200, 400, double.PositiveInfinity };
+            string[] bracketLabels = { "0-3", "3-5", "5-10", "10-25", "25-50", "50-75", "75-100", "100-200", "200-400", "400-Inf" };
+            int bracketCount = bracketLabels.Length; // Should be 10
 
-            // Generate labels and color boxes for each bracket
-            for (int i = 0; i < 10; i++)
+            // 1) Create a label for the unit at the top of legendPanel
+            unitLabel = new System.Windows.Forms.Label
             {
-                double bracketMin = min + (i * bracketSize);
-                double bracketMax = bracketMin + bracketSize;
+                Text = "Yük Yoğunluğu (W/m²)",
+                Font = new System.Drawing.Font("Times New Roman", 9, FontStyle.Bold),
+                AutoSize = true,
+                Location = new System.Drawing.Point(10, 10), // relative to top-left of legendPanel
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                Name = "unitLabel"
+            };
 
-                // Calculate color gradient from blue to red
-                System.Drawing.Color color = GetHeatmapColor(i / 9.0); // Pass a normalized value (0 to 1)
+            // Add the unit label to the panel
+            modülFormu.legendPanel.Controls.Add(unitLabel);
+
+            // 2) Generate labels and color boxes for each bracket
+            for (int i = 0; i < bracketCount; i++)
+            {
+                // Calculate color gradient from blue to red based on the bracket index
+                double normalizedValue = (double)i / (bracketCount - 1);
+                System.Drawing.Color color = GetHeatmapColor(normalizedValue);
 
                 // Create a color box
-                Panel colorBox = new Panel
+                colorBox = new Panel
                 {
                     Size = new System.Drawing.Size(20, 20),
-                    Location = new System.Drawing.Point(10, i * 20 + 10),
-                    BackColor = color
+                    BackColor = color,
+                    // Place it 10 px from the left, and 10 px below the unitLabel plus some spacing
+                    Location = new System.Drawing.Point(10, unitLabel.Bottom + 10 + (i * 25)),
+                    Anchor = AnchorStyles.Top | AnchorStyles.Right
                 };
 
                 modülFormu.legendPanel.Controls.Add(colorBox);
 
                 // Create a label for the bracket range
-                System.Windows.Forms.Label rangeLabel = new System.Windows.Forms.Label
+                rangeLabel = new System.Windows.Forms.Label
                 {
-                    Text = $"{bracketMin:F2} - {bracketMax:F2}",
-                    Location = new System.Drawing.Point(35, i * 20 + 10),
+                    Text = bracketLabels[i],
+                    Font = new System.Drawing.Font("Courier New", 8),
                     AutoSize = true,
-                    Font = new Font("Arial", 8)
+                    // Place it to the right of the colorBox
+                    Location = new System.Drawing.Point(colorBox.Right + 5, colorBox.Top),
+                    Anchor = AnchorStyles.Top | AnchorStyles.Right
                 };
 
                 modülFormu.legendPanel.Controls.Add(rangeLabel);
             }
+
         }
 
-        // Color gradient method for blue to red
-        private System.Drawing.Color GetHeatmapColor(double ratio)
+        private System.Drawing.Color GetHeatmapColor(double normalized)
         {
-            int red = (int)(255 * ratio);
-            int blue = (int)(255 * (1 - ratio));
-            return System.Drawing.Color.FromArgb(255, red, 0, blue); // Opaque colors
+            // Ensure normalized is between 0 and 1.
+            normalized = Math.Max(0, Math.Min(1, normalized));
+
+            // Define an alpha value (0 = fully transparent, 255 = opaque).
+            int alpha = 160; // Adjust this for desired transparency
+
+            // For absolute blue to absolute red:
+            // At normalized = 0: Blue = (0, 0, 255)
+            // At normalized = 1: Red  = (255, 0, 0)
+            int r = (int)(normalized * 255);
+            int g = 0;
+            int b = (int)((1 - normalized) * 255);
+
+            return System.Drawing.Color.FromArgb(alpha, r, g, b);
         }
+
+
 
 
         // ------------------------------- HARİTA EVENTLERİ ----------------------------------/////////////////////

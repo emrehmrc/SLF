@@ -20,6 +20,8 @@ using System.Text;
 using SLF.services;
 using SLF.Services;
 using System.Reflection;
+using System.Globalization;
+using Avalonia;
 
 namespace SLF
 {
@@ -652,7 +654,7 @@ namespace SLF
             {
                 if (checkBoxes[i] != null && checkBoxes[i].Visible)
                 {
-                    checkBoxes[i].Location = new Point(checkBoxes[i].Location.X, currentY);
+                    checkBoxes[i].Location = new System.Drawing.Point(checkBoxes[i].Location.X, currentY);
                     currentY += CheckboxHeight + CheckboxSpacing;
                 }
             }
@@ -4137,8 +4139,6 @@ namespace SLF
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
 
-
-
         private void trackBar_Yıllar_ValueChanged(object sender, EventArgs e)
         {
             int selectedYear = trackBar_Yıllar.Value;
@@ -4152,41 +4152,29 @@ namespace SLF
         }
 
 
+        Panel colorBox;
+        System.Windows.Forms.Label rangeLabel;
+        System.Windows.Forms.Label unitLabel;
+
         private void UpdateHeatmapForYear(string columnName)
         {
-            // Clear the existing overlay for a fresh heatmap
+            // Use the active GMapControl (ensure you're consistent with one control)
             cbs.GetActiveGMapControl().Overlays.Clear();
-            gMapControl_yuk.Overlays.Clear();
-            gMapControl_yuk.Overlays.Add(cbs.tüm_katmanlar_array_yuk[0]);
 
-            // Create a new overlay for the heatmap
-            GMapOverlay heatmapOverlay = new GMapOverlay("Heatmap");
+            // Get the overlay that contains the polygons (make sure it is pre-populated)
+            GMapOverlay heatmapOverlay = cbs.tüm_katmanlar_array_imar[0];
 
-            // Assuming your data is stored in a DataTable called yourDataTable
-            DataTable dataTable = cbs.tüm_katmanlar_datatable[0];
+            // Update the heatmap colors based on the data for the selected year
+            cbs.CreateHeatmap(heatmapOverlay, cbs.tüm_katmanlar_datatable[0], columnName);
 
-            // Initialize min and max values
-            double min = double.MaxValue;
-            double max = double.MinValue;
+            // Update the legend (which should be independent)
+            cbs.CreateHeatmapLegend(colorBox, rangeLabel, unitLabel);
 
-            // Calculate min and max values for the specified column
-            foreach (DataRow row in dataTable.Rows)
-            {
-                if (row[columnName] != DBNull.Value && int.TryParse(row[columnName].ToString(), out int value))
-                {
-                    if (value < min) min = value;
-                    if (value > max) max = value;
-                }
-            }
-
-            // Display heatmap based on the column data
-            cbs.CreateHeatmap(cbs.tüm_katmanlar_array_yuk[0], cbs.tüm_katmanlar_datatable[0], columnName);
-            cbs.CreateHeatmapLegend(min, max);
-
-            // Add the overlay to the GMap control
+            // Add the updated overlay back to the active map
             cbs.GetActiveGMapControl().Overlays.Add(heatmapOverlay);
-            cbs.GetActiveGMapControl().Refresh();
 
+            // Refresh the map control to show updates
+            cbs.GetActiveGMapControl().Refresh();
         }
 
 
