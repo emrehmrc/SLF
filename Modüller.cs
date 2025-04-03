@@ -4145,7 +4145,7 @@ namespace SLF
             yuk_yıl_deger.Text = $"{selectedYear}";
 
             // Construct the column name based on the selected year
-            string columnName = $"{selectedYear}";
+            string columnName = $"Yük_Yoğunluğu_{selectedYear}";
 
             // Call a method to update the heatmap using the selected year's data
             UpdateHeatmapForYear(columnName);
