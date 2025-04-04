@@ -20,8 +20,6 @@ using System.Text;
 using SLF.services;
 using SLF.Services;
 using System.Reflection;
-using System.Globalization;
-using Avalonia;
 
 namespace SLF
 {
@@ -40,9 +38,6 @@ namespace SLF
                 return instance;
             }
         }
-
-        private bool isDtrLoaded = false;
-
 
 
         // ------------------------------------------------------------------------------------------------------------ //
@@ -153,6 +148,13 @@ namespace SLF
 
         public int load_density_cnt = 0;
 
+        // In modülFormu class
+        private int currentYear; // Store the current year from trackBar_Yıllar
+        private ToolTip polygonToolTip; // Custom tooltip for displaying polygon data
+        private GMapPolygon hoveredPolygon; // Track the currently hovered polygon
+
+        Dictionary<GMapPolygon, DataRow> heatmapPolygonAttributes;
+
 
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
@@ -227,6 +229,18 @@ namespace SLF
 
             // Initialize the legend elements
             InitializeHeatmapLegendControls();
+
+            // Initialize the tooltip
+            polygonToolTip = new ToolTip
+            {
+                AutoPopDelay = 5000, // Tooltip stays visible for 5 seconds
+                InitialDelay = 100,  // Delay before showing the tooltip
+                ReshowDelay = 100,   // Delay before showing the tooltip again
+                ShowAlways = false    // Show even if the form is not active
+            };
+
+            // Initialize currentYear
+            currentYear = trackBar_Yıllar.Value;
 
         }
 
@@ -4143,6 +4157,7 @@ namespace SLF
         private void trackBar_Yıllar_ValueChanged(object sender, EventArgs e)
         {
             int selectedYear = trackBar_Yıllar.Value;
+            currentYear = selectedYear; // Update the current year
             yuk_yıl_deger.Text = $"{selectedYear}";
 
             // Construct the column name based on the selected year
@@ -4150,6 +4165,12 @@ namespace SLF
 
             // Call a method to update the heatmap using the selected year's data
             UpdateHeatmapForYear(columnName);
+
+            // If a polygon is currently hovered, update the tooltip
+            if (hoveredPolygon != null)
+            {
+                UpdatePolygonToolTip(hoveredPolygon);
+            }
 
         }
 
@@ -4167,12 +4188,12 @@ namespace SLF
 
             // Get the original overlay that contains the polygons
             GMapOverlay originalOverlay = cbs.tüm_katmanlar_array_imar[0];
-
+            
             // Create a new overlay for the heatmap
             GMapOverlay heatmapOverlay = new GMapOverlay("HeatmapOverlay");
 
             // Create a new dictionary for the heatmap overlay's polygon attributes
-            Dictionary<GMapPolygon, DataRow> heatmapPolygonAttributes = new Dictionary<GMapPolygon, DataRow>();
+            heatmapPolygonAttributes = new Dictionary<GMapPolygon, DataRow>();
 
             // Copy the contents of the original overlay to the heatmap overlay
             cbs.CopyOverlayContents(originalOverlay, heatmapOverlay, cbs.polygonAttributes_imar, heatmapPolygonAttributes);
@@ -5652,6 +5673,95 @@ namespace SLF
                 // İşlem bittiğinde imleci normal duruma getir
                 Cursor.Current = Cursors.Default;
             }
+        }
+
+        private void gMapControl_yuk_MouseMove(object sender, MouseEventArgs e)
+        {
+            // Convert mouse coordinates to geographical coordinates
+            PointLatLng mousePos = gMapControl_yuk.FromLocalToLatLng(e.X, e.Y);
+
+            // Find the heatmap overlay
+            GMapOverlay heatmapOverlay = gMapControl_yuk.Overlays.FirstOrDefault(o => o.Id == "HeatmapOverlay");
+            if (heatmapOverlay == null) return;
+
+            // Check if the mouse is inside any polygon in the heatmap overlay
+            GMapPolygon newHoveredPolygon = null;
+            foreach (GMapPolygon polygon in heatmapOverlay.Polygons)
+            {
+                if (cbs.IsPointInPolygon(mousePos, polygon))
+                {
+                    newHoveredPolygon = polygon;
+                    break;
+                }
+            }
+
+            // If the hovered polygon has changed, update the tooltip
+            if (newHoveredPolygon != hoveredPolygon)
+            {
+                hoveredPolygon = newHoveredPolygon;
+                if (hoveredPolygon != null && checkBox_yuk_main.Checked == true)
+                {
+                    UpdatePolygonToolTip(hoveredPolygon);
+                    polygonToolTip.Show(GetToolTipText(hoveredPolygon), gMapControl_yuk, e.X + 15, e.Y + 15);
+                }
+                else
+                {
+                    polygonToolTip.Hide(gMapControl_yuk);
+                }
+            }
+        }
+
+        private string GetToolTipText(GMapPolygon polygon)
+        {
+            if (polygon == null || heatmapPolygonAttributes == null || !heatmapPolygonAttributes.TryGetValue(polygon, out DataRow attributes))
+            {
+                return "Herhangi bir veri bulunamadı.!";
+            }
+
+            // Define the columns to display
+            string[] columns = new string[]
+            {
+                $"Mesken_{currentYear}",
+                $"Sanayi_{currentYear}",
+                $"Ticarethane_{currentYear}",
+                $"Tarımsal Sulama_{currentYear}",
+                $"Aydınlatma_{currentYear}",
+                $"TOPLAM_YÜK_{currentYear}",
+                $"Hücre İçi Yerleşim Alanı_{currentYear}",
+                $"Yük_Yoğunluğu_{currentYear}"
+            };
+
+            // Build the tooltip text
+            StringBuilder tooltipText = new StringBuilder();
+
+            foreach (string column in columns)
+            {
+                if (attributes.Table.Columns.Contains(column))
+                {
+                    string value = attributes[column]?.ToString() ?? "N/A";
+                    tooltipText.AppendLine($"{column}: {value}");
+                }
+                else
+                {
+                    tooltipText.AppendLine($"{column}: N/A");
+                }
+            }
+
+            return tooltipText.ToString();
+        }
+
+        private void UpdatePolygonToolTip(GMapPolygon polygon)
+        {
+            if (polygon == null) return;
+            string tooltipText = GetToolTipText(polygon);
+            polygonToolTip.SetToolTip(gMapControl_yuk, tooltipText);
+        }
+
+        private void gMapControl_yuk_MouseLeave(object sender, EventArgs e)
+        {
+            // Hide the tooltip and clear the hovered polygon when the mouse leaves the map
+            hoveredPolygon = null;
+            polygonToolTip.Hide(gMapControl_yuk);
         }
 
 
