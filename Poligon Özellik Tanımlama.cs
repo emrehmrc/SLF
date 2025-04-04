@@ -49,7 +49,7 @@ namespace SLF
             string projectRoot = Directory.GetParent(exeLocation)?.Parent?.FullName;
             if (projectRoot != null)
             {
-                excelFilePath = Path.Combine(projectRoot, "Excel Files", "point_load.xlsx");
+                excelFilePath = Path.Combine(projectRoot, "Excel Files", "Point Load Karakteristikleri", "point_load.xlsx");
             }
             else
             {

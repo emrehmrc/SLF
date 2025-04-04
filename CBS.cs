@@ -219,6 +219,7 @@ namespace SLF
                     tüm_katmanlar_datatable[layer_index] = dt;
                     tüm_katmanlar_array_names[layer_index] = filename;
 
+
                     List<CheckBox> associatedChecks = modülFormu.GetCheckBoxesByIndex(layer_index);
                     foreach (var chk in associatedChecks)
                     {

@@ -154,6 +154,7 @@ namespace SLF
         private GMapPolygon hoveredPolygon; // Track the currently hovered polygon
 
         Dictionary<GMapPolygon, DataRow> heatmapPolygonAttributes;
+        private int overlayIndex = -1; // yük yoğunluğu sayfası için kullanılan final dosyanın tüm_katmanlar_array_names'teki indexi.
 
 
         // ------------------------------------------------------------------------------------------------------------ //
@@ -189,7 +190,7 @@ namespace SLF
             string projectRoot = Directory.GetParent(exeLocation)?.Parent?.FullName; // Move up two levels to SLF root (C:\Users\ehan0\source\repos\emrehmrc\SLF)
             if (projectRoot != null)
             {
-                polygonTypesExcelPath = Path.Combine(projectRoot, "Excel Files", "point_load.xlsx"); // e.g., C:\Users\ehan0\source\repos\emrehmrc\SLF\Excel Files\point_load.xlsx
+                polygonTypesExcelPath = Path.Combine(projectRoot, "Excel Files", "Point Load Karakteristikleri.xlsx", "point_load.xlsx"); // e.g., C:\Users\ehan0\source\repos\emrehmrc\SLF\Excel Files\point_load.xlsx
             }
             else
             {
@@ -2253,15 +2254,34 @@ namespace SLF
                     await dekHaritayaVeriYukleAsync();
                 }
 
-            } else if (selectedTabText == "Yük Haritası Modülü")
+            } else if (Modül_Tabları.SelectedTab == tab_yükHaritası)
             {
-                load_density_cnt++;
-                if(load_density_cnt == 1)
+
+                // Find the index of the overlay in tüm_katmanlar_array_imar_names that contains "xxx"
+                string searchText = "SONUCLAR_Load_Density.kml"; // The text to search for
+                overlayIndex = Array.FindIndex(cbs.tüm_katmanlar_array_names,
+                    name => name != null && name.Contains(searchText));
+
+                // if the SONUCLAR_load_density.kml file exists
+                if (overlayIndex != -1)
                 {
-                    trackBar_Yıllar.Value = trackBar_Yıllar.Minimum + 1;
-                    trackBar_Yıllar.Value = trackBar_Yıllar.Minimum;
-                }
-                legendPanel.PerformLayout(); // Force layout update
+                    legendPanel.Visible = true;
+
+                    load_density_cnt++;
+
+                    if (load_density_cnt == 1)
+                    {
+                        trackBar_Yıllar.Value = trackBar_Yıllar.Minimum + 1;
+                        trackBar_Yıllar.Value = trackBar_Yıllar.Minimum;
+                    }
+
+                    legendPanel.PerformLayout(); // Force layout update
+
+                } else
+                {
+                    legendPanel.Visible = false;
+                }        
+
             }
         }
 
@@ -4163,13 +4183,32 @@ namespace SLF
             // Construct the column name based on the selected year
             string columnName = $"Yük_Yoğunluğu_{selectedYear}";
 
-            // Call a method to update the heatmap using the selected year's data
-            UpdateHeatmapForYear(columnName);
 
-            // If a polygon is currently hovered, update the tooltip
-            if (hoveredPolygon != null)
+            // Find the index of the overlay in tüm_katmanlar_array_imar_names that contains "xxx"
+            string searchText = "SONUCLAR_Load_Density.kml"; // The text to search for
+            overlayIndex = Array.FindIndex(cbs.tüm_katmanlar_array_names,
+                name => name != null && name.Contains(searchText));
+
+            // Check if the overlay was found
+            if (overlayIndex == -1 || cbs.tüm_katmanlar_array_imar[overlayIndex] == null)
             {
-                UpdatePolygonToolTip(hoveredPolygon);
+                MessageBox.Show($"SONUCLAR_Load_Density.kml dosyası bulunamadı. Lütfen ilgili dosyanın SLF hesabı sonucu " +
+                    $"oluşturulduğundan emin olunuz.");
+
+            }
+            else
+            {
+                legendPanel.Visible = true;
+
+                // Call a method to update the heatmap using the selected year's data
+                UpdateHeatmapForYear(columnName);
+
+                // If a polygon is currently hovered, update the tooltip
+                if (hoveredPolygon != null)
+                {
+                    UpdatePolygonToolTip(hoveredPolygon);
+                }
+
             }
 
         }
@@ -4186,9 +4225,8 @@ namespace SLF
                 mapControl.Overlays.Remove(existingHeatmapOverlay);
             }
 
-            // Get the original overlay that contains the polygons
-            GMapOverlay originalOverlay = cbs.tüm_katmanlar_array_imar[0];
-            
+            GMapOverlay originalOverlay = cbs.tüm_katmanlar_array_imar[overlayIndex];
+
             // Create a new overlay for the heatmap
             GMapOverlay heatmapOverlay = new GMapOverlay("HeatmapOverlay");
 
@@ -4199,7 +4237,7 @@ namespace SLF
             cbs.CopyOverlayContents(originalOverlay, heatmapOverlay, cbs.polygonAttributes_imar, heatmapPolygonAttributes);
 
             // Update the heatmap colors based on the data for the selected year
-            cbs.CreateHeatmap(heatmapOverlay, cbs.tüm_katmanlar_datatable[0], columnName, heatmapPolygonAttributes);
+            cbs.CreateHeatmap(heatmapOverlay, cbs.tüm_katmanlar_datatable[overlayIndex], columnName, heatmapPolygonAttributes);
 
             // Update the legend (which should be independent)
             cbs.UpdateHeatmapLegend(); // Updated method to reuse existing controls
@@ -4217,7 +4255,7 @@ namespace SLF
             // Force a repaint by toggling the visibility of the heatmap overlay
             SetOverlayVisibility(heatmapOverlay, false); // Hide
             SetOverlayVisibility(heatmapOverlay, true);  // Show
-            //mapControl.Invalidate(); // Force a full repaint
+                                                            //mapControl.Invalidate(); // Force a full repaint
             mapControl.Refresh(); // Refresh the map control
         }
 
@@ -4722,7 +4760,17 @@ namespace SLF
 
             if (poligonOzellikFormu.is_poligon_saved == true)
             {
+
                 PoligonKaydetEventi(sender, e, polygonOverlay_imar, polygonPoints_imar);
+
+                // Mark all categories for update
+                pendingUpdates["imar"] = true;
+                pendingUpdates["yuk"] = true;
+
+                // Update only the active tab immediately
+                UpdateCheckboxPositions(checkBoxes_imar, "imar");
+                UpdateCheckboxPositions(checkBoxes_yuk, "yuk");
+
             }
         }
 
@@ -5225,6 +5273,22 @@ namespace SLF
 
                                         gMapControl_imar.Refresh();
                                         gMapControl_yuk.Refresh();
+                                    }
+
+                                    if (checkBox.Text == "SONUCLAR_Load_Density.kml")
+                                    {
+                                        checkBox_yuk_main.Checked = false;
+                                        checkBox_yuk_main.Visible = false;
+                                        checkBox_yuk_main.Tag = null;
+
+                                        load_density_cnt = 0;
+
+                                        // Remove the heatmapOverlay by its ID
+                                        GMapOverlay heatmapOverlayToRemove = gMapControl_yuk.Overlays.FirstOrDefault(o => o.Id == "HeatmapOverlay");
+                                        if (heatmapOverlayToRemove != null)
+                                        {
+                                            gMapControl_yuk.Overlays.Remove(heatmapOverlayToRemove);
+                                        }
                                     }
                                 }
 

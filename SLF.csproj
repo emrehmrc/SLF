@@ -851,6 +851,7 @@
     <None Include="CBS\SLF\ÇİĞLİ KARŞIYAKA REKORTMAN VERİSİ\REKORTMAN_kars_cigli.csv" />
     <None Include="docs\VEER.md" />
     <None Include="Excel Files\Point Load Karakteristikleri\point_load.xlsx" />
+    <None Include="Excel Files\SLF Sonuçları\SONUCLAR.xlsx" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
