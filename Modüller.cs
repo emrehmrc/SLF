@@ -146,6 +146,11 @@ namespace SLF
         private Dictionary<string, TabPage> categoryTabPages = new Dictionary<string, TabPage>();
         private TabControl tabControlMain; // Reference to the TabControl
 
+        // In modülFormu
+        public Panel[] colorBoxes; // Array to hold color boxes for each bracket
+        public System.Windows.Forms.Label[] rangeLabels; // Array to hold range labels for each bracket
+        public System.Windows.Forms.Label unitLabel; // Single unit label
+
         public int load_density_cnt = 0;
 
 
@@ -4148,11 +4153,52 @@ namespace SLF
 
         }
 
+        private void UpdateHeatmapForYear(string columnName)
+        {
+            // Use the active GMapControl (ensure you're consistent with one control)
+            GMapControl mapControl = cbs.GetActiveGMapControl();
 
-        // In modülFormu
-        public Panel[] colorBoxes; // Array to hold color boxes for each bracket
-        public System.Windows.Forms.Label[] rangeLabels; // Array to hold range labels for each bracket
-        public System.Windows.Forms.Label unitLabel; // Single unit label
+            // Instead of clearing all overlays, remove only the heatmapOverlay if it exists
+            GMapOverlay existingHeatmapOverlay = mapControl.Overlays.FirstOrDefault(o => o.Id == "HeatmapOverlay");
+            if (existingHeatmapOverlay != null)
+            {
+                mapControl.Overlays.Remove(existingHeatmapOverlay);
+            }
+
+            // Get the original overlay that contains the polygons
+            GMapOverlay originalOverlay = cbs.tüm_katmanlar_array_imar[0];
+
+            // Create a new overlay for the heatmap
+            GMapOverlay heatmapOverlay = new GMapOverlay("HeatmapOverlay");
+
+            // Create a new dictionary for the heatmap overlay's polygon attributes
+            Dictionary<GMapPolygon, DataRow> heatmapPolygonAttributes = new Dictionary<GMapPolygon, DataRow>();
+
+            // Copy the contents of the original overlay to the heatmap overlay
+            cbs.CopyOverlayContents(originalOverlay, heatmapOverlay, cbs.polygonAttributes_imar, heatmapPolygonAttributes);
+
+            // Update the heatmap colors based on the data for the selected year
+            cbs.CreateHeatmap(heatmapOverlay, cbs.tüm_katmanlar_datatable[0], columnName, heatmapPolygonAttributes);
+
+            // Update the legend (which should be independent)
+            cbs.UpdateHeatmapLegend(); // Updated method to reuse existing controls
+
+            // Add both the original overlay and the new heatmap overlay to the map
+            //mapControl.Overlays.Add(originalOverlay);
+            mapControl.Overlays.Add(heatmapOverlay);
+
+            // Associate the heatmap overlay with checkBox_yuk_main
+            checkBox_yuk_main.Tag = heatmapOverlay; // Store the overlay in the Tag property
+            checkBox_yuk_main.Checked = true; // Make the heatmap visible by default
+            checkBox_yuk_main.Text = "Yük Yoğunluğu Katmanı"; // Set a meaningful name
+            checkBox_yuk_main.Visible = true; // Ensure the checkbox is visible
+
+            // Force a repaint by toggling the visibility of the heatmap overlay
+            SetOverlayVisibility(heatmapOverlay, false); // Hide
+            SetOverlayVisibility(heatmapOverlay, true);  // Show
+            //mapControl.Invalidate(); // Force a full repaint
+            mapControl.Refresh(); // Refresh the map control
+        }
 
         private void InitializeHeatmapLegendControls()
         {
@@ -4169,9 +4215,9 @@ namespace SLF
             unitLabel = new System.Windows.Forms.Label
             {
                 Text = "Yük Yoğunluğu (W/m²)",
-                Font = new System.Drawing.Font("Times New Roman", 9, FontStyle.Bold),
+                Font = new System.Drawing.Font("Verdana", 7, FontStyle.Bold),
                 AutoSize = true,
-                Location = new System.Drawing.Point(10, 10),
+                Location = new System.Drawing.Point(5, 10),
                 Anchor = AnchorStyles.Top | AnchorStyles.Right,
                 Name = "unitLabel"
             };
@@ -4194,7 +4240,7 @@ namespace SLF
                 rangeLabels[i] = new System.Windows.Forms.Label
                 {
                     Text = bracketLabels[i],
-                    Font = new System.Drawing.Font("Courier New", 8),
+                    Font = new System.Drawing.Font("Verdana", 8),
                     AutoSize = true,
                     Location = new System.Drawing.Point(colorBoxes[i].Right + 5, colorBoxes[i].Top),
                     Anchor = AnchorStyles.Top | AnchorStyles.Right,
@@ -4202,47 +4248,6 @@ namespace SLF
                 };
                 legendPanel.Controls.Add(rangeLabels[i]);
             }
-        }
-
-        private void UpdateHeatmapForYear(string columnName)
-        {
-            // Use the active GMapControl (ensure you're consistent with one control)
-            GMapControl mapControl = cbs.GetActiveGMapControl();
-            mapControl.Overlays.Clear();
-
-            // Get the original overlay that contains the polygons
-            GMapOverlay originalOverlay = cbs.tüm_katmanlar_array_imar[0];
-
-            // Create a new overlay for the heatmap
-            GMapOverlay heatmapOverlay = new GMapOverlay("HeatmapOverlay");
-
-            // Create a new dictionary for the heatmap overlay's polygon attributes
-            Dictionary<GMapPolygon, DataRow> heatmapPolygonAttributes = new Dictionary<GMapPolygon, DataRow>();
-
-            // Copy the contents of the original overlay to the heatmap overlay
-            cbs.CopyOverlayContents(originalOverlay, heatmapOverlay, cbs.polygonAttributes_imar, heatmapPolygonAttributes);
-
-            // Update the heatmap colors based on the data for the selected year
-            cbs.CreateHeatmap(heatmapOverlay, cbs.tüm_katmanlar_datatable[0], columnName, heatmapPolygonAttributes);
-
-            // Update the legend (which should be independent)
-            cbs.UpdateHeatmapLegend(); // Updated method to reuse existing controls
-
-            // Add both the original overlay and the new heatmap overlay to the map
-            mapControl.Overlays.Add(originalOverlay);
-            mapControl.Overlays.Add(heatmapOverlay);
-
-            // Associate the heatmap overlay with checkBox_yuk_main
-            checkBox_yuk_main.Tag = heatmapOverlay; // Store the overlay in the Tag property
-            checkBox_yuk_main.Checked = true; // Make the heatmap visible by default
-            checkBox_yuk_main.Text = "Yük Yoğunluğu Katmanı"; // Set a meaningful name
-            checkBox_yuk_main.Visible = true; // Ensure the checkbox is visible
-
-            // Force a repaint by toggling the visibility of the heatmap overlay
-            SetOverlayVisibility(heatmapOverlay, false); // Hide
-            SetOverlayVisibility(heatmapOverlay, true);  // Show
-            mapControl.Invalidate(); // Force a full repaint
-            mapControl.Refresh(); // Refresh the map control
         }
 
         private void checkBox_yuk_main_CheckedChanged(object sender, EventArgs e)

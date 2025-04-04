@@ -1523,17 +1523,34 @@ namespace SLF
             // Define an alpha value for transparency (0 = fully transparent, 255 = opaque)
             int alpha = 150; // Adjust as needed
 
-            // For blue (low) to yellow (high):
-            // At normalized = 0 -> Blue: (0, 0, 255)
-            // At normalized = 1 -> Yellow: (255, 255, 0)
-            int r = (int)(normalized * 255);      // Increases from 0 to 255
-            int g = (int)(normalized * 255);      // Increases from 0 to 255
-            int b = (int)((1 - normalized) * 255);// Decreases from 255 to 0
+            int r, g, b;
+
+            // Split the gradient into two segments:
+            // - 0 to 0.5: Blue to Yellow
+            // - 0.5 to 1: Yellow to Red
+            if (normalized <= 0.5)
+            {
+                // Segment 1: Blue (0, 0, 255) to Yellow (255, 255, 0)
+                // Scale normalized from [0, 0.5] to [0, 1] for this segment
+                double segmentValue = normalized / 0.5; // Maps 0->0, 0.5->1
+
+                r = (int)(segmentValue * 255);      // Increases from 0 to 255
+                g = (int)(segmentValue * 255);      // Increases from 0 to 255
+                b = (int)((1 - segmentValue) * 255); // Decreases from 255 to 0
+            }
+            else
+            {
+                // Segment 2: Yellow (255, 255, 0) to Red (255, 0, 0)
+                // Scale normalized from [0.5, 1] to [0, 1] for this segment
+                double segmentValue = (normalized - 0.5) / 0.5; // Maps 0.5->0, 1->1
+
+                r = 255;                            // Stays at 255
+                g = (int)((1 - segmentValue) * 255); // Decreases from 255 to 0
+                b = 0;                              // Stays at 0
+            }
 
             return System.Drawing.Color.FromArgb(alpha, r, g, b);
         }
-
-
 
 
         // ------------------------------- HARİTA EVENTLERİ ----------------------------------/////////////////////
