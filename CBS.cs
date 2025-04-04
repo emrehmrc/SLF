@@ -1420,19 +1420,17 @@ namespace SLF
         }
 
 
-
-        public void CreateHeatmap(GMapOverlay overlay, DataTable dataTable, string columnName)
+        public void CreateHeatmap(GMapOverlay overlay, DataTable dataTable, string columnName, 
+            Dictionary<GMapPolygon, DataRow> polygonAttributes)
         {
-
             double[] brackets = { 0, 3, 5, 10, 25, 50, 75, 100, 200, 400, double.PositiveInfinity };
             int bracketCount = brackets.Length - 1; // 10 intervals
 
             // Now continue with your original logic:
             foreach (GMapPolygon polygon in overlay.Polygons)
             {
-                if (polygonAttributes_imar.TryGetValue(polygon, out DataRow attributes))
+                if (polygonAttributes.TryGetValue(polygon, out DataRow attributes))
                 {
-
                     // Check if the DataRow contains the specified column.
                     if (!attributes.Table.Columns.Contains(columnName))
                     {
@@ -1444,7 +1442,7 @@ namespace SLF
 
                     // Attempt to parse the string using InvariantCulture
                     if (!string.IsNullOrWhiteSpace(rawValue) &&
-                        double.TryParse(rawValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+                    double.TryParse(rawValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
                     {
                         // Determine which bracket the value falls into
                         int bracketIndex = -1;
@@ -1478,82 +1476,59 @@ namespace SLF
             modülFormu.gMapControl_yuk.Refresh();
         }
 
-        public void CreateHeatmapLegend(Panel colorBox, System.Windows.Forms.Label rangeLabel, System.Windows.Forms.Label unitLabel)
+        // In cbs class
+        public void UpdateHeatmapLegend()
         {
-            // Clear previous legend if it exists
-            if (modülFormu.Controls.ContainsKey("heatmapLegend"))
-            {
-                modülFormu.Controls.RemoveByKey("heatmapLegend");
-            }
-
             // Define the fixed brackets
             double[] brackets = { 0, 3, 5, 10, 25, 50, 75, 100, 200, 400, double.PositiveInfinity };
             string[] bracketLabels = { "0-3", "3-5", "5-10", "10-25", "25-50", "50-75", "75-100", "100-200", "200-400", "400-Inf" };
             int bracketCount = bracketLabels.Length; // Should be 10
 
-            // 1) Create a label for the unit at the top of legendPanel
-            unitLabel = new System.Windows.Forms.Label
+            // Ensure the arrays exist (they should have been created in InitializeHeatmapLegendControls)
+            if (modülFormu.colorBoxes == null || modülFormu.rangeLabels == null || modülFormu.unitLabel == null)
             {
-                Text = "Yük Yoğunluğu (W/m²)",
-                Font = new System.Drawing.Font("Times New Roman", 9, FontStyle.Bold),
-                AutoSize = true,
-                Location = new System.Drawing.Point(10, 10), // relative to top-left of legendPanel
-                Anchor = AnchorStyles.Top | AnchorStyles.Right,
-                Name = "unitLabel"
-            };
+                MessageBox.Show("Heatmap legend controls not initialized.");
+                return;
+            }
 
-            // Add the unit label to the panel
-            modülFormu.legendPanel.Controls.Add(unitLabel);
+            // Update the unit label (just ensure it's visible)
+            modülFormu.unitLabel.Text = "Yük Yoğunluğu (W/m²)";
+            modülFormu.unitLabel.Visible = true;
 
-            // 2) Generate labels and color boxes for each bracket
+            // Update color boxes and range labels for each bracket
             for (int i = 0; i < bracketCount; i++)
             {
-                // Calculate color gradient from blue to red based on the bracket index
+                // Calculate color gradient from blue to yellow based on the bracket index
                 double normalizedValue = (double)i / (bracketCount - 1);
                 System.Drawing.Color color = GetHeatmapColor(normalizedValue);
 
-                // Create a color box
-                colorBox = new Panel
-                {
-                    Size = new System.Drawing.Size(20, 20),
-                    BackColor = color,
-                    // Place it 10 px from the left, and 10 px below the unitLabel plus some spacing
-                    Location = new System.Drawing.Point(10, unitLabel.Bottom + 10 + (i * 25)),
-                    Anchor = AnchorStyles.Top | AnchorStyles.Right
-                };
+                // Update the color box
+                modülFormu.colorBoxes[i].BackColor = color;
+                modülFormu.colorBoxes[i].Visible = true;
 
-                modülFormu.legendPanel.Controls.Add(colorBox);
-
-                // Create a label for the bracket range
-                rangeLabel = new System.Windows.Forms.Label
-                {
-                    Text = bracketLabels[i],
-                    Font = new System.Drawing.Font("Courier New", 8),
-                    AutoSize = true,
-                    // Place it to the right of the colorBox
-                    Location = new System.Drawing.Point(colorBox.Right + 5, colorBox.Top),
-                    Anchor = AnchorStyles.Top | AnchorStyles.Right
-                };
-
-                modülFormu.legendPanel.Controls.Add(rangeLabel);
+                // Update the range label
+                modülFormu.rangeLabels[i].Text = bracketLabels[i];
+                modülFormu.rangeLabels[i].Visible = true;
             }
 
+            // Force layout update on the legend panel
+            modülFormu.legendPanel.PerformLayout();
         }
 
         private System.Drawing.Color GetHeatmapColor(double normalized)
         {
-            // Ensure normalized is between 0 and 1.
+            // Clamp normalized to the range [0,1]
             normalized = Math.Max(0, Math.Min(1, normalized));
 
-            // Define an alpha value (0 = fully transparent, 255 = opaque).
-            int alpha = 160; // Adjust this for desired transparency
+            // Define an alpha value for transparency (0 = fully transparent, 255 = opaque)
+            int alpha = 150; // Adjust as needed
 
-            // For absolute blue to absolute red:
-            // At normalized = 0: Blue = (0, 0, 255)
-            // At normalized = 1: Red  = (255, 0, 0)
-            int r = (int)(normalized * 255);
-            int g = 0;
-            int b = (int)((1 - normalized) * 255);
+            // For blue (low) to yellow (high):
+            // At normalized = 0 -> Blue: (0, 0, 255)
+            // At normalized = 1 -> Yellow: (255, 255, 0)
+            int r = (int)(normalized * 255);      // Increases from 0 to 255
+            int g = (int)(normalized * 255);      // Increases from 0 to 255
+            int b = (int)((1 - normalized) * 255);// Decreases from 255 to 0
 
             return System.Drawing.Color.FromArgb(alpha, r, g, b);
         }

@@ -146,6 +146,8 @@ namespace SLF
         private Dictionary<string, TabPage> categoryTabPages = new Dictionary<string, TabPage>();
         private TabControl tabControlMain; // Reference to the TabControl
 
+        public int load_density_cnt = 0;
+
 
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
@@ -218,6 +220,8 @@ namespace SLF
 
             CleanupTemporaryFolders();
 
+            // Initialize the legend elements
+            InitializeHeatmapLegendControls();
 
         }
 
@@ -568,21 +572,6 @@ namespace SLF
             {
                 _isSynchronizingCheckboxes = false;  // guard off
             }
-        }
-
-        // Helper to toggle polygons/routes/markers
-        private void SetOverlayVisibility(GMapOverlay overlay, bool visible)
-        {
-            if (overlay == null) return;
-
-            foreach (var poly in overlay.Polygons)
-                poly.IsVisible = visible;
-
-            foreach (var route in overlay.Routes)
-                route.IsVisible = visible;
-
-            foreach (var marker in overlay.Markers)
-                marker.IsVisible = visible;
         }
 
         private void InitializeCategoryTabPages()
@@ -2160,94 +2149,101 @@ namespace SLF
 
         // BURASI SONRADAN AÇILACAK, SIMDILIK BOYLE KALSIN.
         private async void Modül_Tabları_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+            foreach (var category in categoryTabPages.Keys)
             {
-
-                foreach (var category in categoryTabPages.Keys)
+                if (pendingUpdates[category] && tabControlMain.SelectedTab == categoryTabPages[category])
                 {
-                    if (pendingUpdates[category] && tabControlMain.SelectedTab == categoryTabPages[category])
-                    {
-                        if (category == "imar")
-                            UpdateCheckboxPositions(checkBoxes_imar, "imar");
-                        else if (category == "yuk")
-                            UpdateCheckboxPositions(checkBoxes_yuk, "yuk");
+                    if (category == "imar")
+                        UpdateCheckboxPositions(checkBoxes_imar, "imar");
+                    else if (category == "yuk")
+                        UpdateCheckboxPositions(checkBoxes_yuk, "yuk");
 
-                        // Add "yuk" if applicable
-                        pendingUpdates[category] = false;
-                    }
+                    // Add "yuk" if applicable
+                    pendingUpdates[category] = false;
+                }
+            }
+
+            
+            // Gerekli kontrolleri yapmak için seçilen sekmeyi ve modülleri kontrol et
+            string selectedTabText = Modül_Tabları.SelectedTab.Text;
+
+            // Modüllerin yüklü olup olmadığını kontrol et
+            if (selectedMethod == "SLF (Jeo-Uzamsal)")
+            {
+                if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Haritası Modülü") && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
+                {
+                    // Sekme geçişini tamamen iptal et
+                    Console.WriteLine(GirdiModülü.dataTablesByType.Count);
+                    MessageBox.Show("DTR verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
+                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
+                    return;
+                }
+                /*else if (selectedTabText == "İmar Analizleri" && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")))
+                {
+                    // Sekme geçişini tamamen iptal et
+                    MessageBox.Show("İmar planı verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
+                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
+                    return;
+                }*/
+                else if (selectedTabText == "Optimal DTR Konumlandırma"
+                            && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")
+                            && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri")))
+                {
+                    // Sekme geçişini tamamen iptal et
+                    MessageBox.Show("DTR verileri ve İmar planı yüklenmeden bu sekmeye geçiş yapılamaz.");
+                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
+                    return;
+                }
+            }
+
+            // EA Şarj Modülü tabına tıklanmışsa
+            if (selectedTabText == "EA Şarj Modülü")
+            {
+                if ((!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri")))
+                {
+                    MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    return;
+                }
+                else
+                {
+                    InitializeComboBoxes();
+                    await eaHaritayaVeriYukleAsync();
                 }
 
-
-                // Gerekli kontrolleri yapmak için seçilen sekmeyi ve modülleri kontrol et
-                string selectedTabText = Modül_Tabları.SelectedTab.Text;
-
-                // Modüllerin yüklü olup olmadığını kontrol et
-                if (selectedMethod == "SLF (Jeo-Uzamsal)")
+                    
+            } else if (selectedTabText == "DEK Modülü")
+            {
+                Console.WriteLine("DEK Modülü");
+                if (!GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
                 {
-                    if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Haritası Modülü") && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
-                    {
-                        // Sekme geçişini tamamen iptal et
-                        Console.WriteLine(GirdiModülü.dataTablesByType.Count);
-                        MessageBox.Show("DTR verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
-                        Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
-                        Modül_Tabları.SelectedTab = tab_girdi;
-                        Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
-                        return;
-                    }
-                    /*else if (selectedTabText == "İmar Analizleri" && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")))
-                    {
-                        // Sekme geçişini tamamen iptal et
-                        MessageBox.Show("İmar planı verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
-                        Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
-                        Modül_Tabları.SelectedTab = tab_girdi;
-                        Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
-                        return;
-                    }*/
-                    else if (selectedTabText == "Optimal DTR Konumlandırma"
-                               && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")
-                               && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri")))
-                    {
-                        // Sekme geçişini tamamen iptal et
-                        MessageBox.Show("DTR verileri ve İmar planı yüklenmeden bu sekmeye geçiş yapılamaz.");
-                        Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
-                        Modül_Tabları.SelectedTab = tab_girdi;
-                        Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
-                        return;
-                    }
+                    MessageBox.Show("Lütfen DEK modülü verilerinizi yükleyin.");
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    return;
+                }
+                else
+                {
+                    await dekHaritayaVeriYukleAsync();
                 }
 
-                // EA Şarj Modülü tabına tıklanmışsa
-                if (selectedTabText == "EA Şarj Modülü")
+            } else if (selectedTabText == "Yük Haritası Modülü")
+            {
+                load_density_cnt++;
+                if(load_density_cnt == 1)
                 {
-                    if ((!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri")))
-                    {
-                        MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
-                        Modül_Tabları.SelectedTab = tab_girdi;
-                        return;
-                    }
-                    else
-                    {
-                        InitializeComboBoxes();
-                        await eaHaritayaVeriYukleAsync();
-                    }
-
-                    // Harita işlemini başlat
+                    trackBar_Yıllar.Value = trackBar_Yıllar.Minimum + 1;
+                    trackBar_Yıllar.Value = trackBar_Yıllar.Minimum;
                 }
-
-                // DEK Modülü tabına tıklanmışsa
-                else if (selectedTabText == "DEK Modülü")
-                {
-                    Console.WriteLine("DEK Modülü");
-                    if (!GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
-                    {
-                        MessageBox.Show("Lütfen DEK modülü verilerinizi yükleyin.");
-                        Modül_Tabları.SelectedTab = tab_girdi;
-                        return;
-                    }
-                    else
-                    {
-                        await dekHaritayaVeriYukleAsync();
-                    }
-                }
+                legendPanel.PerformLayout(); // Force layout update
+            }
         }
 
 
@@ -4149,32 +4145,137 @@ namespace SLF
 
             // Call a method to update the heatmap using the selected year's data
             UpdateHeatmapForYear(columnName);
+
         }
 
 
-        Panel colorBox;
-        System.Windows.Forms.Label rangeLabel;
-        System.Windows.Forms.Label unitLabel;
+        // In modülFormu
+        public Panel[] colorBoxes; // Array to hold color boxes for each bracket
+        public System.Windows.Forms.Label[] rangeLabels; // Array to hold range labels for each bracket
+        public System.Windows.Forms.Label unitLabel; // Single unit label
+
+        private void InitializeHeatmapLegendControls()
+        {
+            // Define the fixed brackets (same as in CreateHeatmapLegend)
+            double[] brackets = { 0, 3, 5, 10, 25, 50, 75, 100, 200, 400, double.PositiveInfinity };
+            string[] bracketLabels = { "0-3", "3-5", "5-10", "10-25", "25-50", "50-75", "75-100", "100-200", "200-400", "400-Inf" };
+            int bracketCount = bracketLabels.Length; // Should be 10
+
+            // Initialize arrays
+            colorBoxes = new Panel[bracketCount];
+            rangeLabels = new System.Windows.Forms.Label[bracketCount];
+
+            // Create the unit label
+            unitLabel = new System.Windows.Forms.Label
+            {
+                Text = "Yük Yoğunluğu (W/m²)",
+                Font = new System.Drawing.Font("Times New Roman", 9, FontStyle.Bold),
+                AutoSize = true,
+                Location = new System.Drawing.Point(10, 10),
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                Name = "unitLabel"
+            };
+            legendPanel.Controls.Add(unitLabel);
+
+            // Create color boxes and range labels for each bracket
+            for (int i = 0; i < bracketCount; i++)
+            {
+                // Create a color box
+                colorBoxes[i] = new Panel
+                {
+                    Size = new System.Drawing.Size(20, 20),
+                    Location = new System.Drawing.Point(10, unitLabel.Bottom + 10 + (i * 25)),
+                    Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                    Name = $"colorBox_{i}"
+                };
+                legendPanel.Controls.Add(colorBoxes[i]);
+
+                // Create a range label
+                rangeLabels[i] = new System.Windows.Forms.Label
+                {
+                    Text = bracketLabels[i],
+                    Font = new System.Drawing.Font("Courier New", 8),
+                    AutoSize = true,
+                    Location = new System.Drawing.Point(colorBoxes[i].Right + 5, colorBoxes[i].Top),
+                    Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                    Name = $"rangeLabel_{i}"
+                };
+                legendPanel.Controls.Add(rangeLabels[i]);
+            }
+        }
 
         private void UpdateHeatmapForYear(string columnName)
         {
             // Use the active GMapControl (ensure you're consistent with one control)
-            cbs.GetActiveGMapControl().Overlays.Clear();
+            GMapControl mapControl = cbs.GetActiveGMapControl();
+            mapControl.Overlays.Clear();
 
-            // Get the overlay that contains the polygons (make sure it is pre-populated)
-            GMapOverlay heatmapOverlay = cbs.tüm_katmanlar_array_imar[0];
+            // Get the original overlay that contains the polygons
+            GMapOverlay originalOverlay = cbs.tüm_katmanlar_array_imar[0];
+
+            // Create a new overlay for the heatmap
+            GMapOverlay heatmapOverlay = new GMapOverlay("HeatmapOverlay");
+
+            // Create a new dictionary for the heatmap overlay's polygon attributes
+            Dictionary<GMapPolygon, DataRow> heatmapPolygonAttributes = new Dictionary<GMapPolygon, DataRow>();
+
+            // Copy the contents of the original overlay to the heatmap overlay
+            cbs.CopyOverlayContents(originalOverlay, heatmapOverlay, cbs.polygonAttributes_imar, heatmapPolygonAttributes);
 
             // Update the heatmap colors based on the data for the selected year
-            cbs.CreateHeatmap(heatmapOverlay, cbs.tüm_katmanlar_datatable[0], columnName);
+            cbs.CreateHeatmap(heatmapOverlay, cbs.tüm_katmanlar_datatable[0], columnName, heatmapPolygonAttributes);
 
             // Update the legend (which should be independent)
-            cbs.CreateHeatmapLegend(colorBox, rangeLabel, unitLabel);
+            cbs.UpdateHeatmapLegend(); // Updated method to reuse existing controls
 
-            // Add the updated overlay back to the active map
-            cbs.GetActiveGMapControl().Overlays.Add(heatmapOverlay);
+            // Add both the original overlay and the new heatmap overlay to the map
+            mapControl.Overlays.Add(originalOverlay);
+            mapControl.Overlays.Add(heatmapOverlay);
+
+            // Associate the heatmap overlay with checkBox_yuk_main
+            checkBox_yuk_main.Tag = heatmapOverlay; // Store the overlay in the Tag property
+            checkBox_yuk_main.Checked = true; // Make the heatmap visible by default
+            checkBox_yuk_main.Text = "Yük Yoğunluğu Katmanı"; // Set a meaningful name
+            checkBox_yuk_main.Visible = true; // Ensure the checkbox is visible
+
+            // Force a repaint by toggling the visibility of the heatmap overlay
+            SetOverlayVisibility(heatmapOverlay, false); // Hide
+            SetOverlayVisibility(heatmapOverlay, true);  // Show
+            mapControl.Invalidate(); // Force a full repaint
+            mapControl.Refresh(); // Refresh the map control
+        }
+
+        private void checkBox_yuk_main_CheckedChanged(object sender, EventArgs e)
+        {
+            CheckBox cb = sender as CheckBox;
+            if (cb == null) return;
+
+            // Get the associated overlay from the Tag property
+            GMapOverlay overlay = cb.Tag as GMapOverlay;
+            if (overlay == null) return;
+
+            // Toggle visibility of the overlay
+            bool isVisible = cb.Checked;
+            SetOverlayVisibility(overlay, isVisible);
 
             // Refresh the map control to show updates
+            cbs.GetActiveGMapControl().ReloadMap();
             cbs.GetActiveGMapControl().Refresh();
+        }
+
+        // Helper to toggle polygons/routes/markers
+        private void SetOverlayVisibility(GMapOverlay overlay, bool visible)
+        {
+            if (overlay == null) return;
+
+            foreach (var poly in overlay.Polygons)
+                poly.IsVisible = visible;
+
+            foreach (var route in overlay.Routes)
+                route.IsVisible = visible;
+
+            foreach (var marker in overlay.Markers)
+                marker.IsVisible = visible;
         }
 
 
