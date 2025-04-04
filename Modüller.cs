@@ -157,6 +157,9 @@ namespace SLF
         private int overlayIndex = -1; // yük yoğunluğu sayfası için kullanılan final dosyanın tüm_katmanlar_array_names'teki indexi.
 
 
+        private GMapPolygon highlightedPolygon; // Track the currently highlighted polygon
+        private int lastSelectedCheckboxIndex = -1; // Track the last selected checkbox index
+
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------ INITIALIZATION & GENERAL METHODS ------------------------------------------ //
@@ -366,7 +369,7 @@ namespace SLF
             veri_listesi_seçimi.SelectedIndex = 2;
 
             // Initialize the tablo_formu instance
-            tablo_formu = new Tablo_Formu();
+            tablo_formu = new Tablo_Formu(this);
         }
 
         // Helper method to add overlays to the maps
@@ -5070,8 +5073,29 @@ namespace SLF
 
         private void ShowAttributeTable(DataTable datatable)
         {
-            // Always update the DataGridView with the DataTable
-            tablo_formu.attribute_table.DataSource = datatable;
+            // Create a copy of the DataTable to avoid modifying the original
+            DataTable displayTable = datatable.Copy();
+
+            // Add a RowIndex column to map back to the polygons
+            if (!displayTable.Columns.Contains("RowIndex"))
+            {
+                displayTable.Columns.Add("RowIndex", typeof(int));
+            }
+
+            // Populate the RowIndex column
+            for (int i = 0; i < displayTable.Rows.Count; i++)
+            {
+                displayTable.Rows[i]["RowIndex"] = i;
+            }
+
+            // Bind the DataTable to the DataGridView
+            tablo_formu.attribute_table.DataSource = displayTable;
+
+            // Hide the RowIndex column
+            if (tablo_formu.attribute_table.Columns["RowIndex"] != null)
+            {
+                tablo_formu.attribute_table.Columns["RowIndex"].Visible = false;
+            }
 
         }
 
@@ -5084,7 +5108,6 @@ namespace SLF
 
             // Safely parse the Tag property to an integer
             int checkbox_index;
-
             if (!Int32.TryParse(sender_checkbox.Tag?.ToString(), out checkbox_index))
             {
                 return;
@@ -5092,6 +5115,7 @@ namespace SLF
 
             // Adjust the index since the tags are from 1 to 15 but the checkbox_indexes in the arrays are 0 to 14
             checkbox_index -= 1;
+            lastSelectedCheckboxIndex = checkbox_index; // Store the index
 
             // Update the last clicked checkbox (style reset)
             if (lastClickedCheckbox != null)
@@ -5132,7 +5156,70 @@ namespace SLF
                 // Show the attribute table
                 ShowAttributeTable(dataTable);
             }
+        }
 
+        public void ZoomToFeature(int rowIndex)
+        {
+            if (lastSelectedCheckboxIndex < 0 ||
+                lastSelectedCheckboxIndex >= cbs.tüm_katmanlar_array_imar.Length ||
+                lastSelectedCheckboxIndex >= cbs.tüm_katmanlar_array_yuk.Length) return;
+
+            // Get the overlays associated with the last selected checkbox
+            GMapOverlay imarOverlay = cbs.tüm_katmanlar_array_imar[lastSelectedCheckboxIndex];
+            GMapOverlay yukOverlay = cbs.tüm_katmanlar_array_yuk[lastSelectedCheckboxIndex];
+
+            if (imarOverlay == null && yukOverlay == null) return; // If both overlays are null, exit
+
+            // Get the polygons at the specified rowIndex from both overlays
+            GMapPolygon imarPolygon = imarOverlay?.Polygons.ElementAtOrDefault(rowIndex);
+            GMapPolygon yukPolygon = yukOverlay?.Polygons.ElementAtOrDefault(rowIndex);
+
+            if (imarPolygon == null && yukPolygon == null) return; // If no polygons are found, exit
+
+
+            // Calculate the bounding box (use either polygon, assuming they represent the same feature)
+            GMapPolygon targetPolygon = imarPolygon ?? yukPolygon; // Use imarPolygon if available, otherwise yukPolygon
+            if (targetPolygon == null) return;
+
+            double minLat = double.MaxValue, maxLat = double.MinValue;
+            double minLng = double.MaxValue, maxLng = double.MinValue;
+
+            foreach (var point in targetPolygon.Points)
+            {
+                minLat = Math.Min(minLat, point.Lat);
+                maxLat = Math.Max(maxLat, point.Lat);
+                minLng = Math.Min(minLng, point.Lng);
+                maxLng = Math.Max(maxLng, point.Lng);
+            }
+
+            // Add some padding to the bounding box
+            double latPadding = (maxLat - minLat) * 0.1;
+            double lngPadding = (maxLng - minLng) * 0.1;
+            minLat -= latPadding;
+            maxLat += latPadding;
+            minLng -= lngPadding;
+            maxLng += lngPadding;
+
+            // Create the bounding box
+            GMap.NET.RectLatLng bounds = new GMap.NET.RectLatLng(maxLat, minLng, maxLng - minLng, maxLat - minLat);
+
+            // Highlight and zoom in gMapControl_imar if the polygon exists
+            if (imarPolygon != null)
+            {
+                highlightedPolygon = imarPolygon;
+                imarPolygon.Stroke = new Pen(Color.Yellow, 3); // Highlight with a yellow border
+                gMapControl_imar.SetZoomToFitRect(bounds);
+                gMapControl_imar.Refresh();
+            }
+
+            // Highlight and zoom in gMapControl_yuk if the polygon exists
+            if (yukPolygon != null)
+            {
+                highlightedPolygon = yukPolygon; // Update highlightedPolygon to the yukPolygon if it exists
+                yukPolygon.Stroke = new Pen(Color.Yellow, 3); // Highlight with a yellow border
+                gMapControl_yuk.SetZoomToFitRect(bounds);
+                gMapControl_yuk.Refresh();
+            }
         }
 
         // Helper method to reset map controls for a specific map

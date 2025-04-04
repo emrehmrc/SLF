@@ -1516,7 +1516,7 @@ namespace SLF
             modülFormu.legendPanel.PerformLayout();
         }
 
-        private System.Drawing.Color GetHeatmapColor(double normalized)
+        public System.Drawing.Color GetHeatmapColor(double normalized)
         {
             // Clamp normalized to the range [0,1]
             normalized = Math.Max(0, Math.Min(1, normalized));
