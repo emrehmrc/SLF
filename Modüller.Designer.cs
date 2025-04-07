@@ -1449,7 +1449,6 @@ namespace SLF
             this.gMapControl_EA.Size = new System.Drawing.Size(1358, 3077);
             this.gMapControl_EA.TabIndex = 18;
             this.gMapControl_EA.Zoom = 0D;
-            this.gMapControl_EA.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_EA_OnMapClick_1);
             // 
             // tab_ekonometrik
             // 

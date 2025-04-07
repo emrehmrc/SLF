@@ -2903,50 +2903,6 @@ namespace SLF
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
 
-        private async void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
-        {
-
-            if (isAddingChargingStation)
-            {
-                // Yeni marker oluştur
-                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow)
-                {
-                    ToolTipText = "Yeni Şarj İstasyonu"
-                };
-                markerOverlay_ea.Markers.Add(marker);
-
-                // Nokta verisini oluştur
-                NoktaVeri noktaVeri_marker = new NoktaVeri
-                {
-                    Enlem = Math.Round(pointClick.Lat, 5),
-                    Boylam = Math.Round(pointClick.Lng, 5)
-                };
-
-                // Popup formu göster
-                using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
-                {
-                    if (popupForm.ShowDialog() == DialogResult.OK)
-                    {
-                        // Başarılı olduğunda harita verilerini yükle
-                        await eaHaritayaVeriYukleAsync();
-                    }
-                    else if (popupForm.OperationCancelled)
-                    {
-                        // İşlem iptal edilirse marker'ı kaldır
-                        markerOverlay_ea.Markers.Remove(marker);
-                    }
-                }
-
-                // İşaretleme işlemini sıfırla
-                isAddingChargingStation = false;
-                return;
-            }
-
-            /*OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
-                ref polygonOverlay_ea, Mesafe_ea, mesafe_metre_yuk);*/
-
-        }
-
 
         private void EaSimMaxBtn_CheckedChanged(object sender, EventArgs e)
         {
@@ -6673,11 +6629,6 @@ namespace SLF
             }
         }
 
-        private void gMapControl_EA_OnMapClick_1(PointLatLng pointClick, MouseEventArgs e)
-        {
-
-
-        }
 
         private async void DEKSimulasyonSonucGoruntule_Click(object sender, EventArgs e)
         {
