@@ -615,7 +615,7 @@
     <Compile Include="services\IsImportedModule.cs" />
     <Compile Include="services\PathService.cs" />
     <Compile Include="services\PythonHelper.cs" />
-    <Compile Include="services\YearSet.cs" />
+    <Compile Include="services\YearService.cs" />
     <Compile Include="Tablo_olustur.cs">
       <SubType>Form</SubType>
     </Compile>

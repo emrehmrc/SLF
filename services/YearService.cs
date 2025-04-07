@@ -45,7 +45,7 @@ namespace SLF.Services
         /// <summary>
         /// SLF başlangıç yılı
         /// </summary>
-        public int SlfStartYear
+        public int slfStartYear
         {
             get { return _slfStartYear; }
             set
@@ -59,7 +59,7 @@ namespace SLF.Services
         /// <summary>
         /// SLF bitiş yılı
         /// </summary>
-        public int SlfEndYear
+        public int slfEndYear
         {
             get { return _slfEndYear; }
             set
@@ -73,9 +73,9 @@ namespace SLF.Services
         /// <summary>
         /// Son yıl (başlangıç yılından bir önceki)
         /// </summary>
-        public int LastYear
+        public int lastYear
         {
-            get { return SlfStartYear - 1; }
+            get { return slfStartYear - 1; }
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace SLF.Services
         /// </summary>
         public int PenultimateYear
         {
-            get { return SlfStartYear - 2; }
+            get { return slfStartYear - 2; }
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace SLF.Services
         /// </summary>
         public int HorizonYear
         {
-            get { return SlfStartYear; }
+            get { return slfStartYear; }
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace SLF.Services
         /// </summary>
         public bool AreYearsValid()
         {
-            return SlfStartYear > 0 && SlfEndYear > 0 && SlfEndYear >= SlfStartYear;
+            return slfStartYear > 0 && slfEndYear > 0 && slfEndYear >= slfStartYear;
         }
     }
 }

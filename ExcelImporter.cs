@@ -240,7 +240,7 @@ namespace SLF
         private void AddYearColumnsToAboneVerileri(List<string> headers)
         {
             // Son 5 yıl için tüketim ve talep kolonları ekle
-            for (int year = _yearService.PenultimateYear - 3; year <= _yearService.LastYear; year++)
+            for (int year = _yearService.PenultimateYear - 3; year <= _yearService.lastYear; year++)
             {
                 if (year > 0) // Geçerli bir yıl ise
                 {
@@ -248,7 +248,7 @@ namespace SLF
                 }
             }
 
-            for (int year = _yearService.PenultimateYear - 3; year <= _yearService.LastYear; year++)
+            for (int year = _yearService.PenultimateYear - 3; year <= _yearService.lastYear; year++)
             {
                 if (year > 0) // Geçerli bir yıl ise
                 {
@@ -261,7 +261,7 @@ namespace SLF
         private void AddYearColumnsToDTRVerileri(List<string> headers)
         {
             // Son 3 yıl için talep ve tüketim kolonları ekle
-            for (int year = _yearService.PenultimateYear - 1; year <= _yearService.LastYear; year++)
+            for (int year = _yearService.PenultimateYear - 1; year <= _yearService.lastYear; year++)
             {
                 if (year > 0) // Geçerli bir yıl ise
                 {

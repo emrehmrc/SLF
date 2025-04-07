@@ -88,7 +88,7 @@ namespace SLF
         // Diğer ilgili yıl property'leri - bunların YearService'den alınması önemli
         public int lastYear
         {
-            get { return _yearService.LastYear; }
+            get { return _yearService.lastYear; }
         }
 
         public int penultimateYear

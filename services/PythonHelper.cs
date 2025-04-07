@@ -26,7 +26,7 @@ namespace SLF.services
 
                 // YearService'ten lastYear bilgisini al
                 var yearService = YearService.GetInstance();
-                string lastYear = yearService.LastYear.ToString();
+                string lastYear = yearService.lastYear.ToString();
 
                 Console.WriteLine($"Deep Learning model çalıştırılıyor: {selectedCity}/{selectedDistrict}, LastYear: {lastYear}");
 
