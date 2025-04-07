@@ -41,8 +41,8 @@
             this.EA_Y_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ChargingStationpanel2 = new System.Windows.Forms.Panel();
             this.guna2AnimateWindow1_Charging_Popup = new Guna.UI2.WinForms.Guna2AnimateWindow(this.components);
-            this.EATamamButton = new SLF.CustomButton();
-            this.EACancelButton = new SLF.CustomButton();
+            this.EATamamButton = new System.Windows.Forms.Button();
+            this.EACancelButton = new System.Windows.Forms.Button();
             this.ChargingStationpanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ChargingStationDataGridView)).BeginInit();
             this.ChargingStationpanel2.SuspendLayout();
@@ -145,10 +145,6 @@
             // 
             this.EATamamButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.EATamamButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
-            this.EATamamButton.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
-            this.EATamamButton.BorderColor = System.Drawing.Color.PaleVioletRed;
-            this.EATamamButton.BorderRadius = 0;
-            this.EATamamButton.BorderSize = 0;
             this.EATamamButton.FlatAppearance.BorderSize = 0;
             this.EATamamButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.EATamamButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
@@ -158,7 +154,6 @@
             this.EATamamButton.Size = new System.Drawing.Size(180, 45);
             this.EATamamButton.TabIndex = 4;
             this.EATamamButton.Text = "TAMAM";
-            this.EATamamButton.TextColor = System.Drawing.Color.White;
             this.EATamamButton.UseVisualStyleBackColor = false;
             this.EATamamButton.Click += new System.EventHandler(this.EATamamButton_Click);
             // 
@@ -166,10 +161,6 @@
             // 
             this.EACancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.EACancelButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
-            this.EACancelButton.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
-            this.EACancelButton.BorderColor = System.Drawing.Color.PaleVioletRed;
-            this.EACancelButton.BorderRadius = 0;
-            this.EACancelButton.BorderSize = 0;
             this.EACancelButton.FlatAppearance.BorderSize = 0;
             this.EACancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.EACancelButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
@@ -179,7 +170,6 @@
             this.EACancelButton.Size = new System.Drawing.Size(180, 45);
             this.EACancelButton.TabIndex = 3;
             this.EACancelButton.Text = "İPTAL";
-            this.EACancelButton.TextColor = System.Drawing.Color.White;
             this.EACancelButton.UseVisualStyleBackColor = false;
             this.EACancelButton.Click += new System.EventHandler(this.EACancelButton_Click);
             // 
@@ -205,8 +195,8 @@
         private System.Windows.Forms.Panel ChargingStationpanel;
         private System.Windows.Forms.Panel ChargingStationpanel2;
         private Guna.UI2.WinForms.Guna2AnimateWindow guna2AnimateWindow1_Charging_Popup;
-        private CustomButton EACancelButton;
-        private CustomButton EATamamButton;
+        private System.Windows.Forms.Button EACancelButton;
+        private System.Windows.Forms.Button EATamamButton;
         private System.Windows.Forms.DataGridView ChargingStationDataGridView;
         private System.Windows.Forms.DataGridViewTextBoxColumn ISTASYON_ADI;
         private System.Windows.Forms.DataGridViewComboBoxColumn ISTASYON_TIPI;

@@ -166,8 +166,8 @@ namespace SLF
         
         private readonly Dictionary<string, (float Min, float Max)> minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
         {
-            { "DEK_X_KOORDINAT", (float.MinValue, float.MaxValue) }, // TODO: Update these values from the other data
-            { "DEK_Y_KOORDINAT", (float.MinValue, float.MaxValue) } // TODO: Update these values from the other data
+            { "DEK_X_KOORDINAT", (float.MinValue, float.MaxValue) }, // TODO: Update these values from the other data // kaldırıcak tartısılacak 
+            { "DEK_Y_KOORDINAT", (float.MinValue, float.MaxValue) } // TODO: Update these values from the other data 
             
         };
         private void ReportCoordinatesOutOfLimits()

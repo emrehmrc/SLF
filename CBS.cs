@@ -14,6 +14,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GMap.NET.WindowsForms.Markers;
+using System.Globalization;
+using System.Diagnostics;
 
 namespace SLF
 {
@@ -217,6 +219,7 @@ namespace SLF
                     tüm_katmanlar_datatable[layer_index] = dt;
                     tüm_katmanlar_array_names[layer_index] = filename;
 
+
                     List<CheckBox> associatedChecks = modülFormu.GetCheckBoxesByIndex(layer_index);
                     foreach (var chk in associatedChecks)
                     {
@@ -225,12 +228,19 @@ namespace SLF
                         chk.Checked = true;
                     }
 
+                    // Update the checkboxes for that layer in each 4 different map
+                    associatedChecks = modülFormu.GetCheckBoxesByIndex(layer_index);
+                    foreach (var chk in associatedChecks)
+                    {
+                        chk.ForeColor = overlayColors[layer_index].BorderColor;
+                    }
+
                     // Mark all categories for update
                     modülFormu.pendingUpdates["imar"] = true;
                     modülFormu.pendingUpdates["yuk"] = true;
 
                     // Update only the active tab immediately
-                    modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_imar, "imar");
+                    modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_imar, "imar"); 
                     modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_yuk, "yuk");
                 }
                 finally
@@ -1190,12 +1200,12 @@ namespace SLF
             }
 
             // Mark all categories for update
-            modülFormu.pendingUpdates["imar"] = true;
-            modülFormu.pendingUpdates["yuk"] = true;
+            //modülFormu.pendingUpdates["imar"] = true; ////////////////////////////////////////////////////////////////////////////////////////
+            //modülFormu.pendingUpdates["yuk"] = true;////////////////////////////////////////////////////////////////////////////////////////
 
             // Update only the active tab immediately
-            modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_imar, "imar");
-            modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_yuk, "yuk");
+            //modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_imar, "imar");////////////////////////////////////////////////////////////////////////////////////////
+            //modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_yuk, "yuk");////////////////////////////////////////////////////////////////////////////////////////
 
             modülFormu.gMapControl_imar.Refresh();
         }
@@ -1372,7 +1382,6 @@ namespace SLF
 
         }
 
-
         public void Draw_Polygon(List<PointLatLng> polygonPoints, GMapOverlay polygonOverlay, GMapControl gmap)
         {
             // bu noktalar arasında poligon çiz, mavi ile işaretle, ve de 
@@ -1412,103 +1421,136 @@ namespace SLF
         }
 
 
-        public System.Drawing.Color GetHeatmapColor(double value, double min, double max)
+        public void CreateHeatmap(GMapOverlay overlay, DataTable dataTable, string columnName, 
+            Dictionary<GMapPolygon, DataRow> polygonAttributes)
         {
-            double ratio = (value - min) / (max - min);
-            int red = (int)(255 * ratio);
-            int blue = (int)(255 * (1 - ratio));
-            return System.Drawing.Color.FromArgb(100, red, 0, blue); // Semi-transparent color
-        }
+            double[] brackets = { 0, 3, 5, 10, 25, 50, 75, 100, 200, 400, double.PositiveInfinity };
+            int bracketCount = brackets.Length - 1; // 10 intervals
 
-
-        public void CreateHeatmap(GMapOverlay overlay, System.Data.DataTable dataTable, string columnName)
-        {
-            // Step 1: Find the min and max values for normalization
-            double min = double.MaxValue;
-            double max = double.MinValue;
-
-            foreach (DataRow row in dataTable.Rows)
-            {
-                if (row[columnName] != DBNull.Value && double.TryParse(row[columnName].ToString(),
-                    out double value))
-                {
-                    if (value < min) min = value;
-                    if (value > max) max = value;
-                }
-            }
-
-            // Step 2: Apply heatmap color to each polygon based on the column value
+            // Now continue with your original logic:
             foreach (GMapPolygon polygon in overlay.Polygons)
             {
-                // Get the corresponding DataRow for the polygon
-                if (polygonAttributes_imar.TryGetValue(polygon, out DataRow attributes))
+                if (polygonAttributes.TryGetValue(polygon, out DataRow attributes))
                 {
-
-                    if (attributes[columnName] != DBNull.Value && double.TryParse(attributes[columnName].ToString(),
-                        out double value))
+                    // Check if the DataRow contains the specified column.
+                    if (!attributes.Table.Columns.Contains(columnName))
                     {
+                        MessageBox.Show("Seçilen yıla ait veri bulunamadı.");
+                        break;
+                    }
 
-                        System.Drawing.Color heatColor = GetHeatmapColor(value, min, max);
-                        polygon.Stroke = new Pen(heatColor, 1);
-                        polygon.Fill = new SolidBrush(heatColor);
+                    string rawValue = attributes[columnName].ToString();
+
+                    // Attempt to parse the string using InvariantCulture
+                    if (!string.IsNullOrWhiteSpace(rawValue) &&
+                    double.TryParse(rawValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+                    {
+                        // Determine which bracket the value falls into
+                        int bracketIndex = -1;
+                        for (int i = 0; i < bracketCount; i++)
+                        {
+                            if (value >= brackets[i] && value < brackets[i + 1])
+                            {
+                                bracketIndex = i;
+                                break;
+                            }
+                        }
+
+                        if (bracketIndex >= 0)
+                        {
+                            // Normalize the bracket index to a value between 0 and 1 for color mapping
+                            double normalizedValue = (double)bracketIndex / (bracketCount - 1);
+                            Color heatColor = GetHeatmapColor(normalizedValue);
+                            polygon.Stroke = new Pen(heatColor, 1);
+                            polygon.Fill = new SolidBrush(heatColor);
+                            continue;
+                        }
                     }
                 }
+
+                // If parsing fails or no value is provided, color the polygon with a default gray.
+                polygon.Stroke = new Pen(Color.Gray, 1);
+                polygon.Fill = new SolidBrush(Color.Gray);
             }
 
-            // Refresh the map control to show updated colors
+            // Refresh the map control to show updated colors.
             modülFormu.gMapControl_yuk.Refresh();
         }
 
-        public void CreateHeatmapLegend(double min, double max)
+        // In cbs class
+        public void UpdateHeatmapLegend()
         {
-            // Clear previous legend if it exists
-            if (modülFormu.Controls.ContainsKey("heatmapLegend"))
+            // Define the fixed brackets
+            double[] brackets = { 0, 3, 5, 10, 25, 50, 75, 100, 200, 400, double.PositiveInfinity };
+            string[] bracketLabels = { "0-3", "3-5", "5-10", "10-25", "25-50", "50-75", "75-100", "100-200", "200-400", "400-Inf" };
+            int bracketCount = bracketLabels.Length; // Should be 10
+
+            // Ensure the arrays exist (they should have been created in InitializeHeatmapLegendControls)
+            if (modülFormu.colorBoxes == null || modülFormu.rangeLabels == null || modülFormu.unitLabel == null)
             {
-                modülFormu.Controls.RemoveByKey("heatmapLegend");
+                MessageBox.Show("Heatmap legend controls not initialized.");
+                return;
             }
 
-            // Divide the range into 10 equal brackets
-            double range = max - min;
-            double bracketSize = range / 10;
+            // Update the unit label (just ensure it's visible)
+            modülFormu.unitLabel.Text = "Yük Yoğunluğu (W/m²)";
+            modülFormu.unitLabel.Visible = true;
 
-            // Generate labels and color boxes for each bracket
-            for (int i = 0; i < 10; i++)
+            // Update color boxes and range labels for each bracket
+            for (int i = 0; i < bracketCount; i++)
             {
-                double bracketMin = min + (i * bracketSize);
-                double bracketMax = bracketMin + bracketSize;
+                // Calculate color gradient from blue to yellow based on the bracket index
+                double normalizedValue = (double)i / (bracketCount - 1);
+                System.Drawing.Color color = GetHeatmapColor(normalizedValue);
 
-                // Calculate color gradient from blue to red
-                System.Drawing.Color color = GetHeatmapColor(i / 9.0); // Pass a normalized value (0 to 1)
+                // Update the color box
+                modülFormu.colorBoxes[i].BackColor = color;
+                modülFormu.colorBoxes[i].Visible = true;
 
-                // Create a color box
-                Panel colorBox = new Panel
-                {
-                    Size = new System.Drawing.Size(20, 20),
-                    Location = new System.Drawing.Point(10, i * 20 + 10),
-                    BackColor = color
-                };
-
-                modülFormu.legendPanel.Controls.Add(colorBox);
-
-                // Create a label for the bracket range
-                System.Windows.Forms.Label rangeLabel = new System.Windows.Forms.Label
-                {
-                    Text = $"{bracketMin:F2} - {bracketMax:F2}",
-                    Location = new System.Drawing.Point(35, i * 20 + 10),
-                    AutoSize = true,
-                    Font = new Font("Arial", 8)
-                };
-
-                modülFormu.legendPanel.Controls.Add(rangeLabel);
+                // Update the range label
+                modülFormu.rangeLabels[i].Text = bracketLabels[i];
+                modülFormu.rangeLabels[i].Visible = true;
             }
+
+            // Force layout update on the legend panel
+            modülFormu.legendPanel.PerformLayout();
         }
 
-        // Color gradient method for blue to red
-        private System.Drawing.Color GetHeatmapColor(double ratio)
+        public System.Drawing.Color GetHeatmapColor(double normalized)
         {
-            int red = (int)(255 * ratio);
-            int blue = (int)(255 * (1 - ratio));
-            return System.Drawing.Color.FromArgb(255, red, 0, blue); // Opaque colors
+            // Clamp normalized to the range [0,1]
+            normalized = Math.Max(0, Math.Min(1, normalized));
+
+            // Define an alpha value for transparency (0 = fully transparent, 255 = opaque)
+            int alpha = 150; // Adjust as needed
+
+            int r, g, b;
+
+            // Split the gradient into two segments:
+            // - 0 to 0.5: Blue to Yellow
+            // - 0.5 to 1: Yellow to Red
+            if (normalized <= 0.5)
+            {
+                // Segment 1: Blue (0, 0, 255) to Yellow (255, 255, 0)
+                // Scale normalized from [0, 0.5] to [0, 1] for this segment
+                double segmentValue = normalized / 0.5; // Maps 0->0, 0.5->1
+
+                r = (int)(segmentValue * 255);      // Increases from 0 to 255
+                g = (int)(segmentValue * 255);      // Increases from 0 to 255
+                b = (int)((1 - segmentValue) * 255); // Decreases from 255 to 0
+            }
+            else
+            {
+                // Segment 2: Yellow (255, 255, 0) to Red (255, 0, 0)
+                // Scale normalized from [0.5, 1] to [0, 1] for this segment
+                double segmentValue = (normalized - 0.5) / 0.5; // Maps 0.5->0, 1->1
+
+                r = 255;                            // Stays at 255
+                g = (int)((1 - segmentValue) * 255); // Decreases from 255 to 0
+                b = 0;                              // Stays at 0
+            }
+
+            return System.Drawing.Color.FromArgb(alpha, r, g, b);
         }
 
 

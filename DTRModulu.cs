@@ -4,6 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
+using System.Windows.Forms;
 
 
 namespace SLF
@@ -14,6 +15,7 @@ namespace SLF
         private readonly (float warningThreshold, float errorThreshold) TUKETIM_ERROR_THRESHOLD = WarningErrorBoundary(0.2f);
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = ERROR_ONLY;
         private readonly string DATE_FORMAT = "dd.MM.yyyy";
+        
         private static readonly List<int> TRAFO_KAPASITE_LISTESI = new List<int>
         {
             15, 25, 40, 50, 63, 100, 160, 200, 250, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500
@@ -88,7 +90,7 @@ namespace SLF
                     if (float.TryParse(trafoKapasitesi?.ToString(), out float kapasite) && kapasite > 0)
                     {
                         float load = demand / kapasite;
-                        if (load > loadThreshold )
+                        if (load > loadThreshold)
                         {
                             overLoadCount++;
                             nullRows.Add(currentDataTable.Rows.IndexOf(row));
@@ -242,12 +244,12 @@ namespace SLF
             { "TRAFO_KODU", ERROR_ONLY},
             { "TRAFO_X_KOORDINAT", ERROR_ONLY},
             { "TRAFO_Y_KOORDINAT", ERROR_ONLY},
-            { "TM_FIDER_ID", WarningErrorBoundary(0.1f)},
+            //{ "TM_FIDER_ID", WarningErrorBoundary(0.1f)},
             { "TRAFO_KURULUM_TARIHI", WarningErrorBoundary(0.2f) },
             { "TRAFO_KAPASITESI", ERROR_ONLY }, // WarningErrorBoundary(0.2f) },
             { "TRAFO_MULKIYET", WarningErrorBoundary(0.2f) },
-            //{ "YIL_TUKETIM_2023", WarningErrorBoundary(0.2f) },
-            //{ "YIL_DEMANT_2023", WarningErrorBoundary(0.2f) },
+            { "YIL_TUKETIM_2023", WarningErrorBoundary(0.2f) },
+            { "YIL_DEMANT_2023", WarningErrorBoundary(0.2f) },
             { "PRIMER_GERILIM", WARNING_ONLY },
             //{ "SEKONDER_GERILIM", WARNING_ONLY },
         };
@@ -300,46 +302,46 @@ namespace SLF
             int totalRows = currentDataTable.Rows.Count;
             string column = "PRIMER_GERILIM";
 
-                List<int> invalidRows = new List<int>();
+            List<int> invalidRows = new List<int>();
 
-                int invalidCount = 0;
+            int invalidCount = 0;
 
-                for (int i = 0; i < totalRows; i++)
+            for (int i = 0; i < totalRows; i++)
+            {
+                var row = currentDataTable.Rows[i];
+                var cellValue = row[column]?.ToString();
+                if (!IsNullLike(cellValue))
                 {
-                    var row = currentDataTable.Rows[i];
-                    var cellValue = row[column]?.ToString();
-                    if (!IsNullLike(cellValue))
+                    if (int.TryParse(cellValue, out int value))
                     {
-                        if (int.TryParse(cellValue, out int value))
-                        {
-                            if (!PRIMER_GERILIM_LISTESI.Contains(value))
-                            {
-                                invalidCount++;
-                                // Add the row number to the invalidRows
-                                invalidRows.Add(i);
-                            }
-                        }
-                        else
+                        if (!PRIMER_GERILIM_LISTESI.Contains(value))
                         {
                             invalidCount++;
-                            // Add the row number to the invalidRows if the value cannot be parsed
+                            // Add the row number to the invalidRows
                             invalidRows.Add(i);
                         }
                     }
+                    else
+                    {
+                        invalidCount++;
+                        // Add the row number to the invalidRows if the value cannot be parsed
+                        invalidRows.Add(i);
+                    }
                 }
+            }
 
-                //columnInvalidRowsMap[column.ColumnName] = invalidRows;
+            //columnInvalidRowsMap[column.ColumnName] = invalidRows;
 
-                invalidPercentage = (float)invalidCount / totalRows;
+            invalidPercentage = (float)invalidCount / totalRows;
 
-                if (invalidPercentage > 0)
-                {
-                    //var thresholds = invalidFieldsCheckWithLevel[column.ColumnName];
-                    //var datatableLevel = GetDataTableBasedOnThreshold(invalidPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
-                    statDataTable.Rows.Add(new object[] {
+            if (invalidPercentage > 0)
+            {
+                //var thresholds = invalidFieldsCheckWithLevel[column.ColumnName];
+                //var datatableLevel = GetDataTableBasedOnThreshold(invalidPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+                statDataTable.Rows.Add(new object[] {
                     "PRIMER_GERILIM", "Geçersiz değer", $"{invalidPercentage:P1}"
                 });
-                }
+            }
         }
 
         private void ReportSekonderGerilim()
@@ -393,25 +395,28 @@ namespace SLF
 
         public override void Validate()
         {
-            base.Validate();
-
-            ReportNullCounts();
-
-            ReportCoordinatesOutOfLimits();
-
-            ReportCompositeDuplicateCounts();
-
-            ReportDateFormatErrors();
-            ReportErrorLessThanZero($"YIL_TUKETIM_{lastYear}");
-            ReportErrorLessThanZero($"YIL_DEMANT_{lastYear}");
-            ReportTrafoLoad();
-
-            ReportPrimerGerilim();
-            ReportSekonderGerilim();
+            try
+            {
+                base.Validate();
+                ReportNullCounts();
+                ReportCoordinatesOutOfLimits();
+                ReportCompositeDuplicateCounts();
+                ReportDateFormatErrors();
+                ReportErrorLessThanZero($"YIL_TUKETIM_{lastYear}");
+                ReportErrorLessThanZero($"YIL_DEMANT_{lastYear}");
+                ReportTrafoLoad();
+                ReportPrimerGerilim();
+                ReportSekonderGerilim();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Doğrulama sırasında hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
-        public override void Impute() { 
-            ImputeTMFiderID();
+        public override void Impute()
+        {
+            //ImputeTMFiderID();
             ImputeAverageDate();
             ImputeTrafoMulkiyet();
             //ImputeTrafoKapasitesi();
@@ -492,14 +497,32 @@ namespace SLF
         {
             var demandColumn = $"YIL_DEMANT_{lastYear}";
             var tuketimColumn = $"YIL_TUKETIM_{lastYear}";
+            var kapasiteColumn = "TRAFO_KAPASITESI";
+
             foreach (int missingIndex in imputableRowsMap[demandColumn])
             {
                 var missingRow = currentDataTable.Rows[missingIndex];
                 var tuketim_value = missingRow[tuketimColumn];
+                var kapasite_value = missingRow[kapasiteColumn];
+
                 double imputedValue;
+                double kapasiteDouble = 0;
+
+                // Trafo kapasitesini oku
+                bool kapasiteValid = double.TryParse(kapasite_value?.ToString(), out kapasiteDouble);
+
                 if (double.TryParse(tuketim_value.ToString(), out double tuketimDouble))
                 {
+                    // Tüketim değerinden talep hesapla
                     imputedValue = K_FACTOR * tuketimDouble / HoursInYear;
+
+                    // Eğer hesaplanan talep, trafo kapasitesinden büyükse ve kapasiteye değeri geçerliyse
+                    if (kapasiteValid && kapasiteDouble > 0 && imputedValue > kapasiteDouble)
+                    {
+                        // Talebi trafo kapasitesine eşitle
+                        imputedValue = kapasiteDouble;
+                    }
+                    
                     missingRow[demandColumn] = imputedValue;
                 }
             }
@@ -531,49 +554,49 @@ namespace SLF
             }
         }
 
-        private void ImputeTMFiderID()
-        {
-            // 0.01 is the 2d distance of the delta of x and y coordinates. Roughly equal to 1 km.
-            const double maxDistance = 0.01;
+        //private void ImputeTMFiderID()
+        //{
+        //    // 0.01 is the 2d distance of the delta of x and y coordinates. Roughly equal to 1 km.
+        //    const double maxDistance = 0.01;
 
-            foreach (int missingIndex in columnNullRowsMap["TM_FIDER_ID"])
-            {
-                var missingRow = currentDataTable.Rows[missingIndex];
-                double missingX = Convert.ToDouble(missingRow["TRAFO_X_KOORDINAT"]);
-                double missingY = Convert.ToDouble(missingRow["TRAFO_Y_KOORDINAT"]);
+        //    foreach (int missingIndex in columnNullRowsMap["TM_FIDER_ID"])
+        //    {
+        //        var missingRow = currentDataTable.Rows[missingIndex];
+        //        double missingX = Convert.ToDouble(missingRow["TRAFO_X_KOORDINAT"]);
+        //        double missingY = Convert.ToDouble(missingRow["TRAFO_Y_KOORDINAT"]);
 
-                double closestDistance = double.MaxValue;
-                DataRow closestRow = null;
+        //        double closestDistance = double.MaxValue;
+        //        DataRow closestRow = null;
 
-                foreach (DataRow row in currentDataTable.Rows)
-                {
-                    if (row == missingRow || IsNullLike(row["TM_FIDER_ID"], true))
-                    {
-                        continue;
-                    }
+        //        foreach (DataRow row in currentDataTable.Rows)
+        //        {
+        //            if (row == missingRow || IsNullLike(row["TM_FIDER_ID"], true))
+        //            {
+        //                continue;
+        //            }
 
-                    double x = Convert.ToDouble(row["TRAFO_X_KOORDINAT"]);
-                    double y = Convert.ToDouble(row["TRAFO_Y_KOORDINAT"]);
-                    double distance = Math.Sqrt(Math.Pow(missingX - x, 2) + Math.Pow(missingY - y, 2));
+        //            double x = Convert.ToDouble(row["TRAFO_X_KOORDINAT"]);
+        //            double y = Convert.ToDouble(row["TRAFO_Y_KOORDINAT"]);
+        //            double distance = Math.Sqrt(Math.Pow(missingX - x, 2) + Math.Pow(missingY - y, 2));
 
-                    if (distance < closestDistance && distance < maxDistance)
-                    {
-                        closestDistance = distance;
-                        closestRow = row;
-                    }
-                }
+        //            if (distance < closestDistance && distance < maxDistance)
+        //            {
+        //                closestDistance = distance;
+        //                closestRow = row;
+        //            }
+        //        }
 
-                if (closestRow != null)
-                {
-                    missingRow["TM_FIDER_ID"] = closestRow["TM_FIDER_ID"];
-                    missingRow["FIDER_ADI"] = closestRow["FIDER_ADI"];
-                }
-                else
-                {
-                    missingRow["TM_FIDER_ID"] = "Fider Bulunamadı";
-                }
-            }
-        }
+        //        if (closestRow != null)
+        //        {
+        //            missingRow["TM_FIDER_ID"] = closestRow["TM_FIDER_ID"];
+        //            missingRow["FIDER_ADI"] = closestRow["FIDER_ADI"];
+        //        }
+        //        else
+        //        {
+        //            missingRow["TM_FIDER_ID"] = "Fider Bulunamadı";
+        //        }
+        //    }
+        //}
         private void ReportErrorLessThanZero(string columnName)
         {
             float negativePercentage, zeroPercentage;
@@ -584,28 +607,39 @@ namespace SLF
 
             int negativeCount = 0;
             int zeroCount = 0;
-
+            
             foreach (DataRow row in currentDataTable.Rows)
             {
+                if (!currentDataTable.Columns.Contains(columnName))
+                {
+                    MessageBox.Show($"{columnName} sütunu bulunamadı.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
                 if (
                     row.IsNull(column) ||
                     row[column] == DBNull.Value ||
                     nullLikeStrings.Contains(row[column]?.ToString(), StringComparer.OrdinalIgnoreCase) ||
                     float.TryParse(row[column]?.ToString(), out float value) && value < 0)
                 {
-                    // Son yıl tüketimi 0'dan az ise
+                    // Değer negatifse veya parse edilemiyorsa
                     negativeCount++;
                     imputableRows.Add(currentDataTable.Rows.IndexOf(row));
                 }
-                else if (float.TryParse(row[column]?.ToString(), out float value2) && value2 == 0) 
-                { 
+                else if (float.TryParse(row[column]?.ToString(), out float value2) && value2 == 0)
+                {
+                    // Sıfır değer
                     zeroCount++;
+                    // Raporlamak istiyorsanız nullRows'a ekleyebilirsiniz:
                     nullRows.Add(currentDataTable.Rows.IndexOf(row));
+
+                    // Aynı zamanda impute edilmesi için buraya da ekleyin:
+                    imputableRows.Add(currentDataTable.Rows.IndexOf(row));
                 }
             }
 
             columnNullRowsMap[column.ColumnName] = nullRows;
             imputableRowsMap[column.ColumnName] = imputableRows;
+
             negativePercentage = (float)negativeCount / totalRows;
             zeroPercentage = (float)zeroCount / totalRows;
 
@@ -614,18 +648,17 @@ namespace SLF
                 var thresholds = TUKETIM_ERROR_THRESHOLD;
                 var datatableLevel = GetDataTableBasedOnThreshold(negativePercentage, thresholds.warningThreshold, thresholds.errorThreshold);
 
-                // Append the column name and null count to the report message
                 datatableLevel.Rows.Add(new object[] {
-                    column.ColumnName, "Son yıl verisi", $"{negativePercentage:P1} abonenin tüketim verisi yok",
-                    "Bu abonelerin tüketim verileri silinecek."
-                });
+            column.ColumnName, "Son yıl verisi", $"{negativePercentage:P1} abonenin tüketim verisi yok",
+            "Bu abonelerin tüketim verileri silinecek."
+        });
             }
             if (zeroPercentage > 0)
             {
-                // Append the column name and null count to the report message
                 infoDataTable.Rows.Add(new object[] {
-                    column.ColumnName, "Son yıl verisi", $"{zeroPercentage:P1}", "Bu trafolarda son yıl verisi yok. Tüketim verileri silinecek."
-                });
+            column.ColumnName, "Son yıl verisi", $"{zeroPercentage:P1}",
+            "Bu trafolarda son yıl verisi 0. İmpute edilecek."
+        });
             }
         }
         void ImputeAverageDate()

@@ -1,4 +1,6 @@
-﻿namespace SLF
+﻿using System.Web.UI.WebControls;
+
+namespace SLF
 {
     partial class HomePageForm
     {
@@ -36,9 +38,11 @@
             this.label1 = new System.Windows.Forms.Label();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.roundButton1 = new RoundButton();
-            this.roundButton2 = new RoundButton();
+            this.roundButton1 = new System.Windows.Forms.Button();
+            this.roundButton2 = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.buton_yardım = new System.Windows.Forms.Button();
+            this.buton_hakkında = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
@@ -84,7 +88,7 @@
             this.label2.Location = new System.Drawing.Point(12, 9);
             this.label2.MaximumSize = new System.Drawing.Size(1362, 1810);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(363, 35);
+            this.label2.Size = new System.Drawing.Size(457, 45);
             this.label2.TabIndex = 3;
             this.label2.Text = "Jeo-Uzamsal Yük Tahmini";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -97,7 +101,7 @@
             this.StartButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.StartButton.Font = new System.Drawing.Font("Maiandra GD", 25.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.StartButton.ForeColor = System.Drawing.Color.Transparent;
-            this.StartButton.Location = new System.Drawing.Point(942, 3);
+            this.StartButton.Location = new System.Drawing.Point(937, 8);
             this.StartButton.Name = "StartButton";
             this.StartButton.Size = new System.Drawing.Size(222, 63);
             this.StartButton.TabIndex = 8;
@@ -114,7 +118,7 @@
             this.label1.Location = new System.Drawing.Point(291, 57);
             this.label1.MaximumSize = new System.Drawing.Size(1362, 1810);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(193, 35);
+            this.label1.Size = new System.Drawing.Size(244, 45);
             this.label1.TabIndex = 9;
             this.label1.Text = "Ar-GE Projesi";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -136,8 +140,8 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.Moccasin;
-            this.panel1.Controls.Add(this.roundButton1);
-            this.panel1.Controls.Add(this.roundButton2);
+            this.panel1.Controls.Add(this.buton_hakkında);
+            this.panel1.Controls.Add(this.buton_yardım);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
@@ -148,14 +152,11 @@
             // 
             // roundButton1
             // 
-            this.roundButton1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.roundButton1.BackColor = System.Drawing.Color.White;
-            this.roundButton1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.roundButton1.Font = new System.Drawing.Font("Verdana", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.roundButton1.ForeColor = System.Drawing.Color.DarkCyan;
-            this.roundButton1.Location = new System.Drawing.Point(907, 19);
+            this.roundButton1.Location = new System.Drawing.Point(0, 0);
             this.roundButton1.Name = "roundButton1";
-            this.roundButton1.Size = new System.Drawing.Size(126, 73);
+            this.roundButton1.Size = new System.Drawing.Size(75, 23);
             this.roundButton1.TabIndex = 4;
             this.roundButton1.Text = "Hakkında";
             this.roundButton1.UseVisualStyleBackColor = false;
@@ -163,14 +164,10 @@
             // 
             // roundButton2
             // 
-            this.roundButton2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.roundButton2.BackColor = System.Drawing.Color.White;
-            this.roundButton2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.roundButton2.Font = new System.Drawing.Font("Verdana", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.roundButton2.ForeColor = System.Drawing.Color.Tomato;
-            this.roundButton2.Location = new System.Drawing.Point(1059, 19);
+            this.roundButton2.Location = new System.Drawing.Point(0, 0);
             this.roundButton2.Name = "roundButton2";
-            this.roundButton2.Size = new System.Drawing.Size(126, 73);
+            this.roundButton2.Size = new System.Drawing.Size(75, 23);
             this.roundButton2.TabIndex = 5;
             this.roundButton2.Text = "Yardım";
             this.roundButton2.UseVisualStyleBackColor = false;
@@ -189,9 +186,29 @@
             this.panel2.Size = new System.Drawing.Size(1197, 83);
             this.panel2.TabIndex = 12;
             // 
+            // buton_yardım
+            // 
+            this.buton_yardım.Location = new System.Drawing.Point(995, 30);
+            this.buton_yardım.Name = "buton_yardım";
+            this.buton_yardım.Size = new System.Drawing.Size(75, 50);
+            this.buton_yardım.TabIndex = 10;
+            this.buton_yardım.Text = "Yardım";
+            this.buton_yardım.UseVisualStyleBackColor = true;
+            this.buton_yardım.Click += new System.EventHandler(this.buton_yardım_Click);
+            // 
+            // buton_hakkında
+            // 
+            this.buton_hakkında.Location = new System.Drawing.Point(1099, 30);
+            this.buton_hakkında.Name = "buton_hakkında";
+            this.buton_hakkında.Size = new System.Drawing.Size(86, 50);
+            this.buton_hakkında.TabIndex = 11;
+            this.buton_hakkında.Text = "Hakkında";
+            this.buton_hakkında.UseVisualStyleBackColor = true;
+            this.buton_hakkında.Click += new System.EventHandler(this.buton_hakkında_Click);
+            // 
             // HomePageForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Snow;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
@@ -223,13 +240,15 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.Label label2;
-        private RoundButton roundButton1;
-        private RoundButton roundButton2;
+        private System.Windows.Forms.Button roundButton1;
+        private System.Windows.Forms.Button roundButton2;
         private System.Windows.Forms.Button StartButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox pictureBox3;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Button buton_hakkında;
+        private System.Windows.Forms.Button buton_yardım;
     }
 }
 

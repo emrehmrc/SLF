@@ -33,10 +33,9 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DEKCenterPopupForm));
             this.DEKCenterpanel2_Dek_Popup = new System.Windows.Forms.Panel();
-            this.DEKTamamButton = new SLF.CustomButton();
-            this.DEKCancelButton = new SLF.CustomButton();
+            this.DEKTamamButton = new System.Windows.Forms.Button();
+            this.DEKCancelButton = new System.Windows.Forms.Button();
             this.DEKCenterpanel1_Dek_Popup = new System.Windows.Forms.Panel();
-            this.guna2AnimateWindow1_Dek_Popup = new Guna.UI2.WinForms.Guna2AnimateWindow(this.components);
             this.DEKCenterDataGridView = new System.Windows.Forms.DataGridView();
             this.KAYNAK_TIPI = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.DEK_KURULU_GUCU = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -65,10 +64,6 @@
             // 
             this.DEKTamamButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.DEKTamamButton.BackColor = System.Drawing.Color.DarkOrange;
-            this.DEKTamamButton.BackgroundColor = System.Drawing.Color.DarkOrange;
-            this.DEKTamamButton.BorderColor = System.Drawing.Color.PaleVioletRed;
-            this.DEKTamamButton.BorderRadius = 0;
-            this.DEKTamamButton.BorderSize = 0;
             this.DEKTamamButton.FlatAppearance.BorderSize = 0;
             this.DEKTamamButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.DEKTamamButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
@@ -78,7 +73,6 @@
             this.DEKTamamButton.Size = new System.Drawing.Size(180, 45);
             this.DEKTamamButton.TabIndex = 4;
             this.DEKTamamButton.Text = "TAMAM";
-            this.DEKTamamButton.TextColor = System.Drawing.Color.White;
             this.DEKTamamButton.UseVisualStyleBackColor = false;
             this.DEKTamamButton.Click += new System.EventHandler(this.DEKTamamButton_Click);
             // 
@@ -86,10 +80,6 @@
             // 
             this.DEKCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.DEKCancelButton.BackColor = System.Drawing.Color.DarkOrange;
-            this.DEKCancelButton.BackgroundColor = System.Drawing.Color.DarkOrange;
-            this.DEKCancelButton.BorderColor = System.Drawing.Color.PaleVioletRed;
-            this.DEKCancelButton.BorderRadius = 0;
-            this.DEKCancelButton.BorderSize = 0;
             this.DEKCancelButton.FlatAppearance.BorderSize = 0;
             this.DEKCancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.DEKCancelButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
@@ -99,7 +89,6 @@
             this.DEKCancelButton.Size = new System.Drawing.Size(180, 45);
             this.DEKCancelButton.TabIndex = 3;
             this.DEKCancelButton.Text = "İPTAL";
-            this.DEKCancelButton.TextColor = System.Drawing.Color.White;
             this.DEKCancelButton.UseVisualStyleBackColor = false;
             this.DEKCancelButton.Click += new System.EventHandler(this.DEKCancelButton_Click);
             // 
@@ -222,9 +211,8 @@
         #endregion
         private System.Windows.Forms.Panel DEKCenterpanel2_Dek_Popup;
         private System.Windows.Forms.Panel DEKCenterpanel1_Dek_Popup;
-        private Guna.UI2.WinForms.Guna2AnimateWindow guna2AnimateWindow1_Dek_Popup;
-        private CustomButton DEKCancelButton;
-        private CustomButton DEKTamamButton;
+        private System.Windows.Forms.Button DEKCancelButton;
+        private System.Windows.Forms.Button DEKTamamButton;
         private System.Windows.Forms.DataGridView DEKCenterDataGridView;
         private System.Windows.Forms.DataGridViewComboBoxColumn KAYNAK_TIPI;
         private System.Windows.Forms.DataGridViewTextBoxColumn DEK_KURULU_GUCU;

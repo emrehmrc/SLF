@@ -15,7 +15,7 @@ namespace SLF
         public ModülFormu modül_formu;
         public bool is_yukler_changed = false;
 
-        public Nokta_Yuk_Bilgi_Formu (string filePath)
+        public Nokta_Yuk_Bilgi_Formu(string filePath)
         {
             InitializeComponent();
             excelFilePath = filePath;
@@ -77,35 +77,11 @@ namespace SLF
             }
 
             // Bind the DataTable to the YGADataGridView
-            YGADataGridView.DataSource = dataTable;
-            YGADataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            YGADataGridView.AllowUserToAddRows = true;
-            YGADataGridView.AllowUserToDeleteRows = true;
+            NoktaYukDataGridView.DataSource = dataTable;
+            NoktaYukDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            NoktaYukDataGridView.AllowUserToAddRows = true;
+            NoktaYukDataGridView.AllowUserToDeleteRows = true;
         }
-
-        private void YGATableSaveButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                // Use ClosedXML to write the DataTable back to the Excel file
-                using (var workbook = new XLWorkbook())
-                {
-                    var worksheet = workbook.Worksheets.Add("PolygonTypes");
-                    // Write headers
-                    for (int col = 0; col < dataTable.Columns.Count; col++)
-                    {
-                        worksheet.Cell(1, col + 1).Value = dataTable.Columns[col].ColumnName;
-                    }
-                    // Write data rows
-                    for (int row = 0; row < dataTable.Rows.Count; row++)
-                    {
-                        for (int col = 0; col < dataTable.Columns.Count; col++)
-                        {
-                            worksheet.Cell(row + 2, col + 1).Value = dataTable.Rows[row][col]?.ToString();
-                        }
-                    }
-                    workbook.SaveAs(excelFilePath);
-                }
                 MessageBox.Show("Değişiklikler kaydedildi!", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this.DialogResult = DialogResult.OK;
                 this.Close();
@@ -161,5 +137,40 @@ namespace SLF
             }
         }
 
+        private void NoktaYukTableSaveButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Use ClosedXML to write the DataTable back to the Excel file
+                using (var workbook = new XLWorkbook())
+                {
+                    var worksheet = workbook.Worksheets.Add("PolygonTypes");
+                    // Write headers
+                    for (int col = 0; col < dataTable.Columns.Count; col++)
+                    {
+                        worksheet.Cell(1, col + 1).Value = dataTable.Columns[col].ColumnName;
+                    }
+                    // Write data rows
+                    for (int row = 0; row < dataTable.Rows.Count; row++)
+                    {
+                        for (int col = 0; col < dataTable.Columns.Count; col++)
+                        {
+                            worksheet.Cell(row + 2, col + 1).Value = dataTable.Rows[row][col]?.ToString();
+                        }
+                    }
+                    workbook.SaveAs(excelFilePath);
+                }
+                MessageBox.Show("Değişiklikler kaydedildi!", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                this.DialogResult = DialogResult.OK;
+                this.Close();
+
+                is_yukler_changed = true;
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Değişiklikler kaydedilirken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
     }
 }

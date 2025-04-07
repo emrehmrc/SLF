@@ -133,19 +133,9 @@ namespace SLF.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Folder {
+        internal static System.Drawing.Bitmap gdz {
             get {
-                object obj = ResourceManager.GetObject("Folder", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Folder2 {
-            get {
-                object obj = ResourceManager.GetObject("Folder2", resourceCulture);
+                object obj = ResourceManager.GetObject("gdz", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

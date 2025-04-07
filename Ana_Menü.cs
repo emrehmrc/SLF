@@ -46,16 +46,16 @@ namespace SLF
             this.Hide();
         }
 
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        private void buton_yardım_Click(object sender, EventArgs e)
         {
-            // Only trigger the StartButton's click event if HomePageForm is the active form
-            if (keyData == Keys.Enter && this == Form.ActiveForm)
-            {
-                // Trigger StartButton's Click event
-                StartButton.PerformClick();
-                return true; // Mark the key as handled
-            }
-            return base.ProcessCmdKey(ref msg, keyData);
+            Yardım yardım = new Yardım();
+            yardım.Show();
+        }
+
+        private void buton_hakkında_Click(object sender, EventArgs e)
+        {
+            Hakkında hakkında = new Hakkında();
+            hakkında.Show();
         }
     }
 
