@@ -168,7 +168,7 @@ namespace SLF
             { "EA_Y_KOORDINAT", WARNING_ONLY },
             { "ISTASYON_ADI", WARNING_ONLY},
             { "ISTASYON_GUCU", InfoErrorBoundary(0.2f) },
-            { "EA_TRAFO_KODU", InfoErrorBoundary(0.2f) },
+            { "EA_TRAFO_KODU", InfoErrorBoundary(0.7f) },
             { "ISTASYON_TIPI", WARNING_ONLY},
         };
         private const float COORDINATE_BUFFER_PERCENTAGE = 10f; // 10% buffer for dynamic bounds

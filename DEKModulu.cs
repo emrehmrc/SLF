@@ -46,7 +46,7 @@ namespace SLF
                     if (int.TryParse(cellValue, out int value))
                     {
                         // Eğer değer 1000'den büyükse
-                        if (value > 0)
+                        if (value > 1000)
                         {
                             // Geçersiz değer sayısını artır
                             invalidCount++;
@@ -163,43 +163,186 @@ namespace SLF
         }
 
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = WarningErrorBoundary(0.1f);
-        
-        private readonly Dictionary<string, (float Min, float Max)> minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
+        private Dictionary<string, (float Min, float Max)> minMaxCheckMap;
+
+        // Helper method to calculate dynamic bounds (unchanged from previous)
+        private void InitializeCoordinateBounds()
         {
-            { "DEK_X_KOORDINAT", (float.MinValue, float.MaxValue) }, // TODO: Update these values from the other data
-            { "DEK_Y_KOORDINAT", (float.MinValue, float.MaxValue) } // TODO: Update these values from the other data
-            
+            DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+            if (trafoDataTable == null || trafoDataTable.Rows.Count == 0)
+            {
+                minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
+        {
+            { "DEK_X_KOORDINAT", (float.MinValue, float.MaxValue) },
+            { "DEK_Y_KOORDINAT", (float.MinValue, float.MaxValue) }
         };
+                return;
+            }
+
+            var xCoords = trafoDataTable.AsEnumerable()
+                .Select(row => float.TryParse(row["TRAFO_X_KOORDINAT"]?.ToString(), out float x) ? x : float.NaN)
+                .Where(x => !float.IsNaN(x))
+                .ToList();
+
+            var yCoords = trafoDataTable.AsEnumerable()
+                .Select(row => float.TryParse(row["TRAFO_Y_KOORDINAT"]?.ToString(), out float y) ? y : float.NaN)
+                .Where(y => !float.IsNaN(y))
+                .ToList();
+
+            if (xCoords.Count == 0 || yCoords.Count == 0)
+            {
+                minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
+        {
+            { "DEK_X_KOORDINAT", (float.MinValue, float.MaxValue) },
+            { "DEK_Y_KOORDINAT", (float.MinValue, float.MaxValue) }
+        };
+                return;
+            }
+
+            float minX = xCoords.Min();
+            float maxX = xCoords.Max();
+            float xRange = maxX - minX;
+            float xTolerance = xRange * 0.1f;
+
+            float minY = yCoords.Min();
+            float maxY = yCoords.Max();
+            float yRange = maxY - minY;
+            float yTolerance = yRange * 0.1f;
+
+            minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
+    {
+        { "DEK_X_KOORDINAT", (minX - xTolerance, maxX + xTolerance) },
+        { "DEK_Y_KOORDINAT", (minY - yTolerance, maxY + yTolerance) }
+    };
+        }
+
         private void ReportCoordinatesOutOfLimits()
         {
+            // Ensure bounds are initialized
+            if (minMaxCheckMap == null)
+            {
+                InitializeCoordinateBounds();
+            }
+
+            if (currentDataTable.Rows.Count == 0) return; // Avoid division by zero
+
             var (minXValue, maxXValue) = minMaxCheckMap["DEK_X_KOORDINAT"];
             var (minYValue, maxYValue) = minMaxCheckMap["DEK_Y_KOORDINAT"];
 
-            int countOutOfThresholdCoordinates = 0;
+            int countOutOfThresholdCoordinates = currentDataTable.AsEnumerable()
+                .Count(row =>
+                    float.TryParse(row["DEK_X_KOORDINAT"]?.ToString(), out float valueX) &&
+                    float.TryParse(row["DEK_Y_KOORDINAT"]?.ToString(), out float valueY) &&
+                    (valueX < minXValue || valueX > maxXValue || valueY < minYValue || valueY > maxYValue));
 
-            foreach (DataRow row in currentDataTable.Rows)
-            {
-                if (float.TryParse(row["DEK_X_KOORDINAT"]?.ToString(), out float valueX) && float.TryParse(row["DEK_Y_KOORDINAT"]?.ToString(), out float valueY))
-                {
-                    if (valueX < minXValue || valueX > maxXValue || valueY < minYValue || valueY > maxYValue)
-                    {
-                        countOutOfThresholdCoordinates++;
-                    }
-                }
-            }
             float outOfThresholdPercentage = (float)countOutOfThresholdCoordinates / currentDataTable.Rows.Count;
-
             if (outOfThresholdPercentage > 0)
             {
                 var thresholds = COORDINATE_ERROR_THRESHOLD;
                 var datatableLevel = GetDataTableBasedOnThreshold(outOfThresholdPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
-
-                // Add the warning to the DataTable
                 datatableLevel.Rows.Add(new object[] {
-                    "DEK_X_KOORDINAT & DEK_Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}", "%10'dan fazla abonede konum bilgisi doğru değildir."
-                });
+            "DEK_X_KOORDINAT & DEK_Y_KOORDINAT",
+            "Koordinat Sınırları",
+            $"{outOfThresholdPercentage:P1}",
+            $"DEK_X_KOORDINAT ve/veya DEK_Y_KOORDINAT parametresi ilgili trafo koordinat aralığında değil. (X: {minXValue:F2} to {maxXValue:F2}, Y: {minYValue:F2} to {maxYValue:F2}) for {countOutOfThresholdCoordinates}. Bu değerler imputasyon aşamasında düzeltilecektir."
+        });
             }
         }
+        // New method to impute out-of-bound coordinates
+        private void ImputeOutOfBoundCoordinates()
+        {
+            if (minMaxCheckMap == null)
+            {
+                InitializeCoordinateBounds();
+            }
+
+            if (currentDataTable.Rows.Count == 0) return;
+
+            DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+            if (trafoDataTable == null) return;
+
+            // Create a lookup for transformer coordinates
+            var trafoLookup = trafoDataTable.AsEnumerable()
+                .ToDictionary(
+                    row => row["TRAFO_KODU"].ToString(),
+                    row => (X: row["TRAFO_X_KOORDINAT"], Y: row["TRAFO_Y_KOORDINAT"])
+                );
+
+            var (minXValue, maxXValue) = minMaxCheckMap["DEK_X_KOORDINAT"];
+            var (minYValue, maxYValue) = minMaxCheckMap["DEK_Y_KOORDINAT"];
+
+            int correctedCount = 0;
+
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                bool isXValid = float.TryParse(row["DEK_X_KOORDINAT"]?.ToString(), out float valueX);
+                bool isYValid = float.TryParse(row["DEK_Y_KOORDINAT"]?.ToString(), out float valueY);
+
+                bool isOutOfBounds = (isXValid && (valueX < minXValue || valueX > maxXValue)) ||
+                                     (isYValid && (valueY < minYValue || valueY > maxYValue));
+
+                if (isOutOfBounds)
+                {
+                    string trafoCode = row["DEK_BAGLANDIGI_TRAFO_KODU"]?.ToString();
+                    if (!string.IsNullOrEmpty(trafoCode) && trafoLookup.TryGetValue(trafoCode, out var coords))
+                    {
+                        row["DEK_X_KOORDINAT"] = coords.X;
+                        row["DEK_Y_KOORDINAT"] = coords.Y;
+                        correctedCount++;
+                    }
+                }
+            }
+
+            // Optional reporting
+            if (correctedCount > 0)
+            {
+                float correctedPercentage = (float)correctedCount / currentDataTable.Rows.Count;
+                var thresholds = COORDINATE_ERROR_THRESHOLD;
+                var datatableLevel = GetDataTableBasedOnThreshold(correctedPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+                datatableLevel.Rows.Add(new object[] {
+            "DEK_X_KOORDINAT & DEK_Y_KOORDINAT",
+            "Koordinat Düzeltme",
+            $"{correctedPercentage:P1}",
+            $"{correctedCount} out-of-bound coordinates corrected using transformer data."
+        });
+            }
+        }
+        /*        private readonly Dictionary<string, (float Min, float Max)> minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
+                {
+                    { "DEK_X_KOORDINAT", (float.MinValue, float.MaxValue) }, // TODO: Update these values from the other data
+                    { "DEK_Y_KOORDINAT", (float.MinValue, float.MaxValue) } // TODO: Update these values from the other data
+
+                };
+                private void ReportCoordinatesOutOfLimits()
+                {
+                    var (minXValue, maxXValue) = minMaxCheckMap["DEK_X_KOORDINAT"];
+                    var (minYValue, maxYValue) = minMaxCheckMap["DEK_Y_KOORDINAT"];
+
+                    int countOutOfThresholdCoordinates = 0;
+
+                    foreach (DataRow row in currentDataTable.Rows)
+                    {
+                        if (float.TryParse(row["DEK_X_KOORDINAT"]?.ToString(), out float valueX) && float.TryParse(row["DEK_Y_KOORDINAT"]?.ToString(), out float valueY))
+                        {
+                            if (valueX < minXValue || valueX > maxXValue || valueY < minYValue || valueY > maxYValue)
+                            {
+                                countOutOfThresholdCoordinates++;
+                            }
+                        }
+                    }
+                    float outOfThresholdPercentage = (float)countOutOfThresholdCoordinates / currentDataTable.Rows.Count;
+
+                    if (outOfThresholdPercentage > 0)
+                    {
+                        var thresholds = COORDINATE_ERROR_THRESHOLD;
+                        var datatableLevel = GetDataTableBasedOnThreshold(outOfThresholdPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+
+                        // Add the warning to the DataTable
+                        datatableLevel.Rows.Add(new object[] {
+                            "DEK_X_KOORDINAT & DEK_Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}", "%10'dan fazla abonede konum bilgisi doğru değildir."
+                        });
+                    }
+                }*/
 
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
@@ -271,6 +414,8 @@ namespace SLF
             ImputeIlceAdi();
 
             ImputeKaynakTipi();
+
+            ImputeOutOfBoundCoordinates();
 
             ImputeCoordinate();
         }
