@@ -54,8 +54,8 @@
             // 
             // PoligonDataGridView
             // 
-            this.PoligonDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.PoligonDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.PoligonDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
             this.PoligonDataGridView.BackgroundColor = System.Drawing.Color.Snow;
@@ -121,7 +121,6 @@
             this.Controls.Add(this.PoligonDataGridView);
             this.Controls.Add(this.buton_poligon_ozellik);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MaximumSize = new System.Drawing.Size(1100, 600);
             this.Name = "Poligon_Özellik_Tanımlama";
             this.Text = "Poligon_Özellik_Tanımlama";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Poligon_Özellik_Tanımlama_FormClosed);

@@ -82,18 +82,7 @@ namespace SLF
             NoktaYukDataGridView.AllowUserToAddRows = true;
             NoktaYukDataGridView.AllowUserToDeleteRows = true;
         }
-                MessageBox.Show("Değişiklikler kaydedildi!", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                this.DialogResult = DialogResult.OK;
-                this.Close();
 
-                is_yukler_changed = true;
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Değişiklikler kaydedilirken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
 
         private void PopulateDefaultData()
         {

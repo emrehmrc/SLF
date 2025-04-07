@@ -203,21 +203,6 @@ namespace SLF
             }
 
 
-            // Resolve the Excel file path relative to SLF.exe
-            string exeLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); // e.g., C:\Users\ehan0\source\repos\emrehmrc\SLF\bin\Debug
-            string projectRoot = Directory.GetParent(exeLocation)?.Parent?.FullName; // Move up two levels to SLF root (C:\Users\ehan0\source\repos\emrehmrc\SLF)
-            if (projectRoot != null)
-            {
-                polygonTypesExcelPath = Path.Combine(projectRoot, "Excel Files", "point_load.xlsx"); // e.g., C:\Users\ehan0\source\repos\emrehmrc\SLF\Excel Files\point_load.xlsx
-            }
-            else
-            {
-                // Fallback to a default path if resolution fails
-                polygonTypesExcelPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "point_load.xlsx");
-                MessageBox.Show($"Excel dosya yolu çözülemedi. Varsayılan yol kullanılıyor: {polygonTypesExcelPath}", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-
-
             _excelService = new ExcelService();
             InitializeLogTextBox(); // Initialize logTextBox
 
@@ -265,50 +250,7 @@ namespace SLF
 
         public ModülFormu() : this("", "")
         {
-            // Get tab_imar client size (accounting for padding/margins if any)
-            Rectangle tabClientArea = tab_imar.ClientRectangle;
-            int tabWidth = tabClientArea.Width;
-            int tabHeight = tabClientArea.Height;
-
-            // Calculate panel size based on ratios
-            int targetWidth = (int)(tabWidth * PanelWidthRatio);
-            int targetHeight = (int)(tabHeight * PanelHeightRatio);
-
-            // Calculate panel position based on ratios
-            int targetX = (int)(tabWidth * PanelXOffsetRatio);
-            int targetY = (int)(tabHeight * PanelYOffsetRatio);
-
-            // Apply size to panel_imar
-            panel_imar.Size = new Size(targetWidth, targetHeight);
-
-            // Boundary check: Ensure panel stays within tab_imar and form boundaries
-            int margin = 10; // Small margin to prevent touching edges
-            int maxX = tabWidth - targetWidth - margin; // Maximum X position to keep panel inside tab_imar
-            int maxY = tabHeight - targetHeight - margin; // Maximum Y position to keep panel inside tab_imar
-
-            // Further constrain by form's client size (to prevent overflow outside form)
-            Rectangle formClientArea = this.ClientRectangle;
-            int formMaxX = formClientArea.Width - targetWidth - margin - (this.Width - this.ClientSize.Width); // Account for form borders
-            int formMaxY = formClientArea.Height - targetHeight - margin - (this.Height - this.ClientSize.Height);
-
-            // Use the more restrictive boundary (tab_imar or form)
-            maxX = Math.Min(maxX, formMaxX - tab_imar.Location.X); // Adjust for tab_imar's offset in form
-            maxY = Math.Min(maxY, formMaxY - tab_imar.Location.Y);
-
-            // Ensure position doesn't go negative
-            targetX = Math.Max(0, Math.Min(targetX, maxX));
-            targetY = Math.Max(0, Math.Min(targetY, maxY));
-
-            // Apply the constrained position
-            panel_imar.Location = new Point(targetX, targetY);
-
-            // Refresh GMapControl to handle rendering
-            gMapControl_imar.Refresh();
         }
-        private void SetupLayout()
-        {
-            // Set initial size based on form size
-            UpdatePanelSize();
 
         private void InitializeGMap(GMap.NET.WindowsForms.GMapControl gmap)
         {
@@ -531,26 +473,6 @@ namespace SLF
                     SenaryoModuleTabControl.TabPages.Remove(tabPage);
                 }
             }
-        }
-
-        private void SortTabPagesAlphabetically(TabControl tabControl, bool ascending = true)
-        {
-            // Get the list of TabPages
-            List<TabPage> tabPages = new List<TabPage>();
-            foreach (TabPage tabPage in tabControl.TabPages)
-            {
-                tabPages.Add(tabPage);
-            }
-
-            // Sort the list of TabPages based on the Text property
-            tabPages.Sort((x, y) =>
-            {
-                return ascending ? string.Compare(x.Text, y.Text) : -string.Compare(x.Text, y.Text);
-            });
-
-            // Clear the current TabPages and add the sorted TabPages
-            tabControl.TabPages.Clear();
-            tabControl.TabPages.AddRange(tabPages.ToArray());
         }
 
         private void SortTabPagesAlphabetically(TabControl tabControl, bool ascending = true)
@@ -851,20 +773,26 @@ namespace SLF
                 return; // Exit if no valid data type is selected
             }
 
-            // EA Şarj Modülü tabına tıklanmışsa
-            if (selectedTabText == "EA Şarj Modülü")
+            // Perform file selection based on the selected data type
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+
+            if (seçilenVeriTipi == "İmar Verileri")
             {
-                if ((!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri")))
+                using (imarFileSelectionPopup fileSelectionPopup = new imarFileSelectionPopup(dataGridView_girdi))
                 {
-                    MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
-                    Modül_Tabları.SelectedTab = tab_girdi;
-                    return;
+                    if (fileSelectionPopup.ShowDialog() == DialogResult.OK)
+                    {
+                        string csvFilePath = fileSelectionPopup.CsvFilePath;
+                        string kmlFilePath = fileSelectionPopup.KmlFilePath;
+
+                        if (!File.Exists(csvFilePath) || !File.Exists(kmlFilePath))
+                        {
+                            MessageBox.Show("Geçerli dosyalar seçilmedi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                    }
                 }
-                else
-                {
-                    InitializeComboBoxes();
-                    await eaHaritayaVeriYukleAsync();
-                }
+            }
 
             // Ensure girdiModülü is properly initialized
             if (!girdiModülleri.ContainsKey(seçilenVeriTipi))
@@ -879,8 +807,8 @@ namespace SLF
                 MessageBox.Show($"{seçilenVeriTipi} için girdi modülü oluşturulamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return; // Metodu sonlandır
             }
-            // DEK Modülü tabına tıklanmışsa
-            else if (selectedTabText == "DEK Modülü")
+            // Use the selectedMethod here
+            if (selectedMethod == "ELF (Ekonometrik)")
             {
                 // Logic for ELF selection
                 // MessageBox.Show("ELF method selected, skipping prerequisites.");
@@ -929,44 +857,77 @@ namespace SLF
             // Disable the button initially
             OpenModuleButton.Enabled = false;
 
-            // toggle overlay visibility across all four arrays ---
-            SetOverlayVisibility(cbs.tüm_katmanlar_array_imar[layerIndex], isVisible);
-            SetOverlayVisibility(cbs.tüm_katmanlar_array_yuk[layerIndex], isVisible);
+            string filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
 
-            // refresh all maps ---
-            gMapControl_imar.Refresh();
-            gMapControl_yuk.Refresh();
+            // Load the data table for the selected type
+            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
 
-            // programmatically change the other two checkboxes in the same slot so that they match the newly toggled state.    
-            _isSynchronizingCheckboxes = true;  // guard on
-
-            try
+            // Check if the data table has any rows
+            if (dataTable == null || dataTable.Rows.Count == 0)
             {
-                // We want to find the "sibling" checkboxes at the same index across each map array:
-                // e.g. checkBoxes_imar[layerIndex], checkBoxes_yga[layerIndex], etc.
-                // But we only do it if they exist (i.e. within bounds).
+                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından modüle gidilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                OpenModuleButton.Enabled = true; // Re-enable the button before returning
+                return;
+            }
 
-                // If 'cb' is from the imar array, we set the yga and stokastik arrays' checkboxes.
-                // If 'cb' is from the stokastik array, we set the imar and yga arrays' checkboxes, etc.
-                // We can do it more generically by always syncing all three.
-
-                if (layerIndex < checkBoxes_imar.Length)
+            // Check if the selected data type is "Ekonometrik Yük Tahmini Verileri"
+            if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
+            {
+                // Asynchronous task to load the Excel package
+                await Task.Run(() =>
                 {
-                    // Only set if it's a *different* reference to avoid re-triggering for the same box
-                    if (!ReferenceEquals(cb, checkBoxes_imar[layerIndex]))
+                    using (var package = new ExcelPackage(new FileInfo(filePath)))
                     {
-                        checkBoxes_imar[layerIndex].Checked = isVisible;
-                    }
-                }
+                        Invoke(new Action(() =>
+                        {
+                            // Clear previous data
+                            ELFMinSenaryoTable.DataSource = null;
+                            ELFLowSenaryoTable.DataSource = null;
+                            ELFBaseSenaryoTable.DataSource = null;
+                            ELFHighSenaryoTable.DataSource = null;
+                            ELFMaxSenaryoTable.DataSource = null;
+                        }));
 
-                if (layerIndex < checkBoxes_yuk.Length)
-                {
-                    // Only set if it's a *different* reference to avoid re-triggering for the same box
-                    if (!ReferenceEquals(cb, checkBoxes_yuk[layerIndex]))
-                    {
-                        checkBoxes_yuk[layerIndex].Checked = isVisible;
+                        // Ensure there are at least 6 worksheets
+                        int totalSheets = package.Workbook.Worksheets.Count;
+                        for (int i = 1; i <= 5; i++)
+                        {
+                            if (i < totalSheets)
+                            {
+                                var worksheet = package.Workbook.Worksheets[i];
+                                DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
+
+                                Invoke(new Action(() =>
+                                {
+                                    var dataGrids = new[] { ELFMinSenaryoTable, ELFLowSenaryoTable, ELFBaseSenaryoTable, ELFHighSenaryoTable, ELFMaxSenaryoTable };
+                                    dataGrids[i - 1].DataSource = dt;
+                                }));
+                            }
+                            else
+                            {
+                                // If there are fewer than 6 sheets, show a message or handle as needed
+                                MessageBox.Show("Eksik sayfalar bulundu. Lütfen dosyayı kontrol edin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                break;
+                            }
+                        }
                     }
-                }
+                });
+            }
+
+            // Based on the selected data type, switch to the corresponding tab
+            if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
+            {
+                Modül_Tabları.SelectedTab = tab_senaryo;
+            }
+            else if (seçilenVeriTipi == "EA Şarj Verileri")
+            {
+                Modül_Tabları.SelectedTab = tab_ea;
+            }
+            else if (seçilenVeriTipi == "DEK Verileri")
+            {
+                Modül_Tabları.SelectedTab = tab_dek;
+            }
 
             // After loading the data, enable the button
             OpenModuleButton.Enabled = true;
@@ -2227,7 +2188,7 @@ namespace SLF
                 }
             }
 
-            
+
             // Gerekli kontrolleri yapmak için seçilen sekmeyi ve modülleri kontrol et
             string selectedTabText = Modül_Tabları.SelectedTab.Text;
 
@@ -2266,12 +2227,24 @@ namespace SLF
                 }
             }
 
-                // Yeni satırı formatlanmış tabloya ekleyin
-                formattedEATable.Rows.Add(newRow);
-            }
+            // EA Şarj Modülü tabına tıklanmışsa
+            if (selectedTabText == "EA Şarj Modülü")
+            {
+                if ((!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri")))
+                {
+                    MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    return;
+                }
+                else
+                {
+                    InitializeComboBoxes();
+                    await eaHaritayaVeriYukleAsync();
+                }
 
-                    
-            } else if (selectedTabText == "DEK Modülü")
+
+            }
+            else if (selectedTabText == "DEK Modülü")
             {
                 Console.WriteLine("DEK Modülü");
                 if (!GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
@@ -2285,7 +2258,8 @@ namespace SLF
                     await dekHaritayaVeriYukleAsync();
                 }
 
-            } else if (Modül_Tabları.SelectedTab == tab_yükHaritası)
+            }
+            else if (Modül_Tabları.SelectedTab == tab_yükHaritası)
             {
 
                 // Find the index of the overlay in tüm_katmanlar_array_imar_names that contains "xxx"
@@ -2308,10 +2282,11 @@ namespace SLF
 
                     legendPanel.PerformLayout(); // Force layout update
 
-                } else
+                }
+                else
                 {
                     legendPanel.Visible = false;
-                }        
+                }
 
             }
         }
@@ -3477,61 +3452,6 @@ namespace SLF
 
         }
 
-        private void calculateChargeStationWithFilter(int acHomeCount, int acWorkCount, int acPublicCount, int fastDcCount)
-        {
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new Action(() => calculateChargeStationWithFilter(acHomeCount, acWorkCount, acPublicCount, fastDcCount)));
-                return;
-            }
-
-            // Mevcut paneli temizle
-            var existingControls = this.Controls.Find("istasyonAdetLabelPanel", true);
-            foreach (var control in existingControls)
-            {
-                this.Controls.Remove(control);
-            }
-
-            // Paneli oluştur ve ana formun üzerine ekle
-            FlowLayoutPanel panel = new FlowLayoutPanel
-            {
-                Location = new System.Drawing.Point(10, 10), // Sol üst köşeye yerleştir
-                Size = new System.Drawing.Size(200, 150),    // Sabit boyut belirle
-                Anchor = AnchorStyles.Top | AnchorStyles.Left,
-                BackColor = Color.FromArgb(200, 255, 255, 255), // Yarı saydam beyaz arka plan
-                Name = "istasyonAdetLabelPanel",
-                Padding = new Padding(5),
-                BorderStyle = BorderStyle.FixedSingle        // Çerçeve ekleyerek görünürlüğü artır
-            };
-
-
-            // Paneli ana forma ekleyin
-            this.Controls.Add(panel);
-            panel.BringToFront(); // Paneli öne getir
-        }
-
-        private void checkBox_Ac_Home(object sender, EventArgs e)
-        {
-            ToggleMarkers("AC-Home", checkBox_AC_Home.Checked);
-        }
-
-        private void checkBox_Ac_Work(object sender, EventArgs e)
-        {
-            ToggleMarkers("AC-Work", checkBox_AC_Work.Checked);
-        }
-
-        private void checkBox_Ac_Public(object sender, EventArgs e)
-        {
-            ToggleMarkers("AC-Public", checkBox_AC_Public.Checked);
-
-        }
-
-        private void checkBox_Dc_Fast(object sender, EventArgs e)
-        {
-            ToggleMarkers("DC-Fast", checkBox_DC_Fast.Checked);
-
-        }
-
 
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
@@ -4260,12 +4180,6 @@ namespace SLF
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
 
-        // ------------------------------------------------------------------------------------------------------------ //
-        // ------------------------------------------------------------------------------------------------------------ //
-        // -------------------------------------------- YUK ------------------------------------------------------------ //
-        // ------------------------------------------------------------------------------------------------------------ //
-        // ------------------------------------------------------------------------------------------------------------ //
-
         private void trackBar_Yıllar_ValueChanged(object sender, EventArgs e)
         {
             int selectedYear = trackBar_Yıllar.Value;
@@ -4347,7 +4261,7 @@ namespace SLF
             // Force a repaint by toggling the visibility of the heatmap overlay
             SetOverlayVisibility(heatmapOverlay, false); // Hide
             SetOverlayVisibility(heatmapOverlay, true);  // Show
-                                                            //mapControl.Invalidate(); // Force a full repaint
+                                                         //mapControl.Invalidate(); // Force a full repaint
             mapControl.Refresh(); // Refresh the map control
         }
 
