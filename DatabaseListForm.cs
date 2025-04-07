@@ -5,14 +5,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using DocumentFormat.OpenXml.Office2010.PowerPoint;
-using NetTopologySuite.IO;
-using NetTopologySuite.IO.ShapeFile.Extended;
 using Npgsql;
 using SLF.services;
-using System.Drawing;               // Color ve Font için
-using System.Windows.Forms;         // Form kontrolleri için
-using System.Drawing.Drawing2D;     // Grafik işlemleri için (eğer özel şekiller çizecekseniz
+
+
 namespace SLF
 {
     public partial class DatabaseListForm : Form
@@ -312,6 +308,7 @@ namespace SLF
                 MessageBox.Show("Hata: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         private DataTable LoadTabFile(string filePath)
         {
             DataTable dataTable = new DataTable();
@@ -370,50 +367,7 @@ namespace SLF
             return dataTable;
         }
 
-        public void HandleData(string source, string dataType, bool isDatabaseTable = false)
-        {
-            try
-            {
-                DataTable dataTable;
 
-                if (isDatabaseTable)
-                {
-                    // Veritabanı tablosunu yükle
-                    dataTable = LoadDatabaseTable(source);
-
-                    // GirdiModülü'nü oluştur ve veriyi işle
-                    GirdiModülü module = new GirdiModülü();
-                    module.importedDataTable = dataTable;
-
-                    if (module.VEERProcess(dataType))
-                    {
-                        // Başarılı işlem sonrası ModülFormu'nu güncelle
-                        ModülFormu modülFormu = new ModülFormu();
-                        modülFormu.isİmportedModule(true, dataType);
-
-                        MessageBox.Show($"{dataType} başarıyla işlendi ve Girdi Modülü'ne aktarıldı.",
-                            "Başarılı!", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                        // Ana form DataGridView'ı güncelle
-                        dataGridViewTableData.DataSource = module.importedDataTable;
-                    }
-                    else
-                    {
-                        MessageBox.Show($"{dataType} işleme sırasında hata oluştu.",
-                            "Hata!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-                else
-                {
-                    // CSV dosyası işleme kodu...
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Veri işleme hatası: {ex.Message}",
-                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
         private void listBoxCbsFiles_SelectedIndexChanged(object sender, EventArgs e)
         {
             try

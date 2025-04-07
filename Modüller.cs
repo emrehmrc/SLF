@@ -14,21 +14,19 @@ using GMap.NET.WindowsForms.Markers;
 using System.Xml;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Threading.Tasks;
-using ClosedXML.Excel;
 using OfficeOpenXml;
 using DrawingImage = System.Drawing.Image;
-using MapWinGIS;
 using System.Text;
 using SLF.services;
-using OSGeo.OGR;
 using SLF.Services;
-using System.Windows.Forms;
+using System.Reflection;
 
 namespace SLF
 {
     public partial class ModülFormu : Form
     {
         private static ModülFormu instance;
+
         public static ModülFormu Instance
         {
             get
@@ -41,116 +39,73 @@ namespace SLF
             }
         }
 
+
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ---------------------------------------------- GENEL DEĞİŞKENLER ---------------------------------------------- //
+
+        List<string> modulescheck = new List<string>();
         public readonly CBS cbs;
-        private readonly double startX = 0;
-        private readonly double startY = 0;
         public int slfStartYear = 0, slfEndYear = 0;
 
-        TextBox logTextBox; // Declare logTextBox here --------------
+        // point load degerlerini iceren Excel dosyası pathi.
+        public string polygonTypesExcelPath;
+
+        System.Windows.Forms.TextBox logTextBox; // Declare logTextBox here --------------
         private ExcelService _excelService;
         private ExcelService excelService = new ExcelService();
-        private string SelectedSpeed = "";
-        public bool isAddingChargingStation = false; // Sadece şarj istasyonu eklenirken true olacak.
-        private bool isAddingDekPoint = false; // Sadece dek noktası eklenirken  true olacak.
-        private int _selectedYear = -1;
-        private string _selectedCity = null;
-        private Form popupForm; // easim ekran popup 
-        private DataTable veriMonteCarlo;
 
-        public static List<string> modulescheck = new List<string>();
-        private bool isDtrLoaded = false;
-        private Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
-        {
-            { "İzmir", new PointLatLng(38.4192, 27.1287) }, // Example coordinates for İzmir
-            { "Eskişehir", new PointLatLng(39.7768, 30.5206) }, // Example coordinates for Eskişehir
-            // Add more cities and their coordinates as needed
-        };
-        private bool aboneVerisiYuklendi = false;
-        private bool dtrVerisiYuklendi = false;
-        private bool eaVerisiYuklendi = false;
-
-        // form objeleri
-        public HomePageForm gir1;
-        private GirdiModülü girdiModülü;
-        public static Dictionary<string, GirdiModülü> girdiModülleri = new Dictionary<string, GirdiModülü> {
-            {"Abone Verileri", new AboneVerileri()},
-            {"DEK Verileri", new DEKModulu()},
-            {"DTR Verileri", new DTRModulu()},
-            {"EA Şarj Verileri", new EASarjModulu()},
-            {"Ekonometrik Yük Tahmini Verileri", new EkonometrikYukTahminiModulu()},
-            {"Fider Verileri", new FiderVerileri()},
-            {"İmar Verileri", new GirdiModülü()},
-            {"Enerji Müsaadeleri Verileri", new EnerjiMusaadeleri()},
-            {"Yeni Projelendirilmiş DTR Verileri", new YeniProjelendirilmisDTR()},
-        };
+        private Form popupForm;
         public Fonksiyon_Oluştur fonksiyonFormu;
-
-        // declare an instance of the Tablo_Formu to be used to see the Attribute Table of the vector layers
         public Tablo_Formu tablo_formu;
+        private GirdiModülü girdiModülü;
+        public Nokta_Yuk_Bilgi_Formu noktaYukBilgiFormuObjesi;
+        public Poligon_Özellik_Tanımlama poligonOzellikFormu;
 
-        // variables to be used to create "ruler" in Stochastic/EA modules
-        public List<PointLatLng> rulerPoints_yga = new List<PointLatLng>();
-        public List<PointLatLng> rulerPoints_stokastik = new List<PointLatLng>();
         public List<PointLatLng> rulerPoints_ea = new List<PointLatLng>();
         public List<PointLatLng> rulerPoints_yuk = new List<PointLatLng>();
         public List<PointLatLng> rulerPoints_imar = new List<PointLatLng>();
-        public List<PointLatLng> rulerPoints_DEK = new List<PointLatLng>();
 
-        public GMapOverlay rulerOverlay_yga = new GMapOverlay("rulerOverlay_yga");
-        public GMapOverlay rulerOverlay_stokastik = new GMapOverlay("rulerOverlay_stokastik");
         public GMapOverlay rulerOverlay_ea = new GMapOverlay("rulerOverlay_ea");
         public GMapOverlay rulerOverlay_yuk = new GMapOverlay("rulerOverlay_yuk");
         public GMapOverlay rulerOverlay_imar = new GMapOverlay("rulerOverlay_imar");
-        public GMapOverlay rulerOverlay_DEK = new GMapOverlay("rulerOverlay_DEK");
 
-        public GMapRoute rulerRoute_yga;
-        public GMapRoute rulerRoute_stokastik;
         public GMapRoute rulerRoute_ea;
         public GMapRoute rulerRoute_yuk;
         public GMapRoute rulerRoute_imar;
-        public GMapRoute rulerRoute_DEK;
 
-        public bool isRulerEnabled = false;
-        public bool isRulerActive = false; // enable the drawing of a ruler
-        public bool isSelecting_polygon = false;
-
-        public GMapOverlay markerOverlay_yga = new GMapOverlay("markerOverlay_yga");
-        public GMapOverlay markerOverlay_stokastik = new GMapOverlay("markerOverlay_stokastik");
         public GMapOverlay markerOverlay_ea = new GMapOverlay("markerOverlay_ea");
         public GMapOverlay markerOverlay_yuk = new GMapOverlay("markerOverlay_yuk");
         public GMapOverlay markerOverlay_imar = new GMapOverlay("markerOverlay_imar");
         public GMapOverlay markerOverlay_DEK = new GMapOverlay("markerOverlay_DEK");
 
-        private List<PointLatLng> polygonPoints_yga = new List<PointLatLng>();
-        private List<PointLatLng> polygonPoints_ea = new List<PointLatLng>();
-        private List<PointLatLng> polygonPoints_stokastik = new List<PointLatLng>();
-        private List<PointLatLng> polygonPoints_imar = new List<PointLatLng>();
-        private List<PointLatLng> polygonPoints_yuk = new List<PointLatLng>();
-        private List<PointLatLng> polygonPoints_DEK = new List<PointLatLng>();
+        public List<PointLatLng> polygonPoints_ea = new List<PointLatLng>();
+        public List<PointLatLng> polygonPoints_imar = new List<PointLatLng>();
+        public List<PointLatLng> polygonPoints_yuk = new List<PointLatLng>();
+        public List<PointLatLng> polygonPoints_DEK = new List<PointLatLng>();
 
-        public GMapOverlay polygonOverlay_yga = new GMapOverlay("polygonOverlay_yga");
-        private GMapOverlay polygonOverlay_ea = new GMapOverlay("polygonOverlay_ea");
-        public GMapOverlay polygonOverlay_stokastik = new GMapOverlay("polygonOverlay_stokastik");
+        public GMapOverlay polygonOverlay_ea = new GMapOverlay("polygonOverlay_ea");
         public GMapOverlay polygonOverlay_imar = new GMapOverlay("polygonOverlay_imar");
         public GMapOverlay polygonOverlay_yuk = new GMapOverlay("polygonOverlay_yuk");
         public GMapOverlay polygonOverlay_DEK = new GMapOverlay("polygonOverlay_DEK");
 
+        public Dictionary<int, GMapOverlay> overlaysByLayerIndex = new Dictionary<int, GMapOverlay>();
+        public Dictionary<int, System.Windows.Forms.CheckBox[]> checkboxesByLayerIndex = new Dictionary<int, System.Windows.Forms.CheckBox[]>();
+        public Dictionary<string, GMapOverlay> overlaysByName = new Dictionary<string, GMapOverlay>();
 
-        private DTRModulu dtrmod = new DTRModulu();
+        public bool isRulerEnabled = false;
+        public bool isRulerActive = false;
+        public bool isSelecting_polygon = false;
 
-
-        // boolean variable to control the marker/point selection by mouse down event
+        public bool isSelecting_YGA = false;
+        public bool isSelecting_YUK = false;
         private bool isSelecting_marker = false;
 
-        // X and Y coordinates of the center location of the gMapControl object
+        // X and Y coordinates of the center location of the gMapControl object to be used to create a sample
+        // kml file to be opened in the Google Earth Desktop
         public string centerX;
         public string centerY;
 
-
-        private List<YüklenenDosya> loadedFiles = new List<YüklenenDosya>();
-
-
-        // Find the first available slot in the array that holds shapefile overlay layers
+        // Find the first available slot in the arrays that holds the shapefile overlay layers
         public int layer_index;
 
         // variables to be used in the "join attributes by location" functionality
@@ -162,104 +117,63 @@ namespace SLF
         // variable to control whichever checkbox/its associated data is selected the latest
         public System.Windows.Forms.CheckBox lastClickedCheckbox;
 
-        // Nokta veri yapısı
-        public class NoktaVeri
-        {
-            public double Enlem { get; set; }
-            public double Boylam { get; set; }
-            public double Bina_Demandi { get; set; }
-            public int Abone_Sayısı { get; set; }
-
-
-        }
-        public enum FileType
-        {
-            CSV,
-            Poligon
-        }
-
-        public struct YüklenenDosya
-        {
-            public string file_name { get; set; }
-            public FileType file_type { get; set; }
-        }
-
-        public class PoligonVeri
-        {
-            public string polygon_name { get; set; }
-            public List<NoktaVeri> Noktalar { get; set; }
-        }
-        private void ToggleMarkers(string markerType, bool isVisible)
-        {
-            // gMapControl_EA üzerindeki tüm overlay'leri dolaşarak marker'ları kontrol ediyoruz
-            foreach (var overlay in gMapControl_EA.Overlays)
-            {
-                foreach (var marker in overlay.Markers)
-                {
-                    // Marker, GMarkerGoogle türündeyse ve ToolTipText ile belirtilen türle eşleşiyorsa
-                    if (marker is GMarkerGoogle googleMarker && googleMarker.ToolTipText == markerType)
-                    {
-                        // Marker'ın görünürlük durumunu güncelle
-                        googleMarker.IsVisible = isVisible;
-                    }
-                }
-            }
-
-            // Harita güncellenmesi için refresh yapıyoruz
-            gMapControl_EA.Refresh();
-        }
-
-
-        // Nokta veri yapısı
-        public int SelectedYear
-        {
-            get => _selectedYear;
-            set
-            {
-                _selectedYear = value;
-                CheckSelections();
-            }
-        }
-
-        private void CheckSelections()
-        {
-            // Seçimlerin yapıldığını kontrol ederek butonu etkinleştir
-            GelecekSimButton.Enabled = SelectedYear != -1 && SelectedCity != null; // ea modulu 
-            DEKSimButton.Enabled = SelectedYear != -1 && SelectedCity != null; // dek modulu 
-        }
-
-        public string SelectedCity
-        {
-            get => _selectedCity;
-            set
-            {
-                _selectedCity = value;
-                CheckSelections();
-            }
-        }
-        private void InitializeGMap(GMap.NET.WindowsForms.GMapControl gmap)
-        {
-            gmap.MapProvider = GMapProviders.GoogleSatelliteMap;
-            gmap.ShowCenter = false;
-            gmap.Position = new PointLatLng(38.472, 27.10);
-            gmap.MinZoom = 8;
-            gmap.Manager.Mode = AccessMode.ServerAndCache;
-            gmap.MaxZoom = 20;
-            gmap.Zoom = 13;
-            gmap.DragButton = MouseButtons.Left;
-
-        }
         private string selectedMethod;  // Store the method
         public List<TabPage> hiddenTabs = new List<TabPage>();  // To store hidden tabs
 
-        // Main constructor with parameters for selectedMethod and tabToSelect
+        // Initialize all checkboxes
+        // Class-level declaration of checkbox arrays
+        public System.Windows.Forms.CheckBox[] checkBoxes_imar;
+        public System.Windows.Forms.CheckBox[] checkBoxes_yuk;
+
+        // nokta ekleme/çıkarma gibi opsiyonların olduğu sağ tık menüsü
+        public ContextMenuStrip nokta_menüsü;
+
+        // sol tıkla nokta ekleyebilme kontrolü
+        public bool adding_points = false;
+
+        // initialize the count of overlays within each mao
+        public int imarOverlayCount = 0;
+
+        // variable to control the simultaneous on/off operations for all the related checkboxes together
+        private bool _isSynchronizingCheckboxes = false;
+
+        private Dictionary<string, int> checkboxStartY = new Dictionary<string, int>();
+        private Dictionary<string, TabPage> categoryTabPages = new Dictionary<string, TabPage>();
+        private TabControl tabControlMain; // Reference to the TabControl
+
+        // In modülFormu
+        public Panel[] colorBoxes; // Array to hold color boxes for each bracket
+        public System.Windows.Forms.Label[] rangeLabels; // Array to hold range labels for each bracket
+        public System.Windows.Forms.Label unitLabel; // Single unit label
+
+        public int load_density_cnt = 0;
+
+        // In modülFormu class
+        private int currentYear; // Store the current year from trackBar_Yıllar
+        private ToolTip polygonToolTip; // Custom tooltip for displaying polygon data
+        private GMapPolygon hoveredPolygon; // Track the currently hovered polygon
+
+        Dictionary<GMapPolygon, DataRow> heatmapPolygonAttributes;
+        private int overlayIndex = -1; // yük yoğunluğu sayfası için kullanılan final dosyanın tüm_katmanlar_array_names'teki indexi.
+
+
+        private GMapPolygon highlightedPolygon; // Track the currently highlighted polygon
+        private int lastSelectedCheckboxIndex = -1; // Track the last selected checkbox index
+
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------ INITIALIZATION & GENERAL METHODS ------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+
+        // Main constructor of the Modüller Formu 
         public ModülFormu(string selectedMethod = "", string tabToSelect = "")
         {
             // initialize the Modul Formu
             InitializeComponent();
-            
-            _excelService = new ExcelService();
-            InitializeLogTextBox(); // Initialize logTextBox
+            SetupLayout();
+
+
             var yearService = YearService.GetInstance();
             if (this.slfStartYear > 0 && this.slfEndYear > 0)
             {
@@ -272,12 +186,32 @@ namespace SLF
                 this.slfStartYear = yearService.slfStartYear;
                 this.slfEndYear = yearService.slfEndYear;
             }
-            this.DoubleBuffered = true;
+
+
+            // Resolve the Excel file path relative to SLF.exe
+            string exeLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); // e.g., C:\Users\ehan0\source\repos\emrehmrc\SLF\bin\Debug
+            string projectRoot = Directory.GetParent(exeLocation)?.Parent?.FullName; // Move up two levels to SLF root (C:\Users\ehan0\source\repos\emrehmrc\SLF)
+            if (projectRoot != null)
+            {
+                polygonTypesExcelPath = Path.Combine(projectRoot, "Excel Files", "Point Load Karakteristikleri.xlsx", "point_load.xlsx"); // e.g., C:\Users\ehan0\source\repos\emrehmrc\SLF\Excel Files\point_load.xlsx
+            }
+            else
+            {
+                // Fallback to a default path if resolution fails
+                polygonTypesExcelPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "point_load.xlsx");
+                MessageBox.Show($"Excel dosya yolu çözülemedi. Varsayılan yol kullanılıyor: {polygonTypesExcelPath}", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+
+            _excelService = new ExcelService();
+            InitializeLogTextBox(); // Initialize logTextBox
+
             this.selectedMethod = selectedMethod;  // Store the method
             InitializeComboBoxes();
-            CleanupTemporaryFolders();
+
             // initialize the instance of a CBS form
             cbs = new CBS(this);
+            this.DoubleBuffered = true;
 
             this.selectedMethod = selectedMethod;  // Store the method
             // Initialize the maps and other UI components
@@ -292,54 +226,129 @@ namespace SLF
                 InitializeFormBasedOnMethod();  // Initialize based on the selected method
             }
 
+            InitializeCheckboxStartPositions();
+            InitializeCategoryTabPages();
+
+            CleanupTemporaryFolders();
+
+            // Initialize the legend elements
+            InitializeHeatmapLegendControls();
+
+            // Initialize the tooltip
+            polygonToolTip = new ToolTip
+            {
+                AutoPopDelay = 5000, // Tooltip stays visible for 5 seconds
+                InitialDelay = 100,  // Delay before showing the tooltip
+                ReshowDelay = 100,   // Delay before showing the tooltip again
+                ShowAlways = false    // Show even if the form is not active
+            };
+
+            // Initialize currentYear
+            currentYear = trackBar_Yıllar.Value;
 
         }
+
         public ModülFormu() : this("", "")
         {
         }
 
-        // Initialize all form components (called in the constructors)
-        private void InitializeComboBoxes()
+        private void InitializeGMap(GMap.NET.WindowsForms.GMapControl gmap)
         {
-            // Yıl aralığını ComboBox1'e ekleyin
-
-
-            Console.WriteLine("secilen_ilce_dizin: " + Path.Combine(PathService.BaseDirectory, PathService.FullPath));
-            var yearList = new List<int>();
-            for (int year = slfStartYear; year <= slfEndYear; year++)
-            {
-                yearList.Add(year);
-            }
-            comboBox_ea_yıl_secimi.DataSource = yearList; // Yıl seçimi için ComboBox1
-            comboBox_DEK_Yıl.DataSource = yearList; // DEK yılı seçimi için ComboBox3
-                                                    // Şehir isimlerini ComboBox2'ye ekleyin
-            comboBox_DEK_il.Items.Clear(); // dek
-            comboBox_ea_il_secimi.Items.Clear();   // ea 
-            comboBox_ea_il_secimi.Items.Add("İzmir");
-            comboBox_ea_il_secimi.Items.Add("Eskişehir");
-            comboBox_DEK_il.Items.Add("İzmir");
-            comboBox_DEK_il.Items.Add("Eskişehir");
-            
+            gmap.MapProvider = GMapProviders.GoogleSatelliteMap;
+            gmap.ShowCenter = false;
+            gmap.MinZoom = 8;
+            gmap.Manager.Mode = AccessMode.ServerAndCache;
+            gmap.MaxZoom = 20;
+            gmap.Zoom = 13;
+            gmap.DragButton = MouseButtons.Left;
+            gmap.Position = new PointLatLng(38.4644, 27.1114);
         }
+
+        private const float PanelWidthRatio = 0.840f; // 1335/1585 ≈ 84.2% of tab_imar width
+        private const float PanelHeightRatio = 0.850f; // 649/677 ≈ 95.9% of tab_imar height
+        private const float PanelXOffsetRatio = 0.128f; // 203/1585 ≈ 12.8% (unchanged)
+        private const float PanelYOffsetRatio = 0.0635f; // 43/677 ≈ 6.35% (unchanged)
+
+        private void UpdatePanelSize()
+        {
+            // Get tab_imar client size (accounting for padding/margins if any)
+            Rectangle tabClientArea = tab_imar.ClientRectangle;
+            int tabWidth = tabClientArea.Width;
+            int tabHeight = tabClientArea.Height;
+
+            // Calculate panel size based on ratios
+            int targetWidth = (int)(tabWidth * PanelWidthRatio);
+            int targetHeight = (int)(tabHeight * PanelHeightRatio);
+
+            // Calculate panel position based on ratios
+            int targetX = (int)(tabWidth * PanelXOffsetRatio);
+            int targetY = (int)(tabHeight * PanelYOffsetRatio);
+
+            // Apply size to panel_imar
+            //panel_imar.Size = new Size(targetWidth, targetHeight);
+
+            // Boundary check: Ensure panel stays within tab_imar and form boundaries
+            int margin = 10; // Small margin to prevent touching edges
+            int maxX = tabWidth - targetWidth - margin; // Maximum X position to keep panel inside tab_imar
+            int maxY = tabHeight - targetHeight - margin; // Maximum Y position to keep panel inside tab_imar
+
+            // Further constrain by form's client size (to prevent overflow outside form)
+            Rectangle formClientArea = this.ClientRectangle;
+            int formMaxX = formClientArea.Width - targetWidth - margin - (this.Width - this.ClientSize.Width); // Account for form borders
+            int formMaxY = formClientArea.Height - targetHeight - margin - (this.Height - this.ClientSize.Height);
+
+            // Use the more restrictive boundary (tab_imar or form)
+            maxX = Math.Min(maxX, formMaxX - tab_imar.Location.X); // Adjust for tab_imar's offset in form
+            maxY = Math.Min(maxY, formMaxY - tab_imar.Location.Y);
+
+            // Ensure position doesn't go negative
+            targetX = Math.Max(0, Math.Min(targetX, maxX));
+            targetY = Math.Max(0, Math.Min(targetY, maxY));
+
+            // Apply the constrained position
+            //panel_imar.Location = new Point(targetX, targetY);
+
+            // Refresh GMapControl to handle rendering
+            gMapControl_imar.Refresh();
+        }
+        private void SetupLayout()
+        {
+            // Set initial size based on form size
+            UpdatePanelSize();
+
+            // Handle form resize to update constraints
+            this.Resize += Form1_Resize;
+        }
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            UpdatePanelSize();
+            gMapControl_imar.Refresh(); // Refresh GMapControl to handle rendering
+        }
+
+        private void InitializeCheckboxStartPositions()
+        {
+            if (checkBoxes_imar[0] != null && checkBoxes_imar[0].Parent != null)
+                checkboxStartY["imar"] = checkBoxes_imar[0].Location.Y;
+            if (checkBoxes_yuk[0] != null && checkBoxes_yuk[0].Parent != null)
+                checkboxStartY["yuk"] = checkBoxes_yuk[0].Location.Y;
+        }
+
 
         // Initialize all form components (called in the constructors)
         private void InitializeFormComponents()
         {
             // Initialize GMap Controls
-            InitializeGMap(gMapControl_stokastik);
             InitializeGMap(gMapControl_EA);
             InitializeGMap(gMapControl_yuk);
             InitializeGMap(gMapControl_imar);
             InitializeGMap(gMapControl_optimalDTR);
             InitializeGMap(gMapControl_DEK);
-            InitializeGMap(gMapControl_yga);
-
 
             // Sort TabPages Alphabetically
             SortTabPagesAlphabetically(Modül_Tabları, true);
 
             // Enable double buffering to reduce flickering
-            this.DoubleBuffered = true;
+            // this.DoubleBuffered = true;
 
             // Set Default Selected Tab
             Modül_Tabları.SelectedTab = tab_girdi;
@@ -360,18 +369,7 @@ namespace SLF
             veri_listesi_seçimi.SelectedIndex = 2;
 
             // Initialize the tablo_formu instance
-            tablo_formu = new Tablo_Formu();
-        }
-
-        // Helper method to bring buttons to the front
-        private void BringButtonsToFront()
-        {
-            buton_yga_harita_katmanlar.BringToFront();
-            buton_stokastik_harita_katmanlar.BringToFront();
-            buton_ea_harita_katmanlar.BringToFront();
-            buton_yuk_haritası_katmanlar.BringToFront();
-            buton_imar_katmanlar.BringToFront();
-            buton_optimalDTR_katmanlar.BringToFront();
+            tablo_formu = new Tablo_Formu(this);
         }
 
         // Helper method to add overlays to the maps
@@ -379,14 +377,12 @@ namespace SLF
         {
             // Create a dictionary of overlays for each map control
             var overlays = new Dictionary<GMapControl, List<GMapOverlay>>()
-    {
-        { gMapControl_stokastik, new List<GMapOverlay> { polygonOverlay_stokastik, rulerOverlay_stokastik, markerOverlay_stokastik } },
-        { gMapControl_DEK, new List<GMapOverlay> { rulerOverlay_DEK, markerOverlay_DEK /*, polygonOverlay_DEK*/ } },
-        { gMapControl_EA, new List<GMapOverlay> { rulerOverlay_ea, markerOverlay_ea /*, polygonOverlay_ea*/ } },
-        { gMapControl_yga, new List<GMapOverlay> { polygonOverlay_yga, markerOverlay_yga, rulerOverlay_yga } },
-        { gMapControl_yuk, new List<GMapOverlay> { rulerOverlay_yuk, markerOverlay_yuk, polygonOverlay_yuk } },
-        { gMapControl_imar, new List<GMapOverlay> { rulerOverlay_imar, markerOverlay_imar, polygonOverlay_imar, cbs.gridOverlay } }
-    };
+            {
+                { gMapControl_DEK, new List<GMapOverlay> { markerOverlay_DEK} },
+                { gMapControl_EA, new List<GMapOverlay> { rulerOverlay_ea, markerOverlay_ea} },
+                { gMapControl_yuk, new List<GMapOverlay> { polygonOverlay_yuk, rulerOverlay_yuk, markerOverlay_yuk } },
+                { gMapControl_imar, new List<GMapOverlay> { polygonOverlay_imar, rulerOverlay_imar, markerOverlay_imar} }
+            };
 
             // Iterate through each map control and add overlays
             foreach (var mapControl in overlays)
@@ -397,7 +393,6 @@ namespace SLF
                 }
             }
         }
-
 
         // Initialize specific tabs and hide others
         // Method to hide a specific item from the ComboBox
@@ -421,8 +416,10 @@ namespace SLF
             if (filteredItems.Count > 0)
             {
                 veri_listesi_seçimi.SelectedIndex = 2; // Select the first item or another index as needed
+                veri_listesi_seçimi.SelectedIndex = 2; // Select the first item or another index as needed
             }
         }
+
         private void InitializeTabs(params string[] tabsToSelect)
         {
             foreach (string tabToSelect in tabsToSelect)
@@ -478,6 +475,26 @@ namespace SLF
             }
         }
 
+        private void SortTabPagesAlphabetically(TabControl tabControl, bool ascending = true)
+        {
+            // Get the list of TabPages
+            List<TabPage> tabPages = new List<TabPage>();
+            foreach (TabPage tabPage in tabControl.TabPages)
+            {
+                tabPages.Add(tabPage);
+            }
+
+            // Sort the list of TabPages based on the Text property
+            tabPages.Sort((x, y) =>
+            {
+                return ascending ? string.Compare(x.Text, y.Text) : -string.Compare(x.Text, y.Text);
+            });
+
+            // Clear the current TabPages and add the sorted TabPages
+            tabControl.TabPages.Clear();
+            tabControl.TabPages.AddRange(tabPages.ToArray());
+        }
+
         // Initialize form based on the selected method
         private void InitializeFormBasedOnMethod()
         {
@@ -510,29 +527,237 @@ namespace SLF
             }
         }
 
-        // Restore hidden tabs
-        public void RestoreHiddenTabs()
+
+        private void SenaryoNewSelectionButton_Click(object sender, EventArgs e)
         {
-            // Restore tabs for Modül_Tabları
-            foreach (TabPage tabPage in hiddenTabs.ToList())
-            {
-                if (!Modül_Tabları.TabPages.Contains(tabPage))
-                {
-                    Modül_Tabları.TabPages.Add(tabPage);
-                }
-            }
-
-            // Restore tabs for SenaryoModuleTabControl
-            foreach (TabPage tabPage in hiddenTabs.ToList())
-            {
-                if (!SenaryoModuleTabControl.TabPages.Contains(tabPage))
-                {
-                    SenaryoModuleTabControl.TabPages.Add(tabPage);
-                }
-            }
-
-            hiddenTabs.Clear();  // Clear the list after restoring
+            Modül_Tabları.SelectedTab = tab_senaryo;
         }
+
+        private void checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            // Prevent infinite recursion if we're programmatically changing checkboxes
+            if (_isSynchronizingCheckboxes) return;
+
+            CheckBox cb = sender as CheckBox;
+            if (cb == null) return;
+
+            // The layer index is stored in cb.Tag (1-based from your code)
+            if (!int.TryParse(cb.Tag?.ToString(), out int oneBasedLayerIndex))
+                return; // invalid Tag
+
+            // Convert to 0-based
+            int layerIndex = oneBasedLayerIndex - 1;
+            if (layerIndex < 0) return;
+
+            bool isVisible = cb.Checked;
+
+            // toggle overlay visibility across all four arrays ---
+            SetOverlayVisibility(cbs.tüm_katmanlar_array_imar[layerIndex], isVisible);
+            SetOverlayVisibility(cbs.tüm_katmanlar_array_yuk[layerIndex], isVisible);
+
+            // refresh all maps ---
+            gMapControl_imar.Refresh();
+            gMapControl_yuk.Refresh();
+
+            // programmatically change the other two checkboxes in the same slot so that they match the newly toggled state.    
+            _isSynchronizingCheckboxes = true;  // guard on
+
+            try
+            {
+                // We want to find the "sibling" checkboxes at the same index across each map array:
+                // e.g. checkBoxes_imar[layerIndex], checkBoxes_yga[layerIndex], etc.
+                // But we only do it if they exist (i.e. within bounds).
+
+                // If 'cb' is from the imar array, we set the yga and stokastik arrays' checkboxes.
+                // If 'cb' is from the stokastik array, we set the imar and yga arrays' checkboxes, etc.
+                // We can do it more generically by always syncing all three.
+
+                if (layerIndex < checkBoxes_imar.Length)
+                {
+                    // Only set if it's a *different* reference to avoid re-triggering for the same box
+                    if (!ReferenceEquals(cb, checkBoxes_imar[layerIndex]))
+                    {
+                        checkBoxes_imar[layerIndex].Checked = isVisible;
+                    }
+                }
+
+                if (layerIndex < checkBoxes_yuk.Length)
+                {
+                    // Only set if it's a *different* reference to avoid re-triggering for the same box
+                    if (!ReferenceEquals(cb, checkBoxes_yuk[layerIndex]))
+                    {
+                        checkBoxes_yuk[layerIndex].Checked = isVisible;
+                    }
+                }
+
+            }
+            finally
+            {
+                _isSynchronizingCheckboxes = false;  // guard off
+            }
+        }
+
+        private void InitializeCategoryTabPages()
+        {
+            // Adjust these names based on your designer
+            tabControlMain = Modül_Tabları; // The TabControl containing all tabs
+            categoryTabPages["imar"] = tab_imar; // Tab page for "İmar Analizi"
+            categoryTabPages["yuk"] = tab_yükHaritası;
+        }
+
+        public void checkboxes_init()
+        {
+
+            checkBoxes_imar = new System.Windows.Forms.CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4,
+        checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9,
+        checkBox_imar_10, checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15 };
+
+            checkBoxes_yuk = new System.Windows.Forms.CheckBox[] { checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4,
+        checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9,
+        checkBox_yuk_10, checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15 };
+
+            int[] tagValuesForCheckboxes = Enumerable.Range(1, 15).ToArray();
+
+            void initializeCheckBoxes(System.Windows.Forms.CheckBox[] checkBoxes, int[] tagValues)
+            {
+                for (int i = 0; i < checkBoxes.Length; i++)
+                {
+                    checkBoxes[i].Tag = tagValues[i];
+                    checkBoxes[i].CheckedChanged += checkBox_CheckedChanged;
+                    checkBoxes[i].MouseDown += checkBox_MouseDown;
+                    checkBoxes[i].ForeColor = cbs.overlayColors[i].BorderColor;
+                    checkBoxes[i].Visible = false;
+                }
+            }
+
+            initializeCheckBoxes(checkBoxes_imar, tagValuesForCheckboxes);
+            initializeCheckBoxes(checkBoxes_yuk, tagValuesForCheckboxes);
+        }
+
+        private const int CheckboxHeight = 27; // Height of each checkbox (adjust as needed)
+        private const int CheckboxSpacing = 8; // Space between checkboxes
+
+        public Dictionary<string, bool> pendingUpdates = new Dictionary<string, bool>
+        {
+            { "imar", false },
+            { "yuk", false }
+        };
+
+        public void UpdateCheckboxPositions(CheckBox[] checkBoxes, string mapCategory)
+        {
+            if (!checkboxStartY.ContainsKey(mapCategory) || !categoryTabPages.ContainsKey(mapCategory))
+                return;
+
+            TabPage tabPage = categoryTabPages[mapCategory];
+
+            // If the tab is not currently visible, mark it for a pending update
+            if (tabControlMain.SelectedTab != tabPage)
+            {
+                pendingUpdates[mapCategory] = true;
+                return;
+            }
+
+            int currentY = checkboxStartY[mapCategory];
+
+            tabControlMain.SuspendLayout();
+            tabPage.SuspendLayout();
+
+            for (int i = 0; i < checkBoxes.Length; i++)
+            {
+                if (checkBoxes[i] != null && checkBoxes[i].Visible)
+                {
+                    checkBoxes[i].Location = new System.Drawing.Point(checkBoxes[i].Location.X, currentY);
+                    currentY += CheckboxHeight + CheckboxSpacing;
+                }
+            }
+
+            tabPage.ResumeLayout(false);
+            tabControlMain.ResumeLayout(true);
+
+            foreach (Control control in tabPage.Controls)
+            {
+                control.Invalidate();
+                control.Update();
+            }
+
+            tabControlMain.Invalidate();
+            tabControlMain.Update();
+            this.Invalidate();
+            this.Update();
+        }
+
+        private void ClearCheckboxesForAllMaps(int checkboxIndex)
+        {
+            var allCheckBoxes = new List<CheckBox>
+            {
+                checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5,
+                checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
+                checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15,
+
+                checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4, checkBox_yuk_5,
+                checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9, checkBox_yuk_10,
+                checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15,
+            };
+
+            var categoryCheckboxes = new Dictionary<string, CheckBox[]>
+            {
+                { "imar", checkBoxes_imar },
+                { "yuk", checkBoxes_yuk }
+            };
+
+
+            CheckBox targetCheckbox = null;
+            string targetCategory = null;
+            foreach (var checkBox in allCheckBoxes)
+            {
+                if (checkBox.Tag != null && int.TryParse(checkBox.Tag.ToString(), out int tagIndex))
+                {
+                    if (tagIndex - 1 == checkboxIndex)
+                    {
+                        targetCheckbox = checkBox;
+                        if (checkBox.Name.Contains("imar")) targetCategory = "imar";
+                        else if (checkBox.Name.Contains("yuk")) targetCategory = "yuk";
+                        break;
+                    }
+                }
+            }
+
+            if (targetCheckbox == null || targetCategory == null)
+                return;
+
+            foreach (var category in categoryCheckboxes.Keys)
+            {
+                if (categoryCheckboxes[category][checkboxIndex] != null)
+                {
+                    categoryCheckboxes[category][checkboxIndex].Checked = false;
+                    categoryCheckboxes[category][checkboxIndex].Visible = false;
+                    categoryCheckboxes[category][checkboxIndex].Refresh();
+                }
+            }
+
+            foreach (var category in categoryCheckboxes.Keys)
+            {
+                UpdateCheckboxPositions(categoryCheckboxes[category], category);
+            }
+        }
+
+
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------ GİRDİ MODÜLÜ DEĞİŞKENLER ---------------------------------------- //
+
+        public static Dictionary<string, GirdiModülü> girdiModülleri = new Dictionary<string, GirdiModülü> {
+            {"Abone Verileri", new AboneVerileri()},
+            {"DEK Verileri", new DEKModulu()},
+            {"DTR Verileri", new DTRModulu()},
+            {"EA Şarj Verileri", new EASarjModulu()},
+            {"Ekonometrik Yük Tahmini Verileri", new EkonometrikYukTahminiModulu()},
+            {"Fider Verileri", new FiderVerileri()},
+            {"İmar Verileri", new GirdiModülü()},
+            {"Enerji Müsaadeleri Verileri", new EnerjiMusaadeleri()},
+            {"Yeni Projelendirilmiş DTR Verileri", new YeniProjelendirilmisDTR()},
+        };
+
+
         private void SelectFolderButton_Click(object sender, EventArgs e)
         {
             // Handle file loading logic for the "Girdi" module
@@ -627,6 +852,412 @@ namespace SLF
 
         }
 
+        private async void OpenModuleButton_Click(object sender, EventArgs e)
+        {
+            // Disable the button initially
+            OpenModuleButton.Enabled = false;
+
+            string filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+
+            // Load the data table for the selected type
+            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
+
+            // Check if the data table has any rows
+            if (dataTable == null || dataTable.Rows.Count == 0)
+            {
+                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından modüle gidilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                OpenModuleButton.Enabled = true; // Re-enable the button before returning
+                return;
+            }
+
+            // Check if the selected data type is "Ekonometrik Yük Tahmini Verileri"
+            if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
+            {
+                // Asynchronous task to load the Excel package
+                await Task.Run(() =>
+                {
+                    using (var package = new ExcelPackage(new FileInfo(filePath)))
+                    {
+                        Invoke(new Action(() =>
+                        {
+                            // Clear previous data
+                            ELFMinSenaryoTable.DataSource = null;
+                            ELFLowSenaryoTable.DataSource = null;
+                            ELFBaseSenaryoTable.DataSource = null;
+                            ELFHighSenaryoTable.DataSource = null;
+                            ELFMaxSenaryoTable.DataSource = null;
+                        }));
+
+                        // Ensure there are at least 6 worksheets
+                        int totalSheets = package.Workbook.Worksheets.Count;
+                        for (int i = 1; i <= 5; i++)
+                        {
+                            if (i < totalSheets)
+                            {
+                                var worksheet = package.Workbook.Worksheets[i];
+                                DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
+
+                                Invoke(new Action(() =>
+                                {
+                                    var dataGrids = new[] { ELFMinSenaryoTable, ELFLowSenaryoTable, ELFBaseSenaryoTable, ELFHighSenaryoTable, ELFMaxSenaryoTable };
+                                    dataGrids[i - 1].DataSource = dt;
+                                }));
+                            }
+                            else
+                            {
+                                // If there are fewer than 6 sheets, show a message or handle as needed
+                                MessageBox.Show("Eksik sayfalar bulundu. Lütfen dosyayı kontrol edin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                break;
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Based on the selected data type, switch to the corresponding tab
+            if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
+            {
+                Modül_Tabları.SelectedTab = tab_senaryo;
+            }
+            else if (seçilenVeriTipi == "EA Şarj Verileri")
+            {
+                Modül_Tabları.SelectedTab = tab_ea;
+            }
+            else if (seçilenVeriTipi == "DEK Verileri")
+            {
+                Modül_Tabları.SelectedTab = tab_dek;
+            }
+
+            // After loading the data, enable the button
+            OpenModuleButton.Enabled = true;
+        }
+
+        private void veri_listesi_seçimi_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (veri_listesi_seçimi.SelectedItem != null)
+            {
+                string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+
+                // dataTablesByType'ta bu veri var mı kontrol et
+                if (GirdiModülü.dataTablesByType.ContainsKey(seçilenVeriTipi))
+                {
+                    // GirdiModülü'nü güncelle
+                    if (girdiModülleri.ContainsKey(seçilenVeriTipi))
+                    {
+                        girdiModülleri[seçilenVeriTipi].importedDataTable = GirdiModülü.dataTablesByType[seçilenVeriTipi];
+                    }
+
+                    // DataGridView'ı güncelle
+                    dataGridView_girdi.DataSource = GirdiModülü.dataTablesByType[seçilenVeriTipi];
+                    dataGridView_girdi.Refresh();
+
+                    Debug.WriteLine($"Seçilen veri tipi: {seçilenVeriTipi}, Satır sayısı: {GirdiModülü.dataTablesByType[seçilenVeriTipi].Rows.Count}");
+                }
+                else
+                {
+                    Debug.WriteLine($"Seçilen veri tipi için yüklenmiş veri yok: {seçilenVeriTipi}");
+                    dataGridView_girdi.DataSource = null;
+                }
+            }
+        }
+
+        private void veri_listesi_seçimi_DrawItem(object sender, DrawItemEventArgs e)
+        {
+
+            // Check if the index is valid
+            if (e.Index < 0)
+                return;
+
+            // Get the current item to be drawn
+            string text = veri_listesi_seçimi.Items[e.Index].ToString();
+
+            // Determine the color based on some condition
+            Color textColor = Color.Red;
+            var girdiModülü = girdiModülleri[text];
+            if (girdiModülü.importedDataTable.Rows.Count > 0)
+            {
+                textColor = Color.Green;
+            }
+
+            e.DrawBackground();
+            // Draw the text with the determined color
+            using (Brush brush = new SolidBrush(textColor))
+            {
+                e.Graphics.DrawString(text, e.Font, brush, e.Bounds);
+            }
+
+            // Draw the focus rectangle if the item is selected
+            e.DrawFocusRectangle();
+        }
+
+        private void raporGoruntuleButonu_Click(object sender, EventArgs e)
+        {
+            // Girdi modülündeki dosya yükleme butonuna tıklandığında çalışacak kodlar
+            if (slfStartYear == 0 || slfEndYear == 0)
+            {
+                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            // Veri listesinde seçilen veri tipine göre dosya seçme işlemi yapılacak
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+            girdiModülü = girdiModülleri[seçilenVeriTipi];
+            girdiModülü.VEERReport(seçilenVeriTipi);
+        }
+
+        private void ExcelDownloadButton_Click(object sender, EventArgs e)
+        {
+            if (slfStartYear == 0 || slfEndYear == 0)
+            {
+                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            const string FilterExcelFiles = "Excel dosyaları (*.xlsx)|*.xlsx";
+            const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
+            if (dataTable.Rows.Count == 0)
+            {
+                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Excel dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            else if (dataTable.Rows.Count > 50000)
+            {
+                MessageBox.Show($"{seçilenVeriTipi} için veri boyutu çok büyük. CSV olarak dışa aktarmayı deneyebilirsiniz.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            var fileDialog = new SaveFileDialog
+            {
+                Title = "Kaydedeceğiniz dosyanın adını giriniz.",
+                Filter = $"{FilterExcelFiles}|{FilterAllFiles}"
+            };
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var filePath = fileDialog.FileName;
+                var excelExporter = new ExcelExporter();
+                excelExporter.ExportExcelFile(
+                    filePath,
+                    dataTable,
+                    seçilenVeriTipi
+                );
+            }
+            else
+            {
+                MessageBox.Show("Dosya seçilmedi.");
+            }
+
+        }
+
+        private void csvExportButton_Click(object sender, EventArgs e)
+        {
+            if (slfStartYear == 0 || slfEndYear == 0)
+            {
+                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            const string FilterCsvFiles = "Csv dosyaları (*.csv)|*.csv";
+            const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
+            if (dataTable.Rows.Count == 0)
+            {
+                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Csv dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            var fileDialog = new SaveFileDialog
+            {
+                Title = "Kaydedeceğiniz dosyanın adını giriniz.",
+                Filter = $"{FilterCsvFiles}|{FilterAllFiles}"
+            };
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var filePath = fileDialog.FileName;
+                var csvHandler = new CsvHandler();
+                csvHandler.ExportCsvFile(
+                    filePath,
+                    dataTable
+                );
+            }
+            else
+            {
+                MessageBox.Show("Dosya seçilmedi.");
+            }
+        }
+
+
+        private void ResetYearSelectionProcessGirdiModulu()
+        {
+            slfStartYear = slfEndYear = 0;
+            int currentYear = DateTime.Now.Year;
+            int lastYear = currentYear - 1;
+            int lastYear2 = currentYear - 2;
+            startYearComboBox.SelectedIndex = -1;
+            startYearComboBox.Text = "Yıl seçiniz";
+            endYearComboBox.SelectedIndex = -1;
+            endYearComboBox.Text = "Yıl seçiniz";
+            yearApproveButton.Text = "Onayla";
+
+            //// Clear any existing items in the ComboBox
+            startYearComboBox.Items.Clear();
+
+            // Add the years to the ComboBox
+            startYearComboBox.Items.Add(lastYear2);
+            startYearComboBox.Items.Add(lastYear);
+            startYearComboBox.Items.Add(currentYear);
+
+            // Disable the endYearComboBox initially
+            startYearComboBox.Enabled = true;
+            endYearComboBox.Enabled = false;
+            yearApproveButton.Enabled = false;
+            // veri_listesi_seçimi.Enabled = false;
+        }
+
+        private void startYearComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (startYearComboBox.SelectedIndex == -1)
+            {
+                return;
+            }
+            // Get the selected year
+            int selectedYear = (int)startYearComboBox.SelectedItem;
+
+
+            // Enable the endYearComboBox
+            endYearComboBox.Enabled = true;
+
+            // Clear any existing items in the ComboBox
+            endYearComboBox.Items.Clear();
+
+            // Add years from selectedYear + 4 to selectedYear + 14
+            for (int year = selectedYear + 4; year <= selectedYear + 14; year++)
+            {
+                endYearComboBox.Items.Add(year);
+            }
+
+            // Optionally, set the first year as the selected item
+            //endYearComboBox.SelectedIndex = 0;
+        }
+
+        private void endYearComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            yearApproveButton.Enabled = true;
+        }
+
+        private void HomePageButton_Click(object sender, EventArgs e)
+        {
+            // Show the confirmation dialog for navigating to the home page
+            DialogResult result = MessageBox.Show(
+                "Ana sayfaya dönmek istediğinize emin misiniz? Kaydedilmeyen veriler kaybolacaktır!",
+                "Ana Sayfaya Dön",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                // Unsubscribe from the FormClosing event only if the user clicks 'Yes'
+                this.FormClosing -= ModülFormu_FormClosing;
+                this.Hide(); // Hide the current form (ModülFormu)
+            }
+            // If the user clicks 'No', do nothing and stay on the current form
+        }
+
+        private void yearApproveButton_Click(object sender, EventArgs e)
+        {
+            if (endYearComboBox.SelectedIndex == -1)
+            {
+                // if the end year is not chosen, it means we are still in selection process
+                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            else if (startYearComboBox.Enabled == false && endYearComboBox.Enabled == false)
+            {
+                // but if both combobox are disabled, it means the selection process is already done
+                // Check if any DataTable in girdiModülleri has rows
+                bool anyTableHasRows = girdiModülleri.Values.Any(girdiModülü =>
+                    girdiModülü.importedDataTable != null && girdiModülü.importedDataTable.Rows.Count > 0);
+                if (anyTableHasRows)
+                {
+                    var dialogResult = MessageBox.Show("Yılları değiştirirseniz verileri tekrardan içeri aktarmanız gerekecek, devam etmek istiyor musunuz?", "Uyarı!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (dialogResult != DialogResult.Yes)
+                    {
+                        return;
+                    }
+                }
+                ResetYearSelectionProcessGirdiModulu();
+                foreach (var girdiModülü in girdiModülleri.Values)
+                {
+                    //girdiModülü.importedDataTable?.Clear(); // Clear the DataTable if it is not null
+                    girdiModülü.importedDataTable = new DataTable();
+                }
+                dataGridView_girdi.DataSource = null;
+            }
+            else
+            {
+                // selections are completed
+                startYearComboBox.Enabled = false;
+                endYearComboBox.Enabled = false;
+                //veri_listesi_seçimi.Enabled = true;
+                slfStartYear = (int)startYearComboBox.SelectedItem;
+                slfEndYear = (int)endYearComboBox.SelectedItem;
+                MessageBox.Show($"Başlangıç yılı: {slfStartYear}, Bitiş yılı: {slfEndYear}", "Yıllar belirlendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                //yearApproveButton.Enabled = false;
+                yearApproveButton.Text = "Sıfırla";
+            }
+        }
+
+
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------ DEK MODÜLÜ DEĞİŞKENLER ------------------------------------------ //
+
+
+        private DataTable veriMonteCarlo;
+
+        private Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
+        {
+            { "İzmir", new PointLatLng(38.4192, 27.1287) }, // Example coordinates for İzmir
+            { "Eskişehir", new PointLatLng(39.7768, 30.5206) }, // Example coordinates for Eskişehir
+            // Add more cities and their coordinates as needed
+        };
+
+
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------ EA MODÜLÜ DEĞİŞKENLER ------------------------------------------- //
+
+        private string SelectedSpeed = "";
+        public bool isAddingChargingStation = false; // Sadece şarj istasyonu eklenirken true olacak.
+        private bool isAddingDekPoint = false; // Sadece dek noktası eklenirken  true olacak.
+        private int _selectedYear = -1;
+        private string _selectedCity = null;
+
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+
+
+        // Initialize all form components (called in the constructors)
+        private void InitializeComboBoxes()
+        {
+            // Yıl aralığını ComboBox1'e ekleyin
+
+
+            Console.WriteLine("secilen_ilce_dizin: " + Path.Combine(PathService.BaseDirectory, PathService.FullPath));
+            var yearList = new List<int>();
+            for (int year = slfStartYear; year <= slfEndYear; year++)
+            {
+                yearList.Add(year);
+            }
+            comboBox_ea_yıl_secimi.DataSource = yearList; // Yıl seçimi için ComboBox1
+            comboBox_DEK_Yıl.DataSource = yearList; // DEK yılı seçimi için ComboBox3
+                                                    // Şehir isimlerini ComboBox2'ye ekleyin
+            comboBox_DEK_il.Items.Clear(); // dek
+            comboBox_ea_il_secimi.Items.Clear();   // ea 
+            comboBox_ea_il_secimi.Items.Add("İzmir");
+            comboBox_ea_il_secimi.Items.Add("Eskişehir");
+            comboBox_DEK_il.Items.Add("İzmir");
+            comboBox_DEK_il.Items.Add("Eskişehir");
+
+        }
+
         public void isİmportedModule(bool isImported, string seçilenVeriTipi)
         {
             girdiModülü = girdiModülleri[seçilenVeriTipi];
@@ -634,7 +1265,6 @@ namespace SLF
             {
                 // Create a new DataTable and add it to the dictionary
                 GirdiModülü.dataTablesByType[seçilenVeriTipi] = new DataTable();
-                Console.WriteLine($"isİmportedModule: {seçilenVeriTipi} için yeni bir tablo oluşturuldu.");
             }
             //girdiModülü = girdiModülleri[seçilenVeriTipi];
             var importedDataTable = GirdiModülü.dataTablesByType[seçilenVeriTipi];
@@ -652,11 +1282,9 @@ namespace SLF
                 return;
             }
 
-            Console.WriteLine($"isImportedModule: {seçilenVeriTipi} tablosu bulundu. Satır sayısı: {importedDataTable.Rows.Count}");
 
             // DataGridView temizleme ve bağlama
             dataGridView_girdi.DataSource = importedDataTable;
-            Console.WriteLine("datagridview" + dataGridView_girdi.DataSource);
 
             // Görünürlük kontrolleri
             EnsureVisibility(dataGridView_girdi);
@@ -668,9 +1296,8 @@ namespace SLF
                 dataGridView_girdi.BringToFront();
             });
 
-            Console.WriteLine($"DataGridView Görünürlük: {dataGridView_girdi.Visible}");
-            Console.WriteLine($"DataGridView Boyut: {dataGridView_girdi.Width}x{dataGridView_girdi.Height}");
         }
+
         private void EnsureVisibility(Control control)
         {
             // Parent kontrolü görünür değilse, görünür hale getir
@@ -687,6 +1314,7 @@ namespace SLF
                 control.Visible = true;
             }
         }
+
 
         private void ModülFormu_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -841,6 +1469,255 @@ namespace SLF
                 MessageBox.Show("Kapanış sırasında hata: " + ex.Message);
             }
         }
+
+
+        // ModülFormu sınıfına eklenecek yeni metot
+        private void ClearUserInterfaceState()
+        {
+            try
+            {
+                // Panel, ComboBox ve diğer kontrolleri başlangıç durumuna geri getir
+
+                // ComboBox'ları sıfırla
+                if (veri_listesi_seçimi != null)
+                {
+                    veri_listesi_seçimi.SelectedIndex = -1;
+                }
+
+                if (comboBox_ea_il_secimi != null)
+                {
+                    comboBox_ea_il_secimi.SelectedIndex = -1;
+                }
+
+                if (comboBox_ea_yıl_secimi != null)
+                {
+                    comboBox_ea_yıl_secimi.SelectedIndex = -1;
+                }
+
+                if (comboBox_DEK_il != null)
+                {
+                    comboBox_DEK_il.SelectedIndex = -1;
+                }
+
+                if (comboBox_DEK_Yıl != null)
+                {
+                    comboBox_DEK_Yıl.SelectedIndex = -1;
+                }
+
+                // DataGridView'ları temizle
+                if (dataGridView_girdi != null)
+                {
+                    dataGridView_girdi.DataSource = null;
+                }
+
+                // Tüm harita overlaylerini temizle
+                ClearAllMapOverlays();
+
+                // Haritaların renklerini sıfırla
+                ResetMapColors();
+
+                // CheckBox'ları sıfırla
+                ResetAllCheckBoxes();
+
+                // Form başlığını varsayılana çevir
+                this.Text = "SLF Yazılımı";
+
+                Console.WriteLine("UI durumu temizlendi");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"UI durumu temizlenirken hata: {ex.Message}");
+                // Hatayı yut ve devam et
+            }
+        }
+
+        // Haritaların renklerini sıfırlayan yardımcı metot
+        private void ResetMapColors()
+        {
+            try
+            {
+
+                // Haritaların renklerini varsayılana çevir
+                if (gMapControl_EA != null)
+                {
+                    gMapControl_EA.MapProvider = GMapProviders.GoogleSatelliteMap;
+                }
+
+                if (gMapControl_DEK != null)
+                {
+                    gMapControl_DEK.MapProvider = GMapProviders.GoogleSatelliteMap;
+                }
+
+                if (gMapControl_yuk != null)
+                {
+                    gMapControl_yuk.MapProvider = GMapProviders.GoogleSatelliteMap;
+                }
+
+                if (gMapControl_imar != null)
+                {
+                    gMapControl_imar.MapProvider = GMapProviders.GoogleSatelliteMap;
+                }
+
+
+                if (gMapControl_optimalDTR != null)
+                {
+                    gMapControl_optimalDTR.MapProvider = GMapProviders.GoogleSatelliteMap;
+                }
+
+                Console.WriteLine("Harita renkleri sıfırlandı");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Harita renkleri sıfırlanırken hata: {ex.Message}");
+            }
+        }
+
+
+        // Tüm CheckBox'ları sıfırlayan yardımcı metot
+        private void ResetAllCheckBoxes()
+        {
+            try
+            {
+                checkBoxes_imar = new System.Windows.Forms.CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4,
+                    checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9,
+                    checkBox_imar_10, checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15 };
+
+                checkBoxes_yuk = new System.Windows.Forms.CheckBox[] { checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4,
+                    checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9,
+                    checkBox_yuk_10, checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15 };
+
+
+                // EA modülü checkboxlarını sıfırla
+                if (checkBox_AC_Home != null) checkBox_AC_Home.Checked = false;
+                if (checkBox_AC_Public != null) checkBox_AC_Public.Checked = false;
+                if (checkBox_AC_Work != null) checkBox_AC_Work.Checked = false;
+                if (checkBox_DC_Fast != null) checkBox_DC_Fast.Checked = false;
+
+                // EA modülü radio buttonlarını sıfırla
+                if (EaSimMaxBtn != null) EaSimMaxBtn.Checked = false;
+                if (EaSimMinBtn != null) EaSimMinBtn.Checked = false;
+                if (EaSimDefBtn != null) EaSimDefBtn.Checked = false;
+
+                // DEK modülü radio buttonlarını sıfırla
+                if (dekSimMaxBtn != null) dekSimMaxBtn.Checked = false;
+                if (dekSimMinBtn != null) dekSimMinBtn.Checked = false;
+                if (dekSimDefBtn != null) dekSimDefBtn.Checked = false;
+
+                // YGA, İmar ve Stokastik checkboxlarını sıfırla
+                foreach (var cb in checkBoxes_yuk)
+                {
+                    if (cb != null)
+                    {
+                        cb.Checked = false;
+                        cb.Visible = false;
+                        cb.Text = "";
+                        cb.ForeColor = SystemColors.ControlText; // Rengi varsayılana çevir
+                    }
+                }
+
+                foreach (var cb in checkBoxes_imar)
+                {
+                    if (cb != null)
+                    {
+                        cb.Checked = false;
+                        cb.Visible = false;
+                        cb.Text = "";
+                        cb.ForeColor = SystemColors.ControlText; // Rengi varsayılana çevir
+                    }
+                }
+
+                // Last clicked checkbox'ı sıfırla
+                lastClickedCheckbox = null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"CheckBox'lar sıfırlanırken hata: {ex.Message}");
+            }
+        }
+
+
+
+
+
+        // Tüm harita overlay'lerini temizleyen yardımcı metot
+        private void ClearAllMapOverlays()
+        {
+            try
+            {
+                // Tüm GMapControl'lerdeki overlay'leri temizle
+                if (gMapControl_EA != null && gMapControl_EA.Overlays != null)
+                {
+                    gMapControl_EA.Overlays.Clear();
+                    gMapControl_EA.Refresh();
+                }
+
+                if (gMapControl_DEK != null && gMapControl_DEK.Overlays != null)
+                {
+                    gMapControl_DEK.Overlays.Clear();
+                    gMapControl_DEK.Refresh();
+                }
+
+
+                if (gMapControl_yuk != null && gMapControl_yuk.Overlays != null)
+                {
+                    gMapControl_yuk.Overlays.Clear();
+                    gMapControl_yuk.Refresh();
+                }
+
+                if (gMapControl_imar != null && gMapControl_imar.Overlays != null)
+                {
+                    gMapControl_imar.Overlays.Clear();
+                    gMapControl_imar.Refresh();
+                }
+
+
+                if (gMapControl_optimalDTR != null && gMapControl_optimalDTR.Overlays != null)
+                {
+                    gMapControl_optimalDTR.Overlays.Clear();
+                    gMapControl_optimalDTR.Refresh();
+                }
+
+                // CBS sınıfındaki overlay dizisini de sıfırla
+                if (cbs != null)
+                {
+                    for (int i = 0; i < cbs.tüm_katmanlar_array_imar.Length; i++)
+                    {
+                        cbs.tüm_katmanlar_array_imar[i] = null;
+                        cbs.tüm_katmanlar_array_names[i] = null;
+
+                        if (cbs.tüm_katmanlar_datatable[i] != null)
+                        {
+                            cbs.tüm_katmanlar_datatable[i].Dispose();
+                            cbs.tüm_katmanlar_datatable[i] = null;
+                        }
+
+                        if (cbs.shapeFileArray_MapWinGIS[i] != null)
+                        {
+                            cbs.shapeFileArray_MapWinGIS[i].Close();
+                            cbs.shapeFileArray_MapWinGIS[i] = null;
+                        }
+                    }
+                }
+
+                // Poligon noktalarını da temizle
+                polygonPoints_imar?.Clear();
+                polygonPoints_yuk?.Clear();
+                polygonPoints_ea?.Clear();
+                polygonPoints_DEK?.Clear();
+
+                // Ruler noktalarını da temizle
+                rulerPoints_imar?.Clear();
+                rulerPoints_yuk?.Clear();
+                rulerPoints_ea?.Clear();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Harita overlay'leri temizlenirken hata: {ex.Message}");
+            }
+        }
+
+
         private void ClearGlobalData()
         {
             try
@@ -859,8 +1736,8 @@ namespace SLF
                 Console.WriteLine($"Global veri temizleme hatası: {ex.Message}");
             }
         }
+
         // Yeni proje oluştur ve verileri kaydet
-        // Yeni proje oluşturma ve kaydetme metodu - düzeltilmiş versiyon
         private bool CreateAndSaveProject(string projectName)
         {
             try
@@ -1024,8 +1901,8 @@ namespace SLF
 
             Console.WriteLine("Standart klasör yapısı oluşturuldu");
         }
-        // Proje durumunu kaydetme metodu
-        // Proje durumunu kaydetme metodu - ProjectState.cs dosyasında benzeri var ancak burada kendi versiyonumuzu kullanıyoruz
+
+        // Proje durumunu kaydetme metodu ProjectState.cs dosyasında benzeri var ancak burada kendi versiyonumuzu kullanıyoruz
         private void SaveProjectState(string projectPath)
         {
             try
@@ -1089,82 +1966,9 @@ namespace SLF
                 return false;
             }
         }
-        private bool SaveAsProject()
-        {
-            try
-            {
-                // Proje klasörünün ana dizini
-                string projectsBaseDir = Path.Combine(PathService.BaseDirectory, PathService.FullPath);
 
-                // Proje Ekle dialogunu göster
-                using (var folderBrowser = new ProjectFolderPicker(projectsBaseDir))
-                {
-                    // Sadece mevcut projeleri seçmeye izin ver - bu seçeneği istemiyorsanız kaldırabilirsiniz
-                    folderBrowser.EnableCreateProject = true;
 
-                    if (folderBrowser.ShowDialog() == DialogResult.OK)
-                    {
-                        string selectedPath = folderBrowser.SelectedPath;
-                        string projectName = folderBrowser.SelectedProjectName;
-
-                        // Projeyi aç
-                        PathService.OpenProject(projectName);
-
-                        // Proje durumunu kaydet ve verileri ekle
-                        return UpdateCurrentProject();
-                    }
-                }
-
-                // Kullanıcı iptal etti
-                return false;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Proje kaydedilirken hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-        }
-        private bool UpdateCurrentProject()
-        {
-            try
-            {
-                // YearService'ten yılları al
-                var yearService = YearService.GetInstance();
-
-                // Proje yolunu al
-                string projectPath = Path.Combine(
-                    PathService.BaseDirectory,
-                    PathService.FullPath,
-                    PathService.CurrentWorkingFolder);
-
-                // Proje durumunu hazırla
-                var projectState = new Dictionary<string, object>();
-                projectState["CompletedModules"] = GirdiModülü.dataTablesByType.Keys.ToList();
-                projectState["SLFStartYear"] = yearService.slfStartYear;
-                projectState["SLFEndYear"] = yearService.slfEndYear;
-                projectState["LastSaved"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-                // Durum dosyasını güncelle
-                string statePath = Path.Combine(projectPath, "project_state.json");
-                string json = System.Text.Json.JsonSerializer.Serialize(projectState,
-                    new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
-
-                File.WriteAllText(statePath, json);
-
-                // Modül verilerini kaydet
-                SaveAllModuleDataToCSV(projectPath);
-
-                // Başarılı
-                return true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Proje güncellenirken hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-        }
         // Geçici klasörü proje olarak kaydet
-
         private bool CleanupTemporaryFolders(bool cleanupAll = false)
         {
             try
@@ -1301,208 +2105,6 @@ namespace SLF
             }
         }
 
-        // Read-Only özniteliğini kaldıran yardımcı metot
-        private void RemoveReadOnlyAttributes(string path)
-        {
-            // Dosyaların özniteliklerini değiştir
-            string[] files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
-            foreach (string file in files)
-            {
-                FileInfo fileInfo = new FileInfo(file);
-                if ((fileInfo.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
-                {
-                    fileInfo.Attributes &= ~FileAttributes.ReadOnly;
-                }
-            }
-
-            // Alt klasörlerin özniteliklerini değiştir
-            string[] directories = Directory.GetDirectories(path);
-            foreach (string directory in directories)
-            {
-                DirectoryInfo dirInfo = new DirectoryInfo(directory);
-                if ((dirInfo.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
-                {
-                    dirInfo.Attributes &= ~FileAttributes.ReadOnly;
-                }
-            }
-        }
-
-        // Eski geçici klasörleri temizleme metodu
-        //private void CleanupOldTempFolders()
-        //{
-        //    try
-        //    {
-        //        if (string.IsNullOrEmpty(PathService.SelectedCity) ||
-        //            string.IsNullOrEmpty(PathService.SelectedDistrict))
-        //            return;
-
-        //        string districtPath = Path.Combine(PathService.BaseDirectory, PathService.FullPath);
-
-        //        if (!Directory.Exists(districtPath))
-        //            return;
-
-        //        // "temp_" ile başlayan tüm klasörleri bul
-        //        string[] tempFolders = Directory.GetDirectories(districtPath, "temp_*");
-
-        //        foreach (string folder in tempFolders)
-        //        {
-        //            // Aktif klasör değilse sil
-        //            if (PathService.CurrentMode != PathService.WorkingMode.Temporary ||
-        //                !folder.EndsWith(PathService.CurrentWorkingFolder))
-        //            {
-        //                try
-        //                {
-        //                    // Salt okunur özniteliklerini kaldır
-        //                    RemoveReadOnlyAttributesRecursive(folder);
-
-        //                    // Klasörü sil
-        //                    Directory.Delete(folder, true);
-        //                    Debug.WriteLine($"Eski geçici klasör silindi: {folder}");
-        //                }
-        //                catch (Exception ex)
-        //                {
-        //                    Debug.WriteLine($"Klasör silinirken hata: {ex.Message}");
-        //                }
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine($"Eski klasörler temizlenirken hata: {ex.Message}");
-        //    }
-        //}
-        //private void SaveCurrentProject()
-        //{
-        //    try
-        //    {
-        //        using (var inputDialog = new InputDialog("Proje Adı", "Lütfen projenin adını girin:"))
-        //        {
-        //            if (inputDialog.ShowDialog() == DialogResult.OK)
-        //            {
-        //                string projectName = inputDialog.InputText;
-
-        //                if (string.IsNullOrWhiteSpace(projectName))
-        //                {
-        //                    MessageBox.Show("Geçerli bir proje adı girmelisiniz.",
-        //                        "Geçersiz İsim", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        //                    return;
-        //                }
-
-        //                // Projeyi kaydet
-        //                string projectPath = PathService.SaveAsProject(projectName);
-
-        //                MessageBox.Show($"Proje '{projectName}' adıyla başarıyla kaydedildi.\n" +
-        //                    $"Klasör: {projectPath}",
-        //                    "Proje Kaydedildi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show($"Proje kaydedilirken hata oluştu: {ex.Message}",
-        //            "Kayıt Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //    }
-        //}
-        private bool DirectoryHasContent(string path)
-        {
-            if (!Directory.Exists(path))
-                return false;
-
-            int fileCount = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories).Length;
-            return fileCount > 0;
-        }
-
-        // Eski geçici klasörleri temizleme metodu
-        private void CleanupOldTempFolders()
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(PathService.SelectedCity) ||
-                    string.IsNullOrEmpty(PathService.SelectedDistrict))
-                    return;
-
-                string districtPath = Path.Combine(PathService.BaseDirectory, PathService.FullPath);
-
-                if (!Directory.Exists(districtPath))
-                    return;
-
-                // "temp_" ile başlayan tüm klasörleri bul
-                string[] tempFolders = Directory.GetDirectories(districtPath, "temp_*");
-
-                foreach (string folder in tempFolders)
-                {
-                    // Aktif klasör değilse sil
-                    if (PathService.CurrentMode != PathService.WorkingMode.Temporary ||
-                        !folder.EndsWith(PathService.CurrentWorkingFolder))
-                    {
-                        try
-                        {
-                            Directory.Delete(folder, true);
-                            Debug.WriteLine($"Eski geçici klasör silindi: {folder}");
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine($"Klasör silinirken hata: {ex.Message}");
-                        }
-
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Eski klasörler temizlenirken hata: {ex.Message}");
-            }
-        }
-
-        // Projeyi kaydetme metodu
-        //private void SaveCurrentProject()
-        //{
-        //    try
-        //    {
-        //        string projectName = "";
-
-        //        // Kullanıcıdan proje adını iste
-        //        using (var inputDialog = new InputDialog("Proje Adı", "Lütfen projenin adını girin:"))
-        //        {
-        //            if (inputDialog.ShowDialog() == DialogResult.OK)
-        //            {
-        //                projectName = inputDialog.InputText;
-        //            }
-        //            else
-        //            {
-        //                return; // İptal edildi
-        //            }
-        //        }
-
-        //        if (string.IsNullOrWhiteSpace(projectName))
-        //        {
-        //            MessageBox.Show(
-        //                "Geçerli bir proje adı girmelisiniz.",
-        //                "Geçersiz İsim",
-        //                MessageBoxButtons.OK,
-        //                MessageBoxIcon.Warning);
-        //            return;
-        //        }
-
-        //        // Projeyi kaydet
-        //        string projectPath = PathService.SaveAsProject(projectName);
-
-        //        MessageBox.Show(
-        //            $"Proje '{projectName}' adıyla başarıyla kaydedildi.\n" +
-        //            $"Klasör: {projectPath}",
-        //            "Proje Kaydedildi",
-        //            MessageBoxButtons.OK,
-        //            MessageBoxIcon.Information);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(
-        //            $"Proje kaydedilirken hata: {ex.Message}",
-        //            "Kayıt Hatası",
-        //            MessageBoxButtons.OK,
-        //            MessageBoxIcon.Error);
-        //    }
-        //}
         public class ExcelService
         {
             // Load the worksheet into a DataTable for displaying in DataGridView
@@ -1530,7 +2132,6 @@ namespace SLF
                 return dt;
             }
 
-            // Update the worksheet from DataGridView based on user's changes
             // Update the worksheet from DataGridView based on user's changes
             public void UpdateWorksheetFromDataGridView(ExcelWorksheet worksheet, DataGridView dgv)
             {
@@ -1568,492 +2169,819 @@ namespace SLF
                 }
             }
         }
-        private async void OpenModuleButton_Click(object sender, EventArgs e)
+
+        // BURASI SONRADAN AÇILACAK, SIMDILIK BOYLE KALSIN.
+        private async void Modül_Tabları_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // Disable the button initially
-            OpenModuleButton.Enabled = false;
 
-            string filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
-            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
-
-            // Load the data table for the selected type
-            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
-
-            // Check if the data table has any rows
-            if (dataTable == null || dataTable.Rows.Count == 0)
+            foreach (var category in categoryTabPages.Keys)
             {
-                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından modüle gidilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                OpenModuleButton.Enabled = true; // Re-enable the button before returning
-                return;
-            }
-
-            // Check if the selected data type is "Ekonometrik Yük Tahmini Verileri"
-            if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
-            {
-                // Asynchronous task to load the Excel package
-                await Task.Run(() =>
+                if (pendingUpdates[category] && tabControlMain.SelectedTab == categoryTabPages[category])
                 {
-                    using (var package = new ExcelPackage(new FileInfo(filePath)))
-                    {
-                        Invoke(new Action(() =>
-                        {
-                            // Clear previous data
-                            ELFMinSenaryoTable.DataSource = null;
-                            ELFLowSenaryoTable.DataSource = null;
-                            ELFBaseSenaryoTable.DataSource = null;
-                            ELFHighSenaryoTable.DataSource = null;
-                            ELFMaxSenaryoTable.DataSource = null;
-                        }));
+                    if (category == "imar")
+                        UpdateCheckboxPositions(checkBoxes_imar, "imar");
+                    else if (category == "yuk")
+                        UpdateCheckboxPositions(checkBoxes_yuk, "yuk");
 
-                        // Ensure there are at least 6 worksheets
-                        int totalSheets = package.Workbook.Worksheets.Count;
-                        for (int i = 1; i <= 5; i++)
-                        {
-                            if (i < totalSheets)
-                            {
-                                var worksheet = package.Workbook.Worksheets[i];
-                                DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
-
-                                Invoke(new Action(() =>
-                                {
-                                    var dataGrids = new[] { ELFMinSenaryoTable, ELFLowSenaryoTable, ELFBaseSenaryoTable, ELFHighSenaryoTable, ELFMaxSenaryoTable };
-                                    dataGrids[i - 1].DataSource = dt;
-                                }));
-                            }
-                            else
-                            {
-                                // If there are fewer than 6 sheets, show a message or handle as needed
-                                MessageBox.Show("Eksik sayfalar bulundu. Lütfen dosyayı kontrol edin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                break;
-                            }
-                        }
-                    }
-                });
+                    // Add "yuk" if applicable
+                    pendingUpdates[category] = false;
+                }
             }
 
-            // Based on the selected data type, switch to the corresponding tab
-            if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
+            
+            // Gerekli kontrolleri yapmak için seçilen sekmeyi ve modülleri kontrol et
+            string selectedTabText = Modül_Tabları.SelectedTab.Text;
+
+            // Modüllerin yüklü olup olmadığını kontrol et
+            if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
-                Modül_Tabları.SelectedTab = tab_senaryo;
-            }
-            else if (seçilenVeriTipi == "EA Şarj Verileri")
-            {
-                Modül_Tabları.SelectedTab = tab_ea;
-            }
-            else if (seçilenVeriTipi == "DEK Verileri")
-            {
-                Modül_Tabları.SelectedTab = tab_dek;
-            }
-
-            // After loading the data, enable the button
-            OpenModuleButton.Enabled = true;
-        }
-
-        private void LoadImagesIntoPictureBoxes()
-        {
-            // Path to the folder where the images are saved
-            string imageFolderPath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\Grafik Outputs\";
-
-            // Load images into PictureBox controls with checks
-            LoadImageIntoPictureBox(pictureBox_ELF_1, Path.Combine(imageFolderPath, "bolge_aydınlatma_projections.png"));
-            LoadImageIntoPictureBox(pictureBox_ELF_2, Path.Combine(imageFolderPath, "bolge_mesken_projections.png"));
-            LoadImageIntoPictureBox(pictureBox_ELF_3, Path.Combine(imageFolderPath, "bolge_sanayi_projections.png"));
-            LoadImageIntoPictureBox(pictureBox_ELF_4, Path.Combine(imageFolderPath, "bolge_sulama_projections.png"));
-            LoadImageIntoPictureBox(pictureBox_ELF_5, Path.Combine(imageFolderPath, "bolge_ticarethane_projections.png"));
-            // Add more PictureBox assignments as needed
-        }
-
-
-
-        // Save button logic to update Excel file with changes from DataGridViews
-
-        /// <summary>
-        /// ELF METHOD Model RScript Run RELATED CHANGES & UPDATES
-        /// </summary>
-
-        // Save button logic to update Excel file with changes from DataGridViews
-        private async void ELFScenerioSaveButton_Click(object sender, EventArgs e)
-        {
-            string originalFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
-            string modifiedFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
-
-            try
-            {
-                await Task.Run(() =>
+                if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Haritası Modülü") && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
                 {
-                    using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
-                    {
-                        // Update worksheets with data from DataGridViews
-                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[0], ELFMinSenaryoTable);
-                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[1], ELFLowSenaryoTable);
-                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[2], ELFBaseSenaryoTable);
-                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[3], ELFHighSenaryoTable);
-                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[4], ELFMaxSenaryoTable);
-
-                        // Save the modified Excel file
-                        package.SaveAs(new FileInfo(modifiedFilePath));
-                    }
-                });
-
-                MessageBox.Show("Kullanıcı değişiklikleri excel dosyasına kaydedildi.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Dosya güncelleme hatası: {ex.Message}");
-            }
-        }
-        private void LoadResultsToTabEkonometrik(string resultsFilePath)
-        {
-            if (!File.Exists(resultsFilePath))
-            {
-                MessageBox.Show("The results file does not exist.");
-                return;
-            }
-
-            using (var package = new ExcelPackage(new FileInfo(resultsFilePath)))
-            {
-                // Load the corresponding results into each DataGridView
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[1], ELFMinResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[2], ELFLowResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[3], ELFBaseResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[4], ELFHighResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[5], ELFMaxResultsTable);
-            }
-
-            // Switch to the results tab after loading all the data
-            Modül_Tabları.SelectedTab = tab_ekonometrik;
-        }
-        private void ELFPredictionShowResultsButton_Click(object sender, EventArgs e)
-        {
-            // Set cursor to wait
-            Cursor.Current = Cursors.WaitCursor;
-
-            string modifiedInputFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
-            string logFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\script_output_log2.txt";
-
-            try
-            {
-                // Check if the modified file exists
-                if (!File.Exists(modifiedInputFilePath))
-                {
-                    MessageBox.Show("The modified Excel file does not exist. Please save the scenario first.", "File Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    LogOutput("The specified modified input file does not exist.");
+                    // Sekme geçişini tamamen iptal et
+                    Console.WriteLine(GirdiModülü.dataTablesByType.Count);
+                    MessageBox.Show("DTR verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
+                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
                     return;
                 }
-
-                // Log the start of script execution
-                LogOutput("Starting R script execution...");
-
-                // Call the R script execution method
-                string resultsFilePath = RunModelRScript(modifiedInputFilePath);
-
-                if (string.IsNullOrEmpty(resultsFilePath))
+                /*else if (selectedTabText == "İmar Analizleri" && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")))
                 {
-                    // Log failure
-                    LogOutput($"R script execution failed or returned no results. Check the log file for details: {logFilePath}");
-                    MessageBox.Show("R script execution failed or returned no results.", "Execution Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // Sekme geçişini tamamen iptal et
+                    MessageBox.Show("İmar planı verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
+                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
+                    return;
+                }*/
+                else if (selectedTabText == "Optimal DTR Konumlandırma"
+                            && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")
+                            && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri")))
+                {
+                    // Sekme geçişini tamamen iptal et
+                    MessageBox.Show("DTR verileri ve İmar planı yüklenmeden bu sekmeye geçiş yapılamaz.");
+                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
                     return;
                 }
-
-                // Log success
-                LogOutput("R script executed successfully. Loading results...");
-
-                // Load results into the econometric tab
-                LoadResultsToTabEkonometrik(resultsFilePath);
-
-                // Notify user
-                MessageBox.Show("Algorithm executed successfully and results have been loaded.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch (Exception ex)
+
+            // EA Şarj Modülü tabına tıklanmışsa
+            if (selectedTabText == "EA Şarj Modülü")
             {
-                // Log the exception
-                LogOutput($"An error occurred while running the R script: {ex.Message}");
-                MessageBox.Show($"An error occurred while running the R script: {ex.Message}", "Execution Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                // Restore cursor to default
-                Cursor.Current = Cursors.Default;
-
-                // Log end of operation
-                LogOutput("R script execution process completed.");
-            }
-        }
-
-
-
-        // Helper method for logging output to logTextBox
-        private void LogOutput(string message)
-        {
-            if (logTextBox != null)
-            {
-                if (logTextBox.InvokeRequired)
+                if ((!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri")))
                 {
-                    logTextBox.Invoke(new Action<string>(LogOutput), message);
+                    MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    return;
                 }
                 else
                 {
-                    logTextBox.AppendText(message + Environment.NewLine);
+                    InitializeComboBoxes();
+                    await eaHaritayaVeriYukleAsync();
                 }
-            }
-        }
 
-        private void InitializeLogTextBox()
-        {
-            logTextBox = new TextBox
+                    
+            } else if (selectedTabText == "DEK Modülü")
             {
-                Multiline = true,
-                Dock = DockStyle.Bottom, // Dock it at the bottom of the form
-                Height = 100, // Adjust height as necessary
-                ScrollBars = ScrollBars.Vertical // Enable vertical scroll
-            };
-            this.Controls.Add(logTextBox); // Add to the form controls
-        }
-
-        private async void ShowResultsButton_Click(object sender, EventArgs e)
-        {
-            // Path to the Excel file
-            string filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\ELF_Tahmin_Sonuçları_2024-11-08 22_35_57.xlsx";
-
-            // Asynchronous task to load the Excel package
-            await Task.Run(() =>
-            {
-                using (var package = new ExcelPackage(new FileInfo(filePath)))
+                Console.WriteLine("DEK Modülü");
+                if (!GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
                 {
-                    // Clear previous data in the DataGridViews
-                    Invoke(new Action(() =>
-                    {
-                        // Set DataSources to null to clear previous data
-                        ELFMinResultsTable.DataSource = null;
-                        ELFLowResultsTable.DataSource = null;
-                        ELFBaseResultsTable.DataSource = null;
-                        ELFHighResultsTable.DataSource = null;
-                        ELFMaxResultsTable.DataSource = null;
-                    }));
-
-                    // Load sheets into their respective DataGridViews
-                    var worksheets = new[] { "Bagımlı_Degisken_Tahminleri_1", "Bagımlı_Degisken_Tahminleri_2", "Bagımlı_Degisken_Tahminleri_3", "Bagımlı_Degisken_Tahminleri_4", "Bagımlı_Degisken_Tahminleri_5" }; // Replace with actual sheet names if needed
-                    var dataGrids = new[] { ELFMinResultsTable, ELFLowResultsTable, ELFBaseResultsTable, ELFHighResultsTable, ELFMaxResultsTable };
-
-                    for (int i = 0; i < worksheets.Length; i++)
-                    {
-                        var worksheet = package.Workbook.Worksheets[worksheets[i]];
-                        if (worksheet != null)
-                        {
-                            DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
-
-                            Invoke(new Action(() =>
-                            {
-                                dataGrids[i].DataSource = dt; // Set DataGridView's DataSource
-                            }));
-                        }
-                    }
+                    MessageBox.Show("Lütfen DEK modülü verilerinizi yükleyin.");
+                    Modül_Tabları.SelectedTab = tab_girdi;
+                    return;
                 }
-            });
-
-            // Load images into PictureBox controls after loading the results
-            LoadImagesIntoPictureBoxes();
-
-            // Optionally, switch to the results tab
-            Modül_Tabları.SelectedTab = tab_ekonometrik;
-        }
-
-
-
-        /*        private void ELFPredictionShowResultsGunaButton_Click(object sender, EventArgs e) 
+                else
                 {
-                    try
-                    {
-                        // Set cursor to wait while running the operations
-                        Cursor.Current = Cursors.WaitCursor;
-
-                        string modifiedFilePath = @"C:\Users\begum.orhan\MRC\İletişim sitesi - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
-
-                        // Check if the modified file exists
-                        if (!File.Exists(modifiedFilePath))
-                        {
-                            MessageBox.Show("The modified Excel file does not exist. Please save the scena" +
-                                "rio first.");
-                            return;
-                        }
-
-                        // Run the R script
-                        string resultsFilePath = RunModelRScript(modifiedFilePath);
-
-                        if (resultsFilePath == null)
-                        {
-                            // If R script failed or no results path was returned, stop further execution
-                            return;
-                        }
-
-                        // Load results into tab_ekonometrik
-                        LoadResultsToTabEkonometrik(resultsFilePath);
-                    }
-                    finally
-                    {
-                        // Restore cursor to default
-                        Cursor.Current = Cursors.Default;
-                    }
-                }*/
-
-        // Method to run the R script
-        private string RunModelRScript(string modifiedFilePath)
-        {
-            string rScriptPath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\begum_model_deneme.R";
-            string resultsFilePath = "";
-
-            // Set up process info
-            var processInfo = new ProcessStartInfo()
-            {
-                FileName = "Rscript.exe",
-                Arguments = $"\"{rScriptPath}\" \"{modifiedFilePath}\"",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            // Start the process
-            using (var process = Process.Start(processInfo))
-            {
-                process.OutputDataReceived += (sender, args) =>
-                {
-                    if (!string.IsNullOrEmpty(args.Data))
-                    {
-                        Console.WriteLine(args.Data);
-                        resultsFilePath = args.Data;  // Capture the file path
-                    }
-                };
-
-                process.ErrorDataReceived += (sender, args) => Console.WriteLine("ERROR: " + args.Data);
-
-                process.BeginOutputReadLine();
-                process.WaitForExit();
-            }
-
-            if (string.IsNullOrEmpty(resultsFilePath))
-            {
-                MessageBox.Show("Error: No results file path was generated by the R script.");
-                return null;
-            }
-
-            MessageBox.Show("R script executed successfully. Results saved in: " + resultsFilePath);
-            return resultsFilePath;  // Return the results file path
-        }
-
-        // Method to load results into tab_ekonometrik
-
-
-        // Helper method to load data from an Excel worksheet into a DataGridView
-        private void LoadWorksheetToDataGridView(ExcelWorksheet worksheet, DataGridView dataGridView)
-        {
-            DataTable dt = new DataTable();
-
-            // Load headers from the first row
-            for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
-            {
-                dt.Columns.Add(worksheet.Cells[1, col].Text);
-            }
-
-            // Load data from the worksheet into the DataTable (starting from row 2)
-            for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
-            {
-                var newRow = dt.NewRow();
-                for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
-                {
-                    newRow[col - 1] = worksheet.Cells[row, col].Text;
+                    await dekHaritayaVeriYukleAsync();
                 }
-                dt.Rows.Add(newRow);
-            }
 
-            // Assign the DataTable as the DataSource of the DataGridView
-            dataGridView.DataSource = dt;
-        }
-        private void LoadImageIntoPictureBox(PictureBox pictureBox, string imagePath)
-        {
-            if (File.Exists(imagePath))
+            } else if (Modül_Tabları.SelectedTab == tab_yükHaritası)
             {
-                using (DrawingImage img = DrawingImage.FromFile(imagePath))
+
+                // Find the index of the overlay in tüm_katmanlar_array_imar_names that contains "xxx"
+                string searchText = "SONUCLAR_Load_Density.kml"; // The text to search for
+                overlayIndex = Array.FindIndex(cbs.tüm_katmanlar_array_names,
+                    name => name != null && name.Contains(searchText));
+
+                // if the SONUCLAR_load_density.kml file exists
+                if (overlayIndex != -1)
                 {
-                    pictureBox.Image = new Bitmap(img); // Create a new Bitmap to avoid file lock issues
-                }
-            }
-            else
-            {
-                MessageBox.Show($"Image not found: {imagePath}", "Image Load Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    legendPanel.Visible = true;
+
+                    load_density_cnt++;
+
+                    if (load_density_cnt == 1)
+                    {
+                        trackBar_Yıllar.Value = trackBar_Yıllar.Minimum + 1;
+                        trackBar_Yıllar.Value = trackBar_Yıllar.Minimum;
+                    }
+
+                    legendPanel.PerformLayout(); // Force layout update
+
+                } else
+                {
+                    legendPanel.Visible = false;
+                }        
+
             }
         }
-        public DataTable ReadExcelToDataTable(string filePath)
+
+
+        public void ProjeEkleButton_Click(object sender, EventArgs e)
         {
-            // Check if file exists
-            if (!File.Exists(filePath))
-            {
-                MessageBox.Show($"Excel file not found: {filePath}");
-                return null;
-            }
-
-            DataTable dataTable = new DataTable();
-
             try
             {
-                // Load the Excel file
-                using (var workbook = new XLWorkbook(filePath))
+                // İl/ilçe bilgilerini kontrol et
+                if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
                 {
-                    // Get the first worksheet in the Excel file
-                    var worksheet = workbook.Worksheet(1);
+                    MessageBox.Show("Lütfen önce il ve ilçe seçimi yapın.",
+                        "İl/İlçe Seçilmedi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
-                    // Read the header (assuming the first row contains column names)
-                    bool headerRow = true;
-                    foreach (var row in worksheet.RowsUsed())
+                // Proje klasörünün ana dizini
+                string projectsBaseDir = Path.Combine(PathService.BaseDirectory, PathService.FullPath);
+
+                // Burada sadece mevcut projeleri listeleme ve seçme işlemi
+                using (var folderBrowser = new ProjectFolderPicker(projectsBaseDir))
+                {
+                    if (folderBrowser.ShowDialog() == DialogResult.OK)
                     {
-                        if (headerRow)
+                        try
                         {
-                            foreach (var cell in row.Cells())
+                            string selectedPath = folderBrowser.SelectedPath;
+                            string projectName = folderBrowser.SelectedProjectName;
+
+                            // Geçici klasörden yüklü veri kontrolü
+                            if (PathService.CurrentMode == PathService.WorkingMode.Temporary && GirdiModülü.dataTablesByType.Count > 0)
                             {
-                                dataTable.Columns.Add(cell.Value.ToString()); // Create columns based on the first row
+                                var result = MessageBox.Show(
+                                    "Geçici çalışma klasöründeki veriler kaydedilmemiş. Proje açmak geçici verilerin kaybına neden olacaktır. Devam etmek istiyor musunuz?",
+                                    "Veri Kaybı Uyarısı",
+                                    MessageBoxButtons.YesNo,
+                                    MessageBoxIcon.Warning);
+                                if (result != DialogResult.Yes)
+                                    return;
                             }
-                            headerRow = false; // Only process the header row once
+
+                            // Projeyi aç
+                            PathService.OpenProject(projectName);
+
+                            // Varsayılan geçici klasörü temizle
+                            CleanupDefaultTempFolder();
+
+                            // Proje durumunu yükle
+                            LoadProjectState();
+
+                            // UI'ı güncelle
+                            UpdateUIForLoadedProject();
+
+                            // Form başlığını güncelle
+                            this.Text = $"SLF Yazılımı - {PathService.SelectedCity}/{PathService.SelectedDistrict} - Proje: {projectName}";
+
+                            MessageBox.Show($"Proje '{projectName}' başarıyla açıldı.",
+                                "Proje Açıldı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                            // Son çalışılan projeyi ayarlar dosyasına kaydet
+                            try
+                            {
+
+                                Console.WriteLine($"Son proje bilgileri kaydedildi: {projectName}");
+                            }
+                            catch (Exception settingsEx)
+                            {
+                                Console.WriteLine($"Ayarlar kaydedilirken hata: {settingsEx.Message}");
+                                // Ayarlar kaydedilemediğinde ana işlevi etkilememesi için hatayı yut
+                            }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            // Create a new DataRow for each subsequent row in the Excel file
-                            DataRow dataRow = dataTable.NewRow();
-                            int columnIndex = 0;
-
-                            foreach (var cell in row.Cells())
-                            {
-                                dataRow[columnIndex] = cell.Value.ToString(); // Assign cell values to the DataRow
-                                columnIndex++;
-                            }
-
-                            dataTable.Rows.Add(dataRow); // Add DataRow to DataTable
+                            MessageBox.Show($"Proje açılırken hata oluştu: {ex.Message}",
+                                "Proje Açma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error reading Excel file: {ex.Message}");
-                return null;
+                MessageBox.Show($"Proje işlemi sırasında hata oluştu: {ex.Message}",
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Debug.WriteLine($"Proje işlem hatası: {ex}");
             }
-
-            return dataTable;
         }
-        // DEK şehri seçildiğinde çağrılan metot
-        private void dek_city_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (comboBox_DEK_il.SelectedItem != null)  // Geçerli bir seçim yapıldığında
-            {
-                SelectedCity = comboBox_DEK_il.SelectedItem.ToString();  // Şehir adını ayarla
-                CheckSelections();  // Seçim durumunu kontrol et
 
-                // Set map position based on selected city
-                if (cityCoordinates.TryGetValue(SelectedCity, out PointLatLng coordinates))
+        // Yeni metot: Varsayılan geçici klasörü temizle
+        private bool CleanupDefaultTempFolder()
+        {
+            try
+            {
+                string districtPath = Path.Combine(PathService.BaseDirectory, PathService.FullPath);
+
+                if (Directory.Exists(districtPath))
                 {
-                    gMapControl_DEK.Position = coordinates; // Set the map's position
-                    gMapControl_DEK.Zoom = 12; // Adjust the zoom level as needed
+                    // "temp_" ile başlayan tüm klasörleri bul
+                    string[] tempFolders = Directory.GetDirectories(districtPath, "temp_*");
+
+                    foreach (string folder in tempFolders)
+                    {
+                        try
+                        {
+                            // Salt okunur özniteliklerini kaldır
+                            RemoveReadOnlyAttributesRecursive(folder);
+
+                            // Klasörü sil
+                            Directory.Delete(folder, true);
+                            Console.WriteLine($"Geçici klasör silindi: {folder}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Geçici klasör silinirken hata: {ex.Message}");
+                        }
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Geçici klasörleri temizlerken hata: {ex.Message}");
+                return false;
+            }
+        }
+
+        private void LoadProjectState()
+        {
+            try
+            {
+                string statePath = Path.Combine(
+                    PathService.BaseDirectory,
+                    PathService.FullPath,
+                    PathService.CurrentWorkingFolder,
+                    "project_state.json");
+
+                Console.WriteLine($"Proje durum dosyası: {statePath}");
+
+                if (File.Exists(statePath))
+                {
+                    string json = File.ReadAllText(statePath);
+                    Console.WriteLine($"Okunan JSON: {json}");
+
+                    // JSON'ı deserialize et
+                    var options = new System.Text.Json.JsonSerializerOptions
+                    {
+                        AllowTrailingCommas = true,
+                        ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip,
+                        PropertyNameCaseInsensitive = true
+                    };
+
+                    var projectState = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json, options);
+
+                    // JSON deserialize edildi mi kontrol et
+                    if (projectState == null)
+                    {
+                        Console.WriteLine("HATA: JSON deserialize edilemedi!");
+                        return;
+                    }
+
+                    // JSON içeriğini yazdır
+                    Console.WriteLine("JSON içeriği:");
+                    foreach (var key in projectState.Keys)
+                    {
+                        Console.WriteLine($"- {key}: {projectState[key]}");
+                    }
+
+                    // Yıl bilgilerini yükle
+                    if (projectState.TryGetValue("SLFStartYear", out object startYearObj) &&
+                        projectState.TryGetValue("SLFEndYear", out object endYearObj))
+                    {
+                        try
+                        {
+                            // JSON.NET ile JsonElement tipindeki değeri int'e çevir
+                            int startYear = Convert.ToInt32(startYearObj.ToString());
+                            int endYear = Convert.ToInt32(endYearObj.ToString());
+
+                            Console.WriteLine($"Yüklenecek yıllar: Başlangıç {startYear}, Bitiş {endYear}");
+
+                            // YearService'i güncelle
+                            var yearService = YearService.GetInstance();
+                            yearService.SetYears(startYear, endYear);
+
+                            // ModülFormu değişkenlerini güncelle
+                            this.slfStartYear = startYear;
+                            this.slfEndYear = endYear;
+
+                            Console.WriteLine($"Yıllar başarıyla yüklendi ve setlendi");
+
+                            // ComboBox'ları güncelle
+                            UpdateYearComboBoxes();
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Yılları setlerken hata: {ex.Message}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("UYARI: JSON dosyasında yıl bilgileri bulunamadı!");
+                    }
+
+                    // Tamamlanan modülleri yükle
+                    if (projectState.TryGetValue("CompletedModules", out object modulesObj))
+                    {
+                        try
+                        {
+                            // Modül listesini al
+                            var modulesElement = (System.Text.Json.JsonElement)modulesObj;
+                            List<string> completedModules = new List<string>();
+
+                            // JsonElement dizisini List<string>'e dönüştür
+                            if (modulesElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                            {
+                                foreach (var element in modulesElement.EnumerateArray())
+                                {
+                                    if (element.ValueKind == System.Text.Json.JsonValueKind.String)
+                                    {
+                                        completedModules.Add(element.GetString());
+                                    }
+                                }
+                            }
+
+                            // Konsola kaydedilmiş modülleri yazdır
+                            Console.WriteLine($"Kaydedilmiş {completedModules.Count} modül bulundu:");
+                            foreach (var module in completedModules)
+                            {
+                                Console.WriteLine($"- {module}");
+                            }
+
+                            // Modül verilerini yükle
+                            foreach (string module in completedModules)
+                            {
+                                LoadModuleData(module);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Modül listesi yüklenirken hata: {ex.Message}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("UYARI: JSON dosyasında modül listesi bulunamadı!");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"UYARI: Proje durum dosyası bulunamadı: {statePath}");
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Proje durumu yüklenirken hata: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+            }
+        }
+
+        // ComboBox'ları yüklenen yıllara göre güncelle
+        private void UpdateYearComboBoxes()
+        {
+            try
+            {
+                // ComboBox'ları bul ve yılları set et (buradaki isimler projenizdeki gerçek adlara göre değiştirilmeli)
+                if (startYearComboBox != null && endYearComboBox != null)
+                {
+                    // YearService'ten yılları al
+                    var yearService = YearService.GetInstance();
+                    int startYear = yearService.slfStartYear;
+                    int endYear = yearService.slfEndYear;
+
+                    // ComboBox'lara yılları seç
+                    for (int i = 0; i < startYearComboBox.Items.Count; i++)
+                    {
+                        if (startYearComboBox.Items[i].ToString() == startYear.ToString())
+                        {
+                            startYearComboBox.SelectedIndex = i;
+                            break;
+                        }
+                    }
+
+                    for (int i = 0; i < endYearComboBox.Items.Count; i++)
+                    {
+                        if (endYearComboBox.Items[i].ToString() == endYear.ToString())
+                        {
+                            endYearComboBox.SelectedIndex = i;
+                            break;
+                        }
+                    }
+
+                    // "Onayla" butonunun metnini güncelle (eğer bu butonu kullanıyorsanız)
+                    if (yearApproveButton != null)
+                    {
+                        yearApproveButton.Text = "Sıfırla"; // Yıllar setlenmiş durumda
+                    }
+
+                    Console.WriteLine($"ComboBox'lar yüklenen yıllara göre güncellendi");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ComboBox'lar güncellenirken hata: {ex.Message}");
+            }
+        }
+
+        /// Modül verilerini yükler
+        private void LoadModuleData(string moduleName)
+        {
+            try
+            {
+                Console.WriteLine($"Modül verisi yükleniyor: {moduleName}");
+
+                // Modül için girdiler klasörünü bul
+                string modulePath = PathService.GetGirdilerPathForDataType(moduleName);
+                Console.WriteLine($"Modül yolu: {modulePath}");
+
+                if (!Directory.Exists(modulePath))
+                {
+                    Console.WriteLine($"Modül klasörü bulunamadı: {modulePath}");
+                    return;
+                }
+
+                // Klasördeki tüm CSV dosyalarını göster
+                var directory = new DirectoryInfo(modulePath);
+                var csvFiles = directory.GetFiles("*.csv");
+                Console.WriteLine($"{csvFiles.Length} adet CSV dosyası bulundu.");
+
+                foreach (var file in csvFiles)
+                {
+                    Console.WriteLine($"- {file.Name} ({file.LastWriteTime})");
+                }
+
+                // Klasördeki en son dosyayı bul
+                var latestFile = csvFiles.OrderByDescending(f => f.LastWriteTime).FirstOrDefault();
+
+                if (latestFile != null)
+                {
+                    Console.WriteLine($"En son dosya: {latestFile.Name}");
+
+                    // CSV'yi yükle
+                    var csvHandler = new CsvHandler();
+                    DataTable moduleData = csvHandler.ImportCsvFile(latestFile.FullName);
+
+                    if (moduleData != null)
+                    {
+                        Console.WriteLine($"CSV başarıyla yüklendi: {moduleData.Rows.Count} satır, {moduleData.Columns.Count} sütun");
+
+                        // GirdiModülü.dataTablesByType'a ekle
+                        if (moduleData.Rows.Count > 0)
+                        {
+                            GirdiModülü.dataTablesByType[moduleName] = moduleData;
+
+                            // GirdiModülleri sözlüğünü güncelle
+                            if (girdiModülleri.ContainsKey(moduleName))
+                            {
+                                girdiModülleri[moduleName].importedDataTable = moduleData;
+                                Console.WriteLine($"GirdiModülleri sözlüğü güncellendi: {moduleName}");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"UYARI: {moduleName} girdiModülleri sözlüğünde bulunamadı!");
+                            }
+
+                            Console.WriteLine($"Modül verisi yüklendi: {moduleName}, Satır sayısı: {moduleData.Rows.Count}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"UYARI: {moduleName} için CSV dosyası boş!");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"HATA: {latestFile.FullName} dosyası DataTable'a yüklenemedi!");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"UYARI: {modulePath} klasöründe CSV dosyası bulunamadı!");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Modül verisi yüklenirken hata: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+            }
+        }
+        private void UpdateUIForLoadedProject()
+        {
+            try
+            {
+                // veri_listesi_seçimi ComboBox'ını güncelle
+                if (veri_listesi_seçimi != null)
+                {
+                    veri_listesi_seçimi.Refresh();
+                }
+
+                // Modül butonlarını etkinleştir/devre dışı bırak
+                UpdateModuleButtonsState();
+
+                // DataGridView'ı güncelle
+                if (dataGridView_girdi != null && GirdiModülü.dataTablesByType.Count > 0)
+                {
+                    // İlk veri tipini göster
+                    var firstModule = GirdiModülü.dataTablesByType.Keys.FirstOrDefault();
+                    if (!string.IsNullOrEmpty(firstModule))
+                    {
+                        // GirdiModülü'nü güncelle
+                        if (girdiModülleri.ContainsKey(firstModule))
+                        {
+                            girdiModülleri[firstModule].importedDataTable = GirdiModülü.dataTablesByType[firstModule];
+                        }
+
+                        // DataGridView'ı güncelle
+                        dataGridView_girdi.DataSource = GirdiModülü.dataTablesByType[firstModule];
+                        dataGridView_girdi.Refresh();
+
+                        // ComboBox'ta da seç
+                        if (veri_listesi_seçimi != null)
+                        {
+                            for (int i = 0; i < veri_listesi_seçimi.Items.Count; i++)
+                            {
+                                if (veri_listesi_seçimi.Items[i].ToString() == firstModule)
+                                {
+                                    veri_listesi_seçimi.SelectedIndex = i;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Form başlığını güncelle
+                if (PathService.CurrentWorkingFolder != null && PathService.CurrentWorkingFolder.StartsWith("proje_"))
+                {
+                    string projectName = PathService.CurrentWorkingFolder.Substring(6); // "proje_" çıkar
+                    this.Text = $"SLF Yazılımı - {PathService.SelectedCity}/{PathService.SelectedDistrict} - Proje: {projectName}";
+                }
+
+                Debug.WriteLine("UI yüklenen projeye göre güncellendi");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"UI güncellenirken hata: {ex.Message}");
+            }
+        }
+
+        private void UpdateModuleButtonsState()
+        {
+            // Burada gerçek buton adlarınıza göre butonların etkinliğini kontrol edin
+            // Örnek: Bazı butonlar belirli modüllerin yüklenmiş olmasını gerektirebilir
+
+            // DTR verisi yüklenmişse EA Şarj ve DEK modülleri etkinleştir
+            bool dtrLoaded = GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri");
+
+            // Bu kısımda gerçek buton adlarınızı kullanmalısınız
+            // Örnek:
+            if (dtrLoaded)
+            {
+                // EA Şarj ve DEK modülleri için butonları etkinleştir
+                if (OpenModuleButton != null)
+                    OpenModuleButton.Enabled = true;
+
+                if (GelecekSimButton != null)
+                    GelecekSimButton.Enabled = dtrLoaded;
+
+                if (DEKSimButton != null)
+                    DEKSimButton.Enabled = dtrLoaded;
+            }
+
+            // Diğer modüller için benzer kontroller eklenebilir
+        }
+
+
+        // Modül verilerini CSV olarak kaydet
+        private void SaveAllModuleDataToCSV(string projectPath)
+        {
+            string girdilerPath = Path.Combine(projectPath, "Girdiler");
+
+            // Klasör yoksa oluştur
+            if (!Directory.Exists(girdilerPath))
+            {
+                Directory.CreateDirectory(girdilerPath);
+            }
+
+            foreach (var kvp in GirdiModülü.dataTablesByType)
+            {
+                string moduleKey = kvp.Key;
+                DataTable moduleData = kvp.Value;
+
+                string moduleFolderName = moduleKey.Replace(" ", "_");
+                string moduleFolder = Path.Combine(girdilerPath, moduleFolderName);
+
+                // Modül klasörü yoksa oluştur
+                if (!Directory.Exists(moduleFolder))
+                {
+                    Directory.CreateDirectory(moduleFolder);
+                }
+
+                // Dosya adı oluştur
+                string fileName = $"{moduleFolderName}_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+                string filePath = Path.Combine(moduleFolder, fileName);
+
+                // CSV olarak kaydet
+                using (StreamWriter sw = new StreamWriter(filePath, false, Encoding.UTF8))
+                {
+                    // Başlık satırı
+                    int columnCount = moduleData.Columns.Count;
+                    for (int i = 0; i < columnCount; i++)
+                    {
+                        sw.Write(moduleData.Columns[i].ColumnName);
+                        if (i < columnCount - 1)
+                        {
+                            sw.Write(",");
+                        }
+                    }
+                    sw.WriteLine();
+
+                    // Veri satırları
+                    foreach (DataRow row in moduleData.Rows)
+                    {
+                        for (int i = 0; i < columnCount; i++)
+                        {
+                            // Null değerleri boş string olarak yaz
+                            string value = row[i]?.ToString() ?? "";
+
+                            // Virgül içeren değerleri çift tırnak içine al
+                            if (value.Contains(",") || value.Contains("\"") || value.Contains("\n"))
+                            {
+                                value = "\"" + value.Replace("\"", "\"\"") + "\"";
+                            }
+
+                            sw.Write(value);
+                            if (i < columnCount - 1)
+                            {
+                                sw.Write(",");
+                            }
+                        }
+                        sw.WriteLine();
+                    }
+                }
+            }
+        }
+
+
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+        // -------------------------------------------- CUSTOM CLASSES ------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+
+        // Nokta veri yapısı
+        public class NoktaVeri
+        {
+            public double Enlem { get; set; }
+            public double Boylam { get; set; }
+            public double Bina_Demandi { get; set; }
+            public int Abone_Sayısı { get; set; }
+
+
+        }
+
+
+        // A simple prompt dialog for renaming
+        public static class Prompt
+        {
+            public static string ShowDialog(string text, string caption)
+            {
+                Form prompt = new Form()
+                {
+                    Width = 320,
+                    Height = 160,
+                    FormBorderStyle = FormBorderStyle.FixedDialog,
+                    Text = caption,
+                    StartPosition = FormStartPosition.CenterScreen
+                };
+                System.Windows.Forms.Label textLabel = new System.Windows.Forms.Label() { Left = 50, Top = 20, Text = text };
+                System.Windows.Forms.TextBox textBox = new System.Windows.Forms.TextBox() { Left = 50, Top = 50, Width = 170, Height = 70 };
+                System.Windows.Forms.Button confirmation = new System.Windows.Forms.Button() { Text = "Tamam", Left = 170, Width = 100, Top = 85, DialogResult = DialogResult.OK };
+                confirmation.Click += (sender, e) => { prompt.Close(); };
+                prompt.Controls.Add(textBox);
+                prompt.Controls.Add(confirmation);
+                prompt.Controls.Add(textLabel);
+                prompt.AcceptButton = confirmation;
+
+                return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
+            }
+        }
+
+
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+        // -------------------------------------------- EA ------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+
+        private async void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        {
+
+            if (isAddingChargingStation)
+            {
+                // Yeni marker oluştur
+                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow)
+                {
+                    ToolTipText = "Yeni Şarj İstasyonu"
+                };
+                markerOverlay_ea.Markers.Add(marker);
+
+                // Nokta verisini oluştur
+                NoktaVeri noktaVeri_marker = new NoktaVeri
+                {
+                    Enlem = Math.Round(pointClick.Lat, 5),
+                    Boylam = Math.Round(pointClick.Lng, 5)
+                };
+
+                // Popup formu göster
+                using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+                {
+                    if (popupForm.ShowDialog() == DialogResult.OK)
+                    {
+                        // Başarılı olduğunda harita verilerini yükle
+                        await eaHaritayaVeriYukleAsync();
+                    }
+                    else if (popupForm.OperationCancelled)
+                    {
+                        // İşlem iptal edilirse marker'ı kaldır
+                        markerOverlay_ea.Markers.Remove(marker);
+                    }
+                }
+
+                // İşaretleme işlemini sıfırla
+                isAddingChargingStation = false;
+                return;
+            }
+
+            /*OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
+                ref polygonOverlay_ea, Mesafe_ea, mesafe_metre_yuk);*/
+
+        }
+
+
+        private void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
+        {
+            if (item.Tag != null && item.Tag is NoktaVeri && Modül_Tabları.SelectedTab == tab_ea)
+            {
+                NoktaVeri seçili_nokta = item.Tag as NoktaVeri;
+                NoktaBilgileriniGoster(seçili_nokta);
+            }
+        }
+
+        private void EA_Nokta_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                ContextMenuStrip_Nokta.Show(Cursor.Position);
+            }
+        }
+        private void EaSimMaxBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (EaSimMaxBtn.Checked)
+            {
+
+                SelectedSpeed = "Hızlı";
+            }
+        }
+        private void EaSimMinBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (EaSimMinBtn.Checked)
+            {
+
+                SelectedSpeed = "Yavaş";
+            }
+        }
+        private void EaSimDefBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (EaSimMinBtn.Checked)
+            {
+                SelectedSpeed = "varsayılan";
+            }
+        }
+        private void ToggleMarkers(string markerType, bool isVisible)
+        {
+            // gMapControl_EA üzerindeki tüm overlay'leri dolaşarak marker'ları kontrol ediyoruz
+            foreach (var overlay in gMapControl_EA.Overlays)
+            {
+                foreach (var marker in overlay.Markers)
+                {
+                    // Marker, GMarkerGoogle türündeyse ve ToolTipText ile belirtilen türle eşleşiyorsa
+                    if (marker is GMarkerGoogle googleMarker && googleMarker.ToolTipText == markerType)
+                    {
+                        // Marker'ın görünürlük durumunu güncelle
+                        googleMarker.IsVisible = isVisible;
+                    }
+                }
+            }
+
+            // Harita güncellenmesi için refresh yapıyoruz
+            gMapControl_EA.Refresh();
         }
 
         // Şehir seçimi yapıldığında çağrılan metot
@@ -2082,327 +3010,6 @@ namespace SLF
                 CheckSelections();  // Seçim durumunu kontrol et
             }
         }
-
-
-        private void veri_listesi_seçimi_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (veri_listesi_seçimi.SelectedItem != null)
-            {
-                string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
-
-                // dataTablesByType'ta bu veri var mı kontrol et
-                if (GirdiModülü.dataTablesByType.ContainsKey(seçilenVeriTipi))
-                {
-                    // GirdiModülü'nü güncelle
-                    if (girdiModülleri.ContainsKey(seçilenVeriTipi))
-                    {
-                        girdiModülleri[seçilenVeriTipi].importedDataTable = GirdiModülü.dataTablesByType[seçilenVeriTipi];
-                    }
-
-                    // DataGridView'ı güncelle
-                    dataGridView_girdi.DataSource = GirdiModülü.dataTablesByType[seçilenVeriTipi];
-                    dataGridView_girdi.Refresh();
-
-                    Debug.WriteLine($"Seçilen veri tipi: {seçilenVeriTipi}, Satır sayısı: {GirdiModülü.dataTablesByType[seçilenVeriTipi].Rows.Count}");
-                }
-                else
-                {
-                    Debug.WriteLine($"Seçilen veri tipi için yüklenmiş veri yok: {seçilenVeriTipi}");
-                    dataGridView_girdi.DataSource = null;
-                }
-            }
-        }
-
-        private void SortTabPagesAlphabetically(TabControl tabControl, bool ascending = true)
-        {
-            // Get the list of TabPages
-            List<TabPage> tabPages = new List<TabPage>();
-            foreach (TabPage tabPage in tabControl.TabPages)
-            {
-                tabPages.Add(tabPage);
-            }
-
-            // Sort the list of TabPages based on the Text property
-            tabPages.Sort((x, y) =>
-            {
-                return ascending ? string.Compare(x.Text, y.Text) : -string.Compare(x.Text, y.Text);
-            });
-
-            // Clear the current TabPages and add the sorted TabPages
-            tabControl.TabPages.Clear();
-            tabControl.TabPages.AddRange(tabPages.ToArray());
-        }
-        private void veri_listesi_seçimi_DrawItem(object sender, DrawItemEventArgs e)
-        {
-           
-            if (e.Index < 0)
-                return;
-
-            string text = veri_listesi_seçimi.Items[e.Index].ToString();
-           
-
-            Color textColor = Color.Red;
-            if (girdiModülleri.ContainsKey(text) && girdiModülleri[text].importedDataTable != null)
-            {
-                if (girdiModülleri[text].importedDataTable.Rows.Count > 0)
-                {
-                    textColor = Color.Green;
-                    
-                    
-                }
-            }
-
-            e.DrawBackground();
-            using (Brush brush = new SolidBrush(textColor))
-            {
-                e.Graphics.DrawString(text, e.Font, brush, e.Bounds);
-            }
-            e.DrawFocusRectangle();
-        }
-
-        private void raporGoruntuleButonu_Click(object sender, EventArgs e)
-        {
-            // Girdi modülündeki dosya yükleme butonuna tıklandığında çalışacak kodlar
-            if (slfStartYear == 0 || slfEndYear == 0)
-            {
-                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            // Veri listesinde seçilen veri tipine göre dosya seçme işlemi yapılacak
-            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
-            girdiModülü = girdiModülleri[seçilenVeriTipi];
-            girdiModülü.VEERReport(seçilenVeriTipi);
-        }
-
-        private void ExcelDownloadButton_Click(object sender, EventArgs e)
-        {
-            if (slfStartYear == 0 || slfEndYear == 0)
-            {
-                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            const string FilterExcelFiles = "Excel dosyaları (*.xlsx)|*.xlsx";
-            const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
-            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
-            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
-            if (dataTable.Rows.Count == 0)
-            {
-                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Excel dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            else if (dataTable.Rows.Count > 50000)
-            {
-                MessageBox.Show($"{seçilenVeriTipi} için veri boyutu çok büyük. CSV olarak dışa aktarmayı deneyebilirsiniz.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            var fileDialog = new SaveFileDialog
-            {
-                Title = "Kaydedeceğiniz dosyanın adını giriniz.",
-                Filter = $"{FilterExcelFiles}|{FilterAllFiles}"
-            };
-            if (fileDialog.ShowDialog() == DialogResult.OK)
-            {
-                var filePath = fileDialog.FileName;
-                var excelExporter = new ExcelExporter();
-                excelExporter.ExportExcelFile(
-                    filePath,
-                    dataTable,
-                    seçilenVeriTipi
-                );
-            }
-            else
-            {
-                MessageBox.Show("Dosya seçilmedi.");
-            }
-
-        }
-
-        private void csvExportButton_Click(object sender, EventArgs e)
-        {
-            if (slfStartYear == 0 || slfEndYear == 0)
-            {
-                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            const string FilterCsvFiles = "Csv dosyaları (*.csv)|*.csv";
-            const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
-            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
-            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
-            if (dataTable.Rows.Count == 0)
-            {
-                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Csv dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            var fileDialog = new SaveFileDialog
-            {
-                Title = "Kaydedeceğiniz dosyanın adını giriniz.",
-                Filter = $"{FilterCsvFiles}|{FilterAllFiles}"
-            };
-            if (fileDialog.ShowDialog() == DialogResult.OK)
-            {
-                var filePath = fileDialog.FileName;
-                var csvHandler = new CsvHandler();
-                csvHandler.ExportCsvFile(
-                    filePath,
-                    dataTable
-                );
-            }
-            else
-            {
-                MessageBox.Show("Dosya seçilmedi.");
-            }
-        }
-
-
-        /* -------------------------------------------------------------------------------------------*/
-
-
-        //////////////// YEAR SELECTION EVENTS ////////////////
-
-        private void ResetYearSelectionProcessGirdiModulu()
-        {
-            slfStartYear = slfEndYear = 0;
-            int currentYear = DateTime.Now.Year;
-            int lastYear = currentYear - 1;
-
-            startYearComboBox.SelectedIndex = -1;
-            startYearComboBox.Text = "Yıl seçiniz";
-            endYearComboBox.SelectedIndex = -1;
-            endYearComboBox.Text = "Yıl seçiniz";
-            yearApproveButton.Text = "Onayla";
-
-            //// Clear any existing items in the ComboBox
-            startYearComboBox.Items.Clear();
-
-            // Add the years to the ComboBox
-            startYearComboBox.Items.Add(lastYear);
-            startYearComboBox.Items.Add(currentYear);
-
-            // Disable the endYearComboBox initially
-            startYearComboBox.Enabled = true;
-            endYearComboBox.Enabled = false;
-            yearApproveButton.Enabled = false;
-            // veri_listesi_seçimi.Enabled = false;
-        }
-        private void ModülFormu_Load(object sender, EventArgs e)
-        {
-          // Modül formunu yüklerken reset year selection sürecini başlat
-            ResetYearSelectionProcessGirdiModulu();
-        }
-
-        private void startYearComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (startYearComboBox.SelectedIndex == -1)
-            {
-                return;
-            }
-            // Get the selected year
-            int selectedYear = (int)startYearComboBox.SelectedItem;
-
-
-            // Enable the endYearComboBox
-            endYearComboBox.Enabled = true;
-
-            // Clear any existing items in the ComboBox
-            endYearComboBox.Items.Clear();
-
-            // Add years from selectedYear + 4 to selectedYear + 14
-            for (int year = selectedYear + 4; year <= selectedYear + 14; year++)
-            {
-                endYearComboBox.Items.Add(year);
-            }
-
-            // Optionally, set the first year as the selected item
-            //endYearComboBox.SelectedIndex = 0;
-        }
-
-        private void endYearComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            yearApproveButton.Enabled = true;
-        }
-        private void HomePageButton_Click(object sender, EventArgs e)
-        {
-            // Show the confirmation dialog for navigating to the home page
-            DialogResult result = MessageBox.Show(
-                "Ana sayfaya dönmek istediğinize emin misiniz? Kaydedilmeyen veriler kaybolacaktır!",
-                "Ana Sayfaya Dön",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning
-            );
-
-            if (result == DialogResult.Yes)
-            {
-                // Unsubscribe from the FormClosing event only if the user clicks 'Yes'
-                this.FormClosing -= ModülFormu_FormClosing;
-                this.Hide(); // Hide the current form (ModülFormu)
-            }
-            // If the user clicks 'No', do nothing and stay on the current form
-        }
-
-        private void yearApproveButton_Click(object sender, EventArgs e)
-{
-    try {
-        // Yıl servisi referansını al - DOĞRU
-        var yearService = YearService.GetInstance();
-
-                // Debug için mevcut değerlere bakalım
-        Debug.WriteLine($"YearService değerleri değişti mi? - Başlangıç: {yearService.slfStartYear}, Bitiş: {yearService.slfEndYear}");
-
-                if (endYearComboBox.SelectedIndex == -1)
-        {
-            // Doğru işlem - hata mesajı
-        }
-        else if (startYearComboBox.Enabled == false && endYearComboBox.Enabled == false)
-        {
-            // Yıl sıfırlama kodu - doğru
-        }
-        else
-        {
-            // Seçimler tamamlandı
-            startYearComboBox.Enabled = false;
-            endYearComboBox.Enabled = false;
-            
-            // Seçilen değerleri al
-            int selectedStartYear = (int)startYearComboBox.SelectedItem;
-            int selectedEndYear = (int)endYearComboBox.SelectedItem;
-            
-            Debug.WriteLine($"Seçilen yıllar - Başlangıç: {selectedStartYear}, Bitiş: {selectedEndYear}");
-            
-            // YearService'e değerleri ayarla
-            yearService.SetYears(selectedStartYear, selectedEndYear);
-            
-            // Değerler başarıyla ayarlandı mı kontrol edelim
-            Debug.WriteLine($"YearService değerleri değişti mi? - Başlangıç: {yearService.slfStartYear}, Bitiş: {yearService.slfEndYear}");
-            
-            // Geriye dönük uyumluluk için sınıf değişkenlerini de güncelle
-            slfStartYear = selectedStartYear;
-            slfEndYear = selectedEndYear;
-            
-            // GirdiModülleri dictionary'sindeki bir örneği kontrol edelim
-            if (girdiModülleri != null && girdiModülleri.Count > 0)
-            {
-                var firstModule = girdiModülleri.FirstOrDefault();
-                if (firstModule.Value != null)
-                {
-                    Debug.WriteLine($"Örnek GirdiModülü değerleri - Modül: {firstModule.Key}, Başlangıç: {firstModule.Value.slfStartYear}, Bitiş: {firstModule.Value.slfEndYear}");
-                }
-            }
-            
-            MessageBox.Show($"Başlangıç yılı: {selectedStartYear}, Bitiş yılı: {selectedEndYear}",
-                "Yıllar belirlendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            yearApproveButton.Text = "Sıfırla";
-        }
-    }
-    catch (Exception ex) {
-        Debug.WriteLine($"yearApproveButton_Click hata: {ex.Message}");
-        MessageBox.Show($"Yıl ayarlama sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-    }
-}
-
-
-        /* -------------------------------------------------------------------------------------------*/
-
-
         private void calculateChargeStation(int greenAc, int redDc)
         {
             if (this.InvokeRequired)
@@ -2449,83 +3056,46 @@ namespace SLF
             gMapControl_EA.Refresh();
         }
 
-
-        // BURASI SONRADAN AÇILACAK, SIMDILIK BOYLE KALSIN.
-        private async void Modül_Tabları_SelectedIndexChanged(object sender, EventArgs e)
+        private DataTable FormatEATableForDisplay(DataTable originalEATable)
         {
-            
-            // Gerekli kontrolleri yapmak için seçilen sekmeyi ve modülleri kontrol et
-            string selectedTabText = Modül_Tabları.SelectedTab.Text;
+            // Yeni bir DataTable oluşturun
+            DataTable formattedEATable = new DataTable();
 
-            // Modüllerin yüklü olup olmadığını kontrol et
-            if (selectedMethod == "SLF (Jeo-Uzamsal)")
+            // İhtiyacınız olan sütunları ekleyin
+            formattedEATable.Columns.Add("Hücre ID", typeof(string));
+            formattedEATable.Columns.Add("Ilce", typeof(string)); // İlçe isimleri Çiğli ve Karşıyaka olarak ayarlanacak
+            formattedEATable.Columns.Add("AC (Home)", typeof(int));
+            formattedEATable.Columns.Add("AC (Work)", typeof(int));
+            formattedEATable.Columns.Add("AC (Public)", typeof(int));
+            formattedEATable.Columns.Add("Fast DC", typeof(int));
+            formattedEATable.Columns.Add("İstasyon Gücü(kW)", typeof(int));
+            formattedEATable.Columns.Add("Tüketim (kW/h)", typeof(int));
+
+            // Orijinal tablodaki her bir satırı işleyin
+            foreach (DataRow row in originalEATable.Rows)
             {
-                if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Haritası Modülü") && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
-                {
-                    // Sekme geçişini tamamen iptal et
-                    Console.WriteLine(GirdiModülü.dataTablesByType.Count);
-                    MessageBox.Show("DTR verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
-                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
-                    Modül_Tabları.SelectedTab = tab_girdi;
-                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
-                    return;
-                }
-                /*else if (selectedTabText == "İmar Analizleri" && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")))
-                {
-                    // Sekme geçişini tamamen iptal et
-                    MessageBox.Show("İmar planı verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
-                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
-                    Modül_Tabları.SelectedTab = tab_girdi;
-                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
-                    return;
-                }*/
-                else if (selectedTabText == "Optimal DTR Konumlandırma"
-                           && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")
-                           && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri")))
-                {
-                    // Sekme geçişini tamamen iptal et
-                    MessageBox.Show("DTR verileri ve İmar planı yüklenmeden bu sekmeye geçiş yapılamaz.");
-                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
-                    Modül_Tabları.SelectedTab = tab_girdi;
-                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
-                    return;
-                }
+                // Yeni bir satır oluşturun
+                DataRow newRow = formattedEATable.NewRow();
+
+                // ID değerini alın
+                newRow["Hücre ID"] = row["id"].ToString();  // Change "ID" to "Hücre ID" to match the formatted table column
+
+                // İlçe değerini dönüştür (1 = Çiğli, 2 = Karşıyaka)
+                int ilceValue = Convert.ToInt32(row["ilce"]);
+                newRow["Ilce"] = ilceValue == 1 ? "Çiğli" : ilceValue == 2 ? "Karşıyaka" : "Eskişehir";
+
+                // AC ve DC istasyon sayısını alın
+                newRow["AC (Home)"] = Convert.ToInt32(row["AC (Home)_count"]);
+                newRow["AC (Work)"] = Convert.ToInt32(row["AC (Work)_count"]);
+                newRow["AC (Public)"] = Convert.ToInt32(row["AC (Public)_count"]);
+                newRow["Fast DC"] = Convert.ToInt32(row["Fast DC_count"]);
+
+                // Yeni satırı formatlanmış tabloya ekleyin
+                formattedEATable.Rows.Add(newRow);
             }
 
-            // EA Şarj Modülü tabına tıklanmışsa
-            if (selectedTabText == "EA Şarj Modülü")
-            {
-                if ((!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri")))
-                {
-                    MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
-                    Modül_Tabları.SelectedTab = tab_girdi;
-                    return;
-                }
-                else
-                {
-                    InitializeComboBoxes();
-                    await eaHaritayaVeriYukleAsync();
-                }
-
-                // Harita işlemini başlat
-            }
-            // DEK Modülü tabına tıklanmışsa
-            else if (selectedTabText == "DEK Modülü")
-            {
-                Console.WriteLine("DEK Modülü");
-                if (!GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
-                {
-                    MessageBox.Show("Lütfen DEK modülü verilerinizi yükleyin.");
-                    Modül_Tabları.SelectedTab = tab_girdi;
-                    return;
-                }
-                else
-                {
-                    await dekHaritayaVeriYukleAsync();
-                }
-            }
+            return formattedEATable;
         }
-
         private void EAStationAddButton_Click(object sender, EventArgs e)
         {
             // Check if the "EA Şarj Verileri" key exists in the dataTablesByType dictionary
@@ -2559,49 +3129,6 @@ namespace SLF
             // Reset the flag after adding the station
             isAddingChargingStation = false;
         }
-        private async void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
-        {
-
-            if (isAddingChargingStation)
-            {
-                // Yeni marker oluştur
-                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow)
-                {
-                    ToolTipText = "Yeni Şarj İstasyonu"
-                };
-                markerOverlay_ea.Markers.Add(marker);
-
-                // Nokta verisini oluştur
-                NoktaVeri noktaVeri_marker = new NoktaVeri
-                {
-                    Enlem = Math.Round(pointClick.Lat, 4),
-                    Boylam = Math.Round(pointClick.Lng, 4)
-                };
-
-                // Popup formu göster
-                using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
-                {
-                    if (popupForm.ShowDialog() == DialogResult.OK)
-                    {
-                        // Başarılı olduğunda harita verilerini yükle
-                        await eaHaritayaVeriYukleAsync();
-                    }
-                    else if (popupForm.OperationCancelled)
-                    {
-                        // İşlem iptal edilirse marker'ı kaldır
-                        markerOverlay_ea.Markers.Remove(marker);
-                    }
-                }
-
-                // İşaretleme işlemini sıfırla
-                isAddingChargingStation = false;
-                return;
-            }
-            OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
-    ref polygonOverlay_ea, Mesafe_yuk, mesafe_metre_yuk);
-        }
-
-
         private async Task eaHaritayaVeriYukleAsync()
         {
             int redDc = 0;
@@ -2797,6 +3324,7 @@ namespace SLF
             popupForm.Controls.Add(dataGridView);
             popupForm.Show(); // Yeni pencereyi göster
         }
+
         private Task HaritaUzerindeSimulasyonGosterimi(DataTable veriTablosu)
         {
             // Create a new overlay for simulation markers
@@ -2866,6 +3394,68 @@ namespace SLF
             return Task.CompletedTask;
         }
 
+        private void calculateChargeStationWithFilter(int acHomeCount, int acWorkCount, int acPublicCount, int fastDcCount)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(() => calculateChargeStationWithFilter(acHomeCount, acWorkCount, acPublicCount, fastDcCount)));
+                return;
+            }
+
+            // Mevcut paneli temizle
+            var existingControls = this.Controls.Find("istasyonAdetLabelPanel", true);
+            foreach (var control in existingControls)
+            {
+                this.Controls.Remove(control);
+            }
+
+            // Paneli oluştur ve ana formun üzerine ekle
+            FlowLayoutPanel panel = new FlowLayoutPanel
+            {
+                Location = new System.Drawing.Point(10, 10), // Sol üst köşeye yerleştir
+                Size = new System.Drawing.Size(200, 150),    // Sabit boyut belirle
+                Anchor = AnchorStyles.Top | AnchorStyles.Left,
+                BackColor = Color.FromArgb(200, 255, 255, 255), // Yarı saydam beyaz arka plan
+                Name = "istasyonAdetLabelPanel",
+                Padding = new Padding(5),
+                BorderStyle = BorderStyle.FixedSingle        // Çerçeve ekleyerek görünürlüğü artır
+            };
+
+
+            // Paneli ana forma ekleyin
+            this.Controls.Add(panel);
+            panel.BringToFront(); // Paneli öne getir
+        }
+
+        private void checkBox_Ac_Home(object sender, EventArgs e)
+        {
+            ToggleMarkers("AC-Home", checkBox_AC_Home.Checked);
+        }
+
+        private void checkBox_Ac_Work(object sender, EventArgs e)
+        {
+            ToggleMarkers("AC-Work", checkBox_AC_Work.Checked);
+        }
+
+        private void checkBox_Ac_Public(object sender, EventArgs e)
+        {
+            ToggleMarkers("AC-Public", checkBox_AC_Public.Checked);
+
+        }
+
+        private void checkBox_Dc_Fast(object sender, EventArgs e)
+        {
+            ToggleMarkers("DC-Fast", checkBox_DC_Fast.Checked);
+
+        }
+
+
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+        // -------------------------------------------- DEK ------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+
         // Modül tabları veri importu mantıgında refer ediliyor. Silinmesin.
         private void DEKCenterAddButton_Click(object sender, EventArgs e)
         {
@@ -2912,19 +3502,19 @@ namespace SLF
             }
             var pointClick = gMapControl_DEK.FromLocalToLatLng(MousePosition.X, MousePosition.Y);
 
-            //// Create or get the overlay for charging station markers
-            //GMapOverlay chargingStationOverlay = gMapControl_EA.Overlays.FirstOrDefault(o => o.Id == "ChargingStationLayer");
-            //if (chargingStationOverlay == null)
-            //{
-            //    chargingStationOverlay = new GMapOverlay("ChargingStationLayer");
-            //    gMapControl_EA.Overlays.Add(chargingStationOverlay);
-            //}
-
             // Refresh the map to show the new marker
             gMapControl_DEK.Refresh();
 
             // Reset the flag after adding the station
             isAddingDekPoint = false;
+        }
+        private void gMapControl_Dek_OnMarkerClick(GMapMarker item, MouseEventArgs e)
+        {
+            if (item.Tag != null && item.Tag is NoktaVeri && Modül_Tabları.SelectedTab == tab_dek)
+            {
+                NoktaVeri seçili_nokta = item.Tag as NoktaVeri;
+                NoktaBilgileriniGoster(seçili_nokta);
+            }
         }
 
         private async void gMapControl_DEK_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
@@ -2945,8 +3535,8 @@ namespace SLF
                 // Nokta verisini oluştur
                 NoktaVeri noktaVeri_marker = new NoktaVeri
                 {
-                    Enlem = Math.Round(pointClick.Lat, 4),
-                    Boylam = Math.Round(pointClick.Lng, 4)
+                    Enlem = Math.Round(pointClick.Lat, 5),
+                    Boylam = Math.Round(pointClick.Lng, 5)
                 };
 
                 // Popup formu göster
@@ -2969,90 +3559,25 @@ namespace SLF
                 return;
             }
         }
-        private async Task dekHaritayaVeriYukleAsync()
+
+
+        // DEK şehri seçildiğinde çağrılan metot
+        private void dek_city_SelectedIndexChanged(object sender, EventArgs e)
         {
-            try
+            if (comboBox_DEK_il.SelectedItem != null)  // Geçerli bir seçim yapıldığında
             {
-                GMapOverlay dekOverlay = new GMapOverlay("Dek Layer");
+                SelectedCity = comboBox_DEK_il.SelectedItem.ToString();  // Şehir adını ayarla
+                CheckSelections();  // Seçim durumunu kontrol et
 
-                if (dataGridView_girdi.DataSource == null)
+                // Set map position based on selected city
+                if (cityCoordinates.TryGetValue(SelectedCity, out PointLatLng coordinates))
                 {
-                    MessageBox.Show("Veri kaynağı bulunamadı. Lütfen verileri kontrol edin.");
-                    return;
+                    gMapControl_DEK.Position = coordinates; // Set the map's position
+                    gMapControl_DEK.Zoom = 12; // Adjust the zoom level as needed
                 }
-
-                if (gMapControl_DEK.Overlays.Contains(dekOverlay))
-                {
-                    gMapControl_DEK.Overlays.Remove(dekOverlay);
-                }
-
-
-                DataTable dekData = await Task.Run(() => GirdiModülü.dataTablesByType["DEK Verileri"]);
-                if (dekData != null && dekData.Rows.Count > 0)
-                {
-                    Invoke(new Action(() =>
-                    {
-                        foreach (DataRow row in dekData.Rows)
-                        {
-                            if (!dekData.Columns.Contains("DEK_X_KOORDINAT") ||
-                                !dekData.Columns.Contains("DEK_Y_KOORDINAT") ||
-                                !dekData.Columns.Contains("KAYNAK_TIPI") ||
-                                !GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
-                            {
-                                MessageBox.Show("Lütfen DEK modülü verilerinizi yükleyin.");
-                                return;
-                            }
-
-                            if (!girdiModülü.IsNullLike(row["DEK_X_KOORDINAT"]) &&
-                                !girdiModülü.IsNullLike(row["DEK_Y_KOORDINAT"]))
-                            {
-                                if (double.TryParse(row["DEK_X_KOORDINAT"].ToString(), out double x) &&
-                                    double.TryParse(row["DEK_Y_KOORDINAT"].ToString(), out double y))
-                                {
-                                    string kaynakTipi = row["KAYNAK_TIPI"].ToString().ToLower();
-                                    GMarkerGoogle marker;
-
-                                    // Kaynak tipine göre marker rengini belirle
-                                    if (kaynakTipi.Contains("güneş"))
-                                    {
-                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.yellow);
-                                    }
-                                    else if (kaynakTipi.Contains("rüzgar"))
-                                    {
-                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.blue);
-                                    }
-                                    else if (kaynakTipi.Contains("hidroelektrik"))
-                                    {
-                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.gray_small);
-                                    }
-                                    else if (kaynakTipi.Contains("biokütle"))
-                                    {
-                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.green);
-                                    }
-                                    else
-                                    {
-                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.red);
-                                    }
-
-                                    dekOverlay.Markers.Add(marker);
-                                }
-                            }
-                        }
-
-                        gMapControl_DEK.Overlays.Add(dekOverlay);
-                        gMapControl_DEK.Refresh();
-                    }));
-                }
-                else
-                {
-                    Invoke(new Action(() => MessageBox.Show("Lütfen Dek noktalarını görebilmek için verilerinizi yükleyiniz.")));
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Bir hata oluştu: {ex.Message}");
             }
         }
+
         private async void dekSimulasyonGoruntule(object sender, EventArgs e)
         {
             gMapControl_DEK.Overlays.Clear();
@@ -3149,57 +3674,6 @@ namespace SLF
             popupForm.Show(); // Yeni pencereyi göster
         }
 
-        private DataTable FormatEATableForDisplay(DataTable originalEATable)
-        {
-            // Yeni bir DataTable oluşturun
-            DataTable formattedEATable = new DataTable();
-
-            // İhtiyacınız olan sütunları ekleyin
-            formattedEATable.Columns.Add("Hücre ID", typeof(string));
-            formattedEATable.Columns.Add("Ilce", typeof(string)); // İlçe isimleri Çiğli ve Karşıyaka olarak ayarlanacak
-            formattedEATable.Columns.Add("AC (Home)", typeof(int));
-            formattedEATable.Columns.Add("AC (Work)", typeof(int));
-            formattedEATable.Columns.Add("AC (Public)", typeof(int));
-            formattedEATable.Columns.Add("Fast DC", typeof(int));
-            formattedEATable.Columns.Add("İstasyon Gücü(kW)", typeof(int));
-            formattedEATable.Columns.Add("Tüketim (kW/h)", typeof(int));
-
-            // Orijinal tablodaki her bir satırı işleyin
-            foreach (DataRow row in originalEATable.Rows)
-            {
-                // Yeni bir satır oluşturun
-                DataRow newRow = formattedEATable.NewRow();
-
-                // ID değerini alın
-                newRow["Hücre ID"] = row["id"].ToString();  // Change "ID" to "Hücre ID" to match the formatted table column
-
-                // İlçe değerini dönüştür (1 = Çiğli, 2 = Karşıyaka)
-                int ilceValue = Convert.ToInt32(row["ilce"]);
-                newRow["Ilce"] = ilceValue == 1 ? "Çiğli" : ilceValue == 2 ? "Karşıyaka" : "Eskişehir";
-
-                // AC ve DC istasyon sayısını alın
-                newRow["AC (Home)"] = Convert.ToInt32(row["AC (Home)_count"]);
-                newRow["AC (Work)"] = Convert.ToInt32(row["AC (Work)_count"]);
-                newRow["AC (Public)"] = Convert.ToInt32(row["AC (Public)_count"]);
-                newRow["Fast DC"] = Convert.ToInt32(row["Fast DC_count"]);
-
-                // Yeni satırı formatlanmış tabloya ekleyin
-                formattedEATable.Rows.Add(newRow);
-            }
-
-            return formattedEATable;
-        }
-
-
-        private void EaSimMaxBtn_CheckedChanged(object sender, EventArgs e)
-        {
-            if (EaSimMaxBtn.Checked)
-            {
-
-                SelectedSpeed = "Hızlı";
-            }
-        }
-
         private void dekSimMinBtn_CheckedChanged(object sender, EventArgs e)
         {
             if (dekSimMinBtn.Checked)
@@ -3218,15 +3692,6 @@ namespace SLF
             }
         }
 
-        private void EaSimMinBtn_CheckedChanged(object sender, EventArgs e)
-        {
-            if (EaSimMinBtn.Checked)
-            {
-
-                SelectedSpeed = "Yavaş";
-            }
-        }
-
         private void dekSimDefBtn_CheckedChanged(object sender, EventArgs e)
         {
             {
@@ -3237,72 +3702,118 @@ namespace SLF
                 }
             }
         }
-        private void EaSimDefBtn_CheckedChanged(object sender, EventArgs e)
+
+        // Nokta veri yapısı
+        public int SelectedYear
         {
-            if (EaSimMinBtn.Checked)
+            get => _selectedYear;
+            set
             {
-                SelectedSpeed = "varsayılan";
+                _selectedYear = value;
+                CheckSelections();
+            }
+        }
+        public string SelectedCity
+        {
+            get => _selectedCity;
+            set
+            {
+                _selectedCity = value;
+                CheckSelections();
             }
         }
 
-
-
-        private void calculateChargeStationWithFilter(int acHomeCount, int acWorkCount, int acPublicCount, int fastDcCount)
+        private void CheckSelections()
         {
-            if (this.InvokeRequired)
+            // Seçimlerin yapıldığını kontrol ederek butonu etkinleştir
+            EASimButton.Enabled = SelectedYear != -1 && SelectedCity != null; // ea modulu 
+            DEKSimButton.Enabled = SelectedYear != -1 && SelectedCity != null; // dek modulu 
+        }
+
+        private async Task dekHaritayaVeriYukleAsync()
+        {
+            try
             {
-                this.Invoke(new Action(() => calculateChargeStationWithFilter(acHomeCount, acWorkCount, acPublicCount, fastDcCount)));
-                return;
+                GMapOverlay dekOverlay = new GMapOverlay("Dek Layer");
+
+                if (dataGridView_girdi.DataSource == null)
+                {
+                    MessageBox.Show("Veri kaynağı bulunamadı. Lütfen verileri kontrol edin.");
+                    return;
+                }
+
+                if (gMapControl_DEK.Overlays.Contains(dekOverlay))
+                {
+                    gMapControl_DEK.Overlays.Remove(dekOverlay);
+                }
+
+
+                DataTable dekData = await Task.Run(() => GirdiModülü.dataTablesByType["DEK Verileri"]);
+                if (dekData != null && dekData.Rows.Count > 0)
+                {
+                    Invoke(new Action(() =>
+                    {
+                        foreach (DataRow row in dekData.Rows)
+                        {
+                            if (!dekData.Columns.Contains("DEK_X_KOORDINAT") ||
+                                !dekData.Columns.Contains("DEK_Y_KOORDINAT") ||
+                                !dekData.Columns.Contains("KAYNAK_TIPI") ||
+                                !GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
+                            {
+                                MessageBox.Show("Lütfen DEK modülü verilerinizi yükleyin.");
+                                return;
+                            }
+
+                            if (!girdiModülü.IsNullLike(row["DEK_X_KOORDINAT"]) &&
+                                !girdiModülü.IsNullLike(row["DEK_Y_KOORDINAT"]))
+                            {
+                                if (double.TryParse(row["DEK_X_KOORDINAT"].ToString(), out double x) &&
+                                    double.TryParse(row["DEK_Y_KOORDINAT"].ToString(), out double y))
+                                {
+                                    string kaynakTipi = row["KAYNAK_TIPI"].ToString().ToLower();
+                                    GMarkerGoogle marker;
+
+                                    // Kaynak tipine göre marker rengini belirle
+                                    if (kaynakTipi.Contains("güneş"))
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.yellow);
+                                    }
+                                    else if (kaynakTipi.Contains("rüzgar"))
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.blue);
+                                    }
+                                    else if (kaynakTipi.Contains("hidroelektrik"))
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.gray_small);
+                                    }
+                                    else if (kaynakTipi.Contains("biokütle"))
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.green);
+                                    }
+                                    else
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.red);
+                                    }
+
+                                    dekOverlay.Markers.Add(marker);
+                                }
+                            }
+                        }
+
+                        gMapControl_DEK.Overlays.Add(dekOverlay);
+                        gMapControl_DEK.Refresh();
+                    }));
+                }
+                else
+                {
+                    Invoke(new Action(() => MessageBox.Show("Lütfen Dek noktalarını görebilmek için verilerinizi yükleyiniz.")));
+                }
             }
-
-            // Mevcut paneli temizle
-            var existingControls = this.Controls.Find("istasyonAdetLabelPanel", true);
-            foreach (var control in existingControls)
+            catch (Exception ex)
             {
-                this.Controls.Remove(control);
+                MessageBox.Show($"Bir hata oluştu: {ex.Message}");
             }
-
-            // Paneli oluştur ve ana formun üzerine ekle
-            FlowLayoutPanel panel = new FlowLayoutPanel
-            {
-                Location = new System.Drawing.Point(10, 10), // Sol üst köşeye yerleştir
-                Size = new System.Drawing.Size(200, 150),    // Sabit boyut belirle
-                Anchor = AnchorStyles.Top | AnchorStyles.Left,
-                BackColor = Color.FromArgb(200, 255, 255, 255), // Yarı saydam beyaz arka plan
-                Name = "istasyonAdetLabelPanel",
-                Padding = new Padding(5),
-                BorderStyle = BorderStyle.FixedSingle        // Çerçeve ekleyerek görünürlüğü artır
-            };
-
-
-
-            // Paneli ana forma ekleyin
-            this.Controls.Add(panel);
-            panel.BringToFront(); // Paneli öne getir
         }
-
-        private void checkBox_Ac_Home(object sender, EventArgs e)
-        {
-            ToggleMarkers("AC-Home", checkBox_AC_Home.Checked);
-        }
-
-        private void checkBox_Ac_Work(object sender, EventArgs e)
-        {
-            ToggleMarkers("AC-Work", checkBox_AC_Work.Checked);
-        }
-
-        private void checkBox_Ac_Public(object sender, EventArgs e)
-        {
-            ToggleMarkers("AC-Public", checkBox_AC_Public.Checked);
-
-        }
-
-        private void checkBox_Dc_Fast(object sender, EventArgs e)
-        {
-            ToggleMarkers("DC-Fast", checkBox_DC_Fast.Checked);
-
-        }
-
 
         private DataTable FormatDEKTableForDisplay(DataTable originalDEKTable)
         {
@@ -3399,10 +3910,6 @@ namespace SLF
             return Task.CompletedTask;
         }
 
-        private void ELFShowGraphsButton_Click(object sender, EventArgs e)
-        {
-            ELFResultsTabControls.SelectedTab = ELFGraphicOutputsTabPage;
-        }
         private void dek_list_years(object sender, EventArgs e) // 
         {
             if (comboBox_DEK_Yıl.SelectedIndex != -1)  // Geçerli bir seçim yapıldığında
@@ -3410,11 +3917,6 @@ namespace SLF
                 SelectedYear = comboBox_DEK_Yıl.SelectedIndex;  // Yıl indeksini ayarla
                 CheckSelections();  // Seçim durumunu kontrol et
             }
-        }
-
-        private void SenaryoNewSelectionButton_Click(object sender, EventArgs e)
-        {
-            Modül_Tabları.SelectedTab = tab_senaryo;
         }
 
         private void HesaplaMerkezNoktaVeEkle(DataTable dataTable)
@@ -3455,495 +3957,682 @@ namespace SLF
             }
         }
 
-        // yga dosya seçimi butonu
-        private async void yga_dosya_secimi_Click(object sender, EventArgs e)
-        {
-            // Assume `cbs` is properly instantiated
-            await cbs.cbs_dosya_secimi(gMapControl_yga, this, tablo_formu.attribute_table);
-        }
 
-        // stokastik dosya seçimi butonu
-        private async void stokastik_dosya_seçimi_Click(object sender, EventArgs e)
-        {
-
-            // Assume `cbs` is properly instantiated
-            await cbs.cbs_dosya_secimi(gMapControl_stokastik, this, tablo_formu.attribute_table);
-
-        }
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+        // -------------------------------------------- İMAR ------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
 
         private async void imar_dosya_seçimi_Click(object sender, EventArgs e)
         {
             await cbs.cbs_dosya_secimi(gMapControl_imar, this, tablo_formu.attribute_table);
         }
-        public List<CheckBox> GetCheckBoxesByIndex(int index)
-        {
-            // Define arrays for checkboxes
-            var stokastikCheckBoxes = new CheckBox[] { checkBox_stokastik_1, checkBox_stokastik_2, checkBox_stokastik_3, checkBox_stokastik_4, checkBox_stokastik_5, checkBox_stokastik_6, checkBox_stokastik_7, checkBox_stokastik_8, checkBox_stokastik_9, checkBox_stokastik_10, checkBox_stokastik_11, checkBox_stokastik_12, checkBox_stokastik_13 };
-            var imarCheckBoxes = new CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10, checkBox_imar_11, checkBox_imar_12, checkBox_imar_13 };
-            var ygaCheckBoxes = new CheckBox[] { checkBox_yga_1, checkBox_yga_2, checkBox_yga_3, checkBox_yga_4, checkBox_yga_5, checkBox_yga_6, checkBox_yga_7, checkBox_yga_8, checkBox_yga_9, checkBox_yga_10, checkBox_yga_11, checkBox_yga_12, checkBox_yga_13 };
 
-            // Ensure the index is valid before accessing arrays
-            if (index >= 0 && index < 13)
+        private void İmar_Mesafe_Ölç_Click(object sender, EventArgs e)
+        {
+            isRulerActive = true;
+            isRulerEnabled = true;
+            polygonPoints_imar?.Clear();
+            polygonOverlay_imar?.Clear();
+
+            cbs.CBS_ölç(mesafe_metre_imar, Mesafe_imar);
+        }
+
+        private void İmar_Kaydır_Click(object sender, EventArgs e)
+        {
+            cbs.CBS_kaydır(markerOverlay_imar, rulerRoute_imar, gMapControl_imar,
+                mesafe_metre_imar, Mesafe_imar);
+        }
+
+        private void İmar_Seç_Click(object sender, EventArgs e)
+        {
+            cbs.CBS_sec(markerOverlay_imar, rulerRoute_imar, gMapControl_imar,
+                    mesafe_metre_imar, Mesafe_imar);
+        }
+
+        private void gMapControl_imar_MouseDown(object sender, MouseEventArgs e)
+        {
+            MouseDownEvent(sender, e, gMapControl_imar, Mesafe_imar, mesafe_metre_imar,
+                rulerPoints_imar, markerOverlay_imar, rulerOverlay_imar, ref rulerRoute_imar,
+                polygonPoints_imar, polygonOverlay_imar);
+        }
+
+        private void İmar_Poligon_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
             {
-                // Return the checkboxes for the given index
-                return new List<CheckBox> { stokastikCheckBoxes[index], imarCheckBoxes[index], ygaCheckBoxes[index] };
+                ContextMenuStrip_Poligon.Show(Cursor.Position);
+            }
+        }
+
+        private void gMapControl_imar_MouseMove(object sender, MouseEventArgs e)
+        {
+            // Get the current position of the center of the map
+            PointLatLng centerPosition = gMapControl_imar.Position;
+
+            // Update the strings with the center position coordinates
+            centerX = centerPosition.Lng.ToString();
+            centerY = centerPosition.Lat.ToString();
+
+            // boolean controlu ile grid oluşturulacak alan seçimine başlanması
+            if (e.Button == MouseButtons.Left && cbs.isSelecting_grid == true)
+            {
+                cbs.ending_point = gMapControl_imar.FromLocalToLatLng(e.X, e.Y);
+                cbs.UpdateSelectionPolygon(gMapControl_imar);
             }
 
-            // Return null or an empty list for invalid index
-            return null; // or return new List<CheckBox>();
-        }
-        private void checkboxes_init()
-        {
-            // Arrays of CheckBoxes for YGA, Imar, and Stokastik
-            var checkBoxes_yga = new CheckBox[] { checkBox_yga_1, checkBox_yga_2, checkBox_yga_3, checkBox_yga_4, checkBox_yga_5, checkBox_yga_6, checkBox_yga_7, checkBox_yga_8, checkBox_yga_9, checkBox_yga_10, checkBox_yga_11, checkBox_yga_12, checkBox_yga_13 };
-            var checkBoxes_imar = new CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10, checkBox_imar_11, checkBox_imar_12, checkBox_imar_13 };
-            var checkBoxes_stokastik = new CheckBox[] { checkBox_stokastik_1, checkBox_stokastik_2, checkBox_stokastik_3, checkBox_stokastik_4, checkBox_stokastik_5, checkBox_stokastik_6, checkBox_stokastik_7, checkBox_stokastik_8, checkBox_stokastik_9, checkBox_stokastik_10, checkBox_stokastik_11, checkBox_stokastik_12, checkBox_stokastik_13 };
-
-            // Common Tag values for the checkboxes (1 to 13)
-            int[] tagValuesForCheckboxes = Enumerable.Range(1, 13).ToArray();  // This generates an array [1, 2, 3, ..., 13]
-
-            // Function to initialize CheckBoxes with a tag, event handlers, and forecolor
-            void initializeCheckBoxes(CheckBox[] checkBoxes, int[] tagValues)
+            // eğer sadece 1 adet nokta seçilmişse, ve ikinci nokta dinamik olarak farklı yerlere
+            // tıklanarak seçiliyorsa, mesafeyi de buna göre güncelle.
+            if (isRulerActive && rulerPoints_imar.Count == 1 && isRulerEnabled == true)
             {
-                for (int i = 0; i < checkBoxes.Length; i++)
+
+                var point = gMapControl_imar.FromLocalToLatLng(e.X, e.Y);
+                if (rulerRoute_imar != null && rulerRoute_imar.Distance != 0)
                 {
-                    checkBoxes[i].Tag = tagValues[i];
-                    checkBoxes[i].CheckedChanged += checkBox_CheckedChanged;
-                    checkBoxes[i].MouseDown += checkBox_MouseDown;
-                    checkBoxes[i].ForeColor = cbs.overlayColors[i].BorderColor;  // Set the color from the corresponding cbs.overlayColors
+                    rulerOverlay_imar.Routes.Remove(rulerRoute_imar);
+                }
+                rulerRoute_imar = new GMapRoute(new List<PointLatLng> { rulerPoints_imar[0], point },
+                    "rulerRoute_imar");
+                rulerRoute_imar.Stroke = new Pen(Color.Red, 3);
+                rulerOverlay_imar.Routes.Add(rulerRoute_imar);
+                gMapControl_imar.Refresh();
+            }
+        }
+
+        private void gMapControl_imar_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && cbs.isSelecting_grid)
+            {
+                // grid oluşturmak için seçilen alan (bounding box) ın son noktası
+                cbs.ending_point = gMapControl_imar.FromLocalToLatLng(e.X, e.Y);
+                cbs.isSelecting_grid = false;
+                gMapControl_imar.CanDragMap = true;
+
+                // Clear the selection polygon and refresh the map
+                gMapControl_imar.Overlays.Remove(cbs.bounding_box_overlay);
+                cbs.AddGridToMap(gMapControl_imar);
+                gMapControl_imar.Refresh();
+            }
+        }
+
+        private void gMapControl_imar_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        {
+            OnMapClickEventi(pointClick, e, markerOverlay_imar, ref polygonPoints_imar,
+                    ref polygonOverlay_imar, Mesafe_imar, mesafe_metre_imar);
+        }
+
+
+        private void İmar_Grid_Oluştur_Click(object sender, EventArgs e)
+        {
+            Grid_Seçenekler grid_formu = new Grid_Seçenekler();
+            grid_formu.Tag = this;
+            grid_formu.Owner = this;
+            grid_formu.Show();
+            grid_formu.Activate();
+            grid_formu.StartPosition = FormStartPosition.CenterParent;
+        }
+
+        private void İmar_Fonksiyonlar_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                ContextMenuStrip_Fonksiyon.Show(Cursor.Position);
+            }
+        }
+
+        private void gMapControl_yuk_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && lastClickedCheckbox != null)
+            {
+                try
+                {
+                    int checkbox_index = int.Parse(lastClickedCheckbox.Tag.ToString()) - 1;
+
+                    // Ensure checkbox_index is within valid range
+                    if (checkbox_index < 0 || checkbox_index >= cbs.tüm_katmanlar_array_yuk.Length)
+                    {
+                        Console.WriteLine("Invalid checkbox index.");
+                        return;
+                    }
+
+                    foreach (var polygon in cbs.tüm_katmanlar_array_yuk[checkbox_index].Polygons)
+                    {
+                        if (cbs.IsPointInPolygon(pointClick, polygon))
+                        {
+                            // Highlight the polygon and update the layer index
+                            cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
+                            layer_index = checkbox_index;  // Update the current layer index to the clicked polygon's layer
+
+                            // Try to get the attributes of the clicked polygon
+                            if (cbs.polygonAttributes_yuk.TryGetValue(polygon, out DataRow row))
+                            {
+                                ShowAttributeRow(row);  // Show the row attributes
+                                tablo_formu.Show();     // Display the table form
+                            }
+                            else
+                            {
+                                Console.WriteLine("Polygon attributes not found.");
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Handle any exceptions to prevent the app from crashing
+                    Console.WriteLine($"Error: {ex.Message}");
                 }
             }
-
-            // Initialize all checkboxes
-            initializeCheckBoxes(checkBoxes_yga, tagValuesForCheckboxes);
-            initializeCheckBoxes(checkBoxes_imar, tagValuesForCheckboxes);
-            initializeCheckBoxes(checkBoxes_stokastik, tagValuesForCheckboxes);
         }
 
 
-        private void FinishPolygonButton_Click(object sender, EventArgs e)
+        private void gMapControl_imar_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
         {
-            if (polygonPoints_yga.Count >= 3)  // Ensure polygon is valid (at least 3 points)
+            if (e.Button == MouseButtons.Left && lastClickedCheckbox != null)
             {
-                // Create a DataTable with polygon data (latitude, longitude, and parameters)
-                DataTable polygonDataTable = cbs.CreatePolygonDataTable(polygonPoints_yga, layer_index);
+                try
+                {
+                    int checkbox_index = int.Parse(lastClickedCheckbox.Tag.ToString()) - 1;
 
-                // Call PoligonKaydetEventi to save the polygon and handle other operations
-                // For now, pass in the necessary overlays and labels (replace null if needed)
-                PoligonKaydetEventi(sender, e, polygonOverlay_yga, markerOverlay_yga, polygonPoints_yga, Mesafe_yga, mesafe_metre_yga);
-                // Clean up after saving the polygon
-                polygonPoints_yga.Clear(); // Clear the list of points for the polygon
-                // Show the YGA-specific attribute table popup
-                ShowAttributeTable(polygonDataTable, true);  // `true` indicates it's for YGA
+                    // Ensure checkbox_index is within valid range
+                    if (checkbox_index < 0 || checkbox_index >= cbs.tüm_katmanlar_array_imar.Length)
+                    {
+                        Console.WriteLine("Invalid checkbox index.");
+                        return;
+                    }
 
+                    foreach (var polygon in cbs.tüm_katmanlar_array_imar[checkbox_index].Polygons)
+                    {
+                        if (cbs.IsPointInPolygon(pointClick, polygon))
+                        {
+                            // Highlight the polygon and update the layer index
+                            cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
+                            layer_index = checkbox_index;  // Update the current layer index to the clicked polygon's layer
+
+                            // Try to get the attributes of the clicked polygon
+                            if (cbs.polygonAttributes_imar.TryGetValue(polygon, out DataRow row))
+                            {
+                                ShowAttributeRow(row);  // Show the row attributes
+                                tablo_formu.Show();     // Display the table form
+                            }
+                            else
+                            {
+                                Console.WriteLine("Polygon attributes not found.");
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Handle any exceptions to prevent the app from crashing
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
+            }
+        }
+
+
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+        // -------------------------------------------- YUK ------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+
+        private void trackBar_Yıllar_ValueChanged(object sender, EventArgs e)
+        {
+            int selectedYear = trackBar_Yıllar.Value;
+            currentYear = selectedYear; // Update the current year
+            yuk_yıl_deger.Text = $"{selectedYear}";
+
+            // Construct the column name based on the selected year
+            string columnName = $"Yük_Yoğunluğu_{selectedYear}";
+
+
+            // Find the index of the overlay in tüm_katmanlar_array_imar_names that contains "xxx"
+            string searchText = "SONUCLAR_Load_Density.kml"; // The text to search for
+            overlayIndex = Array.FindIndex(cbs.tüm_katmanlar_array_names,
+                name => name != null && name.Contains(searchText));
+
+            // Check if the overlay was found
+            if (overlayIndex == -1 || cbs.tüm_katmanlar_array_imar[overlayIndex] == null)
+            {
+                MessageBox.Show($"SONUCLAR_Load_Density.kml dosyası bulunamadı. Lütfen ilgili dosyanın SLF hesabı sonucu " +
+                    $"oluşturulduğundan emin olunuz.");
 
             }
             else
             {
-                MessageBox.Show("Please draw a polygon with at least 3 points.");
-            }
-        }
+                legendPanel.Visible = true;
 
-        private void ShowYGAPopupForm(DataTable datatable)
-        {
-            // Create the YGA-specific popup and pass the DataTable for context
-            YGAPopupForm popup = new YGAPopupForm(datatable);
+                // Call a method to update the heatmap using the selected year's data
+                UpdateHeatmapForYear(columnName);
 
-            // Show the form as a dialog (blocking until it's closed)
-            if (popup.ShowDialog() == DialogResult.OK)
-            {
-                // After user input, get the updated DataTable from the popup
-                DataTable updatedData = popup.GetUpdatedData();  // Get the updated table
-                ShowAttributeTable(updatedData, true);  // Update the UI with the new data for YGA
-            }
-        }
-
-        public void ShowAttributeTable(DataTable datatable, bool isYga = false)
-        {
-            // Always update the DataGridView with the DataTable
-            tablo_formu.attribute_table.DataSource = datatable;
-
-            // If it's for YGA, trigger the popup for additional input
-            if (isYga)
-            {
-                // Remove this line from ShowAttributeTable to prevent recursion
-                ShowYGAPopupForm(datatable);  // Display the YGA popup form
-            }
-        }
-
-
-        // mouse down event of the checkboxes which displays the related data table with the corresponding
-        // checkbox/layer
-        private void checkBox_MouseDown(object sender, MouseEventArgs e)
-        {
-            System.Windows.Forms.CheckBox sender_checkbox = sender as System.Windows.Forms.CheckBox;
-            int checkbox_index = int.Parse(sender_checkbox.Tag.ToString()) - 1;
-
-            // Update the last clicked checkbox
-            if (lastClickedCheckbox != null)
-            {
-                // Reset previous checkbox style to normal
-                lastClickedCheckbox.Font = new Font(lastClickedCheckbox.Font, FontStyle.Regular);
-            }
-
-            //sender_checkbox.Font = new Font(sender_checkbox.Font, FontStyle.Italic | FontStyle.Underline);
-            lastClickedCheckbox = sender_checkbox;
-
-            temizleToolStripMenuItem.Tag = sender_checkbox;
-            rengiDeğiştirToolStripMenuItem.Tag = sender_checkbox;
-            kaydetToolStripMenuItem.Tag = sender_checkbox;
-            yenidenAdlandırToolStripMenuItem.Tag = sender_checkbox;
-
-            if (cbs.tüm_katmanlar_array[checkbox_index] != null)
-            {
-                tablo_formu.Text = "Veri Tablosu -- " + cbs.tüm_katmanlar_array_names[checkbox_index] +
-                   " -- " + cbs.tüm_katmanlar_datatable[checkbox_index].Rows.Count + " satır -- " +
-                   cbs.tüm_katmanlar_datatable[checkbox_index].Columns.Count + " sütun";
-                ShowAttributeTable(cbs.tüm_katmanlar_datatable[checkbox_index]);
-            }
-        }
-
-        // display or hide the layers by checkboxes of the stokastik_yuk_tahmini form
-        private void checkBox_CheckedChanged(object sender, EventArgs e)
-        {
-            System.Windows.Forms.CheckBox checkBox = (System.Windows.Forms.CheckBox)sender;
-            int index = int.Parse(checkBox.Tag.ToString()) - 1;
-
-            if (cbs.tüm_katmanlar_array[index] != null)
-            {
-                cbs.tüm_katmanlar_array[index].IsVisibile = checkBox.Checked;
-                cbs.GetActiveGMapControl().Refresh();
-            }
-        }
-
-
-        //------------------------------------Tool Strip Menu Items --------------------------//
-        private void yenidenAdlandırToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ToolStripMenuItem yeniden_adlandir = sender as ToolStripMenuItem;
-
-            if (yeniden_adlandir != null)
-            {
-                System.Windows.Forms.CheckBox checkBox = yeniden_adlandir.Tag as System.Windows.Forms.CheckBox;
-                int checkbox_index = int.Parse(checkBox.Tag.ToString()) - 1;
-
-                if (cbs.tüm_katmanlar_array[checkbox_index] != null)
+                // If a polygon is currently hovered, update the tooltip
+                if (hoveredPolygon != null)
                 {
-                    // Prompt the user to input a new name
-                    string newName = Prompt.ShowDialog("Yeni isim:", "Katmanı Yeniden Adlandır");
-
-                    if (!string.IsNullOrEmpty(newName))
-                    {
-                        // Rename the layer in your underlying data structure
-                        checkBox.Text = newName; // Adjust this according to your layer data structure
-                        cbs.tüm_katmanlar_array_names[checkbox_index] = newName;
-
-                        // Refresh the list/tree view
-                        checkBox.Refresh();
-                    }
+                    UpdatePolygonToolTip(hoveredPolygon);
                 }
+
             }
+
         }
 
-        private void kaydetToolStripMenuItem_Click(object sender, EventArgs e)
+        private void UpdateHeatmapForYear(string columnName)
         {
-            if (sender is ToolStripMenuItem kaydet_menu_item)
+            // Use the active GMapControl (ensure you're consistent with one control)
+            GMapControl mapControl = cbs.GetActiveGMapControl();
+
+            // Instead of clearing all overlays, remove only the heatmapOverlay if it exists
+            GMapOverlay existingHeatmapOverlay = mapControl.Overlays.FirstOrDefault(o => o.Id == "HeatmapOverlay");
+            if (existingHeatmapOverlay != null)
             {
-                System.Windows.Forms.CheckBox checkBox = kaydet_menu_item.Tag as System.Windows.Forms.CheckBox;
-                int checkbox_index = int.Parse(checkBox.Tag.ToString()) - 1;
+                mapControl.Overlays.Remove(existingHeatmapOverlay);
+            }
 
-                SaveFileDialog kaydet_file_dialog = new SaveFileDialog();
+            GMapOverlay originalOverlay = cbs.tüm_katmanlar_array_imar[overlayIndex];
 
-                kaydet_file_dialog.Filter = "Shapefile |*.shp|MapInfo File|*.tab|Google Earth File|*.kml";
-                kaydet_file_dialog.InitialDirectory = cbs.targetDirectory;
+            // Create a new overlay for the heatmap
+            GMapOverlay heatmapOverlay = new GMapOverlay("HeatmapOverlay");
 
-                DialogResult kaydet_result = kaydet_file_dialog.ShowDialog();
+            // Create a new dictionary for the heatmap overlay's polygon attributes
+            heatmapPolygonAttributes = new Dictionary<GMapPolygon, DataRow>();
 
-                if (kaydet_result == DialogResult.OK)
+            // Copy the contents of the original overlay to the heatmap overlay
+            cbs.CopyOverlayContents(originalOverlay, heatmapOverlay, cbs.polygonAttributes_imar, heatmapPolygonAttributes);
+
+            // Update the heatmap colors based on the data for the selected year
+            cbs.CreateHeatmap(heatmapOverlay, cbs.tüm_katmanlar_datatable[overlayIndex], columnName, heatmapPolygonAttributes);
+
+            // Update the legend (which should be independent)
+            cbs.UpdateHeatmapLegend(); // Updated method to reuse existing controls
+
+            // Add both the original overlay and the new heatmap overlay to the map
+            //mapControl.Overlays.Add(originalOverlay);
+            mapControl.Overlays.Add(heatmapOverlay);
+
+            // Associate the heatmap overlay with checkBox_yuk_main
+            checkBox_yuk_main.Tag = heatmapOverlay; // Store the overlay in the Tag property
+            checkBox_yuk_main.Checked = true; // Make the heatmap visible by default
+            checkBox_yuk_main.Text = "Yük Yoğunluğu Katmanı"; // Set a meaningful name
+            checkBox_yuk_main.Visible = true; // Ensure the checkbox is visible
+
+            // Force a repaint by toggling the visibility of the heatmap overlay
+            SetOverlayVisibility(heatmapOverlay, false); // Hide
+            SetOverlayVisibility(heatmapOverlay, true);  // Show
+                                                            //mapControl.Invalidate(); // Force a full repaint
+            mapControl.Refresh(); // Refresh the map control
+        }
+
+        private void InitializeHeatmapLegendControls()
+        {
+            // Define the fixed brackets (same as in CreateHeatmapLegend)
+            double[] brackets = { 0, 3, 5, 10, 25, 50, 75, 100, 200, 400, double.PositiveInfinity };
+            string[] bracketLabels = { "0-3", "3-5", "5-10", "10-25", "25-50", "50-75", "75-100", "100-200", "200-400", "400-Inf" };
+            int bracketCount = bracketLabels.Length; // Should be 10
+
+            // Initialize arrays
+            colorBoxes = new Panel[bracketCount];
+            rangeLabels = new System.Windows.Forms.Label[bracketCount];
+
+            // Create the unit label
+            unitLabel = new System.Windows.Forms.Label
+            {
+                Text = "Yük Yoğunluğu (W/m²)",
+                Font = new System.Drawing.Font("Verdana", 7, FontStyle.Bold),
+                AutoSize = true,
+                Location = new System.Drawing.Point(5, 10),
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                Name = "unitLabel"
+            };
+            legendPanel.Controls.Add(unitLabel);
+
+            // Create color boxes and range labels for each bracket
+            for (int i = 0; i < bracketCount; i++)
+            {
+                // Create a color box
+                colorBoxes[i] = new Panel
                 {
-                    string filepath = kaydet_file_dialog.FileName;
-                    string filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
-                    string extension = filename.Substring(filename.Length - 3);
+                    Size = new System.Drawing.Size(20, 20),
+                    Location = new System.Drawing.Point(10, unitLabel.Bottom + 10 + (i * 25)),
+                    Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                    Name = $"colorBox_{i}"
+                };
+                legendPanel.Controls.Add(colorBoxes[i]);
 
-                    if (extension == "shp")
-                    {
-                        MapWinGIS.Shapefile shapefile = cbs.shapeFileArray_MapWinGIS[checkbox_index];
-
-                        int fieldIndex;
-
-                        fieldIndex = shapefile.get_FieldIndexByName("MWShapeID");
-
-                        if (fieldIndex != -1)
-                        {
-                            shapefile.EditDeleteField(fieldIndex);
-                        }
-
-                        shapefile.SaveAsEx(filepath, false, false);
-                        shapefile.Close();
-                        cbs.shapeFileArray_MapWinGIS[checkbox_index] = null;
-                        MessageBox.Show("Dosya başarıyla kaydedildi.");
-                    }
-                    else if (extension == "kml")
-                    {
-                        GMapOverlay kmlOverlay = new GMapOverlay();
-                        kmlOverlay = cbs.tüm_katmanlar_array[checkbox_index];
-
-                        cbs.ExportOverlayToKml(kmlOverlay, filepath);
-                        MessageBox.Show("Dosya başarıyla kaydedildi.");
-                    }
-
-                }
+                // Create a range label
+                rangeLabels[i] = new System.Windows.Forms.Label
+                {
+                    Text = bracketLabels[i],
+                    Font = new System.Drawing.Font("Verdana", 8),
+                    AutoSize = true,
+                    Location = new System.Drawing.Point(colorBoxes[i].Right + 5, colorBoxes[i].Top),
+                    Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                    Name = $"rangeLabel_{i}"
+                };
+                legendPanel.Controls.Add(rangeLabels[i]);
             }
         }
 
-        private void temizleToolStripMenuItem_Click(object sender, EventArgs e)
+        private void checkBox_yuk_main_CheckedChanged(object sender, EventArgs e)
         {
+            CheckBox cb = sender as CheckBox;
+            if (cb == null) return;
+
+            // Get the associated overlay from the Tag property
+            GMapOverlay overlay = cb.Tag as GMapOverlay;
+            if (overlay == null) return;
+
+            // Toggle visibility of the overlay
+            bool isVisible = cb.Checked;
+            SetOverlayVisibility(overlay, isVisible);
+
+            // Refresh the map control to show updates
+            cbs.GetActiveGMapControl().ReloadMap();
+            cbs.GetActiveGMapControl().Refresh();
+        }
+
+        // Helper to toggle polygons/routes/markers
+        private void SetOverlayVisibility(GMapOverlay overlay, bool visible)
+        {
+            if (overlay == null) return;
+
+            foreach (var poly in overlay.Polygons)
+                poly.IsVisible = visible;
+
+            foreach (var route in overlay.Routes)
+                route.IsVisible = visible;
+
+            foreach (var marker in overlay.Markers)
+                marker.IsVisible = visible;
+        }
+
+
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+        // -------------------------------------------- ELF ------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+
+        private void LoadImagesIntoPictureBoxes()
+        {
+            // Path to the folder where the images are saved
+            string imageFolderPath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\Grafik Outputs\";
+
+            // Load images into PictureBox controls with checks
+            LoadImageIntoPictureBox(pictureBox_ELF_1, Path.Combine(imageFolderPath, "bolge_aydınlatma_projections.png"));
+            LoadImageIntoPictureBox(pictureBox_ELF_2, Path.Combine(imageFolderPath, "bolge_mesken_projections.png"));
+            LoadImageIntoPictureBox(pictureBox_ELF_3, Path.Combine(imageFolderPath, "bolge_sanayi_projections.png"));
+            LoadImageIntoPictureBox(pictureBox_ELF_4, Path.Combine(imageFolderPath, "bolge_sulama_projections.png"));
+            LoadImageIntoPictureBox(pictureBox_ELF_5, Path.Combine(imageFolderPath, "bolge_ticarethane_projections.png"));
+            // Add more PictureBox assignments as needed
+        }
+
+
+        // Save button logic to update Excel file with changes from DataGridViews
+        private async void ELFScenerioSaveButton_Click(object sender, EventArgs e)
+        {
+            string originalFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+            string modifiedFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+
             try
             {
-                var delete_menu_item = sender as ToolStripMenuItem;
-                if (delete_menu_item?.Tag == null) return;
-
-                var checkBox = delete_menu_item.Tag as System.Windows.Forms.CheckBox;
-                if (checkBox?.Tag == null) return;
-
-                if (!int.TryParse(checkBox.Tag.ToString(), out int checkbox_index))
+                await Task.Run(() =>
                 {
-                    MessageBox.Show("Geçersiz katman indeksi.");
-                    return;
-                }
+                    using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
+                    {
+                        // Update worksheets with data from DataGridViews
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[0], ELFMinSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[1], ELFLowSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[2], ELFBaseSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[3], ELFHighSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[4], ELFMaxSenaryoTable);
 
-                checkbox_index -= 1;
+                        // Save the modified Excel file
+                        package.SaveAs(new FileInfo(modifiedFilePath));
+                    }
+                });
 
-                if (checkbox_index < 0 || checkbox_index >= cbs.tüm_katmanlar_array.Length)
+                MessageBox.Show("Kullanıcı değişiklikleri excel dosyasına kaydedildi.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Dosya güncelleme hatası: {ex.Message}");
+            }
+        }
+
+        private void LoadResultsToTabEkonometrik(string resultsFilePath)
+        {
+            if (!File.Exists(resultsFilePath))
+            {
+                MessageBox.Show("Sonuç dosyası bulunamadı.");
+                return;
+            }
+
+            using (var package = new ExcelPackage(new FileInfo(resultsFilePath)))
+            {
+                // Load the corresponding results into each DataGridView
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[1], ELFMinResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[2], ELFLowResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[3], ELFBaseResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[4], ELFHighResultsTable);
+                LoadWorksheetToDataGridView(package.Workbook.Worksheets[5], ELFMaxResultsTable);
+            }
+
+            // Switch to the results tab after loading all the data
+            Modül_Tabları.SelectedTab = tab_ekonometrik;
+        }
+
+
+        // Helper method for logging output to logTextBox
+        private void LogOutput(string message)
+        {
+            if (logTextBox != null)
+            {
+                if (logTextBox.InvokeRequired)
                 {
-                    MessageBox.Show("Katman indeksi sınırlar dışında.");
-                    return;
-                }
-
-                var katman = cbs.tüm_katmanlar_array[checkbox_index];
-                if (katman == null) return;
-
-                string katman_ismi = cbs.tüm_katmanlar_array_names[checkbox_index] ?? "Bilinmeyen";
-
-                var temizle_result = MessageBox.Show(
-                    $"{katman_ismi} isimli katman silinecektir. Emin misiniz?",
-                    "Katman Silme",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question);
-
-                if (temizle_result != DialogResult.Yes) return;
-
-                var mapControl = cbs.GetActiveGMapControl();
-                if (mapControl == null)
-                {
-                    MessageBox.Show("Harita kontrolü bulunamadı.");
-                    return;
-                }
-
-                if (mapControl.InvokeRequired)
-                {
-                    mapControl.Invoke(new Action(() => KatmanıTemizle(mapControl, checkbox_index, checkBox)));
-                    Console.WriteLine("temizle-fonk");
+                    logTextBox.Invoke(new Action<string>(LogOutput), message);
                 }
                 else
                 {
-                    KatmanıTemizle(mapControl, checkbox_index, checkBox);
+                    logTextBox.AppendText(message + Environment.NewLine);
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Katman silinirken hata oluştu: {ex.Message}");
             }
         }
 
-        private void KatmanıTemizle(GMapControl mapControl, int checkbox_index, CheckBox checkBox)
+        private void InitializeLogTextBox()
+        {
+            logTextBox = new TextBox
+            {
+                Multiline = true,
+                Dock = DockStyle.Bottom, // Dock it at the bottom of the form
+                Height = 100, // Adjust height as necessary
+                ScrollBars = ScrollBars.Vertical // Enable vertical scroll
+            };
+            this.Controls.Add(logTextBox); // Add to the form controls
+        }
+
+        private async void ShowResultsButton_Click(object sender, EventArgs e)
+        {
+            // Path to the Excel file
+            string filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\ELF_Tahmin_Sonuçları_2024-11-08 22_35_57.xlsx";
+
+            // Asynchronous task to load the Excel package
+            await Task.Run(() =>
+            {
+                using (var package = new ExcelPackage(new FileInfo(filePath)))
+                {
+                    // Clear previous data in the DataGridViews
+                    Invoke(new Action(() =>
+                    {
+                        // Set DataSources to null to clear previous data
+                        ELFMinResultsTable.DataSource = null;
+                        ELFLowResultsTable.DataSource = null;
+                        ELFBaseResultsTable.DataSource = null;
+                        ELFHighResultsTable.DataSource = null;
+                        ELFMaxResultsTable.DataSource = null;
+                    }));
+
+                    // Load sheets into their respective DataGridViews
+                    var worksheets = new[] { "Bagımlı_Degisken_Tahminleri_1", "Bagımlı_Degisken_Tahminleri_2", "Bagımlı_Degisken_Tahminleri_3", "Bagımlı_Degisken_Tahminleri_4", "Bagımlı_Degisken_Tahminleri_5" }; // Replace with actual sheet names if needed
+                    var dataGrids = new[] { ELFMinResultsTable, ELFLowResultsTable, ELFBaseResultsTable, ELFHighResultsTable, ELFMaxResultsTable };
+
+                    for (int i = 0; i < worksheets.Length; i++)
+                    {
+                        var worksheet = package.Workbook.Worksheets[worksheets[i]];
+                        if (worksheet != null)
+                        {
+                            DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
+
+                            Invoke(new Action(() =>
+                            {
+                                dataGrids[i].DataSource = dt; // Set DataGridView's DataSource
+                            }));
+                        }
+                    }
+                }
+            });
+
+            // Load images into PictureBox controls after loading the results
+            LoadImagesIntoPictureBoxes();
+
+            // Optionally, switch to the results tab
+            Modül_Tabları.SelectedTab = tab_ekonometrik;
+        }
+
+        private void ELFPredictionShowResultsButton_Click(object sender, EventArgs e)
         {
             try
             {
-                if (cbs.tüm_katmanlar_array[checkbox_index] != null)
+                // Set cursor to wait while running the operations
+                Cursor.Current = Cursors.WaitCursor;
+
+                string modifiedFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+
+                // Check if the modified file exists
+                if (!File.Exists(modifiedFilePath))
                 {
-                    var overlay = cbs.tüm_katmanlar_array[checkbox_index];
-
-                    // Önce overlay'i Overlays koleksiyonundan güvenli bir şekilde kaldır
-                    if (mapControl.Overlays.Contains(overlay))
-                    {
-                        mapControl.Overlays.Remove(overlay);
-                    }
-
-                    // Kaynakları temizle
-                    using (overlay)
-                    {
-                        // Overlay içindeki tüm markerları temizle
-                        if (overlay.Markers != null)
-                        {
-                            foreach (var marker in overlay.Markers.ToList())
-                            {
-                                marker.Dispose();
-                            }
-                            overlay.Markers.Clear();
-                        }
-
-                        // Overlay içindeki tüm routes'ları temizle
-                        if (overlay.Routes != null)
-                        {
-                            foreach (var route in overlay.Routes.ToList())
-                            {
-                                route.Dispose();
-                            }
-                            overlay.Routes.Clear();
-                        }
-
-                        // Overlay içindeki tüm polygonları temizle
-                        if (overlay.Polygons != null)
-                        {
-                            foreach (var polygon in overlay.Polygons.ToList())
-                            {
-                                polygon.Dispose();
-                            }
-                            overlay.Polygons.Clear();
-                        }
-                    }
-
-                    // Arrays'i temizle
-                    cbs.tüm_katmanlar_array[checkbox_index] = null;
-                    cbs.tüm_katmanlar_array_names[checkbox_index] = null;
-
-                    if (cbs.tüm_katmanlar_datatable[checkbox_index] != null)
-                    {
-                        cbs.tüm_katmanlar_datatable[checkbox_index].Dispose();
-                        cbs.tüm_katmanlar_datatable[checkbox_index] = null;
-                    }
-
-                    // UI elemanlarını güncelle
-                    checkBox.Checked = false;
-                    checkBox.Visible = false;
-
-                    // Haritayı yenile
-                    mapControl.Refresh();
-
-                    // Belleği temizle
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Katman temizlenirken hata oluştu: {ex.Message}");
-            }
-        }
-
-        private void rengiDeğiştirToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ToolStripMenuItem rengini_degistir_menu_item = sender as ToolStripMenuItem;
-
-            if (rengini_degistir_menu_item != null)
-            {
-                System.Windows.Forms.CheckBox checkBox = rengini_degistir_menu_item.Tag as System.Windows.Forms.CheckBox;
-                int checkbox_index = int.Parse(checkBox.Tag.ToString()) - 1;
-
-                if (checkbox_index < 0 || checkbox_index >= cbs.tüm_katmanlar_array.Length)
-                {
-                    MessageBox.Show("Yanlış katman endeksi!", "",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Lütfen önce senaryo dosyasını ekleyin.");
                     return;
                 }
 
-                GMapOverlay overlay = cbs.tüm_katmanlar_array[checkbox_index];
-                if (overlay == null)
+                // Run the R script
+                string resultsFilePath = RunModelRScript(modifiedFilePath);
+
+                if (resultsFilePath == null)
                 {
-                    MessageBox.Show("Katmanda herhangi bir data bulunamadı.",
-                        "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // If R script failed or no results path was returned, stop further execution
                     return;
                 }
 
-                ColorDialog colorDialog = new ColorDialog
+                // Load results into tab_ekonometrik
+                LoadResultsToTabEkonometrik(resultsFilePath);
+            }
+            finally
+            {
+                // Restore cursor to default
+                Cursor.Current = Cursors.Default;
+            }
+        }
+
+        // Method to run the R script
+        private string RunModelRScript(string modifiedFilePath)
+        {
+            string rScriptPath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\begum_model_deneme.R";
+            string resultsFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\";
+
+            // Set up process info
+            var processInfo = new ProcessStartInfo()
+            {
+                FileName = "Rscript.exe",
+                Arguments = $"\"{rScriptPath}\" \"{modifiedFilePath}\"",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            // Start the process
+            using (var process = Process.Start(processInfo))
+            {
+                process.OutputDataReceived += (sender, args) =>
                 {
-                    AnyColor = true,
-                    AllowFullOpen = true,
-                    FullOpen = true
+                    if (!string.IsNullOrEmpty(args.Data))
+                    {
+                        Console.WriteLine(args.Data);
+                        resultsFilePath = args.Data;  // Capture the file path
+                    }
                 };
 
-                if (colorDialog.ShowDialog() == DialogResult.OK)
+                process.ErrorDataReceived += (sender, args) => Console.WriteLine("ERROR: " + args.Data);
+
+                process.BeginOutputReadLine();
+                process.WaitForExit();
+            }
+
+            if (string.IsNullOrEmpty(resultsFilePath))
+            {
+                MessageBox.Show("Error: No results file path was generated by the R script.");
+                return null;
+            }
+
+            MessageBox.Show("Modeller başarıyla çalıştırıldı. " + resultsFilePath);
+            return resultsFilePath;  // Return the results file path
+        }
+
+
+        // Helper method to load data from an Excel worksheet into a DataGridView
+        private void LoadWorksheetToDataGridView(ExcelWorksheet worksheet, DataGridView dataGridView)
+        {
+            DataTable dt = new DataTable();
+
+            // Load headers from the first row
+            for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+            {
+                dt.Columns.Add(worksheet.Cells[1, col].Text);
+            }
+
+            // Load data from the worksheet into the DataTable (starting from row 2)
+            for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+            {
+                var newRow = dt.NewRow();
+                for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
                 {
-                    Color selectedColor = colorDialog.Color;
-                    byte a = selectedColor.A;
-                    byte r = selectedColor.R;
-                    byte g = selectedColor.G;
-                    byte b = selectedColor.B;
+                    newRow[col - 1] = worksheet.Cells[row, col].Text;
+                }
+                dt.Rows.Add(newRow);
+            }
 
-                    // Combine them into a single uint in the order expected by the Color class
-                    uint abgr = (uint)(a << 24 | b << 16 | g << 8 | r);
+            // Assign the DataTable as the DataSource of the DataGridView
+            dataGridView.DataSource = dt;
+        }
 
-                    // Update the polygons in the overlay
-                    foreach (var polygon in overlay.Polygons)
-                    {
-                        polygon.Stroke = new Pen(Color.FromArgb(a, r, g, b), 3); // Set border color
-                        polygon.Fill = new SolidBrush(Color.FromArgb(50, selectedColor)); // Set fill color with transparency
-                    }
-
-                    checkBox.ForeColor = Color.FromArgb(a, r, g, b);
-
-                    cbs.GetActiveGMapControl().Refresh(); // Redraw the map to reflect the changes
+        private void LoadImageIntoPictureBox(PictureBox pictureBox, string imagePath)
+        {
+            if (File.Exists(imagePath))
+            {
+                using (DrawingImage img = DrawingImage.FromFile(imagePath))
+                {
+                    pictureBox.Image = new Bitmap(img); // Create a new Bitmap to avoid file lock issues
                 }
             }
-        }
-
-        // when clicked on "Tabloyu Gör" toolStripMenuItem applied onto the layers added
-        // onto the maps, open up their attribute table
-        private void tabloyuGörToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            tablo_formu.Show();
-            tablo_formu.Activate();
-        }
-
-        // A simple prompt dialog for renaming
-        public static class Prompt
-        {
-            public static string ShowDialog(string text, string caption)
+            else
             {
-                Form prompt = new Form()
-                {
-                    Width = 320,
-                    Height = 160,
-                    FormBorderStyle = FormBorderStyle.FixedDialog,
-                    Text = caption,
-                    StartPosition = FormStartPosition.CenterScreen
-                };
-                System.Windows.Forms.Label textLabel = new System.Windows.Forms.Label() { Left = 50, Top = 20, Text = text };
-                System.Windows.Forms.TextBox textBox = new System.Windows.Forms.TextBox() { Left = 50, Top = 50, Width = 170, Height = 70 };
-                System.Windows.Forms.Button confirmation = new System.Windows.Forms.Button() { Text = "Tamam", Left = 170, Width = 100, Top = 85, DialogResult = DialogResult.OK };
-                confirmation.Click += (sender, e) => { prompt.Close(); };
-                prompt.Controls.Add(textBox);
-                prompt.Controls.Add(confirmation);
-                prompt.Controls.Add(textLabel);
-                prompt.AcceptButton = confirmation;
-
-                return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
+                MessageBox.Show($"Image not found: {imagePath}", "Image Load Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
-        // nokta ekleme/çıkarma gibi opsiyonların olduğu menü
-        public ContextMenuStrip nokta_menüsü;
-
-        // noktaların eklenip çıkarılacağı liste
-        //private List<Shape> pointsList = new List<Shape>();
-
-        // sol tıkla nokta ekleyebilme kontrolü
-        public bool adding_points = false;
-        int point_index = 0;
-
-               //------------------------------------Tool Strip Menu Items END --------------------------//
-               //---------------------------------------------------------------------------///
-
-               //////////////// --------------- MAP RELATED BUTTON EVENTS  ------------------------////////////////
-
-               private void button6_Click(object sender, EventArgs e)
+        private void ELFShowGraphsButton_Click(object sender, EventArgs e)
         {
-            Modül_Tabları.SelectTab(tab_girdi);
-            veri_listesi_seçimi.Text = "İmar Verileri";
-            veri_listesi_seçimi.Enabled = false;
+            ELFResultsTabControls.SelectedTab = ELFGraphicOutputsTabPage;
         }
 
+
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+        // -------------------------------- GENEL HARITA VE TOOLBAR EVENTLERİ & METOTLAR -------------------------------//
+        // ------------------------------------------------------------------------------------------------------------ //
+        // ------------------------------------------------------------------------------------------------------------ //
+
+        // toolstrip'teki nokta butonu
         private void Nokta_Ekle_Click(object sender, EventArgs e)
         {
             isSelecting_marker = true;
@@ -3972,6 +4661,15 @@ namespace SLF
             cbs.GetActiveGMapControl().Visible = true;
             cbs.GetActiveWebView().Visible = false;
             cbs.GetActiveGMapControl().MapProvider = GMapProviders.GoogleSatelliteMap;
+        }
+
+        private void Sokak_Görünümü_Click(object sender, EventArgs e)
+        {
+            cbs.GetActiveGMapControl().Visible = false;
+            cbs.GetActiveWebView().Visible = true;
+
+            string url = "https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu";
+            cbs.GetActiveWebView().CoreWebView2.Navigate(url);
         }
 
         // haritalardaki OSM katmanı
@@ -4028,194 +4726,278 @@ namespace SLF
             {
                 MessageBox.Show("Google Earth Desktop uygulaması açılamadı. Lütfen ilgili yüklemenin bilgi" +
                     "sayarınızda halihazırda yüklü olduğunu teyit ediniz!   >" +
-                    $"An error occurred: {ex.Message}", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    $"Hata Mesajı: {ex.Message}", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
 
-        private void Poligon_Çiz_Click(object sender, EventArgs e)
-        {
-            isSelecting_polygon = true;
-            isRulerEnabled = false;
-            isRulerActive = false;
 
-            // Determine the active map control and reset accordingly
+        private void Poligon_Sil_Click(object sender, EventArgs e)
+        {
             if (cbs.GetActiveGMapControl() == gMapControl_imar)
             {
-                ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar, rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
+                if (polygonOverlay_imar == null || polygonOverlay_imar.Polygons.Count == 0)
+                {
+                    MessageBox.Show("Herhangi bir poligon çizilmemiştir. Lütfen öncelikle bir poligon çiziniz.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
             }
-            else if (cbs.GetActiveGMapControl() == gMapControl_yga)
-            {
-                ResetMapControls(gMapControl_yga, mesafe_metre_yga, Mesafe_yga, markerOverlay_yga, rulerOverlay_yga, rulerRoute_yga, rulerPoints_yga);
-            }
-            else if (cbs.GetActiveGMapControl() == gMapControl_stokastik)
-            {
-                ResetMapControls(gMapControl_stokastik, mesafe_metre_stokastik, Mesafe_stokastik, markerOverlay_stokastik, rulerOverlay_stokastik, rulerRoute_stokastik, rulerPoints_stokastik);
-            }
+
         }
 
-        // Helper method to reset map controls for a specific map
-        private void ResetMapControls(GMapControl mapControl, System.Windows.Forms.Label distanceLabel, System.Windows.Forms.Label distanceMetreLabel,
-            GMapOverlay markerOverlay, GMapOverlay rulerOverlay, GMapRoute rulerRoute, List<PointLatLng> rulerPoints)
+        private void Poligon_Kaydet_Click(object sender, EventArgs e)
         {
-            // Clear the distance display and visibility
-            distanceMetreLabel.Text = string.Empty;
-            distanceLabel.Visible = false;
+            if (isSelecting_YUK == true)
+            {
+                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(true, false, polygonPoints_imar);
 
-            // Clear overlays and ruler data
-            markerOverlay?.Clear();
-            rulerOverlay?.Clear();
-            rulerRoute?.Clear();
-            rulerPoints?.Clear();
+            }
+            else if (isSelecting_YGA == true)
+            {
+                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, true, polygonPoints_imar);
+                poligonOzellikFormu.buton_yük_tipleri.Visible = false;
+            }
+
+            poligonOzellikFormu.Owner = this;
+            poligonOzellikFormu.ShowDialog();
+            poligonOzellikFormu.BringToFront();
+            poligonOzellikFormu.Focus();
+
+            if (poligonOzellikFormu.is_poligon_saved == true)
+            {
+
+                PoligonKaydetEventi(sender, e, polygonOverlay_imar, polygonPoints_imar);
+
+                // Mark all categories for update
+                pendingUpdates["imar"] = true;
+                pendingUpdates["yuk"] = true;
+
+                // Update only the active tab immediately
+                UpdateCheckboxPositions(checkBoxes_imar, "imar");
+                UpdateCheckboxPositions(checkBoxes_yuk, "yuk");
+
+            }
         }
 
+        // Helper method to bring buttons to the front
+        private void BringButtonsToFront()
+        {
+            buton_ea_harita_katmanlar.BringToFront();
+            buton_yuk_haritası_katmanlar.BringToFront();
+            buton_imar_katmanlar.BringToFront();
+        }
 
-               //////////////// --------------- BUTTON EVENTS END ------------------------////////////////
-               ///
-               //---------------------------- CBS TOOLBOX EVENTLERİ  ----------------------------------//
-               // show the list of the available functions when clicked on the function button
-               private void Stokastik_Fonksiyonlar_MouseDown(object sender, MouseEventArgs e)
+        public void OnMapClickEventi(
+            PointLatLng pointClick,
+            MouseEventArgs e,
+            GMapOverlay markerOverlay,
+            ref List<PointLatLng> polygonPoints,
+            ref GMapOverlay polygonOverlay,
+            System.Windows.Forms.Label mesafe,
+            System.Windows.Forms.Label mesafe_metre)
         {
             if (e.Button == MouseButtons.Left)
             {
-                ContextMenuStrip_Fonksiyon.Show(Cursor.Position);
-            }
-        }
-        private void Stokastik_Kaydır_Click(object sender, EventArgs e)
-        {
-            cbs.CBS_kaydır(markerOverlay_stokastik, rulerRoute_stokastik, gMapControl_stokastik,
-                mesafe_metre_stokastik, Mesafe_stokastik);
-        }
-
-        private void İmar_Kaydır_Click(object sender, EventArgs e)
-        {
-            cbs.CBS_kaydır(markerOverlay_imar, rulerRoute_imar, gMapControl_imar,
-                mesafe_metre_imar, Mesafe_imar);
-        }
-
-        private void EA_Kaydır_Click(object sender, EventArgs e)
-        {
-            cbs.CBS_kaydır(markerOverlay_stokastik, rulerRoute_stokastik, gMapControl_stokastik,
-                mesafe_metre_stokastik, Mesafe_stokastik);
-        }
-        private void Yuk_Seç_Click(object sender, EventArgs e)
-        {
-            cbs.CBS_sec(markerOverlay_yuk, rulerRoute_yuk, gMapControl_yuk,
-                mesafe_metre_yuk, Mesafe_yuk);
-        }
-        private void Yuk_Kaydır_Click(object sender, EventArgs e)
-        {
-            cbs.CBS_kaydır(markerOverlay_yuk, rulerRoute_yuk, gMapControl_yuk,
-                mesafe_metre_yuk, Mesafe_yuk);
-        }
-        private void Yga_Sec_Click(object sender, EventArgs e)
-        {
-            cbs.CBS_sec(markerOverlay_stokastik, rulerRoute_stokastik, gMapControl_stokastik,
-                mesafe_metre_stokastik, Mesafe_stokastik);
-        }
-        private void Stokastik_Seç_Click(object sender, EventArgs e)
-        {
-            cbs.CBS_sec(markerOverlay_stokastik, rulerRoute_stokastik, gMapControl_stokastik,
-                mesafe_metre_stokastik, Mesafe_stokastik);
-        }
-
-        private void İmar_Seç_Click(object sender, EventArgs e)
-        {
-            cbs.CBS_sec(markerOverlay_imar, rulerRoute_imar, gMapControl_imar,
-                    mesafe_metre_imar, Mesafe_imar);
-        }
-
-        private void Yga_Mesafe_Olc_Click(object sender, EventArgs e)
-        {
-            isRulerActive = true;
-            isRulerEnabled = true;
-            polygonPoints_yga?.Clear();
-            polygonOverlay_yga?.Clear();
-
-            cbs.CBS_ölç(mesafe_metre_yga, Mesafe_yga);
-        }
-        private void Stokastik_Mesafe_Ölç_Click(object sender, EventArgs e)
-        {
-            isRulerActive = true;
-            isRulerEnabled = true;
-            polygonPoints_stokastik?.Clear();
-            polygonOverlay_stokastik?.Clear();
-
-            cbs.CBS_ölç(mesafe_metre_stokastik, Mesafe_stokastik);
-        }
-
-        private void Yuk_Mesafe_Ölç_Click(object sender, EventArgs e)
-        {
-            isRulerActive = true;
-            isRulerEnabled = true;
-            polygonPoints_yuk?.Clear();
-            polygonOverlay_yuk?.Clear();
-
-            cbs.CBS_ölç(mesafe_metre_yuk, Mesafe_yuk);
-        }
-
-        private void İmar_Mesafe_Ölç_Click(object sender, EventArgs e)
-        {
-            isRulerActive = true;
-            isRulerEnabled = true;
-            polygonPoints_imar?.Clear();
-            polygonOverlay_imar?.Clear();
-
-            cbs.CBS_ölç(mesafe_metre_imar, Mesafe_imar);
-        }
-
-        private void Stokastik_Grid_Oluştur_Click(object sender, EventArgs e)
-        {
-            Grid_Seçenekler grid_formu = new Grid_Seçenekler();
-            grid_formu.Tag = this;
-            grid_formu.Owner = this;
-            grid_formu.Show();
-            grid_formu.Activate();
-            grid_formu.StartPosition = FormStartPosition.CenterParent;
-        }
-
-
-
-                //////////////// HARİTA EVENTLERİ - MouseDown, MouseUp, MouseMove, OnMapClick  ////////////////
-                public void OnMapClickEventi(PointLatLng pointClick, MouseEventArgs e, GMapOverlay markerOverlay,
-        ref List<PointLatLng> polygonPoints, ref GMapOverlay polygonOverlay,
-        System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
-        {
-            if (e.Button == MouseButtons.Left && isSelecting_polygon)
-            {
-                // Yeni bir nokta ekle
-                polygonPoints.Add(pointClick);
-
-                // Mevcut markerları temizle ve yeniden çiz
-                markerOverlay.Markers.Clear();
-
-                // Sadece kullanıcının eklediği noktaları göster
-                foreach (var point in polygonPoints)
+                // If user is placing markers (not polygons)
+                if (isSelecting_marker)
                 {
-                    GMarkerGoogle marker = new GMarkerGoogle(point, GMarkerGoogleType.blue);
-                    markerOverlay.Markers.Add(marker);
-                }
-
-                // En az 3 nokta varsa poligon çiz
-                if (polygonPoints.Count >= 3)
-                {
-                    polygonOverlay.Polygons.Clear();
-
-                    GMapPolygon polygon = new GMapPolygon(polygonPoints, "Polygon")
+                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green)
                     {
-                        Fill = new SolidBrush(Color.FromArgb(50, Color.Red)),
-                        Stroke = new Pen(Color.Red, 2),
-                        IsVisible = true
+                        ToolTipText = $"Lat={Math.Round(pointClick.Lat, 5)}, Lng={Math.Round(pointClick.Lng, 5)}"
                     };
+                    markerOverlay.Markers.Add(marker);
+                    // Possibly store data in marker.Tag, etc.
+                }
 
-                    polygonOverlay.Polygons.Add(polygon);
+                // If user is drawing polygons
+                if (isSelecting_polygon)
+                {
+                    // Add the newly clicked point
+                    polygonPoints.Add(pointClick);
 
-                    // Alan hesapla
-                    double area = cbs.CalculatePolygonArea(polygonPoints);
-                    mesafe.Visible = true;
-                    mesafe.Text = "Seçili Alan: " + Math.Round(area, 0).ToString() + " m²";
+                    // Add a small marker on each click so the user sees the polygon corners
+                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue_small);
+                    markerOverlay.Markers.Add(marker);
+
+                    // find first free layer index
+                    int layerIndex = FindFirstFreeLayerIndex();
+                    if (layerIndex == -1)
+                    {
+                        MessageBox.Show("En fazla 15 adet katman!");
+                        return;
+                    }
+
+                    // decide which map array to use, based on which gMapControl is currently active
+                    GMapControl activeMap = cbs.GetActiveGMapControl();
+                    GMapOverlay[] arrayForActiveMap = null;
+
+                    if (activeMap == gMapControl_imar)
+                        arrayForActiveMap = cbs.tüm_katmanlar_array_imar;
+                    else if (activeMap == gMapControl_yuk)
+                        arrayForActiveMap = cbs.tüm_katmanlar_array_yuk;
+                    else
+                    {
+                        MessageBox.Show("Geçersiz harita kontrolü!");
+                        return;
+                    }
+
+                    // 3) If we haven't created an overlay for this layerIndex yet, create & store it
+                    if (arrayForActiveMap[layerIndex] == null)
+                    {
+                        // define the Id of the polygon "PolygonLayer_{layerIndex+1}"
+                        string overlayName = $"PolygonLayer_{layerIndex + 1}";
+
+                        GMapOverlay newOverlay = new GMapOverlay(overlayName);
+                        activeMap.Overlays.Add(newOverlay);
+                        arrayForActiveMap[layerIndex] = newOverlay;
+                    }
+
+                    // now set polygonOverlay = that array entry
+                    polygonOverlay = arrayForActiveMap[layerIndex];
+
+                    // if there are at least 3 points, let's draw or re-draw the polygon
+                    if (polygonPoints.Count >= 3)
+                    {
+                        cbs.Draw_Polygon(polygonPoints, polygonOverlay, activeMap);
+
+                        double area = cbs.CalculatePolygonArea(polygonPoints);
+                        mesafe_metre.Visible = false;
+                        mesafe.Visible = true;
+                        mesafe.Text = "Seçili Alan: " + Math.Round(area, 0) + " m²";
+                    }
+
+                    activeMap.Refresh();
                 }
             }
         }
+
+        public void PoligonKaydetEventi(
+            object sender,
+            EventArgs e,
+            GMapOverlay polygonOverlay,     // the overlay that user just drew the polygon(s) in
+            List<PointLatLng> polygonPoints)
+        {
+            // make sure there's actually a polygon
+            if (polygonOverlay == null || polygonOverlay.Polygons.Count == 0)
+            {
+                MessageBox.Show("Herhangi bir poligon çizilmemiştir. Önce poligon çiziniz.");
+                return;
+            }
+            else
+            {
+                markerOverlay_ea.Markers?.Clear();
+                markerOverlay_DEK.Markers?.Clear();
+                markerOverlay_imar.Markers?.Clear();
+                markerOverlay_yuk.Markers?.Clear();
+
+                //Figure out which map array & layerIndex this overlay belongs to
+                layer_index = FindLayerIndexFromOverlay(polygonOverlay);
+
+                if (layer_index < 0)
+                {
+                    MessageBox.Show("Çizilen poligon geçersiz bir katmana ait!");
+                    return;
+                }
+
+                // re-color the polygon
+                foreach (var poly in polygonOverlay.Polygons)
+                {
+                    poly.Stroke = new Pen(cbs.overlayColors[layer_index].BorderColor, 3);
+                    poly.Fill = new SolidBrush(cbs.overlayColors[layer_index].FillColor);
+                }
+
+                // identify the dictionary for that overlay
+                Dictionary<GMapPolygon, DataRow> sourceDict = null;
+                if (polygonOverlay == cbs.tüm_katmanlar_array_imar[layer_index])
+                    sourceDict = cbs.polygonAttributes_imar;
+                else if (polygonOverlay == cbs.tüm_katmanlar_array_yuk[layer_index])
+                    sourceDict = cbs.polygonAttributes_yuk;
+
+                else
+                {
+                    MessageBox.Show("Overlay dictionary eşleşmedi!");
+                    return;
+                }
+
+                // create a DataTable for the layer
+                DataTable polygonDataTable = poligonOzellikFormu.PolygonDataTable;
+                cbs.tüm_katmanlar_datatable[layer_index] = polygonDataTable;
+
+                // if you assume just one polygon => one row, store it in the dictionary
+                DataRow singleRow = (polygonDataTable.Rows.Count > 0) ? polygonDataTable.Rows[0] : null;
+                if (singleRow != null)
+                {
+                    foreach (var userPoly in polygonOverlay.Polygons)
+                    {
+                        sourceDict[userPoly] = singleRow;
+                    }
+                }
+
+                //name for this layer
+                string layerName = "Polygon_" + (layer_index + 1);
+                cbs.tüm_katmanlar_array_names[layer_index] = layerName;
+
+                // convert to shapefile
+                MapWinGIS.Shapefile shp = cbs.ConvertOverlayToShapefile(polygonOverlay);
+                cbs.shapeFileArray_MapWinGIS[layer_index] = shp;
+
+                // copy to other overlays + dictionaries
+                if (polygonOverlay != cbs.tüm_katmanlar_array_imar[layer_index])
+                {
+                    GMapOverlay newImar = new GMapOverlay($"PolygonLayer_{layer_index + 1}");
+                    gMapControl_imar.Overlays.Add(newImar);
+                    cbs.tüm_katmanlar_array_imar[layer_index] = newImar;
+
+                    cbs.CopyOverlayContents(
+                        polygonOverlay,
+                        cbs.tüm_katmanlar_array_imar[layer_index],
+                        sourceDict,
+                        cbs.polygonAttributes_imar
+                    );
+                }
+
+                if (polygonOverlay != cbs.tüm_katmanlar_array_yuk[layer_index])
+                {
+
+                    GMapOverlay newYuk = new GMapOverlay($"PolygonLayer_{layer_index + 1}");
+                    gMapControl_yuk.Overlays.Add(newYuk);
+                    cbs.tüm_katmanlar_array_yuk[layer_index] = newYuk;
+
+                    cbs.CopyOverlayContents(
+                        polygonOverlay,
+                        cbs.tüm_katmanlar_array_yuk[layer_index],
+                        sourceDict,
+                        cbs.polygonAttributes_yuk
+                    );
+                }
+
+
+                // Update the checkboxes for that layer in each 4 different map
+                List<CheckBox> associatedChecks = GetCheckBoxesByIndex(layer_index);
+                foreach (var chk in associatedChecks)
+                {
+                    chk.Text = polygonOverlay.Id;   // display layer name
+                    chk.Visible = true;
+                    chk.Checked = true;
+                    chk.ForeColor = cbs.overlayColors[layer_index].BorderColor;
+                }
+
+                // Prepare a new overlay for future use
+                polygonOverlay = null;
+                polygonPoints.Clear();
+                isSelecting_polygon = false;
+
+                gMapControl_imar.Refresh();
+                gMapControl_yuk.Refresh();
+
+                mesafe_metre_imar.Text = "";
+                Mesafe_imar.Text = "";
+
+                MessageBox.Show("Poligon kaydedildi!");
+
+                isSelecting_YGA = false;
+                isSelecting_YUK = false;
+            }
+        }
+
 
         private void MouseDownEvent(object sender, MouseEventArgs e, GMapControl gMapControl,
             System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre,
@@ -4259,481 +5041,445 @@ namespace SLF
             }
 
         }
-        private void gMapControl_Dek_MouseUp(object sender, MouseEventArgs e)
 
+        private void ModülFormu_Load(object sender, EventArgs e)
+        {
+            // Modül formunu yüklerken reset year selection sürecini başlat
+            ResetYearSelectionProcessGirdiModulu();
+        }
+
+
+        public List<CheckBox> GetCheckBoxesByIndex(int index)
         {
 
-            if (e.Button == MouseButtons.Left && cbs.isSelecting_grid)
+            var imarCheckBoxes = new CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4,
+                checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
+                checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15 };
 
+            var yukCheckBoxes = new CheckBox[] { checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4,
+                checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9, checkBox_yuk_10,
+                checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15 };
+
+            // Ensure the index is valid before accessing arrays
+            if (index >= 0 && index < 15)
             {
+                // Return the checkboxes for the given index
+                return new List<CheckBox> { imarCheckBoxes[index], yukCheckBoxes[index] };
+            }
 
-                // grid oluşturmak için seçilen alan (bounding box) ın son noktası
+            // Return an empty list if index is out of range
+            return new List<CheckBox>();  // Empty list instead of null
+        }
 
-                cbs.ending_point = gMapControl_DEK.FromLocalToLatLng(e.X, e.Y);
+        private void ShowAttributeTable(DataTable datatable)
+        {
+            // Create a copy of the DataTable to avoid modifying the original
+            DataTable displayTable = datatable.Copy();
 
-                cbs.isSelecting_grid = false;
+            // Add a RowIndex column to map back to the polygons
+            if (!displayTable.Columns.Contains("RowIndex"))
+            {
+                displayTable.Columns.Add("RowIndex", typeof(int));
+            }
 
-                gMapControl_stokastik.CanDragMap = true;
+            // Populate the RowIndex column
+            for (int i = 0; i < displayTable.Rows.Count; i++)
+            {
+                displayTable.Rows[i]["RowIndex"] = i;
+            }
 
-                // Clear the selection polygon and refresh the map
+            // Bind the DataTable to the DataGridView
+            tablo_formu.attribute_table.DataSource = displayTable;
 
-                gMapControl_DEK.Overlays.Remove(cbs.bounding_box_overlay);
-
-                cbs.AddGridToMap(gMapControl_DEK);
-
-                gMapControl_DEK.Refresh();
-
+            // Hide the RowIndex column
+            if (tablo_formu.attribute_table.Columns["RowIndex"] != null)
+            {
+                tablo_formu.attribute_table.Columns["RowIndex"].Visible = false;
             }
 
         }
 
-        private void gMapControl_Dek_MouseDown(object sender, MouseEventArgs e)
-
+        // temizle, rengini degistir vs. contextmenuitemları için associated checkbox taglerini ekleme
+        // ilgili tabloyu getirme
+        private void checkBox_MouseDown(object sender, MouseEventArgs e)
         {
+            // Cast the sender to a CheckBox
+            System.Windows.Forms.CheckBox sender_checkbox = sender as System.Windows.Forms.CheckBox;
 
-            if (e.Button == MouseButtons.Left && isRulerEnabled)
-
+            // Safely parse the Tag property to an integer
+            int checkbox_index;
+            if (!Int32.TryParse(sender_checkbox.Tag?.ToString(), out checkbox_index))
             {
+                return;
+            }
 
-                // sol tuşa basıldığında nokta seçmeye başla ve cetveli aktif hale getir
+            // Adjust the index since the tags are from 1 to 15 but the checkbox_indexes in the arrays are 0 to 14
+            checkbox_index -= 1;
+            lastSelectedCheckboxIndex = checkbox_index; // Store the index
 
-                isRulerActive = true;
+            // Update the last clicked checkbox (style reset)
+            if (lastClickedCheckbox != null)
+            {
+                // Reset the previous checkbox style to normal
+                lastClickedCheckbox.Font = new Font(lastClickedCheckbox.Font, FontStyle.Regular);
+            }
 
-                // seçilen piksel noktaları latitude ve longitude bilgisine dönüştür.
+            // Update the last clicked checkbox reference
+            lastClickedCheckbox = sender_checkbox;
 
-                var point = gMapControl_DEK.FromLocalToLatLng(e.X, e.Y);
+            // Set the Tag property for context menu items
+            if (temizleToolStripMenuItem != null)
+            {
+                temizleToolStripMenuItem.Tag = sender_checkbox;
+            }
+            if (rengiDeğiştirToolStripMenuItem != null)
+            {
+                rengiDeğiştirToolStripMenuItem.Tag = sender_checkbox;
+            }
+            if (kaydetToolStripMenuItem != null)
+            {
+                kaydetToolStripMenuItem.Tag = sender_checkbox;
+            }
+            if (yenidenAdlandırToolStripMenuItem != null)
+            {
+                yenidenAdlandırToolStripMenuItem.Tag = sender_checkbox;
+            }
 
-                // seçilen noktaları bir listeye koy
+            // Check if the layer at the checkbox index exists
+            if (checkbox_index >= 0 && checkbox_index < cbs.tüm_katmanlar_array_imar.Length && cbs.tüm_katmanlar_array_imar[checkbox_index] != null)
+            {
+                // Update the table form text
+                var layerName = cbs.tüm_katmanlar_array_names[checkbox_index];
+                var dataTable = cbs.tüm_katmanlar_datatable[checkbox_index];
+                tablo_formu.Text = $"Veri Tablosu -- {layerName} -- {dataTable.Rows.Count} satır -- {dataTable.Columns.Count} sütun";
 
-                rulerPoints_DEK.Add(point);
+                // Show the attribute table
+                ShowAttributeTable(dataTable);
+            }
+        }
 
-                // bir marker objesi oluştur ve seçilen noktalara marker ata
+        public void ZoomToFeature(int rowIndex)
+        {
+            if (lastSelectedCheckboxIndex < 0 ||
+                lastSelectedCheckboxIndex >= cbs.tüm_katmanlar_array_imar.Length ||
+                lastSelectedCheckboxIndex >= cbs.tüm_katmanlar_array_yuk.Length) return;
 
-                GMapMarker marker = new GMarkerGoogle(point, GMarkerGoogleType.orange_dot);
+            // Get the overlays associated with the last selected checkbox
+            GMapOverlay imarOverlay = cbs.tüm_katmanlar_array_imar[lastSelectedCheckboxIndex];
+            GMapOverlay yukOverlay = cbs.tüm_katmanlar_array_yuk[lastSelectedCheckboxIndex];
 
-                rulerOverlay_DEK.Markers.Add(marker);
+            if (imarOverlay == null && yukOverlay == null) return; // If both overlays are null, exit
 
-                // 2 adet nokta seçildiğinde aralarındaki mesafeyi hesapla ve noktaların tutulduğu listeyi temizle
+            // Get the polygons at the specified rowIndex from both overlays
+            GMapPolygon imarPolygon = imarOverlay?.Polygons.ElementAtOrDefault(rowIndex);
+            GMapPolygon yukPolygon = yukOverlay?.Polygons.ElementAtOrDefault(rowIndex);
 
-                if (rulerPoints_DEK.Count == 2)
+            if (imarPolygon == null && yukPolygon == null) return; // If no polygons are found, exit
 
+
+            // Calculate the bounding box (use either polygon, assuming they represent the same feature)
+            GMapPolygon targetPolygon = imarPolygon ?? yukPolygon; // Use imarPolygon if available, otherwise yukPolygon
+            if (targetPolygon == null) return;
+
+            double minLat = double.MaxValue, maxLat = double.MinValue;
+            double minLng = double.MaxValue, maxLng = double.MinValue;
+
+            foreach (var point in targetPolygon.Points)
+            {
+                minLat = Math.Min(minLat, point.Lat);
+                maxLat = Math.Max(maxLat, point.Lat);
+                minLng = Math.Min(minLng, point.Lng);
+                maxLng = Math.Max(maxLng, point.Lng);
+            }
+
+            // Add some padding to the bounding box
+            double latPadding = (maxLat - minLat) * 0.1;
+            double lngPadding = (maxLng - minLng) * 0.1;
+            minLat -= latPadding;
+            maxLat += latPadding;
+            minLng -= lngPadding;
+            maxLng += lngPadding;
+
+            // Create the bounding box
+            GMap.NET.RectLatLng bounds = new GMap.NET.RectLatLng(maxLat, minLng, maxLng - minLng, maxLat - minLat);
+
+            // Highlight and zoom in gMapControl_imar if the polygon exists
+            if (imarPolygon != null)
+            {
+                highlightedPolygon = imarPolygon;
+                imarPolygon.Stroke = new Pen(Color.Yellow, 3); // Highlight with a yellow border
+                gMapControl_imar.SetZoomToFitRect(bounds);
+                gMapControl_imar.Refresh();
+            }
+
+            // Highlight and zoom in gMapControl_yuk if the polygon exists
+            if (yukPolygon != null)
+            {
+                highlightedPolygon = yukPolygon; // Update highlightedPolygon to the yukPolygon if it exists
+                yukPolygon.Stroke = new Pen(Color.Yellow, 3); // Highlight with a yellow border
+                gMapControl_yuk.SetZoomToFitRect(bounds);
+                gMapControl_yuk.Refresh();
+            }
+        }
+
+        // Helper method to reset map controls for a specific map
+        private void ResetMapControls(GMapControl mapControl, System.Windows.Forms.Label distanceLabel, System.Windows.Forms.Label distanceMetreLabel,
+            GMapOverlay markerOverlay, GMapOverlay rulerOverlay, GMapRoute rulerRoute, List<PointLatLng> rulerPoints)
+        {
+            // Clear the distance display and visibility
+            distanceMetreLabel.Text = string.Empty;
+            distanceLabel.Visible = false;
+
+            // Clear overlays and ruler data
+            markerOverlay?.Clear();
+            rulerOverlay?.Clear();
+            rulerRoute?.Clear();
+            rulerPoints?.Clear();
+        }
+
+        private void yenidenAdlandırToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem yeniden_adlandir = sender as ToolStripMenuItem;
+
+            if (yeniden_adlandir != null)
+            {
+                System.Windows.Forms.CheckBox checkBox = yeniden_adlandir.Tag as System.Windows.Forms.CheckBox;
+                int checkbox_index = int.Parse(checkBox.Tag.ToString()) - 1;
+
+                if (cbs.tüm_katmanlar_array_imar[checkbox_index] != null)
                 {
+                    // Prompt the user to input a new name
+                    string newName = Prompt.ShowDialog("Yeni isim:", "Katmanı Yeniden Adlandır");
 
-                    rulerRoute_DEK?.Dispose();
-
-                    DrawRuler_Dek(rulerOverlay_DEK, rulerPoints_DEK);
-
-                    //CalculateDistance(gMapControl_Dek, mesafe_metre_dek, rulerPoints_Dek);
-
-                    rulerPoints_DEK.Clear();
-
-                    isRulerActive = false;
-
-                }
-
-            }
-
-        }
-
-        private void gMapControl_Dek_MouseMove(object sender, MouseEventArgs e)
-
-        {
-
-            if (isRulerActive && rulerPoints_DEK.Count == 1 && isRulerEnabled)
-
-            {
-
-                var point = gMapControl_DEK.FromLocalToLatLng(e.X, e.Y);
-
-                if (rulerRoute_DEK != null)
-
-                {
-
-                    rulerOverlay_DEK.Routes.Remove(rulerRoute_DEK);
-
-                }
-
-                rulerRoute_DEK = new GMapRoute(new List<PointLatLng> { rulerPoints_DEK[0], point }, "rulerRoute_Dek");
-
-                rulerRoute_DEK.Stroke = new Pen(Color.Red, 3);
-
-                rulerOverlay_DEK.Routes.Add(rulerRoute_DEK);
-
-                gMapControl_DEK.Refresh();
-
-            }
-
-        }
-        private void DrawRuler_Dek(GMapOverlay rulerOverlay, List<PointLatLng> rulerPoints)
-
-        {
-
-            if (rulerRoute_ea != null)
-
-            {
-
-                rulerOverlay.Routes.Remove(rulerRoute_ea);
-
-            }
-
-            rulerRoute_ea = new GMapRoute(rulerPoints, "rulerRoute")
-            {
-                Stroke = new Pen(Color.Red, 3)
-            };
-
-            rulerOverlay.Routes.Add(rulerRoute_ea);
-
-            gMapControl_EA.Refresh();
-
-        }
-
-        private void gMapControl_Dek_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
-
-        {
-
-            if (e.Button == MouseButtons.Left)
-
-            {
-                if (cbs.tüm_katmanlar_array[layer_index] != null)
-                {
-                    foreach (var polygon in cbs.tüm_katmanlar_array[layer_index].Polygons)
-
+                    if (!string.IsNullOrEmpty(newName))
                     {
+                        // Rename the layer in your underlying data structure
+                        checkBoxes_imar[checkbox_index].Text = newName;
+                        checkBoxes_yuk[checkbox_index].Text = newName;
+                        cbs.tüm_katmanlar_array_names[checkbox_index] = newName;
 
-                        if (cbs.IsPointInPolygon(pointClick, polygon))
-                        {
-                            cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
-
-                            if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
-                            {
-                                ShowAttributeRow(row);
-                                tablo_formu.Show();
-                            }
-
-                        }
-
+                        // Refresh the list/tree view
+                        checkBox.Refresh();
                     }
                 }
             }
-
         }
-        private void gMapControl_Dek_OnMarkerClick(GMapMarker item, MouseEventArgs e)
 
+        private void kaydetToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
-            if (item.Tag != null && item.Tag is NoktaVeri && Modül_Tabları.SelectedTab == tab_dek)
-
+            if (sender is ToolStripMenuItem kaydet_menu_item)
             {
+                System.Windows.Forms.CheckBox checkBox = kaydet_menu_item.Tag as System.Windows.Forms.CheckBox;
+                int checkbox_index = int.Parse(checkBox.Tag.ToString()) - 1;
 
-                NoktaVeri seçili_nokta = item.Tag as NoktaVeri;
+                SaveFileDialog kaydet_file_dialog = new SaveFileDialog();
 
-                NoktaBilgileriniGoster(seçili_nokta);
+                kaydet_file_dialog.Filter = "Shapefile |*.shp|MapInfo File|*.tab|Google Earth File|*.kml";
+                kaydet_file_dialog.InitialDirectory = cbs.targetDirectory;
 
-            }
+                DialogResult kaydet_result = kaydet_file_dialog.ShowDialog();
 
-        }
-
-        private void Yga_Polygon_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                ContextMenuStrip_Poligon.Show(Cursor.Position);
-            }
-        }
-
-        private void Stokastik_Poligon_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                ContextMenuStrip_Poligon.Show(Cursor.Position);
-            }
-        }
-
-        private void EA_Nokta_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                ContextMenuStrip_Nokta.Show(Cursor.Position);
-            }
-        }
-
-        private void Yga_Nokta_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                ContextMenuStrip_Nokta.Show(Cursor.Position);
-            }
-        }
-        private void Stokastik_Nokta_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                ContextMenuStrip_Nokta.Show(Cursor.Position);
-            }
-        }
-
-        private void gMapControl_yga_MouseDown(object sender, MouseEventArgs e)
-        {
-            MouseDownEvent(sender, e, gMapControl_yga, Mesafe_yga, mesafe_metre_yga,
-                rulerPoints_yga, markerOverlay_yga, rulerOverlay_yga, ref rulerRoute_yga,
-                polygonPoints_yga, polygonOverlay_yga);
-        }
-        private void gMapControl_stokastik_MouseDown(object sender, MouseEventArgs e)
-        {
-            MouseDownEvent(sender, e, gMapControl_stokastik, Mesafe_stokastik, mesafe_metre_stokastik,
-                rulerPoints_stokastik, markerOverlay_stokastik, rulerOverlay_stokastik, ref rulerRoute_stokastik,
-                polygonPoints_stokastik, polygonOverlay_stokastik);
-        }
-
-        private void gMapControl_imar_MouseDown(object sender, MouseEventArgs e)
-        {
-            MouseDownEvent(sender, e, gMapControl_imar, Mesafe_imar, mesafe_metre_imar,
-                rulerPoints_imar, markerOverlay_imar, rulerOverlay_imar, ref rulerRoute_imar,
-                polygonPoints_imar, polygonOverlay_imar);
-        }
-
-        private void gMapControl_yuk_MouseDown(object sender, MouseEventArgs e)
-        {
-            MouseDownEvent(sender, e, gMapControl_yuk, Mesafe_yuk, mesafe_metre_yuk,
-                rulerPoints_yuk, markerOverlay_yuk, rulerOverlay_yuk, ref rulerRoute_yuk,
-                polygonPoints_yuk, polygonOverlay_yuk);
-        }
-        private void İmar_Poligon_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                ContextMenuStrip_Poligon.Show(Cursor.Position);
-            }
-        }
-        private void gMapControl_yga_MouseMove(object sender, MouseEventArgs e)
-        {
-
-            // Get the current position of the center of the map
-            PointLatLng centerPosition = gMapControl_yga.Position;
-
-            // Update the strings with the center position coordinates
-            centerX = centerPosition.Lng.ToString();
-            centerY = centerPosition.Lat.ToString();
-
-            // boolean controlu ile grid oluşturulacak alan seçimine başlanması
-            if (e.Button == MouseButtons.Left && cbs.isSelecting_grid == true)
-            {
-                cbs.ending_point = gMapControl_yga.FromLocalToLatLng(e.X, e.Y);
-                cbs.UpdateSelectionPolygon(gMapControl_yga);
-            }
-
-            // eğer sadece 1 adet nokta seçilmişse, ve ikinci nokta dinamik olarak farklı yerlere
-            // tıklanarak seçiliyorsa, mesafeyi de buna göre güncelle.
-            if (isRulerActive && rulerPoints_yga.Count == 1 && isRulerEnabled == true)
-            {
-
-                var point = gMapControl_yga.FromLocalToLatLng(e.X, e.Y);
-                if (rulerRoute_yga != null)
+                if (kaydet_result == DialogResult.OK)
                 {
-                    rulerOverlay_yga.Routes.Remove(rulerRoute_yga);
-                }
-                rulerRoute_yga = new GMapRoute(new List<PointLatLng> { rulerPoints_yga[0], point }, "rulerRoute_yga");
-                rulerRoute_yga.Stroke = new Pen(Color.Red, 3);
-                rulerOverlay_yga.Routes.Add(rulerRoute_yga);
-                gMapControl_yga.Refresh();
-            }
-        }
-        private void gMapControl_stokastik_MouseMove(object sender, MouseEventArgs e)
-        {
+                    string filepath = kaydet_file_dialog.FileName;
+                    string filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
+                    string extension = filename.Substring(filename.Length - 3);
 
-            // Get the current position of the center of the map
-            PointLatLng centerPosition = gMapControl_stokastik.Position;
+                    if (extension == "shp")
+                    {
+                        MapWinGIS.Shapefile shapefile = cbs.shapeFileArray_MapWinGIS[checkbox_index];
 
-            // Update the strings with the center position coordinates
-            centerX = centerPosition.Lng.ToString();
-            centerY = centerPosition.Lat.ToString();
+                        int fieldIndex;
 
-            // boolean controlu ile grid oluşturulacak alan seçimine başlanması
-            if (e.Button == MouseButtons.Left && cbs.isSelecting_grid == true)
-            {
-                cbs.ending_point = gMapControl_stokastik.FromLocalToLatLng(e.X, e.Y);
-                cbs.UpdateSelectionPolygon(gMapControl_stokastik);
-            }
+                        fieldIndex = shapefile.get_FieldIndexByName("MWShapeID");
 
-            // eğer sadece 1 adet nokta seçilmişse, ve ikinci nokta dinamik olarak farklı yerlere
-            // tıklanarak seçiliyorsa, mesafeyi de buna göre güncelle.
-            if (isRulerActive && rulerPoints_stokastik.Count == 1 && isRulerEnabled == true)
-            {
+                        if (fieldIndex != -1)
+                        {
+                            shapefile.EditDeleteField(fieldIndex);
+                        }
 
-                var point = gMapControl_stokastik.FromLocalToLatLng(e.X, e.Y);
-                if (rulerRoute_stokastik != null)
-                {
-                    rulerOverlay_stokastik.Routes.Remove(rulerRoute_stokastik);
-                }
-                rulerRoute_stokastik = new GMapRoute(new List<PointLatLng> { rulerPoints_stokastik[0], point }, "rulerRoute_stokastik");
-                rulerRoute_stokastik.Stroke = new Pen(Color.Red, 3);
-                rulerOverlay_stokastik.Routes.Add(rulerRoute_stokastik);
-                gMapControl_stokastik.Refresh();
-            }
-        }
+                        shapefile.SaveAsEx(filepath, false, false);
+                        shapefile.Close();
+                        cbs.shapeFileArray_MapWinGIS[checkbox_index] = null;
+                        MessageBox.Show("Dosya başarıyla kaydedildi.");
+                    }
+                    else if (extension == "kml")
+                    {
+                        GMapOverlay kmlOverlay = new GMapOverlay();
+                        kmlOverlay = cbs.tüm_katmanlar_array_imar[checkbox_index];
 
-        private void gMapControl_imar_MouseMove(object sender, MouseEventArgs e)
-        {
-            // Get the current position of the center of the map
-            PointLatLng centerPosition = gMapControl_imar.Position;
+                        cbs.ExportOverlayToKml(kmlOverlay, filepath);
+                        MessageBox.Show("Dosya başarıyla kaydedildi.");
+                    }
 
-            // Update the strings with the center position coordinates
-            centerX = centerPosition.Lng.ToString();
-            centerY = centerPosition.Lat.ToString();
-
-            // boolean controlu ile grid oluşturulacak alan seçimine başlanması
-            if (e.Button == MouseButtons.Left && cbs.isSelecting_grid == true)
-            {
-                cbs.ending_point = gMapControl_imar.FromLocalToLatLng(e.X, e.Y);
-                cbs.UpdateSelectionPolygon(gMapControl_imar);
-            }
-
-            // eğer sadece 1 adet nokta seçilmişse, ve ikinci nokta dinamik olarak farklı yerlere
-            // tıklanarak seçiliyorsa, mesafeyi de buna göre güncelle.
-            if (isRulerActive && rulerPoints_imar.Count == 1 && isRulerEnabled == true)
-            {
-
-                var point = gMapControl_imar.FromLocalToLatLng(e.X, e.Y);
-                if (rulerRoute_imar != null && rulerRoute_imar.Distance != 0)
-                {
-                    rulerOverlay_imar.Routes.Remove(rulerRoute_imar);
-                }
-                rulerRoute_imar = new GMapRoute(new List<PointLatLng> { rulerPoints_imar[0], point },
-                    "rulerRoute_imar");
-                rulerRoute_imar.Stroke = new Pen(Color.Red, 3);
-                rulerOverlay_imar.Routes.Add(rulerRoute_imar);
-                gMapControl_imar.Refresh();
-            }
-        }
-        private void gMapControl_yuk_MouseMove(object sender, MouseEventArgs e)
-        {
-            // Get the current position of the center of the map
-            PointLatLng centerPosition = gMapControl_yuk.Position;
-
-            // Update the strings with the center position coordinates
-            centerX = centerPosition.Lng.ToString();
-            centerY = centerPosition.Lat.ToString();
-
-            // boolean controlu ile grid oluşturulacak alan seçimine başlanması
-            if (e.Button == MouseButtons.Left && cbs.isSelecting_grid == true)
-            {
-                cbs.ending_point = gMapControl_yuk.FromLocalToLatLng(e.X, e.Y);
-                cbs.UpdateSelectionPolygon(gMapControl_yuk);
-            }
-
-            // eğer sadece 1 adet nokta seçilmişse, ve ikinci nokta dinamik olarak farklı yerlere
-            // tıklanarak seçiliyorsa, mesafeyi de buna göre güncelle.
-            if (isRulerActive && rulerPoints_yuk.Count == 1 && isRulerEnabled == true)
-            {
-
-                var point = gMapControl_yuk.FromLocalToLatLng(e.X, e.Y);
-                if (rulerRoute_yuk != null)
-                {
-                    rulerOverlay_yuk.Routes.Remove(rulerRoute_yuk);
-                }
-                rulerRoute_yuk = new GMapRoute(new List<PointLatLng> { rulerPoints_yuk[0], point }, "rulerRoute_yuk");
-                rulerRoute_yuk.Stroke = new Pen(Color.Red, 3);
-                rulerOverlay_yuk.Routes.Add(rulerRoute_yuk);
-                gMapControl_yuk.Refresh();
-            }
-        }
-
-        private void gMapControl_stokastik_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left && cbs.isSelecting_grid)
-            {
-                // grid oluşturmak için seçilen alan (bounding box) ın son noktası
-                cbs.ending_point = gMapControl_stokastik.FromLocalToLatLng(e.X, e.Y);
-                cbs.isSelecting_grid = false;
-                gMapControl_stokastik.CanDragMap = true;
-
-                // Clear the selection polygon and refresh the map
-                gMapControl_stokastik.Overlays.Remove(cbs.bounding_box_overlay);
-                cbs.AddGridToMap(gMapControl_stokastik);
-                gMapControl_stokastik.Refresh();
-            }
-        }
-
-        private void gMapControl_yuk_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left && cbs.isSelecting_grid)
-            {
-                // grid oluşturmak için seçilen alan (bounding box) ın son noktası
-                cbs.ending_point = gMapControl_yuk.FromLocalToLatLng(e.X, e.Y);
-                cbs.isSelecting_grid = false;
-                gMapControl_yuk.CanDragMap = true;
-
-                // Clear the selection polygon and refresh the map
-                gMapControl_yuk.Overlays.Remove(cbs.bounding_box_overlay);
-                cbs.AddGridToMap(gMapControl_yuk);
-                gMapControl_yuk.Refresh();
-            }
-        }
-
-        private void gMapControl_imar_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left && cbs.isSelecting_grid)
-            {
-                // grid oluşturmak için seçilen alan (bounding box) ın son noktası
-                cbs.ending_point = gMapControl_imar.FromLocalToLatLng(e.X, e.Y);
-                cbs.isSelecting_grid = false;
-                gMapControl_imar.CanDragMap = true;
-
-                // Clear the selection polygon and refresh the map
-                gMapControl_imar.Overlays.Remove(cbs.bounding_box_overlay);
-                cbs.AddGridToMap(gMapControl_imar);
-                gMapControl_imar.Refresh();
-            }
-        }
-
-        private void trackBar_Yıllar_ValueChanged(object sender, EventArgs e)
-        {
-            int selectedYear = trackBar_Yıllar.Value;
-            yuk_yıl_deger.Text = $"{selectedYear}";
-
-            // Construct the column name based on the selected year
-            string columnName = $"{selectedYear}";
-
-            // Call a method to update the heatmap using the selected year's data
-            UpdateHeatmapForYear(columnName);
-        }
-
-        private void UpdateHeatmapForYear(string columnName)
-        {
-            // Clear the existing overlay for a fresh heatmap
-            cbs.GetActiveGMapControl().Overlays.Clear();
-            gMapControl_yuk.Overlays.Clear();
-            gMapControl_yuk.Overlays.Add(cbs.tüm_katmanlar_array[0]);
-
-            // Create a new overlay for the heatmap
-            GMapOverlay heatmapOverlay = new GMapOverlay("Heatmap");
-
-            // Assuming your data is stored in a DataTable called yourDataTable
-            DataTable dataTable = cbs.tüm_katmanlar_datatable[0];
-
-            // Initialize min and max values
-            double min = double.MaxValue;
-            double max = double.MinValue;
-
-            // Calculate min and max values for the specified column
-            foreach (DataRow row in dataTable.Rows)
-            {
-                if (row[columnName] != DBNull.Value && double.TryParse(row[columnName].ToString(), out double value))
-                {
-                    if (value < min) min = value;
-                    if (value > max) max = value;
                 }
             }
+        }
 
-            // Display heatmap based on the column data
-            cbs.CreateHeatmap(cbs.tüm_katmanlar_array[0], cbs.tüm_katmanlar_datatable[0], columnName);
-            cbs.CreateHeatmapLegend(min, max);
+        private void temizleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem delete_menu_item = sender as ToolStripMenuItem;
 
-            // Add the overlay to the GMap control
-            cbs.GetActiveGMapControl().Overlays.Add(heatmapOverlay);
-            cbs.GetActiveGMapControl().Refresh();
+            if (delete_menu_item != null)
+            {
+                System.Windows.Forms.CheckBox checkBox = delete_menu_item.Tag as System.Windows.Forms.CheckBox;
 
+                // Ensure the Tag is set and is a valid number
+                if (checkBox != null && checkBox.Tag != null)
+                {
+                    int checkbox_index;
 
+                    if (int.TryParse(checkBox.Tag.ToString(), out checkbox_index))
+                    {
+                        checkbox_index -= 1;  // Adjust for 0-based indexing
+
+                        // Ensure the index is within bounds of the array and the item exists
+                        if (checkbox_index >= 0 && checkbox_index < cbs.tüm_katmanlar_array_imar.Length &&
+                            cbs.tüm_katmanlar_array_imar[checkbox_index] != null)
+                        {
+                            string katman_ismi = cbs.tüm_katmanlar_array_names[checkbox_index];
+
+                            DialogResult temizle_result = MessageBox.Show(katman_ismi + " isimli katman " +
+                                "silinecektir. Emin misiniz?", "", MessageBoxButtons.YesNo);
+
+                            if (temizle_result == DialogResult.Yes)
+                            {
+                                // Safe removal from overlays
+                                if (cbs.tüm_katmanlar_array_imar[checkbox_index] != null)
+                                {
+                                    // Check if the overlay exists and remove it safely
+                                    var overlay_imar = cbs.tüm_katmanlar_array_imar[checkbox_index];
+                                    var overlay_yuk = cbs.tüm_katmanlar_array_yuk[checkbox_index];
+
+                                    var activeMap = cbs.GetActiveGMapControl();
+
+                                    if (activeMap.Overlays.Contains(overlay_imar) || activeMap.Overlays.Contains(overlay_yuk))
+                                    {
+                                        gMapControl_imar.Overlays.Remove(overlay_imar);
+                                        gMapControl_yuk.Overlays.Remove(overlay_yuk);
+
+                                        gMapControl_imar.Refresh();
+                                        gMapControl_yuk.Refresh();
+                                    }
+
+                                    if (checkBox.Text == "SONUCLAR_Load_Density.kml")
+                                    {
+                                        checkBox_yuk_main.Checked = false;
+                                        checkBox_yuk_main.Visible = false;
+                                        checkBox_yuk_main.Tag = null;
+
+                                        load_density_cnt = 0;
+
+                                        // Remove the heatmapOverlay by its ID
+                                        GMapOverlay heatmapOverlayToRemove = gMapControl_yuk.Overlays.FirstOrDefault(o => o.Id == "HeatmapOverlay");
+                                        if (heatmapOverlayToRemove != null)
+                                        {
+                                            gMapControl_yuk.Overlays.Remove(heatmapOverlayToRemove);
+                                        }
+                                    }
+                                }
+
+                                // Dispose and nullify references
+                                cbs.tüm_katmanlar_array_imar[checkbox_index]?.Dispose();
+                                cbs.tüm_katmanlar_array_yuk[checkbox_index]?.Dispose();
+
+                                cbs.tüm_katmanlar_array_imar[checkbox_index] = null;
+                                cbs.tüm_katmanlar_array_yuk[checkbox_index] = null;
+
+                                cbs.tüm_katmanlar_datatable[checkbox_index] = null;
+                                cbs.tüm_katmanlar_array_names[checkbox_index] = null;
+
+                                // Clear checkboxes for all maps
+                                ClearCheckboxesForAllMaps(checkbox_index);
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("Silinecek katman bulunamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Silinecek katman sorunu.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
+        private void SetOverlayColor(GMapOverlay overlay, Color selectedColor)
+        {
+            if (overlay == null) return;
+
+            // For polygons (area geometry)
+            foreach (var polygon in overlay.Polygons)
+            {
+                // Set outline (stroke)
+                polygon.Stroke = new Pen(Color.FromArgb(selectedColor.A, selectedColor.R, selectedColor.G, selectedColor.B), 3);
+                polygon.Fill = new SolidBrush(Color.FromArgb(50, selectedColor));
+            }
+
+            // For routes (line geometry)
+            foreach (var route in overlay.Routes)
+            {
+                route.Stroke = new Pen(Color.FromArgb(selectedColor.A, selectedColor.R, selectedColor.G, selectedColor.B), 3);
+            }
+
+        }
+
+        private void rengiDeğiştirToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // get the "Change Color" menu item
+            var menuItem = sender as ToolStripMenuItem;
+            if (menuItem == null) return;
+
+            // get the associated checkbox from the menu item’s Tag
+            CheckBox checkBox = menuItem.Tag as CheckBox;
+            if (checkBox == null) return;
+
+            // Parse the layer index from the checkbox’s Tag to get the 0-based index
+            if (!int.TryParse(checkBox.Tag?.ToString(), out int zeroBasedIndex))
+            {
+                MessageBox.Show("Katman endeksi çözümlenemedi.");
+                return;
+            }
+
+            int layerIndex = zeroBasedIndex - 1;
+
+            // retrieve the four overlay arrays 
+            GMapOverlay overlayImar = cbs.tüm_katmanlar_array_imar[layerIndex];
+            GMapOverlay overlayYuk = cbs.tüm_katmanlar_array_yuk[layerIndex];
+
+            // prompt user for a color
+            using (ColorDialog colorDialog = new ColorDialog
+            {
+                AnyColor = true,
+                AllowFullOpen = true,
+                FullOpen = true
+            })
+            {
+                if (colorDialog.ShowDialog() == DialogResult.OK)
+                {
+                    Color selectedColor = colorDialog.Color;
+
+                    // aApply color to each overlay
+                    SetOverlayColor(overlayImar, selectedColor);
+                    SetOverlayColor(overlayYuk, selectedColor);
+
+                    // Recolor all three checkboxes associated with this layer index
+                    checkBoxes_imar[layerIndex].ForeColor = selectedColor;
+                    checkBoxes_yuk[layerIndex].ForeColor = selectedColor;
+
+                    // refresh each map
+                    gMapControl_imar.Refresh();
+                    gMapControl_yuk.Refresh();
+                }
+            }
+        }
+
+        private void tabloyuGörToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            tablo_formu.Show();
+            tablo_formu.Activate();
         }
 
 
@@ -4782,201 +5528,6 @@ namespace SLF
                     "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
-        private void gMapControl_yga_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
-        {
-            OnMapClickEventi(pointClick, e, markerOverlay_yga, ref polygonPoints_yga,
-                ref polygonOverlay_yga, Mesafe_yga, mesafe_metre_yga);
-
-        }
-        private void gMapControl_imar_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
-        {
-            OnMapClickEventi(pointClick, e, markerOverlay_imar, ref polygonPoints_imar,
-                    ref polygonOverlay_imar, Mesafe_imar, mesafe_metre_imar);
-        }
-
-        private void gMapControl_stokastik_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
-        {
-            OnMapClickEventi(pointClick, e, markerOverlay_stokastik, ref polygonPoints_stokastik,
-                ref polygonOverlay_stokastik, Mesafe_stokastik, mesafe_metre_stokastik);
-
-        }
-
-        private void gMapControl_yuk_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
-        {
-            OnMapClickEventi(pointClick, e, markerOverlay_yuk, ref polygonPoints_yuk,
-        ref polygonOverlay_yuk, Mesafe_yuk, mesafe_metre_yuk);
-        }
-
-
-
-        public void PoligonKaydetEventi(object sender, EventArgs e, GMapOverlay polygonOverlay,
-    GMapOverlay markerOverlay, List<PointLatLng> polygonPoints,
-    System.Windows.Forms.Label mesafe, System.Windows.Forms.Label mesafe_metre)
-        {
-            if (polygonPoints.Count >= 3)
-            {
-                try
-                {
-                    layer_index = Array.FindIndex(cbs.tüm_katmanlar_array, s => s == null);
-
-                    if (layer_index == -1)
-                    {
-                        MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
-                        return;
-                    }
-
-                    // Yeni overlay oluştur
-                    GMapOverlay newOverlay = new GMapOverlay($"Polygon_{layer_index + 1}");
-
-                    // Önce markerları ekle
-                    foreach (var point in polygonPoints)
-                    {
-                        GMarkerGoogle marker = new GMarkerGoogle(point, GMarkerGoogleType.blue);
-                        newOverlay.Markers.Add(marker);
-                    }
-
-                    // Sonra poligonu ekle
-                    GMapPolygon polygon = new GMapPolygon(new List<PointLatLng>(polygonPoints), $"Polygon_{layer_index + 1}")
-                    {
-                        Fill = new SolidBrush(Color.FromArgb(50, Color.Red)),
-                        Stroke = new Pen(Color.Red, 2)
-                    };
-
-                    newOverlay.Polygons.Add(polygon);
-
-                    // Haritaya ekle
-                    cbs.GetActiveGMapControl().Overlays.Add(newOverlay);
-                    cbs.tüm_katmanlar_array[layer_index] = newOverlay;
-                    cbs.tüm_katmanlar_array_names[layer_index] = "Polygon_" + (layer_index + 1).ToString();
-
-                    // Shapefile işlemleri
-                    MapWinGIS.Shapefile myShapefile = cbs.ConvertOverlayToShapefile(newOverlay);
-                    cbs.shapeFileArray_MapWinGIS[layer_index] = myShapefile;
-
-                    // DataTable işlemleri
-                    DataTable polygonDataTable = cbs.CreatePolygonDataTable(polygonPoints, layer_index);
-                    cbs.tüm_katmanlar_datatable[layer_index] = polygonDataTable;
-
-                    // Checkbox güncelleme
-                    UpdateCheckboxes(layer_index);
-
-                    // Temizlik
-                    polygonOverlay.Polygons.Clear();
-                    markerOverlay.Markers.Clear();
-                    polygonPoints.Clear();
-
-                    mesafe.Visible = false;
-                    mesafe_metre.Visible = false;
-                    isSelecting_polygon = false;
-
-                    // Haritayı yenile
-                    cbs.GetActiveGMapControl().Zoom = cbs.GetActiveGMapControl().Zoom;
-                    cbs.GetActiveGMapControl().Invalidate();
-
-                    MessageBox.Show("Poligon kaydedildi.");
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Poligon kaydedilirken hata oluştu: {ex.Message}");
-                }
-            }
-            else
-            {
-                MessageBox.Show("Geçerli bir poligon çizilmemiştir. En az 3 nokta gereklidir.");
-            }
-        }
-
-
-        private void AddMarkersToOverlay(List<PointLatLng> points, GMapOverlay overlay)
-        {
-            foreach (var point in points)
-            {
-                var marker = new GMarkerGoogle(point, GMarkerGoogleType.blue);
-                overlay.Markers.Add(marker);
-            }
-        }
-
-        private void AddPolygonToOverlay(List<PointLatLng> points, GMapOverlay overlay)
-        {
-            var polygon = new GMapPolygon(new List<PointLatLng>(points), overlay.Id)
-            {
-                Fill = new SolidBrush(Color.FromArgb(50, Color.Red)),
-                Stroke = new Pen(Color.Red, 2)
-            };
-            overlay.Polygons.Add(polygon);
-        }
-
-        private void UpdateMapWithNewOverlay(GMapOverlay overlay, int index)
-        {
-            cbs.GetActiveGMapControl().Overlays.Add(overlay);
-            cbs.tüm_katmanlar_array[index] = overlay;
-            cbs.tüm_katmanlar_array_names[index] = overlay.Id;
-
-            // Shapefile işlemleri
-            cbs.shapeFileArray_MapWinGIS[index] = cbs.ConvertOverlayToShapefile(overlay);
-
-            // DataTable işlemleri
-            cbs.tüm_katmanlar_datatable[index] = cbs.CreatePolygonDataTable(overlay.Polygons[0].Points.ToList(), index);
-
-            UpdateCheckboxes(index);
-        }
-
-        private void CleanupAfterSave(GMapOverlay polygonOverlay, GMapOverlay markerOverlay,
-        List<PointLatLng> polygonPoints,
-        System.Windows.Forms.Label mesafe,
-        System.Windows.Forms.Label mesafe_metre)
-        {
-            polygonOverlay.Polygons.Clear();
-            markerOverlay.Markers.Clear();
-            polygonPoints.Clear();
-
-            mesafe.Visible = false;
-            mesafe_metre.Visible = false;
-
-            isSelecting_polygon = false;
-
-            // Haritayı yenile
-            cbs.GetActiveGMapControl().Invalidate();
-        }
-
-        private void UpdateCheckboxes(int layerIndex)
-        {
-            List<System.Windows.Forms.CheckBox> associatedCheckBoxes = GetCheckBoxesByIndex(layerIndex);
-            if (associatedCheckBoxes != null)
-            {
-                foreach (var checkBox in associatedCheckBoxes)
-                {
-                    checkBox.Checked = true;
-                    checkBox.Visible = true;
-                    checkBox.Text = cbs.tüm_katmanlar_array_names[layerIndex];
-                }
-            }
-        }
-
-        private void Poligon_Kaydet_Click(object sender, EventArgs e)
-        {
-            if (cbs.GetActiveGMapControl() == gMapControl_imar)
-            {
-                PoligonKaydetEventi(sender, e, polygonOverlay_imar, markerOverlay_imar,
-                    polygonPoints_imar, Mesafe_imar, mesafe_metre_imar);
-
-            }
-            if (cbs.GetActiveGMapControl() == gMapControl_yga)
-            {
-                PoligonKaydetEventi(sender, e, polygonOverlay_yga, markerOverlay_yga,
-                    polygonPoints_yga, Mesafe_yga, mesafe_metre_yga);
-
-            }
-            else if (cbs.GetActiveGMapControl() == gMapControl_stokastik)
-
-            {
-                PoligonKaydetEventi(sender, e, polygonOverlay_stokastik, markerOverlay_stokastik,
-                    polygonPoints_stokastik, Mesafe_stokastik, mesafe_metre_stokastik);
-            }
-
-        }
-
-        /////////////////////////////// ---------------------- /////////////////////////////////
 
         private void katmanlar_right_click_Opening(object sender, CancelEventArgs e)
         {
@@ -4987,6 +5538,30 @@ namespace SLF
             System.Windows.Forms.CheckBox clickedCheckBox = (System.Windows.Forms.CheckBox)contextMenuStrip.SourceControl;
             clickedCheckBox.Font = new Font(clickedCheckBox.Font, System.Drawing.FontStyle.Underline | FontStyle.Italic);
 
+        }
+
+        private int FindFirstFreeLayerIndex()
+        {
+            for (int i = 0; i < 13; i++)  // or whatever max size
+            {
+                if (cbs.tüm_katmanlar_datatable[i] == null)
+                {
+                    return i;
+                }
+            }
+            return -1; // no free slot
+        }
+
+        // find the first open slot within the arrays
+        public int FindLayerIndexFromOverlay(GMapOverlay overlay)
+        {
+            // Check each array for a match
+            for (int i = 0; i < 15; i++)
+            {
+                if (cbs.tüm_katmanlar_array_imar[i] == overlay) return i;
+                if (cbs.tüm_katmanlar_array_yuk[i] == overlay) return i;
+            }
+            return -1; // not found
         }
 
         private void ButtonKml_Click(object sender, EventArgs e)
@@ -5082,9 +5657,7 @@ namespace SLF
         }
 
 
-                /*---------------------------------- MARKER ADDITION ----------------------------------- */
-
-                private void NoktaBilgileriniGoster(NoktaVeri nokta)
+        private void NoktaBilgileriniGoster(NoktaVeri nokta)
         {
             // Nokta bilgilerini göster
             MessageBox.Show($"Enlem: {nokta.Enlem}\nBoylam: {nokta.Boylam}\nBina Demandi: " +
@@ -5093,191 +5666,8 @@ namespace SLF
             // Noktayı silmek için enlem ve boylamdan PointLatLng oluşturuyoruz
             PointLatLng point = new PointLatLng(nokta.Enlem, nokta.Boylam);
         }
-        private void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
-        {
-            if (item.Tag != null && item.Tag is NoktaVeri && Modül_Tabları.SelectedTab == tab_ea)
-            {
-                NoktaVeri seçili_nokta = item.Tag as NoktaVeri;
-                NoktaBilgileriniGoster(seçili_nokta);
-            }
-        }
 
-        private void gMapControl_yga_OnMarkerClick(GMapMarker item, MouseEventArgs e)
-        {
-            if (item.Tag != null && item.Tag is NoktaVeri && Modül_Tabları.SelectedTab == tab_yga)
-            {
-                NoktaVeri seçili_nokta = item.Tag as NoktaVeri;
-                NoktaBilgileriniGoster(seçili_nokta);
-            }
-        }
-        private void gMapControl_stokastik_OnMarkerClick(GMapMarker item, MouseEventArgs e)
-        {
-            if (item.Tag != null && item.Tag is NoktaVeri && Modül_Tabları.SelectedTab == tab_stokastik)
-            {
-                NoktaVeri seçili_nokta = item.Tag as NoktaVeri;
-                NoktaBilgileriniGoster(seçili_nokta);
-            }
-        }
-        private void buton_stokastik_harita_katmanlar_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
-            {
-                harita_katmanları_right_click.Show();
-            }
-            else
-            {
-                harita_katmanları_right_click.Hide();
-            }
-        }
-        private void buton_yga_harita_katmanlar_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
-            {
-                harita_katmanları_right_click.Show();
-            }
-            else
-            {
-                harita_katmanları_right_click.Hide();
-            }
-        }
-
-        private void Sokak_Görünümü_Click(object sender, EventArgs e)
-        {
-            cbs.GetActiveGMapControl().Visible = false;
-            cbs.GetActiveWebView().Visible = true;
-
-            string url = "https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu";
-            cbs.GetActiveWebView().CoreWebView2.Navigate(url);
-        }
-
-        private void İmar_Grid_Oluştur_Click(object sender, EventArgs e)
-        {
-            Grid_Seçenekler grid_formu = new Grid_Seçenekler();
-            grid_formu.Tag = this;
-            grid_formu.Owner = this;
-            grid_formu.Show();
-            grid_formu.Activate();
-            grid_formu.StartPosition = FormStartPosition.CenterParent;
-        }
-
-        private void İmar_Fonksiyonlar_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                ContextMenuStrip_Fonksiyon.Show(Cursor.Position);
-            }
-        }
-        /*---------------------------------------------------------------------------------------------- */
-        /*----------------------------------     CUSTOM METHODS & CLASSES     -------------------------- */
-
-
-        // show information about polygons when double-clicking on the map
-        private void gMapControl_yga_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-
-
-                if (cbs.tüm_katmanlar_array[layer_index] != null)
-                {
-
-                    foreach (var polygon in cbs.tüm_katmanlar_array[layer_index].Polygons)
-                    {
-                        if (cbs.IsPointInPolygon(pointClick, polygon))
-                        {
-                            cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
-
-                            if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
-                            {
-                                ShowAttributeRow(row);
-                                tablo_formu.Show();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        // show information about polygons when double-clicking on the map
-        private void gMapControl_stokastik_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-
-                if (cbs.tüm_katmanlar_array[layer_index] != null)
-                {
-
-                    foreach (var polygon in cbs.tüm_katmanlar_array[layer_index].Polygons)
-                    {
-                        if (cbs.IsPointInPolygon(pointClick, polygon))
-                        {
-                            cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
-
-                            if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
-                            {
-                                ShowAttributeRow(row);
-                                tablo_formu.Show();
-                            }
-                        }
-                    }
-                }
-            }
-        }
- 
-        private void gMapControl_imar_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left && lastClickedCheckbox != null)
-            {
-                int checkbox_index = int.Parse(lastClickedCheckbox.Tag.ToString()) - 1;
-
-                foreach (var polygon in cbs.tüm_katmanlar_array[checkbox_index].Polygons)
-                {
-                    if (cbs.IsPointInPolygon(pointClick, polygon))
-                    {
-                        cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
-                        layer_index = checkbox_index;
-                        if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
-                        {
-                            ShowAttributeRow(row);
-                            tablo_formu.Show();
-                        }
-                    }
-                }
-            }
-        }
-
-        // show just the single row whenever a polygon is clicked on which corresponds to its row
-        private void ShowAttributeRow(DataRow row)
-        {
-            DataTable singleRowTable = row.Table.Clone(); // Clone the structure of the original table
-            singleRowTable.ImportRow(row); // Import the specific row into the new table
-            ShowAttributeTable(singleRowTable);
-        }
-
-        // show information about polygons when double-clicking on the map
-        private void gMapControl_EA_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                if (cbs.tüm_katmanlar_array[layer_index] != null)
-                {
-                    foreach (var polygon in cbs.tüm_katmanlar_array[layer_index].Polygons)
-                    {
-                        if (cbs.IsPointInPolygon(pointClick, polygon))
-                        {
-                            cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
-
-                            if (cbs.polygonAttributes.TryGetValue(polygon, out DataRow row))
-                            {
-                                ShowAttributeRow(row);
-                                tablo_formu.Show();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private void button1_Click(object sender, EventArgs e) // database login butonu
+        private void buton_database_giris_Click(object sender, EventArgs e)
         {
             try
             {
@@ -5324,7 +5714,8 @@ namespace SLF
                         using (var databaseListForm = new DatabaseListForm())
                         {
                             databaseListForm.Owner = this;
-                            databaseListForm.FormClosed += (s, args) => {
+                            databaseListForm.FormClosed += (s, args) =>
+                            {
                                 // Form kapandığında gerekli güncellemeleri yap
                                 if (dataGridView_girdi.DataSource != null)
                                 {
@@ -5361,1295 +5752,44 @@ namespace SLF
                     "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private void LogDataTableInfo(DataTable dt, string source)
+
+        private void buton_tablo_olustur_Click(object sender, EventArgs e)
         {
-            if (dt != null)
+            Tablo_olustur tablo_olustur_formu = new Tablo_olustur();
+            tablo_olustur_formu.Show();
+        }
+
+        private void YGA_Ekle_Click(object sender, EventArgs e)
+        {
+            isSelecting_polygon = true;
+            isSelecting_YGA = true;
+
+            isRulerEnabled = false;
+            isRulerActive = false;
+
+            // Determine the active map control and reset accordingly
+            if (cbs.GetActiveGMapControl() == gMapControl_imar)
             {
-                LogOutput($"Veri Kaynağı: {source}");
-                LogOutput($"Satır Sayısı: {dt.Rows.Count}");
-                LogOutput($"Kolon Sayısı: {dt.Columns.Count}");
-                LogOutput($"Kolonlar: {string.Join(", ", dt.Columns.Cast<DataColumn>().Select(c => c.ColumnName))}");
-            }
-            else
-            {
-                LogOutput($"Veri Kaynağı {source}: DataTable null");
+                ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar, rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void Point_Load_Ekle_Click(object sender, EventArgs e)
         {
-            // Tablonun bulunduğu formu oluştur ve göster
-            Tablo_olustur tabloForm = new Tablo_olustur();
-            tabloForm.Show();
-        }
+            isSelecting_polygon = true;
+            isSelecting_YUK = true;
 
-        private void label1_Click(object sender, EventArgs e)
-        {
+            isRulerEnabled = false;
+            isRulerActive = false;
 
-        }
-
-        //private void ProjeEkleButton_Click(object sender, EventArgs e)
-        //{
-        //    try
-        //    {
-        //        // İl/ilçe bilgilerini kontrol et
-        //        if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
-        //        {
-        //            MessageBox.Show("Lütfen önce il ve ilçe seçimi yapın.",
-        //                "İl/İlçe Seçilmedi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        //            return;
-        //        }
-
-        //        // Proje klasörünün ana dizini
-        //        string projectsBaseDir = Path.Combine(PathService.BaseDirectory, PathService.SelectedCity, PathService.SelectedDistrict);
-
-        //        // Klasör picker dialog'unu göster
-        //        using (var folderBrowser = new ProjectFolderPicker(projectsBaseDir))
-        //        {
-        //            if (folderBrowser.ShowDialog() == DialogResult.OK)
-        //            {
-        //                string selectedPath = folderBrowser.SelectedPath;
-        //                string folderName = new DirectoryInfo(selectedPath).Name;
-
-        //                // Klasör adının "proje_" ile başladığını kontrol et
-        //                if (!folderName.StartsWith("proje_"))
-        //                {
-        //                    MessageBox.Show("Geçerli bir proje klasörü seçmelisiniz.\nKlasör adı 'proje_' ile başlamalıdır.",
-        //                        "Geçersiz Klasör", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        //                    return;
-        //                }
-
-        //                // Proje adını çıkar
-        //                string projectName = folderName.Substring(6); // "proje_" kısmını çıkar
-
-        //                // PathService'i güncelle
-        //                PathService.OpenProject(projectName);
-
-        //                // Proje durumunu yükle
-        //                LoadProjectState();
-
-        //                // UI'ı güncelle
-        //                UpdateUIForLoadedProject();
-
-        //                MessageBox.Show($"Proje '{projectName}' başarıyla yüklendi.",
-        //                    "Proje Yüklendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show($"Proje yüklenirken hata oluştu: {ex.Message}",
-        //            "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //    }
-        //}
-        //// ProjectFolderPicker sınıfı
-        //public class ProjectFolderPicker : Form
-        //{
-        //    private ListView projectListView;
-        //    private Button selectButton;
-        //    private Button cancelButton;
-        //    private string baseDirectory;
-
-        //    public string SelectedPath { get; private set; }
-
-        //    public ProjectFolderPicker(string baseDir)
-        //    {
-        //        baseDirectory = baseDir;
-        //        InitializeComponents();
-        //        LoadProjectFolders();
-        //    }
-
-        //    private void InitializeComponents()
-        //    {
-        //        // Form ayarları
-        //        this.Text = "Proje Seçimi";
-        //        this.Width = 500;
-        //        this.Height = 400;
-        //        this.StartPosition = FormStartPosition.CenterParent;
-        //        this.FormBorderStyle = FormBorderStyle.FixedDialog;
-        //        this.MaximizeBox = false;
-        //        this.MinimizeBox = false;
-
-        //        // ListView oluştur
-        //        projectListView = new ListView
-        //        {
-        //            View = View.Details,
-        //            FullRowSelect = true,
-        //            MultiSelect = false,
-        //            Dock = DockStyle.Fill,
-        //            Margin = new Padding(10),
-        //            GridLines = true
-        //        };
-
-        //        // Sütunlar ekle
-        //        projectListView.Columns.Add("Proje Adı", 150);
-        //        projectListView.Columns.Add("Oluşturulma Tarihi", 150);
-        //        projectListView.Columns.Add("Son Değişiklik", 150);
-
-        //        // Buton paneli
-        //        var buttonPanel = new Panel
-        //        {
-        //            Dock = DockStyle.Bottom,
-        //            Height = 50
-        //        };
-
-        //        // Seç butonu
-        //        selectButton = new Button
-        //        {
-        //            Text = "Seç",
-        //            DialogResult = DialogResult.OK,
-        //            Enabled = false,
-        //            Width = 100,
-        //            Height = 30,
-        //            Location = new Point(this.Width - 230, 10)
-        //        };
-        //        selectButton.Click += (s, e) => {
-        //            if (projectListView.SelectedItems.Count > 0)
-        //            {
-        //                this.SelectedPath = projectListView.SelectedItems[0].Tag.ToString();
-        //                this.DialogResult = DialogResult.OK;
-        //                this.Close();
-        //            }
-        //        };
-
-        //        // İptal butonu
-        //        cancelButton = new Button
-        //        {
-        //            Text = "İptal",
-        //            DialogResult = DialogResult.Cancel,
-        //            Width = 100,
-        //            Height = 30,
-        //            Location = new Point(this.Width - 120, 10)
-        //        };
-        //        cancelButton.Click += (s, e) => {
-        //            this.DialogResult = DialogResult.Cancel;
-        //            this.Close();
-        //        };
-
-        //        // ListView'a öğe seçildiğinde Seç butonunu etkinleştir
-        //        projectListView.SelectedIndexChanged += (s, e) => {
-        //            selectButton.Enabled = projectListView.SelectedItems.Count > 0;
-        //        };
-
-        //        // DoubleClick ile seçim
-        //        projectListView.DoubleClick += (s, e) => {
-        //            if (projectListView.SelectedItems.Count > 0)
-        //            {
-        //                this.SelectedPath = projectListView.SelectedItems[0].Tag.ToString();
-        //                this.DialogResult = DialogResult.OK;
-        //                this.Close();
-        //            }
-        //        };
-
-        //        // Kontrolleri form'a ekle
-        //        buttonPanel.Controls.Add(selectButton);
-        //        buttonPanel.Controls.Add(cancelButton);
-        //        this.Controls.Add(projectListView);
-        //        this.Controls.Add(buttonPanel);
-        //    }
-
-        //    private void LoadProjectFolders()
-        //    {
-        //        try
-        //        {
-        //            // Proje klasörlerini bul
-        //            if (Directory.Exists(baseDirectory))
-        //            {
-        //                string[] projectFolders = Directory.GetDirectories(baseDirectory, "proje_*");
-
-        //                foreach (string folder in projectFolders)
-        //                {
-        //                    DirectoryInfo dirInfo = new DirectoryInfo(folder);
-        //                    string projectName = dirInfo.Name.Substring(6); // "proje_" çıkar
-
-        //                    // Proje state dosyasını kontrol et
-        //                    string statePath = Path.Combine(folder, "project_state.json");
-        //                    string lastSaved = "-";
-
-        //                    if (File.Exists(statePath))
-        //                    {
-        //                        try
-        //                        {
-        //                            string json = File.ReadAllText(statePath);
-        //                            var projectState = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-
-        //                            if (projectState.TryGetValue("LastSaved", out object lastSavedObj))
-        //                            {
-        //                                lastSaved = lastSavedObj.ToString();
-        //                            }
-        //                        }
-        //                        catch { /* Hata durumunda varsayılan değeri kullan */ }
-        //                    }
-
-        //                    // ListView'a ekle
-        //                    var item = new ListViewItem(projectName);
-        //                    item.SubItems.Add(dirInfo.CreationTime.ToString("yyyy-MM-dd HH:mm:ss"));
-        //                    item.SubItems.Add(lastSaved);
-        //                    item.Tag = folder; // tam yolu sakla
-
-        //                    projectListView.Items.Add(item);
-        //                }
-        //            }
-        //            else
-        //            {
-        //                MessageBox.Show($"Proje dizini bulunamadı: {baseDirectory}",
-        //                    "Dizin Bulunamadı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            MessageBox.Show($"Proje klasörleri yüklenirken hata: {ex.Message}",
-        //                "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //        }
-        //    }
-        //}
-
-        //// Bu metodlar ModülFormu sınıfının içine eklenmelidir
-        //private void LoadProjectState()
-        //{
-        //    try
-        //    {
-        //        string statePath = Path.Combine(
-        //            PathService.BaseDirectory,
-        //            PathService.FullPath,
-        //            PathService.CurrentWorkingFolder,
-        //            "project_state.json");
-
-        //        if (File.Exists(statePath))
-        //        {
-        //            string json = File.ReadAllText(statePath);
-        //            var projectState = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-
-        //            // Tamamlanan modülleri yükle
-        //            if (projectState.TryGetValue("CompletedModules", out object modulesObj))
-        //            {
-        //                // Json'dan List<string> olarak dönüştür
-        //                string modulesJson = modulesObj.ToString();
-        //                List<string> completedModules = System.Text.Json.JsonSerializer.Deserialize<List<string>>(modulesJson);
-
-        //                // Modül verilerini yükle
-        //                foreach (string module in completedModules)
-        //                {
-        //                    LoadModuleData(module);
-        //                }
-        //            }
-
-        //            Debug.WriteLine($"Proje durumu yüklendi: {statePath}");
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine($"Proje durumu yüklenirken hata: {ex.Message}");
-        //    }
-        //}
-
-        //// Modül verilerini yükle
-        //private void LoadModuleData(string moduleName)
-        //{
-        //    try
-        //    {
-        //        // Modül için girdiler klasörünü bul
-        //        string modulePath = PathService.GetGirdilerPathForDataType(moduleName);
-
-        //        // Klasördeki en son dosyayı bul (en güncel veri)
-        //        var directory = new DirectoryInfo(modulePath);
-        //        var latestFile = directory.GetFiles("*.csv")
-        //            .OrderByDescending(f => f.LastWriteTime)
-        //            .FirstOrDefault();
-
-        //        if (latestFile != null)
-        //        {
-        //            // CSV'yi yükle
-        //            var csvHandler = new CsvHandler();
-        //            DataTable moduleData = csvHandler.ImportCsvFile(latestFile.FullName);
-
-        //            // GirdiModülü.dataTablesByType'a ekle
-        //            if (moduleData != null && moduleData.Rows.Count > 0)
-        //            {
-        //                GirdiModülü.dataTablesByType[moduleName] = moduleData;
-        //                Debug.WriteLine($"Modül verisi yüklendi: {moduleName}, Satır sayısı: {moduleData.Rows.Count}");
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine($"Modül verisi yüklenirken hata: {ex.Message}");
-        //    }
-        //}
-
-        //// UI'ı güncelle
-        //private void UpdateUIForLoadedProject()
-        //{
-        //    try
-        //    {
-        //        // veri_listesi_seçimi ComboBox'ını güncelle
-        //        if (veri_listesi_seçimi != null)
-        //        {
-        //            veri_listesi_seçimi.Refresh();
-        //        }
-
-        //        // Modül butonlarını etkinleştir/devre dışı bırak
-        //        // Örneğin, aşağıdaki butonlar varsayımsal, gerçek buton adlarınıza göre değiştirin
-        //        UpdateModuleButtonsState();
-
-        //        // DataGridView'ı güncelle 
-        //        if (dataGridView_girdi != null && dataGridView_girdi.DataSource == null && GirdiModülü.dataTablesByType.Count > 0)
-        //        {
-        //            // İlk veri tipini göster
-        //            var firstModule = GirdiModülü.dataTablesByType.Keys.FirstOrDefault();
-        //            if (!string.IsNullOrEmpty(firstModule))
-        //            {
-        //                dataGridView_girdi.DataSource = GirdiModülü.dataTablesByType[firstModule];
-
-        //                // ComboBox'ta da seç
-        //                if (veri_listesi_seçimi != null)
-        //                {
-        //                    for (int i = 0; i < veri_listesi_seçimi.Items.Count; i++)
-        //                    {
-        //                        if (veri_listesi_seçimi.Items[i].ToString() == firstModule)
-        //                        {
-        //                            veri_listesi_seçimi.SelectedIndex = i;
-        //                            break;
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
-
-        //        Debug.WriteLine("UI yüklenen projeye göre güncellendi");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine($"UI güncellenirken hata: {ex.Message}");
-        //    }
-        //}
-
-        //// Modül butonlarının durumunu güncelle
-        //private void UpdateModuleButtonsState()
-        //{
-        //    // Burada gerçek buton adlarınıza göre butonların etkinliğini kontrol edin
-        //    // Örnek: Bazı butonlar belirli modüllerin yüklenmiş olmasını gerektirebilir
-
-        //    // DTR verisi yüklenmişse EA Şarj ve DEK modülleri etkinleştir
-        //    bool dtrLoaded = GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri");
-
-        //    // Bu kısımda gerçek buton adlarınızı kullanmalısınız
-        //    // Örnek:
-        //    /*
-        //    if (EA_Şarj_Modülü_Button != null)
-        //        EA_Şarj_Modülü_Button.Enabled = dtrLoaded;
-
-        //    if (DEK_Modülü_Button != null)
-        //        DEK_Modülü_Button.Enabled = dtrLoaded;
-        //    */
-        //}
-        // ModülFormu sınıfına eklenecek yeni metot
-        private void ClearUserInterfaceState()
-        {
-            try
+            // Determine the active map control and reset accordingly
+            if (cbs.GetActiveGMapControl() == gMapControl_imar)
             {
-                // Panel, ComboBox ve diğer kontrolleri başlangıç durumuna geri getir
-
-                // ComboBox'ları sıfırla
-                if (veri_listesi_seçimi != null)
-                {
-                    veri_listesi_seçimi.SelectedIndex = -1;
-                }
-
-                if (comboBox_ea_il_secimi != null)
-                {
-                    comboBox_ea_il_secimi.SelectedIndex = -1;
-                }
-
-                if (comboBox_ea_yıl_secimi != null)
-                {
-                    comboBox_ea_yıl_secimi.SelectedIndex = -1;
-                }
-
-                if (comboBox_DEK_il != null)
-                {
-                    comboBox_DEK_il.SelectedIndex = -1;
-                }
-
-                if (comboBox_DEK_Yıl != null)
-                {
-                    comboBox_DEK_Yıl.SelectedIndex = -1;
-                }
-
-                // DataGridView'ları temizle
-                if (dataGridView_girdi != null)
-                {
-                    dataGridView_girdi.DataSource = null;
-                }
-
-                // Tüm harita overlaylerini temizle
-                ClearAllMapOverlays();
-
-                // Haritaların renklerini sıfırla
-                ResetMapColors();
-
-                // CheckBox'ları sıfırla
-                ResetAllCheckBoxes();
-
-                // Form başlığını varsayılana çevir
-                this.Text = "SLF Yazılımı";
-
-                Console.WriteLine("UI durumu temizlendi");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"UI durumu temizlenirken hata: {ex.Message}");
-                // Hatayı yut ve devam et
+                ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar, rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
             }
         }
 
-        // Tüm harita overlay'lerini temizleyen yardımcı metot
-        private void ClearAllMapOverlays()
-        {
-            try
-            {
-                // Tüm GMapControl'lerdeki overlay'leri temizle
-                if (gMapControl_EA != null && gMapControl_EA.Overlays != null)
-                {
-                    gMapControl_EA.Overlays.Clear();
-                    gMapControl_EA.Refresh();
-                }
-
-                if (gMapControl_DEK != null && gMapControl_DEK.Overlays != null)
-                {
-                    gMapControl_DEK.Overlays.Clear();
-                    gMapControl_DEK.Refresh();
-                }
-
-                if (gMapControl_stokastik != null && gMapControl_stokastik.Overlays != null)
-                {
-                    gMapControl_stokastik.Overlays.Clear();
-                    gMapControl_stokastik.Refresh();
-                }
-
-                if (gMapControl_yuk != null && gMapControl_yuk.Overlays != null)
-                {
-                    gMapControl_yuk.Overlays.Clear();
-                    gMapControl_yuk.Refresh();
-                }
-
-                if (gMapControl_imar != null && gMapControl_imar.Overlays != null)
-                {
-                    gMapControl_imar.Overlays.Clear();
-                    gMapControl_imar.Refresh();
-                }
-
-                if (gMapControl_yga != null && gMapControl_yga.Overlays != null)
-                {
-                    gMapControl_yga.Overlays.Clear();
-                    gMapControl_yga.Refresh();
-                }
-
-                if (gMapControl_optimalDTR != null && gMapControl_optimalDTR.Overlays != null)
-                {
-                    gMapControl_optimalDTR.Overlays.Clear();
-                    gMapControl_optimalDTR.Refresh();
-                }
-
-                // CBS sınıfındaki overlay dizisini de sıfırla
-                if (cbs != null)
-                {
-                    for (int i = 0; i < cbs.tüm_katmanlar_array.Length; i++)
-                    {
-                        cbs.tüm_katmanlar_array[i] = null;
-                        cbs.tüm_katmanlar_array_names[i] = null;
-
-                        if (cbs.tüm_katmanlar_datatable[i] != null)
-                        {
-                            cbs.tüm_katmanlar_datatable[i].Dispose();
-                            cbs.tüm_katmanlar_datatable[i] = null;
-                        }
-
-                        if (cbs.shapeFileArray_MapWinGIS[i] != null)
-                        {
-                            cbs.shapeFileArray_MapWinGIS[i].Close();
-                            cbs.shapeFileArray_MapWinGIS[i] = null;
-                        }
-                    }
-                }
-
-                // Poligon noktalarını da temizle
-                polygonPoints_yga?.Clear();
-                polygonPoints_stokastik?.Clear();
-                polygonPoints_imar?.Clear();
-                polygonPoints_yuk?.Clear();
-                polygonPoints_ea?.Clear();
-                polygonPoints_DEK?.Clear();
-
-                // Ruler noktalarını da temizle
-                rulerPoints_yga?.Clear();
-                rulerPoints_stokastik?.Clear();
-                rulerPoints_imar?.Clear();
-                rulerPoints_yuk?.Clear();
-                rulerPoints_ea?.Clear();
-                rulerPoints_DEK?.Clear();
-
-                Console.WriteLine("Tüm harita overlay'leri temizlendi");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Harita overlay'leri temizlenirken hata: {ex.Message}");
-            }
-        }
-
-        // Haritaların renklerini sıfırlayan yardımcı metot
-        private void ResetMapColors()
-        {
-            try
-            {
-                // Haritaların renklerini varsayılana çevir
-                if (gMapControl_EA != null)
-                {
-                    gMapControl_EA.MapProvider = GMapProviders.GoogleSatelliteMap;
-                }
-
-                if (gMapControl_DEK != null)
-                {
-                    gMapControl_DEK.MapProvider = GMapProviders.GoogleSatelliteMap;
-                }
-
-                if (gMapControl_stokastik != null)
-                {
-                    gMapControl_stokastik.MapProvider = GMapProviders.GoogleSatelliteMap;
-                }
-
-                if (gMapControl_yuk != null)
-                {
-                    gMapControl_yuk.MapProvider = GMapProviders.GoogleSatelliteMap;
-                }
-
-                if (gMapControl_imar != null)
-                {
-                    gMapControl_imar.MapProvider = GMapProviders.GoogleSatelliteMap;
-                }
-
-                if (gMapControl_yga != null)
-                {
-                    gMapControl_yga.MapProvider = GMapProviders.GoogleSatelliteMap;
-                }
-
-                if (gMapControl_optimalDTR != null)
-                {
-                    gMapControl_optimalDTR.MapProvider = GMapProviders.GoogleSatelliteMap;
-                }
-
-                Console.WriteLine("Harita renkleri sıfırlandı");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Harita renkleri sıfırlanırken hata: {ex.Message}");
-            }
-        }
-
-        // Tüm CheckBox'ları sıfırlayan yardımcı metot
-        private void ResetAllCheckBoxes()
-        {
-            try
-            {
-                // Checkbox kontrol dizileri
-                var checkBoxes_yga = new CheckBox[] { checkBox_yga_1, checkBox_yga_2, checkBox_yga_3, checkBox_yga_4, checkBox_yga_5,
-                                             checkBox_yga_6, checkBox_yga_7, checkBox_yga_8, checkBox_yga_9, checkBox_yga_10,
-                                             checkBox_yga_11, checkBox_yga_12, checkBox_yga_13 };
-
-                var checkBoxes_imar = new CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5,
-                                              checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
-                                              checkBox_imar_11, checkBox_imar_12, checkBox_imar_13 };
-
-                var checkBoxes_stokastik = new CheckBox[] { checkBox_stokastik_1, checkBox_stokastik_2, checkBox_stokastik_3, checkBox_stokastik_4,
-                                                   checkBox_stokastik_5, checkBox_stokastik_6, checkBox_stokastik_7, checkBox_stokastik_8,
-                                                   checkBox_stokastik_9, checkBox_stokastik_10, checkBox_stokastik_11, checkBox_stokastik_12,
-                                                   checkBox_stokastik_13 };
-
-                // EA modülü checkboxlarını sıfırla
-                if (checkBox_AC_Home != null) checkBox_AC_Home.Checked = false;
-                if (checkBox_AC_Public != null) checkBox_AC_Public.Checked = false;
-                if (checkBox_AC_Work != null) checkBox_AC_Work.Checked = false;
-                if (checkBox_DC_Fast != null) checkBox_DC_Fast.Checked = false;
-
-                // EA modülü radio buttonlarını sıfırla
-                if (EaSimMaxBtn != null) EaSimMaxBtn.Checked = false;
-                if (EaSimMinBtn != null) EaSimMinBtn.Checked = false;
-                if (EaSimDefBtn != null) EaSimDefBtn.Checked = false;
-
-                // DEK modülü radio buttonlarını sıfırla
-                if (dekSimMaxBtn != null) dekSimMaxBtn.Checked = false;
-                if (dekSimMinBtn != null) dekSimMinBtn.Checked = false;
-                if (dekSimDefBtn != null) dekSimDefBtn.Checked = false;
-
-                // YGA, İmar ve Stokastik checkboxlarını sıfırla
-                foreach (var cb in checkBoxes_yga)
-                {
-                    if (cb != null)
-                    {
-                        cb.Checked = false;
-                        cb.Visible = false;
-                        cb.Text = "";
-                        cb.ForeColor = SystemColors.ControlText; // Rengi varsayılana çevir
-                    }
-                }
-
-                foreach (var cb in checkBoxes_imar)
-                {
-                    if (cb != null)
-                    {
-                        cb.Checked = false;
-                        cb.Visible = false;
-                        cb.Text = "";
-                        cb.ForeColor = SystemColors.ControlText; // Rengi varsayılana çevir
-                    }
-                }
-
-                foreach (var cb in checkBoxes_stokastik)
-                {
-                    if (cb != null)
-                    {
-                        cb.Checked = false;
-                        cb.Visible = false;
-                        cb.Text = "";
-                        cb.ForeColor = SystemColors.ControlText; // Rengi varsayılana çevir
-                    }
-                }
-
-                // Last clicked checkbox'ı sıfırla
-                lastClickedCheckbox = null;
-
-                Console.WriteLine("Tüm CheckBox'lar sıfırlandı");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"CheckBox'lar sıfırlanırken hata: {ex.Message}");
-            }
-        }
-        private void ProjeEkleButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                // İl/ilçe bilgilerini kontrol et
-                if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
-                {
-                    MessageBox.Show("Lütfen önce il ve ilçe seçimi yapın.",
-                        "İl/İlçe Seçilmedi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                // Proje klasörünün ana dizini
-                string projectsBaseDir = Path.Combine(PathService.BaseDirectory, PathService.FullPath);
-
-                // Burada sadece mevcut projeleri listeleme ve seçme işlemi
-                using (var folderBrowser = new ProjectFolderPicker(projectsBaseDir))
-                {
-                    if (folderBrowser.ShowDialog() == DialogResult.OK)
-                    {
-                        try
-                        {
-                            string selectedPath = folderBrowser.SelectedPath;
-                            string projectName = folderBrowser.SelectedProjectName;
-
-                            // Geçici klasörden yüklü veri kontrolü
-                            if (PathService.CurrentMode == PathService.WorkingMode.Temporary && GirdiModülü.dataTablesByType.Count > 0)
-                            {
-                                var result = MessageBox.Show(
-                                    "Geçici çalışma klasöründeki veriler kaydedilmemiş. Proje açmak geçici verilerin kaybına neden olacaktır. Devam etmek istiyor musunuz?",
-                                    "Veri Kaybı Uyarısı",
-                                    MessageBoxButtons.YesNo,
-                                    MessageBoxIcon.Warning);
-                                if (result != DialogResult.Yes)
-                                    return;
-                            }
-
-                            // Projeyi aç
-                            PathService.OpenProject(projectName);
-
-                            // Varsayılan geçici klasörü temizle
-                            CleanupDefaultTempFolder();
-
-                            // Proje durumunu yükle
-                            LoadProjectState();
-
-                            // UI'ı güncelle
-                            UpdateUIForLoadedProject();
-
-                            // Form başlığını güncelle
-                            this.Text = $"SLF Yazılımı - {PathService.SelectedCity}/{PathService.SelectedDistrict} - Proje: {projectName}";
-
-                            MessageBox.Show($"Proje '{projectName}' başarıyla açıldı.",
-                                "Proje Açıldı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                            // Son çalışılan projeyi ayarlar dosyasına kaydet
-                            try
-                            {
-                                //Properties.Settings.Default.LastProjectName = projectName;
-                                //Properties.Settings.Default.LastProjectCity = PathService.SelectedCity;
-                                //Properties.Settings.Default.LastProjectDistrict = PathService.SelectedDistrict;
-                                //Properties.Settings.Default.Save();
-
-                                Console.WriteLine($"Son proje bilgileri kaydedildi: {projectName}");
-                            }
-                            catch (Exception settingsEx)
-                            {
-                                Console.WriteLine($"Ayarlar kaydedilirken hata: {settingsEx.Message}");
-                                // Ayarlar kaydedilemediğinde ana işlevi etkilememesi için hatayı yut
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Proje açılırken hata oluştu: {ex.Message}",
-                                "Proje Açma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Proje işlemi sırasında hata oluştu: {ex.Message}",
-                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Debug.WriteLine($"Proje işlem hatası: {ex}");
-            }
-        }
-
-
-        // Yeni metot: Varsayılan geçici klasörü temizle
-        private bool CleanupDefaultTempFolder()
-        {
-            try
-            {
-                string districtPath = Path.Combine(PathService.BaseDirectory, PathService.FullPath);
-
-                if (Directory.Exists(districtPath))
-                {
-                    // "temp_" ile başlayan tüm klasörleri bul
-                    string[] tempFolders = Directory.GetDirectories(districtPath, "temp_*");
-
-                    foreach (string folder in tempFolders)
-                    {
-                        try
-                        {
-                            // Salt okunur özniteliklerini kaldır
-                            RemoveReadOnlyAttributesRecursive(folder);
-
-                            // Klasörü sil
-                            Directory.Delete(folder, true);
-                            Console.WriteLine($"Geçici klasör silindi: {folder}");
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Geçici klasör silinirken hata: {ex.Message}");
-                        }
-                    }
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Geçici klasörleri temizlerken hata: {ex.Message}");
-                return false;
-            }
-        }
-        private void LoadProjectState()
-        {
-            try
-            {
-                string statePath = Path.Combine(
-                    PathService.BaseDirectory,
-                    PathService.FullPath,
-                    PathService.CurrentWorkingFolder,
-                    "project_state.json");
-
-                Console.WriteLine($"Proje durum dosyası: {statePath}");
-
-                if (File.Exists(statePath))
-                {
-                    string json = File.ReadAllText(statePath);
-                    Console.WriteLine($"Okunan JSON: {json}");
-
-                    // JSON'ı deserialize et
-                    var options = new System.Text.Json.JsonSerializerOptions
-                    {
-                        AllowTrailingCommas = true,
-                        ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip,
-                        PropertyNameCaseInsensitive = true
-                    };
-
-                    var projectState = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json, options);
-
-                    // JSON deserialize edildi mi kontrol et
-                    if (projectState == null)
-                    {
-                        Console.WriteLine("HATA: JSON deserialize edilemedi!");
-                        return;
-                    }
-
-                    // JSON içeriğini yazdır
-                    Console.WriteLine("JSON içeriği:");
-                    foreach (var key in projectState.Keys)
-                    {
-                        Console.WriteLine($"- {key}: {projectState[key]}");
-                    }
-
-                    // Yıl bilgilerini yükle
-                    if (projectState.TryGetValue("SLFStartYear", out object startYearObj) &&
-                        projectState.TryGetValue("SLFEndYear", out object endYearObj))
-                    {
-                        try
-                        {
-                            // JSON.NET ile JsonElement tipindeki değeri int'e çevir
-                            int startYear = Convert.ToInt32(startYearObj.ToString());
-                            int endYear = Convert.ToInt32(endYearObj.ToString());
-
-                            Console.WriteLine($"Yüklenecek yıllar: Başlangıç {startYear}, Bitiş {endYear}");
-
-                            // YearService'i güncelle
-                            var yearService = YearService.GetInstance();
-                            yearService.SetYears(startYear, endYear);
-
-                            // ModülFormu değişkenlerini güncelle
-                            this.slfStartYear = startYear;
-                            this.slfEndYear = endYear;
-
-                            Console.WriteLine($"Yıllar başarıyla yüklendi ve setlendi");
-
-                            // ComboBox'ları güncelle
-                            UpdateYearComboBoxes();
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Yılları setlerken hata: {ex.Message}");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("UYARI: JSON dosyasında yıl bilgileri bulunamadı!");
-                    }
-
-                    // Tamamlanan modülleri yükle
-                    if (projectState.TryGetValue("CompletedModules", out object modulesObj))
-                    {
-                        try
-                        {
-                            // Modül listesini al
-                            var modulesElement = (System.Text.Json.JsonElement)modulesObj;
-                            List<string> completedModules = new List<string>();
-
-                            // JsonElement dizisini List<string>'e dönüştür
-                            if (modulesElement.ValueKind == System.Text.Json.JsonValueKind.Array)
-                            {
-                                foreach (var element in modulesElement.EnumerateArray())
-                                {
-                                    if (element.ValueKind == System.Text.Json.JsonValueKind.String)
-                                    {
-                                        completedModules.Add(element.GetString());
-                                    }
-                                }
-                            }
-
-                            // Konsola kaydedilmiş modülleri yazdır
-                            Console.WriteLine($"Kaydedilmiş {completedModules.Count} modül bulundu:");
-                            foreach (var module in completedModules)
-                            {
-                                Console.WriteLine($"- {module}");
-                            }
-
-                            // Modül verilerini yükle
-                            foreach (string module in completedModules)
-                            {
-                                LoadModuleData(module);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Modül listesi yüklenirken hata: {ex.Message}");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("UYARI: JSON dosyasında modül listesi bulunamadı!");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine($"UYARI: Proje durum dosyası bulunamadı: {statePath}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Proje durumu yüklenirken hata: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-            }
-        }
-
-        // ComboBox'ları yüklenen yıllara göre güncelle
-        private void UpdateYearComboBoxes()
-        {
-            try
-            {
-                // ComboBox'ları bul ve yılları set et (buradaki isimler projenizdeki gerçek adlara göre değiştirilmeli)
-                if (startYearComboBox != null && endYearComboBox != null)
-                {
-                    // YearService'ten yılları al
-                    var yearService = YearService.GetInstance();
-                    int startYear = yearService.slfStartYear;
-                    int endYear = yearService.slfEndYear;
-
-                    // ComboBox'lara yılları seç
-                    for (int i = 0; i < startYearComboBox.Items.Count; i++)
-                    {
-                        if (startYearComboBox.Items[i].ToString() == startYear.ToString())
-                        {
-                            startYearComboBox.SelectedIndex = i;
-                            break;
-                        }
-                    }
-
-                    for (int i = 0; i < endYearComboBox.Items.Count; i++)
-                    {
-                        if (endYearComboBox.Items[i].ToString() == endYear.ToString())
-                        {
-                            endYearComboBox.SelectedIndex = i;
-                            break;
-                        }
-                    }
-
-                    // "Onayla" butonunun metnini güncelle (eğer bu butonu kullanıyorsanız)
-                    if (yearApproveButton != null)
-                    {
-                        yearApproveButton.Text = "Sıfırla"; // Yıllar setlenmiş durumda
-                    }
-
-                    Console.WriteLine($"ComboBox'lar yüklenen yıllara göre güncellendi");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"ComboBox'lar güncellenirken hata: {ex.Message}");
-            }
-        }
-        /// <summary>
-        /// Modül verilerini yükler
-        /// </summary>
-        private void LoadModuleData(string moduleName)
-        {
-            try
-            {
-                Console.WriteLine($"Modül verisi yükleniyor: {moduleName}");
-
-                // Modül için girdiler klasörünü bul
-                string modulePath = PathService.GetGirdilerPathForDataType(moduleName);
-                Console.WriteLine($"Modül yolu: {modulePath}");
-
-                if (!Directory.Exists(modulePath))
-                {
-                    Console.WriteLine($"Modül klasörü bulunamadı: {modulePath}");
-                    return;
-                }
-
-                // Klasördeki tüm CSV dosyalarını göster
-                var directory = new DirectoryInfo(modulePath);
-                var csvFiles = directory.GetFiles("*.csv");
-                Console.WriteLine($"{csvFiles.Length} adet CSV dosyası bulundu.");
-
-                foreach (var file in csvFiles)
-                {
-                    Console.WriteLine($"- {file.Name} ({file.LastWriteTime})");
-                }
-
-                // Klasördeki en son dosyayı bul
-                var latestFile = csvFiles.OrderByDescending(f => f.LastWriteTime).FirstOrDefault();
-
-                if (latestFile != null)
-                {
-                    Console.WriteLine($"En son dosya: {latestFile.Name}");
-
-                    // CSV'yi yükle
-                    var csvHandler = new CsvHandler();
-                    DataTable moduleData = csvHandler.ImportCsvFile(latestFile.FullName);
-
-                    if (moduleData != null)
-                    {
-                        Console.WriteLine($"CSV başarıyla yüklendi: {moduleData.Rows.Count} satır, {moduleData.Columns.Count} sütun");
-
-                        // GirdiModülü.dataTablesByType'a ekle
-                        if (moduleData.Rows.Count > 0)
-                        {
-                            GirdiModülü.dataTablesByType[moduleName] = moduleData;
-
-                            // GirdiModülleri sözlüğünü güncelle
-                            if (girdiModülleri.ContainsKey(moduleName))
-                            {
-                                girdiModülleri[moduleName].importedDataTable = moduleData;
-                                Console.WriteLine($"GirdiModülleri sözlüğü güncellendi: {moduleName}");
-                            }
-                            else
-                            {
-                                Console.WriteLine($"UYARI: {moduleName} girdiModülleri sözlüğünde bulunamadı!");
-                            }
-
-                            Console.WriteLine($"Modül verisi yüklendi: {moduleName}, Satır sayısı: {moduleData.Rows.Count}");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"UYARI: {moduleName} için CSV dosyası boş!");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"HATA: {latestFile.FullName} dosyası DataTable'a yüklenemedi!");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine($"UYARI: {modulePath} klasöründe CSV dosyası bulunamadı!");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Modül verisi yüklenirken hata: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-            }
-        }
-        
-        private void UpdateUIForLoadedProject()
-        {
-            try
-            {
-                // veri_listesi_seçimi ComboBox'ını güncelle
-                if (veri_listesi_seçimi != null)
-                {
-                    veri_listesi_seçimi.Refresh();
-                }
-
-                // Modül butonlarını etkinleştir/devre dışı bırak
-                UpdateModuleButtonsState();
-
-                // DataGridView'ı güncelle
-                if (dataGridView_girdi != null && GirdiModülü.dataTablesByType.Count > 0)
-                {
-                    // İlk veri tipini göster
-                    var firstModule = GirdiModülü.dataTablesByType.Keys.FirstOrDefault();
-                    if (!string.IsNullOrEmpty(firstModule))
-                    {
-                        // GirdiModülü'nü güncelle
-                        if (girdiModülleri.ContainsKey(firstModule))
-                        {
-                            girdiModülleri[firstModule].importedDataTable = GirdiModülü.dataTablesByType[firstModule];
-                        }
-
-                        // DataGridView'ı güncelle
-                        dataGridView_girdi.DataSource = GirdiModülü.dataTablesByType[firstModule];
-                        dataGridView_girdi.Refresh();
-
-                        // ComboBox'ta da seç
-                        if (veri_listesi_seçimi != null)
-                        {
-                            for (int i = 0; i < veri_listesi_seçimi.Items.Count; i++)
-                            {
-                                if (veri_listesi_seçimi.Items[i].ToString() == firstModule)
-                                {
-                                    veri_listesi_seçimi.SelectedIndex = i;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Form başlığını güncelle
-                if (PathService.CurrentWorkingFolder != null && PathService.CurrentWorkingFolder.StartsWith("proje_"))
-                {
-                    string projectName = PathService.CurrentWorkingFolder.Substring(6); // "proje_" çıkar
-                    this.Text = $"SLF Yazılımı - {PathService.SelectedCity}/{PathService.SelectedDistrict} - Proje: {projectName}";
-                }
-
-                Debug.WriteLine("UI yüklenen projeye göre güncellendi");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"UI güncellenirken hata: {ex.Message}");
-            }
-        }
-        private void ClearLoadedData()
-        {
-            // GirdiModülü'ndeki veri tablolarını temizle
-            GirdiModülü.dataTablesByType.Clear();
-
-            // DataGridView'daki verileri temizle
-            if (dataGridView_girdi != null)
-            {
-                dataGridView_girdi.DataSource = null;
-            }
-
-            // UI durumunu sıfırla
-            if (veri_listesi_seçimi != null)
-            {
-                veri_listesi_seçimi.SelectedIndex = -1;
-            }
-
-            // Diğer UI elemanlarını sıfırla
-            UpdateModuleButtonsState();
-        }
-        private void UpdateModuleButtonsState()
-        {
-            // Burada gerçek buton adlarınıza göre butonların etkinliğini kontrol edin
-            // Örnek: Bazı butonlar belirli modüllerin yüklenmiş olmasını gerektirebilir
-
-            // DTR verisi yüklenmişse EA Şarj ve DEK modülleri etkinleştir
-            bool dtrLoaded = GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri");
-
-            // Bu kısımda gerçek buton adlarınızı kullanmalısınız
-            // Örnek:
-            if (dtrLoaded)
-            {
-                // EA Şarj ve DEK modülleri için butonları etkinleştir
-                if (OpenModuleButton != null)
-                    OpenModuleButton.Enabled = true;
-
-                if (GelecekSimButton != null)
-                    GelecekSimButton.Enabled = dtrLoaded;
-
-                if (DEKSimButton != null)
-                    DEKSimButton.Enabled = dtrLoaded;
-            }
-
-            // Diğer modüller için benzer kontroller eklenebilir
-        }
-        /// <summary>
-        /// Mevcut verileri proje olarak kaydet
-        /// </summary>
-        // ModülFormu sınıfında mevcut SaveCurrentProject metodunu şu şekilde değiştirin:
-        private bool SaveCurrentProject()
-        {
-            try
-            {
-                // YearService'ten yılları al
-                var yearService = YearService.GetInstance();
-
-                // Proje durumunu hazırla
-                var projectState = new Dictionary<string, object>();
-                projectState["CompletedModules"] = GirdiModülü.dataTablesByType.Keys.ToList();
-                projectState["SLFStartYear"] = yearService.slfStartYear;
-                projectState["SLFEndYear"] = yearService.slfEndYear;
-                projectState["LastSaved"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-                // Mevcut çalışma moduna göre işlem yap
-                if (PathService.CurrentMode == PathService.WorkingMode.Project)
-                {
-                    // Projenin tam yolunu al
-                    string projectPath = Path.Combine(
-                        PathService.BaseDirectory,
-                        PathService.FullPath,
-                        PathService.CurrentWorkingFolder);
-
-                    // Proje durum dosyasını güncelle
-                    string statePath = Path.Combine(projectPath, "project_state.json");
-                    string json = System.Text.Json.JsonSerializer.Serialize(projectState,
-                        new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
-
-                    File.WriteAllText(statePath, json);
-
-                    // Tüm modül verilerini CSV olarak kaydet
-                    SaveAllModuleDataToCSV(projectPath);
-
-                    // Projenin adını al (proje_ ön ekini çıkar)
-                    string projectName = PathService.CurrentWorkingFolder.StartsWith("proje_")
-                        ? PathService.CurrentWorkingFolder.Substring(6)
-                        : PathService.CurrentWorkingFolder;
-
-                    MessageBox.Show($"Proje '{projectName}' başarıyla güncellendi.",
-                        "Proje Güncellendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    return true;
-                }
-                else // Temporary mode - yeni proje oluşturma
-                {
-                    // Bu kısmı yine var olan ProjeEkleButton_Click metoduna yönlendirebilirsiniz
-                    MessageBox.Show("Kaydedilecek bir proje açılmamış. Lütfen önce 'Proje Ekle' butonu ile bir proje açın.",
-                        "Proje Bulunamadı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Proje kaydedilirken hata oluştu: {ex.Message}",
-                    "Kayıt Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-        }
-        // Modül verilerini CSV olarak kaydet
-        private void SaveAllModuleDataToCSV(string projectPath)
-        {
-            string girdilerPath = Path.Combine(projectPath, "Girdiler");
-
-            // Klasör yoksa oluştur
-            if (!Directory.Exists(girdilerPath))
-            {
-                Directory.CreateDirectory(girdilerPath);
-            }
-
-            foreach (var kvp in GirdiModülü.dataTablesByType)
-            {
-                string moduleKey = kvp.Key;
-                DataTable moduleData = kvp.Value;
-
-                string moduleFolderName = moduleKey.Replace(" ", "_");
-                string moduleFolder = Path.Combine(girdilerPath, moduleFolderName);
-
-                // Modül klasörü yoksa oluştur
-                if (!Directory.Exists(moduleFolder))
-                {
-                    Directory.CreateDirectory(moduleFolder);
-                }
-
-                // Dosya adı oluştur
-                string fileName = $"{moduleFolderName}_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
-                string filePath = Path.Combine(moduleFolder, fileName);
-
-                // CSV olarak kaydet
-                using (StreamWriter sw = new StreamWriter(filePath, false, Encoding.UTF8))
-                {
-                    // Başlık satırı
-                    int columnCount = moduleData.Columns.Count;
-                    for (int i = 0; i < columnCount; i++)
-                    {
-                        sw.Write(moduleData.Columns[i].ColumnName);
-                        if (i < columnCount - 1)
-                        {
-                            sw.Write(",");
-                        }
-                    }
-                    sw.WriteLine();
-
-                    // Veri satırları
-                    foreach (DataRow row in moduleData.Rows)
-                    {
-                        for (int i = 0; i < columnCount; i++)
-                        {
-                            // Null değerleri boş string olarak yaz
-                            string value = row[i]?.ToString() ?? "";
-
-                            // Virgül içeren değerleri çift tırnak içine al
-                            if (value.Contains(",") || value.Contains("\"") || value.Contains("\n"))
-                            {
-                                value = "\"" + value.Replace("\"", "\"\"") + "\"";
-                            }
-
-                            sw.Write(value);
-                            if (i < columnCount - 1)
-                            {
-                                sw.Write(",");
-                            }
-                        }
-                        sw.WriteLine();
-                    }
-                }
-            }
-        }
-
-        private void DeepLearningModelButton_Click(object sender, EventArgs e)
+        private void buton_DL_calıstır_Click(object sender, EventArgs e)
         {
             try
             {
@@ -6691,103 +5831,107 @@ namespace SLF
             }
         }
 
-        // ComboBox'ları yüklenen yıllara göre güncelle
-
-        /// <summary>
-        /// Yüklü modül verilerini temizler
-        /// </summary>
-
-
-        /// <summary>
-        /// Yeni proje için UI'ı günceller
-        /// </summary>
-        //------------------------------------------------------------------------------------ //
-
-
-        private void Poligon_Sil_Click(object sender, EventArgs e)
+        private void gMapControl_yuk_MouseMove(object sender, MouseEventArgs e)
         {
-            if (cbs.GetActiveGMapControl() == gMapControl_imar)
+            // Convert mouse coordinates to geographical coordinates
+            PointLatLng mousePos = gMapControl_yuk.FromLocalToLatLng(e.X, e.Y);
+
+            // Find the heatmap overlay
+            GMapOverlay heatmapOverlay = gMapControl_yuk.Overlays.FirstOrDefault(o => o.Id == "HeatmapOverlay");
+            if (heatmapOverlay == null) return;
+
+            // Check if the mouse is inside any polygon in the heatmap overlay
+            GMapPolygon newHoveredPolygon = null;
+            foreach (GMapPolygon polygon in heatmapOverlay.Polygons)
             {
-                if (polygonOverlay_imar == null || polygonOverlay_imar.Polygons.Count == 0)
+                if (cbs.IsPointInPolygon(mousePos, polygon))
                 {
-                    MessageBox.Show("Herhangi bir poligon çizilmemiştir. Lütfen öncelikle bir poligon çiziniz.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                }
-            }
-            if (cbs.GetActiveGMapControl() == gMapControl_yga)
-            {
-                if (polygonOverlay_yga == null || polygonOverlay_yga.Polygons.Count == 0)
-                {
-                    MessageBox.Show("Herhangi bir poligon çizilmemiştir. Lütfen öncelikle bir poligon çiziniz.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                }
-            }
-            else if (cbs.GetActiveGMapControl() == gMapControl_stokastik)
-            {
-                if (polygonOverlay_stokastik == null || polygonOverlay_stokastik.Polygons.Count == 0)
-                {
-                    MessageBox.Show("Herhangi bir poligon çizilmemiştir. Lütfen öncelikle bir poligon çiziniz.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    newHoveredPolygon = polygon;
+                    break;
                 }
             }
 
+            // If the hovered polygon has changed, update the tooltip
+            if (newHoveredPolygon != hoveredPolygon)
+            {
+                hoveredPolygon = newHoveredPolygon;
+                if (hoveredPolygon != null && checkBox_yuk_main.Checked == true)
+                {
+                    UpdatePolygonToolTip(hoveredPolygon);
+                    polygonToolTip.Show(GetToolTipText(hoveredPolygon), gMapControl_yuk, e.X + 15, e.Y + 15);
+                }
+                else
+                {
+                    polygonToolTip.Hide(gMapControl_yuk);
+                }
+            }
+        }
+
+        private string GetToolTipText(GMapPolygon polygon)
+        {
+            if (polygon == null || heatmapPolygonAttributes == null || !heatmapPolygonAttributes.TryGetValue(polygon, out DataRow attributes))
+            {
+                return "Herhangi bir veri bulunamadı.!";
+            }
+
+            // Define the columns to display
+            string[] columns = new string[]
+            {
+                $"Mesken_{currentYear}",
+                $"Sanayi_{currentYear}",
+                $"Ticarethane_{currentYear}",
+                $"Tarımsal Sulama_{currentYear}",
+                $"Aydınlatma_{currentYear}",
+                $"TOPLAM_YÜK_{currentYear}",
+                $"Hücre İçi Yerleşim Alanı_{currentYear}",
+                $"Yük_Yoğunluğu_{currentYear}"
+            };
+
+            // Build the tooltip text
+            StringBuilder tooltipText = new StringBuilder();
+
+            foreach (string column in columns)
+            {
+                if (attributes.Table.Columns.Contains(column))
+                {
+                    string value = attributes[column]?.ToString() ?? "N/A";
+                    tooltipText.AppendLine($"{column}: {value}");
+                }
+                else
+                {
+                    tooltipText.AppendLine($"{column}: N/A");
+                }
+            }
+
+            return tooltipText.ToString();
+        }
+
+        private void UpdatePolygonToolTip(GMapPolygon polygon)
+        {
+            if (polygon == null) return;
+            string tooltipText = GetToolTipText(polygon);
+            polygonToolTip.SetToolTip(gMapControl_yuk, tooltipText);
+        }
+
+        private void gMapControl_yuk_MouseLeave(object sender, EventArgs e)
+        {
+            // Hide the tooltip and clear the hovered polygon when the mouse leaves the map
+            hoveredPolygon = null;
+            polygonToolTip.Hide(gMapControl_yuk);
         }
 
 
+        // Show just the single row whenever a polygon is clicked on which corresponds to its row
+        private void ShowAttributeRow(DataRow row)
+        {
+            // Clone the structure of the original table and import the specific row
+            DataTable singleRowTable = row.Table.Clone();
+            singleRowTable.ImportRow(row);
 
-        //public class InputDialog : Form
-        //{
-        //    private TextBox textBox;
-        //    private Button buttonOK;
-        //    private Button buttonCancel;
-        //    private Label label;
+            // Show the attribute table with just one row
+            ShowAttributeTable(singleRowTable);
 
-        //    public string InputText => textBox.Text;
-
-        //    public InputDialog(string title, string promptText)
-        //    {
-        //        this.Text = title;
-
-        //        label = new Label
-        //        {
-        //            Text = promptText,
-        //            AutoSize = true,
-        //            Location = new System.Drawing.Point(12, 9)
-        //        };
-
-        //        textBox = new TextBox
-        //        {
-        //            Location = new System.Drawing.Point(12, 32),
-        //            Size = new System.Drawing.Size(260, 23)
-        //        };
-
-        //        buttonOK = new Button
-        //        {
-        //            Text = "Tamam",
-        //            DialogResult = DialogResult.OK,
-        //            Location = new System.Drawing.Point(116, 70)
-        //        };
-
-        //        buttonCancel = new Button
-        //        {
-        //            Text = "İptal",
-        //            DialogResult = DialogResult.Cancel,
-        //            Location = new System.Drawing.Point(197, 70)
-        //        };
-
-        //        this.Controls.Add(label);
-        //        this.Controls.Add(textBox);
-        //        this.Controls.Add(buttonOK);
-        //        this.Controls.Add(buttonCancel);
-
-        //        this.AcceptButton = buttonOK;
-        //        this.CancelButton = buttonCancel;
-        //        this.ClientSize = new System.Drawing.Size(284, 107);
-        //        this.FormBorderStyle = FormBorderStyle.FixedDialog;
-        //        this.MaximizeBox = false;
-        //        this.MinimizeBox = false;
-        //        this.StartPosition = FormStartPosition.CenterParent;
-        //    }
-        //}
-        // -------------------------------------------------------------------------------------------------- //
-        // -------------------------------------------------------------------------------------------------- //
+        }
 
     }
 }

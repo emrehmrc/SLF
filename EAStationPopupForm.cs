@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
-using OSGeo.OGR;
 using static SLF.ModülFormu;
 
 namespace SLF
@@ -12,6 +11,7 @@ namespace SLF
     {
         private readonly DataTable dataTable;
         private bool isOperationCancelled = true;
+
         public bool OperationCancelled => isOperationCancelled;
 
         private readonly List<string> acPowers = new List<string> {"11 kW", "22 kW" };
@@ -25,6 +25,7 @@ namespace SLF
             InitializeDataGridView(veri);
             SetupEventHandlers();
         }
+
         private void InitializeDataGridView(NoktaVeri veri)
         {
             // Fill initial coordinates
@@ -63,56 +64,6 @@ namespace SLF
                 MessageBox.Show("DTR Verileri bulunamadı. Lütfen kontrol edin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-        /*        private void InitializeDataGridView(NoktaVeri veri)
-                {
-                    // Fill initial coordinates
-                    ChargingStationDataGridView.Rows.Add();
-                    ChargingStationDataGridView.Rows[0].Cells["EA_X_KOORDINAT"].Value = veri.Enlem;
-                    ChargingStationDataGridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value = veri.Boylam;
-
-                    // Set ISTASYON_TIPI options to AC types and DC
-                    if (ChargingStationDataGridView.Columns["ISTASYON_TIPI"] is DataGridViewComboBoxColumn typeComboBoxColumn)
-                    {
-                        typeComboBoxColumn.DataSource = new List<string> { "AC (Home)", "AC (Work)", "AC (Public)", "Fast DC" };
-                    }
-
-                    // Default ISTASYON_GUCU to show AC power options
-                    if (ChargingStationDataGridView.Columns["ISTASYON_GUCU"] is DataGridViewComboBoxColumn powerComboBoxColumn)
-                    {
-                        powerComboBoxColumn.DataSource = acPowers;
-                    }
-
-                    // Populate transformer codes if available
-                    if (GirdiModülü.dataTablesByType.TryGetValue("DTR Verileri", out DataTable trafoDataTable))
-                    {
-                        List<string> trafoKoduListesi = trafoDataTable.AsEnumerable()
-                                                                      .Select(row => row["TRAFO_KODU"].ToString())
-                                                                      .Distinct()
-                                                                      .ToList();
-
-                        if (ChargingStationDataGridView.Columns["EA_TRAFO_KODU"] is DataGridViewComboBoxColumn comboBoxColumn)
-                        {
-                            comboBoxColumn.DataSource = trafoKoduListesi;
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("DTR Verileri bulunamadı. Lütfen kontrol edin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-        */
-/*        private void ChargingStationDataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.ColumnIndex == ChargingStationDataGridView.Columns["ISTASYON_TIPI"].Index)
-            {
-                string selectedType = ChargingStationDataGridView.Rows[e.RowIndex].Cells["ISTASYON_TIPI"].Value?.ToString();
-                if (ChargingStationDataGridView.Columns["ISTASYON_GUCU"] is DataGridViewComboBoxColumn powerComboBoxColumn)
-                {
-                    powerComboBoxColumn.DataSource = selectedType?.StartsWith("AC") == true ? acPowers : dcPowers;
-                }
-            }
-        }*/
         private void SetupEventHandlers()
         {
             this.FormClosing += ChargingStationPopupForm_FormClosing;

@@ -168,6 +168,12 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="ExcelDataReader, Version=3.7.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
+      <HintPath>packages\ExcelDataReader.3.7.0\lib\net462\ExcelDataReader.dll</HintPath>
+    </Reference>
+    <Reference Include="ExcelDataReader.DataSet, Version=3.7.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
+      <HintPath>packages\ExcelDataReader.DataSet.3.7.0\lib\net462\ExcelDataReader.DataSet.dll</HintPath>
+    </Reference>
     <Reference Include="ExcelNumberFormat, Version=1.1.0.0, Culture=neutral, PublicKeyToken=23c6f5d73be07eca, processorArchitecture=MSIL">
       <HintPath>packages\ExcelNumberFormat.1.1.0\lib\net20\ExcelNumberFormat.dll</HintPath>
     </Reference>
@@ -598,11 +604,29 @@
     <Compile Include="DatabaseListForm.Designer.cs">
       <DependentUpon>DatabaseListForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Fonksiyon Oluştur.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Fonksiyon Oluştur.Designer.cs">
+      <DependentUpon>Fonksiyon Oluştur.cs</DependentUpon>
+    </Compile>
     <Compile Include="LoginForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="LoginForm.Designer.cs">
       <DependentUpon>LoginForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Nokta_Yük_Bilgi_Formu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Nokta_Yük_Bilgi_Formu.Designer.cs">
+      <DependentUpon>Nokta_Yük_Bilgi_Formu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Poligon Özellik Tanımlama.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Poligon Özellik Tanımlama.Designer.cs">
+      <DependentUpon>Poligon Özellik Tanımlama.cs</DependentUpon>
     </Compile>
     <Compile Include="ProjectFolderPicker.cs">
       <SubType>Form</SubType>
@@ -622,12 +646,6 @@
     <Compile Include="Tablo_olustur.Designer.cs">
       <DependentUpon>Tablo_olustur.cs</DependentUpon>
     </Compile>
-    <Compile Include="YGAPopupForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="YGAPopupForm.Designer.cs">
-      <DependentUpon>YGAPopupForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="CBS.cs" />
     <Compile Include="EAStationPopupForm.cs">
       <SubType>Form</SubType>
@@ -636,9 +654,6 @@
       <DependentUpon>EAStationPopupForm.cs</DependentUpon>
     </Compile>
     <Compile Include="CsvHandler.cs" />
-    <Compile Include="CustomButton.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="DEKCenterPopupForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -677,12 +692,6 @@
     <Compile Include="DEKModulu.cs" />
     <Compile Include="DTRModulu.cs" />
     <Compile Include="EASarjModulu.cs" />
-    <Compile Include="Fonksiyon Oluştur.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Fonksiyon Oluştur.Designer.cs">
-      <DependentUpon>Fonksiyon Oluştur.cs</DependentUpon>
-    </Compile>
     <Compile Include="FormOznitelik.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -725,9 +734,6 @@
     <Compile Include="PoligonOznitelikForm.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="rounded_button.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Yardım.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -752,8 +758,17 @@
     <EmbeddedResource Include="DatabaseListForm.resx">
       <DependentUpon>DatabaseListForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Fonksiyon Oluştur.resx">
+      <DependentUpon>Fonksiyon Oluştur.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Nokta_Yük_Bilgi_Formu.resx">
+      <DependentUpon>Nokta_Yük_Bilgi_Formu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Poligon Özellik Tanımlama.resx">
+      <DependentUpon>Poligon Özellik Tanımlama.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectFolderPicker.resx">
       <DependentUpon>ProjectFolderPicker.cs</DependentUpon>
@@ -761,24 +776,14 @@
     <EmbeddedResource Include="Tablo_olustur.resx">
       <DependentUpon>Tablo_olustur.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="YGAPopupForm.resx">
-      <DependentUpon>YGAPopupForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Attribute_Table.resx">
       <DependentUpon>Attribute_Table.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="CustomButton.resx">
-      <DependentUpon>CustomButton.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EAStationPopupForm.resx">
       <DependentUpon>EAStationPopupForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DEKCenterPopupForm.resx">
       <DependentUpon>DEKCenterPopupForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Fonksiyon Oluştur.resx">
-      <DependentUpon>Fonksiyon Oluştur.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Google_Earth.resx">
       <DependentUpon>Google_Earth.cs</DependentUpon>
@@ -809,9 +814,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="rounded_button.resx">
-      <DependentUpon>rounded_button.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Yardım.resx">
       <DependentUpon>Yardım.cs</DependentUpon>
@@ -848,6 +850,8 @@
     <None Include="CBS\SLF\ÇİĞLİ KARŞIYAKA REKORTMAN VERİSİ\REKORTMAN.TAB" />
     <None Include="CBS\SLF\ÇİĞLİ KARŞIYAKA REKORTMAN VERİSİ\REKORTMAN_kars_cigli.csv" />
     <None Include="docs\VEER.md" />
+    <None Include="Excel Files\Point Load Karakteristikleri\point_load.xlsx" />
+    <None Include="Excel Files\SLF Sonuçları\SONUCLAR.xlsx" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
