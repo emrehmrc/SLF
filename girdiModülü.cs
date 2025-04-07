@@ -30,7 +30,7 @@ namespace SLF
   
     public class GirdiModülü
     {
-         
+        public ModülFormu modülFormu;
         protected Önizleme onizleme1 = new Önizleme();
         protected Raporlama raporlama1 = new Raporlama(); // excel sayfası için yapılmıs calısma excelexporter ve excel importer için bakılabilir ileri durumlarda 
         protected readonly List<string> veri_listesi_requires_xlsx = new List<string> {  
@@ -330,6 +330,8 @@ namespace SLF
         
         public GirdiModülü()
         {
+            modülFormu = new ModülFormu();
+
             combinedExcelFilter = $"{FilterExcelFiles}|{FilterAllFiles}";
             combinedCsvFilter = $"{FilterCsvFiles}|{FilterAllFiles}";
             combinedTabularFilter = $"{FilterTabularFiles}|{FilterAllFiles}";
@@ -406,6 +408,7 @@ namespace SLF
                     destination.ImportRow(row);
                 }
             }
+            
         }
 
         public void ImportProcessedData()
@@ -468,6 +471,28 @@ namespace SLF
                     SaveTempProjectState(tempPath);
                 }
 
+                // If "Ekonometrik Yük Tahmini Verileri" is selected, export to Excel and run the R script
+                if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
+                {
+
+                    try
+                    {
+                        var excelExporter = new ExcelExporter();
+
+                        // Update the first sheet of the Excel file with the imported data
+                        excelExporter.UpdateExcelFileFirstSheet(modülFormu.config.ELF.INPUT_FILE, importedDataTable);
+
+                        // Run the R script after exporting to Excel
+                        RunRScriptSenaryolar(modülFormu.config.ELF.INPUT_FILE); // Call the synchronous method
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error while saving the file: {ex.Message}");
+                    }
+                }
+
+
+
                 Console.WriteLine("=== ImportProcessedData Tamamlandı ===\n");
 
                 // Kullanıcıya bilgi göster
@@ -485,6 +510,9 @@ namespace SLF
                 Cursor.Current = Cursors.Default;
             }
         }
+
+
+
         private void SaveModuleDataToCSV()
         {
             try
@@ -580,65 +608,6 @@ namespace SLF
                 Console.WriteLine($"Geçici proje durumu kaydedilirken hata: {ex.Message}");
             }
         }
-        private void SaveDataToCorrectFolder()
-        {
-            try
-            {
-                // Veri tipi için doğru klasör yolunu al
-                string folderPath = PathService.GetGirdilerPathForDataType(seçilenVeriTipi);
-
-                if (string.IsNullOrEmpty(folderPath))
-                {
-                    Console.WriteLine("Geçerli bir klasör yolu alınamadı, veri kaydedilemedi.");
-                    return;
-                }
-
-                // Dosya adını oluştur (veri tipi ve zaman damgası ile)
-                string fileName = $"{seçilenVeriTipi.Replace(" ", "_")}_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
-                string fullPath = Path.Combine(folderPath, fileName);
-
-                // Veriyi CSV olarak kaydet
-                SaveDataTableToCsv(importedDataTable, fullPath);
-
-                Console.WriteLine($"Veri başarıyla kaydedildi: {fullPath}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Veri kaydetme hatası: {ex.Message}");
-            }
-        }
-        private void SaveDataTableToCsv(DataTable dt, string filePath)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            // Sütun başlıklarını ekle
-            List<string> columnNames = new List<string>();
-            foreach (DataColumn column in dt.Columns)
-            {
-                columnNames.Add(column.ColumnName);
-            }
-            sb.AppendLine(string.Join(",", columnNames));
-
-            // Verileri ekle
-            foreach (DataRow row in dt.Rows)
-            {
-                List<string> fields = new List<string>();
-                foreach (var item in row.ItemArray)
-                {
-                    // Virgülleri ve tırnak işaretlerini düzgün biçimlendir
-                    string field = item?.ToString() ?? "";
-                    if (field.Contains(",") || field.Contains("\"") || field.Contains("\n"))
-                    {
-                        field = "\"" + field.Replace("\"", "\"\"") + "\"";
-                    }
-                    fields.Add(field);
-                }
-                sb.AppendLine(string.Join(",", fields));
-            }
-
-            // Dosyayı kaydet
-            System.IO.File.WriteAllText(filePath, sb.ToString());
-        }
 
         private DataTable ConvertColumnNamesToUpperCase(DataTable dataTable)
         {
@@ -664,7 +633,61 @@ namespace SLF
             Console.WriteLine($"Yeni Kolonlar: {updatedColumns}");
 
             return updatedTable;
+
         }
+
+        private void RunRScriptSenaryolar(string excelFilePath)
+        {
+            try
+            {
+                modülFormu.ELFrScriptSenaryolarPath = modülFormu.config.ELF.Rscript_Yolu_Senaryolar;
+
+                string logFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\script_output_log.txt";
+
+                if (!File.Exists(excelFilePath))
+                {
+                    MessageBox.Show("The specified Excel file does not exist.");
+                    return;
+                }
+
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "Rscript.exe",
+                        Arguments = $"\"{modülFormu.ELFrScriptSenaryolarPath}\" \"{excelFilePath}\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+
+                process.Start();
+
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+
+                process.WaitForExit();
+
+                // Log the output and error
+                File.AppendAllText(logFilePath, $"Output:\n{output}\nError:\n{error}\n\n");
+
+                if (process.ExitCode != 0)
+                {
+                    MessageBox.Show($"R script encountered an error. Check the log file for details: {logFilePath}");
+                }
+                else
+                {
+                    MessageBox.Show("R script başarıyla çalıştırıldı.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred while running the R script: {ex.Message}");
+            }
+        }
+
 
         public void ProcessFileSelection(string seçilenVeriTipi)
         {

@@ -21,6 +21,7 @@ using SLF.services;
 using SLF.Services;
 using System.Reflection;
 using System.Globalization;
+using Newtonsoft.Json;
 
 namespace SLF
 {
@@ -43,6 +44,17 @@ namespace SLF
 
         // ------------------------------------------------------------------------------------------------------------ //
         // ---------------------------------------------- GENEL DEĞİŞKENLER ---------------------------------------------- //
+
+        public string exeLocation;
+        public string projectRoot;
+
+        public string json_file;
+        public dynamic config;
+
+        public string ELFrScriptModelPath;
+        public string ELFrScriptSenaryolarPath;
+        public string ELFResultsFilePath;
+        public string ELFSenaryolarFilePath;
 
         List<string> modulescheck = new List<string>();
         public readonly CBS cbs;
@@ -172,10 +184,19 @@ namespace SLF
         // Main constructor of the Modüller Formu 
         public ModülFormu(string selectedMethod = "", string tabToSelect = "")
         {
+
             // initialize the Modul Formu
             InitializeComponent();
             SetupLayout();
 
+            // Resolve the Excel file path relative to SLF.exe
+            exeLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); // e.g., C:\Users\ehan0\source\repos\emrehmrc\SLF\bin\Debug
+            projectRoot = Directory.GetParent(exeLocation)?.Parent?.FullName; // Move up two levels to SLF root (C:\Users\ehan0\source\repos\emrehmrc\SLF)
+
+
+            // read the json file and create the "config" variable.
+            json_file = File.ReadAllText(Path.Combine(projectRoot, "config.json"));
+            config = JsonConvert.DeserializeObject(json_file);
 
             var yearService = YearService.GetInstance();
             if (this.slfStartYear > 0 && this.slfEndYear > 0)
@@ -191,9 +212,7 @@ namespace SLF
             }
 
 
-            // Resolve the Excel file path relative to SLF.exe
-            string exeLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); // e.g., C:\Users\ehan0\source\repos\emrehmrc\SLF\bin\Debug
-            string projectRoot = Directory.GetParent(exeLocation)?.Parent?.FullName; // Move up two levels to SLF root (C:\Users\ehan0\source\repos\emrehmrc\SLF)
+            
             if (projectRoot != null)
             {
                 polygonTypesExcelPath = Path.Combine(projectRoot, "Excel Files", "Point Load Karakteristikleri.xlsx", "point_load.xlsx"); // e.g., C:\Users\ehan0\source\repos\emrehmrc\SLF\Excel Files\point_load.xlsx
@@ -4684,13 +4703,11 @@ namespace SLF
 
         private async void ShowResultsButton_Click(object sender, EventArgs e)
         {
-            // Path to the Excel file
-            string filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\ELF_Tahmin_Sonuçları_2024-11-08 22_35_57.xlsx";
 
             // Asynchronous task to load the Excel package
             await Task.Run(() =>
             {
-                using (var package = new ExcelPackage(new FileInfo(filePath)))
+                using (var package = new ExcelPackage(new FileInfo(ELFResultsFilePath)))
                 {
                     // Clear previous data in the DataGridViews
                     Invoke(new Action(() =>
@@ -4704,7 +4721,7 @@ namespace SLF
                     }));
 
                     // Load sheets into their respective DataGridViews
-                    var worksheets = new[] { "Bagımlı_Degisken_Tahminleri_1", "Bagımlı_Degisken_Tahminleri_2", "Bagımlı_Degisken_Tahminleri_3", "Bagımlı_Degisken_Tahminleri_4", "Bagımlı_Degisken_Tahminleri_5" }; // Replace with actual sheet names if needed
+                    var worksheets = new[] { "Bagımlı_Degisken_Tahminleri_1", "Bagımlı_Degisken_Tahminleri_2", "Bagımlı_Degisken_Tahminleri_3", "Bagımlı_Degisken_Tahminleri_4", "Bagımlı_Degisken_Tahminleri_5" };
                     var dataGrids = new[] { ELFMinResultsTable, ELFLowResultsTable, ELFBaseResultsTable, ELFHighResultsTable, ELFMaxResultsTable };
 
                     for (int i = 0; i < worksheets.Length; i++)
@@ -4730,52 +4747,18 @@ namespace SLF
             Modül_Tabları.SelectedTab = tab_ekonometrik;
         }
 
-        private void ELFPredictionShowResultsButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                // Set cursor to wait while running the operations
-                Cursor.Current = Cursors.WaitCursor;
-
-                string modifiedFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
-
-                // Check if the modified file exists
-                if (!File.Exists(modifiedFilePath))
-                {
-                    MessageBox.Show("Lütfen önce senaryo dosyasını ekleyin.");
-                    return;
-                }
-
-                // Run the R script
-                string resultsFilePath = RunModelRScript(modifiedFilePath);
-
-                if (resultsFilePath == null)
-                {
-                    // If R script failed or no results path was returned, stop further execution
-                    return;
-                }
-
-                // Load results into tab_ekonometrik
-                LoadResultsToTabEkonometrik(resultsFilePath);
-            }
-            finally
-            {
-                // Restore cursor to default
-                Cursor.Current = Cursors.Default;
-            }
-        }
 
         // Method to run the R script
-        private string RunModelRScript(string modifiedFilePath)
+        private string RunModelRScript(string senaryolarFilePath)
         {
-            string rScriptPath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\begum_model_deneme.R";
-            string resultsFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\";
+
+            ELFrScriptModelPath = config.ELF.Rscript_Yolu;
 
             // Set up process info
             var processInfo = new ProcessStartInfo()
             {
                 FileName = "Rscript.exe",
-                Arguments = $"\"{rScriptPath}\" \"{modifiedFilePath}\"",
+                Arguments = $"\"{ELFrScriptModelPath}\" \"{senaryolarFilePath}\"",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -4790,7 +4773,7 @@ namespace SLF
                     if (!string.IsNullOrEmpty(args.Data))
                     {
                         Console.WriteLine(args.Data);
-                        resultsFilePath = args.Data;  // Capture the file path
+                        ELFResultsFilePath = args.Data;  // Capture the file path
                     }
                 };
 
@@ -4800,14 +4783,14 @@ namespace SLF
                 process.WaitForExit();
             }
 
-            if (string.IsNullOrEmpty(resultsFilePath))
+            if (string.IsNullOrEmpty(ELFResultsFilePath))
             {
                 MessageBox.Show("Error: No results file path was generated by the R script.");
                 return null;
             }
 
-            MessageBox.Show("Modeller başarıyla çalıştırıldı. " + resultsFilePath);
-            return resultsFilePath;  // Return the results file path
+            MessageBox.Show("Modeller başarıyla çalıştırıldı. " + ELFResultsFilePath);
+            return ELFResultsFilePath;  // Return the results file path
         }
 
 
@@ -6336,7 +6319,7 @@ namespace SLF
             GMapOverlay heatmapOverlay = gMapControl_yuk.Overlays.FirstOrDefault(o => o.Id == "HeatmapOverlay");
             if (heatmapOverlay == null || heatmapOverlay.Polygons.Count == 0)
             {
-                MessageBox.Show("No heatmap overlay found to export.");
+                MessageBox.Show("Herhangi bir yük yoğunluğu haritası bulunamadı.");
                 return;
             }
 
@@ -6366,8 +6349,8 @@ namespace SLF
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
                 Filter = "HTML File|*.html",
-                Title = "Save Heatmap as HTML",
-                FileName = $"Heatmap_{currentYear}.html",
+                Title = "Haritayı HTML Olarak Kaydet",
+                FileName = $"Yük_Yoğunluğu_Haritası_{currentYear}.html",
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
             };
 
@@ -6503,7 +6486,8 @@ namespace SLF
             htmlContent.AppendLine("  <script src=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js\"></script>");
             htmlContent.AppendLine("  <style>");
             htmlContent.AppendLine("    body { margin: 0; font-family: Arial, sans-serif; }");
-            htmlContent.AppendLine("    #dashboard { position: absolute; top: 10px; left: 10px; z-index: 1000; background: white; padding: 10px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.3); }");
+            // Position the dashboard at the bottom-left corner
+            htmlContent.AppendLine("    #dashboard { position: absolute; bottom: 10px; left: 10px; z-index: 1000; background: white; padding: 10px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.3); }");
             htmlContent.AppendLine("    #map { height: 100vh; width: 100%; }");
             htmlContent.AppendLine("    .leaflet-tooltip { white-space: pre-line; }");
             htmlContent.AppendLine("    #year-label { font-size: 16px; margin-bottom: 5px; }");
@@ -6629,6 +6613,40 @@ namespace SLF
             }
         }
 
+        private void ELFTahminButonu_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Set cursor to wait while running the operations
+                Cursor.Current = Cursors.WaitCursor;
+
+                ELFSenaryolarFilePath = config.ELF.Rscript_Yolu_Senaryolar;
+
+                // Check if the modified file exists
+                if (!File.Exists(ELFSenaryolarFilePath))
+                {
+                    MessageBox.Show("Lütfen önce senaryo dosyasını ekleyin.");
+                    return;
+                }
+
+                // Run the R script
+                string resultsFilePath = RunModelRScript(ELFSenaryolarFilePath);
+
+                if (resultsFilePath == null)
+                {
+                    // If R script failed or no results path was returned, stop further execution
+                    return;
+                }
+
+                // Load results into tab_ekonometrik
+                LoadResultsToTabEkonometrik(resultsFilePath);
+            }
+            finally
+            {
+                // Restore cursor to default
+                Cursor.Current = Cursors.Default;
+            }
+        }
 
         private async void DEKSimulasyonSonucGoruntule_Click(object sender, EventArgs e)
         {
