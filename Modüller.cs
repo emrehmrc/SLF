@@ -20,6 +20,7 @@ using System.Text;
 using SLF.services;
 using SLF.Services;
 using System.Reflection;
+using System.Globalization;
 
 namespace SLF
 {
@@ -160,6 +161,8 @@ namespace SLF
         private GMapPolygon highlightedPolygon; // Track the currently highlighted polygon
         private int lastSelectedCheckboxIndex = -1; // Track the last selected checkbox index
 
+        private GMapOverlay eaOverlay; // Add this as a class-level variable
+
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------ INITIALIZATION & GENERAL METHODS ------------------------------------------ //
@@ -245,6 +248,7 @@ namespace SLF
 
             // Initialize currentYear
             currentYear = trackBar_Yıllar.Value;
+
 
         }
 
@@ -1224,11 +1228,26 @@ namespace SLF
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------ EA MODÜLÜ DEĞİŞKENLER ------------------------------------------- //
 
+        private readonly Dictionary<string, List<string>> cityDistricts = new Dictionary<string, List<string>>
+        {
+            { "İzmir", new List<string> {/* "Aliağa", "Balçova", "Bayındır", "Bayraklı", "Bergama", "Beydağ", "Bornova", "Buca", "Çeşme", */ "Çiğli", /*"Dikili", "Foça", "Gaziemir", "Güzelbahçe", "Karabağlar", "Karaburun", */"Karşıyaka",/* "Kemalpaşa", "Kınık", "Kiraz", "Konak", "Menderes", "Menemen", "Narlıdere", "Ödemiş", "Seferihisar", "Selçuk", "Tire", "Torbalı"*/ } },
+            { "Eskişehir", new List<string> { /*"Alpu", "Beylikova", "Çifteler", "Günyüzü", "Han", "İnönü", "Mahmudiye", "Mihalgazi", "Mihalıççık", "Odunpazarı", "Sarıcakaya", "Seyitgazi", "Sivrihisar", */ "Tepebaşı" } }
+        };
+                private readonly Dictionary<string, string> districtIdMap = new Dictionary<string, string>
+        {
+            { "Çiğli", "1" },
+            { "Karşıyaka", "2" },
+            { "Tepebaşı", "1" }
+        };
+
+
         private string SelectedSpeed = "";
         public bool isAddingChargingStation = false; // Sadece şarj istasyonu eklenirken true olacak.
         private bool isAddingDekPoint = false; // Sadece dek noktası eklenirken  true olacak.
         private int _selectedYear = -1;
         private string _selectedCity = null;
+        private string _selectedDistrict;
+
 
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
@@ -2846,6 +2865,7 @@ namespace SLF
             public double Bina_Demandi { get; set; }
             public int Abone_Sayısı { get; set; }
 
+            public string CellId { get; set; } // Cell ID (optional)
 
         }
 
@@ -2987,21 +3007,278 @@ namespace SLF
             gMapControl_EA.Refresh();
         }
 
+        private async void SimulasyonSonucGoruntule_Click(object sender, EventArgs e)
+        {
+            // Disable the button to prevent multiple clicks while processing
+            EAStationAddButton.Enabled = false;
+            EASimButton.Enabled = false;
+
+            try
+            {
+                string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\çıktı\evcs_monte_carlo_distribution_kumulatif3 - Copy.xlsx";
+                DataTable simulationData;
+                try
+                {
+                    // Excel dosyasını aç
+                    using (var package = new ExcelPackage(new FileInfo(filePath)))
+                    {
+                        // Yıl seçimine göre sayfayı seç (SelectedYear değeri, sayfa indeksini temsil eder)
+                        ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
+
+                        // Veriyi DataTable'a yükle
+                        simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
+                        // Filter DataTable based on SelectedDistrict and its ID
+                        /*                        if (SelectedDistrict != null)
+                                                {
+                                                    if (districtIdMap.TryGetValue(SelectedDistrict, out string districtId))
+                                                    {
+                                                        var filteredRows = veriMonteCarlo.AsEnumerable()
+                                                            .Where(row => row.Field<string>("ilce") == districtId)
+                                                            .CopyToDataTable();
+                                                        veriMonteCarlo = filteredRows; // Update with filtered data
+                                                    }
+                                                    else
+                                                    {
+                                                        MessageBox.Show($"No ID mapping found for district: {SelectedDistrict}. No data will be displayed.",
+                                                            "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                                        veriMonteCarlo.Clear(); // Clear data to prevent displaying all districts
+                                                        return; // Exit the method
+                                                    }
+                                                }*/
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
+                    return; // Hata durumunda işlemi sonlandır
+                }
+
+                /*                    using (var package = new ExcelPackage(new FileInfo(filePath)))
+                                    {
+                                        // Map SelectedYear index to actual year
+                                        int baseYear = slfStartYear; // e.g., 2024
+                                        string year = (SelectedYear != -1 && SelectedYear < (slfEndYear - slfStartYear + 1))
+                                            ? (baseYear + SelectedYear).ToString()
+                                            : "2025";
+
+                                        ExcelWorksheet worksheet = package.Workbook.Worksheets[year];
+                                        if (worksheet == null)
+                                        {
+                                            MessageBox.Show($"Worksheet for year {year} not found in output file.",
+                                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                            return;
+                                        }
+
+                                        simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
+                                }*/
+
+                // Log column names for debugging
+                Console.WriteLine("DataTable Columns: " + string.Join(", ", simulationData.Columns.Cast<DataColumn>().Select(c => c.ColumnName)));
+
+                gMapControl_EA.Overlays.Clear();
+                gMapControl_EA.Refresh();
+                // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
+                HesaplaMerkezNoktaVeEkle(simulationData);
+                await HaritaUzerindeSimulasyonGosterimi(simulationData);
+                // Assuming you have a DataTable named 'veriTablosu' and a year (e.g., 2023)
+                // await HaritaUzerindeSimulasyonGosterimiWithNewPoints(veriTablosu, 2023);
+
+
+                MessageBox.Show("Veri başarıyla yüklendi.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
+            }
+            finally
+            {
+                EAStationAddButton.Enabled = true;
+                EASimButton.Enabled = true;
+
+            }
+        }
+
+        private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
+        {
+            // Disable buttons and TrackBar to prevent interaction while processing
+            // EAStationAddButton.Enabled = false;
+            EANewSimulationResultsButton.Enabled = false;
+            SimulasyonSonucGoruntule.Enabled = false;
+
+            try
+            {
+                Cursor = Cursors.WaitCursor;
+                if (statusLabel != null)
+                {
+                    statusLabel.Text = "Python script started. This may take a while. Please wait...";
+                    statusLabel.Visible = true;
+                }
+                if (progressBar != null)
+                {
+                    progressBar.Style = ProgressBarStyle.Marquee;
+                    progressBar.Visible = true;
+                }
+
+                string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\girdiler\new_buildings_2024_2035.xlsx";
+                string outputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\çıktı\evcs_monte_carlo_distribution_kumulatif3 - Copy.xlsx";
+
+                if (!File.Exists(inputFilePath))
+                {
+                    MessageBox.Show("Input file not found! Please ensure the file is saved correctly.",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                await RunPythonScriptAsync(inputFilePath);
+
+                if (!File.Exists(outputFilePath))
+                {
+                    MessageBox.Show("Output file not generated! Please check the Python script.",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Call SimilasyonSonucGoruntule to handle display
+                //SimilasyonSonucGoruntule();
+
+                // Add info message box to inform user of completion
+                MessageBox.Show("Simulation process completed successfully!",
+                    "Process Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+                if (progressBar != null)
+                    progressBar.Visible = false;
+                if (statusLabel != null)
+                    statusLabel.Text = "Simulation process completed";
+
+                EANewSimulationResultsButton.Enabled = true;
+                // EAStationAddButton.Enabled = true;
+                SimulasyonSonucGoruntule.Enabled = true;
+            }
+        }
+
+        private async Task RunPythonScriptAsync(string inputFilePath)
+        {
+            try
+            {
+                string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\EA_kumulativ.py";
+                string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe";
+
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = pythonExePath,
+                    Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using (Process process = new Process { StartInfo = startInfo })
+                {
+                    process.Start();
+
+                    Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
+                    Task<string> errorTask = process.StandardError.ReadToEndAsync();
+
+                    await Task.Run(() => process.WaitForExit());
+
+                    string output = await outputTask;
+                    string error = await errorTask;
+
+                    if (process.ExitCode != 0)
+                    {
+                        throw new Exception($"Python script failed with exit code {process.ExitCode}.\nError: {error}");
+                    }
+                    else if (!string.IsNullOrEmpty(output))
+                    {
+                        Console.WriteLine($"Python output: {output}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error running Python script: {ex.Message}");
+            }
+        }
+
+        // Add this event handler for the checkbox
+        private void EAPointsLayerCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (eaOverlay == null) return;
+
+            if (EAPointsLayerCheckBox.Checked)
+            {
+                if (!gMapControl_EA.Overlays.Contains(eaOverlay))
+                {
+                    gMapControl_EA.Overlays.Add(eaOverlay);
+                }
+            }
+            else
+            {
+                if (gMapControl_EA.Overlays.Contains(eaOverlay))
+                {
+                    gMapControl_EA.Overlays.Remove(eaOverlay);
+                }
+            }
+            gMapControl_EA.Refresh();
+        }
+
         // Şehir seçimi yapıldığında çağrılan metot
         private void ilSecimiMonteCarlo(object sender, EventArgs e)
         {
-            if (comboBox_ea_il_secimi.SelectedItem != null)  // Geçerli bir seçim yapıldığında
+            // Always clear the district combo box and reset SelectedDistrict
+            comboBox_ea_ilce_secimi.Items.Clear();
+            comboBox_ea_ilce_secimi.SelectedIndex = -1; // Ensure no selection
+            comboBox_ea_ilce_secimi.Enabled = false; // Disable by default
+            SelectedDistrict = null;
+            SelectedCity = comboBox_ea_il_secimi.SelectedItem.ToString();
+            if (cityDistricts.TryGetValue(SelectedCity, out var districts))
             {
-                SelectedCity = comboBox_ea_il_secimi.SelectedItem.ToString();  // Şehir adını ayarla
-                CheckSelections();  // Seçim durumunu kontrol et
-
-                // Set map position based on selected city
-                if (cityCoordinates.TryGetValue(SelectedCity, out PointLatLng coordinates))
+                comboBox_ea_ilce_secimi.Invoke(new Action(() =>
                 {
-                    gMapControl_EA.Position = coordinates; // Set the map's position
-                    gMapControl_EA.Zoom = 12; // Adjust the zoom level as needed
-                }
+                    comboBox_ea_ilce_secimi.Items.Clear();
+                    comboBox_ea_ilce_secimi.Items.AddRange(districts.ToArray());
+                    comboBox_ea_ilce_secimi.SelectedIndex = -1;
+                    comboBox_ea_ilce_secimi.Enabled = true;
+                    comboBox_ea_ilce_secimi.Refresh();
+                }));
             }
+
+            else
+            {
+                SelectedCity = null;
+            }
+
+            // Update button enablement and map position
+            // CheckSelections();
+
+            if (SelectedCity != null && cityCoordinates.TryGetValue(SelectedCity, out PointLatLng coordinates))
+            {
+                gMapControl_EA.Position = coordinates;
+                gMapControl_EA.Zoom = 12;
+            }
+        }
+
+        private void ilceSecimiMonteCarlo(object sender, EventArgs e)
+        {
+            if (comboBox_ea_ilce_secimi.SelectedItem != null)
+            {
+                SelectedDistrict = comboBox_ea_ilce_secimi.SelectedItem.ToString();
+                Console.WriteLine($"Selected District: {SelectedDistrict}");
+            }
+            else
+            {
+                SelectedDistrict = null;
+                Console.WriteLine("District selection cleared.");
+            }
+            //   CheckSelections();
         }
 
         // Yıl seçimi yapıldığında çağrılan metot
@@ -3013,6 +3290,7 @@ namespace SLF
                 CheckSelections();  // Seçim durumunu kontrol et
             }
         }
+
         private void calculateChargeStation(int greenAc, int redDc)
         {
             if (this.InvokeRequired)
@@ -3728,9 +4006,18 @@ namespace SLF
 
         private void CheckSelections()
         {
-            // Seçimlerin yapıldığını kontrol ederek butonu etkinleştir
-            EASimButton.Enabled = SelectedYear != -1 && SelectedCity != null; // ea modulu 
-            DEKSimButton.Enabled = SelectedYear != -1 && SelectedCity != null; // dek modulu 
+            EASimButton.Enabled = SelectedYear != -1 && SelectedCity != null && SelectedDistrict != null;
+            DEKSimButton.Enabled = SelectedYear != -1 && SelectedCity != null; //&& SelectedDistrict != null;
+        }
+
+        public string SelectedDistrict
+        {
+            get => _selectedDistrict;
+            set
+            {
+                _selectedDistrict = value;
+                // CheckSelections();
+            }
         }
 
         private async Task dekHaritayaVeriYukleAsync()
@@ -4258,6 +4545,8 @@ namespace SLF
             checkBox_yuk_main.Text = "Yük Yoğunluğu Katmanı"; // Set a meaningful name
             checkBox_yuk_main.Visible = true; // Ensure the checkbox is visible
 
+            buton_HTML.Visible = true;
+
             // Force a repaint by toggling the visibility of the heatmap overlay
             SetOverlayVisibility(heatmapOverlay, false); // Hide
             SetOverlayVisibility(heatmapOverlay, true);  // Show
@@ -4268,8 +4557,8 @@ namespace SLF
         private void InitializeHeatmapLegendControls()
         {
             // Define the fixed brackets (same as in CreateHeatmapLegend)
-            double[] brackets = { 0, 3, 5, 10, 25, 50, 75, 100, 200, 400, double.PositiveInfinity };
-            string[] bracketLabels = { "0-3", "3-5", "5-10", "10-25", "25-50", "50-75", "75-100", "100-200", "200-400", "400-Inf" };
+            double[] brackets = { 0, 3, 5, 10, 20, 35, 50, 75, 100, 200, double.PositiveInfinity };
+            string[] bracketLabels = { "0-3", "3-5", "5-10", "10-20", "20-35", "35-50", "50-75", "75-100", "100-200", "200-Inf" };
             int bracketCount = bracketLabels.Length; // Should be 10
 
             // Initialize arrays
@@ -5371,6 +5660,8 @@ namespace SLF
                                         checkBox_yuk_main.Visible = false;
                                         checkBox_yuk_main.Tag = null;
 
+                                        buton_HTML.Visible = false;
+
                                         load_density_cnt = 0;
 
                                         // Remove the heatmapOverlay by its ID
@@ -5929,6 +6220,512 @@ namespace SLF
             // Show the attribute table with just one row
             ShowAttributeTable(singleRowTable);
 
+        }
+
+        private GMapOverlay dekOverlay;
+
+        // Add this event handler for the checkbox
+        private void DEKPointsLayerCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (dekOverlay == null) return;
+
+            if (DEKPointsLayerCheckBox.Checked)
+            {
+                if (!gMapControl_DEK.Overlays.Contains(dekOverlay))
+                {
+                    gMapControl_DEK.Overlays.Add(dekOverlay);
+                }
+            }
+            else
+            {
+                if (gMapControl_DEK.Overlays.Contains(dekOverlay))
+                {
+                    gMapControl_DEK.Overlays.Remove(dekOverlay);
+                }
+            }
+            gMapControl_DEK.Refresh();
+        }
+
+        private void ilceSecimiDEK(object sender, EventArgs e)
+        {
+            if (comboBox_dek_ilce_secimi.SelectedItem != null)
+            {
+                SelectedDistrict = comboBox_dek_ilce_secimi.SelectedItem.ToString();
+                Console.WriteLine($"Selected District: {SelectedDistrict}");
+            }
+            else
+            {
+                SelectedDistrict = null;
+                Console.WriteLine("District selection cleared.");
+            }
+            // CheckSelections();
+        }
+
+        private async void DEKRunSimulationButton_Click(object sender, EventArgs e)
+        {
+            // Disable buttons and TrackBar to prevent interaction while processing
+            DEKRunSimulationButton.Enabled = false;
+            DEKSimulasyonSonucGoruntule.Enabled = false;
+            //DEKSimButton.Enabled = false;
+
+            try
+            {
+                Cursor = Cursors.WaitCursor;
+                if (DEKStatusLabel != null)
+                {
+                    DEKStatusLabel.Text = "Python script started. This may take a while. Please wait...";
+                    DEKStatusLabel.Visible = true;
+                }
+                if (DEKProgressBar != null)
+                {
+                    DEKProgressBar.Style = ProgressBarStyle.Marquee;
+                    DEKProgressBar.Visible = true;
+                }
+
+                string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\DELTA_EA_DENEME_IMAR.xlsx";
+                string outputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek_distribution_2024_2030_İzmir_düşük.xlsx";
+
+                if (!File.Exists(inputFilePath))
+                {
+                    MessageBox.Show("Input file not found! Please ensure the file is saved correctly.",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                await RunPythonDEKScriptAsync(inputFilePath);
+
+                if (!File.Exists(outputFilePath))
+                {
+                    MessageBox.Show("Output file not generated! Please check the Python script.",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Call SimilasyonSonucGoruntule to handle display
+                //SimilasyonSonucGoruntule();
+
+                // Add info message box to inform user of completion
+                MessageBox.Show("Simulation process completed successfully!",
+                    "Process Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+                if (DEKProgressBar != null)
+                    DEKProgressBar.Visible = false;
+                if (DEKStatusLabel != null)
+                    DEKStatusLabel.Text = "Simulation process completed";
+
+                DEKRunSimulationButton.Enabled = true;
+                DEKSimulasyonSonucGoruntule.Enabled = true;
+                //DEKSimButton.Enabled = true;
+            }
+        }
+
+        // Updated RunPythonScriptAsync to match your paths
+        private async Task RunPythonDEKScriptAsync(string inputFilePath)
+        {
+            try
+            {
+                string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek.py";
+                string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe";
+
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = pythonExePath,
+                    Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using (Process process = new Process { StartInfo = startInfo })
+                {
+                    process.Start();
+
+                    Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
+                    Task<string> errorTask = process.StandardError.ReadToEndAsync();
+
+                    await Task.Run(() => process.WaitForExit());
+
+                    string output = await outputTask;
+                    string error = await errorTask;
+
+                    if (process.ExitCode != 0)
+                    {
+                        throw new Exception($"Python script failed with exit code {process.ExitCode}.\nError: {error}");
+                    }
+                    else if (!string.IsNullOrEmpty(output))
+                    {
+                        Console.WriteLine($"Python output: {output}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error running Python script: {ex.Message}");
+            }
+        }
+
+        private async void buton_HTML_Click(object sender, EventArgs e)
+        {
+            await ExportHeatmapToHtml();
+        }
+
+
+        private async Task ExportHeatmapToHtml()
+        {
+            // Find the heatmap overlay
+            GMapOverlay heatmapOverlay = gMapControl_yuk.Overlays.FirstOrDefault(o => o.Id == "HeatmapOverlay");
+            if (heatmapOverlay == null || heatmapOverlay.Polygons.Count == 0)
+            {
+                MessageBox.Show("No heatmap overlay found to export.");
+                return;
+            }
+
+            // Define the columns to include in the tooltip
+            string[] tooltipColumns = new string[]
+            {
+                $"Mesken_{currentYear}",
+                $"Sanayi_{currentYear}",
+                $"Ticarethane_{currentYear}",
+                $"Tarımsal Sulama_{currentYear}",
+                $"Aydınlatma_{currentYear}",
+                $"TOPLAM_YÜK_{currentYear}",
+                $"Hücre İçi Yerleşim Alanı_{currentYear}",
+                $"Yük_Yoğunluğu_{currentYear}"
+            };
+
+            // Define the range of years to include (adjust as needed)
+            int minYear = 2025; // Adjust based on your data
+            int maxYear = 2050; // Adjust based on your data
+            List<string> loadDensityColumns = new List<string>();
+            for (int year = minYear; year <= maxYear; year++)
+            {
+                loadDensityColumns.Add($"Yük_Yoğunluğu_{year}");
+            }
+
+            // Open a SaveFileDialog to let the user choose where to save the HTML file
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "HTML File|*.html",
+                Title = "Save Heatmap as HTML",
+                FileName = $"Heatmap_{currentYear}.html",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
+            };
+
+            if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
+
+            string filePath = saveFileDialog.FileName;
+
+            // Generate GeoJSON for the polygons
+            StringBuilder geoJson = new StringBuilder();
+            geoJson.AppendLine("{");
+            geoJson.AppendLine("  \"type\": \"FeatureCollection\",");
+            geoJson.AppendLine("  \"features\": [");
+
+            bool firstFeature = true;
+            foreach (GMapPolygon polygon in heatmapOverlay.Polygons)
+            {
+                if (!firstFeature) geoJson.AppendLine(",");
+                firstFeature = false;
+
+                geoJson.AppendLine("    {");
+                geoJson.AppendLine("      \"type\": \"Feature\",");
+                geoJson.AppendLine("      \"geometry\": {");
+                geoJson.AppendLine("        \"type\": \"Polygon\",");
+                geoJson.AppendLine("        \"coordinates\": [");
+
+                // Add the polygon coordinates
+                geoJson.Append("          [");
+                bool firstPoint = true;
+                foreach (var point in polygon.Points)
+                {
+                    if (!firstPoint) geoJson.Append(",");
+                    firstPoint = false;
+                    geoJson.Append($"[{point.Lng},{point.Lat}]");
+                }
+                // Close the polygon by repeating the first point
+                geoJson.Append($",[{polygon.Points[0].Lng},{polygon.Points[0].Lat}]");
+                geoJson.AppendLine("]");
+
+                geoJson.AppendLine("        ]");
+                geoJson.AppendLine("      },");
+
+                // Add properties for all columns
+                geoJson.AppendLine("      \"properties\": {");
+                bool firstProperty = true;
+
+                // Add loadDensity for all years
+                Dictionary<string, double> loadDensities = new Dictionary<string, double>();
+                if (heatmapPolygonAttributes.TryGetValue(polygon, out DataRow attributes))
+                {
+                    foreach (string column in loadDensityColumns)
+                    {
+                        double loadDensity = 0.0;
+                        if (attributes.Table.Columns.Contains(column))
+                        {
+                            string rawValue = attributes[column].ToString();
+                            if (!string.IsNullOrWhiteSpace(rawValue) &&
+                                double.TryParse(rawValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+                            {
+                                loadDensity = value;
+                            }
+                        }
+                        loadDensities[column] = loadDensity;
+
+                        if (!firstProperty) geoJson.AppendLine(",");
+                        firstProperty = false;
+                        geoJson.Append($"        \"{column}\": {loadDensity}");
+                    }
+
+                    // Add tooltip columns (for the current year)
+                    foreach (string column in tooltipColumns)
+                    {
+                        geoJson.AppendLine(",");
+                        string value = "N/A";
+                        if (attributes.Table.Columns.Contains(column))
+                        {
+                            value = attributes[column]?.ToString() ?? "N/A";
+                            // Escape quotes in the value to ensure valid JSON
+                            value = value.Replace("\"", "\\\"");
+                        }
+                        geoJson.Append($"        \"{column}\": \"{value}\"");
+                    }
+                }
+                else
+                {
+                    // If no attributes, set default values
+                    foreach (string column in loadDensityColumns)
+                    {
+                        if (!firstProperty) geoJson.AppendLine(",");
+                        firstProperty = false;
+                        geoJson.Append($"        \"{column}\": 0.0");
+                    }
+                    foreach (string column in tooltipColumns)
+                    {
+                        geoJson.AppendLine(",");
+                        geoJson.Append($"        \"{column}\": \"N/A\"");
+                    }
+                }
+
+                geoJson.AppendLine();
+                geoJson.AppendLine("      }");
+                geoJson.Append("    }");
+            }
+
+            geoJson.AppendLine();
+            geoJson.AppendLine("  ]");
+            geoJson.AppendLine("}");
+
+            // Calculate the center of the map (average of all polygon coordinates)
+            double avgLat = 0, avgLng = 0;
+            int pointCount = 0;
+            foreach (GMapPolygon polygon in heatmapOverlay.Polygons)
+            {
+                foreach (var point in polygon.Points)
+                {
+                    avgLat += point.Lat;
+                    avgLng += point.Lng;
+                    pointCount++;
+                }
+            }
+            if (pointCount > 0)
+            {
+                avgLat /= pointCount;
+                avgLng /= pointCount;
+            }
+
+            // Generate the HTML content
+            StringBuilder htmlContent = new StringBuilder();
+            htmlContent.AppendLine("<!DOCTYPE html>");
+            htmlContent.AppendLine("<html>");
+            htmlContent.AppendLine("<head>");
+            htmlContent.AppendLine("  <title>Heatmap Dashboard</title>");
+            htmlContent.AppendLine("  <link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css\" />");
+            htmlContent.AppendLine("  <script src=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js\"></script>");
+            htmlContent.AppendLine("  <style>");
+            htmlContent.AppendLine("    body { margin: 0; font-family: Arial, sans-serif; }");
+            htmlContent.AppendLine("    #dashboard { position: absolute; top: 10px; left: 10px; z-index: 1000; background: white; padding: 10px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.3); }");
+            htmlContent.AppendLine("    #map { height: 100vh; width: 100%; }");
+            htmlContent.AppendLine("    .leaflet-tooltip { white-space: pre-line; }");
+            htmlContent.AppendLine("    #year-label { font-size: 16px; margin-bottom: 5px; }");
+            htmlContent.AppendLine("    input[type=range] { width: 200px; }");
+            htmlContent.AppendLine("  </style>");
+            htmlContent.AppendLine("</head>");
+            htmlContent.AppendLine("<body>");
+            htmlContent.AppendLine("  <div id=\"dashboard\">");
+            htmlContent.AppendLine("    <div id=\"year-label\">Year: " + currentYear + "</div>");
+            htmlContent.AppendLine($"    <input type=\"range\" id=\"year-slider\" min=\"{minYear}\" max=\"{maxYear}\" value=\"{currentYear}\" step=\"1\">");
+            htmlContent.AppendLine("  </div>");
+            htmlContent.AppendLine("  <div id=\"map\"></div>");
+            htmlContent.AppendLine("  <script>");
+
+            // Initialize the map
+            htmlContent.AppendLine($"    var map = L.map('map').setView([{avgLat}, {avgLng}], 13);");
+            htmlContent.AppendLine("    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {");
+            htmlContent.AppendLine("      attribution: '© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'");
+            htmlContent.AppendLine("    }).addTo(map);");
+
+            // Add the GeoJSON data
+            htmlContent.AppendLine("    var geojsonData = " + geoJson.ToString() + ";");
+            htmlContent.AppendLine("    var geojsonLayer;");
+
+            // Function to get the color based on load density
+            htmlContent.AppendLine("    function getColor(loadDensity) {");
+            htmlContent.AppendLine("      var brackets = [0, 3, 5, 10, 25, 50, 75, 100, 200, 400, Infinity];");
+            htmlContent.AppendLine("      var bracketIndex = -1;");
+            htmlContent.AppendLine("      for (var i = 0; i < brackets.length - 1; i++) {");
+            htmlContent.AppendLine("        if (loadDensity >= brackets[i] && loadDensity < brackets[i + 1]) {");
+            htmlContent.AppendLine("          bracketIndex = i;");
+            htmlContent.AppendLine("          break;");
+            htmlContent.AppendLine("        }");
+            htmlContent.AppendLine("      }");
+            htmlContent.AppendLine("      var normalized = bracketIndex / (brackets.length - 2);");
+            htmlContent.AppendLine("      if (normalized <= 0.5) {");
+            htmlContent.AppendLine("        var t = normalized / 0.5;");
+            htmlContent.AppendLine("        var r = Math.round(t * 255);");
+            htmlContent.AppendLine("        var g = Math.round(t * 255);");
+            htmlContent.AppendLine("        var b = Math.round((1 - t) * 255);");
+            htmlContent.AppendLine("      } else {");
+            htmlContent.AppendLine("        var t = (normalized - 0.5) / 0.5;");
+            htmlContent.AppendLine("        var r = 255;");
+            htmlContent.AppendLine("        var g = Math.round((1 - t) * 255);");
+            htmlContent.AppendLine("        var b = 0;");
+            htmlContent.AppendLine("      }");
+            htmlContent.AppendLine("      return `rgb(${r}, ${g}, ${b})`;");
+            htmlContent.AppendLine("    }");
+
+            // Function to generate tooltip text
+            htmlContent.AppendLine("    function getTooltipText(feature) {");
+            htmlContent.AppendLine("      var props = feature.properties;");
+            htmlContent.AppendLine("      var tooltipText = '';");
+
+            foreach (string column in tooltipColumns)
+            {
+                htmlContent.AppendLine($"      tooltipText += '{column}: ' + (props['{column}'] || 'N/A') + '\\n';");
+            }
+
+            htmlContent.AppendLine("      return tooltipText;");
+            htmlContent.AppendLine("    }");
+
+            // Function to update the map for a given year
+            htmlContent.AppendLine("    function updateMap(year) {");
+            htmlContent.AppendLine("      if (geojsonLayer) {");
+            htmlContent.AppendLine("        map.removeLayer(geojsonLayer);");
+            htmlContent.AppendLine("      }");
+            htmlContent.AppendLine("      geojsonLayer = L.geoJSON(geojsonData, {");
+            htmlContent.AppendLine("        style: function(feature) {");
+            htmlContent.AppendLine("          var loadDensity = feature.properties['Yük_Yoğunluğu_' + year] || 0;");
+            htmlContent.AppendLine("          return {");
+            htmlContent.AppendLine("            fillColor: getColor(loadDensity),");
+            htmlContent.AppendLine("            fillOpacity: 0.6,");
+            htmlContent.AppendLine("            color: getColor(loadDensity),");
+            htmlContent.AppendLine("            weight: 1");
+            htmlContent.AppendLine("          };");
+            htmlContent.AppendLine("        },");
+            htmlContent.AppendLine("        onEachFeature: function(feature, layer) {");
+            htmlContent.AppendLine("          layer.bindTooltip(getTooltipText(feature), {");
+            htmlContent.AppendLine("            sticky: true,");
+            htmlContent.AppendLine("            direction: 'auto'");
+            htmlContent.AppendLine("          });");
+            htmlContent.AppendLine("        }");
+            htmlContent.AppendLine("      }).addTo(map);");
+            htmlContent.AppendLine("    }");
+
+            // Initialize the map with the current year
+            htmlContent.AppendLine($"    updateMap({currentYear});");
+
+            // Add event listener for the slider
+            htmlContent.AppendLine("    var slider = document.getElementById('year-slider');");
+            htmlContent.AppendLine("    var yearLabel = document.getElementById('year-label');");
+            htmlContent.AppendLine("    slider.addEventListener('input', function() {");
+            htmlContent.AppendLine("      var year = parseInt(slider.value);");
+            htmlContent.AppendLine("      yearLabel.textContent = 'Year: ' + year;");
+            htmlContent.AppendLine("      updateMap(year);");
+            htmlContent.AppendLine("    });");
+
+            // Fit the map to the bounds of the GeoJSON layer
+            htmlContent.AppendLine("    var bounds = L.geoJSON(geojsonData).getBounds();");
+            htmlContent.AppendLine("    map.fitBounds(bounds);");
+
+            htmlContent.AppendLine("  </script>");
+            htmlContent.AppendLine("</body>");
+            htmlContent.AppendLine("</html>");
+
+            // Write the HTML content to the file
+            try
+            {
+                File.WriteAllText(filePath, htmlContent.ToString());
+                MessageBox.Show($"Heatmap exported successfully to {filePath}");
+
+                // Optionally open the HTML file in the default browser
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = filePath,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error exporting heatmap: {ex.Message}");
+            }
+        }
+
+        private async void DEKSimulasyonSonucGoruntule_Click(object sender, EventArgs e)
+        {
+            // Disable the button to prevent multiple clicks while processing
+            DEKCenterAddButton.Enabled = false;
+            DEKSimButton.Enabled = false;
+            try
+            {
+                string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek_distribution_2024_2030_İzmir_düşük.xlsx";
+                DataTable simulationData;
+                try
+                {
+                    // Excel dosyasını aç
+                    using (var package = new ExcelPackage(new FileInfo(filePath)))
+                    {
+                        // Yıl seçimine göre sayfayı seç (SelectedYear değeri, sayfa indeksini temsil eder)
+                        ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
+
+                        // Veriyi DataTable'a yükle
+                        simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
+                    return; // Hata durumunda işlemi sonlandır
+                }
+
+
+                // Log column names for debugging
+                Console.WriteLine("DataTable Columns: " + string.Join(", ", simulationData.Columns.Cast<DataColumn>().Select(c => c.ColumnName)));
+
+                gMapControl_DEK.Overlays.Clear();
+                gMapControl_DEK.Refresh();
+                // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
+                HesaplaMerkezNoktaVeEkle(simulationData);
+                await HaritaUzerindeDEKSimulasyonGosterimi(simulationData);
+
+                MessageBox.Show("Veri başarıyla yüklendi.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
+            }
+            finally
+            {
+                DEKCenterAddButton.Enabled = true;
+                DEKSimButton.Enabled = true;
+            }
         }
 
     }

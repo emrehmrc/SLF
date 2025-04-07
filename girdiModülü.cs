@@ -7,7 +7,6 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using SLF.services;
-using Microsoft.CodeAnalysis.FlowAnalysis;
 using SLF.Services;
 
 
@@ -100,90 +99,7 @@ namespace SLF
             get { return _yearService.HorizonYear; }
         }
 
-        //public bool ExportToExcel(string customPath = null)
-        //{
-        //    try
-        //    {
-        //        // importedDataTable kontrolü
-        //        if (importedDataTable == null || importedDataTable.Rows.Count == 0)
-        //        {
-        //            MessageBox.Show("Aktarılacak veri bulunamadı.",
-        //                "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //            return false;
-        //        }
-
-        //        // Excel dosya yolunu oluştur
-        //        string exportPath = customPath ?? Path.Combine(PathService.BaseDirectory, PathService.FullPath);
-        //        Console.WriteLine("secilen_ilce_dizin: " + exportPath);
-
-        //        // Klasör yoksa oluştur
-        //        Directory.CreateDirectory(Path.GetDirectoryName(exportPath));
-
-        //        // Dosya adını oluştur (tarih-saat ile)
-        //        string fileName = $"{seçilenVeriTipi}_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
-        //        string fullPath = Path.Combine(exportPath, fileName);
-
-        //        // EPPlus ile Excel oluştur
-        //        using (var package = new OfficeOpenXml.ExcelPackage())
-        //        {
-        //            var worksheet = package.Workbook.Worksheets.Add(seçilenVeriTipi);
-
-        //            // Sütun başlıklarını ekle
-        //            for (int col = 1; col <= importedDataTable.Columns.Count; col++)
-        //            {
-        //                worksheet.Cells[1, col].Value = importedDataTable.Columns[col - 1].ColumnName;
-        //                worksheet.Cells[1, col].Style.Font.Bold = true;
-        //            }
-
-        //            // Verileri ekle
-        //            for (int row = 0; row < importedDataTable.Rows.Count; row++)
-        //            {
-        //                for (int col = 0; col < importedDataTable.Columns.Count; col++)
-        //                {
-        //                    worksheet.Cells[row + 2, col + 1].Value = importedDataTable.Rows[row][col];
-        //                }
-        //            }
-
-        //            // Excel dosyasını kaydet
-        //            package.SaveAs(new FileInfo(fullPath));
-        //        }
-
-        //        // Kullanıcıya bilgi ver
-        //        MessageBox.Show($"Veri başarıyla aktarıldı ve {fullPath} konumuna kaydedildi.",
-        //            "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-        //        return true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show($"Veri aktarma sırasında hata oluştu: {ex.Message}",
-        //            "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //        Console.WriteLine($"ExportToExcel Hata: {ex.Message}\n{ex.StackTrace}");
-        //        return false;
-        //    }
-        //}
-        //public int slfEndYear
-        //{
-        //    get { return slfEndYear; }
-        //    set { slfEndYear = value; }
-        //}
-        //protected virtual List<string> Prerequisites { get; } = new List<string>(); 
-
         protected const int HoursInYear = 8760;
-        //public int lastYear
-        //{
-        //    get { return slfStartYear - 1; }
-        //}
-        //public int penultimateYear
-        //{
-        //    get { return slfStartYear - 2; }
-        //}
-        //public int horizonYear
-        //{
-        //    get { return slfStartYear; }
-        //}
-        //protected int lastYear; = DateTime.Now.Year - 1;
-        //protected readonly int penultimateYear = DateTime.Now.Year - 2;
 
         protected const string FileDialogTitle = "Bir veri dosyası seçiniz.";
         protected const string FilterExcelFiles = "Excel dosyaları (*.xlsx)|*.xlsx";
@@ -491,78 +407,7 @@ namespace SLF
                 }
             }
         }
-        /*        protected void ImportProcessedData()
-                {
-                    importedDataTable = currentDataTable.Copy();
-                    dataTablesByType[seçilenVeriTipi] = importedDataTable;
-                }*/
-        //public void ImportProcessedData()
-        //{
-        //    try
-        //    {
-        //        Cursor.Current = Cursors.WaitCursor;
 
-        //        Console.WriteLine("\n=== ImportProcessedData Başlıyor ===");
-
-        //        // CurrentDataTable kontrolü
-        //        if (currentDataTable == null)
-        //        {
-        //            throw new ArgumentNullException("currentDataTable", "CurrentDataTable null olamaz");
-        //        }
-
-        //        // Veriyi kopyala
-        //        importedDataTable = currentDataTable.Copy();
-        //        Console.WriteLine($"Veri kopyalandı - Satır sayısı: {importedDataTable.Rows.Count}");
-        //        Console.WriteLine($"Orijinal seçilenVeriTipi: {seçilenVeriTipi}");
-
-        //        // Key dönüşümü
-        //        if (veri_listesi_requires_database.TryGetValue(seçilenVeriTipi, out string displayKey))
-        //        {
-        //            Console.WriteLine($"Key dönüşümü: {seçilenVeriTipi} -> {displayKey}");
-        //            seçilenVeriTipi = displayKey;
-        //        }
-
-        //        // dataTablesByType null kontrolü
-        //        if (dataTablesByType == null)
-        //        {
-        //            Console.WriteLine("dataTablesByType null, yeni instance oluşturuluyor");
-        //            dataTablesByType = new Dictionary<string, DataTable>();
-        //        }
-
-        //        // Dictionary'e ekle
-        //        if (!dataTablesByType.ContainsKey(seçilenVeriTipi))
-        //        {
-        //            Console.WriteLine($"Yeni veri ekleniyor: {seçilenVeriTipi}");
-        //        }
-        //        else
-        //        {
-        //            Console.WriteLine($"Mevcut veri güncelleniyor: {seçilenVeriTipi}");
-        //        }
-
-        //        dataTablesByType[seçilenVeriTipi] = importedDataTable;
-        //        Console.WriteLine($"Veri eklendi/güncellendi - Key: {seçilenVeriTipi}, Satır sayısı: {importedDataTable.Rows.Count}");
-
-        //        // Mevcut durumu logla
-        //        Console.WriteLine("\nMevcut Dictionary durumu:");
-        //        foreach (var kvp in dataTablesByType)
-        //        {
-        //            Console.WriteLine($"Key: {kvp.Key}, Satır: {kvp.Value?.Rows.Count}");
-        //        }
-
-        //        Console.WriteLine("=== ImportProcessedData Tamamlandı ===\n");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine($"\n!!! ImportProcessedData HATA !!!");
-        //        Console.WriteLine($"Hata Mesajı: {ex.Message}");
-        //        Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-        //        throw;
-        //    }
-        //    finally
-        //    {
-        //        Cursor.Current = Cursors.Default;
-        //    }
-        //}
         public void ImportProcessedData()
         {
             try
@@ -794,56 +639,7 @@ namespace SLF
             // Dosyayı kaydet
             System.IO.File.WriteAllText(filePath, sb.ToString());
         }
-        private void RunRScript(string excelFilePath)
-        {
-            try
-            {
-                string rScriptPath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\Model\begum_senaryolar_deneme.R";
-                string logFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\script_output_log.txt";
 
-                if (!File.Exists(excelFilePath))
-                {
-                    MessageBox.Show("The specified Excel file does not exist.");
-                    return;
-                }
-
-                var process = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "Rscript.exe",
-                        Arguments = $"\"{rScriptPath}\" \"{excelFilePath}\"",
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    }
-                };
-
-                process.Start();
-
-                string output = process.StandardOutput.ReadToEnd();
-                string error = process.StandardError.ReadToEnd();
-
-                process.WaitForExit();
-
-                // Log the output and error
-                File.AppendAllText(logFilePath, $"Output:\n{output}\nError:\n{error}\n\n");
-
-                if (process.ExitCode != 0)
-                {
-                    MessageBox.Show($"R script encountered an error. Check the log file for details: {logFilePath}");
-                }
-                else
-                {
-                    MessageBox.Show("R script başarıyla çalıştırıldı.");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error occurred while running the R script: {ex.Message}");
-            }
-        }
         private DataTable ConvertColumnNamesToUpperCase(DataTable dataTable)
         {
             // Yeni bir DataTable oluşturup kolon adlarını büyük harfe çeviriyoruz
@@ -870,85 +666,6 @@ namespace SLF
             return updatedTable;
         }
 
-        //public void ProcessFileSelection(string seçilenVeriTipi)
-        //{
-        //    this.seçilenVeriTipi = seçilenVeriTipi;
-
-        //    var fileDialog1 = new OpenFileDialog
-        //    {
-        //        Title = FileDialogTitle
-        //    };
-
-        //    if (veri_listesi_requires_xlsx.Contains(seçilenVeriTipi))
-        //    {
-        //        fileDialog1.Filter = combinedExcelFilter;
-        //        if (fileDialog1.ShowDialog() == DialogResult.OK)
-        //        {
-        //            string selectedFileName = fileDialog1.FileName;
-        //            currentDataTable = ProcessExcelFile(selectedFileName, seçilenVeriTipi);
-        //        }
-        //        else throw new NoFileSelectedException("Dosya seçimi gerçekleştirilemedi.");
-        //    }
-        //    else if (veri_listesi_requires_csv.Contains(seçilenVeriTipi))
-        //    {
-        //        fileDialog1.Filter = combinedCsvFilter;
-        //        if (fileDialog1.ShowDialog() == DialogResult.OK)
-        //        {
-        //            string selectedFileName = fileDialog1.FileName;
-        //            currentDataTable = ProcessCsvFile(selectedFileName);
-        //        }
-        //        else throw new NoFileSelectedException("Dosya seçimi gerçekleştirilemedi.");
-        //    }
-        //    else if (veri_listesi_requires_tabular.Contains(seçilenVeriTipi))
-        //    {
-        //        fileDialog1.Filter = combinedTabularFilter;
-        //        if (fileDialog1.ShowDialog() == DialogResult.OK)
-        //        {
-        //            string selectedFileName = fileDialog1.FileName;
-        //            currentDataTable = ProcessTabularFile(selectedFileName);
-        //        }
-        //        else throw new NoFileSelectedException("Dosya seçimi gerçekleştirilemedi.");
-        //    }
-        //    else if (veri_listesi_requires_database.Keys.Contains(seçilenVeriTipi))
-        //    {
-        //        try
-        //        {
-
-        //            //currentDataTable = DatabaseHelper.LoadTable(seçilenVeriTipi);
-        //            currentDataTable = ProcesssqlFile(seçilenVeriTipi);
-        //            Console.WriteLine(seçilenVeriTipi);                    
-        //            if (currentDataTable.Columns.Contains("ID"))
-        //            {
-        //                currentDataTable.Columns.Remove("ID");
-        //                MessageBox.Show("ID kolonu kaldırıldı.", "Bilgilendirme", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //                Console.WriteLine("hi");
-        //            }
-        //            else
-        //            {
-        //                MessageBox.Show("ID kolonu bulunamadı.", "Bilgilendirme", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //            }
-        //            //if (seçilenVeriTipi == "EA_Sarj_verileri")
-        //            //{
-        //            //    //seçilenVeriTipi = "EA Şarj Verileri";
-        //            //    //dataTablesByType[seçilenVeriTipi] = importedDataTable;
-        //            //}
-
-        //            currentDataTable = ConvertColumnNamesToUpperCase(currentDataTable);
-        //            Console.WriteLine(seçilenVeriTipi);
-        //            Console.WriteLine(currentDataTable.Rows.Count);
-
-
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            throw new Exception($"Veritabanından veri alınırken hata oluştu: {ex.Message}");
-        //        }
-        //    }
-        //    else
-        //    {
-        //        throw new NoFileSelectedException("Bu veri tipi için atanmış bir dosya veya veritabanı seçimi prosedürü henüz yok.");
-        //    }
-        //}
         public void ProcessFileSelection(string seçilenVeriTipi)
         {
             try

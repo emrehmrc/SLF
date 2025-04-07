@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -131,6 +132,7 @@ namespace SLF
                 }
             }
         }
+
         private void ImputeIlceAdi()
         {
             // "ILCE_ADI" kolonundaki null değerleri sayma ve en çok tekrarlanan değeri bulma
@@ -150,6 +152,7 @@ namespace SLF
                 return;
             }
 
+
             // "ILCE_ADI" kolonundaki null değerleri en çok kullanılan değer ile doldurma
             foreach (DataRow row in currentDataTable.Rows)
             {
@@ -163,11 +166,11 @@ namespace SLF
         }
 
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = WarningErrorBoundary(0.1f);
-        
+
         private readonly Dictionary<string, (float Min, float Max)> minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
         {
-            { "DEK_X_KOORDINAT", (float.MinValue, float.MaxValue) }, // TODO: Update these values from the other data // kaldırıcak tartısılacak 
-            { "DEK_Y_KOORDINAT", (float.MinValue, float.MaxValue) } // TODO: Update these values from the other data 
+            { "DEK_X_KOORDINAT", (float.MinValue, float.MaxValue) }, // TODO: Update these values from the other data
+            { "DEK_Y_KOORDINAT", (float.MinValue, float.MaxValue) } // TODO: Update these values from the other data
             
         };
         private void ReportCoordinatesOutOfLimits()
@@ -277,6 +280,3 @@ namespace SLF
 
     }
 }
-
-
-

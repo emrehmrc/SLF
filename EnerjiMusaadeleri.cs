@@ -14,52 +14,52 @@ namespace SLF
 
     {
         protected override List<string> Prerequisites => new List<string> { "DTR Verileri", "Yeni Projelendirilmiş DTR Verileri" };
-        private void ImputeMustakilOlmayanTrafoID()
+        private int veerUniqID = 1; // Class-level field
+        private void ImputeMustakilOlmayanTrafoID(List<int> missingCoordinatesRows, List<int> imputedTrafoRows, List<int> noNearestTrafoRows, List<int> newTrafoCreatedRows)
         {
-            int veerUniqID = 1;
-            // "DTR Verileri" tablosundan trafo bilgilerini al
             DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
             DataTable yeniProjelendirilmisTrafoDataTable = dataTablesByType["Yeni Projelendirilmiş DTR Verileri"];
+
             var trafoList = trafoDataTable.AsEnumerable()
-                                          .Select(row => new
-                                          {
-                                              TrafoKodu = row["TRAFO_KODU"].ToString(),
-                                              TrafoXKoordinat = Convert.ToDouble(row["TRAFO_X_KOORDINAT"]),
-                                              TrafoYKoordinat = Convert.ToDouble(row["TRAFO_Y_KOORDINAT"])
-                                          })
-                                          .ToList();
-            var yeniTrafoList = yeniProjelendirilmisTrafoDataTable.AsEnumerable()
-                    .Where(row => row["PROJELENDIRILMIS_TRAFO_ID"] != DBNull.Value &&
-                    row["PROJELENDIRILMIS_TRAFO_X_KOORDINAT"] != DBNull.Value &&
-                    row["PROJELENDIRILMIS_TRAFO_Y_KOORDINAT"] != DBNull.Value)
-
-                  .Select(row => new
-                  {
-                      TrafoKodu = row["PROJELENDIRILMIS_TRAFO_ID"].ToString(),
-                      TrafoXKoordinat = Convert.ToDouble(row["PROJELENDIRILMIS_TRAFO_X_KOORDINAT"]),
-                      TrafoYKoordinat = Convert.ToDouble(row["PROJELENDIRILMIS_TRAFO_Y_KOORDINAT"])
-                  })
-                  .ToList();
-
-            foreach (DataRow row in currentDataTable.Rows)
-            {
-                // "ENERJI_MUSAADE_GERILIM_SEVIYESI" değerine bakar ve "AG" ise kontrol eder
-                if (!IsNullLike(row["ENERJI_MUSAADE_GERILIM_SEVIYESI"]) && row["ENERJI_MUSAADE_GERILIM_SEVIYESI"].ToString() == "AG")
+                .Select(row => new
                 {
-                    // "ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL" değeri 0 ise kontrol eder
-                    if (!IsNullLike(row["ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL"]) && row["ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL"].ToString() == "0")
+                    TrafoKodu = row["TRAFO_KODU"].ToString(),
+                    TrafoXKoordinat = Convert.ToDouble(row["TRAFO_X_KOORDINAT"]),
+                    TrafoYKoordinat = Convert.ToDouble(row["TRAFO_Y_KOORDINAT"])
+                })
+                .ToList();
+
+            var yeniTrafoList = yeniProjelendirilmisTrafoDataTable.AsEnumerable()
+                .Where(row => row["PROJELENDIRILMIS_TRAFO_ID"] != DBNull.Value &&
+                              row["PROJELENDIRILMIS_TRAFO_X_KOORDINAT"] != DBNull.Value &&
+                              row["PROJELENDIRILMIS_TRAFO_Y_KOORDINAT"] != DBNull.Value)
+                .Select(row => new
+                {
+                    TrafoKodu = row["PROJELENDIRILMIS_TRAFO_ID"].ToString(),
+                    TrafoXKoordinat = Convert.ToDouble(row["PROJELENDIRILMIS_TRAFO_X_KOORDINAT"]),
+                    TrafoYKoordinat = Convert.ToDouble(row["PROJELENDIRILMIS_TRAFO_Y_KOORDINAT"])
+                })
+                .ToList();
+
+            for (int i = 0; i < currentDataTable.Rows.Count; i++)
+            {
+                DataRow row = currentDataTable.Rows[i];
+
+                if (!IsNullLike(row["ENERJI_MUSAADE_GERILIM_SEVIYESI"]) &&
+                    row["ENERJI_MUSAADE_GERILIM_SEVIYESI"].ToString() == "AG")
+                {
+                    if (!IsNullLike(row["ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL"]) &&
+                        row["ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL"].ToString() == "0")
                     {
                         string connectedTrafo = row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"].ToString();
-                        // "ENERJI_MUSAADE_X_KOORDINAT" veya "ENERJI_MUSAADE_Y_KOORDINAT" değeri IsNullLike ise kontrol eder
+
                         if (IsNullLike(row["ENERJI_MUSAADE_X_KOORDINAT"]) || IsNullLike(row["ENERJI_MUSAADE_Y_KOORDINAT"]))
                         {
                             row["ENERJI_MUSAADE_GERILIM_SEVIYESI"] = "#N/A";
+                            missingCoordinatesRows.Add(i);
                         }
-
-                        // "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID" değeri IsNullLike ise veya geçerli trafo kodları arasında değilse kontrol eder
                         else if (IsNullLike(connectedTrafo) || !trafoList.Any(t => t.TrafoKodu == connectedTrafo))
                         {
-                            // En yakın trafoyu bul ve "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID" olarak ayarla
                             double enYakinMesafe = double.MaxValue;
                             string enYakinTrafoKodu = null;
                             double musadeXKoordinat = Convert.ToDouble(row["ENERJI_MUSAADE_X_KOORDINAT"]);
@@ -67,8 +67,10 @@ namespace SLF
 
                             foreach (var trafo in trafoList)
                             {
-                                double mesafe = Math.Sqrt(Math.Pow(trafo.TrafoXKoordinat - musadeXKoordinat, 2) + Math.Pow(trafo.TrafoYKoordinat - musadeYKoordinat, 2));
-
+                                double mesafe = Math.Sqrt(
+                                    Math.Pow(trafo.TrafoXKoordinat - musadeXKoordinat, 2) +
+                                    Math.Pow(trafo.TrafoYKoordinat - musadeYKoordinat, 2)
+                                );
                                 if (mesafe < enYakinMesafe)
                                 {
                                     enYakinMesafe = mesafe;
@@ -79,40 +81,109 @@ namespace SLF
                             if (enYakinTrafoKodu != null)
                             {
                                 row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"] = enYakinTrafoKodu;
+                                imputedTrafoRows.Add(i);
                             }
                             else
                             {
                                 row["ENERJI_MUSAADE_GERILIM_SEVIYESI"] = "#N/A";
+                                noNearestTrafoRows.Add(i);
                             }
                         }
                     }
-                    else if (!IsNullLike(row["ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL"]) && row["ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL"].ToString() == "1")
-                    {
-                        string connectedTrafo = row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"].ToString();
-                        // "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID" değeri IsNullLike ise veya geçerli trafo kodları arasında değilse kontrol eder
-                        if (IsNullLike(connectedTrafo) || !yeniTrafoList.Any(t => t.TrafoKodu == connectedTrafo)) // TODO
-                        {
-                            // Yeni Trafo listesine satır ekle Unique ID ile VEER-uniq-0001
-                            string uniqueId = $"VEER-uniq-{veerUniqID++}";
-                            // Yeni Trafo listesine ayni satida kapasiteyi doldur (enerji musaadesindeki baglanti gucunun 10 katini al)
-                            double yeniTrafoKapasitesi = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]) * 10;
-                            int roundedYeniTrafoKapasitesi = RoundUpTrafoKapasitesi(yeniTrafoKapasitesi);
-                            // TRAFO_KAPASITE_LISTESI listesinde bi ustundekine yuvarla bu degerin
-                            yeniProjelendirilmisTrafoDataTable.Rows.Add(
-                                uniqueId,
-                                "",
-                                "",
-                                "",
-                                roundedYeniTrafoKapasitesi,
-                                roundedYeniTrafoKapasitesi,
-                                lastYear
-                            );
+                }
 
-                        }
+                if (!IsNullLike(row["ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL"]) &&
+                    row["ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL"].ToString() == "1")
+                {
+                    string connectedTrafo = row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"].ToString();
+                    // Skip if the row already has a VEER-uniq- ID
+                    if (!IsNullLike(connectedTrafo) && connectedTrafo.StartsWith("VEER-uniq-"))
+                    {
+                        continue;
+                    }
+                    if (IsNullLike(connectedTrafo) || !yeniTrafoList.Any(t => t.TrafoKodu == connectedTrafo))
+                    {
+                        Console.WriteLine($"Row {i}: Creating new transformer ID for independent transformer. Current veerUniqID: {veerUniqID}");
+
+                        string uniqueId = $"VEER-uniq-{veerUniqID++}";
+                        double yeniTrafoKapasitesi = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]) * 10;
+                        int roundedYeniTrafoKapasitesi = RoundUpTrafoKapasitesi(yeniTrafoKapasitesi);
+                        row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"] = uniqueId;
+                        yeniProjelendirilmisTrafoDataTable.Rows.Add(
+                            uniqueId,
+                            "",
+                            "",
+                            "",
+                            roundedYeniTrafoKapasitesi,
+                            roundedYeniTrafoKapasitesi,
+                            lastYear
+                        );
+                        newTrafoCreatedRows.Add(i);
                     }
                 }
             }
         }
+        private void ReportMustakilOlmayanTrafo()
+        {
+            List<int> missingCoordinatesRows = new List<int>();
+            List<int> imputedTrafoRows = new List<int>();
+            List<int> noNearestTrafoRows = new List<int>();
+            List<int> newTrafoCreatedRows = new List<int>();
+
+            // Perform imputation and collect row indices
+            ImputeMustakilOlmayanTrafoID(missingCoordinatesRows, imputedTrafoRows, noNearestTrafoRows, newTrafoCreatedRows);
+
+            // Log summaries for non-independent transformer scenarios
+            if (missingCoordinatesRows.Count > 0)
+            {
+                string message = $"Eksik koordinatlar nedeniyle {missingCoordinatesRows.Count} satır için gerilim seviyesi '#N/A' olarak ayarlanacaktır. (Satır: {string.Join(", ", missingCoordinatesRows)})";
+                warningDataTable.Rows.Add(
+                    "ENERJI_MUSAADE_X_KOORDINAT, ENERJI_MUSAADE_Y_KOORDINAT",
+                    "Koordinat Validasyonu",
+                    $"Toplam: {missingCoordinatesRows.Count} satır",
+                    message
+                );
+            }
+
+            if (imputedTrafoRows.Count > 0)
+            {
+                string message = $"Eksik ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID'ler en yakın TRAFO_ID ile Toplam: {imputedTrafoRows.Count} satır güncellenecektir. (Satır: {string.Join(", ", imputedTrafoRows)})";
+                warningDataTable.Rows.Add(
+                    "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID",
+                    "Koordinat Bazlı TrafoID Güncelleme",
+                    $"Toplam: {imputedTrafoRows.Count} satır",
+                    message
+                );
+            }
+
+            if (noNearestTrafoRows.Count > 0)
+            {
+                string message = $"En yakın trafo bulunamadı, {noNearestTrafoRows.Count} satır için gerilim seviyesi '#N/A' olarak ayarlandı. Bu satırlar geçersiz olduğu için silinecektir. (Satır: {string.Join(", ", noNearestTrafoRows)})";
+                infoDataTable.Rows.Add(
+                    "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID",
+                    "Koordinat Bazlı TrafoID Validasyonu",
+                    $"Toplam: {noNearestTrafoRows.Count} satır",
+                    message
+                );
+            }
+
+            // Log summary for independent transformer scenario
+            if (newTrafoCreatedRows.Count > 0)
+            {
+                string message = $"Unique ENERJİ_MUSAADE_BAGLANACAGI_TRAFO_ID (VEER-uniq-{veerUniqID - newTrafoCreatedRows.Count} to VEER-uniq-{veerUniqID - 1}) oluşturulacak ve Yeni Projelendirme DTR listesine eklenecektir. Toplam: {newTrafoCreatedRows.Count} satır. (Satır: {string.Join(", ", newTrafoCreatedRows)})";
+                warningDataTable.Rows.Add(
+                    "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID",
+                    "Müstakil TrafoID Oluşturma",
+                    $"Toplam: {newTrafoCreatedRows.Count} satır",
+                    message
+                );
+            }
+            else
+            {
+                Console.WriteLine("No rows required new transformer IDs for independent transformers.");
+            }
+        }
+
         private void RemoveDuplicateRows()
         {
             // Step 1: Create a HashSet to track unique values of ENERJI_MUSAADE_NO
@@ -149,326 +220,238 @@ namespace SLF
             // Log the removal results
             Console.WriteLine($"Total Rows Removed: {rowsToRemove.Count}");
             Console.WriteLine($"Remaining Rows After Removal: {remainingRowCount}");
+
+            // Step 5: Log to infoDataTable if duplicates were found and removed
+            if (rowsToRemove.Count > 0)
+            {
+                float duplicatePercentage = (float)rowsToRemove.Count / initialRowCount;
+                string message = $"Tekrarlayan ENERJI_MUSAADE_NO değerleri nedeniyle {rowsToRemove.Count} satır silindi. Toplam: {rowsToRemove.Count} satır, Percentage: {duplicatePercentage:P1}. (Satır: {string.Join(", ", rowsToRemove)})";
+                infoDataTable.Rows.Add(
+                    "ENERJI_MUSAADE_NO",
+                    "Tekrarlayan Satır Validasyonu",
+                    $"Toplam: {rowsToRemove.Count} satır",
+                    message
+                );
+            }
         }
 
-
-        /*        private void ConvertAndValidateBaglantiGucu()
-                {
-                    // Step 1: Convert ENERJI_MUSAADE_BAGLANTI_GUCU from Watt to Kilowatt
-                    foreach (DataRow row in currentDataTable.Rows)
-                    {
-                        if (!IsNullLike(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]))
-                        {
-                            double baglantiGucuWatt = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
-                            row["ENERJI_MUSAADE_BAGLANTI_GUCU"] = baglantiGucuWatt / 1000; // Convert to kW
-                        }
-                    }
-
-                    // Step 2: Cross-check with "DTR Verileri" TRAFO_KAPASITESI
-                    DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
-                    List<int> rowsToRemove = new List<int>();
-
-                    foreach (DataRow row in currentDataTable.Rows)
-                    {
-                        // Co-condition: Check if ENERJI_MUSAADE_GERILIM_SEVIYESI is "AG"
-                        if (IsNullLike(row["ENERJI_MUSAADE_GERILIM_SEVIYESI"]) || row["ENERJI_MUSAADE_GERILIM_SEVIYESI"].ToString() != "AG")
-                            continue;
-
-                        // Get the transformer ID
-                        string trafoID = row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"].ToString();
-
-                        // Skip if transformer ID is null or invalid
-                        if (IsNullLike(trafoID))
-                            continue;
-
-                        // Find the corresponding transformer in "DTR Verileri"
-                        var matchingTrafo = trafoDataTable.AsEnumerable()
-                                                          .FirstOrDefault(t => t["TRAFO_KODU"].ToString() == trafoID);
-
-                        if (matchingTrafo != null)
-                        {
-                            // Get TRAFO_KAPASITESI and ENERJI_MUSAADE_BAGLANTI_GUCU
-                            double trafoKapasitesi = Convert.ToDouble(matchingTrafo["TRAFO_KAPASITESI"]);
-                            double baglantiGucuKW = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
-
-                            // Check if ENERJI_MUSAADE_BAGLANTI_GUCU exceeds 60% of TRAFO_KAPASITESI
-                            if (baglantiGucuKW > trafoKapasitesi * 0.6)
-                            {
-                                rowsToRemove.Add(currentDataTable.Rows.IndexOf(row)); // Mark row for removal
-                            }
-                        }
-                    }
-
-                    // Step 3: Remove invalid rows
-                    RemoveCombinedRows(rowsToRemove);
-                }
-        */
-
-        /*        private void ConvertAndValidateBaglantiGucu()
-                {
-                    // Step 1: Convert ENERJI_MUSAADE_BAGLANTI_GUCU from Watt to Kilowatt
-                    foreach (DataRow row in currentDataTable.Rows)
-                    {
-                        if (!IsNullLike(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]))
-                        {
-                            double baglantiGucuWatt = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
-                            row["ENERJI_MUSAADE_BAGLANTI_GUCU"] = baglantiGucuWatt / 1000; // Convert to kW
-                        }
-                    }
-
-                    // Step 2: Cross-check with "DTR Verileri" TRAFO_KAPASITESI
-                    DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
-                    List<int> rowsToRemove = new List<int>();
-                    List<string> removedRowsDetails = new List<string>();
-
-                    foreach (DataRow row in currentDataTable.Rows)
-                    {
-                        // Co-condition: Check if ENERJI_MUSAADE_GERILIM_SEVIYESI is "AG"
-                        if (IsNullLike(row["ENERJI_MUSAADE_GERILIM_SEVIYESI"]) || row["ENERJI_MUSAADE_GERILIM_SEVIYESI"].ToString() != "AG")
-                            continue;
-
-                        // Check if ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID exists and is valid
-                        string trafoID = row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"]?.ToString();
-                        string enerjiMusaadeNo = row["ENERJI_MUSAADE_NO"]?.ToString();
-
-                        if (IsNullLike(trafoID))
-                        {
-                            removedRowsDetails.Add($"Row Skipped -> ENERJI_MUSAADE_NO: {enerjiMusaadeNo}, ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID is missing");
-                            continue;
-                        }
-
-                        // Find the corresponding transformer in "DTR Verileri"
-                        var matchingTrafo = trafoDataTable.AsEnumerable()
-                                                          .FirstOrDefault(t => t["TRAFO_KODU"].ToString() == trafoID);
-
-                        if (matchingTrafo != null)
-                        {
-                            // Get TRAFO_KAPASITESI and ENERJI_MUSAADE_BAGLANTI_GUCU
-                            double trafoKapasitesi = Convert.ToDouble(matchingTrafo["TRAFO_KAPASITESI"]);
-                            double baglantiGucuKW = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
-
-                            // Check if ENERJI_MUSAADE_BAGLANTI_GUCU exceeds 60% of TRAFO_KAPASITESI
-                            if (baglantiGucuKW > trafoKapasitesi * 0.6)
-                            {
-                                rowsToRemove.Add(currentDataTable.Rows.IndexOf(row));
-
-                                // Calculate percentage and add details to removed rows list
-                                double percentage = (baglantiGucuKW / trafoKapasitesi) * 100;
-                                removedRowsDetails.Add($"Removed Row -> ENERJI_MUSAADE_NO: {enerjiMusaadeNo}, ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID: {trafoID}, BaglantiGucuKW: {baglantiGucuKW:F2}, Percentage of Capacity: {percentage:F2}%");
-                            }
-                        }
-                        else
-                        {
-                           // removedRowsDetails.Add($"Row Skipped -> ENERJI_MUSAADE_NO: {enerjiMusaadeNo}, ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID: {trafoID} not found in DTR Verileri");
-                        }
-                    }
-
-                    // Log removed rows details
-                    Console.WriteLine($"Rows Removed or Skipped Due to Condition (baglantiGucuKW > 60% of TRAFO_KAPASITESI):");
-                    foreach (var detail in removedRowsDetails)
-                    {
-                        Console.WriteLine(detail);
-                    }
-
-                    // Step 3: Remove invalid rows
-                    RemoveCombinedRows(rowsToRemove);
-
-                    // Log summary
-                    Console.WriteLine($"Total Rows Removed: {rowsToRemove.Count}");
-                    Console.WriteLine($"Remaining Rows After Removal: {currentDataTable.Rows.Count}");
-                }*/
-
-        private void ConvertAndValidateBaglantiGucu()
+        private List<(DataRow row, int index)> ConvertAndValidateBaglantiGucu()
         {
-            // Step 1: Convert ENERJI_MUSAADE_BAGLANTI_GUCU from Watt to Kilowatt
+            var removedRowsWithIndices = new List<(DataRow row, int index)>();
+
+            // Step 1: Convert ENERJI_MUSAADE_BAGLANTI_GUCU from watts to kilowatts
             foreach (DataRow row in currentDataTable.Rows)
             {
                 if (!IsNullLike(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]))
                 {
-                    double baglantiGucuWatt = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
-                    row["ENERJI_MUSAADE_BAGLANTI_GUCU"] = baglantiGucuWatt / 1000; // Convert to kW
-                }
-            }
-
-            // Step 2: Cross-check with "DTR Verileri" TRAFO_KAPASITESI
-            DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
-            List<int> rowsToRemove = new List<int>();
-            List<string> removedRowsDetails = new List<string>();
-
-            foreach (DataRow row in currentDataTable.Rows)
-            {
-                // Co-condition: Check if ENERJI_MUSAADE_GERILIM_SEVIYESI is "AG"
-                if (IsNullLike(row["ENERJI_MUSAADE_GERILIM_SEVIYESI"]) || row["ENERJI_MUSAADE_GERILIM_SEVIYESI"].ToString() != "AG")
-                    continue;
-
-                // Check if ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID exists and is valid
-                string trafoID = row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"]?.ToString();
-                string enerjiMusaadeNo = row["ENERJI_MUSAADE_NO"]?.ToString();
-
-                if (IsNullLike(trafoID))
-                    continue;
-
-                // Find the corresponding transformer in "DTR Verileri"
-                var matchingTrafo = trafoDataTable.AsEnumerable()
-                                                  .FirstOrDefault(t => t["TRAFO_KODU"].ToString() == trafoID);
-
-                if (matchingTrafo != null)
-                {
-                    // Get TRAFO_KAPASITESI and ENERJI_MUSAADE_BAGLANTI_GUCU
-                    double trafoKapasitesi = Convert.ToDouble(matchingTrafo["TRAFO_KAPASITESI"]);
-                    double baglantiGucuKW = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
-
-                    // Check if ENERJI_MUSAADE_BAGLANTI_GUCU exceeds 60% of TRAFO_KAPASITESI
-                    if (baglantiGucuKW > trafoKapasitesi * 0.6)
+                    try
                     {
-                        rowsToRemove.Add(currentDataTable.Rows.IndexOf(row));
-
-                        // Calculate percentage and add details to removed rows list
-                        double percentage = (baglantiGucuKW / trafoKapasitesi) * 100;
-                        string detail = $"Removed Row -> ENERJI_MUSAADE_NO: {enerjiMusaadeNo}, ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID: {trafoID}, BaglantiGucuKW: {baglantiGucuKW:F2}, Percentage of Capacity: {percentage:F2}%";
-
-                        // Add to log and print to output window
-                        removedRowsDetails.Add(detail);
-                        Console.WriteLine(detail); // Print to Visual Studio Output Window
+                        double baglantiGucuWatt = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
+                        row["ENERJI_MUSAADE_BAGLANTI_GUCU"] = baglantiGucuWatt / 1000;
+                    }
+                    catch (FormatException)
+                    {
+                        // If the value can't be converted to double, mark the row for removal
+                        int index = currentDataTable.Rows.IndexOf(row);
+                        removedRowsWithIndices.Add((row, index));
                     }
                 }
             }
 
-            // Step 3: Log removed rows details to the specified static path
-            string logFilePath = @"C:\Users\batuhan.yetis\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\RemovedRowsLog.txt";
-            File.WriteAllLines(logFilePath, removedRowsDetails);
+            // Step 2: Validate connection power against transformer capacity for AG rows
+            DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+            for (int i = 0; i < currentDataTable.Rows.Count; i++)
+            {
+                DataRow row = currentDataTable.Rows[i];
+                if (row["ENERJI_MUSAADE_GERILIM_SEVIYESI"]?.ToString() != "AG") continue;
 
-            // Output log location to console
-            Console.WriteLine($"Removed rows have been logged to: {logFilePath}");
+                string trafoID = row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"]?.ToString();
+                if (IsNullLike(trafoID)) continue;
 
-            // Step 4: Remove invalid rows
-            RemoveCombinedRows(rowsToRemove);
+                var matchingTrafo = trafoDataTable.AsEnumerable()
+                    .FirstOrDefault(t => t["TRAFO_KODU"].ToString() == trafoID);
+                if (matchingTrafo == null) continue;
 
-            // Log summary
-            Console.WriteLine($"Total Rows Removed: {rowsToRemove.Count}");
-            Console.WriteLine($"Remaining Rows After Removal: {currentDataTable.Rows.Count}");
+                // Skip if ENERJI_MUSAADE_BAGLANTI_GUCU is NULL (will be handled by ReportNullCounts)
+                if (IsNullLike(row["ENERJI_MUSAADE_BAGLANTI_GUCU"])) continue;
+
+                try
+                {
+                    double trafoKapasitesi = Convert.ToDouble(matchingTrafo["TRAFO_KAPASITESI"]);
+                    double baglantiGucuKW = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
+
+                    if (baglantiGucuKW > trafoKapasitesi * 0.6)
+                    {
+                        removedRowsWithIndices.Add((row, i));
+                    }
+                }
+                catch (FormatException)
+                {
+                    // If conversion fails, mark the row for removal
+                    removedRowsWithIndices.Add((row, i));
+                }
+            }
+
+            return removedRowsWithIndices;
         }
-        private void ReportRemovedRows()
+
+        private void ReportRemovedRows(List<(DataRow row, int index)> removedRowsWithIndices)
         {
-            // Step 1: Convert ENERJI_MUSAADE_BAGLANTI_GUCU from Watt to Kilowatt
-            foreach (DataRow row in currentDataTable.Rows)
-            {
-                if (!IsNullLike(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]))
-                {
-                    double baglantiGucuWatt = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
-                    row["ENERJI_MUSAADE_BAGLANTI_GUCU"] = baglantiGucuWatt / 1000; // Convert to kW
-                }
-            }
+            if (removedRowsWithIndices.Count == 0) return;
 
-            // Step 2: Cross-check with "DTR Verileri" TRAFO_KAPASITESI
+            // Get trafo data ONCE (optimization)
             DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
-            List<string> removedRowsDetails = new List<string>();
 
-            foreach (DataRow row in currentDataTable.Rows)
+            // Collect indices and categorize by reason
+            List<int> rowIndices = new List<int>();
+            int missingTrafoIdCount = 0;
+            int invalidTrafoCount = 0;
+            int exceededCapacityCount = 0;
+            int dataCorruptionCount = 0;
+
+            foreach (var (row, index) in removedRowsWithIndices)
             {
-                // Co-condition: Check if ENERJI_MUSAADE_GERILIM_SEVIYESI is "AG"
-                if (IsNullLike(row["ENERJI_MUSAADE_GERILIM_SEVIYESI"]) || row["ENERJI_MUSAADE_GERILIM_SEVIYESI"].ToString() != "AG")
-                    continue;
-
-                // Check if ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID exists and is valid
+                rowIndices.Add(index);
                 string trafoID = row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"]?.ToString();
-                string enerjiMusaadeNo = row["ENERJI_MUSAADE_NO"]?.ToString();
 
-                if (IsNullLike(trafoID))
-                    continue;
-
-                // Find the corresponding transformer in "DTR Verileri"
-                var matchingTrafo = trafoDataTable.AsEnumerable()
-                                                  .FirstOrDefault(t => t["TRAFO_KODU"].ToString() == trafoID);
-
-                if (matchingTrafo != null)
+                // Case 1: Missing or empty trafoID
+                if (string.IsNullOrEmpty(trafoID))
                 {
-                    // Get TRAFO_KAPASITESI and ENERJI_MUSAADE_BAGLANTI_GUCU
-                    double trafoKapasitesi = Convert.ToDouble(matchingTrafo["TRAFO_KAPASITESI"]);
-                    double baglantiGucuKW = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
+                    missingTrafoIdCount++;
+                    continue;
+                }
 
-                    // Check if ENERJI_MUSAADE_BAGLANTI_GUCU exceeds 60% of TRAFO_KAPASITESI
+                // Case 2: Invalid transformer
+                var matchingTrafo = trafoDataTable.AsEnumerable()
+                    .FirstOrDefault(t => t["TRAFO_KODU"].ToString() == trafoID);
+                if (matchingTrafo == null)
+                {
+                    invalidTrafoCount++;
+                    continue;
+                }
+
+                // Case 3: Check for exceeded capacity or data corruption
+                if (IsNullLike(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]))
+                {
+                    dataCorruptionCount++; // Should be handled by ReportNullCounts, but log here for completeness
+                    continue;
+                }
+
+                try
+                {
+                    double baglantiGucuKW = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
+                    double trafoKapasitesi = Convert.ToDouble(matchingTrafo["TRAFO_KAPASITESI"]);
+
                     if (baglantiGucuKW > trafoKapasitesi * 0.6)
                     {
-                        // Calculate percentage and add details to removed rows list
-                        double percentage = (baglantiGucuKW / trafoKapasitesi) * 100;
-                        string detail = $"ENERJI_MUSAADE_NO: {enerjiMusaadeNo}, TRAFO_ID: {trafoID}, BaglantiGucuKW: {baglantiGucuKW:F2}, Percentage of Capacity: {percentage:F2}%";
-
-                        // Add removed row details to infoDataTable
-                        infoDataTable.Rows.Add(new object[]
-                        {
-                    enerjiMusaadeNo,
-                    "Removed Rows Report",
-                    detail,
-                    "BaglantiGucuKW exceeds 60% of TRAFO_KAPASITESI"
-                        });
-
-                        // Add to log and print to console
-                        removedRowsDetails.Add(detail);
-                        Console.WriteLine($"Row removed: {detail}");
+                        exceededCapacityCount++;
+                    }
+                    else
+                    {
+                        dataCorruptionCount++; // Row was removed for another reason (e.g., invalid format in first loop)
                     }
                 }
+                catch (FormatException)
+                {
+                    dataCorruptionCount++;
+                }
             }
-            Console.WriteLine($"Total Rows Removed Due to Percentage Validation: {removedRowsDetails.Count}");
-        }
 
+            // Create a summary message
+            List<string> reasons = new List<string>();
+            if (missingTrafoIdCount > 0) reasons.Add($"{missingTrafoIdCount} satır eksik TRAFO_ID nedeniyle");
+            if (invalidTrafoCount > 0) reasons.Add($"{invalidTrafoCount} satır geçersiz trafo nedeniyle");
+            if (exceededCapacityCount > 0) reasons.Add($"{exceededCapacityCount} satır trafo kapasitesinin %60'ını aştığı için");
+            if (dataCorruptionCount > 0) reasons.Add($"{dataCorruptionCount} satır veri bozulması nedeniyle");
+
+            string summaryMessage = $"Silinen Satır Özeti: {string.Join(", ", reasons)}. (Satır: {string.Join(", ", rowIndices)})";
+
+            // Log the summary
+            infoDataTable.Rows.Add(
+                "ENERJI_MUSAADE_BAGLANTI_GUCU,TRAFO_KAPASITESI",
+                "Kapasite Aşım Validasyonu",
+                $"Toplam: {removedRowsWithIndices.Count} satır",
+                summaryMessage
+            );
+        }
 
         private void ReportOGBaglanacagiTrafo()
         {
-            int invalidCount = 0;
+            int totalRows = currentDataTable.Rows.Count;
+            List<int> invalidRows = new List<int>();
 
-            foreach (DataRow row in currentDataTable.Rows)
+            // Process all rows to collect invalid ones
+            for (int i = 0; i < currentDataTable.Rows.Count; i++)
             {
-                // "ENERJI_MUSAADE_GERILIM_SEVIYESI" değerine bakar ve "OG" ise kontrol eder
-                if (!IsNullLike(row["ENERJI_MUSAADE_GERILIM_SEVIYESI"]) && row["ENERJI_MUSAADE_GERILIM_SEVIYESI"].ToString() == "OG")
+                DataRow row = currentDataTable.Rows[i];
+                if (!IsNullLike(row["ENERJI_MUSAADE_GERILIM_SEVIYESI"]) &&
+                    row["ENERJI_MUSAADE_GERILIM_SEVIYESI"].ToString() == "OG")
                 {
-                    // "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID" değeri IsNullLike ise kontrol eder
                     if (IsNullLike(row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"]))
                     {
-                        // "ENERJI_MUSAADE_GERILIM_SEVIYESI" değerini #N/A yapar
+                        invalidRows.Add(i);
                         row["ENERJI_MUSAADE_GERILIM_SEVIYESI"] = "#N/A";
-                        invalidCount++;
                     }
                 }
             }
 
-            if (invalidCount > 0)
+            // Log a single summary if there are invalid rows
+            if (invalidRows.Count > 0)
             {
-                float invalidPercentage = (float)invalidCount / currentDataTable.Rows.Count;
-                infoDataTable.Rows.Add(new object[] {
-                "", "Orta gerilim seviyesinden bağlı olan", $"{invalidCount} enerji müsaadesinin bağlanacağı trafo verisi bulunmamaktadır. Yüzde: {invalidPercentage:P1}"
-            });
+                float invalidPercentage = (float)invalidRows.Count / totalRows;
+                string message = $"OG seviyesinde enerji müsaadesi bağlanacağı trafo id boş olan veriler bulunmaktadır bunlar geçersiz olarak işaretlenecektir! Toplam Geçersiz Satır: {invalidRows.Count}, Percentage: {invalidPercentage:P1}. (Satır: {string.Join(", ", invalidRows)})";
+
+                warningDataTable.Rows.Add(
+                    "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID",                          // Related Column Info
+                    "OG-TrafoID Validasyonu", // ValidationType          
+                    $"Toplam: {invalidRows.Count} satır", // Details
+                    message                      // Action message with row indices
+                );
             }
-        
-    }
-    private void ImputeOnay()
+        }
+
+        private void ImputeOnay()
         {
-            // currentDataTable'ın tüm satırlarını dolaş
             foreach (DataRow row in currentDataTable.Rows)
             {
-                // Eğer ENERJI_MUSAADE_TALEP_DURUMU kolonu IsNullLike metoduna göre null ise
                 if (IsNullLike(row["ENERJI_MUSAADE_TALEP_DURUMU"]))
                 {
-                    // ENERJI_MUSAADE_TALEP_DURUMU kolonunu 1 olarak güncelle
+                    string enerjiMusaadeNo = row["ENERJI_MUSAADE_NO"]?.ToString();
                     row["ENERJI_MUSAADE_TALEP_DURUMU"] = 0;
+                    infoDataTable.Rows.Add(
+                        enerjiMusaadeNo,
+                        //   "Impute Onay",
+                        "Request status was null.",
+                        "Defaulted to 0."
+                    );
                 }
             }
         }
 
         private void ImputeEnerjilendirmeYılı()
         {
-            // currentDataTable'ın tüm satırlarını dolaş
-            foreach (DataRow row in currentDataTable.Rows)
+            List<int> imputedRows = new List<int>();
+            for (int i = 0; i < currentDataTable.Rows.Count; i++)
             {
-                // Eğer ENERJI_MUSAADE_ENERJILENDIRME_YILI kolonu IsNullLike metoduna göre null ise
+                DataRow row = currentDataTable.Rows[i];
                 if (IsNullLike(row["ENERJI_MUSAADE_ENERJILENDIRME_YILI"]))
                 {
-                    // ENERJI_MUSAADE_ENERJILENDIRME_YILI değerini horizon ilk yıl olarak güncelle
                     row["ENERJI_MUSAADE_ENERJILENDIRME_YILI"] = lastYear;
+                    imputedRows.Add(i);
                 }
             }
-        }
 
+            if (imputedRows.Count > 0)
+            {
+                string message = $"ENERJI_MUSAADE_ENERJILENDIRME_YILI NULL olan satırlar Planlama Horizonundaki ilk yıl ({lastYear}) olarak varsayılanmıştır. (Satır: {string.Join(", ", imputedRows)})";
+                infoDataTable.Rows.Add(
+                    "ENERJI_MUSAADE_ENERJILENDIRME_YILI",
+                    "Enerjilendirme Yılı Imputation",
+                    $"Toplam: {imputedRows.Count} satır",
+                    message
+                );
+            }
+        }
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
             { "ENERJI_MUSAADE_TALEP_DURUMU", WARNING_ONLY},
@@ -478,66 +461,327 @@ namespace SLF
         };
         private void ReportNullCounts()
         {
-            float nullPercentage = 0.0f;
             int totalRows = currentDataTable.Rows.Count;
+            // Step 1: Check for NULL coordinates (special case for X and Y together)
+            /*            List<int> missingCoordinateRows = new List<int>();
+                        if (currentDataTable.Columns.Contains("ENERJI_MUSAADE_X_KOORDINAT") &&
+                            currentDataTable.Columns.Contains("ENERJI_MUSAADE_Y_KOORDINAT"))
+                        {
+                            for (int i = 0; i < totalRows; i++)
+                            {
+                                DataRow row = currentDataTable.Rows[i];
+                                if (IsNullLike(row["ENERJI_MUSAADE_X_KOORDINAT"]) ||
+                                    IsNullLike(row["ENERJI_MUSAADE_Y_KOORDINAT"]))
+                                {
+                                    missingCoordinateRows.Add(i);
+                                }
+                            }
 
+                            // Log error for missing coordinates
+                            if (missingCoordinateRows.Count > 0)
+                            {
+                                float missingPercentage = (float)missingCoordinateRows.Count / totalRows;
+                                string errorMessage = $"Hata: ENERJI_MUSAADE_X_KOORDINAT veya ENERJI_MUSAADE_Y_KOORDINAT NULL olduğu için {missingCoordinateRows.Count} satır geçersiz. Bu satırlar silinecektir. Toplam: {missingCoordinateRows.Count} satır, Percentage: {missingPercentage:P1}. (Satır: {string.Join(", ", missingCoordinateRows)})";
+                                errorDataTable.Rows.Add(
+                                    "ENERJI_MUSAADE_X_KOORDINAT,ENERJI_MUSAADE_Y_KOORDINAT",
+                                    "Koordinat Eksik Validasyonu",
+                                    $"Toplam: {missingCoordinateRows.Count} satır",
+                                    errorMessage
+                                );
+                            }
+                        }*/
             foreach (DataColumn column in currentDataTable.Columns)
             {
+                // Only process monitored columns.
                 if (!nullFieldsCheckWithLevel.ContainsKey(column.ColumnName))
                 {
                     continue;
                 }
 
                 List<int> nullRows = new List<int>();
-
                 int nullCount = 0;
 
+                // Process each row for the current column to collect NULL rows.
                 for (int i = 0; i < totalRows; i++)
                 {
-                    var row = currentDataTable.Rows[i];
+                    DataRow row = currentDataTable.Rows[i];
                     if (IsNullLike(row[column]))
                     {
                         nullCount++;
-                        // Add the row number and the null-like value to the nullRows
                         nullRows.Add(i);
                     }
                 }
 
-                columnNullRowsMap[column.ColumnName] = nullRows;
-
-                nullPercentage = (float)nullCount / totalRows;
-
-                if (nullPercentage > 0)
+                // Log a single summary entry for the column if there are NULLs.
+                if (nullCount > 0)
                 {
-                    var thresholds = nullFieldsCheckWithLevel[column.ColumnName];
-                    var datatableLevel = GetDataTableBasedOnThreshold(nullPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
-                    datatableLevel.Rows.Add(new object[] {
-                        column.ColumnName, "Null değer", $"{nullPercentage:P1}"
-                    });
+                    float nullPercentage = (float)nullCount / totalRows;
+
+                    // Special case for ENERJI_MUSAADE_TALEP_DURUMU
+                    if (column.ColumnName == "ENERJI_MUSAADE_TALEP_DURUMU")
+                    {
+                        string warningMessage = $"NULL değerler Onaylandı/Tamamlandı(0) olarak kabul edilerek devam edilecektir. (Satır: {string.Join(", ", nullRows)})";
+
+                        warningDataTable.Rows.Add(
+                            "Talep Durumu Validasyonu",
+                            column.ColumnName,
+                            $"{nullPercentage:P1}",
+                            warningMessage
+                        );
+                    }
+                    // Special case for ENERJI_MUSAADE_GERILIM_SEVIYESI
+                    else if (column.ColumnName == "ENERJI_MUSAADE_GERILIM_SEVIYESI")
+                    {
+                        string warningMessage = $"Silinecekler Mesajı: {column.ColumnName} için NULL veya geçersiz olan satırlar silinecektir. (Satır: {string.Join(", ", nullRows)})";
+
+                        infoDataTable.Rows.Add(
+                            "Gerilim Seviyesi Validasyonu",
+                            column.ColumnName,
+                            $"{nullPercentage:P1}",
+                            warningMessage
+                        );
+                    }
+                    // Special case for ENERJI_MUSAADE_ENERJILENDIRME_YILI
+                    else if (column.ColumnName == "ENERJI_MUSAADE_ENERJILENDIRME_YILI")
+                    {
+                        string infoMessage = $"Enerji Musaadeleri Enerjilendirme Yılı doldurulmalıdır. Aksi takdirde Planlama Horizonundaki ilk yıl olarak varsayılanacaktır. Toplam: {nullCount} satır, Percentage: {nullPercentage:P1}. (Satır: {string.Join(", ", nullRows)})";
+                        warningDataTable.Rows.Add(
+                            "Enerjilendirme Yılı Validasyonu",
+                            column.ColumnName,
+                            $"Toplam: {nullCount} satır",
+                            infoMessage
+                        );
+
+                        // Still log the generic message for removal
+                        string genericMessage = $"Silinecekler Mesajı: {column.ColumnName} için NULL veya geçersiz olan satırlar silinecektir. (Satır: {string.Join(", ", nullRows)})";
+                        infoDataTable.Rows.Add(
+                            "NULL Değer Validasyonu",
+                            column.ColumnName,
+                            $"{nullPercentage:P1}",
+                            genericMessage
+                        );
+                    }
+                    else
+                    {
+                        // Default behavior for other columns
+                        string warningMessage = $"Silinecekler Mesajı: {column.ColumnName} için NULL veya geçersiz olan satırlara silinecektir. (Satır: {string.Join(", ", nullRows)})";
+
+                        infoDataTable.Rows.Add(
+                            "NULL Değer Validasyonu",
+                            column.ColumnName,
+                            $"{nullPercentage:P1}",
+                            warningMessage
+                        );
+                    }
+                }
+
+                // Ensure an entry exists in columnNullRowsMap for later removal.
+                if (columnNullRowsMap.ContainsKey(column.ColumnName))
+                {
+                    columnNullRowsMap[column.ColumnName] = nullRows;
+                }
+                else
+                {
+                    columnNullRowsMap.Add(column.ColumnName, nullRows);
                 }
             }
         }
+        /*        private void ReportNullCounts()
+                {
+                    int totalRows = currentDataTable.Rows.Count;
+
+                    foreach (DataColumn column in currentDataTable.Columns)
+                    {
+                        // Only process monitored columns.
+                        if (!nullFieldsCheckWithLevel.ContainsKey(column.ColumnName))
+                        {
+                            continue;
+                        }
+
+                        List<int> nullRows = new List<int>();
+                        int nullCount = 0;
+
+                        // Process each row for the current column to collect NULL rows.
+                        for (int i = 0; i < totalRows; i++)
+                        {
+                            DataRow row = currentDataTable.Rows[i];
+                            if (IsNullLike(row[column]))
+                            {
+                                nullCount++;
+                                nullRows.Add(i);
+                            }
+                        }
+
+                        // Log a single summary entry for the column if there are NULLs.
+                        if (nullCount > 0)
+                        {
+                            float nullPercentage = (float)nullCount / totalRows;
+
+                            // Special case for ENERJI_MUSAADE_TALEP_DURUMU
+                            if (column.ColumnName == "ENERJI_MUSAADE_TALEP_DURUMU")
+                            {
+                                string warningMessage = $"NULL değerler Onaylandı/Tamamlandı(0) olarak kabul edilerek devam edilecektir. (Satır: {string.Join(", ", nullRows)})";
+
+                                warningDataTable.Rows.Add(
+                                    "Talep Durumu Validasyonu",                          // No specific enerjiMusaadeNo since this is a summary
+                                    column.ColumnName,           // ReportType
+                                    $"{nullPercentage:P1}",      // Details (percentage of NULLs)
+                                    warningMessage               // Action message with row indices
+                                );
+                            }
+                            // Special case for ENERJI_MUSAADE_TALEP_DURUMU
+                            if (column.ColumnName == "ENERJI_MUSAADE_GERILIM_SEVIYESI")
+                            {
+                                string warningMessage = $"Silinecekler Mesajı: {column.ColumnName} için NULL veya geçersiz olan satırlar silinecektir. (Satır: {string.Join(", ", nullRows)})";
+
+                                infoDataTable.Rows.Add(
+                                    "Gerilim Seviyesi Validasyonu",                          // No specific enerjiMusaadeNo since this is a summary
+                                    column.ColumnName,           // ReportType
+                                    $"{nullPercentage:P1}",      // Details (percentage of NULLs)
+                                    warningMessage               // Action message with row indices
+                                );
+                            }
+
+                            else
+                            {
+                                // Default behavior for other columns
+                                string warningMessage = $"Silinecekler Mesajı: {column.ColumnName} için NULL veya geçersiz olan satırlara silinecektir. (Satır: {string.Join(", ", nullRows)})";
+
+                                infoDataTable.Rows.Add(
+                                    "NULL Değer Validasyonu",                          // No specific enerjiMusaadeNo since this is a summary
+                                    column.ColumnName,           // ReportType
+                                    $"{nullPercentage:P1}",      // Details (percentage of NULLs)
+                                    warningMessage               // Action message with row indices
+                                );
+                            }
+                        }
+
+                        // Ensure an entry exists in columnNullRowsMap for later removal.
+                        if (columnNullRowsMap.ContainsKey(column.ColumnName))
+                        {
+                            columnNullRowsMap[column.ColumnName] = nullRows;
+                        }
+                        else
+                        {
+                            columnNullRowsMap.Add(column.ColumnName, nullRows);
+                        }
+                    }
+                }
+        */
+
+        /*        private void ReportNullCounts()
+                {
+                    float nullPercentage = 0.0f;
+                    int totalRows = currentDataTable.Rows.Count;
+
+                    foreach (DataColumn column in currentDataTable.Columns)
+                    {
+                        if (!nullFieldsCheckWithLevel.ContainsKey(column.ColumnName))
+                        {
+                            continue;
+                        }
+
+                        List<int> nullRows = new List<int>();
+
+                        int nullCount = 0;
+
+                        for (int i = 0; i < totalRows; i++)
+                        {
+                            var row = currentDataTable.Rows[i];
+                            if (IsNullLike(row[column]))
+                            {
+                                nullCount++;
+                                // Add the row number and the null-like value to the nullRows
+                                nullRows.Add(i);
+                            }
+                        }
+
+                        columnNullRowsMap[column.ColumnName] = nullRows;
+
+                        nullPercentage = (float)nullCount / totalRows;
+
+                        if (nullPercentage > 0)
+                        {
+                            var thresholds = nullFieldsCheckWithLevel[column.ColumnName];
+                            var datatableLevel = GetDataTableBasedOnThreshold(nullPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+                            datatableLevel.Rows.Add(new object[] {
+                                column.ColumnName, "Null değer", $"{nullPercentage:P1}"
+                            });
+                        }
+                    }
+                }*/
         public override void Validate()
         {
             base.Validate();
-
             RemoveDuplicateRows();
 
-            ReportRemovedRows();
+            // Single source of truth
+            List<(DataRow row, int index)> capacityViolations = ConvertAndValidateBaglantiGucu();
+            ReportRemovedRows(capacityViolations);
 
+            // Actually remove rows
+            foreach (var (row, _) in capacityViolations)
+            {
+                currentDataTable.Rows.Remove(row);
+            }
+
+            // Run ReportNullCounts first to catch original NULL values
             ReportNullCounts();
-
+            // Then run ReportOGBaglanacagiTrafo to mark OG rows with NULL TRAFO_ID
+            ReportMustakilOlmayanTrafo(); // Call the new reporting method
             ReportOGBaglanacagiTrafo();
+            // Run ImputeMustakilOlmayanTrafoID
+            //ImputeMustakilOlmayanTrafoID();
 
-            ConvertAndValidateBaglantiGucu();
+            // Debug: Output warningDataTable contents
+            Console.WriteLine("Contents of warningDataTable:");
+            foreach (DataRow row in warningDataTable.Rows)
+            {
+                Console.WriteLine($"Column: {row[0]}, ValidationType: {row[1]}, Details: {row[2]}, Message: {row[3]}");
+            }
         }
+        /*        public override void Validate()
+                {
+                    base.Validate();
+                    RemoveDuplicateRows();
+
+                    // Single source of truth
+                    List<(DataRow row, int index)> capacityViolations = ConvertAndValidateBaglantiGucu();
+                    ReportRemovedRows(capacityViolations);
+
+                    // Actually remove rows
+                    foreach (var (row, _) in capacityViolations)
+                    {
+                        currentDataTable.Rows.Remove(row);
+                    }
+                    ReportNullCounts();
+                    ReportOGBaglanacagiTrafo();  
+                }*/
+        /*        public override void Validate()
+                {
+                    base.Validate();
+                    RemoveDuplicateRows();
+
+                    // Single source of truth
+                    List<DataRow> capacityViolations = ConvertAndValidateBaglantiGucu();
+                    ReportRemovedRows(capacityViolations);
+
+                    // Actually remove rows
+                    foreach (DataRow row in capacityViolations)
+                    {
+                        currentDataTable.Rows.Remove(row);
+                    }
+
+                    ReportNullCounts();
+                    ReportOGBaglanacagiTrafo();
+                }*/
         public override void Impute()
         {
             ImputeOnay();
 
             ImputeEnerjilendirmeYılı();
 
-            ImputeMustakilOlmayanTrafoID();
+            //ImputeMustakilOlmayanTrafoID();
         }
         public override void Remove()
         {
@@ -545,7 +789,7 @@ namespace SLF
 
             // Add row indices from different columns to the combined list
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["ENERJI_MUSAADE_GERILIM_SEVIYESI"]);
-            //combinedRowsToRemoveList.AddRange(columnNullRowsMap["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"]);
+            // combinedRowsToRemoveList.AddRange(columnNullRowsMap["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
 
             RemoveCombinedRows(combinedRowsToRemoveList);
@@ -566,5 +810,3 @@ namespace SLF
         }
     }
 }
-
-

@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace SLF
 {
@@ -127,28 +124,6 @@ namespace SLF
                 {
                     "Fider ve DTR demandı eşlemesi", "Eşlenmeyen değerler", $"{wrongPercentage:P1}", "Bu kadar veride DTR verileri Fider verilerinin %50-%80 aralığında değildir."
                 });
-            }
-        }
-
-            private void PreprocessMismatchedTMAdi()
-        {
-            DataTable TMDataTable = dataTablesByType["TM Verileri"];
-            var validTrafos = new HashSet<string>(TMDataTable.AsEnumerable()
-                                      .Select(row => row["EDW_TM_ID"].ToString())
-                                      .Distinct()
-            );
-
-            // Loop through currentDataTable to find invalid trafos and their indexes
-            foreach (DataRow row in currentDataTable.Rows)
-            {
-                string connectedTM = row["FIDER_TM_ADI"].ToString();
-                if (IsNullLike(connectedTM))
-                {
-                }
-                else if (!validTrafos.Contains(connectedTM))
-                {
-                    row["FIDER_TM_ADI"] = "#N/A";
-                }
             }
         }
         
