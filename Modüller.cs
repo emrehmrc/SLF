@@ -2948,22 +2948,6 @@ namespace SLF
         }
 
 
-        private void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
-        {
-            if (item.Tag != null && item.Tag is NoktaVeri && Modül_Tabları.SelectedTab == tab_ea)
-            {
-                NoktaVeri seçili_nokta = item.Tag as NoktaVeri;
-                NoktaBilgileriniGoster(seçili_nokta);
-            }
-        }
-
-        private void EA_Nokta_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                ContextMenuStrip_Nokta.Show(Cursor.Position);
-            }
-        }
         private void EaSimMaxBtn_CheckedChanged(object sender, EventArgs e)
         {
             if (EaSimMaxBtn.Checked)
@@ -5332,6 +5316,18 @@ namespace SLF
                 cbs.GetActiveGMapControl().Refresh();
             }
 
+            // sağ tıklayarak poligon çizmeyi bitir 
+            if (e.Button == MouseButtons.Right && isRulerEnabled)
+            {
+                markerOverlay.Markers?.Clear();
+                rulerPoints.Clear();
+
+                mesafe.Visible = false;
+                mesafe_metre.Visible = false;
+
+                cbs.GetActiveGMapControl().Refresh();
+            }
+
         }
 
         private void ModülFormu_Load(object sender, EventArgs e)
@@ -6675,6 +6671,12 @@ namespace SLF
             {
                 MessageBox.Show($"Error exporting heatmap: {ex.Message}");
             }
+        }
+
+        private void gMapControl_EA_OnMapClick_1(PointLatLng pointClick, MouseEventArgs e)
+        {
+
+
         }
 
         private async void DEKSimulasyonSonucGoruntule_Click(object sender, EventArgs e)
