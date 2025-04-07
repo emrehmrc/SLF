@@ -165,10 +165,12 @@ namespace SLF
             this.toolStripSeparator14 = new System.Windows.Forms.ToolStripSeparator();
             this.İmar_Fonksiyonlar = new System.Windows.Forms.ToolStripButton();
             this.tab_optDTR = new System.Windows.Forms.TabPage();
+            this.buton_optDTR_katmanlar = new System.Windows.Forms.Button();
             this.gMapControl_optimalDTR = new GMap.NET.WindowsForms.GMapControl();
             this.webView_optimalDTR = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.checkBox_optDTR_Eskişehir = new System.Windows.Forms.CheckBox();
             this.checkBox_optDTR_İzmir = new System.Windows.Forms.CheckBox();
+            this.buton_optimalDTR_katmanlar = new System.Windows.Forms.Button();
             this.tab_senaryo = new System.Windows.Forms.TabPage();
             this.SenaryoModulePanel = new System.Windows.Forms.Panel();
             this.EkonometrikSenaryoElementsPanel = new System.Windows.Forms.Panel();
@@ -213,7 +215,6 @@ namespace SLF
             this.checkBox_yuk_2 = new System.Windows.Forms.CheckBox();
             this.checkBox_yuk_1 = new System.Windows.Forms.CheckBox();
             this.legendPanel = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
             this.yuk_yıl_deger = new System.Windows.Forms.Label();
             this.yuk_yıl_text = new System.Windows.Forms.Label();
             this.trackBar_Yıllar = new System.Windows.Forms.TrackBar();
@@ -449,8 +450,8 @@ namespace SLF
             // 
             // label_girdi_veri_onizleme
             // 
-            this.label_girdi_veri_onizleme.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.label_girdi_veri_onizleme.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label_girdi_veri_onizleme.AutoSize = true;
             this.label_girdi_veri_onizleme.Font = new System.Drawing.Font("Maiandra GD", 9.75F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -500,8 +501,8 @@ namespace SLF
             // 
             this.dataGridView_girdi.AllowUserToAddRows = false;
             this.dataGridView_girdi.AllowUserToDeleteRows = false;
-            this.dataGridView_girdi.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.dataGridView_girdi.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView_girdi.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.dataGridView_girdi.BackgroundColor = System.Drawing.Color.Snow;
@@ -716,12 +717,10 @@ namespace SLF
             // gMapControl_DEK
             // 
             this.gMapControl_DEK.AllowDrop = true;
-            this.gMapControl_DEK.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.gMapControl_DEK.Bearing = 0F;
             this.gMapControl_DEK.CanDragMap = true;
             this.gMapControl_DEK.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.gMapControl_DEK.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gMapControl_DEK.EmptyTileColor = System.Drawing.Color.Navy;
             this.gMapControl_DEK.GrayScaleMode = false;
             this.gMapControl_DEK.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
@@ -838,8 +837,8 @@ namespace SLF
             // 
             // label_DEK_Gelecek
             // 
-            this.label_DEK_Gelecek.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.label_DEK_Gelecek.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label_DEK_Gelecek.AutoSize = true;
             this.label_DEK_Gelecek.Location = new System.Drawing.Point(9, 11);
@@ -995,8 +994,8 @@ namespace SLF
             // 
             // AddStationLabel
             // 
-            this.AddStationLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.AddStationLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.AddStationLabel.AutoSize = true;
             this.AddStationLabel.Location = new System.Drawing.Point(3, 0);
@@ -1099,11 +1098,12 @@ namespace SLF
             // 
             // GelecekSimPanel
             // 
+            this.GelecekSimPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.GelecekSimPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
             this.GelecekSimPanel.Controls.Add(this.EaSimMaxBtn);
             this.GelecekSimPanel.Controls.Add(this.EaSimDefBtn);
             this.GelecekSimPanel.Controls.Add(this.EaSimMinBtn);
-            this.GelecekSimPanel.Controls.Add(this.EASimButton);
+            this.GelecekSimPanel.Controls.Add(this.GelecekSimButton);
             this.GelecekSimPanel.Controls.Add(this.FutureSimLabel);
             this.GelecekSimPanel.Controls.Add(this.comboBox_ea_il_secimi);
             this.GelecekSimPanel.Controls.Add(this.comboBox_ea_yıl_secimi);
@@ -1170,8 +1170,8 @@ namespace SLF
             // 
             // FutureSimLabel
             // 
-            this.FutureSimLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.FutureSimLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.FutureSimLabel.AutoSize = true;
             this.FutureSimLabel.Location = new System.Drawing.Point(35, 32);
@@ -1323,8 +1323,8 @@ namespace SLF
             // 
             // ELFLowResultsTable
             // 
-            this.ELFLowResultsTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.ELFLowResultsTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ELFLowResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
             this.ELFLowResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -1351,8 +1351,8 @@ namespace SLF
             // 
             // ELFBaseResultsTable
             // 
-            this.ELFBaseResultsTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.ELFBaseResultsTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ELFBaseResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
             this.ELFBaseResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -1379,8 +1379,8 @@ namespace SLF
             // 
             // ELFHighResultsTable
             // 
-            this.ELFHighResultsTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.ELFHighResultsTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ELFHighResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
             this.ELFHighResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -1407,8 +1407,8 @@ namespace SLF
             // 
             // ELFMaxResultsTable
             // 
-            this.ELFMaxResultsTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.ELFMaxResultsTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ELFMaxResultsTable.BackgroundColor = System.Drawing.Color.Snow;
             this.ELFMaxResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -1436,8 +1436,8 @@ namespace SLF
             // 
             // panel_ELF_Grafikler
             // 
-            this.panel_ELF_Grafikler.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.panel_ELF_Grafikler.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel_ELF_Grafikler.BackColor = System.Drawing.Color.NavajoWhite;
             this.panel_ELF_Grafikler.Controls.Add(this.pictureBox_ELF_5);
@@ -1503,8 +1503,8 @@ namespace SLF
             // 
             // ELFTablePanel
             // 
-            this.ELFTablePanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.ELFTablePanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ELFTablePanel.Location = new System.Drawing.Point(307, 2);
             this.ELFTablePanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -1604,8 +1604,8 @@ namespace SLF
             // 
             // panel_imar
             // 
-            this.panel_imar.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.panel_imar.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel_imar.Controls.Add(this.Mesafe_imar);
             this.panel_imar.Controls.Add(this.webView_imar);
@@ -2174,6 +2174,7 @@ namespace SLF
             // 
             // tab_optDTR
             // 
+            this.tab_optDTR.Controls.Add(this.buton_optDTR_katmanlar);
             this.tab_optDTR.Controls.Add(this.gMapControl_optimalDTR);
             this.tab_optDTR.Controls.Add(this.webView_optimalDTR);
             this.tab_optDTR.Controls.Add(this.checkBox_optDTR_Eskişehir);
@@ -2204,8 +2205,8 @@ namespace SLF
             // gMapControl_optimalDTR
             // 
             this.gMapControl_optimalDTR.AllowDrop = true;
-            this.gMapControl_optimalDTR.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.gMapControl_optimalDTR.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gMapControl_optimalDTR.Bearing = 0F;
             this.gMapControl_optimalDTR.CanDragMap = true;
@@ -2236,8 +2237,8 @@ namespace SLF
             // webView_optimalDTR
             // 
             this.webView_optimalDTR.AllowExternalDrop = true;
-            this.webView_optimalDTR.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.webView_optimalDTR.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.webView_optimalDTR.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.webView_optimalDTR.CreationProperties = null;
@@ -2443,8 +2444,8 @@ namespace SLF
             // 
             // ELFSenaryoTabControls
             // 
-            this.ELFSenaryoTabControls.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.ELFSenaryoTabControls.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ELFSenaryoTabControls.Controls.Add(this.tabPage_min_senaryo);
             this.ELFSenaryoTabControls.Controls.Add(this.tabPage_dusuk_senaryo);
@@ -2701,8 +2702,8 @@ namespace SLF
             // 
             // panel_yuk
             // 
-            this.panel_yuk.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.panel_yuk.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel_yuk.Controls.Add(this.webView_yuk);
             this.panel_yuk.Controls.Add(this.gMapControl_yuk);
@@ -2971,8 +2972,8 @@ namespace SLF
             // 
             // legendPanel
             // 
-            this.legendPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.legendPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.legendPanel.AutoSize = true;
             this.legendPanel.ForeColor = System.Drawing.Color.MediumBlue;
@@ -3383,14 +3384,6 @@ namespace SLF
             this.Point_Load_Ekle.Text = "Noktasal Yük Ekle";
             this.Point_Load_Ekle.Click += new System.EventHandler(this.Point_Load_Ekle_Click);
             // 
-            // YGA_Çiz
-            // 
-            this.YGA_Çiz.Image = ((System.Drawing.Image)(resources.GetObject("YGA_Çiz.Image")));
-            this.YGA_Çiz.Name = "YGA_Çiz";
-            this.YGA_Çiz.Size = new System.Drawing.Size(244, 26);
-            this.YGA_Çiz.Text = "Yeni Genişleme Alanı Çiz";
-            this.YGA_Çiz.Click += new System.EventHandler(this.YGA_Çiz_Click);
-            // 
             // Poligon_Sil
             // 
             this.Poligon_Sil.Image = ((System.Drawing.Image)(resources.GetObject("Poligon_Sil.Image")));
@@ -3433,8 +3426,8 @@ namespace SLF
             // 
             // ModuleTabPanel
             // 
-            this.ModuleTabPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.ModuleTabPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ModuleTabPanel.BackColor = System.Drawing.Color.LightSalmon;
             this.ModuleTabPanel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
@@ -3589,8 +3582,7 @@ namespace SLF
             this.MinimumSize = new System.Drawing.Size(1333, 811);
             this.Name = "ModülFormu";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Jeo-Uzamsal Talep Tahmini Yazılımı           ";
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.Text = "                          ";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ModülFormu_FormClosing);
             this.Load += new System.EventHandler(this.ModülFormu_Load);
             this.Modül_Tabları.ResumeLayout(false);
@@ -3697,6 +3689,8 @@ namespace SLF
         private System.Windows.Forms.DataGridView dataGridView_girdi;
         private System.Windows.Forms.Label label_girdi_dosya_secimi;
         private System.Windows.Forms.Button SelectFolderButton;
+        private Microsoft.Web.WebView2.WinForms.WebView2 webView_yuk;
+        private System.Windows.Forms.TabPage tab_validasyon;
         private System.Windows.Forms.Panel ELFTablePanel;
         private System.Windows.Forms.ContextMenuStrip katmanlar_right_click;
         private System.Windows.Forms.ToolStripMenuItem tabloyuGörToolStripMenuItem;
@@ -3709,6 +3703,8 @@ namespace SLF
         private System.Windows.Forms.ToolStripMenuItem Uydu;
         private System.Windows.Forms.ToolStripMenuItem Google_Earth;
         private System.Windows.Forms.ToolStripMenuItem OSM;
+        public System.Windows.Forms.Label mesafe_metre_stokastik;
+        private System.Windows.Forms.Label Mesafe_stokastik;
         private System.Windows.Forms.ContextMenuStrip ContextMenuStrip_Nokta;
         private System.Windows.Forms.ToolStripMenuItem Nokta_Ekle;
         private System.Windows.Forms.ToolStripMenuItem Nokta_Sil;
@@ -3774,8 +3770,13 @@ namespace SLF
         private Button buton_yuk_haritası_katmanlar;
         public GMap.NET.WindowsForms.GMapControl gMapControl_yuk;
         public GMap.NET.WindowsForms.GMapControl gMapControl_optimalDTR;
+        private Button buton_optimalDTR_katmanlar;
         private Microsoft.Web.WebView2.WinForms.WebView2 webView_optimalDTR;
         private ToolStrip toolStrip_imar;
+        private ToolStripButton İmar_Seç;
+        private ToolStripSeparator toolStripSeparator9;
+        private ToolStripButton İmar_Kaydır;
+        private ToolStripSeparator toolStripSeparator10;
         private ToolStripButton İmar_Mesafe_Ölç;
         private ToolStripSeparator toolStripSeparator11;
         private ToolStripButton İmar_Poligon;
