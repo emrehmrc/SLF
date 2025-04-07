@@ -11,7 +11,7 @@ namespace SLF
     public class DTRModulu : GirdiModülü
 
     {
-        private readonly (float warningThreshold, float errorThreshold) TUKETIM_ERROR_THRESHOLD = WarningErrorBoundary(0.2f);
+        private readonly (float warningThreshold, float errorThreshold) TUKETIM_ERROR_THRESHOLD = WarningErrorBoundary(0.7f);
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = ERROR_ONLY;
         private readonly string DATE_FORMAT = "dd.MM.yyyy";
         private static readonly List<int> TRAFO_KAPASITE_LISTESI = new List<int>
@@ -1501,6 +1501,7 @@ namespace SLF
                     // Update map after imputation
                     columnNullRowsMap[column] = new List<int>(); // Clear after successful imputation
                 }*/
+
         private void ImputeTrafoMulkiyet()
         {
             var column = "TRAFO_MULKIYET";
@@ -1510,9 +1511,14 @@ namespace SLF
 
             List<int> nullRows = new List<int>();
             List<int> invalidFormatRows = new List<int>();
+            List<int> ozelRows = new List<int>(); // Track rows converted from ÖZEL
+            List<int> kurumRows = new List<int>(); // Track rows converted from KURUM
             var imputableRows = new List<int>();
 
-            // Scan all rows for null and invalid format values
+            // Declare message once at the method scope
+            string message = "";
+
+            // Scan all rows for null, invalid format, and ÖZEL/KURUM values
             for (int i = 0; i < totalRows; i++)
             {
                 var row = currentDataTable.Rows[i];
@@ -1521,22 +1527,32 @@ namespace SLF
                 {
                     nullRows.Add(i);
                 }
+                else if (string.Equals(cellValue, "ÖZEL", StringComparison.OrdinalIgnoreCase))
+                {
+                    row[column] = 1; // Convert ÖZEL to 1
+                    ozelRows.Add(i);
+                }
+                else if (string.Equals(cellValue, "KURUM", StringComparison.OrdinalIgnoreCase))
+                {
+                    row[column] = 0; // Convert KURUM to 0
+                    kurumRows.Add(i);
+                }
                 else if (!int.TryParse(cellValue, out int value) || value < 0) // Invalid format or negative value
                 {
                     invalidFormatRows.Add(i);
                 }
             }
 
-            // Calculate total invalid percentage
+            // Calculate total invalid percentage (excluding converted rows)
             int totalInvalidCount = nullRows.Count + invalidFormatRows.Count;
             float invalidPercentage = (float)totalInvalidCount / originalTotalRows;
 
             // Enforce threshold
             if (invalidPercentage > 0.2f) // 20% threshold from WarningErrorBoundary(0.2f)
             {
-                string message = $"Hata: {invalidPercentage:P1} oranında {column} değerleri eksik veya geçersiz " +
-                                $"(NULL: {string.Join(", ", nullRows)}; Geçersiz format: {string.Join(", ", invalidFormatRows)}). " +
-                                "%20 eşiği aşıldı; imputation uygulanamaz, lütfen verileri manuel olarak düzeltin.";
+                message = $"Hata: {invalidPercentage:P1} oranında {column} değerleri eksik veya geçersiz " +
+                          $"(NULL: {string.Join(", ", nullRows)}; Geçersiz format: {string.Join(", ", invalidFormatRows)}). " +
+                          "%20 eşiği aşıldı; imputation uygulanamaz, lütfen verileri manuel olarak düzeltin.";
                 warningDataTable.Rows.Add(new object[]
                 {
             column,
@@ -1570,14 +1586,27 @@ namespace SLF
                 }
             }
 
-            // Report imputation
+            // Report conversions and imputation
+            message = ""; // Reset message for reporting
+            if (ozelRows.Count > 0)
+            {
+                message += $"Converted ÖZEL to 1 (Satır: {string.Join(", ", ozelRows)}); ";
+            }
+            if (kurumRows.Count > 0)
+            {
+                message += $"Converted KURUM to 0 (Satır: {string.Join(", ", kurumRows)}); ";
+            }
             if (imputableRows.Count > 0)
             {
-                string message = $"Geçersiz değer (imputed with {defaultValue}): " +
-                                $"{(float)nullRows.Count / originalTotalRows:P1} NULL/boş " +
-                                $"(imputed with {defaultValue}) (Satır: {string.Join(", ", nullRows)}) " +
-                                $"{(float)invalidFormatRows.Count / originalTotalRows:P1} geçersiz format " +
-                                $"(imputed with {defaultValue}) (Satır: {string.Join(", ", invalidFormatRows)}).";
+                message += $"Geçersiz değer (imputed with {defaultValue}): " +
+                           $"{(float)nullRows.Count / originalTotalRows:P1} NULL/boş " +
+                           $"(imputed with {defaultValue}) (Satır: {string.Join(", ", nullRows)}) " +
+                           $"{(float)invalidFormatRows.Count / originalTotalRows:P1} geçersiz format " +
+                           $"(imputed with {defaultValue}) (Satır: {string.Join(", ", invalidFormatRows)}).";
+            }
+
+            if (!string.IsNullOrEmpty(message))
+            {
                 warningDataTable.Rows.Add(new object[]
                 {
             column,
@@ -1590,6 +1619,95 @@ namespace SLF
             // Update map after imputation (optional, if still used by other functions)
             columnNullRowsMap[column] = new List<int>(); // Clear after successful imputation
         }
+        /*        private void ImputeTrafoMulkiyet()
+                {
+                    var column = "TRAFO_MULKIYET";
+                    const int defaultValue = 0; // Configurable default value for imputation
+                    int totalRows = currentDataTable.Rows.Count; // Current number of rows
+                    int originalTotalRows = totalRows; // Assume original count (adjust if tracked elsewhere)
+
+                    List<int> nullRows = new List<int>();
+                    List<int> invalidFormatRows = new List<int>();
+                    var imputableRows = new List<int>();
+
+                    // Scan all rows for null and invalid format values
+                    for (int i = 0; i < totalRows; i++)
+                    {
+                        var row = currentDataTable.Rows[i];
+                        var cellValue = row[column]?.ToString();
+                        if (IsNullLike(cellValue))
+                        {
+                            nullRows.Add(i);
+                        }
+                        else if (!int.TryParse(cellValue, out int value) || value < 0) // Invalid format or negative value
+                        {
+                            invalidFormatRows.Add(i);
+                        }
+                    }
+
+                    // Calculate total invalid percentage
+                    int totalInvalidCount = nullRows.Count + invalidFormatRows.Count;
+                    float invalidPercentage = (float)totalInvalidCount / originalTotalRows;
+
+                    // Enforce threshold
+                    if (invalidPercentage > 0.2f) // 20% threshold from WarningErrorBoundary(0.2f)
+                    {
+                        string message = $"Hata: {invalidPercentage:P1} oranında {column} değerleri eksik veya geçersiz " +
+                                        $"(NULL: {string.Join(", ", nullRows)}; Geçersiz format: {string.Join(", ", invalidFormatRows)}). " +
+                                        "%20 eşiği aşıldı; imputation uygulanamaz, lütfen verileri manuel olarak düzeltin.";
+                        warningDataTable.Rows.Add(new object[]
+                        {
+                    column,
+                    "Trafo Mülkiyet Kontrolü",
+                    $"{invalidPercentage:P1}",
+                    message
+                        });
+                        return; // Skip imputation
+                    }
+
+                    // Proceed with imputation if within threshold
+                    imputableRows.AddRange(nullRows);
+                    imputableRows.AddRange(invalidFormatRows);
+
+                    foreach (int missingIndex in imputableRows)
+                    {
+                        if (missingIndex >= 0 && missingIndex < currentDataTable.Rows.Count)
+                        {
+                            var missingRow = currentDataTable.Rows[missingIndex];
+                            missingRow[column] = defaultValue; // Impute with default value
+                        }
+                        else
+                        {
+                            errorDataTable.Rows.Add(new object[]
+                            {
+                        column,
+                        "Geçersiz İndeks",
+                        "0%",
+                        $"İndeks {missingIndex} geçerli aralıkta değil; {column} için imputation uygulanamadı."
+                            });
+                        }
+                    }
+
+                    // Report imputation
+                    if (imputableRows.Count > 0)
+                    {
+                        string message = $"Geçersiz değer (imputed with {defaultValue}): " +
+                                        $"{(float)nullRows.Count / originalTotalRows:P1} NULL/boş " +
+                                        $"(imputed with {defaultValue}) (Satır: {string.Join(", ", nullRows)}) " +
+                                        $"{(float)invalidFormatRows.Count / originalTotalRows:P1} geçersiz format " +
+                                        $"(imputed with {defaultValue}) (Satır: {string.Join(", ", invalidFormatRows)}).";
+                        warningDataTable.Rows.Add(new object[]
+                        {
+                    column,
+                    "Trafo Mülkiyet Kontrolü",
+                    $"{invalidPercentage:P1}",
+                    message
+                        });
+                    }
+
+                    // Update map after imputation (optional, if still used by other functions)
+                    columnNullRowsMap[column] = new List<int>(); // Clear after successful imputation
+                }*/
         /*        private void ImputeTrafoMulkiyet()
                 {
                     var column = "TRAFO_MULKIYET";
