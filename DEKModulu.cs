@@ -202,12 +202,12 @@ namespace SLF
             float minX = xCoords.Min();
             float maxX = xCoords.Max();
             float xRange = maxX - minX;
-            float xTolerance = xRange * 0.1f;
+            float xTolerance = xRange * 10f;
 
             float minY = yCoords.Min();
             float maxY = yCoords.Max();
             float yRange = maxY - minY;
-            float yTolerance = yRange * 0.1f;
+            float yTolerance = yRange * 10f;
 
             minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
     {
@@ -244,7 +244,7 @@ namespace SLF
             "DEK_X_KOORDINAT & DEK_Y_KOORDINAT",
             "Koordinat Sınırları",
             $"{outOfThresholdPercentage:P1}",
-            $"DEK_X_KOORDINAT ve/veya DEK_Y_KOORDINAT parametresi ilgili trafo koordinat aralığında değil. (X: {minXValue:F2} to {maxXValue:F2}, Y: {minYValue:F2} to {maxYValue:F2}) for {countOutOfThresholdCoordinates}. Bu değerler imputasyon aşamasında düzeltilecektir."
+            $"DEK_X_KOORDINAT ve/veya DEK_Y_KOORDINAT parametresi ilgili trafo koordinat aralığında değil. (X: {minXValue:F2} to {maxXValue:F2}, Y: {minYValue:F2} to {maxYValue:F2}) for {countOutOfThresholdCoordinates}. Hata oranı %10'dan fazla değilse bu değerler imputasyon aşamasında düzeltilecektir."
         });
             }
         }

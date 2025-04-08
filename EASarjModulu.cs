@@ -168,7 +168,7 @@ namespace SLF
             { "EA_Y_KOORDINAT", WARNING_ONLY },
             { "ISTASYON_ADI", WARNING_ONLY},
             { "ISTASYON_GUCU", InfoErrorBoundary(0.2f) },
-            { "EA_TRAFO_KODU", InfoErrorBoundary(0.7f) },
+            { "EA_TRAFO_KODU", InfoErrorBoundary(0.2f) },
             { "ISTASYON_TIPI", WARNING_ONLY},
         };
         private const float COORDINATE_BUFFER_PERCENTAGE = 10f; // 10% buffer for dynamic bounds
@@ -287,7 +287,7 @@ namespace SLF
                 "EA_X_KOORDINAT & EA_Y_KOORDINAT",
                 "Koordinat Sınırları",
                 $"{outOfBoundsPercentage:P1}",
-                $"EA_X_KOORDINAT ve/veya EA_Y_KOORDINAT parametresi ilgili trafo koordinat aralığında değil. Trafo koordinat aralığı dışına çıkılamaz. (Sınırlar: X [{minXValue}, {maxXValue}], Y [{minYValue}, {maxYValue}]). Bu değerler imputasyon aşamasında düzeltilecektir."
+                $"EA_X_KOORDINAT ve/veya EA_Y_KOORDINAT parametresi ilgili trafo koordinat aralığında değil. Trafo koordinat aralığı dışına çıkılamaz. (Sınırlar: X [{minXValue}, {maxXValue}], Y [{minYValue}, {maxYValue}]). Hata oranı %10 üzeri değilse bu değerler imputasyon aşamasında düzeltilecektir."
                 });
             }
         }
