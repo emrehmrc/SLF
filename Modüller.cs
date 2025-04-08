@@ -6354,7 +6354,11 @@ namespace SLF
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
             };
 
-            if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
+            if (saveFileDialog.ShowDialog() != DialogResult.OK)
+            {
+                this.Cursor = Cursors.Hand;
+                return;
+            }
 
             string filePath = saveFileDialog.FileName;
 
