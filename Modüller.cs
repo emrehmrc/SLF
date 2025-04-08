@@ -3673,7 +3673,7 @@ namespace SLF
                     DEKProgressBar.Visible = true;
                 }
 
-                string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\DELTA_EA_DENEME_IMAR.xlsx";
+                string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v1\DELTA_EA_DENEME_IMAR.xlsx";
                 string outputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek_distribution_2024_2030_İzmir_düşük.xlsx";
 
                 if (!File.Exists(inputFilePath))
