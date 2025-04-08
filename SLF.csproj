@@ -598,6 +598,12 @@
     <Compile Include="Ana_Menü.Designer.cs">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
     </Compile>
+    <Compile Include="ChargingStationPopupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChargingStationPopupForm.Designer.cs">
+      <DependentUpon>ChargingStationPopupForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="DatabaseListForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -628,6 +634,7 @@
     <Compile Include="Poligon Özellik Tanımlama.Designer.cs">
       <DependentUpon>Poligon Özellik Tanımlama.cs</DependentUpon>
     </Compile>
+    <Compile Include="PoligonOznitelikForm.cs" />
     <Compile Include="ProjectFolderPicker.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -748,6 +755,9 @@
     <EmbeddedResource Include="Ana_Menü.resx">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ChargingStationPopupForm.resx">
+      <DependentUpon>ChargingStationPopupForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DatabaseListForm.resx">
       <DependentUpon>DatabaseListForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -839,6 +849,7 @@
     <None Include="CBS\SLF\ÇİĞLİ KARŞIYAKA REKORTMAN VERİSİ\REKORTMAN.MAP" />
     <None Include="CBS\SLF\ÇİĞLİ KARŞIYAKA REKORTMAN VERİSİ\REKORTMAN.TAB" />
     <None Include="CBS\SLF\ÇİĞLİ KARŞIYAKA REKORTMAN VERİSİ\REKORTMAN_kars_cigli.csv" />
+    <None Include="config.json" />
     <None Include="docs\VEER.md" />
     <None Include="Excel Files\Point Load Karakteristikleri\point_load.xlsx" />
     <None Include="Excel Files\SLF Sonuçları\SONUCLAR.xlsx" />

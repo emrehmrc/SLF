@@ -211,7 +211,6 @@ namespace SLF
                 this.slfEndYear = yearService.slfEndYear;
             }
 
-
             
             if (projectRoot != null)
             {
@@ -223,7 +222,6 @@ namespace SLF
                 polygonTypesExcelPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "point_load.xlsx");
                 MessageBox.Show($"Excel dosya yolu çözülemedi. Varsayılan yol kullanılıyor: {polygonTypesExcelPath}", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-
 
             _excelService = new ExcelService();
             InitializeLogTextBox(); // Initialize logTextBox
