@@ -726,7 +726,6 @@ namespace SLF
                 { "yuk", checkBoxes_yuk }
             };
 
-
             CheckBox targetCheckbox = null;
             string targetCategory = null;
             foreach (var checkBox in allCheckBoxes)
@@ -762,7 +761,6 @@ namespace SLF
             }
         }
 
-
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------ GİRDİ MODÜLÜ DEĞİŞKENLER ---------------------------------------- //
 
@@ -778,19 +776,20 @@ namespace SLF
             {"Yeni Projelendirilmiş DTR Verileri", new YeniProjelendirilmisDTR()},
         };
 
-
         private void SelectFolderButton_Click(object sender, EventArgs e)
         {
             // Handle file loading logic for the "Girdi" module
             if (slfStartYear == 0 || slfEndYear == 0)
             {
-                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", 
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             // Check if an item is selected in the ComboBox before accessing it
             if (veri_listesi_seçimi.SelectedItem == null)
             {
-                MessageBox.Show("Lütfen bir veri tipi seçin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lütfen bir veri tipi seçin.", "Hata", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return; // Exit if no valid data type is selected
             }
 
@@ -808,7 +807,8 @@ namespace SLF
 
                         if (!File.Exists(csvFilePath) || !File.Exists(kmlFilePath))
                         {
-                            MessageBox.Show("Geçerli dosyalar seçilmedi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("Geçerli dosyalar seçilmedi.", "Hata", 
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return;
                         }
                     }
@@ -857,19 +857,19 @@ namespace SLF
 
             // Call VEERProcess with skipPrerequisites flag
             var isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
-            //dataGridView_girdi.DataSource = GirdiModülü.dataTablesByType[seçilenVeriTipi];
-            //dataGridView_girdi.Refresh();
-            //Console.WriteLine(isImported.ToString());
-            //isİmportedModule(isImported, seçilenVeriTipi);
-            //if (isImported)
-            //{
-            //    modulescheck.Add(seçilenVeriTipi);
-            //    veri_listesi_seçimi.Refresh();
-            //    Console.WriteLine(modulescheck.Count);
-            //    dataGridView_girdi.DataSource = girdiModülü.CurrentDataTable;
+            dataGridView_girdi.DataSource = GirdiModülü.dataTablesByType[seçilenVeriTipi];
+            dataGridView_girdi.Refresh();
+            Console.WriteLine(isImported.ToString());
+            isİmportedModule(isImported, seçilenVeriTipi);
+            if (isImported)
+            {
+                modulescheck.Add(seçilenVeriTipi);
+                veri_listesi_seçimi.Refresh();
+                Console.WriteLine(modulescheck.Count);
+                dataGridView_girdi.DataSource = girdiModülü.CurrentDataTable;
 
 
-            //}
+            }
 
         }
 

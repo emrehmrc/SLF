@@ -10,10 +10,11 @@
 		"Host":,
 		"Username": ,
 		"Password":""
-
 	},
 	"Python Kodları":{
-		"Sonuçlar_to_Kml":"C:/Users/ehan0/source/repos/emrehmrc/SLF/python_kod/SLF Sonucları/excel_to_kml_sonuçlar.py"
-			
+		"Sonuçlar_to_Kml":"C:/Users/ehan0/source/repos/emrehmrc/SLF/python_kod/SLF Sonucları/excel_to_kml_sonuçlar.py"			
+	},
+	"DEK":{
+		"Simulasyon_Kodu" : 
 	}
 }
