@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using System.Data;
+using SLF.Services;
+using SLF.services;
 
 namespace SLF
 {
@@ -10,16 +12,70 @@ namespace SLF
     {
         public string CsvFilePath { get; private set; }
         public string KmlFilePath { get; private set; }
-        public string SelectedCity { get; private set; }
 
         private DataGridView _dataGridViewGirdi;
+        private Label cityInfoLabel;
+        private Label csvFilePathLabel; // Label değişkenini ekleyin
+        private Label kmlFilePathLabel; // Label değişkenini ekleyin
 
         public imarFileSelectionPopup(DataGridView dataGridViewGirdi)
         {
             InitializeComponent();
             _dataGridViewGirdi = dataGridViewGirdi;
+
+            // Radio butonları gizleyelim veya kaldıralım çünkü artık kullanılmayacak
+            if (imarizmirRadioButton != null) imarizmirRadioButton.Visible = false;
+            if (imarEskisehirRadioButton != null) imarEskisehirRadioButton.Visible = false;
+
+            // Dosya yolu etiketlerini oluştur
+            CreateFilePathLabels();
+
+            // Seçili il/ilçe bilgilerini gösterelim
+            UpdateCityDistrictLabel();
         }
 
+        private void UpdateCityDistrictLabel()
+        {
+            // Bilgi için bir label ekleyelim ve seçili il/ilçeyi gösterelim
+            if (cityInfoLabel == null)
+            {
+                cityInfoLabel = new Label();
+                cityInfoLabel.AutoSize = true;
+                cityInfoLabel.Location = new System.Drawing.Point(12, 20);
+                cityInfoLabel.Name = "cityInfoLabel";
+                this.Controls.Add(cityInfoLabel);
+            }
+
+            // Eğer il/ilçe seçilmemişse uyarı göster
+            if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
+            {
+                cityInfoLabel.Text = "Lütfen önce il/ilçe seçin!";
+                cityInfoLabel.ForeColor = System.Drawing.Color.Red;
+            }
+            else
+            {
+                cityInfoLabel.Text = $"Seçili Bölge: {PathService.SelectedCity} / {PathService.SelectedDistrict}";
+                cityInfoLabel.ForeColor = System.Drawing.Color.Black;
+            }
+        }
+        private void CreateFilePathLabels()
+        {
+            // CSV dosya adı etiketi
+            csvFilePathLabel = new Label();
+            csvFilePathLabel.AutoSize = true;
+            csvFilePathLabel.Location = new System.Drawing.Point(12, 60); // SelectCsvButton'un altına
+            csvFilePathLabel.Name = "csvFilePathLabel";
+            csvFilePathLabel.Text = "CSV dosyası seçilmedi";
+            this.Controls.Add(csvFilePathLabel);
+
+            // KML dosya adı etiketi
+            kmlFilePathLabel = new Label();
+            kmlFilePathLabel.AutoSize = true;
+            kmlFilePathLabel.Location = new System.Drawing.Point(12, 100); // SelectKmlButton'un altına
+            kmlFilePathLabel.Name = "kmlFilePathLabel";
+            kmlFilePathLabel.Text = "KML dosyası seçilmedi";
+            this.Controls.Add(kmlFilePathLabel);
+        }
         private void imarFileSelectionPanel_Paint(object sender, PaintEventArgs e)
         {
             this.DoubleBuffered = true;
@@ -33,6 +89,7 @@ namespace SLF
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     CsvFilePath = openFileDialog.FileName;
+                    csvFilePathLabel.Text = Path.GetFileName(CsvFilePath);
                 }
             }
         }
@@ -45,6 +102,7 @@ namespace SLF
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     KmlFilePath = openFileDialog.FileName;
+                    kmlFilePathLabel.Text = Path.GetFileName(KmlFilePath);
                 }
             }
         }
@@ -55,33 +113,48 @@ namespace SLF
             {
                 Cursor.Current = Cursors.WaitCursor;
 
+                // PathService'te il ve ilçe bilgileri olup olmadığını kontrol et
+                if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
+                {
+                    MessageBox.Show("Lütfen önce il ve ilçe seçimi yapın.", "Eksik Seçim", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
                 if (imarMethodSelectionComboBox.SelectedIndex == 0)
                 {
-                    if (!imarizmirRadioButton.Checked && !imarEskisehirRadioButton.Checked)
-                    {
-                        MessageBox.Show("Lütfen bir şehir seçin.", "Eksik Seçim", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
-
-                    string selectedRegion = imarizmirRadioButton.Checked ? "İzmir" : "Eskişehir";
-
+                    // Sadece KML dosyası gerekli
                     if (string.IsNullOrEmpty(KmlFilePath))
                     {
                         MessageBox.Show("Lütfen bir KML dosyası seçin.", "Eksik Dosya", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return;
                     }
 
-                    RunPythonScript(selectedRegion: selectedRegion, kmlFilePath: KmlFilePath);
+                    // Dosyayı imar_plans/data klasörüne kopyala
+                    string kmlDestinationPath = PathService.CopyKmlToImarPlansData(KmlFilePath);
+
+                    // PythonHelper.RunImarPlanModel'i çağır
+                    RunImarPlanPython(kmlDestinationPath);
                 }
                 else if (imarMethodSelectionComboBox.SelectedIndex == 1)
                 {
+                    // KML ve CSV dosyaları birlikte gerekli
                     if (string.IsNullOrEmpty(CsvFilePath) || string.IsNullOrEmpty(KmlFilePath))
                     {
                         MessageBox.Show("Lütfen hem CSV hem de KML dosyalarını seçin.", "Eksik Dosya", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return;
                     }
 
-                    RunPythonScript(csvFilePath: CsvFilePath, kmlFilePath: KmlFilePath);
+                    // Dosyaları imar_plans/data klasörüne kopyala
+                    string kmlDestinationPath = PathService.CopyKmlToImarPlansData(KmlFilePath);
+                    string csvDestinationPath = PathService.CopyCsvToImarPlansData(CsvFilePath);
+
+                    // PythonHelper.RunImarPlanModel'i çağır
+                    RunImarPlanPython(kmlDestinationPath, csvDestinationPath);
+                }
+                else
+                {
+                    MessageBox.Show("Lütfen bir yöntem seçin.", "Eksik Seçim", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
 
                 // Populate the DataGridView after successful script execution
@@ -98,11 +171,39 @@ namespace SLF
             }
         }
 
+        private void RunImarPlanPython(string kmlFilePath, string csvFilePath = null)
+        {
+            try
+            {
+                // İşlem başlıyor bildirimi
+                string message = csvFilePath == null
+                    ? "KML dosyası işleniyor ve Overpass verileri çekiliyor..."
+                    : "KML ve CSV dosyaları işleniyor...";
+
+                MessageBox.Show(message, "İşlem Başlıyor", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Python betiğini çalıştır
+                string output = PythonHelper.RunImarPlanModel(kmlFilePath, csvFilePath);
+
+                // Başarılı çalıştırma mesajı
+                MessageBox.Show("İmar planı analizi başarıyla tamamlandı.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"İmar planı analizi çalıştırılırken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                throw;
+            }
+        }
         private void UploadOutputToGridView()
         {
             try
             {
-                string outputCsvPath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\veriler deneme\imar-denemeleri\updated_results.xlsx";
+                // Çıktı klasörünü belirle
+                string outputDir = PathService.GetImarAnaliziPathForType("imar_planlari");
+                string selectedCity = PathService.SelectedCity;
+                string selectedDistrict = PathService.SelectedDistrict;
+                string outputPrefix = $"imar_plan_{selectedCity}_{selectedDistrict}";
+                string outputCsvPath = Path.Combine(outputDir, $"{outputPrefix}.csv");
 
                 if (!File.Exists(outputCsvPath))
                 {
@@ -110,110 +211,56 @@ namespace SLF
                     return;
                 }
 
+                // CSV dosyasını DataTable'a yükle
                 var dataTable = new DataTable();
                 using (var reader = new StreamReader(outputCsvPath))
                 {
-                    bool isHeader = true;
-                    while (!reader.EndOfStream)
+                    string headerLine = reader.ReadLine();
+                    if (headerLine != null)
                     {
-                        var line = reader.ReadLine();
-                        if (line == null) continue;
-
-                        var values = line.Split(',');
-
-                        if (isHeader)
+                        string[] headers = headerLine.Split(',');
+                        foreach (string header in headers)
                         {
-                            foreach (var header in values)
-                            {
-                                dataTable.Columns.Add(header);
-                            }
-                            isHeader = false;
+                            dataTable.Columns.Add(header.Trim('\"'));
                         }
-                        else
+
+                        while (!reader.EndOfStream)
                         {
-                            dataTable.Rows.Add(values);
+                            string dataLine = reader.ReadLine();
+                            if (dataLine != null)
+                            {
+                                string[] dataValues = dataLine.Split(',');
+                                for (int i = 0; i < dataValues.Length; i++)
+                                {
+                                    dataValues[i] = dataValues[i].Trim('\"');
+                                }
+                                dataTable.Rows.Add(dataValues);
+                            }
                         }
                     }
                 }
 
                 _dataGridViewGirdi.DataSource = dataTable;
+
+                // Sütun genişliklerini ayarla
+                _dataGridViewGirdi.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+
+                // Başlık renklendirme
+                for (int i = 0; i < _dataGridViewGirdi.Columns.Count; i++)
+                {
+                    _dataGridViewGirdi.Columns[i].HeaderCell.Style.BackColor = System.Drawing.Color.LightBlue;
+                    _dataGridViewGirdi.Columns[i].HeaderCell.Style.ForeColor = System.Drawing.Color.Navy;
+                    _dataGridViewGirdi.Columns[i].HeaderCell.Style.Font = new System.Drawing.Font(_dataGridViewGirdi.Font, System.Drawing.FontStyle.Bold);
+                }
+
+                // Satır sayısı bilgisi
+                MessageBox.Show($"Toplam {dataTable.Rows.Count} adet kayıt yüklendi.", "Veri Yüklendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"CSV verileri yüklenirken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-        private void RunPythonScript(string csvFilePath = null, string kmlFilePath = null, string selectedRegion = null)
-        {
-            try
-            {
-                const string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe";
-                const string scriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\imar-dataları\imar_datalari_v4.py";
-
-                if (!File.Exists(pythonExePath))
-                {
-                    MessageBox.Show($"Python çalıştırılabilir dosyası bulunamadı: {pythonExePath}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                if (!File.Exists(scriptPath))
-                {
-                    MessageBox.Show($"Python betik dosyası bulunamadı: {scriptPath}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                string arguments;
-                if (!string.IsNullOrEmpty(selectedRegion) && !string.IsNullOrEmpty(kmlFilePath))
-                {
-                    arguments = $"\"{scriptPath}\" \"{selectedRegion}\" \"{kmlFilePath}\"";
-                }
-                else if (!string.IsNullOrEmpty(csvFilePath) && !string.IsNullOrEmpty(kmlFilePath))
-                {
-                    arguments = $"\"{scriptPath}\" \"{csvFilePath}\" \"{kmlFilePath}\"";
-                }
-                else
-                {
-                    MessageBox.Show("Geçersiz parametreler. Python betiği çalıştırılamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                var process = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = pythonExePath,
-                        Arguments = arguments,
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    }
-                };
-
-                process.Start();
-
-                string output = process.StandardOutput.ReadToEnd();
-                string error = process.StandardError.ReadToEnd();
-
-                process.WaitForExit();
-
-                if (process.ExitCode != 0 || !string.IsNullOrEmpty(error))
-                {
-                    MessageBox.Show($"Python betiği çalışırken bir hata oluştu:\n{error}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                else
-                {
-                    MessageBox.Show("Python betiği başarıyla çalıştırıldı.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Python betiği çalıştırılırken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
     }
 }
-
-
+       

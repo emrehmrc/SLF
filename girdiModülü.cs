@@ -388,7 +388,7 @@ namespace SLF
                 throw new PrerequisiteException($"{seçilenVeriTipi}nin yüklenmesi için öncelikle şu verilerin yüklenmesi gerekir: {missingMessage}");
             }
         }
-        protected static (float Min, float Max) WarningErrorBoundary(float boundary)
+        protected static (float Min, float Max) WarningErrorBoundary(float boundary) 
         {
             // Bi verinin "boundary"ye kadar olan kısmı warning, "boundary"den sonrası error
             return (MIN_THRESHOLD, boundary);
