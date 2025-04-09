@@ -101,7 +101,10 @@ namespace SLF.Services
         /// İmar planları veri seti klasör yolu
         /// </summary>
         public static string ImarPlansDataDirectory => Path.Combine(ImarPlansDirectory, "data");
-
+        // Hücre ve uydu verileri klasörlerinin yolları için özellikler
+        // Bunlar il/ilçe klasöründe doğrudan bulunuyor (temp içinde değil)
+        public static string HucrePath => Path.Combine(BaseDirectory, FullPath, "hücre");
+        public static string UyduVerileriPath => Path.Combine(BaseDirectory, FullPath, "uydu_verileri");
         /// <summary>
         /// SLF kök dizinini döndürür
         /// </summary>

@@ -118,9 +118,49 @@ namespace SLF.services
         {
             try
             {
+                // Hücre verisi yolunu al - SHP ya da CSV dosyasını bul
+                string hucrePath = PathService.HucrePath;
+                string hucreFilePath = null;
+                string uyduVeriPath = PathService.UyduVerileriPath;
+                string uyduVeriFilePath = null;
+
                 // Seçilen il/ilçe bilgilerini al
                 string selectedCity = PathService.SelectedCity;
                 string selectedDistrict = PathService.SelectedDistrict;
+
+                // Hücre dosyasını bul
+                if (Directory.Exists(hucrePath))
+                {
+                    string[] hucreFiles = Directory.GetFiles(hucrePath, "*.shp");
+                    if (hucreFiles.Length > 0)
+                    {
+                        hucreFilePath = hucreFiles[0]; // İlk bulunan SHP dosyasını kullan
+                        Console.WriteLine($"Hücre SHP dosyası bulundu: {hucreFilePath}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Hücre klasöründe SHP dosyası bulunamadı.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Hücre klasörü bulunamadı: {hucrePath}");
+                }
+
+                // Uydu verisi dosyasını bul
+                if (Directory.Exists(uyduVeriPath))
+                {
+                    string[] uyduFiles = Directory.GetFiles(uyduVeriPath, "*.csv");
+                    if (uyduFiles.Length > 0)
+                    {
+                        uyduVeriFilePath = uyduFiles[0]; // İlk bulunan CSV dosyasını kullan
+                        Console.WriteLine($"Uydu verisi CSV dosyası bulundu: {uyduVeriFilePath}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Uydu verileri klasöründe CSV dosyası bulunamadı.");
+                    }
+                }
 
                 if (string.IsNullOrEmpty(selectedCity) || string.IsNullOrEmpty(selectedDistrict))
                 {
@@ -159,22 +199,95 @@ namespace SLF.services
                     Directory.CreateDirectory(tempDirPath);
                 }
 
+                // YENİ: Deep Learning Klasöründen mesken ve other dosyalarını bul
+                string meskenFile = null;
+                string otherFile = null;
+
+                // Deep Learning modeli klasörü
+                string deepLearningPath = PathService.GetImarAnaliziPathForType("deep_learning_modeli");
+                if (Directory.Exists(deepLearningPath))
+                {
+                    // Küçük harfe çevirip daha kesin dosya araması yapıyoruz
+                    string cityLower = selectedCity.ToLower();
+                    string districtLower = selectedDistrict.ToLower();
+
+                    // Mesken dosyasını bul
+                    string[] meskenFiles = Directory.GetFiles(deepLearningPath, $"mesken_data_*{cityLower}*{districtLower}*.csv");
+                    if (meskenFiles.Length > 0)
+                    {
+                        meskenFile = meskenFiles[0];
+                        Console.WriteLine($"Mesken veri dosyası bulundu: {meskenFile}");
+                    }
+                    else
+                    {
+                        // Tam eşleşme bulunamazsa daha genel bir arama yap
+                        meskenFiles = Directory.GetFiles(deepLearningPath, "mesken_data_*.csv");
+                        if (meskenFiles.Length > 0)
+                        {
+                            meskenFile = meskenFiles[0];
+                            Console.WriteLine($"Mesken veri dosyası (genel arama ile) bulundu: {meskenFile}");
+                        }
+                    }
+
+                    // Other dosyasını bul
+                    string[] otherFiles = Directory.GetFiles(deepLearningPath, $"other_data_*{cityLower}*{districtLower}*.csv");
+                    if (otherFiles.Length > 0)
+                    {
+                        otherFile = otherFiles[0];
+                        Console.WriteLine($"Diğer bina veri dosyası bulundu: {otherFile}");
+                    }
+                    else
+                    {
+                        // Tam eşleşme bulunamazsa daha genel bir arama yap
+                        otherFiles = Directory.GetFiles(deepLearningPath, "other_data_*.csv");
+                        if (otherFiles.Length > 0)
+                        {
+                            otherFile = otherFiles[0];
+                            Console.WriteLine($"Diğer bina veri dosyası (genel arama ile) bulundu: {otherFile}");
+                        }
+                    }
+                }
+
                 // Log mesajı oluştur
                 Console.WriteLine($"Python kod klasörü: {PathService.PythonKodDirectory}");
                 Console.WriteLine($"Python script: {pythonScriptPath}");
                 Console.WriteLine($"KML dosyası: {kmlFilePath}");
-                Console.WriteLine($"CSV dosyası: {csvFilePath ?? "Kullanılmıyor"}");
+                Console.WriteLine($"Mesken veri dosyası: {meskenFile ?? "Bulunamadı"}");
+                Console.WriteLine($"Other veri dosyası: {otherFile ?? "Bulunamadı"}");
                 Console.WriteLine($"CSV çıktı dosyası: {outputCsvPath}");
                 Console.WriteLine($"KML çıktı dosyası: {outputKmlPath}");
 
-                // Deep Learning benzeri basitleştirilmiş argüman yaklaşımı
-                // Argümanlar: script.py, işlem türü, şehir, kml dosyası, csv çıktısı, kml çıktısı, ilçe, [opsiyonel csv veri dosyası]
+                // Argümanları oluştur
                 StringBuilder args = new StringBuilder();
                 args.Append($"\"{pythonScriptPath}\" process \"{selectedCity}\" \"{kmlFilePath}\"");
                 args.Append($" --district \"{selectedDistrict}\"");
                 args.Append($" --output-dir \"{imarAnaliziPath}\"");  // Ana çıktı klasörü
                 args.Append($" --output-prefix \"{outputPrefix}\"");
-                // Eğer CSV dosyası belirtilmişse, ek argüman olarak ekle
+
+                // Hücre verisi dosyasını ekle
+                if (!string.IsNullOrEmpty(hucreFilePath))
+                {
+                    args.Append($" --hucre-data \"{hucreFilePath}\"");
+                }
+
+                // YENİ: Mesken ve Other dosyalarını ekle
+                if (!string.IsNullOrEmpty(meskenFile))
+                {
+                    args.Append($" --mesken-file \"{meskenFile}\"");
+                }
+
+                if (!string.IsNullOrEmpty(otherFile))
+                {
+                    args.Append($" --other-file \"{otherFile}\"");
+                }
+
+                // Uydu verisi argümanını ekle
+                if (!string.IsNullOrEmpty(uyduVeriFilePath))
+                {
+                    args.Append($" --uydu-data \"{uyduVeriFilePath}\"");
+                }
+
+                // Overpass verisi ekle
                 if (!string.IsNullOrEmpty(csvFilePath))
                 {
                     args.Append($" --overpass-data \"{csvFilePath}\"");
@@ -269,7 +382,7 @@ namespace SLF.services
                 Console.WriteLine($"İmar Planı modeli çalıştırılırken hata: {ex.Message}");
                 throw; // Üst seviye metodların hatayı yakalaması için yeniden fırlat
             }
-
         }
+
     }
-}
+    }
