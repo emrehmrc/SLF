@@ -2920,6 +2920,172 @@ namespace SLF
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
 
+                private async void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        {
+
+            if (isAddingChargingStation)
+            {
+                // Yeni marker oluştur
+                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow)
+                {
+                    ToolTipText = "Yeni Şarj İstasyonu"
+                };
+                markerOverlay_ea.Markers.Add(marker);
+
+                // Nokta verisini oluştur
+                NoktaVeri noktaVeri_marker = new NoktaVeri
+                {
+                    Enlem = Math.Round(pointClick.Lat, 4),
+                    Boylam = Math.Round(pointClick.Lng, 4)
+                };
+
+                // Popup formu göster
+                using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+                {
+                    if (popupForm.ShowDialog() == DialogResult.OK)
+                    {
+                        // Başarılı olduğunda harita verilerini yükle
+                        await eaHaritayaVeriYukleAsync();
+                    }
+                    else if (popupForm.OperationCancelled)
+                    {
+                        // İşlem iptal edilirse marker'ı kaldır
+                        markerOverlay_ea.Markers.Remove(marker);
+                    }
+                }
+
+                // İşaretleme işlemini sıfırla
+                isAddingChargingStation = false;
+                return;
+            }
+
+            OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
+                ref polygonOverlay_ea, Mesafe_Dek, mesafe_metre_DeK);
+
+        }
+        private async Task HandlePopupFormAsync(PointLatLng point, string cellId)
+        {
+            NoktaVeri noktaVeri_marker = new NoktaVeri
+            {
+                Enlem = Math.Round(point.Lat, 4),
+                Boylam = Math.Round(point.Lng, 4),
+                CellId = cellId
+            };
+
+            using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+            {
+                if (popupForm.ShowDialog() == DialogResult.OK)
+                {
+                    Console.WriteLine("Popup form closed with OK. Updating data...");
+                    // await eaHaritayaVeriYukleAsync();
+
+                    DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
+                    DataRow updatedRow = dataTable.Rows.Cast<DataRow>().FirstOrDefault(r => r["id"].ToString() == cellId);
+                    if (updatedRow != null)
+                    {
+                        Console.WriteLine($"Cell {cellId}: AC (Home): {updatedRow["AC (Home)_count"]}, " +
+                                          $"AC (Work): {updatedRow["AC (Work)_count"]}, " +
+                                          $"AC (Public): {updatedRow["AC (Public)_count"]}, " +
+                                          $"Fast DC: {updatedRow["Fast DC_count"]}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"No row found for Cell {cellId} in DataTable.");
+                    }
+
+                    Console.WriteLine("Calling HaritaUzerindeSimulasyonGosterimi...");
+                    await HaritaUzerindeSimulasyonGosterimi(dataTable);
+                    Console.WriteLine("HaritaUzerindeSimulasyonGosterimi completed.");
+                }
+            }
+        }
+        private void RemoveMarkerFromOverlays(GMapMarker marker)
+        {
+            if (markerOverlay_ea.Markers.Contains(marker))
+            {
+                markerOverlay_ea.Markers.Remove(marker);
+            }
+
+            if (simulationOverlay.Markers.Contains(marker))
+            {
+                simulationOverlay.Markers.Remove(marker);
+            }
+
+            if (cellToolTipOverlay.Markers.Contains(marker))
+            {
+                cellToolTipOverlay.Markers.Remove(marker);
+            }
+        }
+        private async void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                // Check if the user is in "adding charging station" mode
+                if (isAddingChargingStation)
+                {
+                    // Use the selected CellId from ModülFormu
+                    string cellId = item.Tag?.ToString() ?? ModülFormu.SelectedCellId;
+
+                    // Create a temporary marker for the charging station at the clicked location
+                    GMapMarker marker = new GMarkerGoogle(item.Position, GMarkerGoogleType.yellow)
+                    {
+                        ToolTipText = "Yeni Şarj İstasyonu",
+                        Tag = cellId // Store CellId in the marker's Tag temporarily
+                    };
+
+                    try
+                    {
+                        // Use the helper method to handle the popup form
+                        await HandlePopupFormAsync(item.Position, cellId);
+                    }
+                    catch
+                    {
+                        RemoveMarkerFromOverlays(marker);
+                    }
+
+                    // Reset the flag after adding the station
+                    isAddingChargingStation = false;
+
+                    return;
+                }
+            }
+        }
+        private GMapMarker FindMarkerAtPosition(PointLatLng point)
+        {
+            foreach (var marker in cellToolTipOverlay.Markers)
+            {
+                if (marker.Position.Lat == point.Lat && marker.Position.Lng == point.Lng)
+                {
+                    return marker;
+                }
+            }
+            return null;
+        }
+        private void AddMarkerToMap(NoktaVeri noktaVeri)
+        {
+            // Create a new marker for the charging station
+            GMapMarker marker = new GMarkerGoogle(new PointLatLng(noktaVeri.Enlem, noktaVeri.Boylam), GMarkerGoogleType.yellow)
+            {
+                ToolTipText = $"Şarj İstasyonu: {noktaVeri.CellId}",
+                Tag = noktaVeri.CellId // Store CellId in the marker's Tag
+            };
+
+            // Add the marker to the appropriate overlay
+            markerOverlay_ea.Markers.Add(marker);
+            simulationOverlay.Markers.Add(marker);
+            cellToolTipOverlay.Markers.Add(marker);
+
+            // Refresh the map to display the new marker
+            gMapControl_EA.Refresh();
+        }
+
+        private void EA_Nokta_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+               // ContextMenuStrip_Nokta.Show(Cursor.Position);
+            }
+        }
 
         private void EaSimMaxBtn_CheckedChanged(object sender, EventArgs e)
         {
@@ -2929,6 +3095,7 @@ namespace SLF
                 SelectedSpeed = "Hızlı";
             }
         }
+
         private void EaSimMinBtn_CheckedChanged(object sender, EventArgs e)
         {
             if (EaSimMinBtn.Checked)
@@ -2937,30 +3104,31 @@ namespace SLF
                 SelectedSpeed = "Yavaş";
             }
         }
+
         private void EaSimDefBtn_CheckedChanged(object sender, EventArgs e)
         {
             if (EaSimMinBtn.Checked)
             {
-                SelectedSpeed = "varsayılan";
+                SelectedSpeed = "Varsayılan";
             }
         }
         private void ToggleMarkers(string markerType, bool isVisible)
         {
-            // gMapControl_EA üzerindeki tüm overlay'leri dolaşarak marker'ları kontrol ediyoruz
+            // Iterate through all overlays and markers
             foreach (var overlay in gMapControl_EA.Overlays)
             {
                 foreach (var marker in overlay.Markers)
                 {
-                    // Marker, GMarkerGoogle türündeyse ve ToolTipText ile belirtilen türle eşleşiyorsa
-                    if (marker is GMarkerGoogle googleMarker && googleMarker.ToolTipText == markerType)
+                    // Check if the marker is a GMarkerGoogle and has the specified type in its Tag
+                    if (marker is GMarkerGoogle googleMarker && googleMarker.Tag?.ToString() == markerType)
                     {
-                        // Marker'ın görünürlük durumunu güncelle
+                        // Update the marker's visibility
                         googleMarker.IsVisible = isVisible;
                     }
                 }
             }
 
-            // Harita güncellenmesi için refresh yapıyoruz
+            // Refresh the map to reflect changes
             gMapControl_EA.Refresh();
         }
 
@@ -3188,6 +3356,7 @@ namespace SLF
         }
 
         // Şehir seçimi yapıldığında çağrılan metot
+        // Şehir seçimi yapıldığında çağrılan metot
         private void ilSecimiMonteCarlo(object sender, EventArgs e)
         {
             // Always clear the district combo box and reset SelectedDistrict
@@ -3207,7 +3376,18 @@ namespace SLF
                     comboBox_ea_ilce_secimi.Refresh();
                 }));
             }
+            /*            // Update SelectedCity if a valid selection exists
+                        if (comboBox_ea_il_secimi.SelectedItem != null)
+                        {
+                            SelectedCity = comboBox_ea_il_secimi.SelectedItem.ToString();
 
+                            // Populate district combo box based on selected city
+                            if (cityDistricts.TryGetValue(SelectedCity, out var districts))
+                            {
+                                comboBox_ea_ilce_secimi.Items.AddRange(districts.ToArray());
+                                comboBox_ea_ilce_secimi.Enabled = true;
+                            }
+                        }*/
             else
             {
                 SelectedCity = null;
@@ -3222,7 +3402,6 @@ namespace SLF
                 gMapControl_EA.Zoom = 12;
             }
         }
-
         private void ilceSecimiMonteCarlo(object sender, EventArgs e)
         {
             if (comboBox_ea_ilce_secimi.SelectedItem != null)
@@ -3244,7 +3423,7 @@ namespace SLF
             if (comboBox_ea_yıl_secimi.SelectedIndex != -1)  // Geçerli bir seçim yapıldığında
             {
                 SelectedYear = comboBox_ea_yıl_secimi.SelectedIndex;  // Yıl indeksini ayarla
-                CheckSelections();  // Seçim durumunu kontrol et
+                                                                      //  CheckSelections();  // Seçim durumunu kontrol et
             }
         }
 
@@ -3336,37 +3515,67 @@ namespace SLF
         }
         private void EAStationAddButton_Click(object sender, EventArgs e)
         {
-            // Check if the "EA Şarj Verileri" key exists in the dataTablesByType dictionary
-            if (!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
+
+            try
             {
-                MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
-                return;
-            }
+                // Show wait cursor
+                Cursor = Cursors.WaitCursor;
 
-            // Use dataGridView1.DataSource as the DataTable instead of eaDataTable
-            DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
-            if (dataTable == null || dataTable.Rows.Count == 0)
+                // Check if the "EA Şarj Verileri" key exists in the dataTablesByType dictionary
+                if (!GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
+                {
+                    MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
+                    return;
+                }
+
+                gMapControl_EA.OnMarkerClick -= gMapControl_EA_OnMarkerClick;
+                //   gMapControl_EA.OnMapClick -= gMapControl_Ea_OnMapClick;
+
+                // Use dataGridView1.DataSource as the DataTable instead of eaDataTable
+                DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
+                if (dataTable == null || dataTable.Rows.Count == 0)
+                {
+                    MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
+                    return;
+                }
+
+                /*                if (!gMapControl_EA.Overlays.Contains(simulationOverlay) || !gMapControl_EA.Overlays.Contains(cellToolTipOverlay))
+                                {
+                                    gMapControl_EA.OnMapClick += gMapControl_Ea_OnMapClick;
+                                }
+                */
+                // Check if we are in the process of adding a charging station
+                if (!isAddingChargingStation)
+                {
+                    MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
+                    isAddingChargingStation = true;
+                    gMapControl_EA.OnMarkerClick += gMapControl_EA_OnMarkerClick;
+                    return; // Exit to wait for the user to click on the map
+                }
+
+                // Get the clicked point on the map
+                var pointClick = gMapControl_EA.FromLocalToLatLng(MousePosition.X, MousePosition.Y);
+
+                // Refresh the map to show the new marker
+                gMapControl_EA.Refresh();
+
+                // Reset the flag after adding the station
+                isAddingChargingStation = false;
+            }
+            catch (Exception ex)
             {
-                MessageBox.Show("Lütfen EA ŞARJ verilerinizi ekleyin.");
-                return;
+                // Handle any unexpected exceptions
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            // Check if we are in the process of adding a charging station
-            if (!isAddingChargingStation)
+            finally
             {
-                MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
-                isAddingChargingStation = true;
-                return; // Exit to wait for the user to click on the map
+                // Restore cursor to default
+                Cursor = Cursors.Default;
             }
-
-            // Get the clicked point on the map
-            var pointClick = gMapControl_EA.FromLocalToLatLng(MousePosition.X, MousePosition.Y);
-            // Refresh the map to show the new marker
-            gMapControl_EA.Refresh();
-
-            // Reset the flag after adding the station
-            isAddingChargingStation = false;
         }
+
+        //private GMapOverlay eaOverlay; // Add this as a class-level variable
+
         private async Task eaHaritayaVeriYukleAsync()
         {
             int redDc = 0;
@@ -3374,7 +3583,11 @@ namespace SLF
 
             try
             {
-                GMapOverlay eaOverlay = new GMapOverlay("EA Layer");
+                // Initialize the overlay if not already created
+                if (eaOverlay == null)
+                {
+                    eaOverlay = new GMapOverlay("EA Layer");
+                }
 
                 if (dataGridView_girdi.DataSource == null)
                 {
@@ -3382,18 +3595,15 @@ namespace SLF
                     return;
                 }
 
-                if (gMapControl_EA.Overlays.Contains(eaOverlay))
-                {
-                    gMapControl_EA.Overlays.Remove(eaOverlay);
-                }
-
-
                 DataTable eaData = await Task.Run(() => GirdiModülü.dataTablesByType["EA Şarj Verileri"]);
 
                 if (eaData != null && eaData.Rows.Count > 0)
                 {
-                    greenAc = 0;  // Sayaçları sıfırla
+                    greenAc = 0;  // Reset counters
                     redDc = 0;
+
+                    // Clear existing markers
+                    eaOverlay.Markers.Clear();
 
                     Invoke(new Action(() =>
                     {
@@ -3407,7 +3617,7 @@ namespace SLF
                                 MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
                                 return;
                             }
-                            //Console.WriteLine(GirdiModülü.dataTablesByType);
+
                             if (!girdiModülü.IsNullLike(row["EA_X_KOORDINAT"]) &&
                                 !girdiModülü.IsNullLike(row["EA_Y_KOORDINAT"]))
                             {
@@ -3442,10 +3652,13 @@ namespace SLF
                             }
                         }
 
-                        gMapControl_EA.Overlays.Add(eaOverlay);
-                        gMapControl_EA.Refresh();
+                        // Only add overlay if checkbox is checked and it's not already added
+                        if (EAPointsLayerCheckBox.Checked && !gMapControl_EA.Overlays.Contains(eaOverlay))
+                        {
+                            gMapControl_EA.Overlays.Add(eaOverlay);
+                        }
 
-                        // Sayaç değerlerini sağ üst köşede göster
+                        gMapControl_EA.Refresh();
                         calculateChargeStation(greenAc, redDc);
                     }));
                 }
@@ -3460,17 +3673,21 @@ namespace SLF
             }
         }
 
+
         private async void gelecekSimilasyonGoruntule(object sender, EventArgs e)
         {
-            // Checkbox'ları görünür hale getir
-            checkBox_AC_Home.Visible = true;
-            checkBox_AC_Public.Visible = true;
-            checkBox_AC_Work.Visible = true;
-            checkBox_DC_Fast.Visible = true;
-            checkBox_AC_Public.Checked = true;
-            checkBox_AC_Work.Checked = true;
-            checkBox_AC_Home.Checked = true;
-            checkBox_DC_Fast.Checked = true;
+            // Disable the button to prevent multiple clicks while processing
+            EAStationAddButton.Enabled = false;
+
+            /*            // Checkbox'ları görünür hale getir
+                        checkBox_AC_Home.Visible = true;
+                        checkBox_AC_Public.Visible = true;
+                        checkBox_AC_Work.Visible = true;
+                        checkBox_DC_Fast.Visible = true;
+                        checkBox_AC_Public.Checked = true;
+                        checkBox_AC_Work.Checked = true;
+                        checkBox_AC_Home.Checked = true;
+                        checkBox_DC_Fast.Checked = true;*/
 
             gMapControl_EA.Overlays.Clear();
             gMapControl_EA.Refresh();
@@ -3480,32 +3697,32 @@ namespace SLF
 
             if (SelectedCity == "İzmir" && SelectedSpeed == "Hızlı")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Yüksek.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Yüksek.xlsx";
             }
             else if (SelectedCity == "İzmir" && SelectedSpeed == "Yavaş")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Düşük.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Düşük.xlsx";
             }
-            else if (SelectedCity == "İzmir" && SelectedSpeed == "varsayılan")
+            else if (SelectedCity == "İzmir" && SelectedSpeed == "Varsayılan")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_baz.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_baz.xlsx";
             }
             else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Hızlı")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Yüksek.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Yüksek.xlsx";
             }
             else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Yavaş")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Düşük.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Düşük.xlsx";
             }
-            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "varsayılan")
+            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Varsayılan")
             {
-                filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\EA Şarj\ArdaS\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_esk_baz.xlsx";
+                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_esk_baz.xlsx";
             }
             else
             {
                 MessageBox.Show("Lütfen geçerli bir şehir ve senaryo seçiniz.");
-                return; // Geçerli bir şehir veya hız seçilmediyse işlemi sonlandır
+                return;
             }
 
             try
@@ -3513,45 +3730,72 @@ namespace SLF
                 // Excel dosyasını aç
                 using (var package = new ExcelPackage(new FileInfo(filePath)))
                 {
-                    // Yıl seçimine göre sayfayı seç (SelectedYear değeri, sayfa indeksini temsil eder)
-                    ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
+                    // Yıl seçimine göre sayfayı seç
+                    int baseYear = slfStartYear; // e.g., 2024
+                    string year = (SelectedYear != -1 && SelectedYear < (slfEndYear - slfStartYear + 1))
+                        ? (baseYear + SelectedYear).ToString()
+                        : "2025";
 
-                    // Veriyi DataTable'a yükle
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[year];
+                    if (worksheet == null)
+                    {
+                        MessageBox.Show($"Worksheet for year {year} not found in output file.",
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    // Load the DataTable
                     veriMonteCarlo = excelService.LoadWorksheetIntoDataTable(worksheet);
+
+                    // Filter DataTable based on SelectedDistrict and its ID
+                    if (SelectedDistrict != null)
+                    {
+                        if (districtIdMap.TryGetValue(SelectedDistrict, out string districtId))
+                        {
+                            var filteredRows = veriMonteCarlo.AsEnumerable()
+                                .Where(row => row.Field<string>("ilce") == districtId)
+                                .CopyToDataTable();
+                            veriMonteCarlo = filteredRows; // Update with filtered data
+                        }
+                        else
+                        {
+                            MessageBox.Show($"No ID mapping found for district: {SelectedDistrict}. No data will be displayed.",
+                                "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            veriMonteCarlo.Clear(); // Clear data to prevent displaying all districts
+                            return; // Exit the method
+                        }
+                    }
                 }
 
                 // Veri başarıyla yüklendiğinde bir bildirim gösterin
                 MessageBox.Show("Veri başarıyla yüklendi.");
+                EAStationAddButton.Enabled = true;
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
-                return; // Hata durumunda işlemi sonlandır
+                return;
             }
+
             DataTable cıktıPopup = FormatEATableForDisplay(veriMonteCarlo);
-            // Yeni bir DataGridView oluştur
             DataGridView dataGridView = new DataGridView
             {
-                DataSource = cıktıPopup,  // Bind the DataTable
-                Dock = DockStyle.Fill,     // Make sure it's filling the container/form
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells // Resize columns based on content
+                DataSource = cıktıPopup,
+                Dock = DockStyle.Fill,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells
             };
-
-
 
             // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
             HesaplaMerkezNoktaVeEkle(veriMonteCarlo);
-
             await HaritaUzerindeSimulasyonGosterimi(veriMonteCarlo);
 
             // Önceki popupForm varsa kapatın
             if (popupForm != null && !popupForm.IsDisposed)
             {
                 popupForm.Close();
-                popupForm.Dispose();  // Eski formu serbest bırak
+                popupForm.Dispose();
             }
 
-            // Yeni popupForm'u oluşturun ve açın
             popupForm = new Form
             {
                 Text = "Hücre Analizi",
@@ -3560,78 +3804,117 @@ namespace SLF
             };
 
             popupForm.Controls.Add(dataGridView);
-            popupForm.Show(); // Yeni pencereyi göster
+            // popupForm.Show();
         }
 
         private Task HaritaUzerindeSimulasyonGosterimi(DataTable veriTablosu)
         {
-            // Create a new overlay for simulation markers
-            GMapOverlay simulationOverlay = new GMapOverlay("Simulasyon_Layer");
-
-            // Add a new overlay for simulation markers (No need to remove it if it's new)
-            gMapControl_EA.Overlays.Clear(); // Optionally clear the previous overlays, if needed
+            // Clear existing overlays and re-add them
+            gMapControl_EA.Overlays.Clear();
+            //   EAPointsLayerCheckBox.Checked = false;
             gMapControl_EA.Overlays.Add(simulationOverlay);
+            gMapControl_EA.Overlays.Add(cellToolTipOverlay);
+            // Uncheck the EAPointsLayerCheckBox since we're clearing all overlays
+            Invoke(new Action(() =>
+            {
+                EAPointsLayerCheckBox.Checked = false;
+            }));
+            // Create a transparent bitmap for invisible markers
+            Bitmap transparentBitmap = new Bitmap(16, 16);
+            using (Graphics g = Graphics.FromImage(transparentBitmap))
+            {
+                g.Clear(Color.Transparent);
+            }
 
-            // Dictionary to hold markers based on their coordinates and types
-            Dictionary<(double, double, string), GMarkerGoogle> markerDictionary = new Dictionary<(double, double, string), GMarkerGoogle>();
-
-            // Process the rows in the DataTable
             foreach (DataRow row in veriTablosu.Rows)
             {
-                if (row["Enlem"] != DBNull.Value && row["Boylam"] != DBNull.Value)
+                if (row["Enlem"] == DBNull.Value || row["Boylam"] == DBNull.Value) continue;
+
+                double enlem = Convert.ToDouble(row["Enlem"]);
+                double boylam = Convert.ToDouble(row["Boylam"]);
+                string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
+
+                // Get counts for each EV type, defaulting to 0 if null
+                int acHomeCount = row["AC (Home)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Home)_count"]) : 0;
+                int acWorkCount = row["AC (Work)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Work)_count"]) : 0;
+                int acPublicCount = row["AC (Public)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Public)_count"]) : 0;
+                int fastDcCount = row["Fast DC_count"] != DBNull.Value ? Convert.ToInt32(row["Fast DC_count"]) : 0;
+
+                // Calculate total count
+                int totalCount = acHomeCount + acWorkCount + acPublicCount + fastDcCount;
+
+                // Build the detailed tooltip text for all cells
+                string tooltipText = $"Cell: {cellId}\n" +
+                                     $"AC (Home): {acHomeCount}\n" +
+                                     $"AC (Work): {acWorkCount}\n" +
+                                     $"AC (Public): {acPublicCount}\n" +
+                                     $"Fast DC: {fastDcCount}";
+
+                if (totalCount == 0)
                 {
-                    double enlem = Convert.ToDouble(row["Enlem"]);
-                    double boylam = Convert.ToDouble(row["Boylam"]);
-
-                    // Check the counts and add markers accordingly
-                    bool acHome = row["AC (Home)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Home)_count"]) != 0;
-                    bool acWork = row["AC (Work)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Work)_count"]) != 0;
-                    bool acPublic = row["AC (Public)_count"] != DBNull.Value && Convert.ToInt32(row["AC (Public)_count"]) != 0;
-                    bool fastDc = row["Fast DC_count"] != DBNull.Value && Convert.ToInt32(row["Fast DC_count"]) != 0;
-
-                    // Create markers based on the conditions
-                    if (acHome)
+                    // Invisible marker for empty cells
+                    var invisibleMarker = new GMarkerGoogle(new PointLatLng(enlem, boylam), transparentBitmap)
                     {
-                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.green);
-                        marker.ToolTipText = "AC-Home";
-                        markerDictionary[(enlem, boylam, "AC-Home")] = marker;
-                    }
-                    if (acWork)
+                        ToolTipText = tooltipText,
+                        ToolTipMode = MarkerTooltipMode.OnMouseOver,
+                        Tag = cellId
+                    };
+                    cellToolTipOverlay.Markers.Add(invisibleMarker);
+                }
+                else
+                {
+                    // Visible marker for cells with EV stations
+                    GMarkerGoogleType markerType = DetermineMarkerType(acHomeCount, acWorkCount, acPublicCount, fastDcCount);
+                    var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), markerType)
                     {
-                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.blue);
-                        marker.ToolTipText = "AC-Work";
-                        markerDictionary[(enlem, boylam, "AC-Work")] = marker;
-                    }
-                    if (acPublic)
-                    {
-                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.yellow);
-                        marker.ToolTipText = "AC-Public";
-                        markerDictionary[(enlem, boylam, "AC-Public")] = marker;
-                    }
-                    if (fastDc)
-                    {
-                        var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), GMarkerGoogleType.red);
-                        marker.ToolTipText = "DC-Fast";
-                        markerDictionary[(enlem, boylam, "DC-Fast")] = marker;
-                    }
+                        ToolTipMode = MarkerTooltipMode.OnMouseOver,
+                        Tag = cellId,
+                        ToolTipText = tooltipText
+                    };
+                    simulationOverlay.Markers.Add(marker);
                 }
             }
 
-            // Add the created markers to the simulation overlay
-            foreach (var marker in markerDictionary.Values)
-            {
-                simulationOverlay.Markers.Add(marker);
-            }
-
-            // Refresh the map control to show the new markers
-            Invoke(new Action(() =>
-            {
-                gMapControl_EA.Refresh();
-            }));
+            // Refresh the map on the UI thread
+            Invoke(new Action(() => gMapControl_EA.Refresh()));
 
             return Task.CompletedTask;
         }
+        private GMarkerGoogleType DetermineMarkerType(int acHomeCount, int acWorkCount, int acPublicCount, int fastDcCount)
+        {
+            int totalCount = acHomeCount + acWorkCount + acPublicCount + fastDcCount;
+            if (totalCount == 0) return GMarkerGoogleType.gray_small; // Not used, but kept for consistency
 
+            var counts = new[]
+            {
+        new { Type = "AC (Home)", Count = acHomeCount },
+        new { Type = "AC (Work)", Count = acWorkCount },
+        new { Type = "AC (Public)", Count = acPublicCount },
+        new { Type = "Fast DC", Count = fastDcCount }
+    };
+            var dominantType = counts.OrderByDescending(c => c.Count).First().Type;
+
+            if (dominantType == "AC (Home)")
+            {
+                return GMarkerGoogleType.green;
+            }
+            else if (dominantType == "AC (Work)")
+            {
+                return GMarkerGoogleType.blue;
+            }
+            else if (dominantType == "AC (Public)")
+            {
+                return GMarkerGoogleType.yellow;
+            }
+            else if (dominantType == "Fast DC")
+            {
+                return GMarkerGoogleType.red;
+            }
+            else
+            {
+                return GMarkerGoogleType.orange; // Fallback
+            }
+        }
         private void calculateChargeStationWithFilter(int acHomeCount, int acWorkCount, int acPublicCount, int fastDcCount)
         {
             if (this.InvokeRequired)
@@ -3660,13 +3943,263 @@ namespace SLF
             };
 
 
+
             // Paneli ana forma ekleyin
             this.Controls.Add(panel);
             panel.BringToFront(); // Paneli öne getir
         }
+        private Task HaritaUzerindeSimulasyonGosterimiWithNewPoints(DataTable veriTablosu, int year)
+        {
+            // Clear existing overlays and re-add them
+            gMapControl_EA.Overlays.Clear();
+            gMapControl_EA.Overlays.Add(simulationOverlay);
+            gMapControl_EA.Overlays.Add(cellToolTipOverlay);
+
+            Invoke(new Action(() =>
+            {
+                EAPointsLayerCheckBox.Checked = false;
+            }));
+
+            // Create a transparent bitmap for invisible markers
+            Bitmap transparentBitmap = new Bitmap(16, 16);
+            using (Graphics g = Graphics.FromImage(transparentBitmap))
+            {
+                g.Clear(Color.Transparent);
+            }
+
+            foreach (DataRow row in veriTablosu.Rows)
+            {
+                if (row["Enlem"] == DBNull.Value || row["Boylam"] == DBNull.Value) continue;
+
+                double enlem = Convert.ToDouble(row["Enlem"]);
+                double boylam = Convert.ToDouble(row["Boylam"]);
+                string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
+
+                // Get counts for each EV type, defaulting to 0 if null.
+                // The base counts are for the overall EV stations.
+                int acHomeCount = row["AC (Home)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Home)_count"]) : 0;
+                int acWorkCount = row["AC (Work)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Work)_count"]) : 0;
+                int acPublicCount = row["AC (Public)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Public)_count"]) : 0;
+                int fastDcCount = row["Fast DC_count"] != DBNull.Value ? Convert.ToInt32(row["Fast DC_count"]) : 0;
+
+                int totalCount = acHomeCount + acWorkCount + acPublicCount + fastDcCount;
+
+                // Build the detailed tooltip text for all cells
+                string tooltipText = $"Cell: {cellId}\n" +
+                                     $"AC (Home): {acHomeCount}\n" +
+                                     $"AC (Work): {acWorkCount}\n" +
+                                     $"AC (Public): {acPublicCount}\n" +
+                                     $"Fast DC: {fastDcCount}";
+
+                // Determine if there is an increase in EV points for the specified year.
+                // For this example, we assume you have columns that indicate the increase,
+                // e.g., "AC (Home)_increase", "AC (Work)_increase", etc.
+                // You might need to adjust this logic based on your data structure.
+                bool hasNewPoints = false;
+                int newAcHome = row["AC (Home)_increase"] != DBNull.Value ? Convert.ToInt32(row["AC (Home)_increase"]) : 0;
+                int newAcWork = row["AC (Work)_increase"] != DBNull.Value ? Convert.ToInt32(row["AC (Work)_increase"]) : 0;
+                int newAcPublic = row["AC (Public)_increase"] != DBNull.Value ? Convert.ToInt32(row["AC (Public)_increase"]) : 0;
+                int newFastDc = row["Fast DC_increase"] != DBNull.Value ? Convert.ToInt32(row["Fast DC_increase"]) : 0;
+
+                // If any of these are greater than zero, we assume there’s an increase.
+                if (newAcHome > 0 || newAcWork > 0 || newAcPublic > 0 || newFastDc > 0)
+                {
+                    hasNewPoints = true;
+                    // You could also update the tooltip to reflect the new additions.
+                    tooltipText += "\n(New EV points added in " + year + ")";
+                }
+
+                // Choose marker based on if new points were added.
+                if (totalCount == 0)
+                {
+                    // Invisible marker for cells with no overall EV stations.
+                    var invisibleMarker = new GMarkerGoogle(new PointLatLng(enlem, boylam), transparentBitmap)
+                    {
+                        ToolTipText = tooltipText,
+                        ToolTipMode = MarkerTooltipMode.OnMouseOver,
+                        Tag = cellId
+                    };
+                    cellToolTipOverlay.Markers.Add(invisibleMarker);
+                }
+                else
+                {
+                    GMarkerGoogleType markerType;
+                    if (hasNewPoints)
+                    {
+                        // Set a distinct color for new EV points. 
+                        // (Assuming GMarkerGoogleType.purple exists or replace with your custom marker type)
+                        markerType = GMarkerGoogleType.purple;
+                    }
+                    else
+                    {
+                        // Otherwise, use the helper method to determine marker type as before.
+                        markerType = DetermineMarkerType(acHomeCount, acWorkCount, acPublicCount, fastDcCount);
+                    }
+                    var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), markerType)
+                    {
+                        ToolTipMode = MarkerTooltipMode.OnMouseOver,
+                        Tag = cellId,
+                        ToolTipText = tooltipText
+                    };
+                    simulationOverlay.Markers.Add(marker);
+                }
+            }
+
+            // Refresh the map on the UI thread
+            Invoke(new Action(() => gMapControl_EA.Refresh()));
+
+            return Task.CompletedTask;
+        }
+        private Task HaritaUzerindeSonYilVeArtisGosterimi(List<DataTable> yillikVeriTablolari, List<int> yillar)
+        {
+            // Validate input
+            if (yillikVeriTablolari.Count != yillar.Count || yillikVeriTablolari.Count == 0)
+                throw new ArgumentException("Number of DataTables must match number of years and be non-empty.");
+
+            // Clear existing overlays
+            gMapControl_EA.Overlays.Clear();
+            gMapControl_EA.Overlays.Add(simulationOverlay);
+            gMapControl_EA.Overlays.Add(cellToolTipOverlay);
+
+            // Uncheck the checkbox on the UI thread
+            Invoke(new Action(() => EAPointsLayerCheckBox.Checked = false));
+
+            // Transparent bitmap for invisible markers
+            Bitmap transparentBitmap = new Bitmap(16, 16);
+            using (Graphics g = Graphics.FromImage(transparentBitmap))
+            {
+                g.Clear(Color.Transparent);
+            }
+
+            // Dictionary to track EV counts per cell across years
+            Dictionary<string, List<int>> cellEvCountsByYear = new Dictionary<string, List<int>>();
+
+            // Process all DataTables to populate cell data for comparison
+            for (int i = 0; i < yillikVeriTablolari.Count; i++)
+            {
+                DataTable veriTablosu = yillikVeriTablolari[i];
+                foreach (DataRow row in veriTablosu.Rows)
+                {
+                    if (row["Enlem"] == DBNull.Value || row["Boylam"] == DBNull.Value) continue;
+
+                    string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
+                    int totalCount = CalculateTotalCount(row);
+
+                    if (!cellEvCountsByYear.ContainsKey(cellId))
+                    {
+                        cellEvCountsByYear[cellId] = new List<int>(new int[yillikVeriTablolari.Count]); // Initialize with zeros
+                    }
+                    cellEvCountsByYear[cellId][i] = totalCount;
+                }
+            }
+
+            // Plot only the latest year's data
+            DataTable latestData = yillikVeriTablolari.Last();
+            int latestYear = yillar.Last();
+
+            foreach (DataRow row in latestData.Rows)
+            {
+                if (row["Enlem"] == DBNull.Value || row["Boylam"] == DBNull.Value) continue;
+
+                double enlem = Convert.ToDouble(row["Enlem"]);
+                double boylam = Convert.ToDouble(row["Boylam"]);
+                string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
+
+                int acHomeCount = row["AC (Home)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Home)_count"]) : 0;
+                int acWorkCount = row["AC (Work)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Work)_count"]) : 0;
+                int acPublicCount = row["AC (Public)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Public)_count"]) : 0;
+                int fastDcCount = row["Fast DC_count"] != DBNull.Value ? Convert.ToInt32(row["Fast DC_count"]) : 0;
+                int totalCount = acHomeCount + acWorkCount + acPublicCount + fastDcCount;
+
+                string tooltipText = $"Cell: {cellId}\n" +
+                                    $"Year: {latestYear}\n" +
+                                    $"AC (Home): {acHomeCount}\n" +
+                                    $"AC (Work): {acWorkCount}\n" +
+                                    $"AC (Public): {acPublicCount}\n" +
+                                    $"Fast DC: {fastDcCount}";
+
+                bool isNewStation = false;
+                int increaseAmount = 0;
+                if (yillikVeriTablolari.Count > 1 && cellEvCountsByYear.ContainsKey(cellId))
+                {
+                    int currentYearIndex = yillikVeriTablolari.Count - 1;
+                    int previousYearIndex = currentYearIndex - 1;
+                    int currentCount = cellEvCountsByYear[cellId][currentYearIndex];
+                    int previousCount = cellEvCountsByYear[cellId][previousYearIndex];
+                    isNewStation = currentCount > previousCount;
+                    increaseAmount = isNewStation ? currentCount - previousCount : 0;
+                    if (isNewStation)
+                    {
+                        tooltipText += $"\nNew Stations Added in {latestYear}: {increaseAmount}";
+                    }
+                }
+
+                if (totalCount == 0)
+                {
+                    // Invisible marker for empty cells
+                    var invisibleMarker = new GMarkerGoogle(new PointLatLng(enlem, boylam), transparentBitmap)
+                    {
+                        ToolTipText = tooltipText,
+                        ToolTipMode = MarkerTooltipMode.OnMouseOver,
+                        Tag = cellId
+                    };
+                    cellToolTipOverlay.Markers.Add(invisibleMarker);
+                }
+                else
+                {
+                    // Use purple for increases, otherwise determine by dominant type
+                    GMarkerGoogleType markerType = isNewStation
+                        ? GMarkerGoogleType.purple_dot // Highlight new stations
+                        : DetermineYearMarkerType(acHomeCount, acWorkCount, acPublicCount, fastDcCount);
+
+                    var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), markerType)
+                    {
+                        ToolTipMode = MarkerTooltipMode.OnMouseOver,
+                        Tag = cellId,
+                        ToolTipText = tooltipText
+                    };
+                    simulationOverlay.Markers.Add(marker);
+                }
+            }
+
+            // Refresh the map on the UI thread
+            Invoke(new Action(() => gMapControl_EA.Refresh()));
+
+            return Task.CompletedTask; // Instead of Task.FromResult(Task.CompletedTask)
+        }
+        private int CalculateTotalCount(DataRow row)
+        {
+            int acHomeCount = row["AC (Home)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Home)_count"]) : 0;
+            int acWorkCount = row["AC (Work)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Work)_count"]) : 0;
+            int acPublicCount = row["AC (Public)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Public)_count"]) : 0;
+            int fastDcCount = row["Fast DC_count"] != DBNull.Value ? Convert.ToInt32(row["Fast DC_count"]) : 0;
+            return acHomeCount + acWorkCount + acPublicCount + fastDcCount;
+        }
+        // Helper method to determine marker type (unchanged from your original)
+        private GMarkerGoogleType DetermineYearMarkerType(int acHomeCount, int acWorkCount, int acPublicCount, int fastDcCount)
+        {
+            int totalCount = acHomeCount + acWorkCount + acPublicCount + fastDcCount;
+            if (totalCount == 0) return GMarkerGoogleType.gray_small; // Not used, but kept for consistency
+
+            var counts = new[]
+            {
+                new { Type = "AC (Home)", Count = acHomeCount },
+                new { Type = "AC (Work)", Count = acWorkCount },
+                new { Type = "AC (Public)", Count = acPublicCount },
+                new { Type = "Fast DC", Count = fastDcCount }
+            };
+            var dominantType = counts.OrderByDescending(c => c.Count).First().Type;
+
+            if (dominantType == "AC (Home)") return GMarkerGoogleType.green;
+            else if (dominantType == "AC (Work)") return GMarkerGoogleType.blue;
+            else if (dominantType == "AC (Public)") return GMarkerGoogleType.yellow;
+            else if (dominantType == "Fast DC") return GMarkerGoogleType.red;
+            else return GMarkerGoogleType.orange; // Fallback
+        }
 
         private void checkBox_Ac_Home(object sender, EventArgs e)
         {
+
             ToggleMarkers("AC-Home", checkBox_AC_Home.Checked);
         }
 
@@ -3686,6 +4219,7 @@ namespace SLF
             ToggleMarkers("DC-Fast", checkBox_DC_Fast.Checked);
 
         }
+
 
 
         // ------------------------------------------------------------------------------------------------------------ //

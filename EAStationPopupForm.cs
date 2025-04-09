@@ -28,12 +28,12 @@ namespace SLF
         private static class Constants
         {
             public static readonly Dictionary<string, string> StationTypeToCountColumn = new Dictionary<string, string>
-            {
-                { "AC (Home)_count", "AC (Home)_count" },
-                { "AC (Work)_count", "AC (Work)_count" },
-                { "AC (Public)_count", "AC (Public)_count" },
-                { "Fast DC_count", "Fast DC_count" }
-            };
+    {
+        { "AC (Home)_count", "AC (Home)_count" },
+        { "AC (Work)_count", "AC (Work)_count" },
+        { "AC (Public)_count", "AC (Public)_count" },
+        { "Fast DC_count", "Fast DC_count" }
+    };
 
             public static readonly List<int> Years = Enumerable.Range(2024, 2035 - 2024 + 1).ToList();
         }
@@ -66,6 +66,16 @@ namespace SLF
             // If CellId is not set, default to "Not Selected".
             ChargingStationDataGridView.Rows[rowIndex].Cells["ID"].Value =
                 !string.IsNullOrEmpty(veri.CellId) ? veri.CellId : "Not Selected";
+
+            // Populate the StartYear combobox column with years 2024 to 2035.
+            /*            if (ChargingStationDataGridView.Columns["StartYear"] is DataGridViewComboBoxColumn startYearColumn)
+                        {
+                            List<int> years = Enumerable.Range(2024, 2035 - 2024 + 1).ToList();
+                            startYearColumn.DataSource = years;
+
+                            // Optionally set the default value (here, the first year 2024)
+                            ChargingStationDataGridView.Rows[rowIndex].Cells["StartYear"].Value = years.First();
+                        }*/
 
             // Set ISTASYON_TIPI options to AC types and DC
             if (ChargingStationDataGridView.Columns["ISTASYON_TIPI"] is DataGridViewComboBoxColumn typeComboBoxColumn)
@@ -149,7 +159,6 @@ namespace SLF
                 this.Cursor = Cursors.Default;
             }
         }
-
         private void SetupEventHandlers()
         {
             this.FormClosing += ChargingStationPopupForm_FormClosing;
@@ -285,8 +294,6 @@ namespace SLF
                 MessageBox.Show($"Error saving data: {ex.Message}");
             }
         }
-
-
         private void EACancelButton_Click(object sender, EventArgs e)
         {
             this.Close();
