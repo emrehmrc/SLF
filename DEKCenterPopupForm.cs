@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using DocumentFormat.OpenXml.Wordprocessing;
 using ClosedXML.Excel;
 using GMap.NET;
 using static SLF.ModülFormu;
@@ -15,6 +17,7 @@ namespace SLF
         private bool isOperationCancelled = true;
         private NoktaVeri veri; // Store the 'veri' object in the class field
                                 // Public property to expose NoktaVeri
+        public NoktaVeri NoktaVeri => veri;
         public bool OperationCancelled => isOperationCancelled;
         private static class Constants
         {
@@ -182,7 +185,54 @@ namespace SLF
                 }
             }
         }
+        /*        private void FilterCountiesBasedOnCoordinates(double selectedX, double selectedY)
+                {
+                    // Get the closest city from the dictionary based on the coordinates
+                    var closestCity = cityCoordinates
+                                      .OrderBy(city => GetDistance(city.Value.Lat, city.Value.Lng, selectedX, selectedY))
+                                      .FirstOrDefault();
 
+                    // Debugging to check which city is selected
+                    Console.WriteLine($"Selected Coordinates: X={selectedX}, Y={selectedY}");
+                    Console.WriteLine($"Closest City: {closestCity.Key}");
+
+                    if (closestCity.Key != null)
+                    {
+                        // Access the ComboBox column in the DataGridView
+                        var comboBoxColumn = DEKCenterDataGridView.Columns["ILCE_ADI"] as DataGridViewComboBoxColumn;
+
+                        if (comboBoxColumn != null)
+                        {
+                            // Clear the existing items
+                            comboBoxColumn.Items.Clear();
+
+                            // Add the districts for the closest city to the ComboBox column
+                            if (cityDistricts.ContainsKey(closestCity.Key))
+                            {
+                                comboBoxColumn.Items.AddRange(cityDistricts[closestCity.Key].ToArray());
+                            }
+
+                            // Debugging to check the districts added
+                            Console.WriteLine($"Added Districts: {string.Join(", ", cityDistricts[closestCity.Key])}");
+                        }
+
+                        // After updating the items, retain the selection
+                        var comboBoxCell = DEKCenterDataGridView.Rows[0].Cells["ILCE_ADI"] as DataGridViewComboBoxCell;
+                        if (comboBoxCell != null)
+                        {
+                            var currentDistrict = comboBoxCell.Value?.ToString();
+                            if (!string.IsNullOrEmpty(currentDistrict) && comboBoxColumn.Items.Contains(currentDistrict))
+                            {
+                                comboBoxCell.Value = currentDistrict; // Retain the current selection
+                            }
+                            else
+                            {
+                                // If no valid selection, set the default district
+                                comboBoxCell.Value = comboBoxColumn.Items.Count > 0 ? comboBoxColumn.Items[0] : null;
+                            }
+                        }
+                    }
+                }*/
         private void DEKCenterDataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             double selectedX = Convert.ToDouble(DEKCenterDataGridView.Rows[0].Cells["DEK_X_KOORDINAT"].Value);
@@ -192,6 +242,18 @@ namespace SLF
 
             FilterCountiesBasedOnCoordinates(selectedX, selectedY);
         }
+        /*        private void DEKCenterDataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+                {
+                    // Use veri.Enlem and veri.Boylam as the selected coordinates
+                    double selectedX = veri.Enlem; // Assuming veri.Enlem is the latitude
+                    double selectedY = veri.Boylam; // Assuming veri.Boylam is the longitude
+
+                    // Debugging to check the coordinates
+                    Console.WriteLine($"Selected Coordinates: X={selectedX}, Y={selectedY}");
+
+                    // Call the method to filter districts based on these coordinates
+                    FilterCountiesBasedOnCoordinates(selectedX, selectedY);
+                }*/
 
         private double GetDistance(double lat1, double lon1, double lat2, double lon2)
         {
@@ -208,6 +270,13 @@ namespace SLF
             return distance;
         }
 
+
+
+        /*        private void SetupEventHandlers()
+                {
+                    this.FormClosing += DEKCenterPopupForm_FormClosing;
+                    DEKCenterDataGridView.CellValueChanged += DEKCenterDataGridView_CellValueChanged;
+                }*/
 
         private void SetupEventHandlers()
         {
@@ -403,7 +472,96 @@ namespace SLF
                 MessageBox.Show($"Error saving data: {ex.Message}");
             }
         }
+        /*        private void SaveUpdatedInputFile(DataTable updatedData)
+                {
+                    try
+                    {
+                        // Retrieve values from the DataGridView
+                        string startYear = DEKCenterDataGridView.Rows[0].Cells["StartYear"].Value?.ToString();
+                        string cellId = DEKCenterDataGridView.Rows[0].Cells["ID"].Value?.ToString();
+                        string dekValue = DEKCenterDataGridView.Rows[0].Cells["DEK_KURULU_GUCU"].Value?.ToString();
+                        double enlem = Convert.ToDouble(DEKCenterDataGridView.Rows[0].Cells["DEK_X_KOORDINAT"].Value);
+                        double boylam = Convert.ToDouble(DEKCenterDataGridView.Rows[0].Cells["DEK_Y_KOORDINAT"].Value);
 
+                        if (string.IsNullOrEmpty(startYear) || string.IsNullOrEmpty(cellId) || string.IsNullOrEmpty(dekValue))
+                        {
+                            MessageBox.Show("Please ensure StartYear, ID, and DEK_KURULU_GUCU are filled.");
+                            return;
+                        }
+                        string countColumnName = GetCountColumnName(dekValue);
+                        if (countColumnName == null)
+                        {
+                            MessageBox.Show("Invalid DEK_KURULU_GUCU selected.");
+                            return;
+                        }
+                        string existingFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek_distribution_2024_2030_İzmir_düşük.xlsx";
+
+                        using (var package = new OfficeOpenXml.ExcelPackage(new FileInfo(existingFilePath)))
+                        {
+                            int startYearInt = int.Parse(startYear);
+                            foreach (int year in Constants.Years.Where(y => y >= startYearInt))
+                            {
+                                var worksheet = package.Workbook.Worksheets[year.ToString()];
+                                if (worksheet == null)
+                                {
+                                    // Optionally create a new sheet if it doesn’t exist
+                                    worksheet = package.Workbook.Worksheets.Add(year.ToString());
+                                    worksheet.Cells[1, 1].Value = "ID";
+                                    worksheet.Cells[1, 2].Value = "DEK_X_KOORDINAT";
+                                    worksheet.Cells[1, 3].Value = "DEK_Y_KOORDINAT";
+                                    worksheet.Cells[1, 4].Value = "DEK_distributed";
+                                }
+
+                                int lastRow = worksheet.Dimension?.End.Row ?? 1;
+                                bool rowUpdated = false;
+
+                                // Find the row with the matching CellId
+                                for (int i = 2; i <= lastRow; i++)
+                                {
+                                    string existingId = worksheet.Cells[i, 1].Text;
+                                    if (existingId == cellId)
+                                    {
+                                        // Update coordinates
+                                        worksheet.Cells[i, 2].Value = enlem;
+                                        worksheet.Cells[i, 3].Value = boylam;
+
+                                        // Increment the count for the selected station type
+                                        int columnIndex = worksheet.Cells[1, 1, 1, worksheet.Dimension.End.Column]
+                                            .FirstOrDefault(c => c.Text == countColumnName)?.Start.Column ?? 0;
+                                        if (columnIndex > 0)
+                                        {
+                                            int currentCount = worksheet.Cells[i, columnIndex].Value != null ? Convert.ToInt32(worksheet.Cells[i, columnIndex].Value) : 0;
+                                            worksheet.Cells[i, columnIndex].Value = currentCount + 1;
+                                        }
+
+                                        rowUpdated = true;
+                                        break;
+                                    }
+                                }
+
+                                // If no matching row found, add a new row
+                                if (!rowUpdated)
+                                {
+                                    int newRowIndex = lastRow + 1;
+                                    worksheet.Cells[newRowIndex, 1].Value = cellId;
+                                    worksheet.Cells[newRowIndex, 2].Value = enlem;
+                                    worksheet.Cells[newRowIndex, 3].Value = boylam;
+
+                                    // Set initial counts (1 for the selected type, 0 for others)
+                                    worksheet.Cells[newRowIndex, 4].Value = dekValue == "DEK_distributed" ? 1 : 0;
+
+                                }
+                            }
+
+                            package.Save();
+                            MessageBox.Show("Data and counts updated successfully in the Excel file!");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error saving data: {ex.Message}");
+                    }
+                }*/
         private void DEKCancelButton_Click(object sender, EventArgs e)
         {
             this.Close();
