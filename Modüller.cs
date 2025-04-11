@@ -4229,7 +4229,6 @@ namespace SLF
         // ------------------------------------------------------------------------------------------------------------ //
 
         // Modül tabları veri importu mantıgında refer ediliyor. Silinmesin.
-        // Modül tabları veri importu mantıgında refer ediliyor. Silinmesin.
         private void DEKCenterAddButton_Click(object sender, EventArgs e)
         {
             // Check if the "DTR Verileri" key exists in the dataTablesByType dictionary
@@ -4777,7 +4776,6 @@ namespace SLF
                 MessageBox.Show($"Bir hata oluştu: {ex.Message}");
             }
         }
-
 
         private DataTable FormatDEKTableForDisplay(DataTable originalDEKTable)
         {
@@ -6996,7 +6994,7 @@ namespace SLF
         {
             try
             {
-                string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\DEK_son_yeni.py";
+                string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\DEK_0411.py";
                 string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe";
 
                 ProcessStartInfo startInfo = new ProcessStartInfo
@@ -7049,7 +7047,7 @@ namespace SLF
             DEKSimButton.Enabled = false;
             try
             {
-                string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek_distribution_2024_2030_İzmir_düşük.xlsx";
+                string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\cıktı\dek_distribution_cumulative_0704.xlsx";
                 DataTable simulationData;
                 try
                 {
