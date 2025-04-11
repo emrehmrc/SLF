@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using DocumentFormat.OpenXml.Wordprocessing;
 using ClosedXML.Excel;
 using GMap.NET;
 using static SLF.ModülFormu;
@@ -15,6 +17,7 @@ namespace SLF
         private bool isOperationCancelled = true;
         private NoktaVeri veri; // Store the 'veri' object in the class field
                                 // Public property to expose NoktaVeri
+        public NoktaVeri NoktaVeri => veri;
         public bool OperationCancelled => isOperationCancelled;
         private static class Constants
         {
@@ -182,7 +185,6 @@ namespace SLF
                 }
             }
         }
-
         private void DEKCenterDataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             double selectedX = Convert.ToDouble(DEKCenterDataGridView.Rows[0].Cells["DEK_X_KOORDINAT"].Value);
@@ -207,7 +209,6 @@ namespace SLF
             double distance = R * c; // Distance in km
             return distance;
         }
-
 
         private void SetupEventHandlers()
         {
@@ -239,38 +240,6 @@ namespace SLF
             }
         }
 
-        /*        private void DEKTamamButton_Click(object sender, EventArgs e)
-                {
-                    // Validate the input
-                    foreach (DataGridViewCell cell in DEKCenterDataGridView.Rows[0].Cells)
-                    {
-                        if (cell.Value == null || string.IsNullOrWhiteSpace(cell.Value.ToString()))
-                        {
-                            MessageBox.Show("Lütfen tüm alanları doldurun.");
-                            return;
-                        }
-                    }
-                    veri.CellId = DEKCenterDataGridView.Rows[0].Cells["ID"].Value?.ToString();
-                    // Add new row to the existing DataTable
-                    DataRow newRow = dataTable.NewRow();
-                    newRow["ILCE_ADI"] = DEKCenterDataGridView.Rows[0].Cells["ILCE_ADI"].Value.ToString();
-                    newRow["KAYNAK_TIPI"] = DEKCenterDataGridView.Rows[0].Cells["KAYNAK_TIPI"].Value.ToString();
-                    newRow["DEK_KURULU_GUCU"] = Convert.ToDouble(DEKCenterDataGridView.Rows[0].Cells["DEK_KURULU_GUCU"].Value);
-                    newRow["DEK_X_KOORDINAT"] = Convert.ToDouble(DEKCenterDataGridView.Rows[0].Cells["DEK_X_KOORDINAT"].Value);
-                    newRow["DEK_Y_KOORDINAT"] = Convert.ToDouble(DEKCenterDataGridView.Rows[0].Cells["DEK_Y_KOORDINAT"].Value);
-                    newRow["DEK_TM_ADI"] = DEKCenterDataGridView.Rows[0].Cells["DEK_TM_ADI"].Value.ToString();
-                    newRow["DEK_KURULUM_YERI"] = DEKCenterDataGridView.Rows[0].Cells["DEK_KURULUM_YERI"].Value.ToString();
-                    //newRow["DEK_BAGLANDIGI_TRAFO_KODU"] = DEKCenterDataGridView.Rows[0].Cells["DEK_BAGLANDIGI_TRAFO_KODU"].Value.ToString();
-
-                    dataTable.Rows.Add(newRow);
-                    SaveUpdatedInputFile(dataTable);
-                    // Show success message
-                    MessageBox.Show("DEK merkezi başarıyla eklendi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    isOperationCancelled = false;
-                    this.DialogResult = DialogResult.OK;
-                    this.Close();
-                }
-        */
         private void DEKTamamButton_Click(object sender, EventArgs e)
         {
             // Validate the input
@@ -403,7 +372,6 @@ namespace SLF
                 MessageBox.Show($"Error saving data: {ex.Message}");
             }
         }
-
         private void DEKCancelButton_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -417,5 +385,4 @@ namespace SLF
             }
         }
     }
-
 }
