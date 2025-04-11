@@ -4426,7 +4426,7 @@ namespace SLF
             }
         }
         // DEK şehri seçildiğinde çağrılan metot
-        private void dek_city_SelectedIndexChanged(object sender, EventArgs e)
+/*        private void dek_city_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBox_DEK_il.SelectedItem != null)  // Geçerli bir seçim yapıldığında
             {
@@ -4457,13 +4457,16 @@ namespace SLF
                     gMapControl_DEK.Zoom = 12; // Adjust the zoom level as needed
                 }
             }
-        }
+        }*/
 
         private async void dekSimulasyonGoruntule(object sender, EventArgs e)
         {
             DEKCenterAddButton.Enabled = false;
             gMapControl_DEK.Overlays.Clear();
             gMapControl_DEK.Refresh();
+
+            SelectedDistrict = PathService.SelectedDistrict;
+            SelectedCity = PathService.SelectedCity;
 
             // Şehir ve hız seçimine göre dosya yolunu ayarla
             string filePath = "";
@@ -6909,7 +6912,7 @@ namespace SLF
             gMapControl_DEK.Refresh();
         }
 
-        private void ilceSecimiDEK(object sender, EventArgs e)
+/*        private void ilceSecimiDEK(object sender, EventArgs e)
         {
             if (comboBox_dek_ilce_secimi.SelectedItem != null)
             {
@@ -6922,7 +6925,7 @@ namespace SLF
                 Console.WriteLine("District selection cleared.");
             }
             // CheckSelections();
-        }
+        }*/
 
         private async void DEKRunSimulationButton_Click(object sender, EventArgs e)
         {
