@@ -17,7 +17,6 @@ using System.Threading.Tasks;
 using OfficeOpenXml;
 using DrawingImage = System.Drawing.Image;
 using System.Text;
-using SLF.services;
 using SLF.Services;
 using System.Reflection;
 using System.Globalization;
@@ -45,11 +44,8 @@ namespace SLF
         // ------------------------------------------------------------------------------------------------------------ //
         // ---------------------------------------------- GENEL DEĞİŞKENLER ---------------------------------------------- //
 
-        public string exeLocation;
-        public string projectRoot;
-
-        public string json_file;
-        public dynamic config;
+        public HomePageForm ana_menu_form_objesi;
+        private MethodForm methodFormObjesi;
 
         public string ELFrScriptModelPath;
         public string ELFrScriptSenaryolarPath;
@@ -189,14 +185,8 @@ namespace SLF
             InitializeComponent();
             SetupLayout();
 
-            // Resolve the Excel file path relative to SLF.exe
-            exeLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); // e.g., C:\Users\ehan0\source\repos\emrehmrc\SLF\bin\Debug
-            projectRoot = Directory.GetParent(exeLocation)?.Parent?.FullName; // Move up two levels to SLF root (C:\Users\ehan0\source\repos\emrehmrc\SLF)
-
-
-            // read the json file and create the "config" variable.
-            json_file = File.ReadAllText(Path.Combine(projectRoot, "config.json"));
-            config = JsonConvert.DeserializeObject(json_file);
+            ana_menu_form_objesi = new HomePageForm();
+            methodFormObjesi = new MethodForm(ana_menu_form_objesi);
 
             var yearService = YearService.GetInstance();
             if (this.slfStartYear > 0 && this.slfEndYear > 0)
@@ -212,15 +202,19 @@ namespace SLF
             }
 
             
-            if (projectRoot != null)
+            if (ana_menu_form_objesi.projectRoot != null)
             {
-                polygonTypesExcelPath = Path.Combine(projectRoot, "Excel Files", "Point Load Karakteristikleri.xlsx", "point_load.xlsx"); // e.g., C:\Users\ehan0\source\repos\emrehmrc\SLF\Excel Files\point_load.xlsx
+                polygonTypesExcelPath = Path.Combine(ana_menu_form_objesi.projectRoot, "Excel Files", 
+                    "Point Load Karakteristikleri.xlsx", "point_load.xlsx"); 
+                // e.g., C:\Users\ehan0\source\repos\emrehmrc\SLF\Excel Files\point_load.xlsx
             }
             else
             {
                 // Fallback to a default path if resolution fails
-                polygonTypesExcelPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "point_load.xlsx");
-                MessageBox.Show($"Excel dosya yolu çözülemedi. Varsayılan yol kullanılıyor: {polygonTypesExcelPath}", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                polygonTypesExcelPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), 
+                    "point_load.xlsx");
+                MessageBox.Show($"Excel dosya yolu çözülemedi. Varsayılan yol kullanılıyor: {polygonTypesExcelPath}", 
+                    "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             _excelService = new ExcelService();
@@ -1185,6 +1179,9 @@ namespace SLF
 
         private void yearApproveButton_Click(object sender, EventArgs e)
         {
+            ana_menu_form_objesi.config.ELF.ufuk_yılı = (int)endYearComboBox.SelectedItem - (int)startYearComboBox.SelectedItem;
+            methodFormObjesi.SaveConfigToFile();
+            
             if (endYearComboBox.SelectedIndex == -1)
             {
                 // if the end year is not chosen, it means we are still in selection process
@@ -4747,48 +4744,50 @@ namespace SLF
 
 
         // Method to run the R script
-        private string RunModelRScript(string senaryolarFilePath)
+        private async Task<string> RunModelRScript()
         {
+            ELFrScriptModelPath = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.ELF.Rscript_Yolu_Model);
 
-            ELFrScriptModelPath = config.ELF.Rscript_Yolu;
-
-            // Set up process info
-            var processInfo = new ProcessStartInfo()
+            var processInfo = new ProcessStartInfo
             {
                 FileName = "Rscript.exe",
-                Arguments = $"\"{ELFrScriptModelPath}\" \"{senaryolarFilePath}\"",
+                Arguments = $"--vanilla \"{(string)ELFrScriptModelPath}\" \"{(string)Path.Combine(ana_menu_form_objesi.projectRoot, "config.json")}\"",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
 
-            // Start the process
-            using (var process = Process.Start(processInfo))
+            using (var process = new Process())
             {
+                process.StartInfo = processInfo;
                 process.OutputDataReceived += (sender, args) =>
                 {
                     if (!string.IsNullOrEmpty(args.Data))
                     {
-                        Console.WriteLine(args.Data);
                         ELFResultsFilePath = args.Data;  // Capture the file path
                     }
                 };
 
-                process.ErrorDataReceived += (sender, args) => Console.WriteLine("ERROR: " + args.Data);
+                process.ErrorDataReceived += (sender, args) => Console.WriteLine("HATA: " + args.Data);
 
+                process.Start();
                 process.BeginOutputReadLine();
-                process.WaitForExit();
-            }
 
-            if (string.IsNullOrEmpty(ELFResultsFilePath))
-            {
-                MessageBox.Show("Error: No results file path was generated by the R script.");
-                return null;
-            }
+                // Wait for the process to exit asynchronously
+                await Task.Run(() => process.WaitForExit());
 
-            MessageBox.Show("Modeller başarıyla çalıştırıldı. " + ELFResultsFilePath);
-            return ELFResultsFilePath;  // Return the results file path
+                if (string.IsNullOrEmpty(ELFResultsFilePath))
+                {
+                    MessageBox.Show("RScript yolu hatası!.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    return null;
+                }
+
+                MessageBox.Show("Modeller başarıyla çalıştırıldı. ","",MessageBoxButtons.OK,MessageBoxIcon.Exclamation);
+                return ELFResultsFilePath;
+            }
         }
 
 
@@ -6615,14 +6614,21 @@ namespace SLF
             }
         }
 
-        private void ELFTahminButonu_Click(object sender, EventArgs e)
+        // Async click event handler
+        private async void ELFTahminButonu_Click(object sender, EventArgs e)
         {
-            try
+            string resultsFilePath = await RunModelRScript();
+            /*try
             {
-                // Set cursor to wait while running the operations
-                Cursor.Current = Cursors.WaitCursor;
+                // Set cursor to wait at the beginning
+                this.Cursor = Cursors.WaitCursor;
 
-                ELFSenaryolarFilePath = config.ELF.Rscript_Yolu_Senaryolar;
+                ELFSenaryolarFilePath = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.İlçe,
+                    (string)ana_menu_form_objesi.config.ELF.INPUT_FILE);
+
+                MessageBox.Show(ELFSenaryolarFilePath);
 
                 // Check if the modified file exists
                 if (!File.Exists(ELFSenaryolarFilePath))
@@ -6631,8 +6637,8 @@ namespace SLF
                     return;
                 }
 
-                // Run the R script
-                string resultsFilePath = RunModelRScript(ELFSenaryolarFilePath);
+                // Run the R script asynchronously
+                string resultsFilePath = await RunModelRScript();
 
                 if (resultsFilePath == null)
                 {
@@ -6645,9 +6651,9 @@ namespace SLF
             }
             finally
             {
-                // Restore cursor to default
-                Cursor.Current = Cursors.Default;
-            }
+                // Restore cursor to default at the end, regardless of success or failure
+                this.Cursor = Cursors.Default;
+            }*/
         }
 
         private async void DEKSimulasyonSonucGoruntule_Click(object sender, EventArgs e)

@@ -1742,6 +1742,7 @@ namespace SLF
 
             return combinedRow;
         }
+
         private DataRow CombineAttributesWithAggregations(
             DataRow leftRow, DataRow rightRow,
             Dictionary<string, double> counts, Dictionary<string, double> sums,

@@ -1,20 +1,25 @@
 {
-	"ELF":{
-		"SONUÇLAR": "C:/Users/ehan0/MRC/MRC - 1.1.3_T&SI/MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı/09_Alinan Veriler/GDZ/Ekonometrik Yük Tahmini Verileri/Program/SONUÇLAR/ELF_Tahmin_Sonuçları2025-03-03 15_56_09.xlsx",
-		"INPUT_FILE": "C:/Users/ehan0/MRC/MRC - 1.1.3_T&SI/MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı/09_Alinan Veriler/GDZ/Ekonometrik Yük Tahmini Verileri/Program/INPUT_FILE/INPUT_FILE.xlsx",
-		"Rscript_Yolu_Model": "C:/Users/ehan0/MRC/MRC - 1.1.3_T&SI/MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı/09_Alinan Veriler/GDZ/Ekonometrik Yük Tahmini Verileri/Program/Model/model.R",
-		"Rscript_Yolu_Senaryolar": "C:/Users/ehan0/MRC/MRC - 1.1.3_T&SI/MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı/09_Alinan Veriler/GDZ/Ekonometrik Yük Tahmini Verileri/Program/Model/senaryolar.R"
-	},
-	"Veritabanı":{
-		"Server Address": "",
-		"Host":,
-		"Username": ,
-		"Password":""
-	},
-	"Python Kodları":{
-		"Sonuçlar_to_Kml":"C:/Users/ehan0/source/repos/emrehmrc/SLF/python_kod/SLF Sonucları/excel_to_kml_sonuçlar.py"			
-	},
-	"DEK":{
-		"Simulasyon_Kodu" : ""
-	}
+  "Ana_Klasör_Yolu": "C:/Users/ehan0/MRC/MRC - 1.1.3_T&SI/MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı/il_ilce_kırılımları",
+  "İl": "İzmir",
+  "İlçe": "Karşıyaka",
+  "ELF": {
+    "SONUÇLAR": "Ekonometrik Yük Tahmini Verileri/SONUÇLAR",
+    "INPUT_FILE": "Ekonometrik Yük Tahmini Verileri/VERİLER.xlsx",
+    "ŞABLON": "Ekonometrik Yük Tahmini Verileri/ŞABLON.xlsx",
+    "Rscript_Yolu_Model": "PROGRAM DOSYALARI/ELF/model.R",
+    "Rscript_Yolu_Senaryolar": "PROGRAM DOSYALARI/ELF/senaryolar.R",
+    "ufuk_yılı": 11
+  },
+  "Veritabanı": {
+    "Server Address": "",
+    "Host": "",
+    "Username": "",
+    "Password": ""
+  },
+  "Python Kodları": {
+    "Sonuçlar_to_Kml": "C:/Users/ehan0/source/repos/emrehmrc/SLF/python_kod/SLF Sonucları/excel_to_kml_sonuçlar.py"
+  },
+  "DEK": {
+    "Simulasyon_Kodu": ""
+  }
 }

@@ -480,10 +480,10 @@ namespace SLF
                         var excelExporter = new ExcelExporter();
 
                         // Update the first sheet of the Excel file with the imported data
-                        excelExporter.UpdateExcelFileFirstSheet(modülFormu.config.ELF.INPUT_FILE, importedDataTable);
+                        excelExporter.UpdateExcelFileFirstSheet(modülFormu.ana_menu_form_objesi.config.ELF.INPUT_FILE, importedDataTable);
 
                         // Run the R script after exporting to Excel
-                        RunRScriptSenaryolar(modülFormu.config.ELF.INPUT_FILE); // Call the synchronous method
+                        RunRScriptSenaryolar(modülFormu.ana_menu_form_objesi.config.ELF.INPUT_FILE); // Call the synchronous method
                     }
                     catch (Exception ex)
                     {
@@ -640,7 +640,7 @@ namespace SLF
         {
             try
             {
-                modülFormu.ELFrScriptSenaryolarPath = modülFormu.config.ELF.Rscript_Yolu_Senaryolar;
+                modülFormu.ELFrScriptSenaryolarPath = modülFormu.ana_menu_form_objesi.config.ELF.Rscript_Yolu_Senaryolar;
 
                 string logFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Program\SONUÇLAR\script_output_log.txt";
 

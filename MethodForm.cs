@@ -1,17 +1,19 @@
-﻿using Avalonia.Controls;
-using SLF.Services;
+﻿using SLF.Services;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace SLF
 {
     public partial class MethodForm : Form
     {
         public ModülFormu mod1;
+
         public string selectedMethod { get; private set; }
         private HomePageForm homePageForm; // Reference to HomePageForm
+
         public string SelectedPath { get; private set; }
 
         // İl ve ilçe seçimlerini geçici olarak saklama
@@ -23,7 +25,7 @@ namespace SLF
             // Önce ComboBox'ları temizle
             IlComboBox.Items.Clear();
             IlceComboBox.Items.Clear();
-
+            
             // "Lütfen seçin" varsayılan maddelerini ekle
             IlComboBox.Items.Add("Lütfen il seçin");
             IlceComboBox.Items.Add("Lütfen ilçe seçin");
@@ -58,6 +60,12 @@ namespace SLF
 
         private void ForwardButton_Click(object sender, EventArgs e)
         {
+
+            homePageForm.config.İl = IlComboBox.SelectedItem.ToString();
+            homePageForm.config.İlçe = IlceComboBox.SelectedItem.ToString();
+
+            SaveConfigToFile();
+            
             if (MethodComboBox.SelectedItem == null)
             {
                 MessageBox.Show("İlerlemek için bir metot seçiniz");
@@ -92,11 +100,25 @@ namespace SLF
                 return;
             }
 
-            // Debug bilgisi
-            Console.WriteLine($"İlerleme öncesi seçilen path: {PathService.FullPath}");
-
             // Seçilen metoda göre modül formunu aç
             OpenModülFormuBasedOnSelection(selectedMethod);
+        }
+
+        // Method to save the updated config to config.json
+        public void SaveConfigToFile()
+        {
+            try
+            {
+                // Serialize the dynamic config object back to JSON with indentation
+                string updatedJson = JsonConvert.SerializeObject(homePageForm.config, Newtonsoft.Json.Formatting.Indented);
+
+                // Write the updated JSON back to the file
+                File.WriteAllText(Path.Combine(homePageForm.projectRoot, "config.json"), updatedJson);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving config: {ex.Message}");
+            }
         }
 
         // Mevcut geçici klasörleri temizleyen metot
@@ -110,8 +132,6 @@ namespace SLF
                 // Klasör yoksa işlem yapma
                 if (!Directory.Exists(districtPath))
                     return;
-                
-                Console.WriteLine($"Geçici klasörler temizleniyor: {districtPath}");
                 
                 // "temp_" ile başlayan tüm klasörleri bul
                 string[] tempFolders = Directory.GetDirectories(districtPath, "temp_*");
@@ -152,10 +172,7 @@ namespace SLF
                     GirdiModülü.dataTablesByType.Clear();
                 }
                 
-                // Diğer global verileri de temizle
-                // ...
 
-                Console.WriteLine("Mevcut oturum verileri temizlendi");
             }
             catch (Exception ex)
             {

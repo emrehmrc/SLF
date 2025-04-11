@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Windows.Forms;
-
+using System.IO;
+using System.Reflection;
 
 namespace SLF
 {
@@ -8,6 +10,12 @@ namespace SLF
     {
         public ModülFormu mod1;
         public Hakkında mod2;
+
+        public string exeLocation;
+        public string projectRoot;
+
+        public string json_file;
+        public dynamic config;
 
         public HomePageForm()
         {
@@ -19,6 +27,15 @@ namespace SLF
 
             // Ensure StartButton has focus when the form is shown
             this.Shown += HomePageForm_Shown;
+
+            // Resolve the Excel file path relative to SLF.exe
+            exeLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); // e.g., C:\Users\ehan0\source\repos\emrehmrc\SLF\bin\Debug
+            projectRoot = Directory.GetParent(exeLocation)?.Parent?.FullName; // Move up two levels to SLF root (C:\Users\ehan0\source\repos\emrehmrc\SLF)
+
+            // read the json file and create the "config" variable.
+            json_file = File.ReadAllText(Path.Combine(projectRoot, "config.json"));
+            config = JsonConvert.DeserializeObject(json_file);
+
         }
 
         private void HomePageForm_Shown(object sender, EventArgs e)

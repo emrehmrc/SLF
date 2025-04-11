@@ -641,12 +641,12 @@
     <Compile Include="ProjectFolderPicker.Designer.cs">
       <DependentUpon>ProjectFolderPicker.cs</DependentUpon>
     </Compile>
-    <Compile Include="services\DatabaseHelpers.cs" />
-    <Compile Include="services\DatabaseManager .cs" />
-    <Compile Include="services\IsImportedModule.cs" />
-    <Compile Include="services\PathService.cs" />
-    <Compile Include="services\PythonHelper.cs" />
-    <Compile Include="services\YearSet.cs" />
+    <Compile Include="Services\DatabaseHelpers.cs" />
+    <Compile Include="Services\DatabaseManager .cs" />
+    <Compile Include="Services\IsImportedModule.cs" />
+    <Compile Include="Services\PathService.cs" />
+    <Compile Include="Services\PythonHelper.cs" />
+    <Compile Include="Services\YearSet.cs" />
     <Compile Include="Tablo_olustur.cs">
       <SubType>Form</SubType>
     </Compile>
