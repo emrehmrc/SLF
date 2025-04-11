@@ -177,7 +177,7 @@ namespace SLF
             OpenFileDialog vektorel_veri_seçimi = new OpenFileDialog();
 
             string targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
-            vektorel_veri_seçimi.Filter = "Shapefile|*.shp|Google Earth File|*.kml|CSV File|*.csv";
+            vektorel_veri_seçimi.Filter = "Shapefile|*.shp|Google Earth File|*.kml";
             vektorel_veri_seçimi.InitialDirectory = targetDirectory;
 
             DialogResult result = vektorel_veri_seçimi.ShowDialog();

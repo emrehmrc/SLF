@@ -643,7 +643,6 @@
     </Compile>
     <Compile Include="Services\DatabaseHelpers.cs" />
     <Compile Include="Services\DatabaseManager .cs" />
-    <Compile Include="Services\IsImportedModule.cs" />
     <Compile Include="Services\PathService.cs" />
     <Compile Include="Services\PythonHelper.cs" />
     <Compile Include="Services\YearSet.cs" />
@@ -687,7 +686,6 @@
     </Compile>
     <Compile Include="YeniProjelendirilmisDTR.cs" />
     <Compile Include="EnerjiMusaadeleri.cs" />
-    <Compile Include="TMVerileri.cs" />
     <Compile Include="Fider Verileri.cs" />
     <Compile Include="EkonometrikYukTahminiModulu.cs" />
     <Compile Include="DEKModulu.cs" />

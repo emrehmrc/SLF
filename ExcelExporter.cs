@@ -123,7 +123,6 @@ namespace SLF
 
                     // Dosyayı kaydet
                     package.Save();
-                    Console.WriteLine("Excel dosyası başarıyla güncellendi.");
                 }
                 catch (Exception ex)
                 {

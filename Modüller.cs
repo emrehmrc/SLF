@@ -18,9 +18,7 @@ using OfficeOpenXml;
 using DrawingImage = System.Drawing.Image;
 using System.Text;
 using SLF.Services;
-using System.Reflection;
 using System.Globalization;
-using Newtonsoft.Json;
 
 namespace SLF
 {
@@ -775,14 +773,14 @@ namespace SLF
             // Handle file loading logic for the "Girdi" module
             if (slfStartYear == 0 || slfEndYear == 0)
             {
-                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", 
+                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.",
                     "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             // Check if an item is selected in the ComboBox before accessing it
             if (veri_listesi_seçimi.SelectedItem == null)
             {
-                MessageBox.Show("Lütfen bir veri tipi seçin.", "Hata", 
+                MessageBox.Show("Lütfen bir veri tipi seçin.", "Hata",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return; // Exit if no valid data type is selected
             }
@@ -801,7 +799,7 @@ namespace SLF
 
                         if (!File.Exists(csvFilePath) || !File.Exists(kmlFilePath))
                         {
-                            MessageBox.Show("Geçerli dosyalar seçilmedi.", "Hata", 
+                            MessageBox.Show("Geçerli dosyalar seçilmedi.", "Hata",
                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return;
                         }
@@ -822,6 +820,7 @@ namespace SLF
                 MessageBox.Show($"{seçilenVeriTipi} için girdi modülü oluşturulamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return; // Metodu sonlandır
             }
+
             // Use the selectedMethod here
             if (selectedMethod == "ELF (Ekonometrik)")
             {
@@ -838,33 +837,51 @@ namespace SLF
                 // Handle other cases or invalid selection
                 MessageBox.Show("No valid method selected.");
             }
-            //string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
-
 
             girdiModülü.slfStartYear = slfStartYear;
             girdiModülü.slfEndYear = slfEndYear;
 
+            InitializeComboBoxes();
 
-            InitializeComboBoxes(); // yılların guncellenmesi 
-                                    // Check if "ELF" is selected to skip prerequisites
             bool skipPrerequisites = (selectedMethod == "ELF (Ekonometrik)");
 
             // Call VEERProcess with skipPrerequisites flag
             var isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
-            dataGridView_girdi.DataSource = GirdiModülü.dataTablesByType[seçilenVeriTipi];
+
+            // Set the DataSource for dataGridView_girdi
+            if (GirdiModülü.dataTablesByType.ContainsKey(seçilenVeriTipi))
+            {
+                dataGridView_girdi.DataSource = GirdiModülü.dataTablesByType[seçilenVeriTipi];
+                // Apply formatting to dataGridView_girdi
+                if (dataGridView_girdi.DataSource != null)
+                {
+                    girdiModülü.ApplyDataGridViewFormatting(GirdiModülü.dataTablesByType[seçilenVeriTipi], dataGridView_girdi);
+                }
+            }
+            else
+            {
+                // Optionally, set DataSource to null or an empty DataTable to clear the grid
+                dataGridView_girdi.DataSource = null;
+            }
+
             dataGridView_girdi.Refresh();
-            Console.WriteLine(isImported.ToString());
+
             isİmportedModule(isImported, seçilenVeriTipi);
+
             if (isImported)
             {
                 modulescheck.Add(seçilenVeriTipi);
                 veri_listesi_seçimi.Refresh();
                 Console.WriteLine(modulescheck.Count);
-                dataGridView_girdi.DataSource = girdiModülü.CurrentDataTable;
-
-
+                // Note: This line seems redundant since we already set the DataSource above
+                // dataGridView_girdi.DataSource = girdiModülü.CurrentDataTable;
+                // If you want to use CurrentDataTable instead, apply formatting again:
+                // dataGridView_girdi.DataSource = girdiModülü.CurrentDataTable;
+                // if (dataGridView_girdi.DataSource != null)
+                // {
+                //     girdiModülü.ApplyDataGridViewFormatting(girdiModülü.CurrentDataTable, dataGridView_girdi);
+                // }
             }
-
         }
 
         private async void OpenModuleButton_Click(object sender, EventArgs e)
@@ -872,7 +889,11 @@ namespace SLF
             // Disable the button initially
             OpenModuleButton.Enabled = false;
 
-            string filePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
+            string filePath = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                (string)ana_menu_form_objesi.config.İl,
+                (string)ana_menu_form_objesi.config.İlçe,
+                (string)ana_menu_form_objesi.config.ELF.INPUT_FILE);
+
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
 
             // Load the data table for the selected type
@@ -5143,8 +5164,11 @@ namespace SLF
         // Save button logic to update Excel file with changes from DataGridViews
         private async void ELFScenerioSaveButton_Click(object sender, EventArgs e)
         {
-            string originalFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx";
-            string modifiedFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\Modified_INPUT_FILE.xlsx";
+
+            string originalFilePath = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                (string)ana_menu_form_objesi.config.İl,
+                (string)ana_menu_form_objesi.config.İlçe,
+                (string)ana_menu_form_objesi.config.ELF.INPUT_FILE);
 
             try
             {
@@ -5153,14 +5177,14 @@ namespace SLF
                     using (var package = new ExcelPackage(new FileInfo(originalFilePath)))
                     {
                         // Update worksheets with data from DataGridViews
-                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[0], ELFMinSenaryoTable);
-                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[1], ELFLowSenaryoTable);
-                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[2], ELFBaseSenaryoTable);
-                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[3], ELFHighSenaryoTable);
-                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[4], ELFMaxSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[1], ELFMinSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[2], ELFLowSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[3], ELFBaseSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[4], ELFHighSenaryoTable);
+                        _excelService.UpdateWorksheetFromDataGridView(package.Workbook.Worksheets[5], ELFMaxSenaryoTable);
 
                         // Save the modified Excel file
-                        package.SaveAs(new FileInfo(modifiedFilePath));
+                        package.SaveAs(originalFilePath);
                     }
                 });
 
@@ -5275,17 +5299,22 @@ namespace SLF
         {
             ELFrScriptModelPath = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
-                    (string)ana_menu_form_objesi.config.ELF.Rscript_Yolu_Model);
+                    (string)ana_menu_form_objesi.config.ELF.Rscript_Yolu_Model).Replace('/', '\\');
+
+            string configPath = Path.Combine(((string)ana_menu_form_objesi.projectRoot).Replace('/', '\\'), 
+                "config.json");
+
 
             var processInfo = new ProcessStartInfo
             {
-                FileName = "Rscript.exe",
-                Arguments = $"--vanilla \"{(string)ELFrScriptModelPath}\" \"{(string)Path.Combine(ana_menu_form_objesi.projectRoot, "config.json")}\"",
+                FileName = "Rscript",
+                Arguments = $"--vanilla \"{ELFrScriptModelPath}\" \"{configPath}\"",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
+
 
             using (var process = new Process())
             {
@@ -5312,7 +5341,7 @@ namespace SLF
                     return null;
                 }
 
-                MessageBox.Show("Modeller başarıyla çalıştırıldı. ","",MessageBoxButtons.OK,MessageBoxIcon.Exclamation);
+                MessageBox.Show("Modeller başarıyla çalıştırıldı. ","",MessageBoxButtons.OK,MessageBoxIcon.Information);
                 return ELFResultsFilePath;
             }
         }
@@ -7144,8 +7173,8 @@ namespace SLF
         // Async click event handler
         private async void ELFTahminButonu_Click(object sender, EventArgs e)
         {
-            string resultsFilePath = await RunModelRScript();
-            /*try
+
+            try
             {
                 // Set cursor to wait at the beginning
                 this.Cursor = Cursors.WaitCursor;
@@ -7154,8 +7183,6 @@ namespace SLF
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
                     (string)ana_menu_form_objesi.config.ELF.INPUT_FILE);
-
-                MessageBox.Show(ELFSenaryolarFilePath);
 
                 // Check if the modified file exists
                 if (!File.Exists(ELFSenaryolarFilePath))
@@ -7180,7 +7207,7 @@ namespace SLF
             {
                 // Restore cursor to default at the end, regardless of success or failure
                 this.Cursor = Cursors.Default;
-            }*/
+            }
         }
 
         private async void DEKSimulasyonSonucGoruntule_Click(object sender, EventArgs e)
@@ -7202,24 +7229,7 @@ namespace SLF
 
                         // Veriyi DataTable'a yükle
                         simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
-                        // Filter DataTable based on SelectedDistrict and its ID
-                        /*                        if (SelectedDistrict != null)
-                                                {
-                                                    if (districtIdMap.TryGetValue(SelectedDistrict, out string districtId))
-                                                    {
-                                                        var filteredRows = veriMonteCarlo.AsEnumerable()
-                                                            .Where(row => row.Field<string>("ilce") == districtId)
-                                                            .CopyToDataTable();
-                                                        veriMonteCarlo = filteredRows; // Update with filtered data
-                                                    }
-                                                    else
-                                                    {
-                                                        MessageBox.Show($"No ID mapping found for district: {SelectedDistrict}. No data will be displayed.",
-                                                            "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                                        veriMonteCarlo.Clear(); // Clear data to prevent displaying all districts
-                                                        return; // Exit the method
-                                                    }
-                                                }*/
+
                     }
                 }
                 catch (Exception ex)
@@ -7227,28 +7237,6 @@ namespace SLF
                     MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
                     return; // Hata durumunda işlemi sonlandır
                 }
-
-                /*                    using (var package = new ExcelPackage(new FileInfo(filePath)))
-                                    {
-                                        // Map SelectedYear index to actual year
-                                        int baseYear = slfStartYear; // e.g., 2024
-                                        string year = (SelectedYear != -1 && SelectedYear < (slfEndYear - slfStartYear + 1))
-                                            ? (baseYear + SelectedYear).ToString()
-                                            : "2025";
-
-                                        ExcelWorksheet worksheet = package.Workbook.Worksheets[year];
-                                        if (worksheet == null)
-                                        {
-                                            MessageBox.Show($"Worksheet for year {year} not found in output file.",
-                                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                            return;
-                                        }
-
-                                        simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
-                                }*/
-
-                // Log column names for debugging
-                Console.WriteLine("DataTable Columns: " + string.Join(", ", simulationData.Columns.Cast<DataColumn>().Select(c => c.ColumnName)));
 
                 gMapControl_DEK.Overlays.Clear();
                 gMapControl_DEK.Refresh();
