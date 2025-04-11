@@ -41,7 +41,6 @@
             this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.KAYNAK_TIPI = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.DEK_KURULU_GUCU = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.CATI_ALANI = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DEK_X_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DEK_Y_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DEK_TM_ADI = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -108,8 +107,8 @@
             // DEKCenterDataGridView
             // 
             this.DEKCenterDataGridView.AllowUserToAddRows = false;
-            this.DEKCenterDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.DEKCenterDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.DEKCenterDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.DEKCenterDataGridView.BackgroundColor = System.Drawing.Color.Snow;
@@ -130,7 +129,6 @@
             this.ID,
             this.KAYNAK_TIPI,
             this.DEK_KURULU_GUCU,
-            this.CATI_ALANI,
             this.DEK_X_KOORDINAT,
             this.DEK_Y_KOORDINAT,
             this.DEK_TM_ADI,
@@ -196,12 +194,6 @@
             this.DEK_KURULU_GUCU.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.DEK_KURULU_GUCU.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.DEK_KURULU_GUCU.Width = 130;
-            // 
-            // CATI_ALANI
-            // 
-            this.CATI_ALANI.HeaderText = "CATI_ALANI";
-            this.CATI_ALANI.Name = "CATI_ALANI";
-            this.CATI_ALANI.Width = 101;
             // 
             // DEK_X_KOORDINAT
             // 
@@ -275,7 +267,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn ID;
         private System.Windows.Forms.DataGridViewComboBoxColumn KAYNAK_TIPI;
         private System.Windows.Forms.DataGridViewTextBoxColumn DEK_KURULU_GUCU;
-        private System.Windows.Forms.DataGridViewTextBoxColumn CATI_ALANI;
         private System.Windows.Forms.DataGridViewTextBoxColumn DEK_X_KOORDINAT;
         private System.Windows.Forms.DataGridViewTextBoxColumn DEK_Y_KOORDINAT;
         private System.Windows.Forms.DataGridViewTextBoxColumn DEK_TM_ADI;

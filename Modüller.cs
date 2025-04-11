@@ -3140,7 +3140,7 @@ namespace SLF
 
             try
             {
-                string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\çıktı\evcs_monte_carlo_distribution_kumulatif3 - Copy.xlsx";
+                string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\çıktı\evcs_monte_carlo_distribution_kumulatif3 - Copy - Copy.xlsx";
                 DataTable simulationData;
                 try
                 {
@@ -6947,8 +6947,8 @@ namespace SLF
                     DEKProgressBar.Visible = true;
                 }
 
-                string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v1\DELTA_EA_DENEME_IMAR.xlsx";
-                string outputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek_distribution_2024_2030_İzmir_düşük.xlsx";
+                string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\girdi\new_buildings_2024_2035_1703.xlsx";
+                string outputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\cıktı\dek_distribution_cumulative_0704.xlsx";
 
                 if (!File.Exists(inputFilePath))
                 {
@@ -6996,7 +6996,7 @@ namespace SLF
         {
             try
             {
-                string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek.py";
+                string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\DEK_son_yeni.py";
                 string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe";
 
                 ProcessStartInfo startInfo = new ProcessStartInfo
@@ -7042,7 +7042,91 @@ namespace SLF
             await ExportHeatmapToHtml();
         }
 
+        private async void DEKSimulasyonSonucGoruntule_Click(object sender, EventArgs e)
+        {
+            // Disable the button to prevent multiple clicks while processing
+            DEKCenterAddButton.Enabled = false;
+            DEKSimButton.Enabled = false;
+            try
+            {
+                string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek_distribution_2024_2030_İzmir_düşük.xlsx";
+                DataTable simulationData;
+                try
+                {
+                    // Excel dosyasını aç
+                    using (var package = new ExcelPackage(new FileInfo(filePath)))
+                    {
+                        // Yıl seçimine göre sayfayı seç (SelectedYear değeri, sayfa indeksini temsil eder)
+                        ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
 
+                        // Veriyi DataTable'a yükle
+                        simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
+                        // Filter DataTable based on SelectedDistrict and its ID
+                        /*                        if (SelectedDistrict != null)
+                                                {
+                                                    if (districtIdMap.TryGetValue(SelectedDistrict, out string districtId))
+                                                    {
+                                                        var filteredRows = veriMonteCarlo.AsEnumerable()
+                                                            .Where(row => row.Field<string>("ilce") == districtId)
+                                                            .CopyToDataTable();
+                                                        veriMonteCarlo = filteredRows; // Update with filtered data
+                                                    }
+                                                    else
+                                                    {
+                                                        MessageBox.Show($"No ID mapping found for district: {SelectedDistrict}. No data will be displayed.",
+                                                            "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                                        veriMonteCarlo.Clear(); // Clear data to prevent displaying all districts
+                                                        return; // Exit the method
+                                                    }
+                                                }*/
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
+                    return; // Hata durumunda işlemi sonlandır
+                }
+
+                /*                    using (var package = new ExcelPackage(new FileInfo(filePath)))
+                                    {
+                                        // Map SelectedYear index to actual year
+                                        int baseYear = slfStartYear; // e.g., 2024
+                                        string year = (SelectedYear != -1 && SelectedYear < (slfEndYear - slfStartYear + 1))
+                                            ? (baseYear + SelectedYear).ToString()
+                                            : "2025";
+
+                                        ExcelWorksheet worksheet = package.Workbook.Worksheets[year];
+                                        if (worksheet == null)
+                                        {
+                                            MessageBox.Show($"Worksheet for year {year} not found in output file.",
+                                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                            return;
+                                        }
+
+                                        simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
+                                }*/
+
+                // Log column names for debugging
+                Console.WriteLine("DataTable Columns: " + string.Join(", ", simulationData.Columns.Cast<DataColumn>().Select(c => c.ColumnName)));
+
+                gMapControl_DEK.Overlays.Clear();
+                gMapControl_DEK.Refresh();
+                // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
+                HesaplaMerkezNoktaVeEkle(simulationData);
+                await HaritaUzerindeDEKSimulasyonGosterimi(simulationData);
+
+                MessageBox.Show("Veri başarıyla yüklendi.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
+            }
+            finally
+            {
+                DEKCenterAddButton.Enabled = true;
+                DEKSimButton.Enabled = true;
+            }
+        }
         private async Task ExportHeatmapToHtml()
         {
             // Find the heatmap overlay
@@ -7379,92 +7463,6 @@ namespace SLF
             {
                 // Restore cursor to default
                 Cursor.Current = Cursors.Default;
-            }
-        }
-
-        private async void DEKSimulasyonSonucGoruntule_Click(object sender, EventArgs e)
-        {
-            // Disable the button to prevent multiple clicks while processing
-            DEKCenterAddButton.Enabled = false;
-            DEKSimButton.Enabled = false;
-            try
-            {
-                string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek_distribution_2024_2030_İzmir_düşük.xlsx";
-                DataTable simulationData;
-                try
-                {
-                    // Excel dosyasını aç
-                    using (var package = new ExcelPackage(new FileInfo(filePath)))
-                    {
-                        // Yıl seçimine göre sayfayı seç (SelectedYear değeri, sayfa indeksini temsil eder)
-                        ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
-
-                        // Veriyi DataTable'a yükle
-                        simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
-                        // Filter DataTable based on SelectedDistrict and its ID
-                        /*                        if (SelectedDistrict != null)
-                                                {
-                                                    if (districtIdMap.TryGetValue(SelectedDistrict, out string districtId))
-                                                    {
-                                                        var filteredRows = veriMonteCarlo.AsEnumerable()
-                                                            .Where(row => row.Field<string>("ilce") == districtId)
-                                                            .CopyToDataTable();
-                                                        veriMonteCarlo = filteredRows; // Update with filtered data
-                                                    }
-                                                    else
-                                                    {
-                                                        MessageBox.Show($"No ID mapping found for district: {SelectedDistrict}. No data will be displayed.",
-                                                            "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                                        veriMonteCarlo.Clear(); // Clear data to prevent displaying all districts
-                                                        return; // Exit the method
-                                                    }
-                                                }*/
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
-                    return; // Hata durumunda işlemi sonlandır
-                }
-
-                /*                    using (var package = new ExcelPackage(new FileInfo(filePath)))
-                                    {
-                                        // Map SelectedYear index to actual year
-                                        int baseYear = slfStartYear; // e.g., 2024
-                                        string year = (SelectedYear != -1 && SelectedYear < (slfEndYear - slfStartYear + 1))
-                                            ? (baseYear + SelectedYear).ToString()
-                                            : "2025";
-
-                                        ExcelWorksheet worksheet = package.Workbook.Worksheets[year];
-                                        if (worksheet == null)
-                                        {
-                                            MessageBox.Show($"Worksheet for year {year} not found in output file.",
-                                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                            return;
-                                        }
-
-                                        simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
-                                }*/
-
-                // Log column names for debugging
-                Console.WriteLine("DataTable Columns: " + string.Join(", ", simulationData.Columns.Cast<DataColumn>().Select(c => c.ColumnName)));
-
-                gMapControl_DEK.Overlays.Clear();
-                gMapControl_DEK.Refresh();
-                // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
-                HesaplaMerkezNoktaVeEkle(simulationData);
-                await HaritaUzerindeDEKSimulasyonGosterimi(simulationData);
-
-                MessageBox.Show("Veri başarıyla yüklendi.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
-            }
-            finally
-            {
-                DEKCenterAddButton.Enabled = true;
-                DEKSimButton.Enabled = true;
             }
         }
 
