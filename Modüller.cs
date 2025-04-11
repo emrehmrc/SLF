@@ -1285,12 +1285,12 @@ namespace SLF
             comboBox_ea_yıl_secimi.DataSource = yearList; // Yıl seçimi için ComboBox1
             comboBox_DEK_Yıl.DataSource = yearList; // DEK yılı seçimi için ComboBox3
                                                     // Şehir isimlerini ComboBox2'ye ekleyin
-            comboBox_DEK_il.Items.Clear(); // dek
+/*            comboBox_DEK_il.Items.Clear(); // dek
             comboBox_ea_il_secimi.Items.Clear();   // ea 
             comboBox_ea_il_secimi.Items.Add("İzmir");
             comboBox_ea_il_secimi.Items.Add("Eskişehir");
             comboBox_DEK_il.Items.Add("İzmir");
-            comboBox_DEK_il.Items.Add("Eskişehir");
+            comboBox_DEK_il.Items.Add("Eskişehir");*/
 
         }
 
@@ -1520,17 +1520,17 @@ namespace SLF
                     veri_listesi_seçimi.SelectedIndex = -1;
                 }
 
-                if (comboBox_ea_il_secimi != null)
+/*                if (comboBox_ea_il_secimi != null)
                 {
                     comboBox_ea_il_secimi.SelectedIndex = -1;
-                }
+                }*/
 
                 if (comboBox_ea_yıl_secimi != null)
                 {
                     comboBox_ea_yıl_secimi.SelectedIndex = -1;
                 }
 
-                if (comboBox_DEK_il != null)
+/*                if (comboBox_DEK_il != null)
                 {
                     comboBox_DEK_il.SelectedIndex = -1;
                 }
@@ -1539,7 +1539,7 @@ namespace SLF
                 {
                     comboBox_DEK_Yıl.SelectedIndex = -1;
                 }
-
+*/
                 // DataGridView'ları temizle
                 if (dataGridView_girdi != null)
                 {
@@ -3356,8 +3356,8 @@ namespace SLF
         }
 
         // Şehir seçimi yapıldığında çağrılan metot
-        // Şehir seçimi yapıldığında çağrılan metot
-        private void ilSecimiMonteCarlo(object sender, EventArgs e)
+
+/*        private void ilSecimiMonteCarlo(object sender, EventArgs e)
         {
             // Always clear the district combo box and reset SelectedDistrict
             comboBox_ea_ilce_secimi.Items.Clear();
@@ -3376,7 +3376,7 @@ namespace SLF
                     comboBox_ea_ilce_secimi.Refresh();
                 }));
             }
-            /*            // Update SelectedCity if a valid selection exists
+            *//*            // Update SelectedCity if a valid selection exists
                         if (comboBox_ea_il_secimi.SelectedItem != null)
                         {
                             SelectedCity = comboBox_ea_il_secimi.SelectedItem.ToString();
@@ -3387,7 +3387,7 @@ namespace SLF
                                 comboBox_ea_ilce_secimi.Items.AddRange(districts.ToArray());
                                 comboBox_ea_ilce_secimi.Enabled = true;
                             }
-                        }*/
+                        }*//*
             else
             {
                 SelectedCity = null;
@@ -3401,8 +3401,8 @@ namespace SLF
                 gMapControl_EA.Position = coordinates;
                 gMapControl_EA.Zoom = 12;
             }
-        }
-        private void ilceSecimiMonteCarlo(object sender, EventArgs e)
+        }*/
+/*        private void ilceSecimiMonteCarlo(object sender, EventArgs e)
         {
             if (comboBox_ea_ilce_secimi.SelectedItem != null)
             {
@@ -3416,7 +3416,7 @@ namespace SLF
             }
             //   CheckSelections();
         }
-
+*/
         // Yıl seçimi yapıldığında çağrılan metot
         private void yilSecimiMonteCarlo(object sender, EventArgs e)
         {
@@ -3679,6 +3679,9 @@ namespace SLF
             // Disable the button to prevent multiple clicks while processing
             EAStationAddButton.Enabled = false;
 
+            SelectedDistrict = PathService.SelectedDistrict;
+            SelectedCity = PathService.SelectedCity;
+
             /*            // Checkbox'ları görünür hale getir
                         checkBox_AC_Home.Visible = true;
                         checkBox_AC_Public.Visible = true;
@@ -3721,7 +3724,7 @@ namespace SLF
             }
             else
             {
-                MessageBox.Show("Lütfen geçerli bir şehir ve senaryo seçiniz.");
+                MessageBox.Show("Lütfen geçerli bir senaryo seçiniz.");
                 return;
             }
 
@@ -4497,7 +4500,7 @@ namespace SLF
             }
             else
             {
-                MessageBox.Show("Lütfen geçerli bir şehir ve senaryo seçiniz.");
+                MessageBox.Show("Lütfen geçerli bir senaryo seçiniz.");
                 return; // Geçerli bir şehir veya hız seçilmediyse işlemi sonlandır
             }
 
