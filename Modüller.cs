@@ -191,6 +191,7 @@ namespace SLF
             ana_menu_form_objesi = new HomePageForm();
             methodFormObjesi = new MethodForm(ana_menu_form_objesi);
 
+
             var yearService = YearService.GetInstance();
             if (this.slfStartYear > 0 && this.slfEndYear > 0)
             {
@@ -861,10 +862,6 @@ namespace SLF
             {
                 modulescheck.Add(seçilenVeriTipi);
                 veri_listesi_seçimi.Refresh();
-                Console.WriteLine(modulescheck.Count);
-
-                // Update tab_ekonometrik accessibility after import
-                UpdateTabEkonometrikAccessibility();
 
             }
         }
@@ -940,6 +937,10 @@ namespace SLF
                         }
                     }
                 });
+
+                // Update tab_ekonometrik accessibility after import
+                UpdateTabEkonometrikAccessibility();
+
             }
 
             // Based on the selected data type, switch to the corresponding tab
@@ -7201,6 +7202,13 @@ namespace SLF
                 EkonometrikSenaryoElementsPanel.Visible = false;
                 label_graphics.Visible = false;
                 comboBox_ekonometrik.Visible = false;
+
+                string results_path = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.İlçe,
+                    (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_klasör,
+                    (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_name).Replace('/', '\\');
+                LoadEkonometrikResults(results_path);
             }
             else if (SenaryoModuleTabControl.SelectedTab == EkonometrikGrafiklerTabPage)
             {
@@ -7360,9 +7368,6 @@ namespace SLF
             {
                 // Prevent switching to the tab
                 e.Cancel = true;
-                // Show the warning message
-                MessageBox.Show("Önce lütfen Ekonometrik Yük Tahmini verilerini yükleyiniz!",
-                    "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
             } else
             {
@@ -7371,6 +7376,124 @@ namespace SLF
                 
         }
 
+        private void ELFMaxSenaryoTable_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            // Ensure the editing control is a TextBox
+            if (e.Control is TextBox textBox)
+            {
+                // Remove any existing KeyPress event handlers to avoid duplicates
+                textBox.KeyPress -= TextBox_KeyPress_NumbersOnly;
+                textBox.KeyPress += TextBox_KeyPress_NumbersOnly;
+            }
+        }
+
+        private void ELFMinSenaryoTable_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            // Ensure the editing control is a TextBox
+            if (e.Control is TextBox textBox)
+            {
+                // Remove any existing KeyPress event handlers to avoid duplicates
+                textBox.KeyPress -= TextBox_KeyPress_NumbersOnly;
+                textBox.KeyPress += TextBox_KeyPress_NumbersOnly;
+            }
+        }
+
+        private void ELFLowSenaryoTable_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            // Ensure the editing control is a TextBox
+            if (e.Control is TextBox textBox)
+            {
+                // Remove any existing KeyPress event handlers to avoid duplicates
+                textBox.KeyPress -= TextBox_KeyPress_NumbersOnly;
+                textBox.KeyPress += TextBox_KeyPress_NumbersOnly;
+            }
+        }
+
+        private void ELFBaseSenaryoTable_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            // Ensure the editing control is a TextBox
+            if (e.Control is TextBox textBox)
+            {
+                // Remove any existing KeyPress event handlers to avoid duplicates
+                textBox.KeyPress -= TextBox_KeyPress_NumbersOnly;
+                textBox.KeyPress += TextBox_KeyPress_NumbersOnly;
+            }
+        }
+
+        private void ELFHighSenaryoTable_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            // Ensure the editing control is a TextBox
+            if (e.Control is TextBox textBox)
+            {
+                // Remove any existing KeyPress event handlers to avoid duplicates
+                textBox.KeyPress -= TextBox_KeyPress_NumbersOnly;
+                textBox.KeyPress += TextBox_KeyPress_NumbersOnly;
+            }
+        }
+
+        private void ELFMinimumResultsTable_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            // Ensure the editing control is a TextBox
+            if (e.Control is TextBox textBox)
+            {
+                // Remove any existing KeyPress event handlers to avoid duplicates
+                textBox.KeyPress -= TextBox_KeyPress_NumbersOnly;
+                textBox.KeyPress += TextBox_KeyPress_NumbersOnly;
+            }
+        }
+
+        private void ELFDüşükResultsTable_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            // Ensure the editing control is a TextBox
+            if (e.Control is TextBox textBox)
+            {
+                // Remove any existing KeyPress event handlers to avoid duplicates
+                textBox.KeyPress -= TextBox_KeyPress_NumbersOnly;
+                textBox.KeyPress += TextBox_KeyPress_NumbersOnly;
+            }
+        }
+
+        private void ELFBazResultsTable_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            // Ensure the editing control is a TextBox
+            if (e.Control is TextBox textBox)
+            {
+                // Remove any existing KeyPress event handlers to avoid duplicates
+                textBox.KeyPress -= TextBox_KeyPress_NumbersOnly;
+                textBox.KeyPress += TextBox_KeyPress_NumbersOnly;
+            }
+        }
+
+        private void ELFYüksekResultsTable_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            // Ensure the editing control is a TextBox
+            if (e.Control is TextBox textBox)
+            {
+                // Remove any existing KeyPress event handlers to avoid duplicates
+                textBox.KeyPress -= TextBox_KeyPress_NumbersOnly;
+                textBox.KeyPress += TextBox_KeyPress_NumbersOnly;
+            }
+        }
+
+        private void ELFMaksimumResultsTable_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            // Ensure the editing control is a TextBox
+            if (e.Control is TextBox textBox)
+            {
+                // Remove any existing KeyPress event handlers to avoid duplicates
+                textBox.KeyPress -= TextBox_KeyPress_NumbersOnly;
+                textBox.KeyPress += TextBox_KeyPress_NumbersOnly;
+            }
+        }
+
+        private void TextBox_KeyPress_NumbersOnly(object sender, KeyPressEventArgs e)
+        {
+            // Allow digits (0-9), backspace, and control characters (e.g., Enter, Tab)
+            if (!char.IsDigit(e.KeyChar) && e.KeyChar != (char)Keys.Back && !char.IsControl(e.KeyChar))
+            {
+                e.Handled = true; // Block the key press
+            }
+        }
 
     }
 }

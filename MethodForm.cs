@@ -73,6 +73,7 @@ namespace SLF
             }
 
             selectedMethod = MethodComboBox.SelectedItem.ToString();
+
             
             // "Lütfen seçin" seçeneklerinin seçili olup olmadığını kontrol et
             if (IlComboBox.SelectedIndex == 0 || IlceComboBox.SelectedIndex == 0)
@@ -182,7 +183,7 @@ namespace SLF
 
         private void OpenModülFormuBasedOnSelection(string method)
         {
-            mod1 = new ModülFormu(method);  // Pass selectedMethod to ModülFormu
+            mod1 = new ModülFormu(method);
 
             // Hide both forms
             this.Hide();  // Hide MethodForm
