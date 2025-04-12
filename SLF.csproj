@@ -626,10 +626,40 @@
       <DependentUpon>DTR_Arayuz.cs</DependentUpon>
     </Compile>
     <Compile Include="Optimal DTR\ReadDB.cs" />
+    <Compile Include="ProjectFolderPicker.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProjectFolderPicker.Designer.cs">
+      <DependentUpon>ProjectFolderPicker.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\DEK.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\DEK.Designer.cs">
+      <DependentUpon>DEK.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\Alansal.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\Alansal.Designer.cs">
+      <DependentUpon>Alansal.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\EA.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\EA.Designer.cs">
+      <DependentUpon>EA.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\DTR.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\DTR.Designer.cs">
+      <DependentUpon>DTR.cs</DependentUpon>
     </Compile>
     <Compile Include="RaporlamaDosyası\Rapor_Arayuz.cs">
       <SubType>Form</SubType>
@@ -784,6 +814,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Optimal DTR\DTR_Arayuz.resx">
       <DependentUpon>DTR_Arayuz.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProjectFolderPicker.resx">
+      <DependentUpon>ProjectFolderPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RaporlamaDosyası\FiltrelemeArayuz\DEK.resx">
+      <DependentUpon>DEK.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RaporlamaDosyası\FiltrelemeArayuz\Alansal.resx">
+      <DependentUpon>Alansal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RaporlamaDosyası\FiltrelemeArayuz\EA.resx">
+      <DependentUpon>EA.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RaporlamaDosyası\FiltrelemeArayuz\DTR.resx">
+      <DependentUpon>DTR.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="RaporlamaDosyası\Rapor_Arayuz.resx">
       <DependentUpon>Rapor_Arayuz.cs</DependentUpon>

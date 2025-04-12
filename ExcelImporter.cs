@@ -271,7 +271,7 @@ namespace SLF
             }
         }
 
-        public DataTable ImportExcelFile(string filePath, string seçilenVeriTipi)
+        public DataTable ImportExcelFile(string filePath, string seçilenVeriTipi, bool ExcValidate = true)
         {
             DataTable dataTable = new DataTable();
 
@@ -284,7 +284,8 @@ namespace SLF
                 ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // Assuming data is in the first worksheet
 
                 // Validate column headers. In case it fails, it throws an exception.
-                ValidateColumnHeaders(worksheet, seçilenVeriTipi);
+                if (ExcValidate)
+                    ValidateColumnHeaders(worksheet, seçilenVeriTipi);
 
                 int rowCount = worksheet.Dimension.Rows;
                 int colCount = worksheet.Dimension.Columns;

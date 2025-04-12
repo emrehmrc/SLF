@@ -42,6 +42,7 @@
             this.vektörel_attribute_table.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.vektörel_attribute_table.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
             this.vektörel_attribute_table.BackgroundColor = System.Drawing.Color.Snow;
             this.vektörel_attribute_table.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.vektörel_attribute_table.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
@@ -64,8 +65,7 @@
             this.vektörel_attribute_table.DefaultCellStyle = dataGridViewCellStyle2;
             this.vektörel_attribute_table.EnableHeadersVisualStyles = false;
             this.vektörel_attribute_table.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.vektörel_attribute_table.Location = new System.Drawing.Point(9, 27);
-            this.vektörel_attribute_table.Margin = new System.Windows.Forms.Padding(2);
+            this.vektörel_attribute_table.Location = new System.Drawing.Point(14, 42);
             this.vektörel_attribute_table.Name = "vektörel_attribute_table";
             this.vektörel_attribute_table.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -79,19 +79,18 @@
             this.vektörel_attribute_table.RowHeadersWidth = 18;
             this.vektörel_attribute_table.RowTemplate.Height = 24;
             this.vektörel_attribute_table.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.vektörel_attribute_table.Size = new System.Drawing.Size(831, 429);
+            this.vektörel_attribute_table.Size = new System.Drawing.Size(1246, 660);
             this.vektörel_attribute_table.TabIndex = 0;
             // 
             // Tablo_Formu
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.ClientSize = new System.Drawing.Size(850, 472);
+            this.ClientSize = new System.Drawing.Size(1275, 726);
             this.Controls.Add(this.vektörel_attribute_table);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(2);
-            this.MinimumSize = new System.Drawing.Size(866, 511);
+            this.MinimumSize = new System.Drawing.Size(1288, 756);
             this.Name = "Tablo_Formu";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Tablo";

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using OfficeOpenXml;
 using SLF.Optimal_DTR;
+using SLF.RaporlamaDosyası;
 
 namespace SLF
 {
@@ -21,8 +22,9 @@ namespace SLF
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new DTR_Arayuz());
-            //Application.Run(new HomePageForm());
+            //Application.Run(new Rapor_Arayuz());
+            //Application.Run(new DTR_Arayuz());
+            Application.Run(new ModülFormu());
             //Application.Run(new ChargingStationPopupForm());
         }
     }
