@@ -13,9 +13,14 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using GMap.NET.WindowsForms.Markers;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Font = System.Drawing.Font;
+using GMap.NET.WindowsPresentation;
+using GMapRoute = GMap.NET.WindowsForms.GMapRoute;
+using GMapPolygon = GMap.NET.WindowsForms.GMapPolygon;
+using GMapControl = GMap.NET.WindowsForms.GMapControl;
+using GMap.NET.WindowsForms.Markers;
+using GMapMarker = GMap.NET.WindowsForms.GMapMarker;
 
 namespace SLF
 {

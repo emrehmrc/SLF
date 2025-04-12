@@ -9,7 +9,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{56900907-8C82-496F-937E-63839AABAB48}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <RootNamespace>SLF</RootNamespace>
     <AssemblyName>SLF</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
@@ -66,6 +66,12 @@
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>SLF.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Avalonia, Version=11.0.10.0, Culture=neutral, PublicKeyToken=c8d484a7012f9a8b, processorArchitecture=MSIL">
@@ -192,11 +198,14 @@
     <Reference Include="GeoAPI.CoordinateSystems, Version=1.7.5.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
       <HintPath>packages\GeoAPI.CoordinateSystems.1.7.5\lib\net45\GeoAPI.CoordinateSystems.dll</HintPath>
     </Reference>
-    <Reference Include="GMap.NET.Avalonia, Version=2.1.7.0, Culture=neutral, PublicKeyToken=b85b9027b614afef, processorArchitecture=MSIL">
-      <HintPath>packages\GMap.NET.WinAvalonia.2.1.7\lib\net472\GMap.NET.Avalonia.dll</HintPath>
+    <Reference Include="GMap.NET.Core, Version=2.1.7.0, Culture=neutral, PublicKeyToken=b85b9027b614afef, processorArchitecture=MSIL">
+      <HintPath>packages\GMap.NET.Core.2.1.7\lib\net472\GMap.NET.Core.dll</HintPath>
     </Reference>
-    <Reference Include="GMap.NET.WindowsForms.Utils, Version=2.1.7.0, Culture=neutral, PublicKeyToken=b85b9027b614afef, processorArchitecture=MSIL">
-      <HintPath>packages\GMap.NET.WinForms.Utils.2.1.7\lib\net472\GMap.NET.WindowsForms.Utils.dll</HintPath>
+    <Reference Include="GMap.NET.WindowsForms, Version=2.1.7.0, Culture=neutral, PublicKeyToken=b85b9027b614afef, processorArchitecture=MSIL">
+      <HintPath>packages\GMap.NET.WinForms.2.1.7\lib\net472\GMap.NET.WindowsForms.dll</HintPath>
+    </Reference>
+    <Reference Include="GMap.NET.WindowsPresentation, Version=2.1.7.0, Culture=neutral, PublicKeyToken=b85b9027b614afef, processorArchitecture=MSIL">
+      <HintPath>packages\GMap.NET.WinPresentation.2.1.7\lib\net472\GMap.NET.WindowsPresentation.dll</HintPath>
     </Reference>
     <Reference Include="Guna.UI2, Version=2.0.4.6, Culture=neutral, PublicKeyToken=8b9d14aa5142e261, processorArchitecture=MSIL">
       <HintPath>packages\Guna.UI2.WinForms.2.0.4.6\lib\net472\Guna.UI2.dll</HintPath>
@@ -212,6 +221,12 @@
     </Reference>
     <Reference Include="JetBrains.Annotations, Version=4242.42.42.42, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>packages\JetBrains.Annotations.2023.3.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="LINQPad, Version=1.0.0.0, Culture=neutral, PublicKeyToken=21353812cd2a2db5, processorArchitecture=MSIL">
+      <HintPath>packages\LINQPad.5.40.0\lib\net46\LINQPad.exe</HintPath>
+    </Reference>
+    <Reference Include="lprun, Version=1.0.0.0, Culture=neutral, PublicKeyToken=21353812cd2a2db5, processorArchitecture=x86">
+      <HintPath>packages\LINQPad.5.40.0\lib\net46\lprun.exe</HintPath>
     </Reference>
     <Reference Include="MaterialSkin, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\MaterialSkin.2.2.3.1\lib\net461\MaterialSkin.dll</HintPath>
@@ -604,11 +619,23 @@
     <Compile Include="LoginForm.Designer.cs">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ProjectFolderPicker.cs">
+    <Compile Include="Optimal DTR\DTR_Arayuz.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ProjectFolderPicker.Designer.cs">
-      <DependentUpon>ProjectFolderPicker.cs</DependentUpon>
+    <Compile Include="Optimal DTR\DTR_Arayuz.Designer.cs">
+      <DependentUpon>DTR_Arayuz.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Optimal DTR\ReadDB.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\Rapor_Arayuz.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\Rapor_Arayuz.Designer.cs">
+      <DependentUpon>Rapor_Arayuz.cs</DependentUpon>
     </Compile>
     <Compile Include="services\DatabaseHelpers.cs" />
     <Compile Include="services\DatabaseManager .cs" />
@@ -755,8 +782,11 @@
     <EmbeddedResource Include="LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ProjectFolderPicker.resx">
-      <DependentUpon>ProjectFolderPicker.cs</DependentUpon>
+    <EmbeddedResource Include="Optimal DTR\DTR_Arayuz.resx">
+      <DependentUpon>DTR_Arayuz.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RaporlamaDosyası\Rapor_Arayuz.resx">
+      <DependentUpon>Rapor_Arayuz.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Tablo_olustur.resx">
       <DependentUpon>Tablo_olustur.cs</DependentUpon>
@@ -1010,30 +1040,7 @@
     <None Include="Pictures\Exterior1.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="python_kod\deep_learning\Arşiv\EMRE.py" />
-    <Content Include="python_kod\deep_learning\Arşiv\XGBoost IMAR_ID Classification Traning_Emre.py" />
-    <Content Include="python_kod\deep_learning\düzenleme\Arşiv\EMRE.py" />
-    <Content Include="python_kod\deep_learning\düzenleme\Arşiv\XGBoost IMAR_ID Classification Traning_Emre.py" />
-    <Content Include="python_kod\deep_learning\düzenleme\program_set\model_gdz.py" />
-    <Content Include="python_kod\deep_learning\kod\Arşiv\EMRE.py" />
-    <Content Include="python_kod\deep_learning\kod\Arşiv\model_gdz.py" />
-    <Content Include="python_kod\deep_learning\kod\Arşiv\model_oedas.py" />
-    <Content Include="python_kod\deep_learning\kod\Arşiv\XGBoost IMAR_ID Classification Traning_Emre.py" />
-    <Content Include="python_kod\deep_learning\kod\batu-sql\deneme_database.py" />
-    <Content Include="python_kod\deep_learning\kod\batu-sql\model_database.py" />
-    <Content Include="python_kod\deep_learning\kod\model_gdz.py" />
-    <Content Include="python_kod\deep_learning\kod\model_oedas.py" />
-    <Content Include="python_kod\deep_learning\kod\oedas_database.py" />
-    <Content Include="python_kod\deep_learning\Modeller\Arşiv\EMRE.py" />
-    <Content Include="python_kod\deep_learning\Modeller\Arşiv\model_gdz.py" />
-    <Content Include="python_kod\deep_learning\Modeller\Arşiv\model_oedas.py" />
-    <Content Include="python_kod\deep_learning\Modeller\Arşiv\XGBoost IMAR_ID Classification Traning_Emre.py" />
-    <Content Include="python_kod\deep_learning\Modeller\batu-sql\deneme_database.py" />
-    <Content Include="python_kod\deep_learning\Modeller\batu-sql\model_database.py" />
-    <Content Include="python_kod\deep_learning\Modeller\model_gdz.py" />
-    <Content Include="python_kod\deep_learning\Modeller\model_oedas.py" />
-    <Content Include="python_kod\deep_learning\Modeller\oedas_database.py" />
-    <Content Include="python_kod\deep_learning\program_set\model_learning.py" />
+    <Content Include="PythonFiles\untitled6.py" />
     <None Include="Pictures\oedaş.jpg" />
     <None Include="Pictures\Next page2.png" />
     <None Include="Pictures\Next page.png" />

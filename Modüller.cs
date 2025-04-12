@@ -22,7 +22,7 @@ using System.Text;
 using SLF.services;
 using OSGeo.OGR;
 using SLF.Services;
-using System.Windows.Forms;
+
 
 namespace SLF
 {
@@ -237,6 +237,8 @@ namespace SLF
                 CheckSelections();
             }
         }
+
+ 
         private void InitializeGMap(GMap.NET.WindowsForms.GMapControl gmap)
         {
             gmap.MapProvider = GMapProviders.GoogleSatelliteMap;
