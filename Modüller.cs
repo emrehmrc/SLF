@@ -21,6 +21,7 @@ using SLF.Services;
 using System.Globalization;
 using Newtonsoft.Json;
 
+
 namespace SLF
 {
     public partial class ModülFormu : Form
@@ -47,6 +48,7 @@ namespace SLF
         private MethodForm methodFormObjesi;
 
         public bool isImported;
+        private System.Windows.Forms.Timer cursorTimer;
 
         public string ELFrScriptModelPath;
         public string ELFrScriptSenaryolarPath;
@@ -261,8 +263,8 @@ namespace SLF
             // Initialize currentYear
             currentYear = trackBar_Yıllar.Value;
 
-            // Initialize tab_senaryo accessibility on form load
-            UpdateTabSenaryoAccessibility();
+            // Initialize tab_ekonometrik accessibility on form load
+            UpdateTabEkonometrikAccessibility();
         }
 
         public ModülFormu() : this("", "")
@@ -518,7 +520,7 @@ namespace SLF
             if (selectedMethod == "ELF (Ekonometrik)")
             {
                 // Show both the "tab_girdi" and "tab_ekonometrik" tabs and hide others
-                InitializeTabs("tab_girdi", "tab_ekonometrik", "tab_senaryo", "EkonometrikSenaryoTabPage", 
+                InitializeTabs("tab_girdi", "tab_ekonometrik", "EkonometrikSenaryoTabPage", 
                     "EkonometrikSonuclarTabPage");
                 Modül_Tabları.SelectedTab = tab_girdi;
             }
@@ -528,7 +530,7 @@ namespace SLF
                 HideComboBoxItem("Ekonometrik Yük Tahmini Verileri"); // Replace with the actual item you want to hide
                 // For SLF, do not hide any tabs. Add logic here if needed.
                 // List of tab names to hide
-                string[] tabsToHide = { "tab_senaryo", "tab_ekonometrik","EkonometrikSenaryoTabPage",
+                string[] tabsToHide = { "tab_ekonometrik","EkonometrikSenaryoTabPage",
                     "EkonometrikSonuclarTabPage"};
 
                 // Loop through each tab name and remove it if it exists
@@ -822,29 +824,13 @@ namespace SLF
                 return; // Metodu sonlandır
             }
 
-            // Use the selectedMethod here
-            if (selectedMethod == "ELF (Ekonometrik)")
-            {
-                // Logic for ELF selection
-                // MessageBox.Show("ELF method selected, skipping prerequisites.");
-            }
-            else if (selectedMethod == "SLF (Jeo-Uzamsal)")
-            {
-                // Logic for SLF selection
-                // MessageBox.Show("SLF method selected, prerequisites are required.");
-            }
-            else
-            {
-                // Handle other cases or invalid selection
-                MessageBox.Show("No valid method selected.");
-            }
-
             girdiModülü.slfStartYear = slfStartYear;
             girdiModülü.slfEndYear = slfEndYear;
 
             InitializeComboBoxes();
 
             bool skipPrerequisites = (selectedMethod == "ELF (Ekonometrik)");
+
 
             // Call VEERProcess with skipPrerequisites flag
             isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
@@ -867,6 +853,7 @@ namespace SLF
 
             dataGridView_girdi.Refresh();
 
+
             isİmportedModule(isImported, seçilenVeriTipi);
 
             if (isImported)
@@ -875,16 +862,16 @@ namespace SLF
                 veri_listesi_seçimi.Refresh();
                 Console.WriteLine(modulescheck.Count);
 
-                // Update tab_senaryo accessibility after import
-                UpdateTabSenaryoAccessibility();
+                // Update tab_ekonometrik accessibility after import
+                UpdateTabEkonometrikAccessibility();
 
             }
         }
 
-        private void UpdateTabSenaryoAccessibility()
+        private void UpdateTabEkonometrikAccessibility()
         {
             string requiredDataType = "Ekonometrik Yük Tahmini Verileri";
-            tab_senaryo.Enabled = modulescheck.Contains(requiredDataType);
+            tab_ekonometrik.Enabled = modulescheck.Contains(requiredDataType);
         }
 
         private async void OpenModuleButton_Click(object sender, EventArgs e)
@@ -957,7 +944,7 @@ namespace SLF
             // Based on the selected data type, switch to the corresponding tab
             if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
             {
-                Modül_Tabları.SelectedTab = tab_senaryo;
+                Modül_Tabları.SelectedTab = tab_ekonometrik;
             }
             else if (seçilenVeriTipi == "EA Şarj Verileri")
             {
@@ -5175,29 +5162,6 @@ namespace SLF
             }
         }
 
-        private void LoadEkonometrikResults(string resultsFilePath)
-        {
-            if (!File.Exists(resultsFilePath))
-            {
-                MessageBox.Show("Sonuç dosyası bulunamadı.");
-                return;
-            }
-
-            using (var package = new ExcelPackage(new FileInfo(resultsFilePath)))
-            {
-                // Load the corresponding results into each DataGridView
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[0], ELFMinimumResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[1], ELFDüşükResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[2], ELFBazResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[3], ELFYüksekResultsTable);
-                LoadWorksheetToDataGridView(package.Workbook.Worksheets[4], ELFMaksimumResultsTable);
-            }
-
-            // Switch to the results tab after loading all the data
-            SenaryoModuleTabControl.SelectedTab = EkonometrikSonuclarTabPage;
-        }
-
-
         // Helper method for logging output to logTextBox
         private void LogOutput(string message)
         {
@@ -5225,113 +5189,6 @@ namespace SLF
             };
             this.Controls.Add(logTextBox); // Add to the form controls
         }
-
-        private async void ShowResultsButton_Click(object sender, EventArgs e)
-        {
-            ELFResultsFilePath = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                (string)ana_menu_form_objesi.config.İl,
-                (string)ana_menu_form_objesi.config.İlçe,
-                (string)ana_menu_form_objesi.config.ELF.SONUÇLAR).Replace('/', '\\');
-
-            // Asynchronous task to load the Excel package
-            await Task.Run(() =>
-            {
-                using (var package = new ExcelPackage(new FileInfo(ELFResultsFilePath)))
-                {
-                    // Clear previous data in the DataGridViews
-                    Invoke(new Action(() =>
-                    {
-                        // Set DataSources to null to clear previous data
-                        ELFMinimumResultsTable.DataSource = null;
-                        ELFDüşükResultsTable.DataSource = null;
-                        ELFBazResultsTable.DataSource = null;
-                        ELFYüksekResultsTable.DataSource = null;
-                        ELFMaksimumResultsTable.DataSource = null;
-                    }));
-
-                    // Load sheets into their respective DataGridViews
-                    var worksheets = new[] { "Bagımlı_Degisken_Tahminleri_1", "Bagımlı_Degisken_Tahminleri_2", "Bagımlı_Degisken_Tahminleri_3", "Bagımlı_Degisken_Tahminleri_4", "Bagımlı_Degisken_Tahminleri_5" };
-                    var dataGrids = new[] { ELFMinimumResultsTable, ELFDüşükResultsTable, ELFBazResultsTable, ELFYüksekResultsTable, ELFMaksimumResultsTable };
-
-                    for (int i = 0; i < worksheets.Length; i++)
-                    {
-                        var worksheet = package.Workbook.Worksheets[worksheets[i]];
-                        if (worksheet != null)
-                        {
-                            DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
-
-                            Invoke(new Action(() =>
-                            {
-                                dataGrids[i].DataSource = dt; // Set DataGridView's DataSource
-                            }));
-                        }
-                    }
-                }
-            });
-
-        }
-
-
-        private async Task<string> RunModelRScript()
-        {
-            ELFrScriptModelPath = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                    (string)ana_menu_form_objesi.config.İl,
-                    (string)ana_menu_form_objesi.config.ELF.Rscript_Yolu_Model).Replace('/', '\\');
-
-            string configPath = Path.Combine(((string)ana_menu_form_objesi.projectRoot).Replace('/', '\\'),
-                "config.json");
-
-            var processInfo = new ProcessStartInfo
-            {
-                FileName = "Rscript.exe", // Use .exe explicitly
-                Arguments = $"--vanilla \"{ELFrScriptModelPath}\" \"{configPath}\"",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            using (var process = new Process())
-            {
-                process.StartInfo = processInfo;
-                process.OutputDataReceived += (sender, args) =>
-                {
-                    if (!string.IsNullOrEmpty(args.Data))
-                    {
-                        ELFResultsFilePath = args.Data;  // Capture the file path
-                    }
-                };
-
-                process.ErrorDataReceived += (sender, args) => Console.WriteLine("HATA: " + args.Data);
-
-                process.Start();
-                process.BeginOutputReadLine();
-
-                // Wait for the process to exit asynchronously
-                await Task.Run(() => process.WaitForExit());
-
-                // read the json file and create the "config" variable.
-                ana_menu_form_objesi.json_file = File.ReadAllText(Path.Combine(ana_menu_form_objesi.projectRoot, "config.json"));
-                ana_menu_form_objesi.config = JsonConvert.DeserializeObject(ana_menu_form_objesi.json_file);
-
-                string results_path = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                    (string)ana_menu_form_objesi.config.İl,
-                    (string)ana_menu_form_objesi.config.İlçe,
-                    (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_klasör,
-                    (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_name).Replace('/', '\\');
-
-
-                if (string.IsNullOrEmpty(results_path))
-                {
-                    MessageBox.Show("RScript yolu hatası!.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    return null;
-                }
-
-                MessageBox.Show("Modeller başarıyla çalıştırıldı. ", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return results_path;
-            }
-        }
-
 
 
         // Helper method to load data from an Excel worksheet into a DataGridView
@@ -7152,42 +7009,176 @@ namespace SLF
             }
         }
 
-        // Async click event handler
+        // Method to run the R script
+        private async Task<string> RunModelRScript()
+        {
+            ELFrScriptModelPath = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.ELF.Rscript_Yolu_Model).Replace('/', '\\');
+
+            string configPath = Path.Combine(((string)ana_menu_form_objesi.projectRoot).Replace('/', '\\'),
+                "config.json");
+
+            var processInfo = new ProcessStartInfo
+            {
+                FileName = "Rscript.exe", // Use .exe explicitly
+                                          // Optionally specify the full path if not in PATH:
+                                          // FileName = "C:\\Program Files\\R\\R-4.3.1\\bin\\Rscript.exe",
+                Arguments = $"--vanilla \"{ELFrScriptModelPath}\" \"{configPath}\"",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (var process = new Process())
+            {
+                process.StartInfo = processInfo;
+
+                // Variables to capture output and error
+                string outputData = null;
+                string errorData = null;
+
+                process.Start();
+
+                // Read output and error synchronously on background threads
+                Task<string> outputTask = Task.Run(() => process.StandardOutput.ReadToEnd());
+                Task<string> errorTask = Task.Run(() => process.StandardError.ReadToEnd());
+
+                // Wait for the process to exit asynchronously
+                await Task.Run(() => process.WaitForExit());
+
+                // Get the output and error
+                outputData = await outputTask;
+                errorData = await errorTask;
+
+                // Process the output to get the file path
+                if (!string.IsNullOrEmpty(outputData))
+                {
+                    ELFResultsFilePath = outputData.Trim(); // Capture the file path
+                }
+
+                // Log any errors
+                if (!string.IsNullOrEmpty(errorData))
+                {
+                    Console.WriteLine("HATA: " + errorData);
+                }
+
+                // Read the JSON file and create the "config" variable
+                ana_menu_form_objesi.json_file = await Task.Run(() =>
+                    File.ReadAllText(Path.Combine(ana_menu_form_objesi.projectRoot, "config.json")));
+
+                // Deserialize on the UI thread since it might be used by UI components
+                ana_menu_form_objesi.config = JsonConvert.DeserializeObject(ana_menu_form_objesi.json_file);
+
+                string results_path = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.İlçe,
+                    (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_klasör,
+                    (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_name).Replace('/', '\\');
+
+                if (string.IsNullOrEmpty(results_path))
+                {
+                    MessageBox.Show("RScript yolu hatası!.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    return null;
+                }
+
+                MessageBox.Show("Modeller başarıyla çalıştırıldı. ", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return results_path;
+            }
+        }
+
+        // Helper method to set the cursor on all controls in the form
+        private void SetFormCursors(Control control, Cursor cursor)
+        {
+            control.Cursor = cursor;
+            foreach (Control child in control.Controls)
+            {
+                SetFormCursors(child, cursor); // Recursively set cursor on all child controls
+            }
+        }
+
         private async void ELFTahminButonu_Click(object sender, EventArgs e)
         {
             try
             {
+                this.Enabled = false;
+                this.Cursor = Cursors.WaitCursor;
+                SetFormCursors(this, Cursors.WaitCursor);
+                this.Refresh();
+
+                // Start a timer to reinforce the wait cursor every 500ms
+                cursorTimer = new System.Windows.Forms.Timer { Interval = 500 };
+                cursorTimer.Tick += (s, args) =>
+                {
+                    this.Cursor = Cursors.WaitCursor;
+                    SetFormCursors(this, Cursors.WaitCursor);
+                };
+                cursorTimer.Start();
 
                 ELFSenaryolarFilePath = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
                     (string)ana_menu_form_objesi.config.ELF.INPUT_FILE);
 
-                // Check if the modified file exists
                 if (!File.Exists(ELFSenaryolarFilePath))
                 {
                     MessageBox.Show("Lütfen önce senaryo dosyasını ekleyin.");
                     return;
                 }
 
-                // Run the R script asynchronously
                 string resultsFilePath = await RunModelRScript();
 
                 if (resultsFilePath == null)
                 {
-                    // If R script failed or no results path was returned, stop further execution
                     return;
                 }
 
-
-                // Load results into tab_ekonometrik
-                LoadEkonometrikResults(resultsFilePath);
+                await Task.Run(() => LoadEkonometrikResults(resultsFilePath));
             }
             finally
             {
-                // Restore cursor to default and force UI refresh
+                if (cursorTimer != null)
+                {
+                    cursorTimer.Stop();
+                    cursorTimer.Dispose();
+                    cursorTimer = null;
+                }
+
+                this.Enabled = true;
                 this.Cursor = Cursors.Default;
-                this.Refresh(); // Force the UI to update the cursor immediately
+                SetFormCursors(this, Cursors.Default);
+                this.Refresh();
+            }
+        }
+
+        private void LoadEkonometrikResults(string resultsFilePath)
+        {
+            if (!File.Exists(resultsFilePath))
+            {
+                // Use Invoke to show the MessageBox on the UI thread
+                this.Invoke((MethodInvoker)delegate
+                {
+                    MessageBox.Show("Sonuç dosyası bulunamadı.");
+                });
+                return;
+            }
+
+            using (var package = new ExcelPackage(new FileInfo(resultsFilePath)))
+            {
+                // Load the corresponding results into each DataGridView
+                // Use Invoke to update the UI on the UI thread
+                this.Invoke((MethodInvoker)delegate
+                {
+                    LoadWorksheetToDataGridView(package.Workbook.Worksheets[0], ELFMinimumResultsTable);
+                    LoadWorksheetToDataGridView(package.Workbook.Worksheets[1], ELFDüşükResultsTable);
+                    LoadWorksheetToDataGridView(package.Workbook.Worksheets[2], ELFBazResultsTable);
+                    LoadWorksheetToDataGridView(package.Workbook.Worksheets[3], ELFYüksekResultsTable);
+                    LoadWorksheetToDataGridView(package.Workbook.Worksheets[4], ELFMaksimumResultsTable);
+
+                    // Switch to the results tab after loading all the data
+                    SenaryoModuleTabControl.SelectedTab = EkonometrikSonuclarTabPage;
+                });
             }
         }
 
@@ -7205,8 +7196,8 @@ namespace SLF
 
         private void Modül_Tabları_Selecting(object sender, TabControlCancelEventArgs e)
         {
-            // Check if the user is trying to access tab_senaryo
-            if (e.TabPage == tab_senaryo && !tab_senaryo.Enabled)
+            // Check if the user is trying to access tab_ekonometrik
+            if (e.TabPage == tab_ekonometrik && !tab_ekonometrik.Enabled)
             {
                 // Prevent switching to the tab
                 e.Cancel = true;

@@ -606,7 +606,6 @@ namespace SLF
             isDagıtılanİmputed = true;
         }
 
-
         //excelde kaldım
         public override void Validate()
         {

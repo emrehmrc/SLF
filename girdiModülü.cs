@@ -210,12 +210,13 @@ namespace SLF
                 {
                     CheckPrerequisites(seçilenVeriTipi);
                 }
-
+                
                 ProcessFileSelection(seçilenVeriTipi);
 
                 DataTable dataTable = CurrentDataTable;
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
+
                     currentDataTable = dataTable; // Ensure currentDataTable reflects the normalized table
                     Onizleme1.Onizleme_DataGrid1.DataSource = currentDataTable;
                     ApplyDataGridViewFormatting(currentDataTable, Onizleme1.Onizleme_DataGrid1); // Updated call
@@ -224,6 +225,7 @@ namespace SLF
                     ClearReportRows();
 
                     Preprocess();
+
                     while (true)
                     {
                         ClearRows();

@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using GMap.NET.WindowsForms.Markers;
 using System.Globalization;
-using System.Diagnostics;
 
 namespace SLF
 {
