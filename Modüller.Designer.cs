@@ -48,6 +48,16 @@ namespace SLF
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle25 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle26 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle27 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle28 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle29 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle30 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle31 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle32 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle33 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle34 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle35 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle36 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle37 = new System.Windows.Forms.DataGridViewCellStyle();
             this.Modül_Tabları = new System.Windows.Forms.TabControl();
             this.tab_girdi = new System.Windows.Forms.TabPage();
             this.panel_proje_ekle = new System.Windows.Forms.Panel();
@@ -134,18 +144,8 @@ namespace SLF
             this.ELFHighResultsTable = new System.Windows.Forms.DataGridView();
             this.ELFMaxResultsTabPage = new System.Windows.Forms.TabPage();
             this.ELFMaxResultsTable = new System.Windows.Forms.DataGridView();
-            this.ELFGraphicOutputsTabPage = new System.Windows.Forms.TabPage();
-            this.panel_ELF_Grafikler = new System.Windows.Forms.Panel();
-            this.pictureBox_ELF_5 = new System.Windows.Forms.PictureBox();
-            this.pictureBox_ELF_4 = new System.Windows.Forms.PictureBox();
-            this.pictureBox_ELF_3 = new System.Windows.Forms.PictureBox();
-            this.pictureBox_ELF_2 = new System.Windows.Forms.PictureBox();
-            this.pictureBox_ELF_1 = new System.Windows.Forms.PictureBox();
             this.ELFTablePanel = new System.Windows.Forms.Panel();
             this.ELFGraphicsPanel = new System.Windows.Forms.Panel();
-            this.ELFShowGraphsButton = new System.Windows.Forms.Button();
-            this.SenaryoNewSelectionButton = new System.Windows.Forms.Button();
-            this.SenaryoResultsLabel = new System.Windows.Forms.Label();
             this.tab_imar = new System.Windows.Forms.TabPage();
             this.panel_imar = new System.Windows.Forms.Panel();
             this.Mesafe_imar = new System.Windows.Forms.Label();
@@ -203,7 +203,6 @@ namespace SLF
             this.tab_senaryo = new System.Windows.Forms.TabPage();
             this.SenaryoModulePanel = new System.Windows.Forms.Panel();
             this.EkonometrikSenaryoElementsPanel = new System.Windows.Forms.Panel();
-            this.ShowResultsButton = new System.Windows.Forms.Button();
             this.ELFTahminButonu = new System.Windows.Forms.Button();
             this.ELFScenerioSaveButton = new System.Windows.Forms.Button();
             this.SenaryoModuleTabControl = new Guna.UI2.WinForms.Guna2TabControl();
@@ -220,6 +219,25 @@ namespace SLF
             this.ELFHighSenaryoTable = new System.Windows.Forms.DataGridView();
             this.tabPage_maks_senaryo = new System.Windows.Forms.TabPage();
             this.ELFMaxSenaryoTable = new System.Windows.Forms.DataGridView();
+            this.EkonometrikSonuclarTabPage = new System.Windows.Forms.TabPage();
+            this.ELFSonuçlarTabControls = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.ELFMinimumResultsTable = new System.Windows.Forms.DataGridView();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.ELFDüşükResultsTable = new System.Windows.Forms.DataGridView();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.ELFBazResultsTable = new System.Windows.Forms.DataGridView();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.ELFYüksekResultsTable = new System.Windows.Forms.DataGridView();
+            this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.ELFMaksimumResultsTable = new System.Windows.Forms.DataGridView();
+            this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
+            this.pictureBox4 = new System.Windows.Forms.PictureBox();
+            this.pictureBox5 = new System.Windows.Forms.PictureBox();
             this.tab_yükHaritası = new System.Windows.Forms.TabPage();
             this.buton_HTML = new System.Windows.Forms.PictureBox();
             this.checkBox_yuk_main = new System.Windows.Forms.CheckBox();
@@ -301,6 +319,7 @@ namespace SLF
             this.Point_Load_Çiz = new System.Windows.Forms.ToolStripMenuItem();
             this.YGA_Çiz = new System.Windows.Forms.ToolStripMenuItem();
             this.miniToolStrip = new System.Windows.Forms.ToolStrip();
+            this.ShowResultsButton = new System.Windows.Forms.Button();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
             this.panel_proje_ekle.SuspendLayout();
@@ -328,14 +347,6 @@ namespace SLF
             ((System.ComponentModel.ISupportInitialize)(this.ELFHighResultsTable)).BeginInit();
             this.ELFMaxResultsTabPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ELFMaxResultsTable)).BeginInit();
-            this.ELFGraphicOutputsTabPage.SuspendLayout();
-            this.panel_ELF_Grafikler.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_5)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_4)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_1)).BeginInit();
-            this.ELFGraphicsPanel.SuspendLayout();
             this.tab_imar.SuspendLayout();
             this.panel_imar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.webView_imar)).BeginInit();
@@ -361,6 +372,25 @@ namespace SLF
             ((System.ComponentModel.ISupportInitialize)(this.ELFHighSenaryoTable)).BeginInit();
             this.tabPage_maks_senaryo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ELFMaxSenaryoTable)).BeginInit();
+            this.EkonometrikSonuclarTabPage.SuspendLayout();
+            this.ELFSonuçlarTabControls.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ELFMinimumResultsTable)).BeginInit();
+            this.tabPage2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ELFDüşükResultsTable)).BeginInit();
+            this.tabPage3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ELFBazResultsTable)).BeginInit();
+            this.tabPage4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ELFYüksekResultsTable)).BeginInit();
+            this.tabPage5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ELFMaksimumResultsTable)).BeginInit();
+            this.tabPage6.SuspendLayout();
+            this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).BeginInit();
             this.tab_yükHaritası.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.buton_HTML)).BeginInit();
             this.panel_yuk.SuspendLayout();
@@ -399,6 +429,7 @@ namespace SLF
             this.Modül_Tabları.Size = new System.Drawing.Size(1315, 729);
             this.Modül_Tabları.TabIndex = 2;
             this.Modül_Tabları.SelectedIndexChanged += new System.EventHandler(this.Modül_Tabları_SelectedIndexChanged);
+            this.Modül_Tabları.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.Modül_Tabları_Selecting);
             // 
             // tab_girdi
             // 
@@ -1480,7 +1511,7 @@ namespace SLF
             this.gMapControl_EA.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_EA.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_EA.ShowTileGridLines = false;
-            this.gMapControl_EA.Size = new System.Drawing.Size(1357, 3103);
+            this.gMapControl_EA.Size = new System.Drawing.Size(1357, 3129);
             this.gMapControl_EA.TabIndex = 18;
             this.gMapControl_EA.Zoom = 0D;
             // 
@@ -1492,11 +1523,11 @@ namespace SLF
             this.tab_ekonometrik.Controls.Add(this.ELFGraphicsPanel);
             this.tab_ekonometrik.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
             this.tab_ekonometrik.ImageIndex = 14;
-            this.tab_ekonometrik.Location = new System.Drawing.Point(4, 56);
+            this.tab_ekonometrik.Location = new System.Drawing.Point(4, 30);
             this.tab_ekonometrik.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tab_ekonometrik.Name = "tab_ekonometrik";
             this.tab_ekonometrik.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tab_ekonometrik.Size = new System.Drawing.Size(1307, 669);
+            this.tab_ekonometrik.Size = new System.Drawing.Size(1307, 695);
             this.tab_ekonometrik.TabIndex = 1;
             this.tab_ekonometrik.Text = "ELF Sonuçları Modülü";
             this.tab_ekonometrik.UseVisualStyleBackColor = true;
@@ -1508,14 +1539,13 @@ namespace SLF
             this.ELFResultsTabControls.Controls.Add(this.ELFBaseResultsTabPage);
             this.ELFResultsTabControls.Controls.Add(this.ELFHighResultsTabPage);
             this.ELFResultsTabControls.Controls.Add(this.ELFMaxResultsTabPage);
-            this.ELFResultsTabControls.Controls.Add(this.ELFGraphicOutputsTabPage);
             this.ELFResultsTabControls.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.ELFResultsTabControls.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ELFResultsTabControls.Location = new System.Drawing.Point(301, 2);
+            this.ELFResultsTabControls.Location = new System.Drawing.Point(262, 2);
             this.ELFResultsTabControls.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFResultsTabControls.Name = "ELFResultsTabControls";
             this.ELFResultsTabControls.SelectedIndex = 0;
-            this.ELFResultsTabControls.Size = new System.Drawing.Size(1003, 665);
+            this.ELFResultsTabControls.Size = new System.Drawing.Size(1042, 691);
             this.ELFResultsTabControls.TabIndex = 3;
             // 
             // ELFMinResultsTabPage
@@ -1525,7 +1555,7 @@ namespace SLF
             this.ELFMinResultsTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFMinResultsTabPage.Name = "ELFMinResultsTabPage";
             this.ELFMinResultsTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFMinResultsTabPage.Size = new System.Drawing.Size(995, 631);
+            this.ELFMinResultsTabPage.Size = new System.Drawing.Size(1034, 657);
             this.ELFMinResultsTabPage.TabIndex = 0;
             this.ELFMinResultsTabPage.Text = "Minimum Sonuçlar";
             this.ELFMinResultsTabPage.UseVisualStyleBackColor = true;
@@ -1552,7 +1582,7 @@ namespace SLF
             this.ELFMinResultsTable.RowHeadersWidth = 51;
             dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             this.ELFMinResultsTable.RowsDefaultCellStyle = dataGridViewCellStyle5;
-            this.ELFMinResultsTable.Size = new System.Drawing.Size(989, 627);
+            this.ELFMinResultsTable.Size = new System.Drawing.Size(1028, 653);
             this.ELFMinResultsTable.TabIndex = 0;
             // 
             // ELFLowResultsTabPage
@@ -1562,7 +1592,7 @@ namespace SLF
             this.ELFLowResultsTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFLowResultsTabPage.Name = "ELFLowResultsTabPage";
             this.ELFLowResultsTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFLowResultsTabPage.Size = new System.Drawing.Size(995, 631);
+            this.ELFLowResultsTabPage.Size = new System.Drawing.Size(1034, 631);
             this.ELFLowResultsTabPage.TabIndex = 1;
             this.ELFLowResultsTabPage.Text = "Düşük Sonuçlar";
             this.ELFLowResultsTabPage.UseVisualStyleBackColor = true;
@@ -1595,7 +1625,7 @@ namespace SLF
             dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.ELFLowResultsTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle7;
             this.ELFLowResultsTable.RowHeadersWidth = 51;
-            this.ELFLowResultsTable.Size = new System.Drawing.Size(989, 627);
+            this.ELFLowResultsTable.Size = new System.Drawing.Size(1028, 627);
             this.ELFLowResultsTable.TabIndex = 1;
             // 
             // ELFBaseResultsTabPage
@@ -1605,7 +1635,7 @@ namespace SLF
             this.ELFBaseResultsTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFBaseResultsTabPage.Name = "ELFBaseResultsTabPage";
             this.ELFBaseResultsTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFBaseResultsTabPage.Size = new System.Drawing.Size(995, 631);
+            this.ELFBaseResultsTabPage.Size = new System.Drawing.Size(1034, 631);
             this.ELFBaseResultsTabPage.TabIndex = 2;
             this.ELFBaseResultsTabPage.Text = "Baz Sonuçlar";
             this.ELFBaseResultsTabPage.UseVisualStyleBackColor = true;
@@ -1638,7 +1668,7 @@ namespace SLF
             dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.ELFBaseResultsTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
             this.ELFBaseResultsTable.RowHeadersWidth = 51;
-            this.ELFBaseResultsTable.Size = new System.Drawing.Size(989, 627);
+            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1028, 627);
             this.ELFBaseResultsTable.TabIndex = 1;
             // 
             // ELFHighResultsTabPage
@@ -1648,7 +1678,7 @@ namespace SLF
             this.ELFHighResultsTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFHighResultsTabPage.Name = "ELFHighResultsTabPage";
             this.ELFHighResultsTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFHighResultsTabPage.Size = new System.Drawing.Size(995, 631);
+            this.ELFHighResultsTabPage.Size = new System.Drawing.Size(1034, 631);
             this.ELFHighResultsTabPage.TabIndex = 3;
             this.ELFHighResultsTabPage.Text = "Yüksek Sonuçlar";
             this.ELFHighResultsTabPage.UseVisualStyleBackColor = true;
@@ -1675,7 +1705,7 @@ namespace SLF
             this.ELFHighResultsTable.RowHeadersWidth = 51;
             dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             this.ELFHighResultsTable.RowsDefaultCellStyle = dataGridViewCellStyle11;
-            this.ELFHighResultsTable.Size = new System.Drawing.Size(989, 627);
+            this.ELFHighResultsTable.Size = new System.Drawing.Size(1028, 627);
             this.ELFHighResultsTable.TabIndex = 1;
             // 
             // ELFMaxResultsTabPage
@@ -1685,7 +1715,7 @@ namespace SLF
             this.ELFMaxResultsTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFMaxResultsTabPage.Name = "ELFMaxResultsTabPage";
             this.ELFMaxResultsTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFMaxResultsTabPage.Size = new System.Drawing.Size(995, 631);
+            this.ELFMaxResultsTabPage.Size = new System.Drawing.Size(1034, 631);
             this.ELFMaxResultsTabPage.TabIndex = 4;
             this.ELFMaxResultsTabPage.Text = "Maksimum Sonuçlar";
             this.ELFMaxResultsTabPage.UseVisualStyleBackColor = true;
@@ -1719,87 +1749,8 @@ namespace SLF
             dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.ELFMaxResultsTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle13;
             this.ELFMaxResultsTable.RowHeadersWidth = 51;
-            this.ELFMaxResultsTable.Size = new System.Drawing.Size(989, 627);
+            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1028, 627);
             this.ELFMaxResultsTable.TabIndex = 1;
-            // 
-            // ELFGraphicOutputsTabPage
-            // 
-            this.ELFGraphicOutputsTabPage.Controls.Add(this.panel_ELF_Grafikler);
-            this.ELFGraphicOutputsTabPage.Location = new System.Drawing.Point(4, 30);
-            this.ELFGraphicOutputsTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFGraphicOutputsTabPage.Name = "ELFGraphicOutputsTabPage";
-            this.ELFGraphicOutputsTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFGraphicOutputsTabPage.Size = new System.Drawing.Size(995, 631);
-            this.ELFGraphicOutputsTabPage.TabIndex = 5;
-            this.ELFGraphicOutputsTabPage.Text = "Projeksiyon Grafik Sonuçları";
-            this.ELFGraphicOutputsTabPage.UseVisualStyleBackColor = true;
-            // 
-            // panel_ELF_Grafikler
-            // 
-            this.panel_ELF_Grafikler.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel_ELF_Grafikler.BackColor = System.Drawing.Color.NavajoWhite;
-            this.panel_ELF_Grafikler.Controls.Add(this.pictureBox_ELF_5);
-            this.panel_ELF_Grafikler.Controls.Add(this.pictureBox_ELF_4);
-            this.panel_ELF_Grafikler.Controls.Add(this.pictureBox_ELF_3);
-            this.panel_ELF_Grafikler.Controls.Add(this.pictureBox_ELF_2);
-            this.panel_ELF_Grafikler.Controls.Add(this.pictureBox_ELF_1);
-            this.panel_ELF_Grafikler.Location = new System.Drawing.Point(3, 2);
-            this.panel_ELF_Grafikler.Margin = new System.Windows.Forms.Padding(4);
-            this.panel_ELF_Grafikler.Name = "panel_ELF_Grafikler";
-            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1114, 274);
-            this.panel_ELF_Grafikler.TabIndex = 6;
-            // 
-            // pictureBox_ELF_5
-            // 
-            this.pictureBox_ELF_5.Location = new System.Drawing.Point(699, 135);
-            this.pictureBox_ELF_5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pictureBox_ELF_5.Name = "pictureBox_ELF_5";
-            this.pictureBox_ELF_5.Size = new System.Drawing.Size(341, 282);
-            this.pictureBox_ELF_5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox_ELF_5.TabIndex = 4;
-            this.pictureBox_ELF_5.TabStop = false;
-            // 
-            // pictureBox_ELF_4
-            // 
-            this.pictureBox_ELF_4.Location = new System.Drawing.Point(351, 290);
-            this.pictureBox_ELF_4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pictureBox_ELF_4.Name = "pictureBox_ELF_4";
-            this.pictureBox_ELF_4.Size = new System.Drawing.Size(341, 282);
-            this.pictureBox_ELF_4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox_ELF_4.TabIndex = 3;
-            this.pictureBox_ELF_4.TabStop = false;
-            // 
-            // pictureBox_ELF_3
-            // 
-            this.pictureBox_ELF_3.Location = new System.Drawing.Point(351, 2);
-            this.pictureBox_ELF_3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pictureBox_ELF_3.Name = "pictureBox_ELF_3";
-            this.pictureBox_ELF_3.Size = new System.Drawing.Size(341, 282);
-            this.pictureBox_ELF_3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox_ELF_3.TabIndex = 2;
-            this.pictureBox_ELF_3.TabStop = false;
-            // 
-            // pictureBox_ELF_2
-            // 
-            this.pictureBox_ELF_2.Location = new System.Drawing.Point(3, 290);
-            this.pictureBox_ELF_2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pictureBox_ELF_2.Name = "pictureBox_ELF_2";
-            this.pictureBox_ELF_2.Size = new System.Drawing.Size(341, 282);
-            this.pictureBox_ELF_2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox_ELF_2.TabIndex = 1;
-            this.pictureBox_ELF_2.TabStop = false;
-            // 
-            // pictureBox_ELF_1
-            // 
-            this.pictureBox_ELF_1.Location = new System.Drawing.Point(3, 2);
-            this.pictureBox_ELF_1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pictureBox_ELF_1.Name = "pictureBox_ELF_1";
-            this.pictureBox_ELF_1.Size = new System.Drawing.Size(341, 282);
-            this.pictureBox_ELF_1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox_ELF_1.TabIndex = 0;
-            this.pictureBox_ELF_1.TabStop = false;
             // 
             // ELFTablePanel
             // 
@@ -1809,69 +1760,20 @@ namespace SLF
             this.ELFTablePanel.Location = new System.Drawing.Point(307, 2);
             this.ELFTablePanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFTablePanel.Name = "ELFTablePanel";
-            this.ELFTablePanel.Size = new System.Drawing.Size(965, 7582);
+            this.ELFTablePanel.Size = new System.Drawing.Size(965, 7608);
             this.ELFTablePanel.TabIndex = 21;
             // 
             // ELFGraphicsPanel
             // 
             this.ELFGraphicsPanel.AutoScroll = true;
             this.ELFGraphicsPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            this.ELFGraphicsPanel.Controls.Add(this.ELFShowGraphsButton);
-            this.ELFGraphicsPanel.Controls.Add(this.SenaryoResultsLabel);
-            this.ELFGraphicsPanel.Controls.Add(this.SenaryoNewSelectionButton);
             this.ELFGraphicsPanel.Cursor = System.Windows.Forms.Cursors.Default;
             this.ELFGraphicsPanel.Dock = System.Windows.Forms.DockStyle.Left;
             this.ELFGraphicsPanel.Location = new System.Drawing.Point(3, 2);
             this.ELFGraphicsPanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFGraphicsPanel.Name = "ELFGraphicsPanel";
-            this.ELFGraphicsPanel.Size = new System.Drawing.Size(298, 665);
+            this.ELFGraphicsPanel.Size = new System.Drawing.Size(259, 691);
             this.ELFGraphicsPanel.TabIndex = 22;
-            // 
-            // ELFShowGraphsButton
-            // 
-            this.ELFShowGraphsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.ELFShowGraphsButton.FlatAppearance.BorderSize = 0;
-            this.ELFShowGraphsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.ELFShowGraphsButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.ELFShowGraphsButton.ForeColor = System.Drawing.Color.White;
-            this.ELFShowGraphsButton.Location = new System.Drawing.Point(24, 580);
-            this.ELFShowGraphsButton.Margin = new System.Windows.Forms.Padding(4);
-            this.ELFShowGraphsButton.Name = "ELFShowGraphsButton";
-            this.ELFShowGraphsButton.Size = new System.Drawing.Size(200, 49);
-            this.ELFShowGraphsButton.TabIndex = 34;
-            this.ELFShowGraphsButton.Text = "Grafik Sonuçlarını Göster";
-            this.ELFShowGraphsButton.UseVisualStyleBackColor = false;
-            this.ELFShowGraphsButton.Click += new System.EventHandler(this.ELFShowGraphsButton_Click);
-            // 
-            // SenaryoNewSelectionButton
-            // 
-            this.SenaryoNewSelectionButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.SenaryoNewSelectionButton.FlatAppearance.BorderSize = 0;
-            this.SenaryoNewSelectionButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.SenaryoNewSelectionButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.SenaryoNewSelectionButton.ForeColor = System.Drawing.Color.White;
-            this.SenaryoNewSelectionButton.Location = new System.Drawing.Point(24, 444);
-            this.SenaryoNewSelectionButton.Margin = new System.Windows.Forms.Padding(4);
-            this.SenaryoNewSelectionButton.Name = "SenaryoNewSelectionButton";
-            this.SenaryoNewSelectionButton.Size = new System.Drawing.Size(200, 49);
-            this.SenaryoNewSelectionButton.TabIndex = 33;
-            this.SenaryoNewSelectionButton.Text = "Yeni Senaryo Oluştur";
-            this.SenaryoNewSelectionButton.UseVisualStyleBackColor = false;
-            this.SenaryoNewSelectionButton.Click += new System.EventHandler(this.SenaryoNewSelectionButton_Click);
-            // 
-            // SenaryoResultsLabel
-            // 
-            this.SenaryoResultsLabel.AutoSize = true;
-            this.SenaryoResultsLabel.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.SenaryoResultsLabel.ForeColor = System.Drawing.Color.DarkOrange;
-            this.SenaryoResultsLabel.Location = new System.Drawing.Point(42, 19);
-            this.SenaryoResultsLabel.MaximumSize = new System.Drawing.Size(200, 0);
-            this.SenaryoResultsLabel.Name = "SenaryoResultsLabel";
-            this.SenaryoResultsLabel.Size = new System.Drawing.Size(193, 59);
-            this.SenaryoResultsLabel.TabIndex = 7;
-            this.SenaryoResultsLabel.Text = "Ekonometrik Talep Tahmin Sonuçları";
-            this.SenaryoResultsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.SenaryoResultsLabel.UseCompatibleTextRendering = true;
             // 
             // tab_imar
             // 
@@ -1918,7 +1820,7 @@ namespace SLF
             this.panel_imar.Location = new System.Drawing.Point(300, 43);
             this.panel_imar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel_imar.Name = "panel_imar";
-            this.panel_imar.Size = new System.Drawing.Size(960, 634);
+            this.panel_imar.Size = new System.Drawing.Size(960, 660);
             this.panel_imar.TabIndex = 73;
             // 
             // Mesafe_imar
@@ -1940,7 +1842,7 @@ namespace SLF
             this.webView_imar.Location = new System.Drawing.Point(0, 0);
             this.webView_imar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.webView_imar.Name = "webView_imar";
-            this.webView_imar.Size = new System.Drawing.Size(960, 634);
+            this.webView_imar.Size = new System.Drawing.Size(960, 660);
             this.webView_imar.Source = new System.Uri("https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu", System.UriKind.Absolute);
             this.webView_imar.TabIndex = 72;
             this.webView_imar.Visible = false;
@@ -1953,7 +1855,7 @@ namespace SLF
             this.buton_imar_katmanlar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.buton_imar_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
             this.buton_imar_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_imar_katmanlar.Location = new System.Drawing.Point(6, 565);
+            this.buton_imar_katmanlar.Location = new System.Drawing.Point(6, 591);
             this.buton_imar_katmanlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buton_imar_katmanlar.Name = "buton_imar_katmanlar";
             this.buton_imar_katmanlar.Size = new System.Drawing.Size(57, 62);
@@ -2063,7 +1965,7 @@ namespace SLF
             this.gMapControl_imar.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_imar.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_imar.ShowTileGridLines = false;
-            this.gMapControl_imar.Size = new System.Drawing.Size(960, 634);
+            this.gMapControl_imar.Size = new System.Drawing.Size(960, 660);
             this.gMapControl_imar.TabIndex = 60;
             this.gMapControl_imar.Zoom = 0D;
             this.gMapControl_imar.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_imar_OnMapClick);
@@ -2075,7 +1977,7 @@ namespace SLF
             // buton_DL_calıstır
             // 
             this.buton_DL_calıstır.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.buton_DL_calıstır.Location = new System.Drawing.Point(316, 789);
+            this.buton_DL_calıstır.Location = new System.Drawing.Point(316, 815);
             this.buton_DL_calıstır.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buton_DL_calıstır.Name = "buton_DL_calıstır";
             this.buton_DL_calıstır.Size = new System.Drawing.Size(148, 59);
@@ -2502,7 +2404,7 @@ namespace SLF
             this.buton_optDTR_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
             this.buton_optDTR_katmanlar.Cursor = System.Windows.Forms.Cursors.Default;
             this.buton_optDTR_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_optDTR_katmanlar.Location = new System.Drawing.Point(0, 2072);
+            this.buton_optDTR_katmanlar.Location = new System.Drawing.Point(0, 2098);
             this.buton_optDTR_katmanlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buton_optDTR_katmanlar.Name = "buton_optDTR_katmanlar";
             this.buton_optDTR_katmanlar.Size = new System.Drawing.Size(59, 52);
@@ -2537,7 +2439,7 @@ namespace SLF
             this.gMapControl_optimalDTR.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_optimalDTR.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_optimalDTR.ShowTileGridLines = false;
-            this.gMapControl_optimalDTR.Size = new System.Drawing.Size(1160, 2116);
+            this.gMapControl_optimalDTR.Size = new System.Drawing.Size(1160, 2142);
             this.gMapControl_optimalDTR.TabIndex = 42;
             this.gMapControl_optimalDTR.Zoom = 0D;
             // 
@@ -2553,7 +2455,7 @@ namespace SLF
             this.webView_optimalDTR.Location = new System.Drawing.Point(3, 2);
             this.webView_optimalDTR.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.webView_optimalDTR.Name = "webView_optimalDTR";
-            this.webView_optimalDTR.Size = new System.Drawing.Size(1160, 2116);
+            this.webView_optimalDTR.Size = new System.Drawing.Size(1160, 2142);
             this.webView_optimalDTR.Source = new System.Uri("https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu", System.UriKind.Absolute);
             this.webView_optimalDTR.TabIndex = 40;
             this.webView_optimalDTR.Visible = false;
@@ -2589,7 +2491,7 @@ namespace SLF
             this.buton_optimalDTR_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
             this.buton_optimalDTR_katmanlar.Cursor = System.Windows.Forms.Cursors.Default;
             this.buton_optimalDTR_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_optimalDTR_katmanlar.Location = new System.Drawing.Point(151, 2067);
+            this.buton_optimalDTR_katmanlar.Location = new System.Drawing.Point(151, 2093);
             this.buton_optimalDTR_katmanlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buton_optimalDTR_katmanlar.Name = "buton_optimalDTR_katmanlar";
             this.buton_optimalDTR_katmanlar.Size = new System.Drawing.Size(59, 52);
@@ -2604,7 +2506,7 @@ namespace SLF
             this.tab_senaryo.Name = "tab_senaryo";
             this.tab_senaryo.Size = new System.Drawing.Size(1307, 669);
             this.tab_senaryo.TabIndex = 3;
-            this.tab_senaryo.Text = "ELF Senaryo Oluşturma Modülü";
+            this.tab_senaryo.Text = "Ekonometrik Talep Tahmini Modülü";
             this.tab_senaryo.UseVisualStyleBackColor = true;
             // 
             // SenaryoModulePanel
@@ -2625,27 +2527,11 @@ namespace SLF
             this.EkonometrikSenaryoElementsPanel.Controls.Add(this.ELFTahminButonu);
             this.EkonometrikSenaryoElementsPanel.Controls.Add(this.ELFScenerioSaveButton);
             this.EkonometrikSenaryoElementsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.EkonometrikSenaryoElementsPanel.Location = new System.Drawing.Point(1127, 0);
+            this.EkonometrikSenaryoElementsPanel.Location = new System.Drawing.Point(1175, 0);
             this.EkonometrikSenaryoElementsPanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.EkonometrikSenaryoElementsPanel.Name = "EkonometrikSenaryoElementsPanel";
-            this.EkonometrikSenaryoElementsPanel.Size = new System.Drawing.Size(180, 669);
+            this.EkonometrikSenaryoElementsPanel.Size = new System.Drawing.Size(132, 669);
             this.EkonometrikSenaryoElementsPanel.TabIndex = 1;
-            // 
-            // ShowResultsButton
-            // 
-            this.ShowResultsButton.BackColor = System.Drawing.Color.OliveDrab;
-            this.ShowResultsButton.FlatAppearance.BorderSize = 0;
-            this.ShowResultsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.ShowResultsButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.ShowResultsButton.ForeColor = System.Drawing.Color.White;
-            this.ShowResultsButton.Location = new System.Drawing.Point(42, 581);
-            this.ShowResultsButton.Margin = new System.Windows.Forms.Padding(4);
-            this.ShowResultsButton.Name = "ShowResultsButton";
-            this.ShowResultsButton.Size = new System.Drawing.Size(120, 60);
-            this.ShowResultsButton.TabIndex = 14;
-            this.ShowResultsButton.Text = " Sonuçları Göster";
-            this.ShowResultsButton.UseVisualStyleBackColor = false;
-            this.ShowResultsButton.Click += new System.EventHandler(this.ShowResultsButton_Click);
             // 
             // ELFTahminButonu
             // 
@@ -2654,10 +2540,10 @@ namespace SLF
             this.ELFTahminButonu.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ELFTahminButonu.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.ELFTahminButonu.ForeColor = System.Drawing.Color.White;
-            this.ELFTahminButonu.Location = new System.Drawing.Point(28, 281);
+            this.ELFTahminButonu.Location = new System.Drawing.Point(9, 281);
             this.ELFTahminButonu.Margin = new System.Windows.Forms.Padding(4);
             this.ELFTahminButonu.Name = "ELFTahminButonu";
-            this.ELFTahminButonu.Size = new System.Drawing.Size(141, 107);
+            this.ELFTahminButonu.Size = new System.Drawing.Size(110, 80);
             this.ELFTahminButonu.TabIndex = 13;
             this.ELFTahminButonu.Text = "Ekonometrik Tahminleri Oluştur";
             this.ELFTahminButonu.UseVisualStyleBackColor = false;
@@ -2670,10 +2556,10 @@ namespace SLF
             this.ELFScenerioSaveButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ELFScenerioSaveButton.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.ELFScenerioSaveButton.ForeColor = System.Drawing.Color.White;
-            this.ELFScenerioSaveButton.Location = new System.Drawing.Point(28, 36);
+            this.ELFScenerioSaveButton.Location = new System.Drawing.Point(21, 42);
             this.ELFScenerioSaveButton.Margin = new System.Windows.Forms.Padding(4);
             this.ELFScenerioSaveButton.Name = "ELFScenerioSaveButton";
-            this.ELFScenerioSaveButton.Size = new System.Drawing.Size(123, 56);
+            this.ELFScenerioSaveButton.Size = new System.Drawing.Size(105, 60);
             this.ELFScenerioSaveButton.TabIndex = 12;
             this.ELFScenerioSaveButton.Text = "Değişiklikleri Kaydet";
             this.ELFScenerioSaveButton.UseVisualStyleBackColor = false;
@@ -2683,6 +2569,7 @@ namespace SLF
             // 
             this.SenaryoModuleTabControl.Alignment = System.Windows.Forms.TabAlignment.Left;
             this.SenaryoModuleTabControl.Controls.Add(this.EkonometrikSenaryoTabPage);
+            this.SenaryoModuleTabControl.Controls.Add(this.EkonometrikSonuclarTabPage);
             this.SenaryoModuleTabControl.Cursor = System.Windows.Forms.Cursors.Default;
             this.SenaryoModuleTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SenaryoModuleTabControl.ItemSize = new System.Drawing.Size(220, 40);
@@ -2709,6 +2596,7 @@ namespace SLF
             this.SenaryoModuleTabControl.TabButtonSize = new System.Drawing.Size(220, 40);
             this.SenaryoModuleTabControl.TabIndex = 0;
             this.SenaryoModuleTabControl.TabMenuBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            this.SenaryoModuleTabControl.SelectedIndexChanged += new System.EventHandler(this.SenaryoModuleTabControl_SelectedIndexChanged);
             // 
             // EkonometrikSenaryoTabPage
             // 
@@ -2719,7 +2607,7 @@ namespace SLF
             this.EkonometrikSenaryoTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.EkonometrikSenaryoTabPage.Size = new System.Drawing.Size(1079, 661);
             this.EkonometrikSenaryoTabPage.TabIndex = 0;
-            this.EkonometrikSenaryoTabPage.Text = "Ekonometrik Senaryolar";
+            this.EkonometrikSenaryoTabPage.Text = "Senaryo Oluştur";
             this.EkonometrikSenaryoTabPage.UseVisualStyleBackColor = true;
             // 
             // EkonometrikSenaryoOutputsPanel
@@ -2844,7 +2732,7 @@ namespace SLF
             this.ELFLowSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle19;
             this.ELFLowSenaryoTable.RowHeadersWidth = 18;
             this.ELFLowSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(887, 619);
+            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(887, 629);
             this.ELFLowSenaryoTable.TabIndex = 1;
             // 
             // tabPage_baz_senaryo
@@ -2888,7 +2776,7 @@ namespace SLF
             dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             this.ELFBaseSenaryoTable.RowsDefaultCellStyle = dataGridViewCellStyle22;
             this.ELFBaseSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(887, 619);
+            this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(887, 629);
             this.ELFBaseSenaryoTable.TabIndex = 1;
             // 
             // tabPage_yuksek_senaryo
@@ -2932,7 +2820,7 @@ namespace SLF
             dataGridViewCellStyle25.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             this.ELFHighSenaryoTable.RowsDefaultCellStyle = dataGridViewCellStyle25;
             this.ELFHighSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFHighSenaryoTable.Size = new System.Drawing.Size(887, 619);
+            this.ELFHighSenaryoTable.Size = new System.Drawing.Size(887, 629);
             this.ELFHighSenaryoTable.TabIndex = 1;
             // 
             // tabPage_maks_senaryo
@@ -2979,8 +2867,318 @@ namespace SLF
             this.ELFMaxSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle27;
             this.ELFMaxSenaryoTable.RowHeadersWidth = 18;
             this.ELFMaxSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(887, 619);
+            this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(887, 629);
             this.ELFMaxSenaryoTable.TabIndex = 1;
+            // 
+            // EkonometrikSonuclarTabPage
+            // 
+            this.EkonometrikSonuclarTabPage.Controls.Add(this.ELFSonuçlarTabControls);
+            this.EkonometrikSonuclarTabPage.Location = new System.Drawing.Point(224, 4);
+            this.EkonometrikSonuclarTabPage.Name = "EkonometrikSonuclarTabPage";
+            this.EkonometrikSonuclarTabPage.Size = new System.Drawing.Size(1079, 661);
+            this.EkonometrikSonuclarTabPage.TabIndex = 1;
+            this.EkonometrikSonuclarTabPage.Text = "Sonuçları Görüntüle";
+            this.EkonometrikSonuclarTabPage.UseVisualStyleBackColor = true;
+            // 
+            // ELFSonuçlarTabControls
+            // 
+            this.ELFSonuçlarTabControls.Controls.Add(this.tabPage1);
+            this.ELFSonuçlarTabControls.Controls.Add(this.tabPage2);
+            this.ELFSonuçlarTabControls.Controls.Add(this.tabPage3);
+            this.ELFSonuçlarTabControls.Controls.Add(this.tabPage4);
+            this.ELFSonuçlarTabControls.Controls.Add(this.tabPage5);
+            this.ELFSonuçlarTabControls.Controls.Add(this.tabPage6);
+            this.ELFSonuçlarTabControls.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.ELFSonuçlarTabControls.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ELFSonuçlarTabControls.Location = new System.Drawing.Point(0, 0);
+            this.ELFSonuçlarTabControls.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.ELFSonuçlarTabControls.Name = "ELFSonuçlarTabControls";
+            this.ELFSonuçlarTabControls.SelectedIndex = 0;
+            this.ELFSonuçlarTabControls.Size = new System.Drawing.Size(1079, 661);
+            this.ELFSonuçlarTabControls.TabIndex = 4;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.ELFMinimumResultsTable);
+            this.tabPage1.Location = new System.Drawing.Point(4, 30);
+            this.tabPage1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPage1.Size = new System.Drawing.Size(1071, 627);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Minimum Sonuçlar";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // ELFMinimumResultsTable
+            // 
+            this.ELFMinimumResultsTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
+            this.ELFMinimumResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.ELFMinimumResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.ELFMinimumResultsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle28.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle28.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle28.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle28.ForeColor = System.Drawing.Color.DarkOrange;
+            dataGridViewCellStyle28.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle28.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle28.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFMinimumResultsTable.DefaultCellStyle = dataGridViewCellStyle28;
+            this.ELFMinimumResultsTable.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ELFMinimumResultsTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.ELFMinimumResultsTable.Location = new System.Drawing.Point(3, 2);
+            this.ELFMinimumResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.ELFMinimumResultsTable.Name = "ELFMinimumResultsTable";
+            this.ELFMinimumResultsTable.RowHeadersWidth = 51;
+            dataGridViewCellStyle29.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.ELFMinimumResultsTable.RowsDefaultCellStyle = dataGridViewCellStyle29;
+            this.ELFMinimumResultsTable.Size = new System.Drawing.Size(1065, 623);
+            this.ELFMinimumResultsTable.TabIndex = 0;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.ELFDüşükResultsTable);
+            this.tabPage2.Location = new System.Drawing.Point(4, 30);
+            this.tabPage2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPage2.Size = new System.Drawing.Size(1071, 627);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Düşük Sonuçlar";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // ELFDüşükResultsTable
+            // 
+            this.ELFDüşükResultsTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
+            this.ELFDüşükResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.ELFDüşükResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.ELFDüşükResultsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle30.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle30.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle30.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle30.ForeColor = System.Drawing.Color.DarkOrange;
+            dataGridViewCellStyle30.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle30.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle30.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFDüşükResultsTable.DefaultCellStyle = dataGridViewCellStyle30;
+            this.ELFDüşükResultsTable.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ELFDüşükResultsTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.ELFDüşükResultsTable.Location = new System.Drawing.Point(3, 2);
+            this.ELFDüşükResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.ELFDüşükResultsTable.Name = "ELFDüşükResultsTable";
+            dataGridViewCellStyle31.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle31.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle31.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle31.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle31.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle31.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle31.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ELFDüşükResultsTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle31;
+            this.ELFDüşükResultsTable.RowHeadersWidth = 51;
+            this.ELFDüşükResultsTable.Size = new System.Drawing.Size(1065, 623);
+            this.ELFDüşükResultsTable.TabIndex = 1;
+            // 
+            // tabPage3
+            // 
+            this.tabPage3.Controls.Add(this.ELFBazResultsTable);
+            this.tabPage3.Location = new System.Drawing.Point(4, 30);
+            this.tabPage3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPage3.Size = new System.Drawing.Size(1071, 627);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "Baz Sonuçlar";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // ELFBazResultsTable
+            // 
+            this.ELFBazResultsTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
+            this.ELFBazResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.ELFBazResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.ELFBazResultsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle32.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle32.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle32.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle32.ForeColor = System.Drawing.Color.DarkOrange;
+            dataGridViewCellStyle32.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle32.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle32.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFBazResultsTable.DefaultCellStyle = dataGridViewCellStyle32;
+            this.ELFBazResultsTable.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ELFBazResultsTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.ELFBazResultsTable.Location = new System.Drawing.Point(3, 2);
+            this.ELFBazResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.ELFBazResultsTable.Name = "ELFBazResultsTable";
+            dataGridViewCellStyle33.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle33.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle33.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle33.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle33.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle33.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle33.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ELFBazResultsTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle33;
+            this.ELFBazResultsTable.RowHeadersWidth = 51;
+            this.ELFBazResultsTable.Size = new System.Drawing.Size(1065, 623);
+            this.ELFBazResultsTable.TabIndex = 1;
+            // 
+            // tabPage4
+            // 
+            this.tabPage4.Controls.Add(this.ELFYüksekResultsTable);
+            this.tabPage4.Location = new System.Drawing.Point(4, 30);
+            this.tabPage4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPage4.Size = new System.Drawing.Size(1071, 627);
+            this.tabPage4.TabIndex = 3;
+            this.tabPage4.Text = "Yüksek Sonuçlar";
+            this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // ELFYüksekResultsTable
+            // 
+            this.ELFYüksekResultsTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
+            this.ELFYüksekResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.ELFYüksekResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.ELFYüksekResultsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle34.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle34.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle34.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle34.ForeColor = System.Drawing.Color.DarkOrange;
+            dataGridViewCellStyle34.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle34.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle34.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFYüksekResultsTable.DefaultCellStyle = dataGridViewCellStyle34;
+            this.ELFYüksekResultsTable.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ELFYüksekResultsTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.ELFYüksekResultsTable.Location = new System.Drawing.Point(3, 2);
+            this.ELFYüksekResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.ELFYüksekResultsTable.Name = "ELFYüksekResultsTable";
+            this.ELFYüksekResultsTable.RowHeadersWidth = 51;
+            dataGridViewCellStyle35.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.ELFYüksekResultsTable.RowsDefaultCellStyle = dataGridViewCellStyle35;
+            this.ELFYüksekResultsTable.Size = new System.Drawing.Size(1065, 623);
+            this.ELFYüksekResultsTable.TabIndex = 1;
+            // 
+            // tabPage5
+            // 
+            this.tabPage5.Controls.Add(this.ELFMaksimumResultsTable);
+            this.tabPage5.Location = new System.Drawing.Point(4, 30);
+            this.tabPage5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPage5.Name = "tabPage5";
+            this.tabPage5.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPage5.Size = new System.Drawing.Size(1071, 627);
+            this.tabPage5.TabIndex = 4;
+            this.tabPage5.Text = "Maksimum Sonuçlar";
+            this.tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // ELFMaksimumResultsTable
+            // 
+            this.ELFMaksimumResultsTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
+            this.ELFMaksimumResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.ELFMaksimumResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.ELFMaksimumResultsTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.ELFMaksimumResultsTable.Cursor = System.Windows.Forms.Cursors.Default;
+            dataGridViewCellStyle36.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle36.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle36.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle36.ForeColor = System.Drawing.Color.DarkOrange;
+            dataGridViewCellStyle36.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle36.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle36.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFMaksimumResultsTable.DefaultCellStyle = dataGridViewCellStyle36;
+            this.ELFMaksimumResultsTable.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ELFMaksimumResultsTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.ELFMaksimumResultsTable.Location = new System.Drawing.Point(3, 2);
+            this.ELFMaksimumResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.ELFMaksimumResultsTable.Name = "ELFMaksimumResultsTable";
+            dataGridViewCellStyle37.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle37.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle37.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle37.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle37.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle37.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle37.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ELFMaksimumResultsTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle37;
+            this.ELFMaksimumResultsTable.RowHeadersWidth = 51;
+            this.ELFMaksimumResultsTable.Size = new System.Drawing.Size(1065, 623);
+            this.ELFMaksimumResultsTable.TabIndex = 1;
+            // 
+            // tabPage6
+            // 
+            this.tabPage6.Controls.Add(this.panel2);
+            this.tabPage6.Location = new System.Drawing.Point(4, 30);
+            this.tabPage6.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPage6.Name = "tabPage6";
+            this.tabPage6.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabPage6.Size = new System.Drawing.Size(1071, 627);
+            this.tabPage6.TabIndex = 5;
+            this.tabPage6.Text = "Projeksiyon Grafik Sonuçları";
+            this.tabPage6.UseVisualStyleBackColor = true;
+            // 
+            // panel2
+            // 
+            this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel2.BackColor = System.Drawing.Color.NavajoWhite;
+            this.panel2.Controls.Add(this.pictureBox1);
+            this.panel2.Controls.Add(this.pictureBox2);
+            this.panel2.Controls.Add(this.pictureBox3);
+            this.panel2.Controls.Add(this.pictureBox4);
+            this.panel2.Controls.Add(this.pictureBox5);
+            this.panel2.Location = new System.Drawing.Point(3, 2);
+            this.panel2.Margin = new System.Windows.Forms.Padding(4);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(1190, 280);
+            this.panel2.TabIndex = 6;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Location = new System.Drawing.Point(699, 135);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(341, 282);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox1.TabIndex = 4;
+            this.pictureBox1.TabStop = false;
+            // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Location = new System.Drawing.Point(351, 290);
+            this.pictureBox2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(341, 282);
+            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox2.TabIndex = 3;
+            this.pictureBox2.TabStop = false;
+            // 
+            // pictureBox3
+            // 
+            this.pictureBox3.Location = new System.Drawing.Point(351, 2);
+            this.pictureBox3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pictureBox3.Name = "pictureBox3";
+            this.pictureBox3.Size = new System.Drawing.Size(341, 282);
+            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox3.TabIndex = 2;
+            this.pictureBox3.TabStop = false;
+            // 
+            // pictureBox4
+            // 
+            this.pictureBox4.Location = new System.Drawing.Point(3, 290);
+            this.pictureBox4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pictureBox4.Name = "pictureBox4";
+            this.pictureBox4.Size = new System.Drawing.Size(341, 282);
+            this.pictureBox4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox4.TabIndex = 1;
+            this.pictureBox4.TabStop = false;
+            // 
+            // pictureBox5
+            // 
+            this.pictureBox5.Location = new System.Drawing.Point(3, 2);
+            this.pictureBox5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pictureBox5.Name = "pictureBox5";
+            this.pictureBox5.Size = new System.Drawing.Size(341, 282);
+            this.pictureBox5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox5.TabIndex = 0;
+            this.pictureBox5.TabStop = false;
             // 
             // tab_yükHaritası
             // 
@@ -3894,6 +4092,23 @@ namespace SLF
             this.miniToolStrip.Size = new System.Drawing.Size(1437, 32);
             this.miniToolStrip.TabIndex = 36;
             // 
+            // ShowResultsButton
+            // 
+            this.ShowResultsButton.BackColor = System.Drawing.Color.OliveDrab;
+            this.ShowResultsButton.FlatAppearance.BorderSize = 0;
+            this.ShowResultsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ShowResultsButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.ShowResultsButton.ForeColor = System.Drawing.Color.White;
+            this.ShowResultsButton.Location = new System.Drawing.Point(21, 528);
+            this.ShowResultsButton.Margin = new System.Windows.Forms.Padding(4);
+            this.ShowResultsButton.Name = "ShowResultsButton";
+            this.ShowResultsButton.Size = new System.Drawing.Size(86, 55);
+            this.ShowResultsButton.TabIndex = 14;
+            this.ShowResultsButton.Text = " Sonuçları Göster";
+            this.ShowResultsButton.UseVisualStyleBackColor = false;
+            this.ShowResultsButton.Visible = false;
+            this.ShowResultsButton.Click += new System.EventHandler(this.ShowResultsButton_Click);
+            // 
             // ModülFormu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -3951,15 +4166,6 @@ namespace SLF
             ((System.ComponentModel.ISupportInitialize)(this.ELFHighResultsTable)).EndInit();
             this.ELFMaxResultsTabPage.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.ELFMaxResultsTable)).EndInit();
-            this.ELFGraphicOutputsTabPage.ResumeLayout(false);
-            this.panel_ELF_Grafikler.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_5)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_4)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ELF_1)).EndInit();
-            this.ELFGraphicsPanel.ResumeLayout(false);
-            this.ELFGraphicsPanel.PerformLayout();
             this.tab_imar.ResumeLayout(false);
             this.tab_imar.PerformLayout();
             this.panel_imar.ResumeLayout(false);
@@ -3989,6 +4195,25 @@ namespace SLF
             ((System.ComponentModel.ISupportInitialize)(this.ELFHighSenaryoTable)).EndInit();
             this.tabPage_maks_senaryo.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.ELFMaxSenaryoTable)).EndInit();
+            this.EkonometrikSonuclarTabPage.ResumeLayout(false);
+            this.ELFSonuçlarTabControls.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.ELFMinimumResultsTable)).EndInit();
+            this.tabPage2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.ELFDüşükResultsTable)).EndInit();
+            this.tabPage3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.ELFBazResultsTable)).EndInit();
+            this.tabPage4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.ELFYüksekResultsTable)).EndInit();
+            this.tabPage5.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.ELFMaksimumResultsTable)).EndInit();
+            this.tabPage6.ResumeLayout(false);
+            this.panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).EndInit();
             this.tab_yükHaritası.ResumeLayout(false);
             this.tab_yükHaritası.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.buton_HTML)).EndInit();
@@ -4141,7 +4366,6 @@ namespace SLF
         private System.Windows.Forms.CheckBox checkBox_imar_1;
         private System.Windows.Forms.CheckBox checkBox_imar_7;
         private System.Windows.Forms.CheckBox checkBox_imar_6;
-        private System.Windows.Forms.Label SenaryoResultsLabel;
         private System.Windows.Forms.ToolStripButton EA_Seç;
         private System.Windows.Forms.ToolStripButton EA_Kaydır;
         private System.Windows.Forms.ToolStripButton EA_Mesafe_Ölç;
@@ -4157,7 +4381,6 @@ namespace SLF
         private Panel GelecekSimPanel;
         private Panel panel_ea;
         private Label AddStationLabel;
-        private TabPage ELFGraphicOutputsTabPage;
         private Panel panel_DEK;
         private ComboBox comboBox_DEK_il;
         private ComboBox comboBox_DEK_Yıl;
@@ -4172,20 +4395,11 @@ namespace SLF
         private ToolStripSeparator toolStripSeparator4;
         private ToolStripSeparator toolStripSeparator5;
         private ToolStripSeparator toolStripSeparator6;
-        private Panel panel_ELF_Grafikler;
-        private PictureBox pictureBox_ELF_5;
-        private PictureBox pictureBox_ELF_4;
-        private PictureBox pictureBox_ELF_3;
-        private PictureBox pictureBox_ELF_2;
-        private PictureBox pictureBox_ELF_1;
         private Panel HeaderPanel;
         private System.Windows.Forms.Button OpenModuleButton;
         private TabPage tab_yga;
         private Button ELFScenerioSaveButton;
         private Button ELFTahminButonu;
-        private Button ShowResultsButton;
-        private Button SenaryoNewSelectionButton;
-        private Button ELFShowGraphsButton;
         private Button EAStationAddButton;
         private Button GelecekSimButton;
         private Button DEKSimButton;
@@ -4268,5 +4482,25 @@ namespace SLF
         private System.Windows.Forms.Button SimulasyonSonucGoruntule;
         private CheckBox EAPointsLayerCheckBox;
         private PictureBox buton_HTML;
+        private TabPage EkonometrikSonuclarTabPage;
+        private TabControl ELFSonuçlarTabControls;
+        private TabPage tabPage1;
+        private DataGridView ELFMinimumResultsTable;
+        private TabPage tabPage2;
+        private DataGridView ELFDüşükResultsTable;
+        private TabPage tabPage3;
+        private DataGridView ELFBazResultsTable;
+        private TabPage tabPage4;
+        private DataGridView ELFYüksekResultsTable;
+        private TabPage tabPage5;
+        private DataGridView ELFMaksimumResultsTable;
+        private TabPage tabPage6;
+        private Panel panel2;
+        private PictureBox pictureBox1;
+        private PictureBox pictureBox2;
+        private PictureBox pictureBox3;
+        private PictureBox pictureBox4;
+        private PictureBox pictureBox5;
+        private Button ShowResultsButton;
     }
 }

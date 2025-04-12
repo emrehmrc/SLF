@@ -3,12 +3,13 @@
   "İl": "İzmir",
   "İlçe": "Karşıyaka",
   "ELF": {
-    "SONUÇLAR": "Ekonometrik Yük Tahmini Verileri/SONUÇLAR",
+    "SONUÇLAR_klasör": "Ekonometrik Yük Tahmini Verileri/SONUÇLAR",
+    "SONUÇLAR_name": "ELF_Tahmin_Sonuçları_2025-04-12 14_46_56.xlsx",
     "INPUT_FILE": "Ekonometrik Yük Tahmini Verileri/VERİLER.xlsx",
     "ŞABLON": "Ekonometrik Yük Tahmini Verileri/ŞABLON.xlsx",
     "Rscript_Yolu_Model": "PROGRAM DOSYALARI/ELF/model.R",
     "Rscript_Yolu_Senaryolar": "PROGRAM DOSYALARI/ELF/senaryolar.R",
-    "ufuk_yılı": 14
+    "ufuk_yılı": 13
   },
   "Veritabanı": {
     "Server Address": "",

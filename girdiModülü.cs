@@ -618,7 +618,7 @@ namespace SLF
                     MessageBox.Show($"R script çalışmasında bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
                         "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 else
-                    MessageBox.Show($"R script başarıyla çalıştırıldı.!",
+                    MessageBox.Show($"R script çalıştırılarak 5 adet senaryo başarıyla oluşturuldu.!",
                         "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
