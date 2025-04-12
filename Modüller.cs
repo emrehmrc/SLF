@@ -20,7 +20,7 @@ using System.Text;
 using SLF.Services;
 using System.Globalization;
 using Newtonsoft.Json;
-
+using System.Runtime.InteropServices;
 
 namespace SLF
 {
@@ -521,17 +521,18 @@ namespace SLF
             {
                 // Show both the "tab_girdi" and "tab_ekonometrik" tabs and hide others
                 InitializeTabs("tab_girdi", "tab_ekonometrik", "EkonometrikSenaryoTabPage", 
-                    "EkonometrikSonuclarTabPage");
+                    "EkonometrikSonuclarTabPage", "EkonometrikGrafiklerTabPage");
                 Modül_Tabları.SelectedTab = tab_girdi;
             }
             else if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
                 // Hide the specific item you want to remove
                 HideComboBoxItem("Ekonometrik Yük Tahmini Verileri"); // Replace with the actual item you want to hide
+
                 // For SLF, do not hide any tabs. Add logic here if needed.
                 // List of tab names to hide
                 string[] tabsToHide = { "tab_ekonometrik","EkonometrikSenaryoTabPage",
-                    "EkonometrikSonuclarTabPage"};
+                    "EkonometrikSonuclarTabPage", "EkonometrikGrafiklerTabPage"};
 
                 // Loop through each tab name and remove it if it exists
                 foreach (string tabName in tabsToHide)
@@ -3147,24 +3148,7 @@ namespace SLF
 
                         // Veriyi DataTable'a yükle
                         simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
-                        // Filter DataTable based on SelectedDistrict and its ID
-                        /*                        if (SelectedDistrict != null)
-                                                {
-                                                    if (districtIdMap.TryGetValue(SelectedDistrict, out string districtId))
-                                                    {
-                                                        var filteredRows = veriMonteCarlo.AsEnumerable()
-                                                            .Where(row => row.Field<string>("ilce") == districtId)
-                                                            .CopyToDataTable();
-                                                        veriMonteCarlo = filteredRows; // Update with filtered data
-                                                    }
-                                                    else
-                                                    {
-                                                        MessageBox.Show($"No ID mapping found for district: {SelectedDistrict}. No data will be displayed.",
-                                                            "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                                        veriMonteCarlo.Clear(); // Clear data to prevent displaying all districts
-                                                        return; // Exit the method
-                                                    }
-                                                }*/
+
                     }
                 }
                 catch (Exception ex)
@@ -3172,25 +3156,6 @@ namespace SLF
                     MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
                     return; // Hata durumunda işlemi sonlandır
                 }
-
-                /*                    using (var package = new ExcelPackage(new FileInfo(filePath)))
-                                    {
-                                        // Map SelectedYear index to actual year
-                                        int baseYear = slfStartYear; // e.g., 2024
-                                        string year = (SelectedYear != -1 && SelectedYear < (slfEndYear - slfStartYear + 1))
-                                            ? (baseYear + SelectedYear).ToString()
-                                            : "2025";
-
-                                        ExcelWorksheet worksheet = package.Workbook.Worksheets[year];
-                                        if (worksheet == null)
-                                        {
-                                            MessageBox.Show($"Worksheet for year {year} not found in output file.",
-                                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                            return;
-                                        }
-
-                                        simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
-                                }*/
 
                 // Log column names for debugging
                 Console.WriteLine("DataTable Columns: " + string.Join(", ", simulationData.Columns.Cast<DataColumn>().Select(c => c.ColumnName)));
@@ -3215,6 +3180,53 @@ namespace SLF
                 EAStationAddButton.Enabled = true;
                 EASimButton.Enabled = true;
 
+            }
+        }
+
+        private async void DEKSimulasyonSonucGoruntule_Click(object sender, EventArgs e)
+        {
+            // Disable the button to prevent multiple clicks while processing
+            DEKCenterAddButton.Enabled = false;
+            DEKSimButton.Enabled = false;
+            try
+            {
+                string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek_distribution_2024_2030_İzmir_düşük.xlsx";
+                DataTable simulationData;
+                try
+                {
+                    // Excel dosyasını aç
+                    using (var package = new ExcelPackage(new FileInfo(filePath)))
+                    {
+                        // Yıl seçimine göre sayfayı seç (SelectedYear değeri, sayfa indeksini temsil eder)
+                        ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
+
+                        // Veriyi DataTable'a yükle
+                        simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
+                    return; // Hata durumunda işlemi sonlandır
+                }
+
+                gMapControl_DEK.Overlays.Clear();
+                gMapControl_DEK.Refresh();
+                // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
+                HesaplaMerkezNoktaVeEkle(simulationData);
+                await HaritaUzerindeDEKSimulasyonGosterimi(simulationData);
+
+                MessageBox.Show("Veri başarıyla yüklendi.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
+            }
+            finally
+            {
+                DEKCenterAddButton.Enabled = true;
+                DEKSimButton.Enabled = true;
             }
         }
 
@@ -7187,10 +7199,157 @@ namespace SLF
             if(SenaryoModuleTabControl.SelectedTab == EkonometrikSonuclarTabPage)
             {
                 EkonometrikSenaryoElementsPanel.Visible = false;
+                label_graphics.Visible = false;
+                comboBox_ekonometrik.Visible = false;
             }
+            else if (SenaryoModuleTabControl.SelectedTab == EkonometrikGrafiklerTabPage)
+            {
+                EkonometrikSenaryoElementsPanel.Visible = true;
+                label_graphics.Visible = true;
+                PopulateEkonometrikComboBox();
+                comboBox_ekonometrik.Visible = true;
+            }
+
             else
             {
                 EkonometrikSenaryoElementsPanel.Visible = true;
+                label_graphics.Visible = false;
+                comboBox_ekonometrik.Visible = false;
+            }
+        }
+
+        private void PopulateEkonometrikComboBox()
+        {
+            try
+            {
+                // Construct the graphics path
+                string graphicsPath = Path.Combine(
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.İlçe,
+                    (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_klasör,
+                    "Grafik Çıktıları"
+                ).Replace('/', '\\');
+
+                // Ensure the directory exists
+                if (!Directory.Exists(graphicsPath))
+                {
+                    MessageBox.Show($"Grafik dosyalarının bulunduğu klasör bulunamadı: {graphicsPath}",
+                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Clear the ComboBox before populating
+                comboBox_ekonometrik.Items.Clear();
+
+                // Get all .png files in the directory
+                string[] pngFiles = Directory.GetFiles(graphicsPath, "*.png");
+
+                if (pngFiles.Length == 0)
+                {
+                    MessageBox.Show("Belirtilen klasörde .png dosyası bulunamadı.",
+                        "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                // Add the file names (without the full path) to the ComboBox
+                foreach (string filePath in pngFiles)
+                {
+                    string fileName = Path.GetFileName(filePath);
+                    comboBox_ekonometrik.Items.Add(fileName);
+                }
+
+                // Store the graphics path for use in events
+                comboBox_ekonometrik.Tag = graphicsPath;
+
+                // Optionally, select the first item by default
+                if (comboBox_ekonometrik.Items.Count > 0)
+                {
+                    comboBox_ekonometrik.SelectedIndex = 0; // This will trigger SelectedIndexChanged
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Grafik dosyaları yüklenirken bir hata oluştu: {ex.Message}",
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void comboBox_ekonometrik_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // Check if an item is selected
+                if (comboBox_ekonometrik.SelectedItem == null)
+                {
+                    return;
+                }
+
+                // Get the selected file name
+                string selectedFileName = comboBox_ekonometrik.SelectedItem.ToString();
+
+                // Get the graphics path from the ComboBox's Tag
+                string graphicsPath = comboBox_ekonometrik.Tag?.ToString();
+                if (string.IsNullOrEmpty(graphicsPath))
+                {
+                    MessageBox.Show("Grafik dosyalarının yolu bulunamadı.",
+                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Construct the full path to the selected .png file
+                string fullFilePath = Path.Combine(graphicsPath, selectedFileName);
+
+                // Ensure the file exists
+                if (!File.Exists(fullFilePath))
+                {
+                    MessageBox.Show($"Seçilen dosya bulunamadı: {fullFilePath}",
+                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Load the image into the PictureBox
+                using (var imageStream = new FileStream(fullFilePath, FileMode.Open, FileAccess.Read))
+                {
+                    pictureBox_ekonometrik.Image?.Dispose(); // Dispose of the previous image to free memory
+                    pictureBox_ekonometrik.Image = Image.FromStream(imageStream);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Resim yüklenirken bir hata oluştu: {ex.Message}",
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void comboBox_ekonometrik_DropDown(object sender, EventArgs e)
+        {
+            try
+            {
+                // Set the dropdown width to twice the ComboBox width
+                int desiredDropDownWidth = comboBox_ekonometrik.Width * 3;
+
+                // Calculate the available space on the right side of the ComboBox
+                Point comboBoxScreenLocation = comboBox_ekonometrik.PointToScreen(new Point(0, 0));
+                int comboBoxRightEdge = comboBoxScreenLocation.X + comboBox_ekonometrik.Width;
+                int formRightEdge = this.ClientRectangle.Width + this.PointToScreen(new Point(0, 0)).X;
+                int availableSpaceOnRight = formRightEdge - comboBoxRightEdge;
+
+                // If there isn't enough space on the right, WinForms should automatically open the dropdown leftward
+                // However, we'll ensure the dropdown width doesn't exceed the available space on the left
+                int comboBoxLeftEdge = comboBoxScreenLocation.X;
+                int availableSpaceOnLeft = comboBoxLeftEdge - this.PointToScreen(new Point(0, 0)).X;
+
+                // Use the desired width if possible, but limit it to the available space
+                int maxDropDownWidth = Math.Max(availableSpaceOnRight, availableSpaceOnLeft);
+                int finalDropDownWidth = Math.Min(desiredDropDownWidth, maxDropDownWidth);
+
+                comboBox_ekonometrik.DropDownWidth = finalDropDownWidth;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Dropdown konumu ayarlanırken bir hata oluştu: {ex.Message}",
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -7212,52 +7371,6 @@ namespace SLF
                 
         }
 
-        private async void DEKSimulasyonSonucGoruntule_Click(object sender, EventArgs e)
-        {
-            // Disable the button to prevent multiple clicks while processing
-            DEKCenterAddButton.Enabled = false;
-            DEKSimButton.Enabled = false;
-            try
-            {
-                string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek_distribution_2024_2030_İzmir_düşük.xlsx";
-                DataTable simulationData;
-                try
-                {
-                    // Excel dosyasını aç
-                    using (var package = new ExcelPackage(new FileInfo(filePath)))
-                    {
-                        // Yıl seçimine göre sayfayı seç (SelectedYear değeri, sayfa indeksini temsil eder)
-                        ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
-
-                        // Veriyi DataTable'a yükle
-                        simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
-
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
-                    return; // Hata durumunda işlemi sonlandır
-                }
-
-                gMapControl_DEK.Overlays.Clear();
-                gMapControl_DEK.Refresh();
-                // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
-                HesaplaMerkezNoktaVeEkle(simulationData);
-                await HaritaUzerindeDEKSimulasyonGosterimi(simulationData);
-
-                MessageBox.Show("Veri başarıyla yüklendi.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
-            }
-            finally
-            {
-                DEKCenterAddButton.Enabled = true;
-                DEKSimButton.Enabled = true;
-            }
-        }
 
     }
 }
