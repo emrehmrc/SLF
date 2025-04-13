@@ -3177,7 +3177,7 @@ namespace SLF
             this.legendPanel.Location = new System.Drawing.Point(1061, 37);
             this.legendPanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.legendPanel.Name = "legendPanel";
-            this.legendPanel.Size = new System.Drawing.Size(193, 596);
+            this.legendPanel.Size = new System.Drawing.Size(245, 596);
             this.legendPanel.TabIndex = 44;
             // 
             // yuk_yıl_deger

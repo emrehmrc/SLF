@@ -47,6 +47,7 @@ namespace SLF
 
         public HomePageForm ana_menu_form_objesi;
         private MethodForm methodFormObjesi;
+        private BekleForm bekleForm;
 
         public bool isImported;
         private System.Windows.Forms.Timer cursorTimer;
@@ -191,6 +192,7 @@ namespace SLF
 
             ana_menu_form_objesi = new HomePageForm();
             methodFormObjesi = new MethodForm(ana_menu_form_objesi);
+            bekleForm = new BekleForm();
 
 
             var yearService = YearService.GetInstance();
@@ -2299,7 +2301,6 @@ namespace SLF
             }
             else if (Modül_Tabları.SelectedTab == tab_yükHaritası)
             {
-
                 // Find the index of the overlay in tüm_katmanlar_array_imar_names that contains "xxx"
                 string searchText = "SONUCLAR_Load_Density.kml"; // The text to search for
                 overlayIndex = Array.FindIndex(cbs.tüm_katmanlar_array_names,
@@ -5064,7 +5065,7 @@ namespace SLF
             // Create the unit label
             unitLabel = new System.Windows.Forms.Label
             {
-                Text = "Yük Yoğunluğu (W/m²)",
+                Text = "Yük Yoğunluğu (MW/km²)",
                 Font = new System.Drawing.Font("Verdana", 7, FontStyle.Bold),
                 AutoSize = true,
                 Location = new System.Drawing.Point(5, 10),
@@ -5090,7 +5091,7 @@ namespace SLF
                 rangeLabels[i] = new System.Windows.Forms.Label
                 {
                     Text = bracketLabels[i],
-                    Font = new System.Drawing.Font("Verdana", 8),
+                    Font = new System.Drawing.Font("Verdana", 7),
                     AutoSize = true,
                     Location = new System.Drawing.Point(colorBoxes[i].Right + 5, colorBoxes[i].Top),
                     Anchor = AnchorStyles.Top | AnchorStyles.Right,
@@ -6722,455 +6723,588 @@ namespace SLF
 
         private async Task ExportHeatmapToHtml()
         {
-            // Find the heatmap overlay
-            GMapOverlay heatmapOverlay = gMapControl_yuk.Overlays.FirstOrDefault(o => o.Id == "HeatmapOverlay");
-            if (heatmapOverlay == null || heatmapOverlay.Polygons.Count == 0)
-            {
-                MessageBox.Show("Herhangi bir yük yoğunluğu haritası bulunamadı.");
-                return;
-            }
-
-            // Define the columns to include in the tooltip for the current year
-            string[] tooltipColumns = new string[]
-            {
-                $"Mesken_{currentYear}",
-                $"Sanayi_{currentYear}",
-                $"Ticarethane_{currentYear}",
-                $"Tarımsal Sulama_{currentYear}",
-                $"Aydınlatma_{currentYear}",
-                $"TOPLAM_YÜK_{currentYear}",
-                $"Hücre İçi Yerleşim Alanı_{currentYear}",
-                $"Yük_Yoğunluğu_{currentYear}"
-            };
-
-            // Define the base columns (without year suffix) to include in the tooltip for all years
-            string[] baseTooltipColumns = new string[]
-            {
-                "Mesken",
-                "Sanayi",
-                "Ticarethane",
-                "Tarımsal Sulama",
-                "Aydınlatma",
-                "TOPLAM_YÜK",
-                "Hücre İçi Yerleşim Alanı",
-                "Yük_Yoğunluğu"
-            };
-
-            // Define the range of years to include
-            int minYear = 2025;
-            int maxYear = 2050;
-            List<string> loadDensityColumns = new List<string>();
-            for (int year = minYear; year <= maxYear; year++)
-            {
-                loadDensityColumns.Add($"Yük_Yoğunluğu_{year}");
-            }
-
-            // Open a SaveFileDialog to let the user choose where to save the HTML file
-            SaveFileDialog saveFileDialog = new SaveFileDialog
-            {
-                Filter = "HTML File|*.html",
-                Title = "Haritayı HTML Olarak Kaydet",
-                FileName = $"Yük_Yoğunluğu_Haritası_{currentYear}.html",
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
-            };
-
-            if (saveFileDialog.ShowDialog() != DialogResult.OK)
-            {
-                this.Cursor = Cursors.Hand;
-                return;
-            }
-
-            string htmlFilePath = saveFileDialog.FileName;
-            string geoJsonFilePath = Path.Combine(Path.GetDirectoryName(htmlFilePath), $"ısı_haritası_{currentYear}.geojson");
-
-            // Generate GeoJSON for the polygons
-            StringBuilder geoJson = new StringBuilder();
-            geoJson.AppendLine("{");
-            geoJson.AppendLine("  \"type\": \"FeatureCollection\",");
-            geoJson.AppendLine("  \"features\": [");
-
-            bool firstFeature = true;
-            foreach (GMapPolygon polygon in heatmapOverlay.Polygons)
-            {
-                if (!firstFeature) geoJson.AppendLine(",");
-                firstFeature = false;
-
-                geoJson.AppendLine("    {");
-                geoJson.AppendLine("      \"type\": \"Feature\",");
-                geoJson.AppendLine("      \"geometry\": {");
-                geoJson.AppendLine("        \"type\": \"Polygon\",");
-                geoJson.AppendLine("        \"coordinates\": [");
-
-                // Add the polygon coordinates
-                geoJson.Append("          [");
-                bool firstPoint = true;
-                foreach (var point in polygon.Points)
-                {
-                    if (!firstPoint) geoJson.Append(",");
-                    firstPoint = false;
-                    geoJson.Append($"[{point.Lng},{point.Lat}]");
-                }
-                // Close the polygon by repeating the first point
-                geoJson.Append($",[{polygon.Points[0].Lng},{polygon.Points[0].Lat}]");
-                geoJson.AppendLine("]");
-
-                geoJson.AppendLine("        ]");
-                geoJson.AppendLine("      },");
-
-                // Add properties for all columns
-                geoJson.AppendLine("      \"properties\": {");
-                bool firstProperty = true;
-
-                // Add loadDensity for all years and other columns
-                Dictionary<string, double> loadDensities = new Dictionary<string, double>();
-                if (heatmapPolygonAttributes.TryGetValue(polygon, out DataRow attributes))
-                {
-                    // Add load density for all years
-                    foreach (string column in loadDensityColumns)
-                    {
-                        double loadDensity = 0.0;
-                        if (attributes.Table.Columns.Contains(column))
-                        {
-                            string rawValue = attributes[column].ToString();
-                            if (!string.IsNullOrWhiteSpace(rawValue) &&
-                                double.TryParse(rawValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
-                            {
-                                loadDensity = value;
-                            }
-                        }
-                        loadDensities[column] = loadDensity;
-
-                        if (!firstProperty) geoJson.AppendLine(",");
-                        firstProperty = false;
-                        geoJson.Append($"        \"{column}\": {loadDensity}");
-                    }
-
-                    // Add all columns for each year (for tooltip display)
-                    for (int year = minYear; year <= maxYear; year++)
-                    {
-                        foreach (string baseColumn in baseTooltipColumns)
-                        {
-                            string column = $"{baseColumn}_{year}";
-                            string value = "N/A";
-                            if (attributes.Table.Columns.Contains(column))
-                            {
-                                value = attributes[column]?.ToString() ?? "N/A";
-                                // Escape quotes in the value to ensure valid JSON
-                                value = value.Replace("\"", "\\\"");
-                            }
-
-                            geoJson.AppendLine(",");
-                            geoJson.Append($"        \"{column}\": \"{value}\"");
-                        }
-                    }
-
-                    // Compute TOPLAM_YUK_DEĞİŞİMİ_{year} as TOPLAM_YÜK_{year} - TOPLAM_YÜK_{year-1}
-                    for (int year = minYear; year <= maxYear; year++)
-                    {
-                        double degisim = 0.0;
-                        string currentYukColumn = $"TOPLAM_YÜK_{year}";
-                        string previousYukColumn = $"TOPLAM_YÜK_{year - 1}";
-
-                        if (year > minYear && attributes.Table.Columns.Contains(currentYukColumn) && attributes.Table.Columns.Contains(previousYukColumn))
-                        {
-                            double currentYuk = 0.0, previousYuk = 0.0;
-                            if (double.TryParse(attributes[currentYukColumn]?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out currentYuk) &&
-                                double.TryParse(attributes[previousYukColumn]?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out previousYuk))
-                            {
-                                degisim = currentYuk - previousYuk;
-                            }
-                        }
-
-                        geoJson.AppendLine(",");
-                        geoJson.Append($"        \"TOPLAM_YUK_DEĞİŞİMİ_{year}\": {degisim}");
-                    }
-                }
-                else
-                {
-                    // If no attributes, set default values
-                    foreach (string column in loadDensityColumns)
-                    {
-                        if (!firstProperty) geoJson.AppendLine(",");
-                        firstProperty = false;
-                        geoJson.Append($"        \"{column}\": 0.0");
-                    }
-
-                    for (int year = minYear; year <= maxYear; year++)
-                    {
-                        foreach (string baseColumn in baseTooltipColumns)
-                        {
-                            string column = $"{baseColumn}_{year}";
-                            geoJson.AppendLine(",");
-                            geoJson.Append($"        \"{column}\": \"N/A\"");
-                        }
-                    }
-
-                    for (int year = minYear; year <= maxYear; year++)
-                    {
-                        geoJson.AppendLine(",");
-                        geoJson.Append($"        \"TOPLAM_YUK_DEĞİŞİMİ_{year}\": 0.0");
-                    }
-                }
-
-                geoJson.AppendLine();
-                geoJson.AppendLine("      }");
-                geoJson.Append("    }");
-            }
-
-            geoJson.AppendLine();
-            geoJson.AppendLine("  ]");
-            geoJson.AppendLine("}");
-
-            // Save the GeoJSON to a separate file
             try
             {
-                File.WriteAllText(geoJsonFilePath, geoJson.ToString());
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error saving GeoJSON file: {ex.Message}");
-                return;
-            }
+                // Set the wait cursor on the UI thread
+                this.Invoke((MethodInvoker)(() => this.Cursor = Cursors.WaitCursor));
 
-            // Calculate the center of the map (average of all polygon coordinates)
-            double avgLat = 0, avgLng = 0;
-            int pointCount = 0;
-            foreach (GMapPolygon polygon in heatmapOverlay.Polygons)
-            {
-                foreach (var point in polygon.Points)
+                // Find the heatmap overlay
+                GMapOverlay heatmapOverlay = gMapControl_yuk.Overlays.FirstOrDefault(o => o.Id == "HeatmapOverlay");
+                if (heatmapOverlay == null || heatmapOverlay.Polygons.Count == 0)
                 {
-                    avgLat += point.Lat;
-                    avgLng += point.Lng;
-                    pointCount++;
+                    MessageBox.Show("Herhangi bir yük yoğunluğu haritası bulunamadı.");
+                    return;
                 }
-            }
-            if (pointCount > 0)
-            {
-                avgLat /= pointCount;
-                avgLng /= pointCount;
-            }
 
-            // Generate the HTML content
-            StringBuilder htmlContent = new StringBuilder();
-            htmlContent.AppendLine("<!DOCTYPE html>");
-            htmlContent.AppendLine("<html>");
-            htmlContent.AppendLine("<head>");
-            htmlContent.AppendLine("  <title>SLF Yük Yoğunluğu Isı Haritası</title>");
-            htmlContent.AppendLine("  <link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css\" />");
-            htmlContent.AppendLine("  <script src=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js\"></script>");
-            htmlContent.AppendLine("  <style>");
-            htmlContent.AppendLine("    html, body { margin: 0; padding: 0; height: 100vh; font-family: Arial, sans-serif; }");
-            htmlContent.AppendLine("    #container { display: flex; height: 100vh; }");
-            htmlContent.AppendLine("    #sidebar { width: 15%; background: white; padding: 10px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); overflow-y: auto; }");
-            htmlContent.AppendLine("    #map { flex: 1; height: 100vh; }");
-            htmlContent.AppendLine("    .leaflet-tooltip { white-space: pre-line; }");
-            htmlContent.AppendLine("    #year-label { font-size: 16px; margin-bottom: 5px; }");
-            htmlContent.AppendLine("    input[type=range] { width: 100%; }");
-            htmlContent.AppendLine("    #checkbox-container { margin: 15px 0; }");
-            htmlContent.AppendLine("    #legend { margin-top: 20px; }");
-            htmlContent.AppendLine("    .legend-item { display: flex; align-items: center; margin-bottom: 5px; }");
-            htmlContent.AppendLine("    .legend-color { width: 20px; height: 20px; margin-right: 5px; border: 1px solid #ccc; }");
-            htmlContent.AppendLine("    #file-input-container { margin-bottom: 15px; }");
-            htmlContent.AppendLine("    #loading-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; color: #333; }");
-            htmlContent.AppendLine("    #error-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; color: red; }");
-            htmlContent.AppendLine("  </style>");
-            htmlContent.AppendLine("</head>");
-            htmlContent.AppendLine("<body>");
-            htmlContent.AppendLine("  <div id=\"container\">");
-            htmlContent.AppendLine("    <div id=\"sidebar\">");
-            htmlContent.AppendLine("      <div id=\"file-input-container\">");
-            htmlContent.AppendLine($"      <label for=\"geojson-file\">GeoJSON dosyasını yükle (ısı_haritası_{currentYear}.geojson):</label>");
-            htmlContent.AppendLine("      <input type=\"file\" id=\"geojson-file\" accept=\".geojson,.json\">");
-            htmlContent.AppendLine("    </div>");
-            htmlContent.AppendLine("    <div id=\"year-label\">Yıl: " + currentYear + "</div>");
-            htmlContent.AppendLine($"    <input type=\"range\" id=\"year-slider\" min=\"{minYear}\" max=\"{maxYear}\" value=\"{currentYear}\" step=\"1\">");
-            htmlContent.AppendLine("    <div id=\"checkbox-container\">");
-            htmlContent.AppendLine("      <input type=\"checkbox\" id=\"yearly-changes\" name=\"yearly-changes\">");
-            htmlContent.AppendLine("      <label for=\"yearly-changes\">Yıllık Değişimler</label>");
-            htmlContent.AppendLine("    </div>");
-            htmlContent.AppendLine("    <div id=\"legend\">");
-            htmlContent.AppendLine("      <strong id=\"legend-title\">Yük Yoğunluğu (MW/km2)</strong>");
-            htmlContent.AppendLine("      <div id=\"legend-items\"></div>");
-            htmlContent.AppendLine("    </div>");
-            htmlContent.AppendLine("  </div>");
-            htmlContent.AppendLine("  <div id=\"map\"></div>");
-            htmlContent.AppendLine("  <div id=\"loading-message\" style=\"display: none;\">Loading data...</div>");
-            htmlContent.AppendLine("  <div id=\"error-message\">Please select a GeoJSON file to load the map.</div>");
-            htmlContent.AppendLine("</div>");
-            htmlContent.AppendLine("  <script>");
-
-            // Initialize the map
-            htmlContent.AppendLine($"    var map = L.map('map').setView([{avgLat}, {avgLng}], 13);");
-            htmlContent.AppendLine("    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {");
-            htmlContent.AppendLine("      attribution: '© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'");
-            htmlContent.AppendLine("    }).addTo(map);");
-
-            // Handle GeoJSON file input
-            htmlContent.AppendLine("    var geojsonLayer;");
-            htmlContent.AppendLine("    var fileInput = document.getElementById('geojson-file');");
-            htmlContent.AppendLine("    fileInput.addEventListener('change', function(e) {");
-            htmlContent.AppendLine("      var file = e.target.files[0];");
-            htmlContent.AppendLine("      if (!file) return;");
-            htmlContent.AppendLine("      document.getElementById('error-message').style.display = 'none';");
-            htmlContent.AppendLine("      document.getElementById('loading-message').style.display = 'block';");
-            htmlContent.AppendLine("      var reader = new FileReader();");
-            htmlContent.AppendLine("      reader.onload = function(e) {");
-            htmlContent.AppendLine("        try {");
-            htmlContent.AppendLine("          var data = JSON.parse(e.target.result);");
-            htmlContent.AppendLine("          window.geojsonData = data;");
-            htmlContent.AppendLine("          document.getElementById('loading-message').style.display = 'none';");
-            htmlContent.AppendLine($"          updateMap({currentYear}, false);");
-            htmlContent.AppendLine("          var bounds = L.geoJSON(data).getBounds();");
-            htmlContent.AppendLine("          map.fitBounds(bounds);");
-            htmlContent.AppendLine("        } catch (error) {");
-            htmlContent.AppendLine("          document.getElementById('loading-message').style.display = 'none';");
-            htmlContent.AppendLine("          document.getElementById('error-message').style.display = 'block';");
-            htmlContent.AppendLine("          document.getElementById('error-message').textContent = 'Error parsing GeoJSON: ' + error.message;");
-            htmlContent.AppendLine("          console.error('Error parsing GeoJSON:', error);");
-            htmlContent.AppendLine("        }");
-            htmlContent.AppendLine("      };");
-            htmlContent.AppendLine("      reader.onerror = function() {");
-            htmlContent.AppendLine("        document.getElementById('loading-message').style.display = 'none';");
-            htmlContent.AppendLine("        document.getElementById('error-message').style.display = 'block';");
-            htmlContent.AppendLine("        document.getElementById('error-message').textContent = 'Error reading file.';");
-            htmlContent.AppendLine("      };");
-            htmlContent.AppendLine("      reader.readAsText(file);");
-            htmlContent.AppendLine("    });");
-
-            // Function to get the color based on value
-            htmlContent.AppendLine("    function getColor(value, isDelta) {");
-            htmlContent.AppendLine("      var brackets = isDelta ? [-20, -10, -5, 0, 3, 8, 12, 16, 25, 40, Infinity] : [0, 3, 5, 10, 20, 30, 40, 50, 75, 100, Infinity];");
-            htmlContent.AppendLine("      var minBracket = brackets[0];");
-            htmlContent.AppendLine("      var maxBracket = brackets[brackets.length - 2];");
-            htmlContent.AppendLine("      var range = maxBracket - minBracket;");
-            htmlContent.AppendLine("      var normalized = (value - minBracket) / range;");
-            htmlContent.AppendLine("      normalized = Math.max(0, Math.min(1, normalized));");
-            htmlContent.AppendLine("      var r, g, b;");
-            htmlContent.AppendLine("      if (normalized <= 0.5) {");
-            htmlContent.AppendLine("        var t = normalized / 0.5;");
-            htmlContent.AppendLine("        r = Math.round(t * 255);");
-            htmlContent.AppendLine("        g = Math.round(t * 255);");
-            htmlContent.AppendLine("        b = Math.round((1 - t) * 255);");
-            htmlContent.AppendLine("      } else {");
-            htmlContent.AppendLine("        var t = (normalized - 0.5) / 0.5;");
-            htmlContent.AppendLine("        r = 255;");
-            htmlContent.AppendLine("        g = Math.round((1 - t) * 255);");
-            htmlContent.AppendLine("        b = 0;");
-            htmlContent.AppendLine("      }");
-            htmlContent.AppendLine("      return `rgb(${r}, ${g}, ${b})`;");
-            htmlContent.AppendLine("    }");
-
-            // Function to generate the legend
-            htmlContent.AppendLine("    function generateLegend(isDelta) {");
-            htmlContent.AppendLine("      var brackets = isDelta ? [-20, -10, -5, 0, 3, 8, 12, 16, 25, 40, Infinity] : [0, 3, 5, 10, 20, 30, 40, 50, 75, 100, Infinity];");
-            htmlContent.AppendLine("      var legendTitle = document.getElementById('legend-title');");
-            htmlContent.AppendLine("      legendTitle.textContent = isDelta ? 'Yıllık Yük Değişimi (kW)' : 'Yük Yoğunluğu (MW/km2)';");
-            htmlContent.AppendLine("      var legendItems = document.getElementById('legend-items');");
-            htmlContent.AppendLine("      legendItems.innerHTML = '';");
-            htmlContent.AppendLine("      for (var i = 0; i < brackets.length - 1; i++) {");
-            htmlContent.AppendLine("        var valueForColor = (brackets[i] + (brackets[i + 1] === Infinity ? brackets[i] : brackets[i + 1])) / 2;");
-            htmlContent.AppendLine("        var color = getColor(valueForColor, isDelta);");
-            htmlContent.AppendLine("        var div = document.createElement('div');");
-            htmlContent.AppendLine("        div.className = 'legend-item';");
-            htmlContent.AppendLine("        div.innerHTML = `<div class=\"legend-color\" style=\"background-color: ${color}\"></div>` +");
-            htmlContent.AppendLine("          (brackets[i + 1] === Infinity ? `${brackets[i]}+` : `${brackets[i]} -> ${brackets[i + 1]}`);");
-            htmlContent.AppendLine("        legendItems.appendChild(div);");
-            htmlContent.AppendLine("      }");
-            htmlContent.AppendLine("    }");
-
-            // Function to generate tooltip text
-            htmlContent.AppendLine("    function getTooltipText(feature, year, showDelta) {");
-            htmlContent.AppendLine("      var props = feature.properties;");
-            htmlContent.AppendLine("      if (showDelta) {");
-            htmlContent.AppendLine("        return 'TOPLAM_YUK_DEĞİŞİMİ_' + year + ': ' + (props['TOPLAM_YUK_DEĞİŞİMİ_' + year] || '0.0');");
-            htmlContent.AppendLine("      } else {");
-            htmlContent.AppendLine("        var tooltipText = '';");
-            htmlContent.AppendLine("        var columns = [");
-            for (int i = 0; i < baseTooltipColumns.Length; i++)
-            {
-                htmlContent.Append($"          '{baseTooltipColumns[i]}'");
-                if (i < baseTooltipColumns.Length - 1) htmlContent.Append(",");
-                htmlContent.AppendLine();
-            }
-            htmlContent.AppendLine("        ];");
-            htmlContent.AppendLine("        for (var i = 0; i < columns.length; i++) {");
-            htmlContent.AppendLine("          var column = columns[i] + '_' + year;");
-            htmlContent.AppendLine("          tooltipText += column + ': ' + (props[column] || 'N/A') + '\\n';");
-            htmlContent.AppendLine("        }");
-            htmlContent.AppendLine("        return tooltipText || 'No data for this year';");
-            htmlContent.AppendLine("      }");
-            htmlContent.AppendLine("    }");
-
-            // Function to update the map
-            htmlContent.AppendLine("    function updateMap(year, showDelta) {");
-            htmlContent.AppendLine("      if (!window.geojsonData) {");
-            htmlContent.AppendLine("        console.error('GeoJSON data not loaded yet.');");
-            htmlContent.AppendLine("        return;");
-            htmlContent.AppendLine("      }");
-            htmlContent.AppendLine("      if (geojsonLayer) {");
-            htmlContent.AppendLine("        map.removeLayer(geojsonLayer);");
-            htmlContent.AppendLine("      }");
-            htmlContent.AppendLine("      geojsonLayer = L.geoJSON(window.geojsonData, {");
-            htmlContent.AppendLine("        style: function(feature) {");
-            htmlContent.AppendLine("          var value = showDelta ? ");
-            htmlContent.AppendLine("            (parseFloat(feature.properties['TOPLAM_YUK_DEĞİŞİMİ_' + year]) || 0) : ");
-            htmlContent.AppendLine("            (parseFloat(feature.properties['Yük_Yoğunluğu_' + year]) || 0);");
-            htmlContent.AppendLine("          return {");
-            htmlContent.AppendLine("            fillColor: getColor(value, showDelta),");
-            htmlContent.AppendLine("            fillOpacity: 0.2,");
-            htmlContent.AppendLine("            color: getColor(value, showDelta),");
-            htmlContent.AppendLine("            weight: 1");
-            htmlContent.AppendLine("          };");
-            htmlContent.AppendLine("        },");
-            htmlContent.AppendLine("        onEachFeature: function(feature, layer) {");
-            htmlContent.AppendLine("          layer.bindTooltip(getTooltipText(feature, year, showDelta), {");
-            htmlContent.AppendLine("            sticky: true,");
-            htmlContent.AppendLine("            direction: 'auto'");
-            htmlContent.AppendLine("          });");
-            htmlContent.AppendLine("        }");
-            htmlContent.AppendLine("      }).addTo(map);");
-            htmlContent.AppendLine("    }");
-
-            // Initialize the legend
-            htmlContent.AppendLine("    generateLegend(false);");
-
-            // Add event listeners
-            htmlContent.AppendLine("    var slider = document.getElementById('year-slider');");
-            htmlContent.AppendLine("    var yearLabel = document.getElementById('year-label');");
-            htmlContent.AppendLine("    var checkbox = document.getElementById('yearly-changes');");
-            htmlContent.AppendLine("    var currentYear = " + currentYear + ";");
-            htmlContent.AppendLine("    slider.addEventListener('input', function() {");
-            htmlContent.AppendLine("      currentYear = parseInt(slider.value);");
-            htmlContent.AppendLine("      yearLabel.textContent = 'Year: ' + currentYear;");
-            htmlContent.AppendLine("      updateMap(currentYear, checkbox.checked);");
-            htmlContent.AppendLine("    });");
-            htmlContent.AppendLine("    checkbox.addEventListener('change', function() {");
-            htmlContent.AppendLine("      generateLegend(checkbox.checked);");
-            htmlContent.AppendLine("      updateMap(currentYear, checkbox.checked);");
-            htmlContent.AppendLine("    });");
-
-            htmlContent.AppendLine("  </script>");
-            htmlContent.AppendLine("</body>");
-            htmlContent.AppendLine("</html>");
-
-            // Write the HTML content to the file
-            try
-            {
-                File.WriteAllText(htmlFilePath, htmlContent.ToString());
-                MessageBox.Show($"Yük Yoğunluğu ısı haritası başarıyla oluşturuldu.! :  {htmlFilePath}\n\n" +
-                    $"Lütfen browser üzerinden yeni oluşturulan geoJson dosyasını (ısı_haritası_{currentYear}.geojson) " +
-                    $"açarak haritayı görüntüleyiniz.","",MessageBoxButtons.OK,MessageBoxIcon.Information);
-
-                // Optionally open the HTML file in the default browser
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                // Define the columns to include in the tooltip for the current year
+                string[] tooltipColumns = new string[]
                 {
-                    FileName = htmlFilePath,
-                    UseShellExecute = true
-                });
+            $"Mesken_{currentYear}",
+            $"Sanayi_{currentYear}",
+            $"Ticarethane_{currentYear}",
+            $"Tarımsal Sulama_{currentYear}",
+            $"Aydınlatma_{currentYear}",
+            $"TOPLAM_YÜK_{currentYear}",
+            $"Hücre İçi Yerleşim Alanı_{currentYear}",
+            $"Yük_Yoğunluğu_{currentYear}"
+                };
+
+                // Define the base columns (without year suffix) to include in the tooltip for all years
+                string[] baseTooltipColumns = new string[]
+                {
+            "Mesken",
+            "Sanayi",
+            "Ticarethane",
+            "Tarımsal Sulama",
+            "Aydınlatma",
+            "TOPLAM_YÜK",
+            "Hücre İçi Yerleşim Alanı",
+            "Yük_Yoğunluğu"
+                };
+
+                // Define the range of years to include
+                int minYear = 2025;
+                int maxYear = 2050;
+                List<string> loadDensityColumns = new List<string>();
+                for (int year = minYear; year <= maxYear; year++)
+                {
+                    loadDensityColumns.Add($"Yük_Yoğunluğu_{year}");
+                }
+
+                // Calculate the total TOPLAM_YÜK for each year
+                Dictionary<int, double> totalYukByYear = new Dictionary<int, double>();
+                for (int year = minYear; year <= maxYear; year++)
+                {
+                    totalYukByYear[year] = 0.0;
+                }
+
+                // First pass: Compute totals while collecting data
+                Dictionary<GMapPolygon, Dictionary<string, string>> polygonData = new Dictionary<GMapPolygon, Dictionary<string, string>>();
+                foreach (GMapPolygon polygon in heatmapOverlay.Polygons)
+                {
+                    Dictionary<string, string> data = new Dictionary<string, string>();
+                    if (heatmapPolygonAttributes.TryGetValue(polygon, out DataRow attributes))
+                    {
+                        // Collect Yük_Yoğunluğu and TOPLAM_YÜK for all years
+                        for (int year = minYear; year <= maxYear; year++)
+                        {
+                            string yukColumn = $"TOPLAM_YÜK_{year}";
+                            string densityColumn = $"Yük_Yoğunluğu_{year}";
+                            double yukValue = 0.0, densityValue = 0.0;
+
+                            if (attributes.Table.Columns.Contains(yukColumn))
+                            {
+                                if (double.TryParse(attributes[yukColumn]?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out yukValue))
+                                {
+                                    totalYukByYear[year] += yukValue;
+                                }
+                            }
+                            if (attributes.Table.Columns.Contains(densityColumn))
+                            {
+                                double.TryParse(attributes[densityColumn]?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out densityValue);
+                            }
+
+                            data[yukColumn] = yukValue.ToString(CultureInfo.InvariantCulture);
+                            data[densityColumn] = densityValue.ToString(CultureInfo.InvariantCulture);
+
+                            // Collect all tooltip columns for all years
+                            foreach (string baseColumn in baseTooltipColumns)
+                            {
+                                string column = $"{baseColumn}_{year}";
+                                string value = attributes.Table.Columns.Contains(column) ? (attributes[column]?.ToString() ?? "N/A") : "N/A";
+                                data[column] = value.Replace("\"", "\\\""); // Escape quotes for JSON
+                            }
+                        }
+                    }
+                    polygonData[polygon] = data;
+                }
+
+                // Open a SaveFileDialog to let the user choose where to save the HTML file
+                SaveFileDialog saveFileDialog = new SaveFileDialog
+                {
+                    Filter = "HTML File|*.html",
+                    Title = "Haritayı HTML Olarak Kaydet",
+                    FileName = $"Yük_Yoğunluğu_Haritası_{currentYear}.html",
+                    InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
+                };
+
+                DialogResult dialogResult = DialogResult.Cancel;
+                // Run the dialog on the UI thread
+                this.Invoke((MethodInvoker)(() => dialogResult = saveFileDialog.ShowDialog()));
+
+                if (dialogResult != DialogResult.OK)
+                {
+                    return;
+                }
+
+
+                string htmlFilePath = saveFileDialog.FileName;
+                string geoJsonFilePath = Path.Combine(Path.GetDirectoryName(htmlFilePath), $"ısı_haritası_{currentYear}.geojson");
+
+                // Run the dialog on the UI thread
+                this.Invoke((MethodInvoker)(() => bekleForm.UseWaitCursor = true));
+                this.Invoke((MethodInvoker)(() => bekleForm.Show()));
+                this.Invoke((MethodInvoker)(() => bekleForm.Refresh()));
+
+                // Stream the GeoJSON directly to the file
+                using (StreamWriter geoJsonWriter = new StreamWriter(geoJsonFilePath))
+                {
+                    await geoJsonWriter.WriteLineAsync("{");
+                    await geoJsonWriter.WriteLineAsync("  \"type\": \"FeatureCollection\",");
+                    await geoJsonWriter.WriteLineAsync("  \"features\": [");
+
+                    bool firstFeature = true;
+                    foreach (GMapPolygon polygon in heatmapOverlay.Polygons)
+                    {
+                        if (!firstFeature) await geoJsonWriter.WriteLineAsync(",");
+                        firstFeature = false;
+
+                        await geoJsonWriter.WriteLineAsync("    {");
+                        await geoJsonWriter.WriteLineAsync("      \"type\": \"Feature\",");
+                        await geoJsonWriter.WriteLineAsync("      \"geometry\": {");
+                        await geoJsonWriter.WriteLineAsync("        \"type\": \"Polygon\",");
+                        await geoJsonWriter.WriteLineAsync("        \"coordinates\": [");
+
+                        // Add the polygon coordinates (correctly formatted linear ring)
+                        await geoJsonWriter.WriteAsync("          [");
+                        bool firstPoint = true;
+                        foreach (var point in polygon.Points)
+                        {
+                            if (!firstPoint) await geoJsonWriter.WriteAsync(",");
+                            firstPoint = false;
+                            await geoJsonWriter.WriteAsync($"[{point.Lng},{point.Lat}]");
+                        }
+                        // Close the polygon by repeating the first point (ensure no duplicates)
+                        if (polygon.Points.Count > 0)
+                        {
+                            await geoJsonWriter.WriteAsync($",[{polygon.Points[0].Lng},{polygon.Points[0].Lat}]");
+                        }
+                        await geoJsonWriter.WriteLineAsync("]");
+                        await geoJsonWriter.WriteLineAsync("        ]");
+                        await geoJsonWriter.WriteLineAsync("      },");
+
+                        // Add properties
+                        await geoJsonWriter.WriteLineAsync("      \"properties\": {");
+                        bool firstProperty = true;
+
+                        if (polygonData.TryGetValue(polygon, out Dictionary<string, string> data))
+                        {
+                            // Add Yük_Yoğunluğu for all years (ensure numeric values)
+                            foreach (string column in loadDensityColumns)
+                            {
+                                string loadDensity = "0.0";
+                                if (data.ContainsKey(column))
+                                {
+                                    if (double.TryParse(data[column], NumberStyles.Any, CultureInfo.InvariantCulture, out double densityValue))
+                                    {
+                                        loadDensity = densityValue.ToString(CultureInfo.InvariantCulture);
+                                    }
+                                }
+                                if (!firstProperty) await geoJsonWriter.WriteLineAsync(",");
+                                firstProperty = false;
+                                await geoJsonWriter.WriteAsync($"        \"{column}\": {loadDensity}");
+                            }
+
+                            // Add all tooltip columns for all years
+                            for (int year = minYear; year <= maxYear; year++)
+                            {
+                                foreach (string baseColumn in baseTooltipColumns)
+                                {
+                                    string column = $"{baseColumn}_{year}";
+                                    string value = data.ContainsKey(column) ? data[column] : "N/A";
+                                    await geoJsonWriter.WriteLineAsync(",");
+                                    await geoJsonWriter.WriteAsync($"        \"{column}\": \"{value}\"");
+                                }
+                            }
+
+                            // Compute and add TOPLAM_YUK_DEĞİŞİMİ_{year}
+                            for (int year = minYear; year <= maxYear; year++)
+                            {
+                                double degisim = 0.0;
+                                string currentYukColumn = $"TOPLAM_YÜK_{year}";
+                                string previousYukColumn = $"TOPLAM_YÜK_{year - 1}";
+
+                                if (year > minYear)
+                                {
+                                    double currentYuk = 0.0, previousYuk = 0.0;
+                                    if (data.ContainsKey(currentYukColumn))
+                                    {
+                                        double.TryParse(data[currentYukColumn], NumberStyles.Any, CultureInfo.InvariantCulture, out currentYuk);
+                                    }
+                                    if (data.ContainsKey(previousYukColumn))
+                                    {
+                                        double.TryParse(data[previousYukColumn], NumberStyles.Any, CultureInfo.InvariantCulture, out previousYuk);
+                                    }
+                                    degisim = currentYuk - previousYuk;
+                                }
+
+                                await geoJsonWriter.WriteLineAsync(",");
+                                await geoJsonWriter.WriteAsync($"        \"TOPLAM_YUK_DEĞİŞİMİ_{year}\": {degisim}");
+                            }
+
+                            // Compute and add YUK_DAGILIM_YUZDESI_{year}
+                            for (int year = minYear; year <= maxYear; year++)
+                            {
+                                double percentage = 0.0;
+                                string yukColumn = $"TOPLAM_YÜK_{year}";
+                                double yukValue = 0.0;
+                                if (data.ContainsKey(yukColumn))
+                                {
+                                    double.TryParse(data[yukColumn], NumberStyles.Any, CultureInfo.InvariantCulture, out yukValue);
+                                }
+                                if (totalYukByYear[year] > 0)
+                                {
+                                    percentage = (yukValue / totalYukByYear[year]) * 100;
+                                }
+
+                                // Round the percentage to 5 decimal places
+                                percentage = Math.Round(percentage, 5);
+
+                                await geoJsonWriter.WriteLineAsync(",");
+                                await geoJsonWriter.WriteAsync($"        \"YUK_DAGILIM_YUZDESI_{year}\": {percentage}");
+                            }
+                        }
+                        else
+                        {
+                            // Default values if no data
+                            foreach (string column in loadDensityColumns)
+                            {
+                                if (!firstProperty) await geoJsonWriter.WriteLineAsync(",");
+                                firstProperty = false;
+                                await geoJsonWriter.WriteAsync($"        \"{column}\": 0.0");
+                            }
+
+                            for (int year = minYear; year <= maxYear; year++)
+                            {
+                                foreach (string baseColumn in baseTooltipColumns)
+                                {
+                                    string column = $"{baseColumn}_{year}";
+                                    await geoJsonWriter.WriteLineAsync(",");
+                                    await geoJsonWriter.WriteAsync($"        \"{column}\": \"N/A\"");
+                                }
+                            }
+
+                            for (int year = minYear; year <= maxYear; year++)
+                            {
+                                await geoJsonWriter.WriteLineAsync(",");
+                                await geoJsonWriter.WriteAsync($"        \"TOPLAM_YUK_DEĞİŞİMİ_{year}\": 0.0");
+                            }
+
+                            for (int year = minYear; year <= maxYear; year++)
+                            {
+                                await geoJsonWriter.WriteLineAsync(",");
+                                await geoJsonWriter.WriteAsync($"        \"YUK_DAGILIM_YUZDESI_{year}\": 0.0");
+                            }
+                        }
+
+                        await geoJsonWriter.WriteLineAsync();
+                        await geoJsonWriter.WriteLineAsync("      }");
+                        await geoJsonWriter.WriteAsync("    }");
+                    }
+
+                    await geoJsonWriter.WriteLineAsync();
+                    await geoJsonWriter.WriteLineAsync("  ]");
+                    await geoJsonWriter.WriteLineAsync("}");
+                }
+
+                // Calculate the center of the map
+                double avgLat = 0, avgLng = 0;
+                int pointCount = 0;
+                foreach (GMapPolygon polygon in heatmapOverlay.Polygons)
+                {
+                    foreach (var point in polygon.Points)
+                    {
+                        avgLat += point.Lat;
+                        avgLng += point.Lng;
+                        pointCount++;
+                    }
+                }
+                if (pointCount > 0)
+                {
+                    avgLat /= pointCount;
+                    avgLng /= pointCount;
+                }
+
+                this.Invoke((MethodInvoker)(() => bekleForm.UseWaitCursor = true));
+                this.Invoke((MethodInvoker)(() => bekleForm.Refresh()));
+
+                // Stream the HTML content to the file
+                using (StreamWriter htmlWriter = new StreamWriter(htmlFilePath))
+                {
+
+                    await htmlWriter.WriteLineAsync("<!DOCTYPE html>");
+                    await htmlWriter.WriteLineAsync("<html>");
+                    await htmlWriter.WriteLineAsync("<head>");
+                    await htmlWriter.WriteLineAsync("  <title>SLF Yük Yoğunluğu Isı Haritası</title>");
+                    await htmlWriter.WriteLineAsync("  <link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css\" />");
+                    await htmlWriter.WriteLineAsync("  <script src=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js\"></script>");
+                    await htmlWriter.WriteLineAsync("  <style>");
+                    await htmlWriter.WriteLineAsync("    html, body { margin: 0; padding: 0; height: 100vh; font-family: Arial, sans-serif; }");
+                    await htmlWriter.WriteLineAsync("    #container { display: flex; height: 100vh; }");
+                    await htmlWriter.WriteLineAsync("    #sidebar { width: 15%; background: white; padding: 10px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); overflow-y: auto; }");
+                    await htmlWriter.WriteLineAsync("    #map { flex: 1; height: 100vh; }");
+                    await htmlWriter.WriteLineAsync("    .leaflet-tooltip { white-space: pre-line; }");
+                    await htmlWriter.WriteLineAsync("    #year-label { font-size: 16px; margin-bottom: 5px; }");
+                    await htmlWriter.WriteLineAsync("    input[type=range] { width: 100%; }");
+                    await htmlWriter.WriteLineAsync("    #checkbox-container { margin: 15px 0; }");
+                    await htmlWriter.WriteLineAsync("    #legend { margin-top: 20px; }");
+                    await htmlWriter.WriteLineAsync("    .legend-item { display: flex; align-items: center; margin-bottom: 5px; }");
+                    await htmlWriter.WriteLineAsync("    .legend-color { width: 20px; height: 20px; margin-right: 5px; border: 1px solid #ccc; }");
+                    await htmlWriter.WriteLineAsync("    #file-input-container { margin-bottom: 15px; }");
+                    await htmlWriter.WriteLineAsync("    #loading-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; color: #333; }");
+                    await htmlWriter.WriteLineAsync("    #error-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; color: red; }");
+                    await htmlWriter.WriteLineAsync("  </style>");
+                    await htmlWriter.WriteLineAsync("</head>");
+                    await htmlWriter.WriteLineAsync("<body>");
+                    await htmlWriter.WriteLineAsync("  <div id=\"container\">");
+                    await htmlWriter.WriteLineAsync("    <div id=\"sidebar\">");
+                    await htmlWriter.WriteLineAsync("      <div id=\"file-input-container\">");
+                    await htmlWriter.WriteLineAsync($"      <label for=\"geojson-file\">GeoJSON dosyasını yükle (ısı_haritası_{currentYear}.geojson):</label>");
+                    await htmlWriter.WriteLineAsync("      <input type=\"file\" id=\"geojson-file\" accept=\".geojson,.json\">");
+                    await htmlWriter.WriteLineAsync("    </div>");
+                    await htmlWriter.WriteLineAsync("    <div id=\"year-label\">Yıl: " + currentYear + "</div>");
+                    await htmlWriter.WriteLineAsync($"    <input type=\"range\" id=\"year-slider\" min=\"{minYear}\" max=\"{maxYear}\" value=\"{currentYear}\" step=\"1\">");
+                    await htmlWriter.WriteLineAsync("    <div id=\"checkbox-container\">");
+                    await htmlWriter.WriteLineAsync("      <input type=\"checkbox\" id=\"yearly-changes\" name=\"yearly-changes\">");
+                    await htmlWriter.WriteLineAsync("      <label for=\"yearly-changes\">Yıllık Yük Değişimleri (kW) </label><br>");
+                    await htmlWriter.WriteLineAsync("      <input type=\"checkbox\" id=\"percentage-distribution\" name=\"percentage-distribution\">");
+                    await htmlWriter.WriteLineAsync("      <label for=\"percentage-distribution\">Hücre Başına Yük Dağılımları (%)</label>");
+                    await htmlWriter.WriteLineAsync("    </div>");
+                    await htmlWriter.WriteLineAsync("    <div id=\"legend\">");
+                    await htmlWriter.WriteLineAsync("      <strong id=\"legend-title\">Yük Yoğunluğu (MW/km2)</strong>");
+                    await htmlWriter.WriteLineAsync("      <div id=\"legend-items\"></div>");
+                    await htmlWriter.WriteLineAsync("    </div>");
+                    await htmlWriter.WriteLineAsync("  </div>");
+                    await htmlWriter.WriteLineAsync("  <div id=\"map\"></div>");
+                    await htmlWriter.WriteLineAsync("  <div id=\"loading-message\" style=\"display: none;\">Loading data...</div>");
+                    await htmlWriter.WriteLineAsync("  <div id=\"error-message\">Please select a GeoJSON file to load the map.</div>");
+                    await htmlWriter.WriteLineAsync("</div>");
+                    await htmlWriter.WriteLineAsync("  <script>");
+
+                    // Initialize the map
+                    await htmlWriter.WriteLineAsync($"    var map = L.map('map').setView([{avgLat}, {avgLng}], 13);");
+                    await htmlWriter.WriteLineAsync("    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {");
+                    await htmlWriter.WriteLineAsync("      attribution: '© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'");
+                    await htmlWriter.WriteLineAsync("    }).addTo(map);");
+
+                    // Handle GeoJSON file input
+                    await htmlWriter.WriteLineAsync("    var geojsonLayer;");
+                    await htmlWriter.WriteLineAsync("    var fileInput = document.getElementById('geojson-file');");
+                    await htmlWriter.WriteLineAsync("    fileInput.addEventListener('change', function(e) {");
+                    await htmlWriter.WriteLineAsync("      var file = e.target.files[0];");
+                    await htmlWriter.WriteLineAsync("      if (!file) return;");
+                    await htmlWriter.WriteLineAsync("      document.getElementById('error-message').style.display = 'none';");
+                    await htmlWriter.WriteLineAsync("      document.getElementById('loading-message').style.display = 'block';");
+                    await htmlWriter.WriteLineAsync("      var reader = new FileReader();");
+                    await htmlWriter.WriteLineAsync("      reader.onload = function(e) {");
+                    await htmlWriter.WriteLineAsync("        try {");
+                    await htmlWriter.WriteLineAsync("          var data = JSON.parse(e.target.result);");
+                    await htmlWriter.WriteLineAsync("          window.geojsonData = data;");
+                    await htmlWriter.WriteLineAsync("          document.getElementById('loading-message').style.display = 'none';");
+                    await htmlWriter.WriteLineAsync($"          updateMap({currentYear}, false, false);");
+                    await htmlWriter.WriteLineAsync("          var bounds = L.geoJSON(data).getBounds();");
+                    await htmlWriter.WriteLineAsync("          map.fitBounds(bounds);");
+                    await htmlWriter.WriteLineAsync("        } catch (error) {");
+                    await htmlWriter.WriteLineAsync("          document.getElementById('loading-message').style.display = 'none';");
+                    await htmlWriter.WriteLineAsync("          document.getElementById('error-message').style.display = 'block';");
+                    await htmlWriter.WriteLineAsync("          document.getElementById('error-message').textContent = 'Error parsing GeoJSON: ' + error.message;");
+                    await htmlWriter.WriteLineAsync("          console.error('Error parsing GeoJSON:', error);");
+                    await htmlWriter.WriteLineAsync("        }");
+                    await htmlWriter.WriteLineAsync("      };");
+                    await htmlWriter.WriteLineAsync("      reader.onerror = function() {");
+                    await htmlWriter.WriteLineAsync("        document.getElementById('loading-message').style.display = 'none';");
+                    await htmlWriter.WriteLineAsync("        document.getElementById('error-message').style.display = 'block';");
+                    await htmlWriter.WriteLineAsync("        document.getElementById('error-message').textContent = 'Error reading file.';");
+                    await htmlWriter.WriteLineAsync("      };");
+                    await htmlWriter.WriteLineAsync("      reader.readAsText(file);");
+                    await htmlWriter.WriteLineAsync("    });");
+
+                    // Function to get the color based on value
+                    await htmlWriter.WriteLineAsync("    function getColor(value, mode) {");
+                    await htmlWriter.WriteLineAsync("      if (mode === 'percentage') {");
+                    await htmlWriter.WriteLineAsync("        var maxPercentage = 0.1;");
+                    await htmlWriter.WriteLineAsync("        var normalized = Math.min(value / maxPercentage, 1);");
+                    await htmlWriter.WriteLineAsync("        var r, g, b;");
+                    await htmlWriter.WriteLineAsync("        if (normalized <= 0.5) {");
+                    await htmlWriter.WriteLineAsync("          var t = normalized / 0.5;");
+                    await htmlWriter.WriteLineAsync("          r = Math.round(t * 255);");
+                    await htmlWriter.WriteLineAsync("          g = Math.round(t * 255);");
+                    await htmlWriter.WriteLineAsync("          b = Math.round((1 - t) * 255);");
+                    await htmlWriter.WriteLineAsync("        } else {");
+                    await htmlWriter.WriteLineAsync("          var t = (normalized - 0.5) / 0.5;");
+                    await htmlWriter.WriteLineAsync("          r = 255;");
+                    await htmlWriter.WriteLineAsync("          g = Math.round((1 - t) * 255);");
+                    await htmlWriter.WriteLineAsync("          b = 0;");
+                    await htmlWriter.WriteLineAsync("        }");
+                    await htmlWriter.WriteLineAsync("        return `rgb(${r}, ${g}, ${b})`;");
+                    await htmlWriter.WriteLineAsync("      } else {");
+                    await htmlWriter.WriteLineAsync("        var brackets = (mode === 'yearly') ? [-20, -10, -5, 0, 3, 8, 12, 16, 25, 40, Infinity] : [0, 3, 5, 10, 20, 30, 40, 50, 75, 100, Infinity];");
+                    await htmlWriter.WriteLineAsync("        var minBracket = brackets[0];");
+                    await htmlWriter.WriteLineAsync("        var maxBracket = brackets[brackets.length - 2];");
+                    await htmlWriter.WriteLineAsync("        var range = maxBracket - minBracket;");
+                    await htmlWriter.WriteLineAsync("        var normalized = (value - minBracket) / range;");
+                    await htmlWriter.WriteLineAsync("        normalized = Math.max(0, Math.min(1, normalized));");
+                    await htmlWriter.WriteLineAsync("        var r, g, b;");
+                    await htmlWriter.WriteLineAsync("        if (normalized <= 0.5) {");
+                    await htmlWriter.WriteLineAsync("          var t = normalized / 0.5;");
+                    await htmlWriter.WriteLineAsync("          r = Math.round(t * 255);");
+                    await htmlWriter.WriteLineAsync("          g = Math.round(t * 255);");
+                    await htmlWriter.WriteLineAsync("          b = Math.round((1 - t) * 255);");
+                    await htmlWriter.WriteLineAsync("        } else {");
+                    await htmlWriter.WriteLineAsync("          var t = (normalized - 0.5) / 0.5;");
+                    await htmlWriter.WriteLineAsync("          r = 255;");
+                    await htmlWriter.WriteLineAsync("          g = Math.round((1 - t) * 255);");
+                    await htmlWriter.WriteLineAsync("          b = 0;");
+                    await htmlWriter.WriteLineAsync("        }");
+                    await htmlWriter.WriteLineAsync("        return `rgb(${r}, ${g}, ${b})`;");
+                    await htmlWriter.WriteLineAsync("      }");
+                    await htmlWriter.WriteLineAsync("    }");
+
+                    // Function to generate the legend
+                    await htmlWriter.WriteLineAsync("    function generateLegend(mode) {");
+                    await htmlWriter.WriteLineAsync("      var legendContainer = document.getElementById('legend');");
+                    await htmlWriter.WriteLineAsync("      if (mode === 'percentage') {");
+                    await htmlWriter.WriteLineAsync("        legendContainer.style.display = 'none';");
+                    await htmlWriter.WriteLineAsync("        return;");
+                    await htmlWriter.WriteLineAsync("      }");
+                    await htmlWriter.WriteLineAsync("      legendContainer.style.display = 'block';");
+                    await htmlWriter.WriteLineAsync("      var brackets = (mode === 'yearly') ? [-20, -10, -5, 0, 3, 8, 12, 16, 25, 40, Infinity] : [0, 3, 5, 10, 20, 30, 40, 50, 75, 100, Infinity];");
+                    await htmlWriter.WriteLineAsync("      var legendTitle = document.getElementById('legend-title');");
+                    await htmlWriter.WriteLineAsync("      legendTitle.textContent = (mode === 'yearly') ? '(kW)' : '(MW/km2)';");
+                    await htmlWriter.WriteLineAsync("      var legendItems = document.getElementById('legend-items');");
+                    await htmlWriter.WriteLineAsync("      legendItems.innerHTML = '';");
+                    await htmlWriter.WriteLineAsync("      for (var i = 0; i < brackets.length - 1; i++) {");
+                    await htmlWriter.WriteLineAsync("        var valueForColor = (brackets[i] + (brackets[i + 1] === Infinity ? brackets[i] : brackets[i + 1])) / 2;");
+                    await htmlWriter.WriteLineAsync("        var color = getColor(valueForColor, mode);");
+                    await htmlWriter.WriteLineAsync("        var div = document.createElement('div');");
+                    await htmlWriter.WriteLineAsync("        div.className = 'legend-item';");
+                    await htmlWriter.WriteLineAsync("        div.innerHTML = `<div class=\"legend-color\" style=\"background-color: ${color}\"></div>` +");
+                    await htmlWriter.WriteLineAsync("          (brackets[i + 1] === Infinity ? `${brackets[i]}+` : `${brackets[i]} -> ${brackets[i + 1]}`);");
+                    await htmlWriter.WriteLineAsync("        legendItems.appendChild(div);");
+                    await htmlWriter.WriteLineAsync("      }");
+                    await htmlWriter.WriteLineAsync("    }");
+
+                    // Function to generate tooltip text
+                    await htmlWriter.WriteLineAsync("    function getTooltipText(feature, year, mode) {");
+                    await htmlWriter.WriteLineAsync("      var props = feature.properties;");
+                    await htmlWriter.WriteLineAsync("      if (mode === 'percentage') {");
+                    await htmlWriter.WriteLineAsync("        return 'YUK_DAGILIM_YUZDESI_' + year + ': ' + (props['YUK_DAGILIM_YUZDESI_' + year] || '0.0') + '%';");
+                    await htmlWriter.WriteLineAsync("      } else if (mode === 'yearly') {");
+                    await htmlWriter.WriteLineAsync("        return 'TOPLAM_YUK_DEĞİŞİMİ_' + year + ': ' + (props['TOPLAM_YUK_DEĞİŞİMİ_' + year] || '0.0');");
+                    await htmlWriter.WriteLineAsync("      } else {");
+                    await htmlWriter.WriteLineAsync("        var tooltipText = '';");
+                    await htmlWriter.WriteLineAsync("        var columns = [");
+                    for (int i = 0; i < baseTooltipColumns.Length; i++)
+                    {
+                        await htmlWriter.WriteAsync($"          '{baseTooltipColumns[i]}'");
+                        if (i < baseTooltipColumns.Length - 1) await htmlWriter.WriteAsync(",");
+                        await htmlWriter.WriteLineAsync();
+                    }
+                    await htmlWriter.WriteLineAsync("        ];");
+                    await htmlWriter.WriteLineAsync("        for (var i = 0; i < columns.length; i++) {");
+                    await htmlWriter.WriteLineAsync("          var column = columns[i] + '_' + year;");
+                    await htmlWriter.WriteLineAsync("          tooltipText += column + ': ' + (props[column] || 'N/A') + '\\n';");
+                    await htmlWriter.WriteLineAsync("        }");
+                    await htmlWriter.WriteLineAsync("        return tooltipText || 'No data for this year';");
+                    await htmlWriter.WriteLineAsync("      }");
+                    await htmlWriter.WriteLineAsync("    }");
+
+                    // Function to update the map
+                    await htmlWriter.WriteLineAsync("    function updateMap(year, showYearlyChanges, showPercentageDistribution) {");
+                    await htmlWriter.WriteLineAsync("      if (!window.geojsonData) {");
+                    await htmlWriter.WriteLineAsync("        console.error('GeoJSON data not loaded yet.');");
+                    await htmlWriter.WriteLineAsync("        return;");
+                    await htmlWriter.WriteLineAsync("      }");
+                    await htmlWriter.WriteLineAsync("      if (geojsonLayer) {");
+                    await htmlWriter.WriteLineAsync("        map.removeLayer(geojsonLayer);");
+                    await htmlWriter.WriteLineAsync("      }");
+                    await htmlWriter.WriteLineAsync("      var mode = showPercentageDistribution ? 'percentage' : (showYearlyChanges ? 'yearly' : 'normal');");
+                    await htmlWriter.WriteLineAsync("      geojsonLayer = L.geoJSON(window.geojsonData, {");
+                    await htmlWriter.WriteLineAsync("        style: function(feature) {");
+                    await htmlWriter.WriteLineAsync("          var value;");
+                    await htmlWriter.WriteLineAsync("          if (showPercentageDistribution) {");
+                    await htmlWriter.WriteLineAsync("            value = parseFloat(feature.properties['YUK_DAGILIM_YUZDESI_' + year]) || 0;");
+                    await htmlWriter.WriteLineAsync("          } else if (showYearlyChanges) {");
+                    await htmlWriter.WriteLineAsync("            value = parseFloat(feature.properties['TOPLAM_YUK_DEĞİŞİMİ_' + year]) || 0;");
+                    await htmlWriter.WriteLineAsync("          } else {");
+                    await htmlWriter.WriteLineAsync("            value = parseFloat(feature.properties['Yük_Yoğunluğu_' + year]) || 0;");
+                    await htmlWriter.WriteLineAsync("          }");
+                    await htmlWriter.WriteLineAsync("          return {");
+                    await htmlWriter.WriteLineAsync("            fillColor: getColor(value, mode),");
+                    await htmlWriter.WriteLineAsync("            fillOpacity: 0.2,");
+                    await htmlWriter.WriteLineAsync("            color: getColor(value, mode),");
+                    await htmlWriter.WriteLineAsync("            weight: 1");
+                    await htmlWriter.WriteLineAsync("          };");
+                    await htmlWriter.WriteLineAsync("        },");
+                    await htmlWriter.WriteLineAsync("        onEachFeature: function(feature, layer) {");
+                    await htmlWriter.WriteLineAsync("          layer.bindTooltip(getTooltipText(feature, year, mode), {");
+                    await htmlWriter.WriteLineAsync("            sticky: true,");
+                    await htmlWriter.WriteLineAsync("            direction: 'auto'");
+                    await htmlWriter.WriteLineAsync("          });");
+                    await htmlWriter.WriteLineAsync("        }");
+                    await htmlWriter.WriteLineAsync("      }).addTo(map);");
+                    await htmlWriter.WriteLineAsync("    }");
+
+                    // Initialize the legend
+                    await htmlWriter.WriteLineAsync("    generateLegend('normal');");
+
+                    // Add event listeners
+                    await htmlWriter.WriteLineAsync("    var slider = document.getElementById('year-slider');");
+                    await htmlWriter.WriteLineAsync("    var yearLabel = document.getElementById('year-label');");
+                    await htmlWriter.WriteLineAsync("    var yearlyChangesCheckbox = document.getElementById('yearly-changes');");
+                    await htmlWriter.WriteLineAsync("    var percentageDistributionCheckbox = document.getElementById('percentage-distribution');");
+                    await htmlWriter.WriteLineAsync("    var currentYear = " + currentYear + ";");
+                    await htmlWriter.WriteLineAsync("    slider.addEventListener('input', function() {");
+                    await htmlWriter.WriteLineAsync("      currentYear = parseInt(slider.value);");
+                    await htmlWriter.WriteLineAsync("      yearLabel.textContent = 'Yıl: ' + currentYear;");
+                    await htmlWriter.WriteLineAsync("      updateMap(currentYear, yearlyChangesCheckbox.checked, percentageDistributionCheckbox.checked);");
+                    await htmlWriter.WriteLineAsync("    });");
+                    await htmlWriter.WriteLineAsync("    yearlyChangesCheckbox.addEventListener('change', function() {");
+                    await htmlWriter.WriteLineAsync("      if (yearlyChangesCheckbox.checked) {");
+                    await htmlWriter.WriteLineAsync("        percentageDistributionCheckbox.checked = false;");
+                    await htmlWriter.WriteLineAsync("      }");
+                    await htmlWriter.WriteLineAsync("      generateLegend(yearlyChangesCheckbox.checked ? 'yearly' : 'normal');");
+                    await htmlWriter.WriteLineAsync("      updateMap(currentYear, yearlyChangesCheckbox.checked, percentageDistributionCheckbox.checked);");
+                    await htmlWriter.WriteLineAsync("    });");
+                    await htmlWriter.WriteLineAsync("    percentageDistributionCheckbox.addEventListener('change', function() {");
+                    await htmlWriter.WriteLineAsync("      if (percentageDistributionCheckbox.checked) {");
+                    await htmlWriter.WriteLineAsync("        yearlyChangesCheckbox.checked = false;");
+                    await htmlWriter.WriteLineAsync("      }");
+                    await htmlWriter.WriteLineAsync("      generateLegend(percentageDistributionCheckbox.checked ? 'percentage' : (yearlyChangesCheckbox.checked ? 'yearly' : 'normal'));");
+                    await htmlWriter.WriteLineAsync("      updateMap(currentYear, yearlyChangesCheckbox.checked, percentageDistributionCheckbox.checked);");
+                    await htmlWriter.WriteLineAsync("    });");
+
+                    await htmlWriter.WriteLineAsync("  </script>");
+                    await htmlWriter.WriteLineAsync("</body>");
+                    await htmlWriter.WriteLineAsync("</html>");
+                }
+
+                // Run the dialog on the UI thread
+                this.Invoke((MethodInvoker)(() => bekleForm.Hide()));
+
+                // Show success message on the UI thread
+                this.Invoke((MethodInvoker)(() =>
+                {
+                    MessageBox.Show(
+                        $"Yük Yoğunluğu ısı haritası başarıyla oluşturuldu.! :  {htmlFilePath}\n\n" +
+                        $"Lütfen browser üzerinden yeni oluşturulan geoJson dosyasını (ısı_haritası_{currentYear}.geojson) " +
+                        $"açarak haritayı görüntüleyiniz.",
+                        "",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+
+                    // Optionally open the HTML file in the default browser
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = htmlFilePath,
+                        UseShellExecute = true
+                    });
+                }));
             }
-            catch (Exception ex)
+            finally
             {
-                MessageBox.Show($"Bir hata ile karşılaşıldı: {ex.Message}","",MessageBoxButtons.OK,MessageBoxIcon.Stop);
+                // Revert the cursor on the UI thread, guaranteed to run even if an error occurs
+                this.Invoke((MethodInvoker)(() => this.Cursor = Cursors.Default));
             }
         }
 

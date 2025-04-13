@@ -1423,7 +1423,7 @@ namespace SLF
         public void CreateHeatmap(GMapOverlay overlay, DataTable dataTable, string columnName, 
             Dictionary<GMapPolygon, DataRow> polygonAttributes)
         {
-            double[] brackets = { 0, 3, 5, 10, 25, 50, 75, 100, 200, 400, double.PositiveInfinity };
+            double[] brackets = { 0, 3, 5, 10, 20, 30, 40, 50, 75, 100, double.PositiveInfinity };
             int bracketCount = brackets.Length - 1; // 10 intervals
 
             // Now continue with your original logic:
@@ -1480,8 +1480,8 @@ namespace SLF
         public void UpdateHeatmapLegend()
         {
             // Define the fixed brackets
-            double[] brackets = { 0, 3, 5, 10, 25, 50, 75, 100, 200, 400, double.PositiveInfinity };
-            string[] bracketLabels = { "0-3", "3-5", "5-10", "10-25", "25-50", "50-75", "75-100", "100-200", "200-400", "400-Inf" };
+            double[] brackets = { 0, 3, 5, 10, 20, 30, 40, 50, 75, 100, double.PositiveInfinity };
+            string[] bracketLabels = { "0-3", "3-5", "5-10", "10-20", "20-30", "30-40", "40-50", "50-75", "75-100", "100-Inf" };
             int bracketCount = bracketLabels.Length; // Should be 10
 
             // Ensure the arrays exist (they should have been created in InitializeHeatmapLegendControls)
@@ -1492,7 +1492,7 @@ namespace SLF
             }
 
             // Update the unit label (just ensure it's visible)
-            modülFormu.unitLabel.Text = "Yük Yoğunluğu (W/m²)";
+            modülFormu.unitLabel.Text = "Yük Yoğunluğu (MW/km²)";
             modülFormu.unitLabel.Visible = true;
 
             // Update color boxes and range labels for each bracket
