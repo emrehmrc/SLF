@@ -33,7 +33,7 @@ namespace SLF
         {
             return Constants.DekValueToCountColumn.TryGetValue(dekValue, out string columnName) ? columnName : null;
         }
-        // Define a dictionary for cities and their coordinates
+/*        // Define a dictionary for cities and their coordinates
         private Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
     {
         { "İzmir", new PointLatLng(38.4192, 27.1287) },
@@ -46,7 +46,7 @@ namespace SLF
     {
         { "İzmir", new List<string> { "Aliağa", "Balçova", "Bayındır", "Bayraklı", "Bergama", "Beydağ", "Bornova", "Buca", "Çeşme", "Çiğli", "Dikili", "Foça", "Gaziemir", "Güzelbahçe", "Karabağlar", "Karaburun", "Karşıyaka", "Kemalpaşa", "Kınık", "Kiraz", "Konak", "Menderes", "Menemen", "Narlıdere", "Ödemiş", "Seferihisar", "Selçuk", "Tire", "Torbalı" } },
         { "Eskişehir", new List<string> { "Alpu", "Beylikova", "Çifteler", "Günyüzü", "Han", "İnönü", "Mahmudiye", "Mihalgazi", "Mihalıççık", "Odunpazarı", "Sarıcakaya", "Seyitgazi", "Sivrihisar", "Tepebaşı" } }
-    };
+    };*/
 
         public DEKCenterPopupForm(DataTable existingDataTable, NoktaVeri veri)
         {
@@ -89,11 +89,11 @@ namespace SLF
             }
 
             // Initially populate the city names in the ILCE_ADI ComboBox
-            PopulateCityComboBox();
+            //PopulateCityComboBox();
             //  DEKCenterDataGridView.CellValueChanged += DEKCenterDataGridView_CellValueChanged;
         }
 
-        private void PopulateCityComboBox()
+/*        private void PopulateCityComboBox()
         {
             var comboBoxColumn = DEKCenterDataGridView.Columns["ILCE_ADI"] as DataGridViewComboBoxColumn;
 
@@ -179,7 +179,7 @@ namespace SLF
                     }
                 }
             }
-        }
+        }*/
 
         private void DEKCenterDataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
@@ -188,7 +188,7 @@ namespace SLF
 
             Console.WriteLine($"Selected Coordinates: X={selectedX}, Y={selectedY}");
 
-            FilterCountiesBasedOnCoordinates(selectedX, selectedY);
+         //   FilterCountiesBasedOnCoordinates(selectedX, selectedY);
         }
 
         private double GetDistance(double lat1, double lon1, double lat2, double lon2)
@@ -242,11 +242,11 @@ namespace SLF
             // Validate the input
             foreach (DataGridViewCell cell in DEKCenterDataGridView.Rows[0].Cells)
             {
-                if (cell.Value == null || string.IsNullOrWhiteSpace(cell.Value.ToString()))
+/*                if (cell.Value == null || string.IsNullOrWhiteSpace(cell.Value.ToString()))
                 {
                     MessageBox.Show("Lütfen tüm alanları doldurun.");
                     return;
-                }
+                }*/
             }
 
             // Update veri.CellId
@@ -254,7 +254,7 @@ namespace SLF
 
             // Add new row to the existing DataTable
             DataRow newRow = dataTable.NewRow();
-            newRow["ILCE_ADI"] = DEKCenterDataGridView.Rows[0].Cells["ILCE_ADI"].Value.ToString();
+          //  newRow["ILCE_ADI"] = DEKCenterDataGridView.Rows[0].Cells["ILCE_ADI"].Value.ToString();
             newRow["KAYNAK_TIPI"] = DEKCenterDataGridView.Rows[0].Cells["KAYNAK_TIPI"].Value.ToString();
             newRow["DEK_KURULU_GUCU"] = Convert.ToDouble(DEKCenterDataGridView.Rows[0].Cells["DEK_KURULU_GUCU"].Value);
             newRow["DEK_X_KOORDINAT"] = Convert.ToDouble(DEKCenterDataGridView.Rows[0].Cells["DEK_X_KOORDINAT"].Value);

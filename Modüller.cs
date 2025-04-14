@@ -6715,7 +6715,7 @@ namespace SLF
         {
             // Disable buttons and TrackBar to prevent interaction while processing
             DEKRunSimulationButton.Enabled = false;
-            DEKSimulasyonSonucGoruntule.Enabled = false;
+            DEKSimulasyonSonucGoruntule.Enabled = true;
             //DEKSimButton.Enabled = false;
 
             try
