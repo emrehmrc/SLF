@@ -283,6 +283,7 @@ namespace SLF
             this.Point_Load_Çiz = new System.Windows.Forms.ToolStripMenuItem();
             this.YGA_Çiz = new System.Windows.Forms.ToolStripMenuItem();
             this.miniToolStrip = new System.Windows.Forms.ToolStrip();
+            this.CreateReportButton = new System.Windows.Forms.Button();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
             this.panel_proje_ekle.SuspendLayout();
@@ -449,7 +450,7 @@ namespace SLF
             this.OpenModuleButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.OpenModuleButton.ForeColor = System.Drawing.Color.White;
             this.OpenModuleButton.Location = new System.Drawing.Point(1191, 610);
-            this.OpenModuleButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.OpenModuleButton.Margin = new System.Windows.Forms.Padding(4);
             this.OpenModuleButton.Name = "OpenModuleButton";
             this.OpenModuleButton.Size = new System.Drawing.Size(107, 39);
             this.OpenModuleButton.TabIndex = 19;
@@ -727,6 +728,7 @@ namespace SLF
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            this.panel1.Controls.Add(this.CreateReportButton);
             this.panel1.Controls.Add(this.DEKPointsLayerCheckBox);
             this.panel1.Controls.Add(this.DEKProgressBar);
             this.panel1.Controls.Add(this.DEKStatusLabel);
@@ -924,7 +926,7 @@ namespace SLF
             this.DEKSimButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.DEKSimButton.ForeColor = System.Drawing.Color.White;
             this.DEKSimButton.Location = new System.Drawing.Point(53, 457);
-            this.DEKSimButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.DEKSimButton.Margin = new System.Windows.Forms.Padding(4);
             this.DEKSimButton.Name = "DEKSimButton";
             this.DEKSimButton.Size = new System.Drawing.Size(187, 78);
             this.DEKSimButton.TabIndex = 54;
@@ -1048,7 +1050,7 @@ namespace SLF
             this.EaSimMaxBtn.AutoSize = true;
             this.EaSimMaxBtn.ForeColor = System.Drawing.Color.DarkBlue;
             this.EaSimMaxBtn.Location = new System.Drawing.Point(16, 191);
-            this.EaSimMaxBtn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.EaSimMaxBtn.Margin = new System.Windows.Forms.Padding(4);
             this.EaSimMaxBtn.Name = "EaSimMaxBtn";
             this.EaSimMaxBtn.Size = new System.Drawing.Size(132, 27);
             this.EaSimMaxBtn.TabIndex = 53;
@@ -1474,7 +1476,7 @@ namespace SLF
             this.ELFLowResultsTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFLowResultsTabPage.Name = "ELFLowResultsTabPage";
             this.ELFLowResultsTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFLowResultsTabPage.Size = new System.Drawing.Size(1041, 626);
+            this.ELFLowResultsTabPage.Size = new System.Drawing.Size(1044, 631);
             this.ELFLowResultsTabPage.TabIndex = 1;
             this.ELFLowResultsTabPage.Text = "Düşük Sonuçlar";
             this.ELFLowResultsTabPage.UseVisualStyleBackColor = true;
@@ -1492,7 +1494,7 @@ namespace SLF
             this.ELFLowResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFLowResultsTable.Name = "ELFLowResultsTable";
             this.ELFLowResultsTable.RowHeadersWidth = 51;
-            this.ELFLowResultsTable.Size = new System.Drawing.Size(1160, 335);
+            this.ELFLowResultsTable.Size = new System.Drawing.Size(1163, 345);
             this.ELFLowResultsTable.TabIndex = 1;
             // 
             // ELFBaseResultsTabPage
@@ -1502,7 +1504,7 @@ namespace SLF
             this.ELFBaseResultsTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFBaseResultsTabPage.Name = "ELFBaseResultsTabPage";
             this.ELFBaseResultsTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFBaseResultsTabPage.Size = new System.Drawing.Size(1041, 626);
+            this.ELFBaseResultsTabPage.Size = new System.Drawing.Size(1044, 631);
             this.ELFBaseResultsTabPage.TabIndex = 2;
             this.ELFBaseResultsTabPage.Text = "Baz Sonuçlar";
             this.ELFBaseResultsTabPage.UseVisualStyleBackColor = true;
@@ -1520,7 +1522,7 @@ namespace SLF
             this.ELFBaseResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFBaseResultsTable.Name = "ELFBaseResultsTable";
             this.ELFBaseResultsTable.RowHeadersWidth = 51;
-            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1160, 335);
+            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1163, 345);
             this.ELFBaseResultsTable.TabIndex = 1;
             // 
             // ELFHighResultsTabPage
@@ -1530,7 +1532,7 @@ namespace SLF
             this.ELFHighResultsTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFHighResultsTabPage.Name = "ELFHighResultsTabPage";
             this.ELFHighResultsTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFHighResultsTabPage.Size = new System.Drawing.Size(1041, 626);
+            this.ELFHighResultsTabPage.Size = new System.Drawing.Size(1044, 631);
             this.ELFHighResultsTabPage.TabIndex = 3;
             this.ELFHighResultsTabPage.Text = "Yüksek Sonuçlar";
             this.ELFHighResultsTabPage.UseVisualStyleBackColor = true;
@@ -1548,7 +1550,7 @@ namespace SLF
             this.ELFHighResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFHighResultsTable.Name = "ELFHighResultsTable";
             this.ELFHighResultsTable.RowHeadersWidth = 51;
-            this.ELFHighResultsTable.Size = new System.Drawing.Size(1155, 335);
+            this.ELFHighResultsTable.Size = new System.Drawing.Size(1158, 345);
             this.ELFHighResultsTable.TabIndex = 1;
             // 
             // ELFMaxResultsTabPage
@@ -1558,7 +1560,7 @@ namespace SLF
             this.ELFMaxResultsTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFMaxResultsTabPage.Name = "ELFMaxResultsTabPage";
             this.ELFMaxResultsTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFMaxResultsTabPage.Size = new System.Drawing.Size(1041, 626);
+            this.ELFMaxResultsTabPage.Size = new System.Drawing.Size(1044, 631);
             this.ELFMaxResultsTabPage.TabIndex = 4;
             this.ELFMaxResultsTabPage.Text = "Maksimum Sonuçlar";
             this.ELFMaxResultsTabPage.UseVisualStyleBackColor = true;
@@ -1577,7 +1579,7 @@ namespace SLF
             this.ELFMaxResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFMaxResultsTable.Name = "ELFMaxResultsTable";
             this.ELFMaxResultsTable.RowHeadersWidth = 51;
-            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1164, 338);
+            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1167, 348);
             this.ELFMaxResultsTable.TabIndex = 1;
             // 
             // ELFGraphicOutputsTabPage
@@ -1587,7 +1589,7 @@ namespace SLF
             this.ELFGraphicOutputsTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFGraphicOutputsTabPage.Name = "ELFGraphicOutputsTabPage";
             this.ELFGraphicOutputsTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.ELFGraphicOutputsTabPage.Size = new System.Drawing.Size(1041, 626);
+            this.ELFGraphicOutputsTabPage.Size = new System.Drawing.Size(1044, 631);
             this.ELFGraphicOutputsTabPage.TabIndex = 5;
             this.ELFGraphicOutputsTabPage.Text = "Projeksiyon Grafik Sonuçları";
             this.ELFGraphicOutputsTabPage.UseVisualStyleBackColor = true;
@@ -1604,9 +1606,9 @@ namespace SLF
             this.panel_ELF_Grafikler.Controls.Add(this.pictureBox_ELF_2);
             this.panel_ELF_Grafikler.Controls.Add(this.pictureBox_ELF_1);
             this.panel_ELF_Grafikler.Location = new System.Drawing.Point(3, 2);
-            this.panel_ELF_Grafikler.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel_ELF_Grafikler.Margin = new System.Windows.Forms.Padding(4);
             this.panel_ELF_Grafikler.Name = "panel_ELF_Grafikler";
-            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1160, 258);
+            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1163, 268);
             this.panel_ELF_Grafikler.TabIndex = 6;
             // 
             // pictureBox_ELF_5
@@ -1693,7 +1695,7 @@ namespace SLF
             this.ELFShowGraphsButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.ELFShowGraphsButton.ForeColor = System.Drawing.Color.White;
             this.ELFShowGraphsButton.Location = new System.Drawing.Point(24, 309);
-            this.ELFShowGraphsButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFShowGraphsButton.Margin = new System.Windows.Forms.Padding(4);
             this.ELFShowGraphsButton.Name = "ELFShowGraphsButton";
             this.ELFShowGraphsButton.Size = new System.Drawing.Size(200, 49);
             this.ELFShowGraphsButton.TabIndex = 34;
@@ -1709,7 +1711,7 @@ namespace SLF
             this.SenaryoNewSelectionButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.SenaryoNewSelectionButton.ForeColor = System.Drawing.Color.White;
             this.SenaryoNewSelectionButton.Location = new System.Drawing.Point(24, 229);
-            this.SenaryoNewSelectionButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.SenaryoNewSelectionButton.Margin = new System.Windows.Forms.Padding(4);
             this.SenaryoNewSelectionButton.Name = "SenaryoNewSelectionButton";
             this.SenaryoNewSelectionButton.Size = new System.Drawing.Size(200, 49);
             this.SenaryoNewSelectionButton.TabIndex = 33;
@@ -2495,7 +2497,7 @@ namespace SLF
             this.ShowResultsButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.ShowResultsButton.ForeColor = System.Drawing.Color.White;
             this.ShowResultsButton.Location = new System.Drawing.Point(21, 335);
-            this.ShowResultsButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ShowResultsButton.Margin = new System.Windows.Forms.Padding(4);
             this.ShowResultsButton.Name = "ShowResultsButton";
             this.ShowResultsButton.Size = new System.Drawing.Size(200, 49);
             this.ShowResultsButton.TabIndex = 14;
@@ -2511,7 +2513,7 @@ namespace SLF
             this.ELFTahminButonu.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.ELFTahminButonu.ForeColor = System.Drawing.Color.White;
             this.ELFTahminButonu.Location = new System.Drawing.Point(21, 250);
-            this.ELFTahminButonu.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFTahminButonu.Margin = new System.Windows.Forms.Padding(4);
             this.ELFTahminButonu.Name = "ELFTahminButonu";
             this.ELFTahminButonu.Size = new System.Drawing.Size(200, 49);
             this.ELFTahminButonu.TabIndex = 13;
@@ -2528,7 +2530,7 @@ namespace SLF
             this.ELFScenerioSaveButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.ELFScenerioSaveButton.ForeColor = System.Drawing.Color.White;
             this.ELFScenerioSaveButton.Location = new System.Drawing.Point(21, 162);
-            this.ELFScenerioSaveButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ELFScenerioSaveButton.Margin = new System.Windows.Forms.Padding(4);
             this.ELFScenerioSaveButton.Name = "ELFScenerioSaveButton";
             this.ELFScenerioSaveButton.Size = new System.Drawing.Size(200, 49);
             this.ELFScenerioSaveButton.TabIndex = 12;
@@ -2676,7 +2678,7 @@ namespace SLF
             this.tabPage_dusuk_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_dusuk_senaryo.Name = "tabPage_dusuk_senaryo";
             this.tabPage_dusuk_senaryo.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_dusuk_senaryo.Size = new System.Drawing.Size(731, 1168);
+            this.tabPage_dusuk_senaryo.Size = new System.Drawing.Size(809, 1175);
             this.tabPage_dusuk_senaryo.TabIndex = 1;
             this.tabPage_dusuk_senaryo.Text = "Düşük Senaryo";
             this.tabPage_dusuk_senaryo.UseVisualStyleBackColor = true;
@@ -2696,7 +2698,7 @@ namespace SLF
             this.ELFLowSenaryoTable.Name = "ELFLowSenaryoTable";
             this.ELFLowSenaryoTable.RowHeadersWidth = 18;
             this.ELFLowSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(725, 1164);
+            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(803, 1171);
             this.ELFLowSenaryoTable.TabIndex = 1;
             // 
             // tabPage_baz_senaryo
@@ -2707,7 +2709,7 @@ namespace SLF
             this.tabPage_baz_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_baz_senaryo.Name = "tabPage_baz_senaryo";
             this.tabPage_baz_senaryo.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_baz_senaryo.Size = new System.Drawing.Size(731, 1168);
+            this.tabPage_baz_senaryo.Size = new System.Drawing.Size(809, 1175);
             this.tabPage_baz_senaryo.TabIndex = 2;
             this.tabPage_baz_senaryo.Text = "Baz Senaryo";
             this.tabPage_baz_senaryo.UseVisualStyleBackColor = true;
@@ -2735,7 +2737,7 @@ namespace SLF
             this.ELFBaseSenaryoTable.Name = "ELFBaseSenaryoTable";
             this.ELFBaseSenaryoTable.RowHeadersWidth = 18;
             this.ELFBaseSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(725, 1164);
+            this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(803, 1171);
             this.ELFBaseSenaryoTable.TabIndex = 1;
             // 
             // tabPage_yuksek_senaryo
@@ -2746,7 +2748,7 @@ namespace SLF
             this.tabPage_yuksek_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_yuksek_senaryo.Name = "tabPage_yuksek_senaryo";
             this.tabPage_yuksek_senaryo.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_yuksek_senaryo.Size = new System.Drawing.Size(731, 1168);
+            this.tabPage_yuksek_senaryo.Size = new System.Drawing.Size(809, 1175);
             this.tabPage_yuksek_senaryo.TabIndex = 3;
             this.tabPage_yuksek_senaryo.Text = "Yüksek Senaryo";
             this.tabPage_yuksek_senaryo.UseVisualStyleBackColor = true;
@@ -2774,7 +2776,7 @@ namespace SLF
             this.ELFHighSenaryoTable.Name = "ELFHighSenaryoTable";
             this.ELFHighSenaryoTable.RowHeadersWidth = 51;
             this.ELFHighSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFHighSenaryoTable.Size = new System.Drawing.Size(725, 1164);
+            this.ELFHighSenaryoTable.Size = new System.Drawing.Size(803, 1171);
             this.ELFHighSenaryoTable.TabIndex = 1;
             // 
             // tabPage_maks_senaryo
@@ -2785,7 +2787,7 @@ namespace SLF
             this.tabPage_maks_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_maks_senaryo.Name = "tabPage_maks_senaryo";
             this.tabPage_maks_senaryo.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_maks_senaryo.Size = new System.Drawing.Size(731, 1168);
+            this.tabPage_maks_senaryo.Size = new System.Drawing.Size(809, 1175);
             this.tabPage_maks_senaryo.TabIndex = 4;
             this.tabPage_maks_senaryo.Text = "Maksimum Senaryo";
             this.tabPage_maks_senaryo.UseVisualStyleBackColor = true;
@@ -2802,7 +2804,7 @@ namespace SLF
             this.ELFMaxSenaryoTable.Name = "ELFMaxSenaryoTable";
             this.ELFMaxSenaryoTable.RowHeadersWidth = 18;
             this.ELFMaxSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(725, 1164);
+            this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(803, 1171);
             this.ELFMaxSenaryoTable.TabIndex = 1;
             // 
             // YeniGenislemeSenaryoTabPage
@@ -2811,7 +2813,7 @@ namespace SLF
             this.YeniGenislemeSenaryoTabPage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.YeniGenislemeSenaryoTabPage.Name = "YeniGenislemeSenaryoTabPage";
             this.YeniGenislemeSenaryoTabPage.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.YeniGenislemeSenaryoTabPage.Size = new System.Drawing.Size(1076, 657);
+            this.YeniGenislemeSenaryoTabPage.Size = new System.Drawing.Size(1079, 661);
             this.YeniGenislemeSenaryoTabPage.TabIndex = 4;
             this.YeniGenislemeSenaryoTabPage.Text = "Yeni Genişleme Alanları ";
             this.YeniGenislemeSenaryoTabPage.UseVisualStyleBackColor = true;
@@ -3610,7 +3612,7 @@ namespace SLF
             this.ModuleTabPanel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.ModuleTabPanel.Controls.Add(this.Modül_Tabları);
             this.ModuleTabPanel.Location = new System.Drawing.Point(0, 38);
-            this.ModuleTabPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ModuleTabPanel.Margin = new System.Windows.Forms.Padding(4);
             this.ModuleTabPanel.Name = "ModuleTabPanel";
             this.ModuleTabPanel.Size = new System.Drawing.Size(1315, 729);
             this.ModuleTabPanel.TabIndex = 5;
@@ -3623,7 +3625,7 @@ namespace SLF
             this.HeaderPanel.Controls.Add(this.HomePageButton);
             this.HeaderPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.HeaderPanel.Location = new System.Drawing.Point(0, 0);
-            this.HeaderPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.HeaderPanel.Margin = new System.Windows.Forms.Padding(4);
             this.HeaderPanel.Name = "HeaderPanel";
             this.HeaderPanel.Size = new System.Drawing.Size(1317, 38);
             this.HeaderPanel.TabIndex = 6;
@@ -3660,7 +3662,7 @@ namespace SLF
             this.HomePageButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.HomePageButton.ForeColor = System.Drawing.Color.White;
             this.HomePageButton.Location = new System.Drawing.Point(1263, 4);
-            this.HomePageButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.HomePageButton.Margin = new System.Windows.Forms.Padding(4);
             this.HomePageButton.Name = "HomePageButton";
             this.HomePageButton.Size = new System.Drawing.Size(45, 34);
             this.HomePageButton.TabIndex = 5;
@@ -3727,6 +3729,15 @@ namespace SLF
             this.miniToolStrip.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.miniToolStrip.Size = new System.Drawing.Size(1437, 32);
             this.miniToolStrip.TabIndex = 36;
+            // 
+            // CreateReportButton
+            // 
+            this.CreateReportButton.Location = new System.Drawing.Point(423, 5);
+            this.CreateReportButton.Name = "CreateReportButton";
+            this.CreateReportButton.Size = new System.Drawing.Size(129, 31);
+            this.CreateReportButton.TabIndex = 63;
+            this.CreateReportButton.Text = "Rapor Oluştur";
+            this.CreateReportButton.UseVisualStyleBackColor = true;
             // 
             // ModülFormu
             // 
@@ -4099,5 +4110,6 @@ namespace SLF
         private System.Windows.Forms.Button SimulasyonSonucGoruntule;
         private CheckBox EAPointsLayerCheckBox;
         private PictureBox buton_HTML;
+        private Button CreateReportButton;
     }
 }

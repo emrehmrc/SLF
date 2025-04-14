@@ -641,6 +641,12 @@
     <Compile Include="ProjectFolderPicker.Designer.cs">
       <DependentUpon>ProjectFolderPicker.cs</DependentUpon>
     </Compile>
+    <Compile Include="ReportTableForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ReportTableForm.Designer.cs">
+      <DependentUpon>ReportTableForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="services\DatabaseHelpers.cs" />
     <Compile Include="services\DatabaseManager .cs" />
     <Compile Include="services\IsImportedModule.cs" />
@@ -775,6 +781,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectFolderPicker.resx">
       <DependentUpon>ProjectFolderPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ReportTableForm.resx">
+      <DependentUpon>ReportTableForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Tablo_olustur.resx">
       <DependentUpon>Tablo_olustur.cs</DependentUpon>
