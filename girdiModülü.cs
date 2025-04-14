@@ -7,8 +7,6 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using SLF.Services;
-using System.Threading;
-
 
 namespace SLF
 {
@@ -585,16 +583,12 @@ namespace SLF
             try
             {
                 // Get the input strings and replace forward slashes with backslashes
-                string anaKlasorYolu = ((string)modülFormu.ana_menu_form_objesi.config.Ana_Klasör_Yolu).Replace('/', '\\');
-                string il = ((string)modülFormu.ana_menu_form_objesi.config.İl).Replace('/', '\\');
-                string rScriptYolu = ((string)modülFormu.ana_menu_form_objesi.config.ELF.Rscript_Yolu_Senaryolar).Replace('/', '\\');
-
                 // Construct the path to the R script
-                string rScriptPath = Path.Combine(anaKlasorYolu, il, rScriptYolu);
+                string rScriptPath = Path.Combine((string)modülFormu.ana_menu_form_objesi.projectRoot,
+                   "Program Dosyaları/ELF/senaryolar.R").Replace('/', '\\');
 
-                // Construct the path to the config file
-                string projectRoot = ((string)modülFormu.ana_menu_form_objesi.projectRoot).Replace('/', '\\');
-                string configPath = Path.Combine(projectRoot, "config.json");
+                string configPath = Path.Combine((string)modülFormu.ana_menu_form_objesi.projectRoot, 
+                    "config.json");
 
                 // Run Rscript.exe directly with quoted paths
                 var process = new Process

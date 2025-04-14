@@ -2921,49 +2921,7 @@ namespace SLF
         // -------------------------------------------- EA ------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
-        private async void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
-        {
 
-            if (isAddingChargingStation)
-            {
-                // Yeni marker oluştur
-                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow)
-                {
-                    ToolTipText = "Yeni Şarj İstasyonu"
-                };
-                markerOverlay_ea.Markers.Add(marker);
-
-                // Nokta verisini oluştur
-                NoktaVeri noktaVeri_marker = new NoktaVeri
-                {
-                    Enlem = Math.Round(pointClick.Lat, 4),
-                    Boylam = Math.Round(pointClick.Lng, 4)
-                };
-
-                // Popup formu göster
-                using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
-                {
-                    if (popupForm.ShowDialog() == DialogResult.OK)
-                    {
-                        // Başarılı olduğunda harita verilerini yükle
-                        await eaHaritayaVeriYukleAsync();
-                    }
-                    else if (popupForm.OperationCancelled)
-                    {
-                        // İşlem iptal edilirse marker'ı kaldır
-                        markerOverlay_ea.Markers.Remove(marker);
-                    }
-                }
-
-                // İşaretleme işlemini sıfırla
-                isAddingChargingStation = false;
-                return;
-            }
-
-            OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
-                ref polygonOverlay_ea, Mesafe_Dek, mesafe_metre_DeK);
-
-        }
         private async Task HandlePopupFormAsync(PointLatLng point, string cellId)
         {
             NoktaVeri noktaVeri_marker = new NoktaVeri
@@ -3000,6 +2958,7 @@ namespace SLF
                 }
             }
         }
+
         private void RemoveMarkerFromOverlays(GMapMarker marker)
         {
             if (markerOverlay_ea.Markers.Contains(marker))
@@ -3017,75 +2976,7 @@ namespace SLF
                 cellToolTipOverlay.Markers.Remove(marker);
             }
         }
-        private async void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                // Check if the user is in "adding charging station" mode
-                if (isAddingChargingStation)
-                {
-                    // Use the selected CellId from ModülFormu
-                    string cellId = item.Tag?.ToString() ?? ModülFormu.SelectedCellId;
 
-                    // Create a temporary marker for the charging station at the clicked location
-                    GMapMarker marker = new GMarkerGoogle(item.Position, GMarkerGoogleType.yellow)
-                    {
-                        ToolTipText = "Yeni Şarj İstasyonu",
-                        Tag = cellId // Store CellId in the marker's Tag temporarily
-                    };
-
-                    try
-                    {
-                        // Use the helper method to handle the popup form
-                        await HandlePopupFormAsync(item.Position, cellId);
-                    }
-                    catch
-                    {
-                        RemoveMarkerFromOverlays(marker);
-                    }
-
-                    // Reset the flag after adding the station
-                    isAddingChargingStation = false;
-
-                    return;
-                }
-            }
-        }
-        private GMapMarker FindMarkerAtPosition(PointLatLng point)
-        {
-            foreach (var marker in cellToolTipOverlay.Markers)
-            {
-                if (marker.Position.Lat == point.Lat && marker.Position.Lng == point.Lng)
-                {
-                    return marker;
-                }
-            }
-            return null;
-        }
-        private void AddMarkerToMap(NoktaVeri noktaVeri)
-        {
-            // Create a new marker for the charging station
-            GMapMarker marker = new GMarkerGoogle(new PointLatLng(noktaVeri.Enlem, noktaVeri.Boylam), GMarkerGoogleType.yellow)
-            {
-                ToolTipText = $"Şarj İstasyonu: {noktaVeri.CellId}",
-                Tag = noktaVeri.CellId // Store CellId in the marker's Tag
-            };
-
-            // Add the marker to the appropriate overlay
-            markerOverlay_ea.Markers.Add(marker);
-            simulationOverlay.Markers.Add(marker);
-            cellToolTipOverlay.Markers.Add(marker);
-
-            // Refresh the map to display the new marker
-            gMapControl_EA.Refresh();
-        }
-        private void EA_Nokta_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-              //  ContextMenuStrip_Nokta.Show(Cursor.Position);
-            }
-        }
 
         private void EaSimMaxBtn_CheckedChanged(object sender, EventArgs e)
         {
@@ -3238,7 +3129,6 @@ namespace SLF
         private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
         {
             // Disable buttons and TrackBar to prevent interaction while processing
-            // EAStationAddButton.Enabled = false;
             EANewSimulationResultsButton.Enabled = false;
             SimulasyonSonucGoruntule.Enabled = false;
 
@@ -3299,66 +3189,7 @@ namespace SLF
                 SimulasyonSonucGoruntule.Enabled = true;
             }
         }
-        /*        private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
-                {
-                    // Disable buttons and TrackBar to prevent interaction while processing
-                   // EAStationAddButton.Enabled = false;
-                    EANewSimulationResultsButton.Enabled = false;
-                    SimulasyonSonucGoruntule.Enabled = false;
 
-                    try
-                    {
-                        Cursor = Cursors.WaitCursor;
-                        if (statusLabel != null)
-                        {
-                            statusLabel.Text = "Python script started. This may take a while. Please wait...";
-                            statusLabel.Visible = true;
-                        }
-                        if (progressBar != null)
-                        {
-                            progressBar.Style = ProgressBarStyle.Marquee;
-                            progressBar.Visible = true;
-                        }
-
-                        string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\girdiler\new_buildings_2024_2035.xlsx";
-                        string outputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\çıktı\evcs_monte_carlo_distribution_kumulatif3 - Copy.xlsx";
-
-                        if (!File.Exists(inputFilePath))
-                        {
-                            MessageBox.Show("Input file not found! Please ensure the file is saved correctly.",
-                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
-                        }
-
-                        await RunPythonScriptAsync(inputFilePath);
-
-                        if (!File.Exists(outputFilePath))
-                        {
-                            MessageBox.Show("Output file not generated! Please check the Python script.",
-                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
-                        }
-
-                        // Call SimilasyonSonucGoruntule to handle display
-                        //SimilasyonSonucGoruntule();
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    finally
-                    {
-                        Cursor = Cursors.Default;
-                        if (progressBar != null)
-                            progressBar.Visible = false;
-                        if (statusLabel != null)
-                            statusLabel.Text = "Simulation process completed";
-
-                        EANewSimulationResultsButton.Enabled = true;
-                       // EAStationAddButton.Enabled = true;
-                        SimulasyonSonucGoruntule.Enabled = true;
-                    }
-                }*/
         private async Task RunPythonScriptAsync(string inputFilePath)
         {
             try
@@ -3427,7 +3258,6 @@ namespace SLF
         }
 
         // Şehir seçimi yapıldığında çağrılan metot
-        // Şehir seçimi yapıldığında çağrılan metot
         private void ilSecimiMonteCarlo(object sender, EventArgs e)
         {
             // Always clear the district combo box and reset SelectedDistrict
@@ -3447,25 +3277,12 @@ namespace SLF
                     comboBox_ea_ilce_secimi.Refresh();
                 }));
             }
-            /*            // Update SelectedCity if a valid selection exists
-                        if (comboBox_ea_il_secimi.SelectedItem != null)
-                        {
-                            SelectedCity = comboBox_ea_il_secimi.SelectedItem.ToString();
 
-                            // Populate district combo box based on selected city
-                            if (cityDistricts.TryGetValue(SelectedCity, out var districts))
-                            {
-                                comboBox_ea_ilce_secimi.Items.AddRange(districts.ToArray());
-                                comboBox_ea_ilce_secimi.Enabled = true;
-                            }
-                        }*/
             else
             {
                 SelectedCity = null;
             }
 
-            // Update button enablement and map position
-            // CheckSelections();
 
             if (SelectedCity != null && cityCoordinates.TryGetValue(SelectedCity, out PointLatLng coordinates))
             {
@@ -3598,8 +3415,6 @@ namespace SLF
                     return;
                 }
 
-                gMapControl_EA.OnMarkerClick -= gMapControl_EA_OnMarkerClick;
-                //   gMapControl_EA.OnMapClick -= gMapControl_Ea_OnMapClick;
 
                 // Use dataGridView1.DataSource as the DataTable instead of eaDataTable
                 DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
@@ -3609,17 +3424,11 @@ namespace SLF
                     return;
                 }
 
-                /*                if (!gMapControl_EA.Overlays.Contains(simulationOverlay) || !gMapControl_EA.Overlays.Contains(cellToolTipOverlay))
-                                {
-                                    gMapControl_EA.OnMapClick += gMapControl_Ea_OnMapClick;
-                                }
-                */
                 // Check if we are in the process of adding a charging station
                 if (!isAddingChargingStation)
                 {
                     MessageBox.Show("Lütfen harita üzerinde şarj istasyonu koordinatlarınızı belirleyiniz.");
                     isAddingChargingStation = true;
-                    gMapControl_EA.OnMarkerClick += gMapControl_EA_OnMarkerClick;
                     return; // Exit to wait for the user to click on the map
                 }
 
@@ -3746,16 +3555,6 @@ namespace SLF
         {
             // Disable the button to prevent multiple clicks while processing
             EAStationAddButton.Enabled = false;
-
-            /*            // Checkbox'ları görünür hale getir
-                        checkBox_AC_Home.Visible = true;
-                        checkBox_AC_Public.Visible = true;
-                        checkBox_AC_Work.Visible = true;
-                        checkBox_DC_Fast.Visible = true;
-                        checkBox_AC_Public.Checked = true;
-                        checkBox_AC_Work.Checked = true;
-                        checkBox_AC_Home.Checked = true;
-                        checkBox_DC_Fast.Checked = true;*/
 
             gMapControl_EA.Overlays.Clear();
             gMapControl_EA.Refresh();
@@ -6609,7 +6408,6 @@ namespace SLF
             // Disable buttons and TrackBar to prevent interaction while processing
             DEKRunSimulationButton.Enabled = false;
             DEKSimulasyonSonucGoruntule.Enabled = false;
-            //DEKSimButton.Enabled = false;
 
             try
             {
@@ -7312,12 +7110,13 @@ namespace SLF
         // Method to run the R script
         private async Task<string> RunModelRScript()
         {
-            ELFrScriptModelPath = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                    (string)ana_menu_form_objesi.config.İl,
-                    (string)ana_menu_form_objesi.config.ELF.Rscript_Yolu_Model).Replace('/', '\\');
+            ELFrScriptModelPath = Path.Combine((string)ana_menu_form_objesi.projectRoot,
+                    "Program Dosyaları/ELF/model.R").Replace('/', '\\');
 
             string configPath = Path.Combine(((string)ana_menu_form_objesi.projectRoot).Replace('/', '\\'),
                 "config.json");
+
+            MessageBox.Show(ELFrScriptModelPath);
 
             var processInfo = new ProcessStartInfo
             {
@@ -7770,6 +7569,41 @@ namespace SLF
                 // Remove any existing KeyPress event handlers to avoid duplicates
                 textBox.KeyPress -= TextBox_KeyPress_NumbersOnly;
                 textBox.KeyPress += TextBox_KeyPress_NumbersOnly;
+            }
+        }
+
+        private async void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                // Check if the user is in "adding charging station" mode
+                if (isAddingChargingStation)
+                {
+                    // Use the selected CellId from ModülFormu
+                    string cellId = item.Tag?.ToString() ?? ModülFormu.SelectedCellId;
+
+                    // Create a temporary marker for the charging station at the clicked location
+                    GMapMarker marker = new GMarkerGoogle(item.Position, GMarkerGoogleType.yellow)
+                    {
+                        ToolTipText = "Yeni Şarj İstasyonu",
+                        Tag = cellId // Store CellId in the marker's Tag temporarily
+                    };
+
+                    try
+                    {
+                        // Use the helper method to handle the popup form
+                        await HandlePopupFormAsync(item.Position, cellId);
+                    }
+                    catch
+                    {
+                        RemoveMarkerFromOverlays(marker);
+                    }
+
+                    // Reset the flag after adding the station
+                    isAddingChargingStation = false;
+
+                    return;
+                }
             }
         }
 

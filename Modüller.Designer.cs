@@ -514,10 +514,9 @@ namespace SLF
             this.dataGridView_girdi.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridView_girdi.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.dataGridView_girdi.BackgroundColor = System.Drawing.Color.Snow;
             this.dataGridView_girdi.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.dataGridView_girdi.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView_girdi.ColumnHeadersHeight = 29;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
             dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -544,7 +543,7 @@ namespace SLF
             dataGridViewCellStyle3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
             this.dataGridView_girdi.RowsDefaultCellStyle = dataGridViewCellStyle3;
             this.dataGridView_girdi.RowTemplate.Height = 24;
-            this.dataGridView_girdi.Size = new System.Drawing.Size(1692, 489);
+            this.dataGridView_girdi.Size = new System.Drawing.Size(4000, 489);
             this.dataGridView_girdi.TabIndex = 4;
             // 
             // panel_girdi_dısa_aktar
@@ -1466,6 +1465,7 @@ namespace SLF
             this.gMapControl_EA.Size = new System.Drawing.Size(1357, 3155);
             this.gMapControl_EA.TabIndex = 18;
             this.gMapControl_EA.Zoom = 0D;
+            this.gMapControl_EA.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(this.gMapControl_EA_OnMarkerClick);
             // 
             // tab_imar
             // 
@@ -2281,7 +2281,7 @@ namespace SLF
             this.ELFScenerioSaveButton.Location = new System.Drawing.Point(56, 38);
             this.ELFScenerioSaveButton.Margin = new System.Windows.Forms.Padding(4);
             this.ELFScenerioSaveButton.Name = "ELFScenerioSaveButton";
-            this.ELFScenerioSaveButton.Size = new System.Drawing.Size(141, 37);
+            this.ELFScenerioSaveButton.Size = new System.Drawing.Size(141, 53);
             this.ELFScenerioSaveButton.TabIndex = 12;
             this.ELFScenerioSaveButton.Text = "Değişiklikleri Kaydet";
             this.ELFScenerioSaveButton.UseVisualStyleBackColor = false;
