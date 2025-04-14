@@ -7244,9 +7244,10 @@ namespace SLF
                     (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_name).Replace('/', '\\');
                 LoadEkonometrikResults(results_path);
 
+
                 label_s_ELF.Visible = true;
-                label_sonuc_ELF.Visible = true;
-                label_sonuc_ELF.Text = (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_name; 
+                textBox_sonuc_ELF.Visible = true;
+                textBox_sonuc_ELF.Text = (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_name; ;
             }
             else if (SenaryoModuleTabControl.SelectedTab == EkonometrikGrafiklerTabPage)
             {
@@ -7255,8 +7256,8 @@ namespace SLF
                 PopulateEkonometrikComboBox();
                 comboBox_ekonometrik.Visible = true;
 
-                label_sonuc_ELF.Visible = true;
-                label_sonuc_ELF.Text = (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_name;
+                textBox_sonuc_ELF.Visible = true;
+                textBox_sonuc_ELF.Text = (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_name;
 
             }
 
@@ -7267,7 +7268,7 @@ namespace SLF
                 comboBox_ekonometrik.Visible = false;
 
                 label_s_ELF.Visible = false;
-                label_sonuc_ELF.Visible = false;
+                textBox_sonuc_ELF.Visible = false;
             }
         }
 

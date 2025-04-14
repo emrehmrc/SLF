@@ -112,8 +112,6 @@ namespace SLF
                     "TARIMSAL_SULAMA_ABONE_SAYISI",
                     "AYDINLATMA_ABONE_SAYISI",
                     "TOPLAM_ABONE_SAYISI",
-                    "BOLGE_YAZ_PUANT",
-                    "BOLGE_KIS_PUANT",
                     "GRP",
                     "GRP_TARIMSAL_URETIM",
                     "GRP_SANAYI_URETIM",
