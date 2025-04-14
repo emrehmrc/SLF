@@ -58,6 +58,7 @@ namespace SLF
             this.SelectFolderButton = new System.Windows.Forms.Button();
             this.tab_dek = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.CreateReportButton = new System.Windows.Forms.Button();
             this.DEKPointsLayerCheckBox = new System.Windows.Forms.CheckBox();
             this.DEKProgressBar = new System.Windows.Forms.ProgressBar();
             this.DEKStatusLabel = new System.Windows.Forms.Label();
@@ -283,7 +284,7 @@ namespace SLF
             this.Point_Load_Çiz = new System.Windows.Forms.ToolStripMenuItem();
             this.YGA_Çiz = new System.Windows.Forms.ToolStripMenuItem();
             this.miniToolStrip = new System.Windows.Forms.ToolStrip();
-            this.CreateReportButton = new System.Windows.Forms.Button();
+            this.CreateReportButton2 = new System.Windows.Forms.Button();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
             this.panel_proje_ekle.SuspendLayout();
@@ -739,6 +740,21 @@ namespace SLF
             this.panel1.Size = new System.Drawing.Size(1026, 43);
             this.panel1.TabIndex = 45;
             // 
+            // CreateReportButton
+            // 
+            this.CreateReportButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.CreateReportButton.FlatAppearance.BorderSize = 0;
+            this.CreateReportButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CreateReportButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.CreateReportButton.ForeColor = System.Drawing.Color.Snow;
+            this.CreateReportButton.Location = new System.Drawing.Point(423, 5);
+            this.CreateReportButton.Name = "CreateReportButton";
+            this.CreateReportButton.Size = new System.Drawing.Size(129, 31);
+            this.CreateReportButton.TabIndex = 63;
+            this.CreateReportButton.Text = "Rapor Oluştur";
+            this.CreateReportButton.UseVisualStyleBackColor = false;
+            this.CreateReportButton.Click += new System.EventHandler(this.CreateReportButton_Click);
+            // 
             // DEKPointsLayerCheckBox
             // 
             this.DEKPointsLayerCheckBox.AutoSize = true;
@@ -1119,6 +1135,7 @@ namespace SLF
             // panel_ea
             // 
             this.panel_ea.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            this.panel_ea.Controls.Add(this.CreateReportButton2);
             this.panel_ea.Controls.Add(this.EAPointsLayerCheckBox);
             this.panel_ea.Controls.Add(this.progressBar);
             this.panel_ea.Controls.Add(this.statusLabel);
@@ -1494,7 +1511,7 @@ namespace SLF
             this.ELFLowResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFLowResultsTable.Name = "ELFLowResultsTable";
             this.ELFLowResultsTable.RowHeadersWidth = 51;
-            this.ELFLowResultsTable.Size = new System.Drawing.Size(1163, 345);
+            this.ELFLowResultsTable.Size = new System.Drawing.Size(1163, 350);
             this.ELFLowResultsTable.TabIndex = 1;
             // 
             // ELFBaseResultsTabPage
@@ -1522,7 +1539,7 @@ namespace SLF
             this.ELFBaseResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFBaseResultsTable.Name = "ELFBaseResultsTable";
             this.ELFBaseResultsTable.RowHeadersWidth = 51;
-            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1163, 345);
+            this.ELFBaseResultsTable.Size = new System.Drawing.Size(1163, 350);
             this.ELFBaseResultsTable.TabIndex = 1;
             // 
             // ELFHighResultsTabPage
@@ -1550,7 +1567,7 @@ namespace SLF
             this.ELFHighResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFHighResultsTable.Name = "ELFHighResultsTable";
             this.ELFHighResultsTable.RowHeadersWidth = 51;
-            this.ELFHighResultsTable.Size = new System.Drawing.Size(1158, 345);
+            this.ELFHighResultsTable.Size = new System.Drawing.Size(1158, 350);
             this.ELFHighResultsTable.TabIndex = 1;
             // 
             // ELFMaxResultsTabPage
@@ -1579,7 +1596,7 @@ namespace SLF
             this.ELFMaxResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFMaxResultsTable.Name = "ELFMaxResultsTable";
             this.ELFMaxResultsTable.RowHeadersWidth = 51;
-            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1167, 348);
+            this.ELFMaxResultsTable.Size = new System.Drawing.Size(1167, 353);
             this.ELFMaxResultsTable.TabIndex = 1;
             // 
             // ELFGraphicOutputsTabPage
@@ -1608,7 +1625,7 @@ namespace SLF
             this.panel_ELF_Grafikler.Location = new System.Drawing.Point(3, 2);
             this.panel_ELF_Grafikler.Margin = new System.Windows.Forms.Padding(4);
             this.panel_ELF_Grafikler.Name = "panel_ELF_Grafikler";
-            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1163, 268);
+            this.panel_ELF_Grafikler.Size = new System.Drawing.Size(1163, 273);
             this.panel_ELF_Grafikler.TabIndex = 6;
             // 
             // pictureBox_ELF_5
@@ -3730,14 +3747,20 @@ namespace SLF
             this.miniToolStrip.Size = new System.Drawing.Size(1437, 32);
             this.miniToolStrip.TabIndex = 36;
             // 
-            // CreateReportButton
+            // CreateReportButton2
             // 
-            this.CreateReportButton.Location = new System.Drawing.Point(423, 5);
-            this.CreateReportButton.Name = "CreateReportButton";
-            this.CreateReportButton.Size = new System.Drawing.Size(129, 31);
-            this.CreateReportButton.TabIndex = 63;
-            this.CreateReportButton.Text = "Rapor Oluştur";
-            this.CreateReportButton.UseVisualStyleBackColor = true;
+            this.CreateReportButton2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.CreateReportButton2.FlatAppearance.BorderSize = 0;
+            this.CreateReportButton2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CreateReportButton2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.CreateReportButton2.ForeColor = System.Drawing.Color.Snow;
+            this.CreateReportButton2.Location = new System.Drawing.Point(488, 6);
+            this.CreateReportButton2.Name = "CreateReportButton2";
+            this.CreateReportButton2.Size = new System.Drawing.Size(129, 31);
+            this.CreateReportButton2.TabIndex = 64;
+            this.CreateReportButton2.Text = "Rapor Oluştur";
+            this.CreateReportButton2.UseVisualStyleBackColor = false;
+            this.CreateReportButton2.Click += new System.EventHandler(this.CreateReportButton2_Click);
             // 
             // ModülFormu
             // 
@@ -4111,5 +4134,6 @@ namespace SLF
         private CheckBox EAPointsLayerCheckBox;
         private PictureBox buton_HTML;
         private Button CreateReportButton;
+        private Button CreateReportButton2;
     }
 }

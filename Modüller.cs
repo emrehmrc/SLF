@@ -7215,6 +7215,56 @@ namespace SLF
                 MessageBox.Show($"Error exporting heatmap: {ex.Message}");
             }
         }
+        private void CreateReportButton_Click(object sender, EventArgs e)
+        {
+            ReportTableForm popup = new ReportTableForm("DEK");
+            if (popup.ShowDialog() == DialogResult.OK)
+            {
+                // Handle OK case if needed
+            }
+            else if (popup.OperationCancelled)
+            {
+                MessageBox.Show("İşlem iptal edildi.");
+            }
+        }
+
+        private void CreateReportButton2_Click(object sender, EventArgs e)
+        {
+            ReportTableForm popup = new ReportTableForm("EA");
+            if (popup.ShowDialog() == DialogResult.OK)
+            {
+                // Handle OK case if needed
+            }
+            else if (popup.OperationCancelled)
+            {
+                MessageBox.Show("İşlem iptal edildi.");
+            }
+        }
+        /*        private void CreateReportButton_Click(object sender, EventArgs e)
+                {
+                    ReportTableForm popup = new ReportTableForm();
+                    if (popup.ShowDialog() == DialogResult.OK)
+                    {
+
+                    }
+                    else if (popup.OperationCancelled)
+                    {
+                        MessageBox.Show("İşlem iptal edildi.");
+                    }
+                }
+
+                private void CreateReportButton2_Click(object sender, EventArgs e)
+                {
+                    ReportTableForm popup = new ReportTableForm();
+                    if (popup.ShowDialog() == DialogResult.OK)
+                    {
+
+                    }
+                    else if (popup.OperationCancelled)
+                    {
+                        MessageBox.Show("İşlem iptal edildi.");
+                    }
+                }*/
 
         private void ELFTahminButonu_Click(object sender, EventArgs e)
         {
