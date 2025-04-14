@@ -37,7 +37,6 @@
             this.DEKCancelButton = new System.Windows.Forms.Button();
             this.DEKCenterpanel1_Dek_Popup = new System.Windows.Forms.Panel();
             this.DEKCenterDataGridView = new System.Windows.Forms.DataGridView();
-            this.ILCE_ADI = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.KAYNAK_TIPI = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.DEK_KURULU_GUCU = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -58,7 +57,7 @@
             this.DEKCenterpanel2_Dek_Popup.Controls.Add(this.DEKCancelButton);
             this.DEKCenterpanel2_Dek_Popup.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.DEKCenterpanel2_Dek_Popup.Location = new System.Drawing.Point(0, 484);
-            this.DEKCenterpanel2_Dek_Popup.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.DEKCenterpanel2_Dek_Popup.Margin = new System.Windows.Forms.Padding(4);
             this.DEKCenterpanel2_Dek_Popup.Name = "DEKCenterpanel2_Dek_Popup";
             this.DEKCenterpanel2_Dek_Popup.Size = new System.Drawing.Size(1372, 76);
             this.DEKCenterpanel2_Dek_Popup.TabIndex = 4;
@@ -72,7 +71,7 @@
             this.DEKTamamButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.DEKTamamButton.ForeColor = System.Drawing.Color.White;
             this.DEKTamamButton.Location = new System.Drawing.Point(1128, 12);
-            this.DEKTamamButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.DEKTamamButton.Margin = new System.Windows.Forms.Padding(4);
             this.DEKTamamButton.Name = "DEKTamamButton";
             this.DEKTamamButton.Size = new System.Drawing.Size(240, 55);
             this.DEKTamamButton.TabIndex = 4;
@@ -89,7 +88,7 @@
             this.DEKCancelButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.DEKCancelButton.ForeColor = System.Drawing.Color.White;
             this.DEKCancelButton.Location = new System.Drawing.Point(880, 12);
-            this.DEKCancelButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.DEKCancelButton.Margin = new System.Windows.Forms.Padding(4);
             this.DEKCancelButton.Name = "DEKCancelButton";
             this.DEKCancelButton.Size = new System.Drawing.Size(240, 55);
             this.DEKCancelButton.TabIndex = 3;
@@ -103,7 +102,7 @@
             this.DEKCenterpanel1_Dek_Popup.Controls.Add(this.DEKCenterDataGridView);
             this.DEKCenterpanel1_Dek_Popup.Dock = System.Windows.Forms.DockStyle.Fill;
             this.DEKCenterpanel1_Dek_Popup.Location = new System.Drawing.Point(0, 0);
-            this.DEKCenterpanel1_Dek_Popup.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.DEKCenterpanel1_Dek_Popup.Margin = new System.Windows.Forms.Padding(4);
             this.DEKCenterpanel1_Dek_Popup.Name = "DEKCenterpanel1_Dek_Popup";
             this.DEKCenterpanel1_Dek_Popup.Size = new System.Drawing.Size(1372, 560);
             this.DEKCenterpanel1_Dek_Popup.TabIndex = 3;
@@ -129,7 +128,6 @@
             this.DEKCenterDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.DEKCenterDataGridView.ColumnHeadersHeight = 25;
             this.DEKCenterDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.ILCE_ADI,
             this.ID,
             this.KAYNAK_TIPI,
             this.DEK_KURULU_GUCU,
@@ -150,7 +148,7 @@
             this.DEKCenterDataGridView.EnableHeadersVisualStyles = false;
             this.DEKCenterDataGridView.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255)))));
             this.DEKCenterDataGridView.Location = new System.Drawing.Point(37, 38);
-            this.DEKCenterDataGridView.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.DEKCenterDataGridView.Margin = new System.Windows.Forms.Padding(4);
             this.DEKCenterDataGridView.Name = "DEKCenterDataGridView";
             this.DEKCenterDataGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -166,14 +164,6 @@
             this.DEKCenterDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.DEKCenterDataGridView.Size = new System.Drawing.Size(1296, 438);
             this.DEKCenterDataGridView.TabIndex = 7;
-            // 
-            // ILCE_ADI
-            // 
-            this.ILCE_ADI.HeaderText = "ILCE_ADI";
-            this.ILCE_ADI.MinimumWidth = 6;
-            this.ILCE_ADI.Name = "ILCE_ADI";
-            this.ILCE_ADI.Visible = false;
-            this.ILCE_ADI.Width = 82;
             // 
             // ID
             // 
@@ -262,7 +252,7 @@
             this.Controls.Add(this.DEKCenterpanel2_Dek_Popup);
             this.Controls.Add(this.DEKCenterpanel1_Dek_Popup);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "DEKCenterPopupForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "DEK Merkezi Bilgileri";
@@ -279,7 +269,6 @@
         private System.Windows.Forms.Button DEKCancelButton;
         private System.Windows.Forms.Button DEKTamamButton;
         private System.Windows.Forms.DataGridView DEKCenterDataGridView;
-        private System.Windows.Forms.DataGridViewComboBoxColumn ILCE_ADI;
         private System.Windows.Forms.DataGridViewTextBoxColumn ID;
         private System.Windows.Forms.DataGridViewComboBoxColumn KAYNAK_TIPI;
         private System.Windows.Forms.DataGridViewTextBoxColumn DEK_KURULU_GUCU;

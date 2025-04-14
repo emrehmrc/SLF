@@ -33,20 +33,6 @@ namespace SLF
         {
             return Constants.DekValueToCountColumn.TryGetValue(dekValue, out string columnName) ? columnName : null;
         }
-/*        // Define a dictionary for cities and their coordinates
-        private Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
-    {
-        { "İzmir", new PointLatLng(38.4192, 27.1287) },
-        { "Eskişehir", new PointLatLng(39.7768, 30.5206) },
-        // Add more cities and their coordinates as needed
-    };
-
-        // Define districts for İzmir and Eskişehir
-        private Dictionary<string, List<string>> cityDistricts = new Dictionary<string, List<string>>
-    {
-        { "İzmir", new List<string> { "Aliağa", "Balçova", "Bayındır", "Bayraklı", "Bergama", "Beydağ", "Bornova", "Buca", "Çeşme", "Çiğli", "Dikili", "Foça", "Gaziemir", "Güzelbahçe", "Karabağlar", "Karaburun", "Karşıyaka", "Kemalpaşa", "Kınık", "Kiraz", "Konak", "Menderes", "Menemen", "Narlıdere", "Ödemiş", "Seferihisar", "Selçuk", "Tire", "Torbalı" } },
-        { "Eskişehir", new List<string> { "Alpu", "Beylikova", "Çifteler", "Günyüzü", "Han", "İnönü", "Mahmudiye", "Mihalgazi", "Mihalıççık", "Odunpazarı", "Sarıcakaya", "Seyitgazi", "Sivrihisar", "Tepebaşı" } }
-    };*/
 
         public DEKCenterPopupForm(DataTable existingDataTable, NoktaVeri veri)
         {
@@ -93,93 +79,7 @@ namespace SLF
             //  DEKCenterDataGridView.CellValueChanged += DEKCenterDataGridView_CellValueChanged;
         }
 
-/*        private void PopulateCityComboBox()
-        {
-            var comboBoxColumn = DEKCenterDataGridView.Columns["ILCE_ADI"] as DataGridViewComboBoxColumn;
 
-            if (comboBoxColumn != null)
-            {
-                // Clear the existing items in the ComboBox column
-                comboBoxColumn.Items.Clear();
-
-                // Add the districts for each city into the ComboBox column
-                foreach (var city in cityCoordinates.Keys)
-                {
-                    if (cityDistricts.ContainsKey(city))
-                    {
-                        comboBoxColumn.Items.AddRange(cityDistricts[city].ToArray());
-                    }
-                }
-
-                // Optionally set the first item as the default if needed
-                var comboBoxCell = DEKCenterDataGridView.Rows[0].Cells["ILCE_ADI"] as DataGridViewComboBoxCell;
-                if (comboBoxCell != null && comboBoxColumn.Items.Count > 0)
-                {
-                    // Clear the selection if necessary and update it
-                    comboBoxCell.Value = null;
-                }
-            }
-        }
-        private void FilterCountiesBasedOnCoordinates(double selectedX, double selectedY)
-        {
-            var closestCity = cityCoordinates
-                              .OrderBy(city => GetDistance(city.Value.Lat, city.Value.Lng, selectedX, selectedY))
-                              .FirstOrDefault();
-
-            Console.WriteLine($"Selected Coordinates: X={selectedX}, Y={selectedY}");
-            Console.WriteLine($"Closest City: {closestCity.Key}");
-
-            if (closestCity.Key != null)
-            {
-                var comboBoxColumn = DEKCenterDataGridView.Columns["ILCE_ADI"] as DataGridViewComboBoxColumn;
-
-                if (comboBoxColumn != null)
-                {
-                    // Get the current cell and its value
-                    var comboBoxCell = DEKCenterDataGridView.Rows[0].Cells["ILCE_ADI"] as DataGridViewComboBoxCell;
-                    string currentDistrict = comboBoxCell?.Value?.ToString();
-
-                    // Temporarily disable the CellValueChanged event
-                    DEKCenterDataGridView.CellValueChanged -= DEKCenterDataGridView_CellValueChanged;
-
-                    try
-                    {
-                        // Clear the current value to avoid validation errors
-                        if (comboBoxCell != null)
-                        {
-                            comboBoxCell.Value = null;
-                        }
-
-                        // Update the items list
-                        comboBoxColumn.Items.Clear();
-                        if (cityDistricts.ContainsKey(closestCity.Key))
-                        {
-                            comboBoxColumn.Items.AddRange(cityDistricts[closestCity.Key].ToArray());
-                        }
-
-                        Console.WriteLine($"Added Districts: {string.Join(", ", cityDistricts[closestCity.Key])}");
-
-                        // Restore the current district if it's still valid, otherwise set a default
-                        if (comboBoxCell != null)
-                        {
-                            if (!string.IsNullOrEmpty(currentDistrict) && comboBoxColumn.Items.Contains(currentDistrict))
-                            {
-                                comboBoxCell.Value = currentDistrict;
-                            }
-                            else
-                            {
-                                comboBoxCell.Value = comboBoxColumn.Items.Count > 0 ? comboBoxColumn.Items[0] : null;
-                            }
-                        }
-                    }
-                    finally
-                    {
-                        // Re-enable the CellValueChanged event
-                        DEKCenterDataGridView.CellValueChanged += DEKCenterDataGridView_CellValueChanged;
-                    }
-                }
-            }
-        }*/
 
         private void DEKCenterDataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
