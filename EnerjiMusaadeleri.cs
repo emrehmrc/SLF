@@ -15,6 +15,7 @@ namespace SLF
     {
         protected override List<string> Prerequisites => new List<string> { "DTR Verileri", "Yeni Projelendirilmiş DTR Verileri" };
         private int veerUniqID = 1; // Class-level field
+
         private void ImputeMustakilOlmayanTrafoID(List<int> missingCoordinatesRows, List<int> imputedTrafoRows, List<int> noNearestTrafoRows, List<int> newTrafoCreatedRows)
         {
             DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
@@ -374,7 +375,6 @@ namespace SLF
                 summaryMessage
             );
         }
-
         private void ReportOGBaglanacagiTrafo()
         {
             int totalRows = currentDataTable.Rows.Count;
@@ -427,6 +427,7 @@ namespace SLF
                 }
             }
         }
+
 
         private void ImputeEnerjilendirmeYılı()
         {
@@ -586,130 +587,7 @@ namespace SLF
                 }
             }
         }
-        /*        private void ReportNullCounts()
-                {
-                    int totalRows = currentDataTable.Rows.Count;
 
-                    foreach (DataColumn column in currentDataTable.Columns)
-                    {
-                        // Only process monitored columns.
-                        if (!nullFieldsCheckWithLevel.ContainsKey(column.ColumnName))
-                        {
-                            continue;
-                        }
-
-                        List<int> nullRows = new List<int>();
-                        int nullCount = 0;
-
-                        // Process each row for the current column to collect NULL rows.
-                        for (int i = 0; i < totalRows; i++)
-                        {
-                            DataRow row = currentDataTable.Rows[i];
-                            if (IsNullLike(row[column]))
-                            {
-                                nullCount++;
-                                nullRows.Add(i);
-                            }
-                        }
-
-                        // Log a single summary entry for the column if there are NULLs.
-                        if (nullCount > 0)
-                        {
-                            float nullPercentage = (float)nullCount / totalRows;
-
-                            // Special case for ENERJI_MUSAADE_TALEP_DURUMU
-                            if (column.ColumnName == "ENERJI_MUSAADE_TALEP_DURUMU")
-                            {
-                                string warningMessage = $"NULL değerler Onaylandı/Tamamlandı(0) olarak kabul edilerek devam edilecektir. (Satır: {string.Join(", ", nullRows)})";
-
-                                warningDataTable.Rows.Add(
-                                    "Talep Durumu Validasyonu",                          // No specific enerjiMusaadeNo since this is a summary
-                                    column.ColumnName,           // ReportType
-                                    $"{nullPercentage:P1}",      // Details (percentage of NULLs)
-                                    warningMessage               // Action message with row indices
-                                );
-                            }
-                            // Special case for ENERJI_MUSAADE_TALEP_DURUMU
-                            if (column.ColumnName == "ENERJI_MUSAADE_GERILIM_SEVIYESI")
-                            {
-                                string warningMessage = $"Silinecekler Mesajı: {column.ColumnName} için NULL veya geçersiz olan satırlar silinecektir. (Satır: {string.Join(", ", nullRows)})";
-
-                                infoDataTable.Rows.Add(
-                                    "Gerilim Seviyesi Validasyonu",                          // No specific enerjiMusaadeNo since this is a summary
-                                    column.ColumnName,           // ReportType
-                                    $"{nullPercentage:P1}",      // Details (percentage of NULLs)
-                                    warningMessage               // Action message with row indices
-                                );
-                            }
-
-                            else
-                            {
-                                // Default behavior for other columns
-                                string warningMessage = $"Silinecekler Mesajı: {column.ColumnName} için NULL veya geçersiz olan satırlara silinecektir. (Satır: {string.Join(", ", nullRows)})";
-
-                                infoDataTable.Rows.Add(
-                                    "NULL Değer Validasyonu",                          // No specific enerjiMusaadeNo since this is a summary
-                                    column.ColumnName,           // ReportType
-                                    $"{nullPercentage:P1}",      // Details (percentage of NULLs)
-                                    warningMessage               // Action message with row indices
-                                );
-                            }
-                        }
-
-                        // Ensure an entry exists in columnNullRowsMap for later removal.
-                        if (columnNullRowsMap.ContainsKey(column.ColumnName))
-                        {
-                            columnNullRowsMap[column.ColumnName] = nullRows;
-                        }
-                        else
-                        {
-                            columnNullRowsMap.Add(column.ColumnName, nullRows);
-                        }
-                    }
-                }
-        */
-
-        /*        private void ReportNullCounts()
-                {
-                    float nullPercentage = 0.0f;
-                    int totalRows = currentDataTable.Rows.Count;
-
-                    foreach (DataColumn column in currentDataTable.Columns)
-                    {
-                        if (!nullFieldsCheckWithLevel.ContainsKey(column.ColumnName))
-                        {
-                            continue;
-                        }
-
-                        List<int> nullRows = new List<int>();
-
-                        int nullCount = 0;
-
-                        for (int i = 0; i < totalRows; i++)
-                        {
-                            var row = currentDataTable.Rows[i];
-                            if (IsNullLike(row[column]))
-                            {
-                                nullCount++;
-                                // Add the row number and the null-like value to the nullRows
-                                nullRows.Add(i);
-                            }
-                        }
-
-                        columnNullRowsMap[column.ColumnName] = nullRows;
-
-                        nullPercentage = (float)nullCount / totalRows;
-
-                        if (nullPercentage > 0)
-                        {
-                            var thresholds = nullFieldsCheckWithLevel[column.ColumnName];
-                            var datatableLevel = GetDataTableBasedOnThreshold(nullPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
-                            datatableLevel.Rows.Add(new object[] {
-                                column.ColumnName, "Null değer", $"{nullPercentage:P1}"
-                            });
-                        }
-                    }
-                }*/
         public override void Validate()
         {
             base.Validate();
@@ -740,41 +618,7 @@ namespace SLF
                 Console.WriteLine($"Column: {row[0]}, ValidationType: {row[1]}, Details: {row[2]}, Message: {row[3]}");
             }
         }
-        /*        public override void Validate()
-                {
-                    base.Validate();
-                    RemoveDuplicateRows();
 
-                    // Single source of truth
-                    List<(DataRow row, int index)> capacityViolations = ConvertAndValidateBaglantiGucu();
-                    ReportRemovedRows(capacityViolations);
-
-                    // Actually remove rows
-                    foreach (var (row, _) in capacityViolations)
-                    {
-                        currentDataTable.Rows.Remove(row);
-                    }
-                    ReportNullCounts();
-                    ReportOGBaglanacagiTrafo();  
-                }*/
-        /*        public override void Validate()
-                {
-                    base.Validate();
-                    RemoveDuplicateRows();
-
-                    // Single source of truth
-                    List<DataRow> capacityViolations = ConvertAndValidateBaglantiGucu();
-                    ReportRemovedRows(capacityViolations);
-
-                    // Actually remove rows
-                    foreach (DataRow row in capacityViolations)
-                    {
-                        currentDataTable.Rows.Remove(row);
-                    }
-
-                    ReportNullCounts();
-                    ReportOGBaglanacagiTrafo();
-                }*/
         public override void Impute()
         {
             ImputeOnay();
@@ -810,3 +654,4 @@ namespace SLF
         }
     }
 }
+
