@@ -234,8 +234,8 @@ namespace SLF
                             // Optionally create a new sheet if it doesn’t exist
                             worksheet = package.Workbook.Worksheets.Add(year.ToString());
                             worksheet.Cells[1, 1].Value = "ID";
-                            worksheet.Cells[1, 11].Value = "EA_X_KOORDINAT";
-                            worksheet.Cells[1, 12].Value = "EA_Y_KOORDINAT";
+                            worksheet.Cells[1, 12].Value = "EA_X_KOORDINAT";
+                            worksheet.Cells[1, 11].Value = "EA_Y_KOORDINAT";
                             worksheet.Cells[1, 7].Value = "AC (Home)_count";
                             worksheet.Cells[1, 8].Value = "AC (Work)_count";
                             worksheet.Cells[1, 9].Value = "AC (Public)_count";
@@ -252,8 +252,8 @@ namespace SLF
                             if (existingId == cellId)
                             {
                                 // Update coordinates
-                                worksheet.Cells[i, 11].Value = enlem;
-                                worksheet.Cells[i, 12].Value = boylam;
+                                worksheet.Cells[i, 12].Value = enlem;
+                                worksheet.Cells[i, 11].Value = boylam;
 
                                 // Increment the count for the selected station type
                                 int columnIndex = worksheet.Cells[1, 1, 1, worksheet.Dimension.End.Column]
@@ -274,8 +274,8 @@ namespace SLF
                         {
                             int newRowIndex = lastRow + 1;
                             worksheet.Cells[newRowIndex, 1].Value = cellId;
-                            worksheet.Cells[newRowIndex, 11].Value = enlem;
-                            worksheet.Cells[newRowIndex, 12].Value = boylam;
+                            worksheet.Cells[newRowIndex, 12].Value = enlem;
+                            worksheet.Cells[newRowIndex, 11].Value = boylam;
 
                             // Set initial counts (1 for the selected type, 0 for others)
                             worksheet.Cells[newRowIndex, 7].Value = stationType == "AC (Home)_count" ? 1 : 0;
