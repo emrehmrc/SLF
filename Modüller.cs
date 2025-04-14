@@ -4110,26 +4110,6 @@ namespace SLF
 
             DataTable dek_veri;
 
-            /*            try
-                        {
-                            // Excel dosyasını aç
-                            using (var package = new ExcelPackage(new FileInfo(filePath)))
-                            {
-                                // Yıl seçimine göre sayfayı seç (SelectedYear değeri, sayfa indeksini temsil eder)
-                                ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
-
-                                // Veriyi DataTable'a yükle
-                                dek_veri = excelService.LoadWorksheetIntoDataTable(worksheet);
-                            }
-
-                            // Veri başarıyla yüklendiğinde bir bildirim gösterin
-                            MessageBox.Show("Veri başarıyla yüklendi.");
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
-                            return; // Hata durumunda işlemi sonlandır
-                        }*/
             try
             {
                 // Excel dosyasını aç
@@ -7263,6 +7243,10 @@ namespace SLF
                     (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_klasör,
                     (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_name).Replace('/', '\\');
                 LoadEkonometrikResults(results_path);
+
+                label_s_ELF.Visible = true;
+                label_sonuc_ELF.Visible = true;
+                label_sonuc_ELF.Text = (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_name; 
             }
             else if (SenaryoModuleTabControl.SelectedTab == EkonometrikGrafiklerTabPage)
             {
@@ -7270,6 +7254,10 @@ namespace SLF
                 label_graphics.Visible = true;
                 PopulateEkonometrikComboBox();
                 comboBox_ekonometrik.Visible = true;
+
+                label_sonuc_ELF.Visible = true;
+                label_sonuc_ELF.Text = (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_name;
+
             }
 
             else
@@ -7277,6 +7265,9 @@ namespace SLF
                 EkonometrikSenaryoElementsPanel.Visible = true;
                 label_graphics.Visible = false;
                 comboBox_ekonometrik.Visible = false;
+
+                label_s_ELF.Visible = false;
+                label_sonuc_ELF.Visible = false;
             }
         }
 

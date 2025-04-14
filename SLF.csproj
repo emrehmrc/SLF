@@ -647,7 +647,7 @@
     <Compile Include="ProjectFolderPicker.Designer.cs">
       <DependentUpon>ProjectFolderPicker.cs</DependentUpon>
     </Compile>
-    <Compile Include="Services\Class1.cs" />
+    <Compile Include="Services\ControlExtensions.cs" />
     <Compile Include="Services\DatabaseHelpers.cs" />
     <Compile Include="Services\DatabaseManager .cs" />
     <Compile Include="Services\PathService.cs" />

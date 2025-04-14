@@ -9,7 +9,7 @@
     "ŞABLON": "Ekonometrik Yük Tahmini Verileri/ŞABLON.xlsx",
     "Rscript_Yolu_Model": "PROGRAM DOSYALARI/ELF/model.R",
     "Rscript_Yolu_Senaryolar": "PROGRAM DOSYALARI/ELF/senaryolar.R",
-    "ufuk_yılı": 12
+    "ufuk_yılı": 11
   },
   "Veritabanı": {
     "Server Address": "",
