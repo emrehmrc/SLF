@@ -31,7 +31,6 @@ namespace SLF
         {
             { "TRAFO_KURULUM_TARIHI", WarningErrorBoundary(0.2f) },
         };
-
         private void ReportDateFormatErrors()
         {
             float invalidPercentage = 0.0f;
@@ -234,11 +233,10 @@ namespace SLF
                 });
             }
         }
-
         private readonly List<string> duplicateFieldsGivingError = new List<string>
-        {
-            "TRAFO_KODU"
-        };
+{
+    "TRAFO_KODU"
+};
 
         private void ReportCompositeDuplicateCounts()
         {
@@ -574,7 +572,6 @@ namespace SLF
                 });
             }
         }
-
         private void ReportSekonderGerilim()
         {
             int totalRows = currentDataTable.Rows.Count;
@@ -642,7 +639,6 @@ namespace SLF
                 });
             }
         }
-
         /// <summary>
         /// Trafo demand değerlerini kontrol eder ve kapasite limitlerini aşan değerleri kapasite değerine eşitler.
         /// </summary>
@@ -952,7 +948,37 @@ namespace SLF
             columnNullRowsMap[column] = new List<int>(); // Clear after successful imputation
         }
 
+        private void ImputeTrafoKapasitesi()
+        {
+            var column = "TRAFO_KAPASITESI";
+            var refColumn = $"YIL_DEMANT_{lastYear}";
+            double demandFactor = 2.5;
+            double tentativeKapasite;
+            foreach (int missingIndex in columnNullRowsMap[column])
+            {
+                var missingRow = currentDataTable.Rows[missingIndex];
 
+                var refValue = missingRow[refColumn];
+
+                if (!IsNullLike(refValue))
+                {
+                    if (double.TryParse(refValue?.ToString(), out double demand))
+                    {
+                        // Calculate the tentative kapasite
+                        tentativeKapasite = demand * demandFactor;
+
+                        // Find the closest kapasite value in the list
+                        double kapasite = TRAFO_KAPASITE_LISTESI.OrderBy(x => Math.Abs(x - tentativeKapasite)).First();
+                        // Assign the calculated kapasite to the missing row
+                        missingRow[column] = kapasite;
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"'{refColumn}' column has invalid data format at row index {missingIndex}.");
+                    }
+                }
+            }
+        }
         private void ImputeDemand()
         {
             var demandColumn = $"YIL_DEMANT_{lastYear}";
@@ -1068,7 +1094,6 @@ namespace SLF
                 }
             }
         }
-
         private void ImputeTMFiderID()
         {
             // 0.01 is the 2d distance of the delta of x and y coordinates, approximately 1 km (assuming degree-based coordinates).
@@ -1132,7 +1157,6 @@ namespace SLF
                 }
             }
         }
-
         private void ReportErrorLessThanZero(string columnName)
         {
             float nullPercentage, negativePercentage, zeroPercentage, formatPercentage;
