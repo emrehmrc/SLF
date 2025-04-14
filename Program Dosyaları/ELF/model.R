@@ -75,7 +75,7 @@ excel_template_path <- paste0(config$Ana_Klasör_Yolu, "/",
 d <- read_excel(excel_input_file_path,
                 sheet = 1,
                 col_names = TRUE,
-                col_types = rep("numeric", 45)) %>%
+                col_types = rep("numeric", 43)) %>%
   as.data.frame()
 
 
@@ -122,22 +122,20 @@ bolge_full_2013 <- as.data.frame(cbind(Mesken_tuketim = data_preparation(filled_
                                        Ticarethane_tuketim = data_preparation(filled_cells(d, 14))$faturalanan,
                                        Sulama_tuketim = data_preparation(filled_cells(d, 15))$faturalanan,
                                        Aydınlatma_tuketim = data_preparation(filled_cells(d, 16))$faturalanan,
-                                       GRP = d[index:(index+nrow_dataset_tuketim-1),26],
-                                       GRP_lag1 = d[(index-1):(index-1+nrow_dataset_tuketim-1),26],
+                                       GRP = d[index:(index+nrow_dataset_tuketim-1),24],
+                                       GRP_lag1 = d[(index-1):(index-1+nrow_dataset_tuketim-1),24],
                                        ILCE_NUFUS = d[index:(index+nrow_dataset_tuketim-1),3],
-                                       Sanayi_üretimi = d[index:(index+nrow_dataset_tuketim-1),28],
-                                       Tarım_üretimi = d[index:(index+nrow_dataset_tuketim-1),27],
-                                       Hizmet_üretimi = d[index:(index+nrow_dataset_tuketim-1),29],
-                                       Insaat_üretimi = d[index:(index+nrow_dataset_tuketim-1),30],
-                                       HDD = d[index:(index+nrow_dataset_tuketim-1),45],
-                                       CDD = d[index:(index+nrow_dataset_tuketim-1),44],
+                                       Sanayi_üretimi = d[index:(index+nrow_dataset_tuketim-1),26],
+                                       Tarım_üretimi = d[index:(index+nrow_dataset_tuketim-1),25],
+                                       Hizmet_üretimi = d[index:(index+nrow_dataset_tuketim-1),27],
+                                       Insaat_üretimi = d[index:(index+nrow_dataset_tuketim-1),28],
+                                       HDD = d[index:(index+nrow_dataset_tuketim-1),43],
+                                       CDD = d[index:(index+nrow_dataset_tuketim-1),42],
                                        Mesken_abone = data_preparation(filled_cells(d, 18))$faturalanan %>% round(0),
                                        Sanayi_abone = data_preparation(filled_cells(d, 19))$faturalanan %>% round(0),
                                        Ticarethane_abone = data_preparation(filled_cells(d, 20))$faturalanan %>% round(0),
                                        Sulama_abone = data_preparation(filled_cells(d, 21))$faturalanan %>% round(0),
-                                       Aydınlatma_abone = data_preparation(filled_cells(d, 22))$faturalanan %>% round(0),
-                                       summer_demand = data_preparation(filled_cells(d, 24))$faturalanan,
-                                       winter_demand = data_preparation(filled_cells(d, 25))$faturalanan))
+                                       Aydınlatma_abone = data_preparation(filled_cells(d, 22))$faturalanan %>% round(0)))
 
 # full dataset related with bolge's billed consumption since 2014
 bolge_full_2014 <- as.data.frame(cbind(Mesken_tuketim = data_preparation(filled_cells(d, 12))$faturalanan[-1],
@@ -150,15 +148,15 @@ bolge_full_2014 <- as.data.frame(cbind(Mesken_tuketim = data_preparation(filled_
                                        Sulama_tuketim_lag1 = data_preparation(filled_cells(d, 15))$faturalanan[-nrow_dataset_tuketim],
                                        Aydınlatma_tuketim = data_preparation(filled_cells(d, 16))$faturalanan[-1],
                                        Aydınlatma_tuketim_lag1 = data_preparation(filled_cells(d, 16))$faturalanan[-nrow_dataset_tuketim],
-                                       GRP = d[(index+1):(index+nrow_dataset_tuketim-1),26][-nrow_dataset_tuketim],
-                                       GRP_lag1 = d[(index):(index+nrow_dataset_tuketim-1),26][-nrow_dataset_tuketim],
+                                       GRP = d[(index+1):(index+nrow_dataset_tuketim-1),25][-nrow_dataset_tuketim],
+                                       GRP_lag1 = d[(index):(index+nrow_dataset_tuketim-1),25][-nrow_dataset_tuketim],
                                        ILCE_NUFUS = d[(index+1):(index+nrow_dataset_tuketim-1),3][-nrow_dataset_tuketim],
-                                       Sanayi_üretimi = d[(index+1):(index+nrow_dataset_tuketim-1),28][-nrow_dataset_tuketim],
-                                       Tarım_üretimi = d[(index+1):(index+nrow_dataset_tuketim-1),27][-nrow_dataset_tuketim],
-                                       Hizmet_üretimi = d[(index+1):(index+nrow_dataset_tuketim-1),29][-nrow_dataset_tuketim],
-                                       Insaat_üretimi = d[(index+1):(index+nrow_dataset_tuketim-1),30][-nrow_dataset_tuketim],
-                                       HDD = d[(index+1):(index+nrow_dataset_tuketim-1),45][-nrow_dataset_tuketim],
-                                       CDD = d[(index+1):(index+nrow_dataset_tuketim-1),44][-nrow_dataset_tuketim],
+                                       Sanayi_üretimi = d[(index+1):(index+nrow_dataset_tuketim-1),26][-nrow_dataset_tuketim],
+                                       Tarım_üretimi = d[(index+1):(index+nrow_dataset_tuketim-1),25][-nrow_dataset_tuketim],
+                                       Hizmet_üretimi = d[(index+1):(index+nrow_dataset_tuketim-1),27][-nrow_dataset_tuketim],
+                                       Insaat_üretimi = d[(index+1):(index+nrow_dataset_tuketim-1),28][-nrow_dataset_tuketim],
+                                       HDD = d[(index+1):(index+nrow_dataset_tuketim-1),43][-nrow_dataset_tuketim],
+                                       CDD = d[(index+1):(index+nrow_dataset_tuketim-1),42][-nrow_dataset_tuketim],
                                        Mesken_abone = data_preparation(filled_cells(d, 18))$faturalanan[-1],
                                        Mesken_abone_lag1 = data_preparation(filled_cells(d, 18))$faturalanan[-nrow_dataset_tuketim],
                                        Sanayi_abone = data_preparation(filled_cells(d, 19))$faturalanan[-1],
@@ -168,11 +166,7 @@ bolge_full_2014 <- as.data.frame(cbind(Mesken_tuketim = data_preparation(filled_
                                        Sulama_abone = data_preparation(filled_cells(d, 21))$faturalanan[-1],
                                        Sulama_abone_lag1 = data_preparation(filled_cells(d, 21))$faturalanan[-nrow_dataset_tuketim],
                                        Aydınlatma_abone = data_preparation(filled_cells(d, 22))$faturalanan[-1],
-                                       Aydınlatma_abone_lag1 = data_preparation(filled_cells(d, 22))$faturalanan[-nrow_dataset_tuketim],
-                                       summer_demand = data_preparation(filled_cells(d, 24))$faturalanan[-1],
-                                       summer_demand_lag1 = data_preparation(filled_cells(d, 24))$faturalanan[-nrow_dataset_tuketim],
-                                       winter_demand = data_preparation(filled_cells(d, 25))$faturalanan[-1],
-                                       winter_demand_lag1 = data_preparation(filled_cells(d, 25))$faturalanan[-nrow_dataset_tuketim]))
+                                       Aydınlatma_abone_lag1 = data_preparation(filled_cells(d, 22))$faturalanan[-nrow_dataset_tuketim]))
 
 
 
@@ -207,7 +201,7 @@ senaryolar_5 <- read_excel(excel_input_file_path,
 # new values of the predictor features of bolge
 bolge_full_new_minimum <- as.data.frame(cbind(
   GRP = senaryolar_1[1:(h+1), "GRP"],
-  GRP_lag1 = append(tail(filled_cells(d, 26), h+1)[1], tail(filled_cells(senaryolar_1, 9), h+1)[1:(h)]),
+  GRP_lag1 = append(tail(filled_cells(d, 24), h+1)[1], tail(filled_cells(senaryolar_1, 9), h+1)[1:(h)]),
   ILCE_NUFUS = senaryolar_1[1:(h+1), "ILCE_NUFUS"],
   Sanayi_üretimi = senaryolar_1[1:(h+1), "GRP_SANAYI_URETIM"],
   Tarım_üretimi = senaryolar_1[1:(h+1), "GRP_TARIMSAL_URETIM"],
@@ -234,17 +228,13 @@ bolge_full_new_minimum <- as.data.frame(cbind(
   rbind(Sulama_abone_lag1 = data_preparation(filled_cells(d, 21))$faturalanan[nrow_dataset_tuketim],
         data.frame(Sulama_abone_lag1 = rep(NA, h))),
   rbind(Aydınlatma_abone_lag1 = data_preparation(filled_cells(d, 22))$faturalanan[nrow_dataset_tuketim],
-        data.frame(Aydınlatma_abone_lag1 = rep(NA, h))),
-  rbind(summer_demand_lag1 = data_preparation(filled_cells(d, 24))$faturalanan[nrow_dataset_tuketim],
-        data.frame(summer_demand_lag1 = rep(NA, h))),
-  rbind(winter_demand_lag1 = data_preparation(filled_cells(d, 25))$faturalanan[nrow_dataset_tuketim],
-        data.frame(winter_demand_lag1 = rep(NA, h)))))
+        data.frame(Aydınlatma_abone_lag1 = rep(NA, h)))))
 
 
 # new values of the predictor features of bolge
 bolge_full_new_dusuk <- as.data.frame(cbind(
   GRP = senaryolar_2[1:(h+1), "GRP"],
-  GRP_lag1 = append(tail(filled_cells(d, 26), h+1)[1], tail(filled_cells(senaryolar_2, 9), h+1)[1:(h)]),
+  GRP_lag1 = append(tail(filled_cells(d, 24), h+1)[1], tail(filled_cells(senaryolar_2, 9), h+1)[1:(h)]),
   ILCE_NUFUS = senaryolar_2[1:(h+1), "ILCE_NUFUS"],
   Sanayi_üretimi = senaryolar_2[1:(h+1), "GRP_SANAYI_URETIM"],
   Tarım_üretimi = senaryolar_2[1:(h+1), "GRP_TARIMSAL_URETIM"],
@@ -271,17 +261,13 @@ bolge_full_new_dusuk <- as.data.frame(cbind(
   rbind(Sulama_abone_lag1 = data_preparation(filled_cells(d, 21))$faturalanan[nrow_dataset_tuketim],
         data.frame(Sulama_abone_lag1 = rep(NA, h))),
   rbind(Aydınlatma_abone_lag1 = data_preparation(filled_cells(d, 22))$faturalanan[nrow_dataset_tuketim],
-        data.frame(Aydınlatma_abone_lag1 = rep(NA, h))),
-  rbind(summer_demand_lag1 = data_preparation(filled_cells(d, 24))$faturalanan[nrow_dataset_tuketim],
-        data.frame(summer_demand_lag1 = rep(NA, h))),
-  rbind(winter_demand_lag1 = data_preparation(filled_cells(d, 25))$faturalanan[nrow_dataset_tuketim],
-        data.frame(winter_demand_lag1 = rep(NA, h)))))
+        data.frame(Aydınlatma_abone_lag1 = rep(NA, h)))))
 
 
 # new values of the predictor features of bolge
 bolge_full_new_baz <- as.data.frame(cbind(
   GRP = senaryolar_3[1:(h+1), "GRP"],
-  GRP_lag1 = append(tail(filled_cells(d, 26), h+1)[1], tail(filled_cells(senaryolar_3, 9), h+1)[1:(h)]),
+  GRP_lag1 = append(tail(filled_cells(d, 24), h+1)[1], tail(filled_cells(senaryolar_3, 9), h+1)[1:(h)]),
   ILCE_NUFUS = senaryolar_3[1:(h+1), "ILCE_NUFUS"],
   Sanayi_üretimi = senaryolar_3[1:(h+1), "GRP_SANAYI_URETIM"],
   Tarım_üretimi = senaryolar_3[1:(h+1), "GRP_TARIMSAL_URETIM"],
@@ -310,15 +296,13 @@ bolge_full_new_baz <- as.data.frame(cbind(
   rbind(Aydınlatma_abone_lag1 = data_preparation(filled_cells(d, 22))$faturalanan[nrow_dataset_tuketim],
         data.frame(Aydınlatma_abone_lag1 = rep(NA, h))),
   rbind(summer_demand_lag1 = data_preparation(filled_cells(d, 24))$faturalanan[nrow_dataset_tuketim],
-        data.frame(summer_demand_lag1 = rep(NA, h))),
-  rbind(winter_demand_lag1 = data_preparation(filled_cells(d, 25))$faturalanan[nrow_dataset_tuketim],
-        data.frame(winter_demand_lag1 = rep(NA, h)))))
+        data.frame(summer_demand_lag1 = rep(NA, h)))))
 
 
 # new values of the predictor features of bolge
 bolge_full_new_yuksek <- as.data.frame(cbind(
   GRP = senaryolar_4[1:(h+1), "GRP"],
-  GRP_lag1 = append(tail(filled_cells(d, 26), h+1)[1], tail(filled_cells(senaryolar_4, 9), h+1)[1:(h)]),
+  GRP_lag1 = append(tail(filled_cells(d, 24), h+1)[1], tail(filled_cells(senaryolar_4, 9), h+1)[1:(h)]),
   ILCE_NUFUS = senaryolar_4[1:(h+1), "ILCE_NUFUS"],
   Sanayi_üretimi = senaryolar_4[1:(h+1), "GRP_SANAYI_URETIM"],
   Tarım_üretimi = senaryolar_4[1:(h+1), "GRP_TARIMSAL_URETIM"],
@@ -345,17 +329,13 @@ bolge_full_new_yuksek <- as.data.frame(cbind(
   rbind(Sulama_abone_lag1 = data_preparation(filled_cells(d, 21))$faturalanan[nrow_dataset_tuketim],
         data.frame(Sulama_abone_lag1 = rep(NA, h))),
   rbind(Aydınlatma_abone_lag1 = data_preparation(filled_cells(d, 22))$faturalanan[nrow_dataset_tuketim],
-        data.frame(Aydınlatma_abone_lag1 = rep(NA, h))),
-  rbind(summer_demand_lag1 = data_preparation(filled_cells(d, 24))$faturalanan[nrow_dataset_tuketim],
-        data.frame(summer_demand_lag1 = rep(NA, h))),
-  rbind(winter_demand_lag1 = data_preparation(filled_cells(d, 25))$faturalanan[nrow_dataset_tuketim],
-        data.frame(winter_demand_lag1 = rep(NA, h)))))
+        data.frame(Aydınlatma_abone_lag1 = rep(NA, h)))))
 
 
 # new values of the predictor features of bolge
 bolge_full_new_maksimum <- as.data.frame(cbind(
   GRP = senaryolar_5[1:(h+1), "GRP"],
-  GRP_lag1 = append(tail(filled_cells(d, 26), h+1)[1], tail(filled_cells(senaryolar_5, 9), h+1)[1:(h)]),
+  GRP_lag1 = append(tail(filled_cells(d, 24), h+1)[1], tail(filled_cells(senaryolar_5, 9), h+1)[1:(h)]),
   ILCE_NUFUS = senaryolar_5[1:(h+1), "ILCE_NUFUS"],
   Sanayi_üretimi = senaryolar_5[1:(h+1), "GRP_SANAYI_URETIM"],
   Tarım_üretimi = senaryolar_5[1:(h+1), "GRP_TARIMSAL_URETIM"],
@@ -382,11 +362,7 @@ bolge_full_new_maksimum <- as.data.frame(cbind(
   rbind(Sulama_abone_lag1 = data_preparation(filled_cells(d, 21))$faturalanan[nrow_dataset_tuketim],
         data.frame(Sulama_abone_lag1 = rep(NA, h))),
   rbind(Aydınlatma_abone_lag1 = data_preparation(filled_cells(d, 22))$faturalanan[nrow_dataset_tuketim],
-        data.frame(Aydınlatma_abone_lag1 = rep(NA, h))),
-  rbind(summer_demand_lag1 = data_preparation(filled_cells(d, 24))$faturalanan[nrow_dataset_tuketim],
-        data.frame(summer_demand_lag1 = rep(NA, h))),
-  rbind(winter_demand_lag1 = data_preparation(filled_cells(d, 25))$faturalanan[nrow_dataset_tuketim],
-        data.frame(winter_demand_lag1 = rep(NA, h)))))
+        data.frame(Aydınlatma_abone_lag1 = rep(NA, h)))))
 
 
 ###################################    MODELS    ###################################
@@ -995,15 +971,6 @@ bolge_ticarethane_abone_best_model <- best_model_among_all(bolge_full_2013, bolg
 bolge_sulama_abone_best_model <- best_model_among_all(bolge_full_2013, bolge_full_2014, "Sulama_abone")
 bolge_aydınlatma_abone_best_model <- best_model_among_all(bolge_full_2013, bolge_full_2014, "Aydınlatma_abone")
 
-if(!is.null(bolge_full_2013$summer_demand)){
-  bolge_yaz_puant_best_model <- best_model_among_all(bolge_full_2013, bolge_full_2014, "summer_demand")
-}
-
-if(!is.null(bolge_full_2013$winter_demand)){
-  bolge_kıs_puant_best_model <- best_model_among_all(bolge_full_2013, bolge_full_2014, "winter_demand")
-}
-
-
 
 # create an array that holds all of the models
 models_array <- list(bolge_mesken_tuketim_best_model = bolge_mesken_tuketim_best_model,
@@ -1118,17 +1085,7 @@ step_by_step_forecast <- function(model, newdata, horizon, consumption_group){
         newdata[i+1 , "Aydınlatma_tuketim_lag1"] <- prediction
         break
 
-      } else if (consumption_group == "yaz_puant") {
-
-        newdata[i+1 , "summer_demand_lag1"] <- prediction
-        break
-
-      } else if (consumption_group == "kıs_puant") {
-
-        newdata[i+1 , "winter_demand_lag1"] <- prediction
-        break
-
-      }
+      } 
     }
   }
 
@@ -1203,7 +1160,7 @@ final_forecasts <- function(model, newdata, horizon) {
     if(!is.null(model$finalModel$model)) {
       if(nrow(model$finalModel$model) != nrow_dataset_tuketim ){
         consumption_group <- str_extract(deparse(substitute(model)),
-                                         pattern = "mesken_tuketim|sanayi_tuketim|ticarethane_tuketim|sulama_tuketim|aydınlatma_tuketim|mesken_abone|sanayi_abone|ticarethane_abone|sulama_abone|aydınlatma_abone|yaz_puant|kıs_puant")
+                                         pattern = "mesken_tuketim|sanayi_tuketim|ticarethane_tuketim|sulama_tuketim|aydınlatma_tuketim|mesken_abone|sanayi_abone|ticarethane_abone|sulama_abone|aydınlatma_abone")
         predictions <- step_by_step_forecast(model, newdata, horizon, consumption_group)
       } else {
         predictions <- forecasts_short(model, newdata, horizon)
@@ -1211,7 +1168,7 @@ final_forecasts <- function(model, newdata, horizon) {
     } else {
       if(nrow(model$model) != nrow_dataset_tuketim ){
         consumption_group <- str_extract(deparse(substitute(model)),
-                                         pattern = "mesken_tuketim|sanayi_tuketim|ticarethane_tuketim|sulama_tuketim|aydınlatma_tuketim|mesken_abone|sanayi_abone|ticarethane_abone|sulama_abone|aydınlatma_abone|yaz_puant|kıs_puant")
+                                         pattern = "mesken_tuketim|sanayi_tuketim|ticarethane_tuketim|sulama_tuketim|aydınlatma_tuketim|mesken_abone|sanayi_abone|ticarethane_abone|sulama_abone|aydınlatma_abone")
         predictions <- step_by_step_forecast(model, newdata, horizon, consumption_group)
       } else {
         predictions <- forecasts_short(model, newdata, horizon)
@@ -1471,44 +1428,6 @@ bolge_toplam_abone_forecasts_maksimum <- bolge_mesken_abone_forecasts_maksimum +
   bolge_ticarethane_abone_forecasts_maksimum + bolge_sulama_abone_forecasts_maksimum + bolge_aydınlatma_abone_forecasts_maksimum
 
 
-
-if(exists("bolge_yaz_puant_best_model")){
-
-  bolge_yaz_puant_forecasts_minimum <- final_forecasts(bolge_yaz_puant_best_model, bolge_full_new_minimum, h+1) %>% round(0)
-  bolge_yaz_puant_forecasts_dusuk <- final_forecasts(bolge_yaz_puant_best_model, bolge_full_new_dusuk, h+1) %>% round(0)
-  bolge_yaz_puant_forecasts_baz <- final_forecasts(bolge_yaz_puant_best_model, bolge_full_new_baz, h+1) %>% round(0)
-  bolge_yaz_puant_forecasts_yuksek <- final_forecasts(bolge_yaz_puant_best_model, bolge_full_new_yuksek, h+1) %>% round(0)
-  bolge_yaz_puant_forecasts_maksimum <- final_forecasts(bolge_yaz_puant_best_model, bolge_full_new_maksimum, h+1) %>% round(0)
-
-} else {
-
-  bolge_yaz_puant_forecasts_minimum <- rep(0,h+1)
-  bolge_yaz_puant_forecasts_dusuk <- rep(0,h+1)
-  bolge_yaz_puant_forecasts_baz <- rep(0,h+1)
-  bolge_yaz_puant_forecasts_yuksek <- rep(0,h+1)
-  bolge_yaz_puant_forecasts_maksimum <- rep(0,h+1)
-
-}
-
-
-if(exists("bolge_kıs_puant_best_model")){
-  bolge_kıs_puant_forecasts_minimum <- final_forecasts(bolge_kıs_puant_best_model, bolge_full_new_minimum, h+1) %>% round(0)
-  bolge_kıs_puant_forecasts_dusuk <- final_forecasts(bolge_kıs_puant_best_model, bolge_full_new_dusuk, h+1) %>% round(0)
-  bolge_kıs_puant_forecasts_baz <- final_forecasts(bolge_kıs_puant_best_model, bolge_full_new_baz, h+1) %>% round(0)
-  bolge_kıs_puant_forecasts_yuksek <- final_forecasts(bolge_kıs_puant_best_model, bolge_full_new_yuksek, h+1) %>% round(0)
-  bolge_kıs_puant_forecasts_maksimum <- final_forecasts(bolge_kıs_puant_best_model, bolge_full_new_maksimum, h+1) %>% round(0)
-
-} else {
-
-  bolge_kıs_puant_forecasts_minimum <- rep(0,h+1)
-  bolge_kıs_puant_forecasts_dusuk <- rep(0,h+1)
-  bolge_kıs_puant_forecasts_baz <- rep(0,h+1)
-  bolge_kıs_puant_forecasts_yuksek <- rep(0,h+1)
-  bolge_kıs_puant_forecasts_maksimum <- rep(0,h+1)
-
-}
-
-
 kko_forecast <- senaryolar_3[1:(h+1), "KKO"]
 
 
@@ -1580,8 +1499,7 @@ bottom_up_model_minimum <- as.data.frame(cbind(bolge_mesken_distributed_tuketim_
                                                bolge_ticarethane_tuketim_forecasts_minimum, bolge_sulama_tuketim_forecasts_minimum,
                                                bolge_aydınlatma_tuketim_forecasts_minimum, bolge_toplam_tuketim_forecasts_minimum, bolge_mesken_abone_forecasts_minimum,
                                                bolge_sanayi_abone_forecasts_minimum, bolge_ticarethane_abone_forecasts_minimum, bolge_sulama_abone_forecasts_minimum,
-                                               bolge_aydınlatma_abone_forecasts_minimum, bolge_toplam_abone_forecasts_minimum, bolge_yaz_puant_forecasts_minimum,
-                                               bolge_kıs_puant_forecasts_minimum))
+                                               bolge_aydınlatma_abone_forecasts_minimum, bolge_toplam_abone_forecasts_minimum))
 
 bottom_up_model_dusuk <- as.data.frame(cbind(bolge_mesken_distributed_tuketim_forecasts_dusuk, bolge_sanayi_distributed_tuketim_forecasts_dusuk,
                                              bolge_ticarethane_distributed_tuketim_forecasts_dusuk, bolge_sulama_distributed_tuketim_forecasts_dusuk,
@@ -1590,8 +1508,7 @@ bottom_up_model_dusuk <- as.data.frame(cbind(bolge_mesken_distributed_tuketim_fo
                                              bolge_ticarethane_tuketim_forecasts_dusuk, bolge_sulama_tuketim_forecasts_dusuk,
                                              bolge_aydınlatma_tuketim_forecasts_dusuk, bolge_toplam_tuketim_forecasts_dusuk, bolge_mesken_abone_forecasts_dusuk,
                                              bolge_sanayi_abone_forecasts_dusuk, bolge_ticarethane_abone_forecasts_dusuk, bolge_sulama_abone_forecasts_dusuk,
-                                             bolge_aydınlatma_abone_forecasts_dusuk, bolge_toplam_abone_forecasts_dusuk, bolge_yaz_puant_forecasts_dusuk,
-                                             bolge_kıs_puant_forecasts_dusuk))
+                                             bolge_aydınlatma_abone_forecasts_dusuk, bolge_toplam_abone_forecasts_dusuk))
 
 bottom_up_model_baz <- as.data.frame(cbind(bolge_mesken_distributed_tuketim_forecasts_baz, bolge_sanayi_distributed_tuketim_forecasts_baz,
                                            bolge_ticarethane_distributed_tuketim_forecasts_baz, bolge_sulama_distributed_tuketim_forecasts_baz,
@@ -1600,8 +1517,7 @@ bottom_up_model_baz <- as.data.frame(cbind(bolge_mesken_distributed_tuketim_fore
                                            bolge_ticarethane_tuketim_forecasts_baz, bolge_sulama_tuketim_forecasts_baz,
                                            bolge_aydınlatma_tuketim_forecasts_baz, bolge_toplam_tuketim_forecasts_baz, bolge_mesken_abone_forecasts_baz,
                                            bolge_sanayi_abone_forecasts_baz, bolge_ticarethane_abone_forecasts_baz, bolge_sulama_abone_forecasts_baz,
-                                           bolge_aydınlatma_abone_forecasts_baz, bolge_toplam_abone_forecasts_baz, bolge_yaz_puant_forecasts_baz,
-                                           bolge_kıs_puant_forecasts_baz))
+                                           bolge_aydınlatma_abone_forecasts_baz, bolge_toplam_abone_forecasts_baz))
 
 bottom_up_model_yuksek <- as.data.frame(cbind(bolge_mesken_distributed_tuketim_forecasts_yuksek, bolge_sanayi_distributed_tuketim_forecasts_yuksek,
                                               bolge_ticarethane_distributed_tuketim_forecasts_yuksek, bolge_sulama_distributed_tuketim_forecasts_yuksek,
@@ -1610,8 +1526,7 @@ bottom_up_model_yuksek <- as.data.frame(cbind(bolge_mesken_distributed_tuketim_f
                                               bolge_ticarethane_tuketim_forecasts_yuksek, bolge_sulama_tuketim_forecasts_yuksek,
                                               bolge_aydınlatma_tuketim_forecasts_yuksek, bolge_toplam_tuketim_forecasts_yuksek, bolge_mesken_abone_forecasts_yuksek,
                                               bolge_sanayi_abone_forecasts_yuksek, bolge_ticarethane_abone_forecasts_yuksek, bolge_sulama_abone_forecasts_yuksek,
-                                              bolge_aydınlatma_abone_forecasts_yuksek, bolge_toplam_abone_forecasts_yuksek, bolge_yaz_puant_forecasts_yuksek,
-                                              bolge_kıs_puant_forecasts_yuksek))
+                                              bolge_aydınlatma_abone_forecasts_yuksek, bolge_toplam_abone_forecasts_yuksek))
 
 bottom_up_model_maksimum <- as.data.frame(cbind(bolge_mesken_distributed_tuketim_forecasts_maksimum, bolge_sanayi_distributed_tuketim_forecasts_maksimum,
                                                 bolge_ticarethane_distributed_tuketim_forecasts_maksimum, bolge_sulama_distributed_tuketim_forecasts_maksimum,
@@ -1620,8 +1535,7 @@ bottom_up_model_maksimum <- as.data.frame(cbind(bolge_mesken_distributed_tuketim
                                                 bolge_ticarethane_tuketim_forecasts_maksimum, bolge_sulama_tuketim_forecasts_maksimum,
                                                 bolge_aydınlatma_tuketim_forecasts_maksimum, bolge_toplam_tuketim_forecasts_maksimum, bolge_mesken_abone_forecasts_maksimum,
                                                 bolge_sanayi_abone_forecasts_maksimum, bolge_ticarethane_abone_forecasts_maksimum, bolge_sulama_abone_forecasts_maksimum,
-                                                bolge_aydınlatma_abone_forecasts_maksimum, bolge_toplam_abone_forecasts_maksimum, bolge_yaz_puant_forecasts_maksimum,
-                                                bolge_kıs_puant_forecasts_maksimum))
+                                                bolge_aydınlatma_abone_forecasts_maksimum, bolge_toplam_abone_forecasts_maksimum))
 
 
 

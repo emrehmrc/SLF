@@ -32,6 +32,7 @@ setwd(this.dir())
 options(warn = -1)
 
 
+
 ##### Config dosyasını oku #####
 config <- jsonlite::fromJSON(args[1])
 
@@ -45,7 +46,7 @@ excel_file_path <- paste0(config$Ana_Klasör_Yolu, "/",
 d <- read_excel(excel_file_path,
                 sheet = 1,
                 col_names = TRUE,
-                col_types = rep("numeric", 45)) %>%
+                col_types = rep("numeric", 43)) %>%
   as.data.frame()
 
 
@@ -493,7 +494,7 @@ writeData(
       wb = workbook,
       sheet = 1,
       x = degerler_last_known_year_nufus,
-      startCol = 26,
+      startCol = 24,
       startRow = last_known_year_nufus_index + 1,
       colNames = FALSE,
       rowNames = FALSE
