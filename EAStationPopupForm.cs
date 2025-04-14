@@ -221,7 +221,7 @@ namespace SLF
                     return;
                 }
 
-                string existingFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\çıktı\evcs_monte_carlo_distribution_kumulatif3 - Copy - Copy.xlsx";
+                string existingFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V3\ÇIKTI\evcs_monte_carlo_distribution_kumulatif_0411.xlsx";
 
                 using (var package = new OfficeOpenXml.ExcelPackage(new FileInfo(existingFilePath)))
                 {
@@ -234,12 +234,12 @@ namespace SLF
                             // Optionally create a new sheet if it doesn’t exist
                             worksheet = package.Workbook.Worksheets.Add(year.ToString());
                             worksheet.Cells[1, 1].Value = "ID";
-                            worksheet.Cells[1, 2].Value = "EA_X_KOORDINAT";
-                            worksheet.Cells[1, 3].Value = "EA_Y_KOORDINAT";
-                            worksheet.Cells[1, 4].Value = "AC (Home)_count";
-                            worksheet.Cells[1, 5].Value = "AC (Work)_count";
-                            worksheet.Cells[1, 6].Value = "AC (Public)_count";
-                            worksheet.Cells[1, 7].Value = "Fast DC_count";
+                            worksheet.Cells[1, 11].Value = "EA_X_KOORDINAT";
+                            worksheet.Cells[1, 12].Value = "EA_Y_KOORDINAT";
+                            worksheet.Cells[1, 7].Value = "AC (Home)_count";
+                            worksheet.Cells[1, 8].Value = "AC (Work)_count";
+                            worksheet.Cells[1, 9].Value = "AC (Public)_count";
+                            worksheet.Cells[1, 10].Value = "Fast DC_count";
                         }
 
                         int lastRow = worksheet.Dimension?.End.Row ?? 1;
@@ -252,8 +252,8 @@ namespace SLF
                             if (existingId == cellId)
                             {
                                 // Update coordinates
-                                worksheet.Cells[i, 2].Value = enlem;
-                                worksheet.Cells[i, 3].Value = boylam;
+                                worksheet.Cells[i, 11].Value = enlem;
+                                worksheet.Cells[i, 12].Value = boylam;
 
                                 // Increment the count for the selected station type
                                 int columnIndex = worksheet.Cells[1, 1, 1, worksheet.Dimension.End.Column]
@@ -274,14 +274,14 @@ namespace SLF
                         {
                             int newRowIndex = lastRow + 1;
                             worksheet.Cells[newRowIndex, 1].Value = cellId;
-                            worksheet.Cells[newRowIndex, 2].Value = enlem;
-                            worksheet.Cells[newRowIndex, 3].Value = boylam;
+                            worksheet.Cells[newRowIndex, 11].Value = enlem;
+                            worksheet.Cells[newRowIndex, 12].Value = boylam;
 
                             // Set initial counts (1 for the selected type, 0 for others)
-                            worksheet.Cells[newRowIndex, 4].Value = stationType == "AC (Home)_count" ? 1 : 0;
-                            worksheet.Cells[newRowIndex, 5].Value = stationType == "AC (Work)_count" ? 1 : 0;
-                            worksheet.Cells[newRowIndex, 6].Value = stationType == "AC (Public)_count" ? 1 : 0;
-                            worksheet.Cells[newRowIndex, 7].Value = stationType == "Fast DC_count" ? 1 : 0;
+                            worksheet.Cells[newRowIndex, 7].Value = stationType == "AC (Home)_count" ? 1 : 0;
+                            worksheet.Cells[newRowIndex, 8].Value = stationType == "AC (Work)_count" ? 1 : 0;
+                            worksheet.Cells[newRowIndex, 9].Value = stationType == "AC (Public)_count" ? 1 : 0;
+                            worksheet.Cells[newRowIndex, 10].Value = stationType == "Fast DC_count" ? 1 : 0;
                         }
                     }
 

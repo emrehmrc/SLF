@@ -3140,7 +3140,7 @@ namespace SLF
 
             try
             {
-                string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\çıktı\evcs_monte_carlo_distribution_kumulatif3 - Copy - Copy.xlsx";
+                string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V3\ÇIKTI\evcs_monte_carlo_distribution_kumulatif_0411.xlsx";
                 DataTable simulationData;
                 try
                 {
@@ -3228,7 +3228,7 @@ namespace SLF
             // Disable buttons and TrackBar to prevent interaction while processing
             // EAStationAddButton.Enabled = false;
             EANewSimulationResultsButton.Enabled = false;
-            SimulasyonSonucGoruntule.Enabled = false;
+            SimulasyonSonucGoruntule.Enabled = true;
 
             try
             {
@@ -3244,8 +3244,8 @@ namespace SLF
                     progressBar.Visible = true;
                 }
 
-                string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\girdiler\new_buildings_2024_2035.xlsx";
-                string outputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\çıktı\evcs_monte_carlo_distribution_kumulatif3 - Copy.xlsx";
+                string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V3\GİRDİ\new_buildings_2024_2035.xlsx";
+                string outputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V3\ÇIKTI\evcs_monte_carlo_distribution_kumulatif_0411.xlsx";
 
                 if (!File.Exists(inputFilePath))
                 {
@@ -3292,7 +3292,7 @@ namespace SLF
         {
             try
             {
-                string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V2\Entegrasyon\EA_kumulativ.py";
+                string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V3\EA_0411.py";
                 string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe";
 
                 ProcessStartInfo startInfo = new ProcessStartInfo
@@ -3951,225 +3951,7 @@ namespace SLF
             this.Controls.Add(panel);
             panel.BringToFront(); // Paneli öne getir
         }
-        private Task HaritaUzerindeSimulasyonGosterimiWithNewPoints(DataTable veriTablosu, int year)
-        {
-            // Clear existing overlays and re-add them
-            gMapControl_EA.Overlays.Clear();
-            gMapControl_EA.Overlays.Add(simulationOverlay);
-            gMapControl_EA.Overlays.Add(cellToolTipOverlay);
 
-            Invoke(new Action(() =>
-            {
-                EAPointsLayerCheckBox.Checked = false;
-            }));
-
-            // Create a transparent bitmap for invisible markers
-            Bitmap transparentBitmap = new Bitmap(16, 16);
-            using (Graphics g = Graphics.FromImage(transparentBitmap))
-            {
-                g.Clear(Color.Transparent);
-            }
-
-            foreach (DataRow row in veriTablosu.Rows)
-            {
-                if (row["Enlem"] == DBNull.Value || row["Boylam"] == DBNull.Value) continue;
-
-                double enlem = Convert.ToDouble(row["Enlem"]);
-                double boylam = Convert.ToDouble(row["Boylam"]);
-                string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
-
-                // Get counts for each EV type, defaulting to 0 if null.
-                // The base counts are for the overall EV stations.
-                int acHomeCount = row["AC (Home)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Home)_count"]) : 0;
-                int acWorkCount = row["AC (Work)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Work)_count"]) : 0;
-                int acPublicCount = row["AC (Public)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Public)_count"]) : 0;
-                int fastDcCount = row["Fast DC_count"] != DBNull.Value ? Convert.ToInt32(row["Fast DC_count"]) : 0;
-
-                int totalCount = acHomeCount + acWorkCount + acPublicCount + fastDcCount;
-
-                // Build the detailed tooltip text for all cells
-                string tooltipText = $"Cell: {cellId}\n" +
-                                     $"AC (Home): {acHomeCount}\n" +
-                                     $"AC (Work): {acWorkCount}\n" +
-                                     $"AC (Public): {acPublicCount}\n" +
-                                     $"Fast DC: {fastDcCount}";
-
-                // Determine if there is an increase in EV points for the specified year.
-                // For this example, we assume you have columns that indicate the increase,
-                // e.g., "AC (Home)_increase", "AC (Work)_increase", etc.
-                // You might need to adjust this logic based on your data structure.
-                bool hasNewPoints = false;
-                int newAcHome = row["AC (Home)_increase"] != DBNull.Value ? Convert.ToInt32(row["AC (Home)_increase"]) : 0;
-                int newAcWork = row["AC (Work)_increase"] != DBNull.Value ? Convert.ToInt32(row["AC (Work)_increase"]) : 0;
-                int newAcPublic = row["AC (Public)_increase"] != DBNull.Value ? Convert.ToInt32(row["AC (Public)_increase"]) : 0;
-                int newFastDc = row["Fast DC_increase"] != DBNull.Value ? Convert.ToInt32(row["Fast DC_increase"]) : 0;
-
-                // If any of these are greater than zero, we assume there’s an increase.
-                if (newAcHome > 0 || newAcWork > 0 || newAcPublic > 0 || newFastDc > 0)
-                {
-                    hasNewPoints = true;
-                    // You could also update the tooltip to reflect the new additions.
-                    tooltipText += "\n(New EV points added in " + year + ")";
-                }
-
-                // Choose marker based on if new points were added.
-                if (totalCount == 0)
-                {
-                    // Invisible marker for cells with no overall EV stations.
-                    var invisibleMarker = new GMarkerGoogle(new PointLatLng(enlem, boylam), transparentBitmap)
-                    {
-                        ToolTipText = tooltipText,
-                        ToolTipMode = MarkerTooltipMode.OnMouseOver,
-                        Tag = cellId
-                    };
-                    cellToolTipOverlay.Markers.Add(invisibleMarker);
-                }
-                else
-                {
-                    GMarkerGoogleType markerType;
-                    if (hasNewPoints)
-                    {
-                        // Set a distinct color for new EV points. 
-                        // (Assuming GMarkerGoogleType.purple exists or replace with your custom marker type)
-                        markerType = GMarkerGoogleType.purple;
-                    }
-                    else
-                    {
-                        // Otherwise, use the helper method to determine marker type as before.
-                        markerType = DetermineMarkerType(acHomeCount, acWorkCount, acPublicCount, fastDcCount);
-                    }
-                    var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), markerType)
-                    {
-                        ToolTipMode = MarkerTooltipMode.OnMouseOver,
-                        Tag = cellId,
-                        ToolTipText = tooltipText
-                    };
-                    simulationOverlay.Markers.Add(marker);
-                }
-            }
-
-            // Refresh the map on the UI thread
-            Invoke(new Action(() => gMapControl_EA.Refresh()));
-
-            return Task.CompletedTask;
-        }
-        private Task HaritaUzerindeSonYilVeArtisGosterimi(List<DataTable> yillikVeriTablolari, List<int> yillar)
-        {
-            // Validate input
-            if (yillikVeriTablolari.Count != yillar.Count || yillikVeriTablolari.Count == 0)
-                throw new ArgumentException("Number of DataTables must match number of years and be non-empty.");
-
-            // Clear existing overlays
-            gMapControl_EA.Overlays.Clear();
-            gMapControl_EA.Overlays.Add(simulationOverlay);
-            gMapControl_EA.Overlays.Add(cellToolTipOverlay);
-
-            // Uncheck the checkbox on the UI thread
-            Invoke(new Action(() => EAPointsLayerCheckBox.Checked = false));
-
-            // Transparent bitmap for invisible markers
-            Bitmap transparentBitmap = new Bitmap(16, 16);
-            using (Graphics g = Graphics.FromImage(transparentBitmap))
-            {
-                g.Clear(Color.Transparent);
-            }
-
-            // Dictionary to track EV counts per cell across years
-            Dictionary<string, List<int>> cellEvCountsByYear = new Dictionary<string, List<int>>();
-
-            // Process all DataTables to populate cell data for comparison
-            for (int i = 0; i < yillikVeriTablolari.Count; i++)
-            {
-                DataTable veriTablosu = yillikVeriTablolari[i];
-                foreach (DataRow row in veriTablosu.Rows)
-                {
-                    if (row["Enlem"] == DBNull.Value || row["Boylam"] == DBNull.Value) continue;
-
-                    string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
-                    int totalCount = CalculateTotalCount(row);
-
-                    if (!cellEvCountsByYear.ContainsKey(cellId))
-                    {
-                        cellEvCountsByYear[cellId] = new List<int>(new int[yillikVeriTablolari.Count]); // Initialize with zeros
-                    }
-                    cellEvCountsByYear[cellId][i] = totalCount;
-                }
-            }
-
-            // Plot only the latest year's data
-            DataTable latestData = yillikVeriTablolari.Last();
-            int latestYear = yillar.Last();
-
-            foreach (DataRow row in latestData.Rows)
-            {
-                if (row["Enlem"] == DBNull.Value || row["Boylam"] == DBNull.Value) continue;
-
-                double enlem = Convert.ToDouble(row["Enlem"]);
-                double boylam = Convert.ToDouble(row["Boylam"]);
-                string cellId = row["id"] != DBNull.Value ? row["id"].ToString() : "N/A";
-
-                int acHomeCount = row["AC (Home)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Home)_count"]) : 0;
-                int acWorkCount = row["AC (Work)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Work)_count"]) : 0;
-                int acPublicCount = row["AC (Public)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Public)_count"]) : 0;
-                int fastDcCount = row["Fast DC_count"] != DBNull.Value ? Convert.ToInt32(row["Fast DC_count"]) : 0;
-                int totalCount = acHomeCount + acWorkCount + acPublicCount + fastDcCount;
-
-                string tooltipText = $"Cell: {cellId}\n" +
-                                    $"Year: {latestYear}\n" +
-                                    $"AC (Home): {acHomeCount}\n" +
-                                    $"AC (Work): {acWorkCount}\n" +
-                                    $"AC (Public): {acPublicCount}\n" +
-                                    $"Fast DC: {fastDcCount}";
-
-                bool isNewStation = false;
-                int increaseAmount = 0;
-                if (yillikVeriTablolari.Count > 1 && cellEvCountsByYear.ContainsKey(cellId))
-                {
-                    int currentYearIndex = yillikVeriTablolari.Count - 1;
-                    int previousYearIndex = currentYearIndex - 1;
-                    int currentCount = cellEvCountsByYear[cellId][currentYearIndex];
-                    int previousCount = cellEvCountsByYear[cellId][previousYearIndex];
-                    isNewStation = currentCount > previousCount;
-                    increaseAmount = isNewStation ? currentCount - previousCount : 0;
-                    if (isNewStation)
-                    {
-                        tooltipText += $"\nNew Stations Added in {latestYear}: {increaseAmount}";
-                    }
-                }
-
-                if (totalCount == 0)
-                {
-                    // Invisible marker for empty cells
-                    var invisibleMarker = new GMarkerGoogle(new PointLatLng(enlem, boylam), transparentBitmap)
-                    {
-                        ToolTipText = tooltipText,
-                        ToolTipMode = MarkerTooltipMode.OnMouseOver,
-                        Tag = cellId
-                    };
-                    cellToolTipOverlay.Markers.Add(invisibleMarker);
-                }
-                else
-                {
-                    // Use purple for increases, otherwise determine by dominant type
-                    GMarkerGoogleType markerType = isNewStation
-                        ? GMarkerGoogleType.purple_dot // Highlight new stations
-                        : DetermineYearMarkerType(acHomeCount, acWorkCount, acPublicCount, fastDcCount);
-
-                    var marker = new GMarkerGoogle(new PointLatLng(enlem, boylam), markerType)
-                    {
-                        ToolTipMode = MarkerTooltipMode.OnMouseOver,
-                        Tag = cellId,
-                        ToolTipText = tooltipText
-                    };
-                    simulationOverlay.Markers.Add(marker);
-                }
-            }
-
-            // Refresh the map on the UI thread
-            Invoke(new Action(() => gMapControl_EA.Refresh()));
-
-            return Task.CompletedTask; // Instead of Task.FromResult(Task.CompletedTask)
-        }
         private int CalculateTotalCount(DataRow row)
         {
             int acHomeCount = row["AC (Home)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Home)_count"]) : 0;
@@ -4407,7 +4189,6 @@ namespace SLF
                 }
             }
         }
-
 
         // DEK şehri seçildiğinde çağrılan metot
         // Helper method to safely remove a marker from overlays
