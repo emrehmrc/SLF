@@ -81,6 +81,7 @@ namespace SLF
         public void UpdateExcelFileFirstSheet(string filePath, DataTable dataTable) // excel formullu sayfa güncellemeleri yapılabilir .
         {
             FileInfo file = new FileInfo(filePath);
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Add this line
 
             using (ExcelPackage package = new ExcelPackage(file))
             {

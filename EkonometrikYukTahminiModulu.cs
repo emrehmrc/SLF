@@ -40,9 +40,11 @@ namespace SLF
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> fiveYearsDataCheck = new Dictionary<string, (float warningThreshold, float errorThreshold)>
 {
             {"YIL", ERROR_ONLY},
-            {"GDP_GROWTH", ERROR_ONLY},
-            {"ULKE_NUFUS", ERROR_ONLY},
-            {"BOLGE_NUFUS", ERROR_ONLY},
+            //{"GDP_GROWTH", ERROR_ONLY},
+            {"GDP_BUYUME_ORANI", ERROR_ONLY},
+            //{"ULKE_NUFUS", ERROR_ONLY},
+            //{"BOLGE_NUFUS", ERROR_ONLY},
+            {"ILCE_NUFUS", ERROR_ONLY},
             {"MESKEN_FATURALANAN", ERROR_ONLY},
             {"SANAYI_FATURALANAN", ERROR_ONLY},
             {"TICARETHANE_FATURALANAN", ERROR_ONLY},
@@ -55,8 +57,6 @@ namespace SLF
             {"TARIMSAL_SULAMA_ABONE_SAYISI", ERROR_ONLY},
             {"AYDINLATMA_ABONE_SAYISI", ERROR_ONLY},
             {"TOPLAM_ABONE_SAYISI", ERROR_ONLY},
-            //{"BOLGE_YAZ_PUANT", ERROR_ONLY},
-            //{"BOLGE_KIS_PUANT", ERROR_ONLY},
             {"GRP", ERROR_ONLY},
             {"GRP_TARIMSAL_URETIM", ERROR_ONLY},
             {"GRP_SANAYI_URETIM", ERROR_ONLY},
@@ -76,12 +76,12 @@ namespace SLF
             {"GDP_HIZMET_URETIM_%", ERROR_ONLY},
             {"GDP_INSAAT_URETIM_%", ERROR_ONLY},
             {"CDD", ERROR_ONLY},
-            {"HDD", ERROR_ONLY},
-            {"ULKE_NUFUS_%", ERROR_ONLY},
-            {"BOLGE_NUFUS_%", ERROR_ONLY},
-            {"EA_Talep", ERROR_ONLY},
-            {"DEK_Uretim", ERROR_ONLY},
-            {"Other", ERROR_ONLY}
+            {"HDD", ERROR_ONLY}
+            //{"ULKE_NUFUS_%", ERROR_ONLY},
+            //{"BOLGE_NUFUS_%", ERROR_ONLY},
+            //{"EA_Talep", ERROR_ONLY},
+            //{"DEK_Uretim", ERROR_ONLY},
+            //{"Other", ERROR_ONLY}
 };
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> dagıtılanCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
@@ -98,7 +98,8 @@ namespace SLF
         };
         public readonly Dictionary<string, bool> setConvertPercentage = new Dictionary<string, bool>
     {
-        { "GDP_GROWTH", true },
+        //{ "GDP_GROWTH", true },
+        { "GDP_BUYUME_ORANI", true },
         { "KKO", true },
         { "GRP_TARIMSAL_URETIM_%", true },
         { "GRP_SANAYI_URETIM_%", true },
@@ -108,8 +109,8 @@ namespace SLF
         { "GDP_SANAYI_URETIM_%", true },
         { "GDP_HIZMET_URETIM_%", true },
         { "GDP_INSAAT_URETIM_%", true },
-        { "ULKE_NUFUS_%", true },
-        { "BOLGE_NUFUS_%", true }
+        //{ "ULKE_NUFUS_%", true },
+        //{ "BOLGE_NUFUS_%", true }
     };
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> loadPercentageIncreaseDetect = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
@@ -627,7 +628,7 @@ namespace SLF
         {
             ImputeKkmKkoDag();
             ImputeDagıtılan();
-            string filePath = @"C:\Users\begum.orhan\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE-deneme.xlsx"; // Excel dosyasının tam yolu
+            string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\veer\Ekonometrik Modülü Testleri\gdz\VERİLER.xlsx"; // Excel dosyasının tam yolu
             ExcelExporter exporter = new ExcelExporter();
             exporter.UpdateExcelFileFirstSheet(filePath, currentDataTable);
         }

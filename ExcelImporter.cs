@@ -90,9 +90,11 @@ namespace SLF
                         {
 "Ekonometrik Yük Tahmini Verileri", new List<string> {
     "YIL",
-    "GDP_GROWTH",
-    "ULKE_NUFUS",
-    "BOLGE_NUFUS",
+    //"GDP_GROWTH",
+    "GDP_BUYUME_ORANI",
+    //"ULKE_NUFUS",
+    //"BOLGE_NUFUS",
+    "ILCE_NUFUS",
     "KKO",
     "KKM",
     "MESKEN_DAGITILAN",
@@ -113,8 +115,8 @@ namespace SLF
     "TARIMSAL_SULAMA_ABONE_SAYISI",
     "AYDINLATMA_ABONE_SAYISI",
     "TOPLAM_ABONE_SAYISI",
-    "BOLGE_YAZ_PUANT",
-    "BOLGE_KIS_PUANT",
+    //"BOLGE_YAZ_PUANT",
+    //"BOLGE_KIS_PUANT",
     "GRP",
     "GRP_TARIMSAL_URETIM",
     "GRP_SANAYI_URETIM",
@@ -134,12 +136,12 @@ namespace SLF
     "GDP_HIZMET_URETIM_%",
     "GDP_INSAAT_URETIM_%",
     "CDD",
-    "HDD",
-    "ULKE_NUFUS_%",
-    "BOLGE_NUFUS_%",
-    "EA_Talep",
-    "DEK_Uretim",
-    "Other"
+    "HDD"
+    //"ULKE_NUFUS_%",
+    //"BOLGE_NUFUS_%",
+    //"EA_Talep",
+    //"DEK_Uretim",
+    //"Other"
 }
 
 
