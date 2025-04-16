@@ -40,10 +40,7 @@ namespace SLF
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> fiveYearsDataCheck = new Dictionary<string, (float warningThreshold, float errorThreshold)>
 {
             {"YIL", ERROR_ONLY},
-            //{"GDP_GROWTH", ERROR_ONLY},
             {"GDP_BUYUME_ORANI", ERROR_ONLY},
-            //{"ULKE_NUFUS", ERROR_ONLY},
-            //{"BOLGE_NUFUS", ERROR_ONLY},
             {"ILCE_NUFUS", ERROR_ONLY},
             {"MESKEN_FATURALANAN", ERROR_ONLY},
             {"SANAYI_FATURALANAN", ERROR_ONLY},
@@ -77,11 +74,6 @@ namespace SLF
             {"GDP_INSAAT_URETIM_%", ERROR_ONLY},
             {"CDD", ERROR_ONLY},
             {"HDD", ERROR_ONLY}
-            //{"ULKE_NUFUS_%", ERROR_ONLY},
-            //{"BOLGE_NUFUS_%", ERROR_ONLY},
-            //{"EA_Talep", ERROR_ONLY},
-            //{"DEK_Uretim", ERROR_ONLY},
-            //{"Other", ERROR_ONLY}
 };
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> dagıtılanCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
@@ -98,7 +90,6 @@ namespace SLF
         };
         public readonly Dictionary<string, bool> setConvertPercentage = new Dictionary<string, bool>
     {
-        //{ "GDP_GROWTH", true },
         { "GDP_BUYUME_ORANI", true },
         { "KKO", true },
         { "GRP_TARIMSAL_URETIM_%", true },
@@ -109,8 +100,7 @@ namespace SLF
         { "GDP_SANAYI_URETIM_%", true },
         { "GDP_HIZMET_URETIM_%", true },
         { "GDP_INSAAT_URETIM_%", true },
-        //{ "ULKE_NUFUS_%", true },
-        //{ "BOLGE_NUFUS_%", true }
+
     };
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> loadPercentageIncreaseDetect = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
@@ -156,7 +146,7 @@ namespace SLF
                     var thresholds = dagıtılanCheckWithLevel[column.ColumnName];
                     var datatableLevel = GetDataTableBasedOnThreshold(nullPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
                     datatableLevel.Rows.Add(new object[] {
-                        column.ColumnName, "bu datalar faturalanan güç değelerine göre düzenlecektir!", $"{nullPercentage:P1}"
+                        column.ColumnName, "Eksik tüketim verileri mevcutsa faturalanan güç değerlerine göre düzenlecektir!", $"{nullPercentage:P1}"
                     });
                 }
             }
@@ -190,7 +180,7 @@ namespace SLF
                     var thresholds = negativeOrZeroLevel[column.ColumnName];
                     var datatableLevel = GetDataTableBasedOnThreshold(negativeOrZeroPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
                     datatableLevel.Rows.Add(new object[] {
-                column.ColumnName, "negatif veya sıfır olan veriler pozitif olmalı !", $"{negativeOrZeroPercentage:P1}"
+                column.ColumnName, "Negatif veya sıfır olan veriler pozitif olmalı!", $"{negativeOrZeroPercentage:P1}"
             });
                 }
             }
@@ -373,7 +363,7 @@ namespace SLF
                     string increaseYilValues = string.Join(", ", increaseYearRows);
                     statDataTable.Rows.Add(new object[]
                     {
-                column.ColumnName, "%10 artış gözlemlendi UYARI", increaseYilValues, "VERİNİN DOĞRULUĞUNDAN EMİN OLUNMALI!!"
+                        column.ColumnName, "%10 artış gözlemlendi UYARI", increaseYilValues, "VERİNİN DOĞRULUĞUNDAN EMİN OLUNMALI!!"
                     });
                 }
 
@@ -386,7 +376,7 @@ namespace SLF
                         string decreaseYilValues = string.Join(", ", decreaseYearRows);
                         statDataTable.Rows.Add(new object[]
                         {
-                    column.ColumnName, "Yıldan yıla kayıp kaçak oranı %50'den fazla UYARI!!", decreaseYilValues, "VERİNİN DOĞRULUĞUNDAN EMİN OLUNMALI!!"
+                            column.ColumnName, "Yıldan yıla kayıp kaçak oranı %50'den fazla UYARI!!", decreaseYilValues, "VERİNİN DOĞRULUĞUNDAN EMİN OLUNMALI!!"
                         });
                     }
                 }
@@ -399,7 +389,7 @@ namespace SLF
                         string kkoYilValues = string.Join(", ", kkoLowYearRows);
                         WarningDataTable.Rows.Add(new object[]
                         {
-                    column.ColumnName, "KKO oranı %5'ten küçük, %5 referans alınarak devam edilecektir", kkoYilValues, "VERİNİN DOĞRULUĞUNDAN EMİN OLUNMALI!!"
+                            column.ColumnName, "KKO oranı %5'ten küçük, %5 referans alınarak devam edilecektir", kkoYilValues, "VERİNİN DOĞRULUĞUNDAN EMİN OLUNMALI!!"
                         });
                     }
                 }
@@ -560,6 +550,8 @@ namespace SLF
             }
             return double.TryParse(value.ToString(), out result);
         }
+
+
         public void ImputeDagıtılan() // Dağıtılan kısımlarının imputasyonu
         {
             int totalRows = currentDataTable.Rows.Count;
