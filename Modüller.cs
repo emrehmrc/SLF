@@ -21,6 +21,7 @@ using SLF.Services;
 using System.Globalization;
 using Newtonsoft.Json;
 
+
 namespace SLF
 {
 
@@ -47,6 +48,8 @@ namespace SLF
         public HomePageForm ana_menu_form_objesi;
         private MethodForm methodFormObjesi;
         private BekleForm bekleForm;
+
+        public Panel imar_legendPanel;
 
         public bool isImported;
         private System.Windows.Forms.Timer cursorTimer;
@@ -111,7 +114,6 @@ namespace SLF
 
         public bool isSelecting_YGA = false;
         public bool isSelecting_YUK = false;
-        private bool isSelecting_marker = false;
 
         // X and Y coordinates of the center location of the gMapControl object to be used to create a sample
         // kml file to be opened in the Google Earth Desktop
@@ -571,51 +573,44 @@ namespace SLF
 
             bool isVisible = cb.Checked;
 
-            // toggle overlay visibility across all four arrays ---
+            // Toggle overlay visibility across all four arrays.
             SetOverlayVisibility(cbs.tüm_katmanlar_array_imar[layerIndex], isVisible);
             SetOverlayVisibility(cbs.tüm_katmanlar_array_yuk[layerIndex], isVisible);
 
-            // refresh all maps ---
+            // Refresh maps.
             gMapControl_imar.Refresh();
             gMapControl_yuk.Refresh();
 
-            // programmatically change the other two checkboxes in the same slot so that they match the newly toggled state.    
-            _isSynchronizingCheckboxes = true;  // guard on
+            _isSynchronizingCheckboxes = true;  // Begin synchronizing
 
             try
             {
-                // We want to find the "sibling" checkboxes at the same index across each map array:
-                // e.g. checkBoxes_imar[layerIndex], checkBoxes_yga[layerIndex], etc.
-                // But we only do it if they exist (i.e. within bounds).
-
-                // If 'cb' is from the imar array, we set the yga and stokastik arrays' checkboxes.
-                // If 'cb' is from the stokastik array, we set the imar and yga arrays' checkboxes, etc.
-                // We can do it more generically by always syncing all three.
-
-                if (layerIndex < checkBoxes_imar.Length)
+                // Synchronize the checkboxes across the different arrays.
+                if (layerIndex < checkBoxes_imar.Length &&
+                    !ReferenceEquals(cb, checkBoxes_imar[layerIndex]))
                 {
-                    // Only set if it's a *different* reference to avoid re-triggering for the same box
-                    if (!ReferenceEquals(cb, checkBoxes_imar[layerIndex]))
-                    {
-                        checkBoxes_imar[layerIndex].Checked = isVisible;
-                    }
+                    checkBoxes_imar[layerIndex].Checked = isVisible;
                 }
 
-                if (layerIndex < checkBoxes_yuk.Length)
+                if (layerIndex < checkBoxes_yuk.Length &&
+                    !ReferenceEquals(cb, checkBoxes_yuk[layerIndex]))
                 {
-                    // Only set if it's a *different* reference to avoid re-triggering for the same box
-                    if (!ReferenceEquals(cb, checkBoxes_yuk[layerIndex]))
-                    {
-                        checkBoxes_yuk[layerIndex].Checked = isVisible;
-                    }
+                    checkBoxes_yuk[layerIndex].Checked = isVisible;
                 }
 
+                // If this layer is for "İMAR_SONUÇLAR.kml", update the legend panel visibility
+                if (cbs.tüm_katmanlar_array_names[layerIndex] == "İMAR_SONUÇLAR.kml")
+                {
+                    // Set the imar_legendPanel Visible property based on the checkbox state.
+                    imar_legendPanel.Visible = isVisible;
+                }
             }
             finally
             {
-                _isSynchronizingCheckboxes = false;  // guard off
+                _isSynchronizingCheckboxes = false;  // End synchronizing
             }
         }
+
 
         private void InitializeCategoryTabPages()
         {
@@ -1129,9 +1124,9 @@ namespace SLF
             startYearComboBox.Items.Clear();
 
             // Add the years to the ComboBox
-            startYearComboBox.Items.Add(lastYear2);
+            //startYearComboBox.Items.Add(lastYear2);
             startYearComboBox.Items.Add(lastYear);
-            startYearComboBox.Items.Add(currentYear);
+            //startYearComboBox.Items.Add(currentYear);
 
             // Disable the endYearComboBox initially
             startYearComboBox.Enabled = true;
@@ -5033,12 +5028,6 @@ namespace SLF
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
 
-        // toolstrip'teki nokta butonu
-        private void Nokta_Ekle_Click(object sender, EventArgs e)
-        {
-            isSelecting_marker = true;
-            isSelecting_polygon = false;
-        }
 
         // haritalardaki arazi katmanı
         private void Arazi_Click(object sender, EventArgs e) // Harita katmanları seçimi - Arazi
@@ -5197,17 +5186,6 @@ namespace SLF
         {
             if (e.Button == MouseButtons.Left)
             {
-                // If user is placing markers (not polygons)
-                if (isSelecting_marker)
-                {
-                    GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green)
-                    {
-                        ToolTipText = $"Lat={Math.Round(pointClick.Lat, 5)}, Lng={Math.Round(pointClick.Lng, 5)}"
-                    };
-                    markerOverlay.Markers.Add(marker);
-                    // Possibly store data in marker.Tag, etc.
-                }
-
                 // If user is drawing polygons
                 if (isSelecting_polygon)
                 {
@@ -5267,6 +5245,15 @@ namespace SLF
 
                     activeMap.Refresh();
                 }
+            } else if (e.Button == MouseButtons.Right)
+            {
+                // If user is placing markers (not polygons)
+                if (isRulerActive) { isRulerActive = false;}
+                if (isRulerEnabled) { isRulerEnabled = false; }
+
+                rulerOverlay_imar?.Clear();
+                rulerRoute_imar?.Clear();
+
             }
         }
 
@@ -5450,6 +5437,11 @@ namespace SLF
                 mesafe.Visible = false;
                 mesafe_metre.Visible = false;
 
+                isRulerEnabled = false;
+                isRulerActive = false;
+                rulerOverlay.Clear();
+                rulerRoute.Clear();
+
                 cbs.GetActiveGMapControl().Refresh();
             }
 
@@ -5583,12 +5575,24 @@ namespace SLF
 
             if (imarOverlay == null && yukOverlay == null) return; // If both overlays are null, exit
 
-            // Get the polygons at the specified rowIndex from both overlays
-            GMapPolygon imarPolygon = imarOverlay?.Polygons.ElementAtOrDefault(rowIndex);
-            GMapPolygon yukPolygon = yukOverlay?.Polygons.ElementAtOrDefault(rowIndex);
+            // Find the polygons with the matching Row_No
+            GMapPolygon imarPolygon = null;
+            GMapPolygon yukPolygon = null;
+
+            // Adjust rowIndex to match Row_No (Row_No starts at 1, rowIndex might be 0-based from DataGridView)
+            int targetRowNo = rowIndex + 1; // Assuming rowIndex is 0-based in DataGridView
+
+            if (imarOverlay != null)
+            {
+                imarPolygon = imarOverlay.Polygons.FirstOrDefault(p => p.Tag != null && Convert.ToInt32(p.Tag) == targetRowNo);
+            }
+
+            if (yukOverlay != null)
+            {
+                yukPolygon = yukOverlay.Polygons.FirstOrDefault(p => p.Tag != null && Convert.ToInt32(p.Tag) == targetRowNo);
+            }
 
             if (imarPolygon == null && yukPolygon == null) return; // If no polygons are found, exit
-
 
             // Calculate the bounding box (use either polygon, assuming they represent the same feature)
             GMapPolygon targetPolygon = imarPolygon ?? yukPolygon; // Use imarPolygon if available, otherwise yukPolygon
@@ -7053,23 +7057,21 @@ namespace SLF
         }
 
 
-
-        // Method to run the R script
         private async Task<string> RunModelRScript()
         {
-            ELFrScriptModelPath = Path.Combine((string)ana_menu_form_objesi.projectRoot,
-                    "Program Dosyaları/ELF/model.R").Replace('/', '\\');
+            // Get the input strings and replace forward slashes with backslashes
+            // Construct the path to the R script
+            ELFrScriptModelPath = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                (string)ana_menu_form_objesi.config.İl,
+               (string)ana_menu_form_objesi.config.ELF.Rscript_Yolu_Model).Replace('/', '\\');
+
 
             string configPath = Path.Combine(((string)ana_menu_form_objesi.projectRoot).Replace('/', '\\'),
                 "config.json");
 
-            MessageBox.Show(ELFrScriptModelPath);
-
             var processInfo = new ProcessStartInfo
             {
-                FileName = "Rscript.exe", // Use .exe explicitly
-                                          // Optionally specify the full path if not in PATH:
-                                          // FileName = "C:\\Program Files\\R\\R-4.3.1\\bin\\Rscript.exe",
+                FileName = "Rscript.exe",
                 Arguments = $"--vanilla \"{ELFrScriptModelPath}\" \"{configPath}\"",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -7247,7 +7249,7 @@ namespace SLF
 
                 label_s_ELF.Visible = true;
                 textBox_sonuc_ELF.Visible = true;
-                textBox_sonuc_ELF.Text = (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_name; ;
+                textBox_sonuc_ELF.Text = (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_name;
             }
             else if (SenaryoModuleTabControl.SelectedTab == EkonometrikGrafiklerTabPage)
             {

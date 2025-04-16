@@ -285,6 +285,10 @@
     <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.IO.RecyclableMemoryStream.3.0.0\lib\netstandard2.0\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Office.Interop.Excel.15.0.4795.1000\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.2957.106, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Web.WebView2.1.0.2957.106\lib\net462\Microsoft.Web.WebView2.Core.dll</HintPath>
     </Reference>
@@ -863,64 +867,6 @@
     <None Include="Excel Files\SLF Sonuçları\SONUCLAR.xlsx" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
-    <None Include="Program Dosyaları\DEK\DEK_0411.ipynb" />
-    <None Include="Program Dosyaları\DEK\dek_distribution.log" />
-    <None Include="Program Dosyaları\EA\Arşiv\EA_0411.ipynb" />
-    <None Include="Program Dosyaları\EA\Arşiv\EA_0411.zip" />
-    <None Include="Program Dosyaları\ELF\.Rhistory" />
-    <None Include="Program Dosyaları\ELF\Arşiv\.Rhistory" />
-    <None Include="Program Dosyaları\ELF\Arşiv\model.R" />
-    <None Include="Program Dosyaları\ELF\Arşiv\senaryolar.R" />
-    <None Include="Program Dosyaları\ELF\model.R" />
-    <None Include="Program Dosyaları\ELF\Rplots.pdf" />
-    <None Include="Program Dosyaları\ELF\senaryolar.R" />
-    <None Include="Program Dosyaları\SLF\1.Saturasyon\Girdi\update_saturation_deneme3.xlsx" />
-    <None Include="Program Dosyaları\SLF\1.Saturasyon\Çıktı\saturation_update_results_29-versiyon.xlsx" />
-    <None Include="Program Dosyaları\SLF\2.İmar oranı tahminleri\Girdi\saturation_update_results_29-versiyon.xlsx" />
-    <None Include="Program Dosyaları\SLF\2.İmar oranı tahminleri\Girdi\SLF_IMAR_TAHMINI_GIRDI4.3.xlsx" />
-    <None Include="Program Dosyaları\SLF\2.İmar oranı tahminleri\Çıktı\2024-2035_son_deneme_imar_tahmin_1203_4.xlsx" />
-    <None Include="Program Dosyaları\SLF\3.Bina Sayısı\Girdi\2024-2035_son_deneme_imar_tahmin_1203_4.xlsx" />
-    <None Include="Program Dosyaları\SLF\3.Bina Sayısı\Girdi\bina_sayisi_as-is.xlsx" />
-    <None Include="Program Dosyaları\SLF\3.Bina Sayısı\Girdi\construction_areas2.xlsx" />
-    <None Include="Program Dosyaları\SLF\3.Bina Sayısı\Girdi\saturation_update_results_29-versiyon.xlsx" />
-    <None Include="Program Dosyaları\SLF\3.Bina Sayısı\kumulative_bina_kodu_v2.ipynb" />
-    <None Include="Program Dosyaları\SLF\3.Bina Sayısı\Çıktı\bina_sayisi_hesaplama_2024_2035_guncel_son_1703.xlsx" />
-    <None Include="Program Dosyaları\SLF\3.Bina Sayısı\Çıktı\new_buildings_2024_2035_1703.xlsx" />
-    <None Include="Program Dosyaları\SLF\4.Abone Sayısı\cumulative_dagilim_son.ipynb" />
-    <None Include="Program Dosyaları\SLF\4.Abone Sayısı\girdi\as_is_abone_sayılari.xlsx" />
-    <None Include="Program Dosyaları\SLF\4.Abone Sayısı\girdi\dagitilacak_abone_delta.xlsx" />
-    <None Include="Program Dosyaları\SLF\4.Abone Sayısı\girdi\new_buildings_2024_2035_1703.xlsx" />
-    <None Include="Program Dosyaları\SLF\4.Abone Sayısı\girdi\SLF_imar_tipi_agirliklar2.xlsx" />
-    <None Include="Program Dosyaları\SLF\4.Abone Sayısı\çıktı\output_abone_dagilimi_kumulatif3.xlsx" />
-    <None Include="Program Dosyaları\SLF\5.yük tahmini\girdi\hor_ver_yuk.xlsx" />
-    <None Include="Program Dosyaları\SLF\5.yük tahmini\girdi\output_abone_dagilimi_kumulatif3.xlsx" />
-    <None Include="Program Dosyaları\SLF\5.yük tahmini\SLF_hor_ver_yuk.ipynb" />
-    <None Include="Program Dosyaları\SLF\5.yük tahmini\çıktı\yukler_sonuc2.xlsx" />
-    <None Include="Program Dosyaları\SLF\Kentsel Dönüşüm\Girdi\bina_sayisi_hesaplama_2024_2035_guncel_son_1703.xlsx" />
-    <None Include="Program Dosyaları\SLF\Kentsel Dönüşüm\Girdi\construction_areas2.xlsx" />
-    <None Include="Program Dosyaları\SLF\Kentsel Dönüşüm\Girdi\kullanici_girdisi4_kentsel_donusum.xlsx" />
-    <None Include="Program Dosyaları\SLF\Kentsel Dönüşüm\Girdi\new_buildings_2024_2035_1703.xlsx" />
-    <None Include="Program Dosyaları\SLF\Kentsel Dönüşüm\kentsel_donusum_entegre.ipynb" />
-    <None Include="Program Dosyaları\SLF\Kentsel Dönüşüm\Çıktı\kentsel_donusum_birlestirilmis3.xlsx" />
-    <None Include="Program Dosyaları\SLF\Kentsel Dönüşüm\Çıktı\kentsel_donusum_sonuc3.xlsx" />
-    <None Include="Program Dosyaları\SLF\Kentsel Dönüşüm\Çıktı\kentsel_donusum_yillik_degisim3.xlsx" />
-    <None Include="Program Dosyaları\SLF\Point load\girdi\enerji_musaadeleri.xlsx" />
-    <None Include="Program Dosyaları\SLF\Point load\girdi\izmir_osb_sonuclar.xlsx" />
-    <None Include="Program Dosyaları\SLF\Point load\girdi\izmir_tum_yol_kaldirim.xlsx" />
-    <None Include="Program Dosyaları\SLF\Point load\girdi\new_buildings_2024_2035_1703.xlsx" />
-    <None Include="Program Dosyaları\SLF\Point load\girdi\sanayi_aday_noktalar.xlsx" />
-    <None Include="Program Dosyaları\SLF\Point load\girdi\ticaret_aday_noktalar.xlsx" />
-    <None Include="Program Dosyaları\SLF\Point load\point_load_yerlestirme.ipynb" />
-    <None Include="Program Dosyaları\SLF\Point load\çıktı\buyuk_sanayi_ticarethane_yerlesimi2.xlsx" />
-    <None Include="Program Dosyaları\SLF\Point load\çıktı\guncellenmis_ana_algoritma_sonuclari.xlsx" />
-    <None Include="Program Dosyaları\SLF\Yga\girdi\construction_areas2.xlsx" />
-    <None Include="Program Dosyaları\SLF\Yga\girdi\kullanici_girdisi4.xlsx" />
-    <None Include="Program Dosyaları\SLF\Yga\girdi\new_buildings_2024_2035_1703.xlsx" />
-    <None Include="Program Dosyaları\SLF\Yga\yeni_genisleme_entegre.ipynb" />
-    <None Include="Program Dosyaları\SLF\Yga\çıktı\bina_sayilari_horizon07_04_6.xlsx" />
-    <None Include="Program Dosyaları\SLF\Yga\çıktı\birlestirilmis_sonuc2.xlsx" />
-    <None Include="Program Dosyaları\SLF\Yga\çıktı\imar_oranlari_horizon7_04_6.xlsx" />
-    <None Include="Program Dosyaları\SLF\Yga\çıktı\saturasyon_horizon07_04_6.xlsx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -1118,12 +1064,6 @@
     <None Include="Pictures\Exterior1.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Program Dosyaları\DEK\DEK_0411.py" />
-    <Content Include="Program Dosyaları\EA\model.py" />
-    <Content Include="Program Dosyaları\EA\trial.py" />
-    <Content Include="Program Dosyaları\Pytthon libraries.txt" />
-    <Content Include="Program Dosyaları\SLF\1.Saturasyon\upgrade_saturation_versiyon7.py" />
-    <Content Include="Program Dosyaları\SLF\2.İmar oranı tahminleri\imar_orani_tahmin_kodu.py" />
     <Content Include="python_kod\deep_learning\Arşiv\EMRE.py" />
     <Content Include="python_kod\deep_learning\Arşiv\XGBoost IMAR_ID Classification Traning_Emre.py" />
     <Content Include="python_kod\deep_learning\düzenleme\Arşiv\EMRE.py" />
@@ -1199,10 +1139,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Program Dosyaları\Optimal DTR\" />
-    <Folder Include="Program Dosyaları\İmar\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

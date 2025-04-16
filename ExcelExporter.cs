@@ -124,7 +124,6 @@ namespace SLF
                     // Dosyayı kaydet
                     package.Save();
 
-                    MessageBox.Show("saved");
                 }
                 catch (Exception ex)
                 {

@@ -88,30 +88,31 @@ namespace SLF
         {
             // Default data in case the Excel file cannot be read
             var defaultData = new List<string[]>
-        {
-            new[] { "Anaokulu", "2,800", "Orta Ticarethane", "30", "0.8", "24" },
-            new[] { "AVM", "10,000", "Büyük Ticarethane", "1,000", "0.6", "600" },
-            new[] { "Banka", "500", "Orta Ticarethane", "100", "0.7", "70" },
-            new[] { "Akaryakıt İstasyonu", "1,400", "Orta Ticarethane", "50", "0.6", "30" },
-            new[] { "Cami", "300", "Orta Ticarethane", "50", "0.7", "35" },
-            new[] { "Fırın", "500", "Orta Ticarethane", "30", "0.7", "21" },
-            new[] { "Halk Sağlığı Merkezi", "400", "Orta Ticarethane", "150", "0.8", "120" },
-            new[] { "Hastane", "30,000", "Büyük Ticarethane", "1,000", "0.9", "900" },
-            new[] { "İtfaiye", "1,100", "Orta Ticarethane", "100", "0.6", "60" },
-            new[] { "Kamu Binası", "1,200", "Orta Ticarethane", "200", "0.6", "120" },
-            new[] { "Konser Alanı", "2,000", "Orta Ticarethane", "400", "0.7", "280" },
-            new[] { "Okul", "7,500", "Orta Ticarethane", "300", "0.8", "240" },
-            new[] { "Oto Tamirci", "700", "Orta Ticarethane", "250", "0.7", "175" },
-            new[] { "Otogar", "5,800", "Büyük Ticarethane", "350", "0.7", "245" },
-            new[] { "Otopark", "2,500", "Orta Ticarethane", "200", "0.8", "160" },
-            new[] { "Pazar Alanı", "5,400", "Orta Ticarethane", "200", "0.8", "160" },
-            new[] { "PTT", "500", "Orta Ticarethane", "50", "0.7", "35" },
-            new[] { "Restoran", "800", "Orta Ticarethane", "120", "0.6", "72" },
-            new[] { "Sanat Alanı", "3,000", "Orta Ticarethane", "100", "0.6", "60" },
-            new[] { "Sosyal Yaşam Merkezi", "1,500", "Orta Ticarethane", "300", "0.7", "210" },
-            new[] { "Süpermarket", "3,500", "Orta Ticarethane", "250", "0.7", "175" },
-            new[] { "Üniversite Kampüsü", "200,000", "Büyük Ticarethane", "1,000", "0.6", "600" }
-        };
+            {
+                new[] { "Anaokulu", "2,800", "Orta Ticarethane", "30", "0.8", "24" },
+                new[] { "AVM", "10,000", "Büyük Ticarethane", "1,000", "0.6", "600" },
+                new[] { "Banka", "500", "Orta Ticarethane", "100", "0.7", "70" },
+                new[] { "Akaryakıt İstasyonu", "1,400", "Orta Ticarethane", "50", "0.6", "30" },
+                new[] { "Cami", "300", "Orta Ticarethane", "50", "0.7", "35" },
+                new[] { "Fırın", "500", "Orta Ticarethane", "30", "0.7", "21" },
+                new[] { "Halk Sağlığı Merkezi", "400", "Orta Ticarethane", "150", "0.8", "120" },
+                new[] { "Hastane", "30,000", "Büyük Ticarethane", "1,000", "0.9", "900" },
+                new[] { "İtfaiye", "1,100", "Orta Ticarethane", "100", "0.6", "60" },
+                new[] { "Kamu Binası", "1,200", "Orta Ticarethane", "200", "0.6", "120" },
+                new[] { "Konser Alanı", "2,000", "Orta Ticarethane", "400", "0.7", "280" },
+                new[] { "Okul", "7,500", "Orta Ticarethane", "300", "0.8", "240" },
+                new[] { "Oto Tamirci", "700", "Orta Ticarethane", "250", "0.7", "175" },
+                new[] { "Otogar", "5,800", "Büyük Ticarethane", "350", "0.7", "245" },
+                new[] { "Otopark", "2,500", "Orta Ticarethane", "200", "0.8", "160" },
+                new[] { "Pazar Alanı", "5,400", "Orta Ticarethane", "200", "0.8", "160" },
+                new[] { "PTT", "500", "Orta Ticarethane", "50", "0.7", "35" },
+                new[] { "Restoran", "800", "Orta Ticarethane", "120", "0.6", "72" },
+                new[] { "Sanat Alanı", "3,000", "Orta Ticarethane", "100", "0.6", "60" },
+                new[] { "Sosyal Yaşam Merkezi", "1,500", "Orta Ticarethane", "300", "0.7", "210" },
+                new[] { "Süpermarket", "3,500", "Orta Ticarethane", "250", "0.7", "175" },
+                new[] { "Tarımsal Alan", "10,000", "Tarımsal Alan", "20", "0.7", "14" },
+                new[] { "Üniversite Kampüsü", "200,000", "Büyük Ticarethane", "1,000", "0.6", "600" }
+            };
 
             foreach (var rowData in defaultData)
             {

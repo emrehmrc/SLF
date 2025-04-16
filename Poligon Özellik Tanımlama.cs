@@ -41,21 +41,10 @@ namespace SLF
             isSelecting_YUK = isSelectingYUK;
             isSelecting_YGA = isSelectingYGA;
 
-            //PoligonDataGridView.EditingControlShowing += PoligonDataGridView_EditingControlShowing;
-
-
-            // Resolve the Excel file path relative to SLF.exe
-            string exeLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string projectRoot = Directory.GetParent(exeLocation)?.Parent?.FullName;
-            if (projectRoot != null)
-            {
-                excelFilePath = Path.Combine(projectRoot, "Excel Files", "Point Load Karakteristikleri", "point_load.xlsx");
-            }
-            else
-            {
-                excelFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "point_load.xlsx");
-                MessageBox.Show($"Excel dosya yolu çözülemedi. Varsayılan yol kullanılıyor: {excelFilePath}", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
+            excelFilePath = Path.Combine((string)modül_formu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                (string)modül_formu.ana_menu_form_objesi.config.İl,
+                (string)modül_formu.ana_menu_form_objesi.config.İlçe,
+                (string)modül_formu.ana_menu_form_objesi.config.Point_Load).Replace('/', '\\');
 
             // Determine layer index
             layerIndex = FindFirstFreeLayerIndex();
@@ -147,7 +136,6 @@ namespace SLF
                 dataTable.Columns.Add("Başlangıç Yılı", typeof(string));
                 dataTable.Columns.Add("Satürasyon Hızı", typeof(string));
                 dataTable.Columns.Add("Park, Yol, Kaldırım Oranı (%)", typeof(string));
-                dataTable.Columns.Add("Sosyal Yapı Parsel Oranı (%)", typeof(string));
 
                 // Add a single row
                 dataTable.Rows.Add(dataTable.NewRow());
@@ -227,11 +215,11 @@ namespace SLF
         {
             // Define the columns that should remain manually defined.
             var manualColumns = new HashSet<string>
-    {
-        "Polygon ID",
-        "Koordinatlar",
-        "Çizilen Alan (m2)"
-    };
+            {
+                "Polygon ID",
+                "Koordinatlar",
+                "Çizilen Alan (m2)"
+            };
 
             // Store current cell values for dropdown columns (from the first non-new row).
             var currentValues = new Dictionary<string, object>();
@@ -309,7 +297,7 @@ namespace SLF
 
         private void buton_yük_tipleri_Click(object sender, EventArgs e)
         {
-            yük_bilgi_formu_objesi = new Nokta_Yuk_Bilgi_Formu(modül_formu.polygonTypesExcelPath);
+            yük_bilgi_formu_objesi = new Nokta_Yuk_Bilgi_Formu(excelFilePath);
             yük_bilgi_formu_objesi.Owner = this;
             yük_bilgi_formu_objesi.ShowDialog();
             yük_bilgi_formu_objesi.BringToFront();

@@ -196,15 +196,13 @@ namespace SLF
         {
             DataTable dataTable = new DataTable();
 
-            // Example of measuring import time
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
             using (var package = new ExcelPackage(new FileInfo(filePath)))
             {
-                ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // Assuming data is in the first worksheet
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
 
-                // Validate column headers. In case it fails, it throws an exception.
                 ValidateColumnHeaders(worksheet, seçilenVeriTipi);
 
                 int rowCount = worksheet.Dimension.Rows;
@@ -215,26 +213,58 @@ namespace SLF
                 {
                     DataColumn column = new DataColumn();
                     column.ColumnName = worksheet.Cells[1, col].Text;
+                    column.AllowDBNull = true;
                     dataTable.Columns.Add(column);
                 }
 
-                // Populate DataTable with Excel data
-                // Row starts from 2 because 1st row is column headers
+                for (int col = 1; col <= colCount; col++)
+                {
+                    string columnName = worksheet.Cells[1, col].Text;
+                }
+
+                // Populate DataTable with only numeric values
                 for (int row = 2; row <= rowCount; row++)
                 {
                     DataRow dataRow = dataTable.NewRow();
+                    bool rowHasData = false;
+
                     for (int col = 1; col <= colCount; col++)
                     {
-                        dataRow[col - 1] = worksheet.Cells[row, col].Value;
+                        var cell = worksheet.Cells[row, col];
+                        object value = cell.Value;
+                        string columnName = worksheet.Cells[1, col].Text;
+
+                        if (value != null)
+                        {
+                            string valueAsString = value.ToString().Trim();
+                            if (double.TryParse(valueAsString, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedValue))
+                            {
+                                dataRow[col - 1] = parsedValue;
+                                rowHasData = true;
+                            }
+                            else
+                            {
+                                dataRow[col - 1] = DBNull.Value; // Treat non-numeric values (e.g., formula results) as null
+                            }
+                        }
+                        else
+                        {
+                            dataRow[col - 1] = DBNull.Value; // Treat null values as null
+                        }
                     }
-                    dataTable.Rows.Add(dataRow);
+
+                    // Only add the row if it contains at least one numeric value
+                    if (rowHasData)
+                    {
+                        dataTable.Rows.Add(dataRow);
+                    }
                 }
             }
-            stopwatch.Stop();
 
-            Console.WriteLine($"Excel file import took: {stopwatch.ElapsedMilliseconds} ms");
+            stopwatch.Stop();
             return dataTable;
         }
+
         private void ValidateColumnHeaders(ExcelWorksheet worksheet, string seçilenVeriTipi)
         {
             int colCount = worksheet.Dimension.Columns;

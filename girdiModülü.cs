@@ -169,21 +169,26 @@ namespace SLF
 
             return roundedKapasite;
         }
-
-        public bool IsNullLike(object value, bool isZero=false) // 0 VE negatif kontrolu 
+        public bool IsNullLike(object value, bool isZero = false) // 0 VE negatif kontrolu 
         {
             if (value == null || value == DBNull.Value)
             {
                 return true;
             }
-            if (isZero && value.ToString()=="0")
+            if (isZero && value.ToString() == "0")
             {
                 return true;
             }
 
-            string stringValue = value.ToString();
+            string stringValue = value?.ToString() ?? ""; // Handle null safely
+            if (string.IsNullOrWhiteSpace(stringValue)) // Treat empty or whitespace as null-like
+            {
+                return true;
+            }
+
             return nullLikeStrings.Contains(stringValue, StringComparer.OrdinalIgnoreCase);
         }
+
 
         public void VEERReport(string seçilenVeriTipi)
         {
@@ -248,9 +253,7 @@ namespace SLF
                         }
                         else if (dialogResult == DialogResult.OK)
                         {
-                            Console.WriteLine("Dialog OK - ImportProcessedData çağrılıyor");
                             ImportProcessedData();
-                            Console.WriteLine("ImportProcessedData tamamlandı");
                             break;
                         }
 
@@ -318,11 +321,6 @@ namespace SLF
             return (boundary, boundary);
         }
 
-        protected static (float Min, float Max) InfoWarningBoundary(float boundary)
-        { 
-            // Bi verinin "boundary"ye kadar olan kısmı info, "boundary"den sonrası warning
-            return (boundary, MAX_THRESHOLD);
-        }
 
         // Public read-only property
         public DataTable CurrentDataTable { get { return currentDataTable; }}
@@ -444,7 +442,11 @@ namespace SLF
                     try
                     {
                         var excelExporter = new ExcelExporter();
-                        excelExporter.UpdateExcelFileFirstSheet((string)modülFormu.ana_menu_form_objesi.config.ELF.INPUT_FILE, importedDataTable);
+                        excelExporter.UpdateExcelFileFirstSheet(Path.Combine((string)modülFormu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                                (string)modülFormu.ana_menu_form_objesi.config.İl,
+                                (string)modülFormu.ana_menu_form_objesi.config.İlçe,
+                                (string)modülFormu.ana_menu_form_objesi.config.ELF.INPUT_FILE).Replace('/', '\\'), 
+                            importedDataTable);
                         RunRScriptSenaryolar();
                     }
                     catch (Exception ex)
@@ -559,9 +561,6 @@ namespace SLF
 
             foreach (DataColumn column in dataTable.Columns)
             {
-                // DEBUG: Her kolon adını göstermek
-                Console.WriteLine($"Orijinal Kolon: {column.ColumnName}");
-
                 updatedTable.Columns.Add(column.ColumnName.ToUpperInvariant(), column.DataType);
             }
 
@@ -583,12 +582,16 @@ namespace SLF
             try
             {
                 // Get the input strings and replace forward slashes with backslashes
-                // Construct the path to the R script
-                string rScriptPath = Path.Combine((string)modülFormu.ana_menu_form_objesi.projectRoot,
-                   "Program Dosyaları/ELF/senaryolar.R").Replace('/', '\\');
+                string anaKlasorYolu = ((string)modülFormu.ana_menu_form_objesi.config.Ana_Klasör_Yolu).Replace('/', '\\');
+                string il = ((string)modülFormu.ana_menu_form_objesi.config.İl).Replace('/', '\\');
+                string rScriptYolu = ((string)modülFormu.ana_menu_form_objesi.config.ELF.Rscript_Yolu_Senaryolar).Replace('/', '\\');
 
-                string configPath = Path.Combine((string)modülFormu.ana_menu_form_objesi.projectRoot, 
-                    "config.json");
+                // Construct the path to the R script
+                string rScriptPath = Path.Combine(anaKlasorYolu, il, rScriptYolu);
+
+                // Construct the path to the config file
+                string projectRoot = ((string)modülFormu.ana_menu_form_objesi.projectRoot).Replace('/', '\\');
+                string configPath = Path.Combine(projectRoot, "config.json");
 
                 // Run Rscript.exe directly with quoted paths
                 var process = new Process
@@ -865,7 +868,6 @@ namespace SLF
             // Ensure the DataGridView is initialized
             if (dataGridView == null)
             {
-                Console.WriteLine("DataGridView is null, cannot apply formatting.");
                 return;
             }
 
@@ -909,16 +911,17 @@ namespace SLF
         protected DataTable NormalizeDataTableTypes(DataTable dataTable)
         {
             var percentageColumns = GetPercentageColumns();
-            DataTable newTable = dataTable.Clone(); // Clone structure without data
+            DataTable newTable = dataTable.Clone();
 
-            // Adjust column types
+            // Adjust column types and allow DBNull
             foreach (DataColumn column in newTable.Columns)
             {
                 bool isPercentage = percentageColumns.Contains(column.ColumnName);
                 bool isNumeric = IsNumericColumn(dataTable.Columns[column.ColumnName]);
                 if (isPercentage || isNumeric)
                 {
-                    column.DataType = typeof(double); // Set to double for numeric/percentages
+                    column.DataType = typeof(double);
+                    column.AllowDBNull = true;
                 }
             }
 
@@ -926,13 +929,17 @@ namespace SLF
             foreach (DataRow row in dataTable.Rows)
             {
                 DataRow newRow = newTable.NewRow();
+                int rowIndex = dataTable.Rows.IndexOf(row) + 2;
                 foreach (DataColumn column in dataTable.Columns)
                 {
                     string columnName = column.ColumnName;
                     object value = row[columnName];
+
                     if (!IsNullLike(value) && (percentageColumns.Contains(columnName) || IsNumericColumn(column)))
                     {
-                        if (double.TryParse(value.ToString(), out double parsedValue))
+                        string valueAsString = value.ToString().Trim();
+
+                        if (double.TryParse(valueAsString, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedValue))
                         {
                             newRow[columnName] = parsedValue;
                         }
@@ -943,13 +950,13 @@ namespace SLF
                     }
                     else
                     {
-                        newRow[columnName] = value; // Keep original value if not numeric/percentage
+                        newRow[columnName] = value;
                     }
                 }
                 newTable.Rows.Add(newRow);
             }
 
-            return newTable; // Return new table instead of modifying in place
+            return newTable;
         }
 
         private bool IsNumericColumn(DataColumn column)
@@ -966,47 +973,6 @@ namespace SLF
             return false;
         }
 
-        private void ConvertColumnToType(DataTable dataTable, string columnName, Type targetType)
-        {
-            if (!dataTable.Columns.Contains(columnName))
-                return;
-
-            DataColumn oldColumn = dataTable.Columns[columnName];
-            string tempColumnName = columnName + "_temp";
-
-            // Create a new column with the target type
-            dataTable.Columns.Add(tempColumnName, targetType);
-
-            // Copy and convert data
-            foreach (DataRow row in dataTable.Rows)
-            {
-                if (!IsNullLike(row[oldColumn]))
-                {
-                    try
-                    {
-                        if (targetType == typeof(double))
-                        {
-                            if (double.TryParse(row[oldColumn].ToString(), out double value))
-                            {
-                                row[tempColumnName] = value;
-                            }
-                            else
-                            {
-                                row[tempColumnName] = DBNull.Value;
-                            }
-                        }
-                    }
-                    catch
-                    {
-                        row[tempColumnName] = DBNull.Value;
-                    }
-                }
-            }
-
-            // Remove old column and rename new column
-            dataTable.Columns.Remove(oldColumn);
-            dataTable.Columns[tempColumnName].ColumnName = columnName;
-        }
 
         protected void NormalizePercentageValues(DataTable dataTable)
         {
