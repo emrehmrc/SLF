@@ -874,7 +874,10 @@ namespace SLF
             // Disable the button initially
             OpenModuleButton.Enabled = false;
 
-            string filePath = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+            string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+            string filePath = Path.Combine(userRootPath,
+                (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                 (string)ana_menu_form_objesi.config.İl,
                 (string)ana_menu_form_objesi.config.İlçe,
                 (string)ana_menu_form_objesi.config.ELF.INPUT_FILE);
@@ -2615,8 +2618,6 @@ namespace SLF
                     {
                         yearApproveButton.Text = "Sıfırla"; // Yıllar setlenmiş durumda
                     }
-
-                    Console.WriteLine($"ComboBox'lar yüklenen yıllara göre güncellendi");
                 }
             }
             catch (Exception ex)
@@ -2972,7 +2973,6 @@ namespace SLF
             {
                 if (popupForm.ShowDialog() == DialogResult.OK)
                 {
-                    Console.WriteLine("Popup form closed with OK. Updating data...");
                     // await eaHaritayaVeriYukleAsync();
 
                     DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
@@ -2989,7 +2989,6 @@ namespace SLF
                         Console.WriteLine($"No row found for Cell {cellId} in DataTable.");
                     }
 
-                    Console.WriteLine("Calling HaritaUzerindeSimulasyonGosterimi...");
                     await HaritaUzerindeSimulasyonGosterimi(dataTable);
                     Console.WriteLine("HaritaUzerindeSimulasyonGosterimi completed.");
                 }
@@ -3162,11 +3161,9 @@ namespace SLF
 
                 gMapControl_EA.Overlays.Clear();
                 gMapControl_EA.Refresh();
-                // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
+
                 HesaplaMerkezNoktaVeEkle(simulationData);
                 await HaritaUzerindeSimulasyonGosterimi(simulationData);
-                // Assuming you have a DataTable named 'veriTablosu' and a year (e.g., 2023)
-                // await HaritaUzerindeSimulasyonGosterimiWithNewPoints(veriTablosu, 2023);
 
 
                 MessageBox.Show("Veri başarıyla yüklendi.");
@@ -3222,9 +3219,6 @@ namespace SLF
                         "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-
-                // Call SimilasyonSonucGoruntule to handle display
-                //SimilasyonSonucGoruntule();
 
                 // Add info message box to inform user of completion
                 MessageBox.Show("Simulation process completed successfully!",
@@ -3315,66 +3309,7 @@ namespace SLF
             gMapControl_EA.Refresh();
         }
 
-        // Şehir seçimi yapıldığında çağrılan metot
 
-/*        private void ilSecimiMonteCarlo(object sender, EventArgs e)
-        {
-            // Always clear the district combo box and reset SelectedDistrict
-            comboBox_ea_ilce_secimi.Items.Clear();
-            comboBox_ea_ilce_secimi.SelectedIndex = -1; // Ensure no selection
-            comboBox_ea_ilce_secimi.Enabled = false; // Disable by default
-            SelectedDistrict = null;
-            SelectedCity = comboBox_ea_il_secimi.SelectedItem.ToString();
-            if (cityDistricts.TryGetValue(SelectedCity, out var districts))
-            {
-                comboBox_ea_ilce_secimi.Invoke(new Action(() =>
-                {
-                    comboBox_ea_ilce_secimi.Items.Clear();
-                    comboBox_ea_ilce_secimi.Items.AddRange(districts.ToArray());
-                    comboBox_ea_ilce_secimi.SelectedIndex = -1;
-                    comboBox_ea_ilce_secimi.Enabled = true;
-                    comboBox_ea_ilce_secimi.Refresh();
-                }));
-            }
-            *//*            // Update SelectedCity if a valid selection exists
-                        if (comboBox_ea_il_secimi.SelectedItem != null)
-                        {
-                            SelectedCity = comboBox_ea_il_secimi.SelectedItem.ToString();
-
-                            // Populate district combo box based on selected city
-                            if (cityDistricts.TryGetValue(SelectedCity, out var districts))
-                            {
-                                comboBox_ea_ilce_secimi.Items.AddRange(districts.ToArray());
-                                comboBox_ea_ilce_secimi.Enabled = true;
-                            }
-                        }*//*
-            else
-            {
-                SelectedCity = null;
-            }
-
-
-            if (SelectedCity != null && cityCoordinates.TryGetValue(SelectedCity, out PointLatLng coordinates))
-            {
-                gMapControl_EA.Position = coordinates;
-                gMapControl_EA.Zoom = 12;
-            }
-        }*/
-/*        private void ilceSecimiMonteCarlo(object sender, EventArgs e)
-        {
-            if (comboBox_ea_ilce_secimi.SelectedItem != null)
-            {
-                SelectedDistrict = comboBox_ea_ilce_secimi.SelectedItem.ToString();
-                Console.WriteLine($"Selected District: {SelectedDistrict}");
-            }
-            else
-            {
-                SelectedDistrict = null;
-                Console.WriteLine("District selection cleared.");
-            }
-            //   CheckSelections();
-        }
-*/
         // Yıl seçimi yapıldığında çağrılan metot
         private void yilSecimiMonteCarlo(object sender, EventArgs e)
         {
@@ -3487,7 +3422,6 @@ namespace SLF
                 }
 
                 gMapControl_EA.OnMarkerClick -= gMapControl_EA_OnMarkerClick;
-                //   gMapControl_EA.OnMapClick -= gMapControl_Ea_OnMapClick;
 
                 // Use dataGridView1.DataSource as the DataTable instead of eaDataTable
                 DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
@@ -3635,15 +3569,6 @@ namespace SLF
             SelectedDistrict = PathService.SelectedDistrict;
             SelectedCity = PathService.SelectedCity;
 
-            /*            // Checkbox'ları görünür hale getir
-                        checkBox_AC_Home.Visible = true;
-                        checkBox_AC_Public.Visible = true;
-                        checkBox_AC_Work.Visible = true;
-                        checkBox_DC_Fast.Visible = true;
-                        checkBox_AC_Public.Checked = true;
-                        checkBox_AC_Work.Checked = true;
-                        checkBox_AC_Home.Checked = true;
-                        checkBox_DC_Fast.Checked = true;*/
 
             gMapControl_EA.Overlays.Clear();
             gMapControl_EA.Refresh();
@@ -4014,14 +3939,6 @@ namespace SLF
             }
             var pointClick = gMapControl_DEK.FromLocalToLatLng(MousePosition.X, MousePosition.Y);
 
-            //// Create or get the overlay for charging station markers
-            //GMapOverlay chargingStationOverlay = gMapControl_EA.Overlays.FirstOrDefault(o => o.Id == "ChargingStationLayer");
-            //if (chargingStationOverlay == null)
-            //{
-            //    chargingStationOverlay = new GMapOverlay("ChargingStationLayer");
-            //    gMapControl_EA.Overlays.Add(chargingStationOverlay);
-            //}
-
             // Refresh the map to show the new marker
             gMapControl_DEK.Refresh();
 
@@ -4163,39 +4080,6 @@ namespace SLF
                 DEKCellToolTipOverlay.Markers.Remove(marker);
             }
         }
-        // DEK şehri seçildiğinde çağrılan metot
-/*        private void dek_city_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (comboBox_DEK_il.SelectedItem != null)  // Geçerli bir seçim yapıldığında
-            {
-                SelectedCity = comboBox_DEK_il.SelectedItem.ToString();  // Şehir adını ayarla
-                SelectedDistrict = null;
-                if (cityDistricts.TryGetValue(SelectedCity, out var districts))
-                {
-                    comboBox_dek_ilce_secimi.Invoke(new Action(() =>
-                    {
-                        comboBox_dek_ilce_secimi.Items.Clear();
-                        comboBox_dek_ilce_secimi.Items.AddRange(districts.ToArray());
-                        comboBox_dek_ilce_secimi.SelectedIndex = -1;
-                        comboBox_dek_ilce_secimi.Enabled = true;
-                        comboBox_dek_ilce_secimi.Refresh();
-                    }));
-                }
-                else
-                {
-                    SelectedCity = null;
-                }
-
-                // Update button enablement and map position
-                // CheckSelections();
-                // Set map position based on selected city
-                if (cityCoordinates.TryGetValue(SelectedCity, out PointLatLng coordinates))
-                {
-                    gMapControl_DEK.Position = coordinates; // Set the map's position
-                    gMapControl_DEK.Zoom = 12; // Adjust the zoom level as needed
-                }
-            }
-        }*/
 
         private async void dekSimulasyonGoruntule(object sender, EventArgs e)
         {
@@ -4241,26 +4125,6 @@ namespace SLF
 
             DataTable dek_veri;
 
-            /*            try
-                        {
-                            // Excel dosyasını aç
-                            using (var package = new ExcelPackage(new FileInfo(filePath)))
-                            {
-                                // Yıl seçimine göre sayfayı seç (SelectedYear değeri, sayfa indeksini temsil eder)
-                                ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
-
-                                // Veriyi DataTable'a yükle
-                                dek_veri = excelService.LoadWorksheetIntoDataTable(worksheet);
-                            }
-
-                            // Veri başarıyla yüklendiğinde bir bildirim gösterin
-                            MessageBox.Show("Veri başarıyla yüklendi.");
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
-                            return; // Hata durumunda işlemi sonlandır
-                        }*/
             try
             {
                 // Excel dosyasını aç
@@ -5081,8 +4945,10 @@ namespace SLF
         // Save button logic to update Excel file with changes from DataGridViews
         private async void ELFScenerioSaveButton_Click(object sender, EventArgs e)
         {
+            string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
-            string originalFilePath = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+            string originalFilePath = Path.Combine(userRootPath,
+                (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                 (string)ana_menu_form_objesi.config.İl,
                 (string)ana_menu_form_objesi.config.İlçe,
                 (string)ana_menu_form_objesi.config.ELF.INPUT_FILE);
@@ -6531,21 +6397,6 @@ namespace SLF
             gMapControl_DEK.Refresh();
         }
 
-/*        private void ilceSecimiDEK(object sender, EventArgs e)
-        {
-            if (comboBox_dek_ilce_secimi.SelectedItem != null)
-            {
-                SelectedDistrict = comboBox_dek_ilce_secimi.SelectedItem.ToString();
-                Console.WriteLine($"Selected District: {SelectedDistrict}");
-            }
-            else
-            {
-                SelectedDistrict = null;
-                Console.WriteLine("District selection cleared.");
-            }
-            // CheckSelections();
-        }*/
-
         private async void DEKRunSimulationButton_Click(object sender, EventArgs e)
         {
             // Disable buttons and TrackBar to prevent interaction while processing
@@ -6681,24 +6532,7 @@ namespace SLF
 
                         // Veriyi DataTable'a yükle
                         simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
-                        // Filter DataTable based on SelectedDistrict and its ID
-                        /*                        if (SelectedDistrict != null)
-                                                {
-                                                    if (districtIdMap.TryGetValue(SelectedDistrict, out string districtId))
-                                                    {
-                                                        var filteredRows = veriMonteCarlo.AsEnumerable()
-                                                            .Where(row => row.Field<string>("ilce") == districtId)
-                                                            .CopyToDataTable();
-                                                        veriMonteCarlo = filteredRows; // Update with filtered data
-                                                    }
-                                                    else
-                                                    {
-                                                        MessageBox.Show($"No ID mapping found for district: {SelectedDistrict}. No data will be displayed.",
-                                                            "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                                        veriMonteCarlo.Clear(); // Clear data to prevent displaying all districts
-                                                        return; // Exit the method
-                                                    }
-                                                }*/
+
                     }
                 }
                 catch (Exception ex)
@@ -6706,28 +6540,6 @@ namespace SLF
                     MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
                     return; // Hata durumunda işlemi sonlandır
                 }
-
-                /*                    using (var package = new ExcelPackage(new FileInfo(filePath)))
-                                    {
-                                        // Map SelectedYear index to actual year
-                                        int baseYear = slfStartYear; // e.g., 2024
-                                        string year = (SelectedYear != -1 && SelectedYear < (slfEndYear - slfStartYear + 1))
-                                            ? (baseYear + SelectedYear).ToString()
-                                            : "2025";
-
-                                        ExcelWorksheet worksheet = package.Workbook.Worksheets[year];
-                                        if (worksheet == null)
-                                        {
-                                            MessageBox.Show($"Worksheet for year {year} not found in output file.",
-                                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                            return;
-                                        }
-
-                                        simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
-                                }*/
-
-                // Log column names for debugging
-                Console.WriteLine("DataTable Columns: " + string.Join(", ", simulationData.Columns.Cast<DataColumn>().Select(c => c.ColumnName)));
 
                 gMapControl_DEK.Overlays.Clear();
                 gMapControl_DEK.Refresh();
@@ -7305,12 +7117,14 @@ namespace SLF
 
         private async Task<string> RunModelRScript()
         {
+            // Get the user's home directory (e.g., C:\Users\ehan0)
+            string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
             // Get the input strings and replace forward slashes with backslashes
-            // Construct the path to the R script
-            ELFrScriptModelPath = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+            ELFrScriptModelPath = Path.Combine(userRootPath,
+                (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                 (string)ana_menu_form_objesi.config.İl,
                (string)ana_menu_form_objesi.config.ELF.Rscript_Yolu_Model).Replace('/', '\\');
-
 
             string configPath = Path.Combine(((string)ana_menu_form_objesi.projectRoot).Replace('/', '\\'),
                 "config.json");
@@ -7365,7 +7179,8 @@ namespace SLF
                 // Deserialize on the UI thread since it might be used by UI components
                 ana_menu_form_objesi.config = JsonConvert.DeserializeObject(ana_menu_form_objesi.json_file);
 
-                string results_path = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                string results_path = Path.Combine(userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
                     (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_klasör,
@@ -7405,43 +7220,6 @@ namespace SLF
             }
         }
 
-        private void CreateReportButton2_Click(object sender, EventArgs e)
-        {
-            ReportTableForm popup = new ReportTableForm("EA");
-            if (popup.ShowDialog() == DialogResult.OK)
-            {
-                // Handle OK case if needed
-            }
-            else if (popup.OperationCancelled)
-            {
-                MessageBox.Show("İşlem iptal edildi.");
-            }
-        }
-        /*        private void CreateReportButton_Click(object sender, EventArgs e)
-                {
-                    ReportTableForm popup = new ReportTableForm();
-                    if (popup.ShowDialog() == DialogResult.OK)
-                    {
-
-                    }
-                    else if (popup.OperationCancelled)
-                    {
-                        MessageBox.Show("İşlem iptal edildi.");
-                    }
-                }
-
-                private void CreateReportButton2_Click(object sender, EventArgs e)
-                {
-                    ReportTableForm popup = new ReportTableForm();
-                    if (popup.ShowDialog() == DialogResult.OK)
-                    {
-
-                    }
-                    else if (popup.OperationCancelled)
-                    {
-                        MessageBox.Show("İşlem iptal edildi.");
-                    }
-                }*/
 
         private async void ELFTahminButonu_Click(object sender, EventArgs e)
         {
@@ -7461,7 +7239,9 @@ namespace SLF
                 };
                 cursorTimer.Start();
 
-                ELFSenaryolarFilePath = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+                ELFSenaryolarFilePath = Path.Combine(userRootPath,(string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
                     (string)ana_menu_form_objesi.config.ELF.INPUT_FILE);
@@ -7535,7 +7315,10 @@ namespace SLF
                 label_graphics.Visible = false;
                 comboBox_ekonometrik.Visible = false;
 
-                string results_path = Path.Combine((string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+                string results_path = Path.Combine(userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
                     (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_klasör,
@@ -7574,8 +7357,12 @@ namespace SLF
         {
             try
             {
+
+                string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+
                 // Construct the graphics path
-                string graphicsPath = Path.Combine(
+                string graphicsPath = Path.Combine(userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
@@ -7830,6 +7617,18 @@ namespace SLF
             }
         }
 
+        private void CreateReportButton2_Click(object sender, EventArgs e)
+        {
+            ReportTableForm popup = new ReportTableForm("EA");
+            if (popup.ShowDialog() == DialogResult.OK)
+            {
+                // Handle OK case if needed
+            }
+            else if (popup.OperationCancelled)
+            {
+                MessageBox.Show("İşlem iptal edildi.");
+            }
+        }
 
         private void TextBox_KeyPress_NumbersOnly(object sender, KeyPressEventArgs e)
         {

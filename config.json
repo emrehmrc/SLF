@@ -1,5 +1,5 @@
 {
-  "Ana_Klasör_Yolu": "C:/Users/ehan0/MRC/MRC - 1.1.3_T&SI/MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı/il_ilce_kırılımları",
+  "Ana_Klasör_Yolu": "MRC/MRC - 1.1.3_T&SI/MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı/il_ilce_kırılımları",
   "İl": "İzmir",
   "İlçe": "Karşıyaka",
   "ELF": {
@@ -21,7 +21,8 @@
     "Sonuçlar_to_Kml": "C:/Users/ehan0/source/repos/emrehmrc/SLF/python_kod/SLF Sonucları/excel_to_kml_sonuçlar.py"
   },
   "DEK": {
-    "Simulasyon_Kodu": ""
+    "min_max_path": "Olasılıklar.xlsx",
+	"baslangıc_yılı":2024,
   },
   "EA": {
     "Klasör": "EA Şarj",

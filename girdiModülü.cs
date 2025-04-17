@@ -441,8 +441,13 @@ namespace SLF
                 {
                     try
                     {
+
+                        string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+
                         var excelExporter = new ExcelExporter();
-                        excelExporter.UpdateExcelFileFirstSheet(Path.Combine((string)modülFormu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        excelExporter.UpdateExcelFileFirstSheet(Path.Combine(userRootPath,
+                            (string)modülFormu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                                 (string)modülFormu.ana_menu_form_objesi.config.İl,
                                 (string)modülFormu.ana_menu_form_objesi.config.İlçe,
                                 (string)modülFormu.ana_menu_form_objesi.config.ELF.INPUT_FILE).Replace('/', '\\'), 
@@ -581,13 +586,17 @@ namespace SLF
         {
             try
             {
+
+                // Get the user's home directory (e.g., C:\Users\ehan0)
+                string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
                 // Get the input strings and replace forward slashes with backslashes
                 string anaKlasorYolu = ((string)modülFormu.ana_menu_form_objesi.config.Ana_Klasör_Yolu).Replace('/', '\\');
                 string il = ((string)modülFormu.ana_menu_form_objesi.config.İl).Replace('/', '\\');
                 string rScriptYolu = ((string)modülFormu.ana_menu_form_objesi.config.ELF.Rscript_Yolu_Senaryolar).Replace('/', '\\');
 
                 // Construct the path to the R script
-                string rScriptPath = Path.Combine(anaKlasorYolu, il, rScriptYolu);
+                string rScriptPath = Path.Combine(userRootPath, anaKlasorYolu, il, rScriptYolu);
 
                 // Construct the path to the config file
                 string projectRoot = ((string)modülFormu.ana_menu_form_objesi.projectRoot).Replace('/', '\\');
