@@ -31,22 +31,6 @@ namespace SLF
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle23 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle24 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle25 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle26 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle27 = new System.Windows.Forms.DataGridViewCellStyle();
             this.Modül_Tabları = new System.Windows.Forms.TabControl();
             this.tab_girdi = new System.Windows.Forms.TabPage();
             this.panel_proje_ekle = new System.Windows.Forms.Panel();
@@ -73,16 +57,15 @@ namespace SLF
             this.SelectFolderButton = new System.Windows.Forms.Button();
             this.tab_dek = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.CreateReportButton = new System.Windows.Forms.Button();
             this.DEKPointsLayerCheckBox = new System.Windows.Forms.CheckBox();
             this.DEKProgressBar = new System.Windows.Forms.ProgressBar();
             this.DEKStatusLabel = new System.Windows.Forms.Label();
             this.gMapControl_DEK = new GMap.NET.WindowsForms.GMapControl();
             this.panel_DEK = new System.Windows.Forms.Panel();
             this.DEKCenterAddButton = new System.Windows.Forms.Button();
-            this.comboBox_DEK_il = new System.Windows.Forms.ComboBox();
             this.DEKSimulasyonSonucGoruntule = new System.Windows.Forms.Button();
             this.DEKRunSimulationButton = new System.Windows.Forms.Button();
-            this.comboBox_dek_ilce_secimi = new System.Windows.Forms.ComboBox();
             this.dekSimMaxBtn = new System.Windows.Forms.RadioButton();
             this.dekSimDefBtn = new System.Windows.Forms.RadioButton();
             this.dekSimMinBtn = new System.Windows.Forms.RadioButton();
@@ -93,11 +76,9 @@ namespace SLF
             this.EAStationsLegendPanel = new System.Windows.Forms.Panel();
             this.SimulasyonSonucGoruntule = new System.Windows.Forms.Button();
             this.EANewSimulationResultsButton = new System.Windows.Forms.Button();
-            this.comboBox_ea_ilce_secimi = new System.Windows.Forms.ComboBox();
             this.EASimButton = new System.Windows.Forms.Button();
             this.EaSimMaxBtn = new System.Windows.Forms.RadioButton();
             this.FutureSimLabel = new System.Windows.Forms.Label();
-            this.comboBox_ea_il_secimi = new System.Windows.Forms.ComboBox();
             this.EaSimDefBtn = new System.Windows.Forms.RadioButton();
             this.comboBox_ea_yıl_secimi = new System.Windows.Forms.ComboBox();
             this.EaSimMinBtn = new System.Windows.Forms.RadioButton();
@@ -275,6 +256,7 @@ namespace SLF
             this.miniToolStrip = new System.Windows.Forms.ToolStrip();
             this.buton_ea_harita_katmanlar = new System.Windows.Forms.Button();
             this.ELFMinSenaryoGraphPicBox = new System.Windows.Forms.PictureBox();
+            this.CreateReportButton2 = new System.Windows.Forms.Button();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
             this.panel_proje_ekle.SuspendLayout();
@@ -719,6 +701,7 @@ namespace SLF
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            this.panel1.Controls.Add(this.CreateReportButton);
             this.panel1.Controls.Add(this.DEKPointsLayerCheckBox);
             this.panel1.Controls.Add(this.DEKProgressBar);
             this.panel1.Controls.Add(this.DEKStatusLabel);
@@ -728,6 +711,21 @@ namespace SLF
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1031, 43);
             this.panel1.TabIndex = 45;
+            // 
+            // CreateReportButton
+            // 
+            this.CreateReportButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.CreateReportButton.FlatAppearance.BorderSize = 0;
+            this.CreateReportButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CreateReportButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.CreateReportButton.ForeColor = System.Drawing.Color.Snow;
+            this.CreateReportButton.Location = new System.Drawing.Point(423, 5);
+            this.CreateReportButton.Name = "CreateReportButton";
+            this.CreateReportButton.Size = new System.Drawing.Size(129, 31);
+            this.CreateReportButton.TabIndex = 63;
+            this.CreateReportButton.Text = "Rapor Oluştur";
+            this.CreateReportButton.UseVisualStyleBackColor = false;
+            this.CreateReportButton.Click += new System.EventHandler(this.CreateReportButton_Click);
             // 
             // DEKPointsLayerCheckBox
             // 
@@ -747,7 +745,7 @@ namespace SLF
             // DEKProgressBar
             // 
             this.DEKProgressBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.DEKProgressBar.Location = new System.Drawing.Point(877, 11);
+            this.DEKProgressBar.Location = new System.Drawing.Point(872, 11);
             this.DEKProgressBar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.DEKProgressBar.MarqueeAnimationSpeed = 200;
             this.DEKProgressBar.Name = "DEKProgressBar";
@@ -795,7 +793,7 @@ namespace SLF
             this.gMapControl_DEK.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_DEK.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_DEK.ShowTileGridLines = false;
-            this.gMapControl_DEK.Size = new System.Drawing.Size(1031, 667);
+            this.gMapControl_DEK.Size = new System.Drawing.Size(1026, 669);
             this.gMapControl_DEK.TabIndex = 38;
             this.gMapControl_DEK.Zoom = 0D;
             this.gMapControl_DEK.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_DEK_OnMapClick);
@@ -805,10 +803,8 @@ namespace SLF
             // 
             this.panel_DEK.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
             this.panel_DEK.Controls.Add(this.DEKCenterAddButton);
-            this.panel_DEK.Controls.Add(this.comboBox_DEK_il);
             this.panel_DEK.Controls.Add(this.DEKSimulasyonSonucGoruntule);
             this.panel_DEK.Controls.Add(this.DEKRunSimulationButton);
-            this.panel_DEK.Controls.Add(this.comboBox_dek_ilce_secimi);
             this.panel_DEK.Controls.Add(this.dekSimMaxBtn);
             this.panel_DEK.Controls.Add(this.dekSimDefBtn);
             this.panel_DEK.Controls.Add(this.dekSimMinBtn);
@@ -816,10 +812,10 @@ namespace SLF
             this.panel_DEK.Controls.Add(this.label_DEK_Gelecek);
             this.panel_DEK.Controls.Add(this.comboBox_DEK_Yıl);
             this.panel_DEK.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel_DEK.Location = new System.Drawing.Point(1031, 0);
+            this.panel_DEK.Location = new System.Drawing.Point(1026, 0);
             this.panel_DEK.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel_DEK.Name = "panel_DEK";
-            this.panel_DEK.Size = new System.Drawing.Size(281, 667);
+            this.panel_DEK.Size = new System.Drawing.Size(281, 669);
             this.panel_DEK.TabIndex = 37;
             // 
             // DEKCenterAddButton
@@ -839,23 +835,9 @@ namespace SLF
             this.DEKCenterAddButton.UseVisualStyleBackColor = false;
             this.DEKCenterAddButton.Click += new System.EventHandler(this.DEKCenterAddButton_Click);
             // 
-            // comboBox_DEK_il
-            // 
-            this.comboBox_DEK_il.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.comboBox_DEK_il.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            this.comboBox_DEK_il.FormattingEnabled = true;
-            this.comboBox_DEK_il.Location = new System.Drawing.Point(40, 289);
-            this.comboBox_DEK_il.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.comboBox_DEK_il.Name = "comboBox_DEK_il";
-            this.comboBox_DEK_il.Size = new System.Drawing.Size(80, 29);
-            this.comboBox_DEK_il.TabIndex = 1;
-            this.comboBox_DEK_il.Text = "İL";
-            this.comboBox_DEK_il.SelectedIndexChanged += new System.EventHandler(this.dek_city_SelectedIndexChanged);
-            // 
             // DEKSimulasyonSonucGoruntule
             // 
             this.DEKSimulasyonSonucGoruntule.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.DEKSimulasyonSonucGoruntule.Enabled = false;
             this.DEKSimulasyonSonucGoruntule.FlatAppearance.BorderSize = 0;
             this.DEKSimulasyonSonucGoruntule.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.DEKSimulasyonSonucGoruntule.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
@@ -884,18 +866,6 @@ namespace SLF
             this.DEKRunSimulationButton.Text = "DEK Gelecek Simülasyonu Oluştur";
             this.DEKRunSimulationButton.UseVisualStyleBackColor = false;
             this.DEKRunSimulationButton.Click += new System.EventHandler(this.DEKRunSimulationButton_Click);
-            // 
-            // comboBox_dek_ilce_secimi
-            // 
-            this.comboBox_dek_ilce_secimi.ForeColor = System.Drawing.Color.DarkBlue;
-            this.comboBox_dek_ilce_secimi.FormattingEnabled = true;
-            this.comboBox_dek_ilce_secimi.Location = new System.Drawing.Point(155, 289);
-            this.comboBox_dek_ilce_secimi.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.comboBox_dek_ilce_secimi.Name = "comboBox_dek_ilce_secimi";
-            this.comboBox_dek_ilce_secimi.Size = new System.Drawing.Size(103, 29);
-            this.comboBox_dek_ilce_secimi.TabIndex = 60;
-            this.comboBox_dek_ilce_secimi.Text = "İLÇE";
-            this.comboBox_dek_ilce_secimi.SelectedIndexChanged += new System.EventHandler(this.ilceSecimiDEK);
             // 
             // dekSimMaxBtn
             // 
@@ -989,7 +959,7 @@ namespace SLF
             this.tab_ea.Location = new System.Drawing.Point(4, 56);
             this.tab_ea.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tab_ea.Name = "tab_ea";
-            this.tab_ea.Size = new System.Drawing.Size(1312, 667);
+            this.tab_ea.Size = new System.Drawing.Size(1307, 669);
             this.tab_ea.TabIndex = 5;
             this.tab_ea.Text = "EA Şarj Modülü";
             this.tab_ea.UseVisualStyleBackColor = true;
@@ -999,19 +969,17 @@ namespace SLF
             this.EAStationsLegendPanel.BackColor = System.Drawing.Color.NavajoWhite;
             this.EAStationsLegendPanel.Controls.Add(this.SimulasyonSonucGoruntule);
             this.EAStationsLegendPanel.Controls.Add(this.EANewSimulationResultsButton);
-            this.EAStationsLegendPanel.Controls.Add(this.comboBox_ea_ilce_secimi);
             this.EAStationsLegendPanel.Controls.Add(this.EASimButton);
             this.EAStationsLegendPanel.Controls.Add(this.EaSimMaxBtn);
             this.EAStationsLegendPanel.Controls.Add(this.FutureSimLabel);
-            this.EAStationsLegendPanel.Controls.Add(this.comboBox_ea_il_secimi);
             this.EAStationsLegendPanel.Controls.Add(this.EaSimDefBtn);
             this.EAStationsLegendPanel.Controls.Add(this.comboBox_ea_yıl_secimi);
             this.EAStationsLegendPanel.Controls.Add(this.EaSimMinBtn);
             this.EAStationsLegendPanel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.EAStationsLegendPanel.Location = new System.Drawing.Point(904, 43);
+            this.EAStationsLegendPanel.Location = new System.Drawing.Point(899, 43);
             this.EAStationsLegendPanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.EAStationsLegendPanel.Name = "EAStationsLegendPanel";
-            this.EAStationsLegendPanel.Size = new System.Drawing.Size(205, 624);
+            this.EAStationsLegendPanel.Size = new System.Drawing.Size(205, 626);
             this.EAStationsLegendPanel.TabIndex = 51;
             // 
             // SimulasyonSonucGoruntule
@@ -1049,22 +1017,9 @@ namespace SLF
             this.EANewSimulationResultsButton.UseVisualStyleBackColor = false;
             this.EANewSimulationResultsButton.Click += new System.EventHandler(this.EANewSimulationResultsButton_Click);
             // 
-            // comboBox_ea_ilce_secimi
-            // 
-            this.comboBox_ea_ilce_secimi.ForeColor = System.Drawing.Color.DarkBlue;
-            this.comboBox_ea_ilce_secimi.FormattingEnabled = true;
-            this.comboBox_ea_ilce_secimi.Location = new System.Drawing.Point(117, 106);
-            this.comboBox_ea_ilce_secimi.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.comboBox_ea_ilce_secimi.Name = "comboBox_ea_ilce_secimi";
-            this.comboBox_ea_ilce_secimi.Size = new System.Drawing.Size(71, 29);
-            this.comboBox_ea_ilce_secimi.TabIndex = 59;
-            this.comboBox_ea_ilce_secimi.Text = "İLÇE";
-            this.comboBox_ea_ilce_secimi.SelectedIndexChanged += new System.EventHandler(this.ilceSecimiMonteCarlo);
-            // 
             // EASimButton
             // 
             this.EASimButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.EASimButton.Enabled = false;
             this.EASimButton.FlatAppearance.BorderSize = 0;
             this.EASimButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.EASimButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
@@ -1105,21 +1060,6 @@ namespace SLF
             this.FutureSimLabel.Size = new System.Drawing.Size(176, 23);
             this.FutureSimLabel.TabIndex = 2;
             this.FutureSimLabel.Text = "Gelecek Simülasyonu:";
-            // 
-            // comboBox_ea_il_secimi
-            // 
-            this.comboBox_ea_il_secimi.ForeColor = System.Drawing.Color.DarkBlue;
-            this.comboBox_ea_il_secimi.FormattingEnabled = true;
-            this.comboBox_ea_il_secimi.Items.AddRange(new object[] {
-            "İzmir",
-            "Eskişehir"});
-            this.comboBox_ea_il_secimi.Location = new System.Drawing.Point(16, 106);
-            this.comboBox_ea_il_secimi.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.comboBox_ea_il_secimi.Name = "comboBox_ea_il_secimi";
-            this.comboBox_ea_il_secimi.Size = new System.Drawing.Size(71, 29);
-            this.comboBox_ea_il_secimi.TabIndex = 1;
-            this.comboBox_ea_il_secimi.Text = "İL";
-            this.comboBox_ea_il_secimi.SelectedIndexChanged += new System.EventHandler(this.ilSecimiMonteCarlo);
             // 
             // EaSimDefBtn
             // 
@@ -1167,6 +1107,7 @@ namespace SLF
             // panel_ea
             // 
             this.panel_ea.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            this.panel_ea.Controls.Add(this.CreateReportButton2);
             this.panel_ea.Controls.Add(this.EAPointsLayerCheckBox);
             this.panel_ea.Controls.Add(this.progressBar);
             this.panel_ea.Controls.Add(this.statusLabel);
@@ -1174,7 +1115,7 @@ namespace SLF
             this.panel_ea.Location = new System.Drawing.Point(0, 0);
             this.panel_ea.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel_ea.Name = "panel_ea";
-            this.panel_ea.Size = new System.Drawing.Size(1109, 43);
+            this.panel_ea.Size = new System.Drawing.Size(1104, 43);
             this.panel_ea.TabIndex = 44;
             // 
             // EAPointsLayerCheckBox
@@ -1195,7 +1136,7 @@ namespace SLF
             // progressBar
             // 
             this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar.Location = new System.Drawing.Point(947, 12);
+            this.progressBar.Location = new System.Drawing.Point(942, 12);
             this.progressBar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.progressBar.MarqueeAnimationSpeed = 200;
             this.progressBar.Name = "progressBar";
@@ -1235,10 +1176,10 @@ namespace SLF
             this.GelecekSimPanel.Controls.Add(this.ACWorkLegendLabel);
             this.GelecekSimPanel.Controls.Add(this.ACHomeLegendValueLabel);
             this.GelecekSimPanel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.GelecekSimPanel.Location = new System.Drawing.Point(1109, 0);
+            this.GelecekSimPanel.Location = new System.Drawing.Point(1104, 0);
             this.GelecekSimPanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.GelecekSimPanel.Name = "GelecekSimPanel";
-            this.GelecekSimPanel.Size = new System.Drawing.Size(203, 667);
+            this.GelecekSimPanel.Size = new System.Drawing.Size(203, 669);
             this.GelecekSimPanel.TabIndex = 43;
             // 
             // DCFastLegendValueLabel
@@ -1381,7 +1322,7 @@ namespace SLF
             this.EAStationAddButton.Location = new System.Drawing.Point(37, 249);
             this.EAStationAddButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.EAStationAddButton.Name = "EAStationAddButton";
-            this.EAStationAddButton.Size = new System.Drawing.Size(140, 59);
+            this.EAStationAddButton.Size = new System.Drawing.Size(140, 42);
             this.EAStationAddButton.TabIndex = 49;
             this.EAStationAddButton.Text = "EA Şarj İstasyonu Ekle";
             this.EAStationAddButton.UseVisualStyleBackColor = false;
@@ -1445,7 +1386,7 @@ namespace SLF
             this.gMapControl_EA.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_EA.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_EA.ShowTileGridLines = false;
-            this.gMapControl_EA.Size = new System.Drawing.Size(1357, 3155);
+            this.gMapControl_EA.Size = new System.Drawing.Size(1357, 3077);
             this.gMapControl_EA.TabIndex = 18;
             this.gMapControl_EA.Zoom = 0D;
             this.gMapControl_EA.OnMarkerClick += new GMap.NET.WindowsForms.MarkerClick(this.gMapControl_EA_OnMarkerClick);
@@ -3791,13 +3732,11 @@ namespace SLF
         private System.ComponentModel.BackgroundWorker backgroundWorker2;
         private System.Windows.Forms.ToolStripMenuItem Point_Load_Çiz;
         private Label FutureSimLabel;
-        private ComboBox comboBox_ea_il_secimi;
         private ComboBox comboBox_ea_yıl_secimi;
         private Panel GelecekSimPanel;
         private Panel panel_ea;
         private Label AddStationLabel;
         private Panel panel_DEK;
-        private ComboBox comboBox_DEK_il;
         private ComboBox comboBox_DEK_Yıl;
         private Label label_DEK_Gelecek;
         private CheckBox checkBox27;
@@ -3875,8 +3814,6 @@ namespace SLF
         private Panel panel_yuk;
         private TrackBar trackBar_Yıllar;
         private CheckBox checkBox_yuk_main;
-
-        private ComboBox comboBox_dek_ilce_secimi;
         private Panel panel1;
         private CheckBox DEKPointsLayerCheckBox;
         private ProgressBar DEKProgressBar;
@@ -3889,7 +3826,6 @@ namespace SLF
         private ProgressBar progressBar;
         private Label RModelStatusLabel;
         private ProgressBar RModelProgressBar;
-        private ComboBox comboBox_ea_ilce_secimi;
         private System.Windows.Forms.Button SimulasyonSonucGoruntule;
         private CheckBox EAPointsLayerCheckBox;
         private PictureBox buton_HTML;

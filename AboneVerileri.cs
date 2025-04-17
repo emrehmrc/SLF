@@ -73,9 +73,11 @@ namespace SLF
             base.Validate();
 
             ReportErrorLessThanZero();
+            // BinaKoordinatMatchCheck(); // Removed from here
             ReportNullCounts();
             ReportDuplicateRowCounts();
             ReportDuplicateCounts();
+            // ReportCoordinatesOutOfLimits();
             AboneKapasiteCheck();
             ReportDateFormatErrors();
             ReportSanalCounts();
@@ -210,37 +212,7 @@ namespace SLF
         });
             }
         }
-        /*        private void ImputeOutOfLimitCoordinates(string column)
-                {
-                    //var column = "COORDINATE_LIMITS";
 
-                    foreach (int missingIndex in columnNullRowsMap[column])
-                    {
-                        var missingRow = currentDataTable.Rows[missingIndex];
-                        if(aboneTrafoConnectivityPass)
-                        {
-                            var trafoKodu = missingRow["BAGLANDIGI_TRAFO_KODU"].ToString();
-                            if (!IsNullLike(trafoKodu) && trafoKodu != "TO_BE_IMPUTED")
-                            {
-                                var trafoRow = dataTablesByType["DTR Verileri"].AsEnumerable().FirstOrDefault(r => r["TRAFO_KODU"].ToString() == trafoKodu);
-                                if (trafoRow != null)
-                                {
-                                    missingRow["ABONE_X_KOORDINAT"] = trafoRow["TRAFO_X_KOORDINAT"];
-                                    missingRow["ABONE_Y_KOORDINAT"] = trafoRow["TRAFO_Y_KOORDINAT"];
-                                }
-                                else
-                                {
-                                    throw new ArgumentException($"Abone verileri için koordinatlar impute edilirken hata oluştu. Trafo kodu: {trafoKodu}");
-                                }
-                            }
-                        }
-                        else
-                        {
-                            missingRow["ABONE_X_KOORDINAT"] = "KOORDINATI_YOK";
-                            missingRow["ABONE_Y_KOORDINAT"] = "KOORDINATI_YOK";
-                        }
-                    }
-                }*/
         private void ImputeCoordinates()
         {
             var imputedRows = new List<int>();
@@ -667,7 +639,6 @@ namespace SLF
                 }
             }
         }
-
         private void ReportCoordinatesOutOfLimits()
         {
             var (minXValue, maxXValue) = minMaxCheckMap["ABONE_X_KOORDINAT"];
@@ -861,6 +832,7 @@ namespace SLF
                 });
             }
         }
+
 
         private void BinaKoordinatMatchCheck()
         {
@@ -1391,6 +1363,7 @@ namespace SLF
             var connectivityPassPercentage = (float)connectivityPassCount / trafoDictionary.Count;
             aboneTrafoConnectivityPass = connectivityPassPercentage > 0.95;
         }
+
         public void DeferredImputeTrafoTuketimDemand()
         {
             var trafoDataTable = dataTablesByType["DTR Verileri"];

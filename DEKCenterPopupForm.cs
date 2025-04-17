@@ -33,20 +33,6 @@ namespace SLF
         {
             return Constants.DekValueToCountColumn.TryGetValue(dekValue, out string columnName) ? columnName : null;
         }
-        // Define a dictionary for cities and their coordinates
-        private Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
-    {
-        { "İzmir", new PointLatLng(38.4192, 27.1287) },
-        { "Eskişehir", new PointLatLng(39.7768, 30.5206) },
-        // Add more cities and their coordinates as needed
-    };
-
-        // Define districts for İzmir and Eskişehir
-        private Dictionary<string, List<string>> cityDistricts = new Dictionary<string, List<string>>
-    {
-        { "İzmir", new List<string> { "Aliağa", "Balçova", "Bayındır", "Bayraklı", "Bergama", "Beydağ", "Bornova", "Buca", "Çeşme", "Çiğli", "Dikili", "Foça", "Gaziemir", "Güzelbahçe", "Karabağlar", "Karaburun", "Karşıyaka", "Kemalpaşa", "Kınık", "Kiraz", "Konak", "Menderes", "Menemen", "Narlıdere", "Ödemiş", "Seferihisar", "Selçuk", "Tire", "Torbalı" } },
-        { "Eskişehir", new List<string> { "Alpu", "Beylikova", "Çifteler", "Günyüzü", "Han", "İnönü", "Mahmudiye", "Mihalgazi", "Mihalıççık", "Odunpazarı", "Sarıcakaya", "Seyitgazi", "Sivrihisar", "Tepebaşı" } }
-    };
 
         public DEKCenterPopupForm(DataTable existingDataTable, NoktaVeri veri)
         {
@@ -69,11 +55,6 @@ namespace SLF
             DEKCenterDataGridView.Rows[0].Cells["ID"].Value =
                 !string.IsNullOrEmpty(veri.CellId) ? veri.CellId : "Not Selected";
 
-            // Set ISTASYON_TIPI options for DEK types
-            /*            if (DEKCenterDataGridView.Columns["KAYNAK_TIPI"] is DataGridViewComboBoxColumn typeComboBoxColumn)
-                        {
-                            typeComboBoxColumn.DataSource = new List<string> { "GES (Güneş)", "RES (Rüzgar)", "BES (Biokütle)" };
-                        }*/
 
             // Populate transformer codes if available
             if (GirdiModülü.dataTablesByType.TryGetValue("DTR Verileri", out DataTable trafoDataTable))
@@ -94,97 +75,12 @@ namespace SLF
             }
 
             // Initially populate the city names in the ILCE_ADI ComboBox
-            PopulateCityComboBox();
+            //PopulateCityComboBox();
             //  DEKCenterDataGridView.CellValueChanged += DEKCenterDataGridView_CellValueChanged;
         }
 
-        private void PopulateCityComboBox()
-        {
-            var comboBoxColumn = DEKCenterDataGridView.Columns["ILCE_ADI"] as DataGridViewComboBoxColumn;
 
-            if (comboBoxColumn != null)
-            {
-                // Clear the existing items in the ComboBox column
-                comboBoxColumn.Items.Clear();
 
-                // Add the districts for each city into the ComboBox column
-                foreach (var city in cityCoordinates.Keys)
-                {
-                    if (cityDistricts.ContainsKey(city))
-                    {
-                        comboBoxColumn.Items.AddRange(cityDistricts[city].ToArray());
-                    }
-                }
-
-                // Optionally set the first item as the default if needed
-                var comboBoxCell = DEKCenterDataGridView.Rows[0].Cells["ILCE_ADI"] as DataGridViewComboBoxCell;
-                if (comboBoxCell != null && comboBoxColumn.Items.Count > 0)
-                {
-                    // Clear the selection if necessary and update it
-                    comboBoxCell.Value = null;
-                }
-            }
-        }
-        private void FilterCountiesBasedOnCoordinates(double selectedX, double selectedY)
-        {
-            var closestCity = cityCoordinates
-                              .OrderBy(city => GetDistance(city.Value.Lat, city.Value.Lng, selectedX, selectedY))
-                              .FirstOrDefault();
-
-            Console.WriteLine($"Selected Coordinates: X={selectedX}, Y={selectedY}");
-            Console.WriteLine($"Closest City: {closestCity.Key}");
-
-            if (closestCity.Key != null)
-            {
-                var comboBoxColumn = DEKCenterDataGridView.Columns["ILCE_ADI"] as DataGridViewComboBoxColumn;
-
-                if (comboBoxColumn != null)
-                {
-                    // Get the current cell and its value
-                    var comboBoxCell = DEKCenterDataGridView.Rows[0].Cells["ILCE_ADI"] as DataGridViewComboBoxCell;
-                    string currentDistrict = comboBoxCell?.Value?.ToString();
-
-                    // Temporarily disable the CellValueChanged event
-                    DEKCenterDataGridView.CellValueChanged -= DEKCenterDataGridView_CellValueChanged;
-
-                    try
-                    {
-                        // Clear the current value to avoid validation errors
-                        if (comboBoxCell != null)
-                        {
-                            comboBoxCell.Value = null;
-                        }
-
-                        // Update the items list
-                        comboBoxColumn.Items.Clear();
-                        if (cityDistricts.ContainsKey(closestCity.Key))
-                        {
-                            comboBoxColumn.Items.AddRange(cityDistricts[closestCity.Key].ToArray());
-                        }
-
-                        Console.WriteLine($"Added Districts: {string.Join(", ", cityDistricts[closestCity.Key])}");
-
-                        // Restore the current district if it's still valid, otherwise set a default
-                        if (comboBoxCell != null)
-                        {
-                            if (!string.IsNullOrEmpty(currentDistrict) && comboBoxColumn.Items.Contains(currentDistrict))
-                            {
-                                comboBoxCell.Value = currentDistrict;
-                            }
-                            else
-                            {
-                                comboBoxCell.Value = comboBoxColumn.Items.Count > 0 ? comboBoxColumn.Items[0] : null;
-                            }
-                        }
-                    }
-                    finally
-                    {
-                        // Re-enable the CellValueChanged event
-                        DEKCenterDataGridView.CellValueChanged += DEKCenterDataGridView_CellValueChanged;
-                    }
-                }
-            }
-        }
         private void DEKCenterDataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             double selectedX = Convert.ToDouble(DEKCenterDataGridView.Rows[0].Cells["DEK_X_KOORDINAT"].Value);
@@ -192,7 +88,7 @@ namespace SLF
 
             Console.WriteLine($"Selected Coordinates: X={selectedX}, Y={selectedY}");
 
-            FilterCountiesBasedOnCoordinates(selectedX, selectedY);
+         //   FilterCountiesBasedOnCoordinates(selectedX, selectedY);
         }
 
         private double GetDistance(double lat1, double lon1, double lat2, double lon2)
@@ -240,16 +136,17 @@ namespace SLF
             }
         }
 
+
         private void DEKTamamButton_Click(object sender, EventArgs e)
         {
             // Validate the input
             foreach (DataGridViewCell cell in DEKCenterDataGridView.Rows[0].Cells)
             {
-                if (cell.Value == null || string.IsNullOrWhiteSpace(cell.Value.ToString()))
+/*                if (cell.Value == null || string.IsNullOrWhiteSpace(cell.Value.ToString()))
                 {
                     MessageBox.Show("Lütfen tüm alanları doldurun.");
                     return;
-                }
+                }*/
             }
 
             // Update veri.CellId
@@ -257,7 +154,7 @@ namespace SLF
 
             // Add new row to the existing DataTable
             DataRow newRow = dataTable.NewRow();
-            newRow["ILCE_ADI"] = DEKCenterDataGridView.Rows[0].Cells["ILCE_ADI"].Value.ToString();
+          //  newRow["ILCE_ADI"] = DEKCenterDataGridView.Rows[0].Cells["ILCE_ADI"].Value.ToString();
             newRow["KAYNAK_TIPI"] = DEKCenterDataGridView.Rows[0].Cells["KAYNAK_TIPI"].Value.ToString();
             newRow["DEK_KURULU_GUCU"] = Convert.ToDouble(DEKCenterDataGridView.Rows[0].Cells["DEK_KURULU_GUCU"].Value);
             newRow["DEK_X_KOORDINAT"] = Convert.ToDouble(DEKCenterDataGridView.Rows[0].Cells["DEK_X_KOORDINAT"].Value);
@@ -309,11 +206,11 @@ namespace SLF
 
                 string countColumnName = "DEK_distributed"; // Hardcoded for now, can be dynamic with Constants
 
-                string existingFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek_distribution_2024_2030_İzmir_düşük.xlsx";
+                string existingFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\cıktı\dek_distribution_cumulative_0704.xlsx";
 
                 using (var workbook = new XLWorkbook(existingFilePath))
                 {
-                    foreach (int year in Enumerable.Range(2024, 2030 - 2024 + 1).Where(y => y >= startYearInt))
+                    foreach (int year in Enumerable.Range(2024, 2035 - 2024 + 1).Where(y => y >= startYearInt))
                     {
                         Console.WriteLine($"Processing year: {year}");
                         var worksheet = workbook.Worksheet(year.ToString());
@@ -321,9 +218,11 @@ namespace SLF
                         {
                             worksheet = workbook.Worksheets.Add(year.ToString());
                             worksheet.Cell("A1").Value = "ID";
-                            worksheet.Cell("B1").Value = "DEK_X_KOORDINAT";
-                            worksheet.Cell("C1").Value = "DEK_Y_KOORDINAT";
-                            worksheet.Cell("I1").Value = "DEK_distributed";
+                            worksheet.Cell("H1").Value = "DEK_X_KOORDINAT";
+                            //worksheet.Cell("H1").Value = "x_koordinat";
+                            worksheet.Cell("I1").Value = "DEK_Y_KOORDINAT";
+                           // worksheet.Cell("I1").Value = "y_koordinat";
+                            worksheet.Cell("G1").Value = "DEK_distributed";
                         }
 
                         var rows = worksheet.RowsUsed();
@@ -336,11 +235,11 @@ namespace SLF
                             Console.WriteLine($"Checking row {row.RowNumber()}, ID: {existingId}");
                             if (existingId == cellId)
                             {
-                                row.Cell("B").Value = enlem;
-                                row.Cell("C").Value = boylam;
+                                row.Cell("H").Value = enlem;
+                                row.Cell("I").Value = boylam;
 
-                                double currentDekValue = row.Cell("I").TryGetValue<double>(out double value) ? value : 0;
-                                row.Cell("I").Value = currentDekValue + dekValue;
+                                double currentDekValue = row.Cell("G").TryGetValue<double>(out double value) ? value : 0;
+                                row.Cell("G").Value = currentDekValue + dekValue;
                                 Console.WriteLine($"Updated DEK_distributed to {currentDekValue + dekValue} for ID {cellId}");
 
                                 rowUpdated = true;
@@ -354,9 +253,9 @@ namespace SLF
                             var lastRow = worksheet.LastRowUsed() ?? worksheet.Row(1);
                             var newRow = worksheet.Row(lastRow.RowNumber() + 1);
                             newRow.Cell("A").Value = cellId;
-                            newRow.Cell("B").Value = enlem;
-                            newRow.Cell("C").Value = boylam;
-                            newRow.Cell("I").Value = dekValue;
+                            newRow.Cell("H").Value = enlem;
+                            newRow.Cell("I").Value = boylam;
+                            newRow.Cell("G").Value = dekValue;
                             Console.WriteLine($"Added new row for ID {cellId} with DEK_distributed {dekValue}");
                         }
                     }
