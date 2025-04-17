@@ -31,6 +31,22 @@ namespace SLF
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle23 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle24 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle25 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle26 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle27 = new System.Windows.Forms.DataGridViewCellStyle();
             this.Modül_Tabları = new System.Windows.Forms.TabControl();
             this.tab_girdi = new System.Windows.Forms.TabPage();
             this.panel_proje_ekle = new System.Windows.Forms.Panel();
@@ -83,6 +99,7 @@ namespace SLF
             this.comboBox_ea_yıl_secimi = new System.Windows.Forms.ComboBox();
             this.EaSimMinBtn = new System.Windows.Forms.RadioButton();
             this.panel_ea = new System.Windows.Forms.Panel();
+            this.CreateReportButton2 = new System.Windows.Forms.Button();
             this.EAPointsLayerCheckBox = new System.Windows.Forms.CheckBox();
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.statusLabel = new System.Windows.Forms.Label();
@@ -256,7 +273,6 @@ namespace SLF
             this.miniToolStrip = new System.Windows.Forms.ToolStrip();
             this.buton_ea_harita_katmanlar = new System.Windows.Forms.Button();
             this.ELFMinSenaryoGraphPicBox = new System.Windows.Forms.PictureBox();
-            this.CreateReportButton2 = new System.Windows.Forms.Button();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
             this.panel_proje_ekle.SuspendLayout();
@@ -793,7 +809,7 @@ namespace SLF
             this.gMapControl_DEK.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_DEK.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_DEK.ShowTileGridLines = false;
-            this.gMapControl_DEK.Size = new System.Drawing.Size(1026, 669);
+            this.gMapControl_DEK.Size = new System.Drawing.Size(1031, 667);
             this.gMapControl_DEK.TabIndex = 38;
             this.gMapControl_DEK.Zoom = 0D;
             this.gMapControl_DEK.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_DEK_OnMapClick);
@@ -812,10 +828,10 @@ namespace SLF
             this.panel_DEK.Controls.Add(this.label_DEK_Gelecek);
             this.panel_DEK.Controls.Add(this.comboBox_DEK_Yıl);
             this.panel_DEK.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel_DEK.Location = new System.Drawing.Point(1026, 0);
+            this.panel_DEK.Location = new System.Drawing.Point(1031, 0);
             this.panel_DEK.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel_DEK.Name = "panel_DEK";
-            this.panel_DEK.Size = new System.Drawing.Size(281, 669);
+            this.panel_DEK.Size = new System.Drawing.Size(281, 667);
             this.panel_DEK.TabIndex = 37;
             // 
             // DEKCenterAddButton
@@ -959,7 +975,7 @@ namespace SLF
             this.tab_ea.Location = new System.Drawing.Point(4, 56);
             this.tab_ea.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tab_ea.Name = "tab_ea";
-            this.tab_ea.Size = new System.Drawing.Size(1307, 669);
+            this.tab_ea.Size = new System.Drawing.Size(1312, 667);
             this.tab_ea.TabIndex = 5;
             this.tab_ea.Text = "EA Şarj Modülü";
             this.tab_ea.UseVisualStyleBackColor = true;
@@ -976,10 +992,10 @@ namespace SLF
             this.EAStationsLegendPanel.Controls.Add(this.comboBox_ea_yıl_secimi);
             this.EAStationsLegendPanel.Controls.Add(this.EaSimMinBtn);
             this.EAStationsLegendPanel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.EAStationsLegendPanel.Location = new System.Drawing.Point(899, 43);
+            this.EAStationsLegendPanel.Location = new System.Drawing.Point(904, 43);
             this.EAStationsLegendPanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.EAStationsLegendPanel.Name = "EAStationsLegendPanel";
-            this.EAStationsLegendPanel.Size = new System.Drawing.Size(205, 626);
+            this.EAStationsLegendPanel.Size = new System.Drawing.Size(205, 624);
             this.EAStationsLegendPanel.TabIndex = 51;
             // 
             // SimulasyonSonucGoruntule
@@ -1115,8 +1131,15 @@ namespace SLF
             this.panel_ea.Location = new System.Drawing.Point(0, 0);
             this.panel_ea.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel_ea.Name = "panel_ea";
-            this.panel_ea.Size = new System.Drawing.Size(1104, 43);
+            this.panel_ea.Size = new System.Drawing.Size(1109, 43);
             this.panel_ea.TabIndex = 44;
+            // 
+            // CreateReportButton2
+            // 
+            this.CreateReportButton2.Location = new System.Drawing.Point(769, 12);
+            this.CreateReportButton2.Name = "CreateReportButton2";
+            this.CreateReportButton2.Size = new System.Drawing.Size(49, 22);
+            this.CreateReportButton2.TabIndex = 0;
             // 
             // EAPointsLayerCheckBox
             // 
@@ -1136,7 +1159,7 @@ namespace SLF
             // progressBar
             // 
             this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar.Location = new System.Drawing.Point(942, 12);
+            this.progressBar.Location = new System.Drawing.Point(947, 12);
             this.progressBar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.progressBar.MarqueeAnimationSpeed = 200;
             this.progressBar.Name = "progressBar";
@@ -1176,10 +1199,10 @@ namespace SLF
             this.GelecekSimPanel.Controls.Add(this.ACWorkLegendLabel);
             this.GelecekSimPanel.Controls.Add(this.ACHomeLegendValueLabel);
             this.GelecekSimPanel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.GelecekSimPanel.Location = new System.Drawing.Point(1104, 0);
+            this.GelecekSimPanel.Location = new System.Drawing.Point(1109, 0);
             this.GelecekSimPanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.GelecekSimPanel.Name = "GelecekSimPanel";
-            this.GelecekSimPanel.Size = new System.Drawing.Size(203, 669);
+            this.GelecekSimPanel.Size = new System.Drawing.Size(203, 667);
             this.GelecekSimPanel.TabIndex = 43;
             // 
             // DCFastLegendValueLabel
@@ -2369,7 +2392,7 @@ namespace SLF
             this.tabPage_dusuk_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_dusuk_senaryo.Name = "tabPage_dusuk_senaryo";
             this.tabPage_dusuk_senaryo.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_dusuk_senaryo.Size = new System.Drawing.Size(843, 617);
+            this.tabPage_dusuk_senaryo.Size = new System.Drawing.Size(824, 617);
             this.tabPage_dusuk_senaryo.TabIndex = 1;
             this.tabPage_dusuk_senaryo.Text = "Düşük Senaryo";
             this.tabPage_dusuk_senaryo.UseVisualStyleBackColor = true;
@@ -2405,7 +2428,7 @@ namespace SLF
             this.ELFLowSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
             this.ELFLowSenaryoTable.RowHeadersWidth = 18;
             this.ELFLowSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(837, 613);
+            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(818, 613);
             this.ELFLowSenaryoTable.TabIndex = 1;
             this.ELFLowSenaryoTable.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.ELFLowSenaryoTable_EditingControlShowing);
             // 
@@ -2417,7 +2440,7 @@ namespace SLF
             this.tabPage_baz_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_baz_senaryo.Name = "tabPage_baz_senaryo";
             this.tabPage_baz_senaryo.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_baz_senaryo.Size = new System.Drawing.Size(843, 617);
+            this.tabPage_baz_senaryo.Size = new System.Drawing.Size(824, 617);
             this.tabPage_baz_senaryo.TabIndex = 2;
             this.tabPage_baz_senaryo.Text = "Baz Senaryo";
             this.tabPage_baz_senaryo.UseVisualStyleBackColor = true;
@@ -2447,7 +2470,7 @@ namespace SLF
             dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             this.ELFBaseSenaryoTable.RowsDefaultCellStyle = dataGridViewCellStyle12;
             this.ELFBaseSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(837, 613);
+            this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(818, 613);
             this.ELFBaseSenaryoTable.TabIndex = 1;
             this.ELFBaseSenaryoTable.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.ELFBaseSenaryoTable_EditingControlShowing);
             // 
@@ -2459,7 +2482,7 @@ namespace SLF
             this.tabPage_yuksek_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_yuksek_senaryo.Name = "tabPage_yuksek_senaryo";
             this.tabPage_yuksek_senaryo.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_yuksek_senaryo.Size = new System.Drawing.Size(843, 617);
+            this.tabPage_yuksek_senaryo.Size = new System.Drawing.Size(824, 617);
             this.tabPage_yuksek_senaryo.TabIndex = 3;
             this.tabPage_yuksek_senaryo.Text = "Yüksek Senaryo";
             this.tabPage_yuksek_senaryo.UseVisualStyleBackColor = true;
@@ -2489,7 +2512,7 @@ namespace SLF
             dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             this.ELFHighSenaryoTable.RowsDefaultCellStyle = dataGridViewCellStyle15;
             this.ELFHighSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFHighSenaryoTable.Size = new System.Drawing.Size(837, 613);
+            this.ELFHighSenaryoTable.Size = new System.Drawing.Size(818, 613);
             this.ELFHighSenaryoTable.TabIndex = 1;
             this.ELFHighSenaryoTable.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.ELFHighSenaryoTable_EditingControlShowing);
             // 
@@ -2501,7 +2524,7 @@ namespace SLF
             this.tabPage_maks_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_maks_senaryo.Name = "tabPage_maks_senaryo";
             this.tabPage_maks_senaryo.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_maks_senaryo.Size = new System.Drawing.Size(843, 617);
+            this.tabPage_maks_senaryo.Size = new System.Drawing.Size(824, 617);
             this.tabPage_maks_senaryo.TabIndex = 4;
             this.tabPage_maks_senaryo.Text = "Maksimum Senaryo";
             this.tabPage_maks_senaryo.UseVisualStyleBackColor = true;
@@ -2534,7 +2557,7 @@ namespace SLF
             this.ELFMaxSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle17;
             this.ELFMaxSenaryoTable.RowHeadersWidth = 18;
             this.ELFMaxSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(837, 613);
+            this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(818, 613);
             this.ELFMaxSenaryoTable.TabIndex = 1;
             this.ELFMaxSenaryoTable.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.ELFMaxSenaryoTable_EditingControlShowing);
             // 
@@ -3859,5 +3882,7 @@ namespace SLF
         private Label label_s_ELF;
         private TextBox textBox_sonuc_ELF;
         private Panel panel2;
+        private System.Windows.Forms.Button CreateReportButton;
+        private System.Windows.Forms.Button CreateReportButton2;
     }
 }

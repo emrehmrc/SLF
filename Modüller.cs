@@ -3183,53 +3183,6 @@ namespace SLF
             }
         }
 
-        private async void DEKSimulasyonSonucGoruntule_Click(object sender, EventArgs e)
-        {
-            // Disable the button to prevent multiple clicks while processing
-            DEKCenterAddButton.Enabled = false;
-            DEKSimButton.Enabled = false;
-            try
-            {
-                string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek_distribution_2024_2030_İzmir_düşük.xlsx";
-                DataTable simulationData;
-                try
-                {
-                    // Excel dosyasını aç
-                    using (var package = new ExcelPackage(new FileInfo(filePath)))
-                    {
-                        // Yıl seçimine göre sayfayı seç (SelectedYear değeri, sayfa indeksini temsil eder)
-                        ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
-
-                        // Veriyi DataTable'a yükle
-                        simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
-
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
-                    return; // Hata durumunda işlemi sonlandır
-                }
-
-                gMapControl_DEK.Overlays.Clear();
-                gMapControl_DEK.Refresh();
-                // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
-                HesaplaMerkezNoktaVeEkle(simulationData);
-                await HaritaUzerindeDEKSimulasyonGosterimi(simulationData);
-
-                MessageBox.Show("Veri başarıyla yüklendi.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
-            }
-            finally
-            {
-                DEKCenterAddButton.Enabled = true;
-                DEKSimButton.Enabled = true;
-            }
-        }
-
 
         private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
         {
@@ -3544,11 +3497,6 @@ namespace SLF
                     return;
                 }
 
-                /*                if (!gMapControl_EA.Overlays.Contains(simulationOverlay) || !gMapControl_EA.Overlays.Contains(cellToolTipOverlay))
-                                {
-                                    gMapControl_EA.OnMapClick += gMapControl_Ea_OnMapClick;
-                                }
-                */
                 // Check if we are in the process of adding a charging station
                 if (!isAddingChargingStation)
                 {
@@ -4080,9 +4028,8 @@ namespace SLF
             // Reset the flag after adding the station
             isAddingDekPoint = false;
         }
-        GMapOverlay simulationOverlay = new GMapOverlay("Simulasyon_Layer");
-        GMapOverlay cellToolTipOverlay = new GMapOverlay("CellToolTips");
-        public static string SelectedCellId { get; set; }
+
+
         private async void gMapControl_Dek_OnMarkerClick(GMapMarker item, MouseEventArgs e)
         {
 
@@ -7883,40 +7830,6 @@ namespace SLF
             }
         }
 
-        private async void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                // Check if the user is in "adding charging station" mode
-                if (isAddingChargingStation)
-                {
-                    // Use the selected CellId from ModülFormu
-                    string cellId = item.Tag?.ToString() ?? ModülFormu.SelectedCellId;
-
-                    // Create a temporary marker for the charging station at the clicked location
-                    GMapMarker marker = new GMarkerGoogle(item.Position, GMarkerGoogleType.yellow)
-                    {
-                        ToolTipText = "Yeni Şarj İstasyonu",
-                        Tag = cellId // Store CellId in the marker's Tag temporarily
-                    };
-
-                    try
-                    {
-                        // Use the helper method to handle the popup form
-                        await HandlePopupFormAsync(item.Position, cellId);
-                    }
-                    catch
-                    {
-                        RemoveMarkerFromOverlays(marker);
-                    }
-
-                    // Reset the flag after adding the station
-                    isAddingChargingStation = false;
-
-                    return;
-                }
-            }
-        }
 
         private void TextBox_KeyPress_NumbersOnly(object sender, KeyPressEventArgs e)
         {
