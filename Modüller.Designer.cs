@@ -255,6 +255,7 @@ namespace SLF
             this.ContextMenuStrip_Poligon = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.YGA_Ekle = new System.Windows.Forms.ToolStripMenuItem();
             this.Point_Load_Ekle = new System.Windows.Forms.ToolStripMenuItem();
+            this.Enerji_Müsaadesi_Ekle = new System.Windows.Forms.ToolStripMenuItem();
             this.Poligon_Sil = new System.Windows.Forms.ToolStripMenuItem();
             this.Poligon_Kaydet = new System.Windows.Forms.ToolStripMenuItem();
             this.ContextMenuStrip_Fonksiyon = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -273,7 +274,6 @@ namespace SLF
             this.miniToolStrip = new System.Windows.Forms.ToolStrip();
             this.buton_ea_harita_katmanlar = new System.Windows.Forms.Button();
             this.ELFMinSenaryoGraphPicBox = new System.Windows.Forms.PictureBox();
-            this.Enerji_Müsaadesi_Ekle = new System.Windows.Forms.ToolStripMenuItem();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
             this.panel_proje_ekle.SuspendLayout();
@@ -520,12 +520,12 @@ namespace SLF
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.dataGridView_girdi.RowHeadersDefaultCellStyle = dataGridViewCellStyle2;
-            this.dataGridView_girdi.RowHeadersWidth = 18;
+            this.dataGridView_girdi.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
             this.dataGridView_girdi.RowsDefaultCellStyle = dataGridViewCellStyle3;
             this.dataGridView_girdi.RowTemplate.Height = 24;
-            this.dataGridView_girdi.Size = new System.Drawing.Size(4000, 489);
+            this.dataGridView_girdi.Size = new System.Drawing.Size(1282, 489);
             this.dataGridView_girdi.TabIndex = 4;
             // 
             // panel_girdi_dısa_aktar
@@ -3380,6 +3380,14 @@ namespace SLF
             this.Point_Load_Ekle.Text = "Noktasal Yük Ekle";
             this.Point_Load_Ekle.Click += new System.EventHandler(this.Point_Load_Ekle_Click);
             // 
+            // Enerji_Müsaadesi_Ekle
+            // 
+            this.Enerji_Müsaadesi_Ekle.Image = ((System.Drawing.Image)(resources.GetObject("Enerji_Müsaadesi_Ekle.Image")));
+            this.Enerji_Müsaadesi_Ekle.Name = "Enerji_Müsaadesi_Ekle";
+            this.Enerji_Müsaadesi_Ekle.Size = new System.Drawing.Size(244, 26);
+            this.Enerji_Müsaadesi_Ekle.Text = "Enerji Müsaadesi Ekle";
+            this.Enerji_Müsaadesi_Ekle.Click += new System.EventHandler(this.Enerji_Müsaadesi_Ekle_Click);
+            // 
             // Poligon_Sil
             // 
             this.Poligon_Sil.Image = ((System.Drawing.Image)(resources.GetObject("Poligon_Sil.Image")));
@@ -3546,14 +3554,6 @@ namespace SLF
             this.ELFMinSenaryoGraphPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.ELFMinSenaryoGraphPicBox.TabIndex = 22;
             this.ELFMinSenaryoGraphPicBox.TabStop = false;
-            // 
-            // Enerji_Müsaadesi_Ekle
-            // 
-            this.Enerji_Müsaadesi_Ekle.Image = ((System.Drawing.Image)(resources.GetObject("Enerji_Müsaadesi_Ekle.Image")));
-            this.Enerji_Müsaadesi_Ekle.Name = "Enerji_Müsaadesi_Ekle";
-            this.Enerji_Müsaadesi_Ekle.Size = new System.Drawing.Size(244, 26);
-            this.Enerji_Müsaadesi_Ekle.Text = "Enerji Müsaadesi Ekle";
-            this.Enerji_Müsaadesi_Ekle.Click += new System.EventHandler(this.Enerji_Müsaadesi_Ekle_Click);
             // 
             // ModülFormu
             // 

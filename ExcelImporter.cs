@@ -196,62 +196,40 @@ namespace SLF
         public DataTable ImportExcelFile(string filePath, string seçilenVeriTipi)
         {
             DataTable dataTable = new DataTable();
-            List<string> dateColumns = new List<string>(); // To store names of columns with date values
-
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
 
             try
             {
                 using (var package = new ExcelPackage(new FileInfo(filePath)))
                 {
-                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // Adjust sheet index if needed
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // First sheet, adjust if needed
 
+                    // Validate headers
                     ValidateColumnHeaders(worksheet, seçilenVeriTipi);
 
-                    int rowCount = worksheet.Dimension.Rows;
-                    int colCount = worksheet.Dimension.Columns;
-
-                    // Create columns and detect date columns
-                    for (int col = 1; col <= colCount; col++)
+                    int rowCount = worksheet.Dimension?.Rows ?? 0;
+                    int colCount = worksheet.Dimension?.Columns ?? 0;
+                    if (rowCount < 2 || colCount < 1)
                     {
-                        string columnName = worksheet.Cells[1, col].Text;
-                        DataColumn column = new DataColumn
-                        {
-                            ColumnName = columnName,
-                            DataType = typeof(string), // Default to string, refine in NormalizeDataTableTypes
-                            AllowDBNull = true
-                        };
-                        dataTable.Columns.Add(column);
-
-                        // Check if the column contains dates in dd.MM.yyyy format
-                        int validDateCount = 0;
-                        int nonEmptyCount = 0;
-                        int sampleSize = Math.Min(10, rowCount - 1); // Check up to 10 rows
-                        for (int row = 2; row <= Math.Min(rowCount, sampleSize + 1); row++)
-                        {
-                            var cell = worksheet.Cells[row, col];
-                            if (cell.Value != null)
-                            {
-                                string valueAsString = cell.Value.ToString().Trim();
-                                if (!string.IsNullOrEmpty(valueAsString))
-                                {
-                                    nonEmptyCount++;
-                                    if (DateTime.TryParseExact(valueAsString, "dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _))
-                                    {
-                                        validDateCount++;
-                                    }
-                                }
-                            }
-                        }
-                        // Consider it a date column if most non-empty values are valid dates
-                        if (nonEmptyCount > 0 && validDateCount >= nonEmptyCount * 0.8) // At least 80% valid dates
-                        {
-                            dateColumns.Add(columnName);
-                        }
+                        throw new Exception("Excel dosyasında veri veya sütun başlığı bulunamadı.");
                     }
 
-                    // Populate DataTable
+                    // Debug: Log worksheet dimensions
+                    System.Diagnostics.Debug.WriteLine($"Worksheet dimensions: {rowCount} rows, {colCount} columns.");
+
+                    // Create columns
+                    for (int col = 1; col <= colCount; col++)
+                    {
+                        string columnName = worksheet.Cells[1, col].Text?.Trim() ?? $"Column{col}";
+                        dataTable.Columns.Add(new DataColumn
+                        {
+                            ColumnName = columnName,
+                            DataType = typeof(string), // Store as string initially
+                            AllowDBNull = true
+                        });
+                    }
+
+                    // Populate all rows
+                    int rowsAdded = 0;
                     for (int row = 2; row <= rowCount; row++)
                     {
                         DataRow dataRow = dataTable.NewRow();
@@ -260,60 +238,41 @@ namespace SLF
                         for (int col = 1; col <= colCount; col++)
                         {
                             var cell = worksheet.Cells[row, col];
-                            object value = cell.Value;
-                            string columnName = worksheet.Cells[1, col].Text;
+                            string valueAsString = cell.Value?.ToString()?.Trim();
 
-                            if (value != null)
-                            {
-                                string valueAsString = value.ToString().Trim();
-
-                                if (dateColumns.Contains(columnName))
-                                {
-                                    // Handle date column
-                                    if (DateTime.TryParseExact(valueAsString, "dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime parsedDate))
-                                    {
-                                        dataRow[col - 1] = valueAsString; // Store as string in dd.MM.yyyy format
-                                        rowHasData = true;
-                                    }
-                                    else
-                                    {
-                                        dataRow[col - 1] = DBNull.Value; // Invalid date format
-                                    }
-                                }
-                                else if (double.TryParse(valueAsString, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedValue))
-                                {
-                                    // Handle numeric columns
-                                    dataRow[col - 1] = valueAsString; // Store as string, convert to double later if needed
-                                    rowHasData = true;
-                                }
-                                else
-                                {
-                                    // Handle other non-numeric columns
-                                    dataRow[col - 1] = valueAsString;
-                                    rowHasData = true;
-                                }
-                            }
-                            else
+                            if (string.IsNullOrEmpty(valueAsString) || valueAsString == "#N/A")
                             {
                                 dataRow[col - 1] = DBNull.Value;
                             }
+                            else
+                            {
+                                dataRow[col - 1] = valueAsString;
+                                rowHasData = true;
+                            }
                         }
 
-                        // Only add the row if it contains at least one non-null value
                         if (rowHasData)
                         {
                             dataTable.Rows.Add(dataRow);
+                            rowsAdded++;
                         }
+                    }
+
+                    // Debug: Log the imported table
+                    System.Diagnostics.Debug.WriteLine($"Imported {dataTable.Rows.Count} rows, {dataTable.Columns.Count} columns (rows added: {rowsAdded}).");
+                    foreach (DataColumn col in dataTable.Columns)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Column: {col.ColumnName}, Type: {col.DataType}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Excel dosyasını okurken bir hata oluştu: {ex.Message}\nStack Trace: {ex.StackTrace}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                throw; // Rethrow to allow caller to handle
+                System.Diagnostics.Debug.WriteLine($"ImportExcelFile exception: {ex.Message}\nStack Trace: {ex.StackTrace}");
+                MessageBox.Show($"Excel dosyasını okurken hata oluştu: {ex.Message}\nStack Trace: {ex.StackTrace}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return new DataTable();
             }
 
-            stopwatch.Stop();
             return dataTable;
         }
 

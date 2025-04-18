@@ -856,9 +856,9 @@ namespace SLF
                 // Optionally, set DataSource to null or an empty DataTable to clear the grid
                 dataGridView_girdi.DataSource = null;
             }
-
+           
+            dataGridView_girdi.ScrollBars = ScrollBars.Both;
             dataGridView_girdi.Refresh();
-
 
             isİmportedModule(isImported, seçilenVeriTipi);
 
@@ -997,7 +997,6 @@ namespace SLF
 
         private void veri_listesi_seçimi_DrawItem(object sender, DrawItemEventArgs e)
         {
-
             // Check if the index is valid
             if (e.Index < 0)
                 return;
@@ -1005,15 +1004,18 @@ namespace SLF
             // Get the current item to be drawn
             string text = veri_listesi_seçimi.Items[e.Index].ToString();
 
-            // Determine the color based on some condition
+            // Default color is red
             Color textColor = Color.Red;
-            var girdiModülü = girdiModülleri[text];
-            if (girdiModülü.importedDataTable.Rows.Count > 0)
+
+            // Check if the module exists and has data
+            if (girdiModülleri.ContainsKey(text) && girdiModülleri[text].importedDataTable.Rows.Count > 0)
             {
                 textColor = Color.Green;
             }
 
+            // Draw the background
             e.DrawBackground();
+
             // Draw the text with the determined color
             using (Brush brush = new SolidBrush(textColor))
             {
@@ -1188,11 +1190,19 @@ namespace SLF
 
             if (result == DialogResult.Yes)
             {
-                // Unsubscribe from the FormClosing event only if the user clicks 'Yes'
+                // Reset the data in each GirdiModülü to make all items red
+                foreach (var module in girdiModülleri.Values)
+                {
+                    module.importedDataTable.Clear(); // Clear the data
+                }
+
+                // Invalidate the ComboBox to trigger redraw of all items
+                veri_listesi_seçimi.Invalidate();
+
+                // Unsubscribe from the FormClosing event
                 this.FormClosing -= ModülFormu_FormClosing;
                 this.Hide(); // Hide the current form (ModülFormu)
             }
-            // If the user clicks 'No', do nothing and stay on the current form
         }
 
         private void yearApproveButton_Click(object sender, EventArgs e)
@@ -2714,6 +2724,7 @@ namespace SLF
                 Console.WriteLine($"Stack Trace: {ex.StackTrace}");
             }
         }
+
         private void UpdateUIForLoadedProject()
         {
             try
@@ -5009,7 +5020,7 @@ namespace SLF
                 Multiline = true,
                 Dock = DockStyle.Bottom, // Dock it at the bottom of the form
                 Height = 100, // Adjust height as necessary
-                ScrollBars = ScrollBars.Vertical // Enable vertical scroll
+                ScrollBars = ScrollBars.Both // Enable vertical scroll
             };
             this.Controls.Add(logTextBox); // Add to the form controls
         }
@@ -5490,6 +5501,7 @@ namespace SLF
         {
             // Modül formunu yüklerken reset year selection sürecini başlat
             ResetYearSelectionProcessGirdiModulu();
+
         }
 
 

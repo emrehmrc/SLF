@@ -7,6 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using SLF.Services;
+using System.Text.RegularExpressions;
 
 namespace SLF
 {
@@ -204,49 +205,64 @@ namespace SLF
             }
         }
 
-        // bool skipPrerequisites is added for direct access to ELF Method
         public bool VEERProcess(string seçilenVeriTipi, bool skipPrerequisites = false)
         {
             try
             {
+                System.Diagnostics.Debug.WriteLine($"Starting VEERProcess with seçilenVeriTipi: {seçilenVeriTipi}");
                 if (!skipPrerequisites)
                 {
                     CheckPrerequisites(seçilenVeriTipi);
                 }
-                
+
                 ProcessFileSelection(seçilenVeriTipi);
+                System.Diagnostics.Debug.WriteLine("File selection processed.");
 
                 DataTable dataTable = CurrentDataTable;
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
+                    System.Diagnostics.Debug.WriteLine($"DataTable has {dataTable.Rows.Count} rows, {dataTable.Columns.Count} columns.");
+                    currentDataTable = dataTable;
 
-                    currentDataTable = dataTable; // Ensure currentDataTable reflects the normalized table
+                    // Configure DataGridView
+                    Onizleme1.Onizleme_DataGrid1.DataSource = null;
+                    Onizleme1.Onizleme_DataGrid1.AllowUserToAddRows = false;
+                    Onizleme1.Onizleme_DataGrid1.VirtualMode = false; // Ensure all rows are loaded
                     Onizleme1.Onizleme_DataGrid1.DataSource = currentDataTable;
-                    ApplyDataGridViewFormatting(currentDataTable, Onizleme1.Onizleme_DataGrid1); // Updated call
-                    onizleme1.Buton_YUKLE.Enabled = false;
-                    onizleme1.Buton_İLERLE.Enabled = true;
+                    ApplyDataGridViewFormatting(currentDataTable, Onizleme1.Onizleme_DataGrid1);
+                    System.Diagnostics.Debug.WriteLine($"DataGridView bound with {Onizleme1.Onizleme_DataGrid1.Rows.Count} rows.");
+
+                    Onizleme1.Buton_YUKLE.Enabled = false;
+                    Onizleme1.Buton_İLERLE.Enabled = true;
                     ClearReportRows();
 
                     Preprocess();
+                    System.Diagnostics.Debug.WriteLine("Preprocessing completed.");
 
                     while (true)
                     {
                         ClearRows();
                         Validate();
+                        System.Diagnostics.Debug.WriteLine($"Validation completed. DataTable rows: {currentDataTable.Rows.Count}");
                         RenameTabCounts();
                         AppendAllToReportDataTables();
                         if (IsError())
                         {
-                            onizleme1.Buton_YUKLE.Enabled = false;
-                            onizleme1.Buton_İLERLE.Enabled = false;
+                            System.Diagnostics.Debug.WriteLine("Errors detected, disabling buttons.");
+                            Onizleme1.Buton_YUKLE.Enabled = false;
+                            Onizleme1.Buton_İLERLE.Enabled = false;
                         }
                         if (!IsInfo() && !IsWarning())
                         {
-                            onizleme1.Buton_YUKLE.Enabled = true;
-                            onizleme1.Buton_İLERLE.Enabled = false;
+                            System.Diagnostics.Debug.WriteLine("No info/warnings, enabling YUKLE.");
+                            Onizleme1.Buton_YUKLE.Enabled = true;
+                            Onizleme1.Buton_İLERLE.Enabled = false;
                         }
 
+                        System.Diagnostics.Debug.WriteLine("Showing Onizleme1 dialog.");
                         var dialogResult = Onizleme1.ShowDialog();
+                        System.Diagnostics.Debug.WriteLine($"Dialog result: {dialogResult}");
+
                         if (dialogResult == DialogResult.Cancel)
                         {
                             return false;
@@ -264,12 +280,21 @@ namespace SLF
                     }
 
                     Postprocess();
+                    System.Diagnostics.Debug.WriteLine("Postprocessing completed.");
                     return true;
                 }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("DataTable is null or empty.");
+                    MessageBox.Show("Veri tablosu boş veya yüklenemedi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                Onizleme1.Onizleme_DataGrid1.ScrollBars = ScrollBars.Both;
+                
             }
             catch (Exception ex)
             {
-                throw;
+                System.Diagnostics.Debug.WriteLine($"VEERProcess exception: {ex.Message}\nStack Trace: {ex.StackTrace}");
+                MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}\nStack Trace: {ex.StackTrace}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             return false;
@@ -599,8 +624,8 @@ namespace SLF
                 string rScriptPath = Path.Combine(userRootPath, anaKlasorYolu, il, rScriptYolu);
 
                 // Construct the path to the config file
-                string projectRoot = ((string)modülFormu.ana_menu_form_objesi.projectRoot).Replace('/', '\\');
-                string configPath = Path.Combine(projectRoot, "config.json");
+
+                string configPath = Path.Combine(((string)modülFormu.ana_menu_form_objesi.projectRoot).Replace('/', '\\'), "config.json");
 
                 // Run Rscript.exe directly with quoted paths
                 var process = new Process
@@ -919,35 +944,106 @@ namespace SLF
 
         protected DataTable NormalizeDataTableTypes(DataTable dataTable)
         {
-            var percentageColumns = GetPercentageColumns();
-            DataTable newTable = dataTable.Clone();
-
-            // Adjust column types and allow DBNull
-            foreach (DataColumn column in newTable.Columns)
+            if (dataTable == null || dataTable.Columns.Count == 0)
             {
-                bool isPercentage = percentageColumns.Contains(column.ColumnName);
-                bool isNumeric = IsNumericColumn(dataTable.Columns[column.ColumnName]);
-                if (isPercentage || isNumeric)
+                System.Diagnostics.Debug.WriteLine("NormalizeDataTableTypes: Input DataTable is null or empty.");
+                return new DataTable();
+            }
+
+            var percentageColumns = GetPercentageColumns(); // Assumes this returns columns like "Pik Yüklenme (%)"
+            List<string> dateColumns = new List<string>();
+            List<string> numericColumns = new List<string>();
+
+            // Classify columns
+            foreach (DataColumn column in dataTable.Columns)
+            {
+                string columnName = column.ColumnName.ToLower();
+                // Predefine known string columns to avoid misclassification
+                if (columnName.Contains("id") || columnName.Contains("adi") || columnName.Contains("kod") ||
+                    columnName.Contains("mulkiyet") || columnName.Contains("mahalle") || columnName.Contains("ilce"))
                 {
-                    column.DataType = typeof(double);
-                    column.AllowDBNull = true;
+                    continue; // Treat as string (e.g., TRAFO_ID, FIDER_ADI, TRAFO_ADI)
+                }
+
+                int validDateCount = 0;
+                int validNumberCount = 0;
+                int nonEmptyCount = 0;
+                int sampleSize = Math.Min(50, dataTable.Rows.Count);
+
+                for (int i = 0; i < sampleSize; i++)
+                {
+                    object value = dataTable.Rows[i][column.ColumnName];
+                    if (!IsNullLike(value))
+                    {
+                        string valueAsString = value.ToString().Trim();
+                        if (valueAsString != "#N/A")
+                        {
+                            nonEmptyCount++;
+                            if (DateTime.TryParseExact(valueAsString, "dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _))
+                            {
+                                validDateCount++;
+                            }
+                            else if (double.TryParse(valueAsString, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedValue) &&
+                                     !Regex.IsMatch(valueAsString, @"^\d+$")) // Exclude integer-like strings
+                            {
+                                validNumberCount++;
+                            }
+                        }
+                    }
+                }
+
+                if (nonEmptyCount > 0)
+                {
+                    if (validDateCount >= nonEmptyCount * 0.9)
+                    {
+                        dateColumns.Add(column.ColumnName);
+                    }
+                    else if (validNumberCount >= nonEmptyCount * 0.9)
+                    {
+                        numericColumns.Add(column.ColumnName);
+                    }
                 }
             }
 
-            // Copy and convert data
+            // Create new table with adjusted types
+            DataTable newTable = dataTable.Clone();
+            foreach (DataColumn column in newTable.Columns)
+            {
+                bool isPercentage = percentageColumns.Contains(column.ColumnName);
+                bool isNumeric = numericColumns.Contains(column.ColumnName);
+                bool isDate = dateColumns.Contains(column.ColumnName);
+                bool isKnownString = column.ColumnName.ToLower().Contains("id") ||
+                                    column.ColumnName.ToLower().Contains("adi") ||
+                                    column.ColumnName.ToLower().Contains("kod") ||
+                                    column.ColumnName.ToLower().Contains("mulkiyet") ||
+                                    column.ColumnName.ToLower().Contains("mahalle") ||
+                                    column.ColumnName.ToLower().Contains("ilce");
+
+                column.DataType = (isPercentage || isNumeric) ? typeof(double) : typeof(string);
+                if (isDate || isKnownString)
+                {
+                    column.DataType = typeof(string); // Override for dates and known string columns
+                }
+                column.AllowDBNull = true;
+            }
+
+            // Copy all rows
+            int rowsCopied = 0;
             foreach (DataRow row in dataTable.Rows)
             {
                 DataRow newRow = newTable.NewRow();
-                int rowIndex = dataTable.Rows.IndexOf(row) + 2;
                 foreach (DataColumn column in dataTable.Columns)
                 {
                     string columnName = column.ColumnName;
                     object value = row[columnName];
 
-                    if (!IsNullLike(value) && (percentageColumns.Contains(columnName) || IsNumericColumn(column)))
+                    if (IsNullLike(value) || value.ToString().Trim() == "#N/A")
+                    {
+                        newRow[columnName] = DBNull.Value;
+                    }
+                    else if (newTable.Columns[columnName].DataType == typeof(double))
                     {
                         string valueAsString = value.ToString().Trim();
-
                         if (double.TryParse(valueAsString, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedValue))
                         {
                             newRow[columnName] = parsedValue;
@@ -959,10 +1055,18 @@ namespace SLF
                     }
                     else
                     {
-                        newRow[columnName] = value;
+                        newRow[columnName] = value.ToString().Trim();
                     }
                 }
                 newTable.Rows.Add(newRow);
+                rowsCopied++;
+            }
+
+            // Debug: Log the normalized table
+            System.Diagnostics.Debug.WriteLine($"Normalized {newTable.Rows.Count} rows, {newTable.Columns.Count} columns (rows copied: {rowsCopied}).");
+            foreach (DataColumn col in newTable.Columns)
+            {
+                System.Diagnostics.Debug.WriteLine($"Column: {col.ColumnName}, Type: {col.DataType}");
             }
 
             return newTable;
@@ -970,16 +1074,31 @@ namespace SLF
 
         private bool IsNumericColumn(DataColumn column)
         {
-            // Consider a column numeric if its values can be parsed as numbers
-            foreach (DataRow row in column.Table.Rows)
+            int validNumberCount = 0;
+            int nonEmptyCount = 0;
+            int sampleSize = Math.Min(50, column.Table.Rows.Count); // Increased sample size for accuracy
+
+            for (int i = 0; i < sampleSize; i++)
             {
-                if (!IsNullLike(row[column]))
+                object value = column.Table.Rows[i][column];
+                if (!IsNullLike(value))
                 {
-                    if (double.TryParse(row[column].ToString(), out _))
-                        return true;
+                    string valueAsString = value.ToString().Trim();
+                    if (valueAsString != "#N/A")
+                    {
+                        nonEmptyCount++;
+                        // Strict numeric check: must parse as double and not look like an ID (e.g., integer-like strings)
+                        if (double.TryParse(valueAsString, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedValue) &&
+                            !Regex.IsMatch(valueAsString, @"^\d+$")) // Exclude integer-like strings (e.g., "12345")
+                        {
+                            validNumberCount++;
+                        }
+                    }
                 }
             }
-            return false;
+
+            // Require 90% valid numbers to classify as numeric (stricter threshold)
+            return nonEmptyCount > 0 && validNumberCount >= nonEmptyCount * 0.9;
         }
 
 
