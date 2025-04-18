@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Windows.Forms;
 
 namespace SLF
 {
@@ -195,75 +196,127 @@ namespace SLF
         public DataTable ImportExcelFile(string filePath, string seçilenVeriTipi)
         {
             DataTable dataTable = new DataTable();
+            List<string> dateColumns = new List<string>(); // To store names of columns with date values
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            try
             {
-                ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
-
-                ValidateColumnHeaders(worksheet, seçilenVeriTipi);
-
-                int rowCount = worksheet.Dimension.Rows;
-                int colCount = worksheet.Dimension.Columns;
-
-                // Create columns in DataTable
-                for (int col = 1; col <= colCount; col++)
+                using (var package = new ExcelPackage(new FileInfo(filePath)))
                 {
-                    DataColumn column = new DataColumn();
-                    column.ColumnName = worksheet.Cells[1, col].Text;
-                    column.AllowDBNull = true;
-                    dataTable.Columns.Add(column);
-                }
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // Adjust sheet index if needed
 
-                for (int col = 1; col <= colCount; col++)
-                {
-                    string columnName = worksheet.Cells[1, col].Text;
-                }
+                    ValidateColumnHeaders(worksheet, seçilenVeriTipi);
 
-                // Populate DataTable with only numeric values
-                for (int row = 2; row <= rowCount; row++)
-                {
-                    DataRow dataRow = dataTable.NewRow();
-                    bool rowHasData = false;
+                    int rowCount = worksheet.Dimension.Rows;
+                    int colCount = worksheet.Dimension.Columns;
 
+                    // Create columns and detect date columns
                     for (int col = 1; col <= colCount; col++)
                     {
-                        var cell = worksheet.Cells[row, col];
-                        object value = cell.Value;
                         string columnName = worksheet.Cells[1, col].Text;
-
-                        if (value != null)
+                        DataColumn column = new DataColumn
                         {
-                            string valueAsString = value.ToString().Trim();
-                            if (double.TryParse(valueAsString, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedValue))
+                            ColumnName = columnName,
+                            DataType = typeof(string), // Default to string, refine in NormalizeDataTableTypes
+                            AllowDBNull = true
+                        };
+                        dataTable.Columns.Add(column);
+
+                        // Check if the column contains dates in dd.MM.yyyy format
+                        int validDateCount = 0;
+                        int nonEmptyCount = 0;
+                        int sampleSize = Math.Min(10, rowCount - 1); // Check up to 10 rows
+                        for (int row = 2; row <= Math.Min(rowCount, sampleSize + 1); row++)
+                        {
+                            var cell = worksheet.Cells[row, col];
+                            if (cell.Value != null)
                             {
-                                dataRow[col - 1] = parsedValue;
-                                rowHasData = true;
+                                string valueAsString = cell.Value.ToString().Trim();
+                                if (!string.IsNullOrEmpty(valueAsString))
+                                {
+                                    nonEmptyCount++;
+                                    if (DateTime.TryParseExact(valueAsString, "dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _))
+                                    {
+                                        validDateCount++;
+                                    }
+                                }
+                            }
+                        }
+                        // Consider it a date column if most non-empty values are valid dates
+                        if (nonEmptyCount > 0 && validDateCount >= nonEmptyCount * 0.8) // At least 80% valid dates
+                        {
+                            dateColumns.Add(columnName);
+                        }
+                    }
+
+                    // Populate DataTable
+                    for (int row = 2; row <= rowCount; row++)
+                    {
+                        DataRow dataRow = dataTable.NewRow();
+                        bool rowHasData = false;
+
+                        for (int col = 1; col <= colCount; col++)
+                        {
+                            var cell = worksheet.Cells[row, col];
+                            object value = cell.Value;
+                            string columnName = worksheet.Cells[1, col].Text;
+
+                            if (value != null)
+                            {
+                                string valueAsString = value.ToString().Trim();
+
+                                if (dateColumns.Contains(columnName))
+                                {
+                                    // Handle date column
+                                    if (DateTime.TryParseExact(valueAsString, "dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime parsedDate))
+                                    {
+                                        dataRow[col - 1] = valueAsString; // Store as string in dd.MM.yyyy format
+                                        rowHasData = true;
+                                    }
+                                    else
+                                    {
+                                        dataRow[col - 1] = DBNull.Value; // Invalid date format
+                                    }
+                                }
+                                else if (double.TryParse(valueAsString, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedValue))
+                                {
+                                    // Handle numeric columns
+                                    dataRow[col - 1] = valueAsString; // Store as string, convert to double later if needed
+                                    rowHasData = true;
+                                }
+                                else
+                                {
+                                    // Handle other non-numeric columns
+                                    dataRow[col - 1] = valueAsString;
+                                    rowHasData = true;
+                                }
                             }
                             else
                             {
-                                dataRow[col - 1] = DBNull.Value; // Treat non-numeric values (e.g., formula results) as null
+                                dataRow[col - 1] = DBNull.Value;
                             }
                         }
-                        else
+
+                        // Only add the row if it contains at least one non-null value
+                        if (rowHasData)
                         {
-                            dataRow[col - 1] = DBNull.Value; // Treat null values as null
+                            dataTable.Rows.Add(dataRow);
                         }
                     }
-
-                    // Only add the row if it contains at least one numeric value
-                    if (rowHasData)
-                    {
-                        dataTable.Rows.Add(dataRow);
-                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Excel dosyasını okurken bir hata oluştu: {ex.Message}\nStack Trace: {ex.StackTrace}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                throw; // Rethrow to allow caller to handle
             }
 
             stopwatch.Stop();
             return dataTable;
         }
+
 
         private void ValidateColumnHeaders(ExcelWorksheet worksheet, string seçilenVeriTipi)
         {
