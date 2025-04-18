@@ -113,6 +113,15 @@ namespace SLF.services
         /// </summary>
         /// <param name="kmlFilePath">KML dosyasının yolu (zorunlu)</param>
         /// <param name="csvFilePath">CSV dosyasının yolu (opsiyonel)</param>
+        /// <param name="dtrModuluPath">DTR Modülü verilerinin yolu (opsiyonel)</param>
+        /// <param name="yeniDtrModuluPath">Yeni Projelendirilmiş DTR Modülü verilerinin yolu (opsiyonel)</param>
+        /// <param name="useDeepLearning">Deep Learning modelini kullan (varsayılan: true)</param>
+        /// <returns>Python betiğinin çıktısı</returns>
+        /// <summary>
+        /// İmar Planı analizini çalıştırır ve sonuçları döndürür
+        /// </summary>
+        /// <param name="kmlFilePath">KML dosyasının yolu (zorunlu)</param>
+        /// <param name="csvFilePath">CSV dosyasının yolu (opsiyonel)</param>
         /// <returns>Python betiğinin çıktısı</returns>
         public static string RunImarPlanModel(string kmlFilePath, string csvFilePath = null)
         {
@@ -127,6 +136,12 @@ namespace SLF.services
                 // Seçilen il/ilçe bilgilerini al
                 string selectedCity = PathService.SelectedCity;
                 string selectedDistrict = PathService.SelectedDistrict;
+
+                // DTR Modülü ve Yeni Projelendirilmiş DTR Modülü verilerini al
+                string dtrModuluPath = PathService.GetGirdilerPathForDataType("DTR Verileri");
+                string dtrModuluFilePath = null;
+                string yeniDtrModuluPath = PathService.GetGirdilerPathForDataType("Yeni Projelendirilmiş DTR Verileri");
+                string yeniDtrModuluFilePath = null;
 
                 // Hücre dosyasını bul
                 if (Directory.Exists(hucrePath))
@@ -160,6 +175,44 @@ namespace SLF.services
                     {
                         Console.WriteLine("Uydu verileri klasöründe CSV dosyası bulunamadı.");
                     }
+                }
+
+                // DTR Modülü dosyasını bul
+                if (Directory.Exists(dtrModuluPath))
+                {
+                    string[] dtrFiles = Directory.GetFiles(dtrModuluPath, "*.csv");
+                    if (dtrFiles.Length > 0)
+                    {
+                        dtrModuluFilePath = dtrFiles[0]; // İlk bulunan CSV dosyasını kullan
+                        Console.WriteLine($"DTR Modülü verisi bulundu: {dtrModuluFilePath}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("DTR Modülü klasöründe CSV dosyası bulunamadı.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"DTR Modülü klasörü bulunamadı: {dtrModuluPath}");
+                }
+
+                // Yeni Projelendirilmiş DTR Modülü dosyasını bul
+                if (Directory.Exists(yeniDtrModuluPath))
+                {
+                    string[] yeniDtrFiles = Directory.GetFiles(yeniDtrModuluPath, "*.csv");
+                    if (yeniDtrFiles.Length > 0)
+                    {
+                        yeniDtrModuluFilePath = yeniDtrFiles[0]; // İlk bulunan CSV dosyasını kullan
+                        Console.WriteLine($"Yeni Projelendirilmiş DTR Modülü verisi bulundu: {yeniDtrModuluFilePath}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Yeni Projelendirilmiş DTR Modülü klasöründe CSV dosyası bulunamadı.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Yeni Projelendirilmiş DTR Modülü klasörü bulunamadı: {yeniDtrModuluPath}");
                 }
 
                 if (string.IsNullOrEmpty(selectedCity) || string.IsNullOrEmpty(selectedDistrict))
@@ -254,6 +307,8 @@ namespace SLF.services
                 Console.WriteLine($"KML dosyası: {kmlFilePath}");
                 Console.WriteLine($"Mesken veri dosyası: {meskenFile ?? "Bulunamadı"}");
                 Console.WriteLine($"Other veri dosyası: {otherFile ?? "Bulunamadı"}");
+                Console.WriteLine($"DTR Modülü verisi: {dtrModuluFilePath ?? "Bulunamadı"}");
+                Console.WriteLine($"Yeni Projelendirilmiş DTR Modülü verisi: {yeniDtrModuluFilePath ?? "Bulunamadı"}");
                 Console.WriteLine($"CSV çıktı dosyası: {outputCsvPath}");
                 Console.WriteLine($"KML çıktı dosyası: {outputKmlPath}");
 
@@ -279,6 +334,17 @@ namespace SLF.services
                 if (!string.IsNullOrEmpty(otherFile))
                 {
                     args.Append($" --other-file \"{otherFile}\"");
+                }
+
+                // YENİ: DTR Modülü ve Yeni Projelendirilmiş DTR Modülü dosyalarını ekle
+                if (!string.IsNullOrEmpty(dtrModuluFilePath))
+                {
+                    args.Append($" --dtr-modulu \"{dtrModuluFilePath}\"");
+                }
+
+                if (!string.IsNullOrEmpty(yeniDtrModuluFilePath))
+                {
+                    args.Append($" --yeni-dtr-modulu \"{yeniDtrModuluFilePath}\"");
                 }
 
                 // Uydu verisi argümanını ekle
@@ -311,7 +377,8 @@ namespace SLF.services
                 using (Process process = Process.Start(processInfo))
                 {
                     // Eş zamanlı çıktı yakalama
-                    process.OutputDataReceived += (sender, e) => {
+                    process.OutputDataReceived += (sender, e) =>
+                    {
                         if (!string.IsNullOrEmpty(e.Data))
                         {
                             Console.WriteLine($"PYTHON: {e.Data}");
@@ -319,7 +386,8 @@ namespace SLF.services
                         }
                     };
 
-                    process.ErrorDataReceived += (sender, e) => {
+                    process.ErrorDataReceived += (sender, e) =>
+                    {
                         if (!string.IsNullOrEmpty(e.Data))
                         {
                             Console.WriteLine($"PYTHON ERROR: {e.Data}");
@@ -331,43 +399,35 @@ namespace SLF.services
                     process.BeginOutputReadLine();
                     process.BeginErrorReadLine();
 
-                    // İşlem durumunu izle
+                    // İşlem durumunu izleme ve ilerleme raporu
                     DateTime startTime = DateTime.Now;
-                    bool finished = false;
 
-                    // Ana işlemi bekletmeden işlem durumunu kontrol et
-                    while (!finished && (DateTime.Now - startTime).TotalMinutes < 10) // 10 dakika zaman aşımı
+                    // İlerleme raporlama için bir Timer başlat
+                    System.Timers.Timer progressTimer = new System.Timers.Timer(30000); // 30 saniyede bir rapor
+                    progressTimer.Elapsed += (sender, e) =>
                     {
-                        // İşlem bittiyse döngüden çık
-                        finished = process.WaitForExit(1000); // 1 saniye bekle
+                        TimeSpan elapsed = DateTime.Now - startTime;
+                        Console.WriteLine($"İşlem devam ediyor... Geçen süre: {elapsed.Minutes} dakika {elapsed.Seconds} saniye");
+                    };
+                    progressTimer.AutoReset = true;
+                    progressTimer.Start();
 
-                        // Her 30 saniyede bir durum raporu
-                        if ((DateTime.Now - startTime).TotalSeconds % 30 < 1)
+                    try
+                    {
+                        // İşlemin tamamlanmasını sonsuza kadar bekle (zaman kısıtlaması yok)
+                        process.WaitForExit();
+
+                        // İşlem tamamlandı, çıkış kodunu kontrol et
+                        if (process.ExitCode != 0)
                         {
-                            TimeSpan elapsed = DateTime.Now - startTime;
-                            Console.WriteLine($"İşlem devam ediyor... Geçen süre: {elapsed.Minutes} dakika {elapsed.Seconds} saniye");
+                            throw new Exception($"Python betiği hata ile sonlandı. Çıkış kodu: {process.ExitCode}");
                         }
                     }
-
-                    // Eğer zaman aşımına uğradıysa
-                    if (!finished)
+                    finally
                     {
-                        Console.WriteLine("İşlem 10 dakika içinde tamamlanamadı. Sonlandırılıyor...");
-                        try
-                        {
-                            process.Kill();
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"İşlem sonlandırılırken hata: {ex.Message}");
-                        }
-                        throw new TimeoutException("Python işlemi zaman aşımına uğradı (10 dakika).");
-                    }
-
-                    // Çıkış kodunu kontrol et
-                    if (process.ExitCode != 0)
-                    {
-                        throw new Exception($"Python betiği hata ile sonlandı. Çıkış kodu: {process.ExitCode}");
+                        // Her durumda Timer'ı durdur
+                        progressTimer.Stop();
+                        progressTimer.Dispose();
                     }
                 }
 
@@ -383,6 +443,9 @@ namespace SLF.services
                 throw; // Üst seviye metodların hatayı yakalaması için yeniden fırlat
             }
         }
+    }
+    }
 
-    }
-    }
+
+
+
