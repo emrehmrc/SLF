@@ -101,6 +101,7 @@
             // 
             // buton_yük_tipleri
             // 
+            this.buton_yük_tipleri.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.buton_yük_tipleri.BackColor = System.Drawing.Color.Azure;
             this.buton_yük_tipleri.Font = new System.Drawing.Font("Microsoft YaHei UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.buton_yük_tipleri.Location = new System.Drawing.Point(4, 485);

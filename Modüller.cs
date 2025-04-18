@@ -49,6 +49,9 @@ namespace SLF
         private MethodForm methodFormObjesi;
         private BekleForm bekleForm;
 
+        public string userRootPath;
+        public string configPath;
+
         public Panel imar_legendPanel;
 
         public bool isImported;
@@ -114,6 +117,7 @@ namespace SLF
 
         public bool isSelecting_YGA = false;
         public bool isSelecting_YUK = false;
+        public bool isSelecting_Musaade = false;
 
         // X and Y coordinates of the center location of the gMapControl object to be used to create a sample
         // kml file to be opened in the Google Earth Desktop
@@ -270,6 +274,9 @@ namespace SLF
 
             // Initialize tab_ekonometrik accessibility on form load
             UpdateTabEkonometrikAccessibility();
+
+            userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            configPath = Path.Combine(((string)ana_menu_form_objesi.projectRoot).Replace('/', '\\'),"config.json");
         }
 
         public ModülFormu() : this("", "")
@@ -874,14 +881,6 @@ namespace SLF
             // Disable the button initially
             OpenModuleButton.Enabled = false;
 
-            string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-            string filePath = Path.Combine(userRootPath,
-                (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                (string)ana_menu_form_objesi.config.İl,
-                (string)ana_menu_form_objesi.config.İlçe,
-                (string)ana_menu_form_objesi.config.ELF.INPUT_FILE);
-
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
 
             // Load the data table for the selected type
@@ -898,6 +897,14 @@ namespace SLF
             // Check if the selected data type is "Ekonometrik Yük Tahmini Verileri"
             if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
             {
+
+                string filePath = Path.Combine(userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.İlçe,
+                    (string)ana_menu_form_objesi.config.ELF.INPUT_FILE);
+
+
                 // Asynchronous task to load the Excel package
                 await Task.Run(() =>
                 {
@@ -5165,13 +5172,17 @@ namespace SLF
         {
             if (isSelecting_YUK == true)
             {
-                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(true, false, polygonPoints_imar);
+                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(true, false, false, polygonPoints_imar);
 
             }
             else if (isSelecting_YGA == true)
             {
-                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, true, polygonPoints_imar);
+                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, true, false, polygonPoints_imar);
                 poligonOzellikFormu.buton_yük_tipleri.Visible = false;
+            }
+            else if (isSelecting_Musaade == true)
+            {
+                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, false, true, polygonPoints_imar);
             }
 
             poligonOzellikFormu.Owner = this;
@@ -7117,17 +7128,12 @@ namespace SLF
 
         private async Task<string> RunModelRScript()
         {
-            // Get the user's home directory (e.g., C:\Users\ehan0)
-            string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
             // Get the input strings and replace forward slashes with backslashes
             ELFrScriptModelPath = Path.Combine(userRootPath,
                 (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                 (string)ana_menu_form_objesi.config.İl,
                (string)ana_menu_form_objesi.config.ELF.Rscript_Yolu_Model).Replace('/', '\\');
-
-            string configPath = Path.Combine(((string)ana_menu_form_objesi.projectRoot).Replace('/', '\\'),
-                "config.json");
 
             var processInfo = new ProcessStartInfo
             {
@@ -7239,12 +7245,12 @@ namespace SLF
                 };
                 cursorTimer.Start();
 
-                string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-                ELFSenaryolarFilePath = Path.Combine(userRootPath,(string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                ELFSenaryolarFilePath = Path.Combine(userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
                     (string)ana_menu_form_objesi.config.ELF.INPUT_FILE);
+
 
                 if (!File.Exists(ELFSenaryolarFilePath))
                 {
@@ -7627,6 +7633,21 @@ namespace SLF
             else if (popup.OperationCancelled)
             {
                 MessageBox.Show("İşlem iptal edildi.");
+            }
+        }
+
+        private void Enerji_Müsaadesi_Ekle_Click(object sender, EventArgs e)
+        {
+            isSelecting_polygon = true;
+            isSelecting_Musaade = true;
+
+            isRulerEnabled = false;
+            isRulerActive = false;
+
+            // Determine the active map control and reset accordingly
+            if (cbs.GetActiveGMapControl() == gMapControl_imar)
+            {
+                ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar, rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
             }
         }
 
