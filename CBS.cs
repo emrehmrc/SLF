@@ -4,7 +4,6 @@ using MapWinGIS;
 using NetTopologySuite.IO;
 using SharpKml.Base;
 using SharpKml.Dom;
-using SharpKml.Engine;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -1070,14 +1069,11 @@ namespace SLF
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"KML dosyası ayrıştırılırken bir hata oluştu: {ex.Message}");
                 return;
             }
 
             gMapControl.Refresh();
         }
-
-
 
         public async Task LoadShapefile(string filepath, GMapOverlay shapeFileOverlay,
             System.Data.DataTable shapefile_datatable, DataGridView dataGridView)
