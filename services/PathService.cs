@@ -58,17 +58,37 @@ namespace SLF.Services
         {
             get
             {
-                // SLF ana dizininde python_kod klasörü
-                string slftRootDir = GetSLFRootDirectory();
-                string pythonKodPath = Path.Combine(slftRootDir, "python_kod");
-
-                // Klasör yoksa oluştur
-                if (!Directory.Exists(pythonKodPath))
+                try
                 {
-                    Directory.CreateDirectory(pythonKodPath);
-                }
+                    // SLF ana dizininde python_kod klasörü
+                    string slftRootDir = GetSLFRootDirectory();
+                    Console.WriteLine($"SLF kök dizini: {slftRootDir}");
 
-                return pythonKodPath;
+                    // Eğer GetSLFRootDirectory bin dizinini döndürüyorsa, bir seviye daha yukarı çık
+                    if (slftRootDir.EndsWith("\\bin"))
+                    {
+                        slftRootDir = Directory.GetParent(slftRootDir).FullName;
+                        Console.WriteLine($"Düzeltilmiş SLF kök dizini: {slftRootDir}");
+                    }
+
+                    string pythonKodPath = Path.Combine(slftRootDir, "python_kod");
+                    Console.WriteLine($"Python kod yolu: {pythonKodPath}");
+
+                    // Klasör yoksa oluştur
+                    if (!Directory.Exists(pythonKodPath))
+                    {
+                        Directory.CreateDirectory(pythonKodPath);
+                        Console.WriteLine($"Python kod klasörü oluşturuldu: {pythonKodPath}");
+                    }
+
+                    return pythonKodPath;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Python kod dizini belirlenirken hata: {ex.Message}");
+                    // Hata durumunda sabit yolu döndür
+                    return @"C:\Users\batuhan.yetis\source\repos\SLF\python_kod";
+                }
             }
         }
 
@@ -962,9 +982,28 @@ namespace SLF.Services
         }
 
         /// <summary>
-        /// Çalışma ortamını sıfırlar ve tüm değişkenleri temizler.
+        /// Çalışma ortamını sıfırlar ve tüm değişkenleri temizler.PythonKodDirectory
         /// Yeni bir il/ilçe seçildiğinde kullanılır.
         /// </summary>
+        /// 
+        public static void DiagnosticTest()
+        {
+            string exeDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            Console.WriteLine($"ExeDirectory: {exeDirectory}");
+
+            // Bir üst dizine çık (bin/Debug'den bin'e)
+            DirectoryInfo parentDir = Directory.GetParent(exeDirectory);
+            Console.WriteLine($"ParentDir: {parentDir?.FullName}");
+
+            // İki üst dizine çık (bin'den SLF'ye)
+            DirectoryInfo projectDir = parentDir?.Parent;
+            Console.WriteLine($"ProjectDir: {projectDir?.FullName}");
+
+            // python_kod klasörünü ara
+            string pythonKodPath = Path.Combine(projectDir?.FullName ?? "", "python_kod");
+            Console.WriteLine($"Python kod yolu: {pythonKodPath}");
+            Console.WriteLine($"Python kod klasörü var mı: {Directory.Exists(pythonKodPath)}");
+        }
         public static void ResetWorkingEnvironment()
         {
             try
