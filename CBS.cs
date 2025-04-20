@@ -66,7 +66,7 @@ namespace SLF
         public string userProfilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         public string targetDirectory;
 
-        public CBS(ModülFormu mainform)
+        public CBS (ModülFormu mainform)
         {
             this.modülFormu = mainform;
 
@@ -1134,7 +1134,7 @@ namespace SLF
             // grid e ait oluşturulmuş mxm hücreleri "polygons" listesiyle return et.
             return polygons;
         }
-
+        
         // creates a grid and adds it onto the map
         public void AddGridToMap(GMapControl gMapControl)
         {
@@ -1168,7 +1168,7 @@ namespace SLF
             }
 
             gMapControl.Refresh();
-
+            
             // Find the first available slot in the array that holds shapefile overlay layers
             layer_index = Array.FindIndex(tüm_katmanlar_array_imar, s => s == null);
             tüm_katmanlar_array_imar[layer_index] = gridOverlay;

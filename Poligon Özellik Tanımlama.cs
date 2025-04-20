@@ -89,7 +89,7 @@ namespace SLF
 
             // Create a string representation of the coordinates in WKT format
             string coordinates = $"Polygon (({string.Join(", ", polygonPoints.Select(p => $"{p.Lat} {p.Lng}"))}))";
-            string area = Math.Round(cbsFormu.CalculatePolygonArea(polygonPoints),1).ToString() + " m2";
+            string area = Math.Round(cbsFormu.CalculatePolygonArea(polygonPoints), 1).ToString() + " m2";
 
             // construct the parameters of the point load addition 
             if (isSelecting_YUK == true)
@@ -125,7 +125,8 @@ namespace SLF
                 LoadExcelData();
                 SetupDropdownColumns(columnValues);
 
-            } else if (isSelecting_YGA == true)
+            }
+            else if (isSelecting_YGA == true)
             {
                 // Add "Polygon ID" column
                 dataTable.Columns.Add("Polygon ID", typeof(string));
@@ -360,7 +361,8 @@ namespace SLF
             if (!isKaydetClicked)
             {
                 is_poligon_saved = false;
-            } else
+            }
+            else
             {
                 isSelecting_YUK = false;
                 isSelecting_YGA = false;

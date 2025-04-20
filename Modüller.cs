@@ -2188,7 +2188,7 @@ namespace SLF
                 }
             }
 
-            
+
             // Gerekli kontrolleri yapmak için seçilen sekmeyi ve modülleri kontrol et
             string selectedTabText = Modül_Tabları.SelectedTab.Text;
 
@@ -2242,8 +2242,9 @@ namespace SLF
                     await eaHaritayaVeriYukleAsync();
                 }
 
-                    
-            } else if (selectedTabText == "DEK Modülü")
+
+            }
+            else if (selectedTabText == "DEK Modülü")
             {
                 Console.WriteLine("DEK Modülü");
                 if (!GirdiModülü.dataTablesByType.ContainsKey("DEK Verileri"))
@@ -2257,7 +2258,8 @@ namespace SLF
                     await dekHaritayaVeriYukleAsync();
                 }
 
-            } else if (Modül_Tabları.SelectedTab == tab_yükHaritası)
+            }
+            else if (Modül_Tabları.SelectedTab == tab_yükHaritası)
             {
 
                 // Find the index of the overlay in tüm_katmanlar_array_imar_names that contains "xxx"
@@ -2280,10 +2282,11 @@ namespace SLF
 
                     legendPanel.PerformLayout(); // Force layout update
 
-                } else
+                }
+                else
                 {
                     legendPanel.Visible = false;
-                }        
+                }
 
             }
         }
@@ -4258,7 +4261,7 @@ namespace SLF
             // Force a repaint by toggling the visibility of the heatmap overlay
             SetOverlayVisibility(heatmapOverlay, false); // Hide
             SetOverlayVisibility(heatmapOverlay, true);  // Show
-                                                            //mapControl.Invalidate(); // Force a full repaint
+                                                         //mapControl.Invalidate(); // Force a full repaint
             mapControl.Refresh(); // Refresh the map control
         }
 
