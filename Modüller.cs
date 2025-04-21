@@ -1208,6 +1208,11 @@ namespace SLF
         private void yearApproveButton_Click(object sender, EventArgs e)
         {
             ana_menu_form_objesi.config.ELF.ufuk_yılı = (int)endYearComboBox.SelectedItem - (int)startYearComboBox.SelectedItem;
+            ana_menu_form_objesi.config.DEK.baslangıc_yılı = (int)startYearComboBox.SelectedItem;
+            ana_menu_form_objesi.config.DEK.bitis_yılı = (int)endYearComboBox.SelectedItem;
+            ana_menu_form_objesi.config.EA.baslangıc_yılı = (int)startYearComboBox.SelectedItem;
+            ana_menu_form_objesi.config.EA.bitis_yılı = (int)endYearComboBox.SelectedItem;
+
             methodFormObjesi.SaveConfigToFile();
             
             if (endYearComboBox.SelectedIndex == -1)
@@ -4000,51 +4005,86 @@ namespace SLF
                 }
             }
         }
-
-
         private async void gMapControl_DEK_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
-            // DEK modülü için OnMapClickEventi çağrısı
             OnMapClickEventi(pointClick, e, markerOverlay_DEK, ref polygonPoints_DEK,
                 ref polygonOverlay_DEK, Mesafe_Dek, mesafe_metre_DeK);
 
             if (isAddingDekPoint)
             {
-                // Use the selected CellId from ModülFormu
-                // Yeni marker oluştur
                 GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green)
                 {
                     ToolTipText = "Yeni DEK Noktası"
                 };
                 markerOverlay_DEK.Markers.Add(marker);
 
-                // Nokta verisini oluştur
                 NoktaVeri noktaVeri_marker = new NoktaVeri
                 {
                     Enlem = Math.Round(pointClick.Lat, 4),
                     Boylam = Math.Round(pointClick.Lng, 4)
                 };
 
-                // Popup formu göster
-                using (DEKCenterPopupForm popupForm = new DEKCenterPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+                using (DEKCenterPopupForm popupForm = new DEKCenterPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker, slfEndYear, ana_menu_form_objesi))
                 {
                     if (popupForm.ShowDialog() == DialogResult.OK)
                     {
-                        // Başarılı olduğunda harita verilerini yükle
                         await dekHaritayaVeriYukleAsync();
                     }
                     else if (popupForm.OperationCancelled)
                     {
-                        // İşlem iptal edilirse marker'ı kaldır
                         markerOverlay_DEK.Markers.Remove(marker);
                     }
                 }
 
-                // İşaretleme işlemini sıfırla
                 isAddingDekPoint = false;
                 return;
             }
         }
+
+        /*        private async void gMapControl_DEK_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+                {
+                    // DEK modülü için OnMapClickEventi çağrısı
+                    OnMapClickEventi(pointClick, e, markerOverlay_DEK, ref polygonPoints_DEK,
+                        ref polygonOverlay_DEK, Mesafe_Dek, mesafe_metre_DeK);
+
+                    if (isAddingDekPoint)
+                    {
+                        // Use the selected CellId from ModülFormu
+                        // Yeni marker oluştur
+                        GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green)
+                        {
+                            ToolTipText = "Yeni DEK Noktası"
+                        };
+                        markerOverlay_DEK.Markers.Add(marker);
+
+                        // Nokta verisini oluştur
+                        NoktaVeri noktaVeri_marker = new NoktaVeri
+                        {
+                            Enlem = Math.Round(pointClick.Lat, 4),
+                            Boylam = Math.Round(pointClick.Lng, 4)
+                        };
+
+                        // Popup formu göster
+                        using (DEKCenterPopupForm popupForm = new DEKCenterPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+                        {
+                            if (popupForm.ShowDialog() == DialogResult.OK)
+                            {
+                                // Başarılı olduğunda harita verilerini yükle
+                                await dekHaritayaVeriYukleAsync();
+                            }
+                            else if (popupForm.OperationCancelled)
+                            {
+                                // İşlem iptal edilirse marker'ı kaldır
+                                markerOverlay_DEK.Markers.Remove(marker);
+                            }
+                        }
+
+                        // İşaretleme işlemini sıfırla
+                        isAddingDekPoint = false;
+                        return;
+                    }
+                }*/
+
         private async Task HandleDEKPopupFormAsync(PointLatLng point, string cellId)
         {
             NoktaVeri noktaVeri_marker = new NoktaVeri
@@ -4054,13 +4094,11 @@ namespace SLF
                 CellId = cellId
             };
 
-            using (DEKCenterPopupForm popupForm = new DEKCenterPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+            using (DEKCenterPopupForm popupForm = new DEKCenterPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker, slfEndYear, ana_menu_form_objesi))
             {
                 if (popupForm.ShowDialog() == DialogResult.OK)
                 {
                     Console.WriteLine("Popup form closed with OK. Updating data...");
-                    // await eaHaritayaVeriYukleAsync();
-
                     DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
                     DataRow updatedRow = dataTable.Rows.Cast<DataRow>().FirstOrDefault(r => r["id"].ToString() == cellId);
                     if (updatedRow != null)
@@ -4078,6 +4116,39 @@ namespace SLF
                 }
             }
         }
+        /*        private async Task HandleDEKPopupFormAsync(PointLatLng point, string cellId)
+                {
+                    NoktaVeri noktaVeri_marker = new NoktaVeri
+                    {
+                        Enlem = Math.Round(point.Lat, 4),
+                        Boylam = Math.Round(point.Lng, 4),
+                        CellId = cellId
+                    };
+
+                    using (DEKCenterPopupForm popupForm = new DEKCenterPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+                    {
+                        if (popupForm.ShowDialog() == DialogResult.OK)
+                        {
+                            Console.WriteLine("Popup form closed with OK. Updating data...");
+                            // await eaHaritayaVeriYukleAsync();
+
+                            DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
+                            DataRow updatedRow = dataTable.Rows.Cast<DataRow>().FirstOrDefault(r => r["id"].ToString() == cellId);
+                            if (updatedRow != null)
+                            {
+                                Console.WriteLine($"Cell {cellId}: ");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"No row found for Cell {cellId} in DataTable.");
+                            }
+
+                            Console.WriteLine("Calling HaritaUzerindeSimulasyonGosterimi...");
+                            await HaritaUzerindeDEKSimulasyonGosterimi(dataTable);
+                            Console.WriteLine("HaritaUzerindeSimulasyonGosterimi completed.");
+                        }
+                    }
+                }*/
 
         // DEK şehri seçildiğinde çağrılan metot
         // Helper method to safely remove a marker from overlays
@@ -6419,30 +6490,37 @@ namespace SLF
             }
             gMapControl_DEK.Refresh();
         }
-
         private async void DEKRunSimulationButton_Click(object sender, EventArgs e)
         {
-            // Disable buttons and TrackBar to prevent interaction while processing
             DEKRunSimulationButton.Enabled = false;
             DEKSimulasyonSonucGoruntule.Enabled = true;
-            //DEKSimButton.Enabled = false;
 
             string inputFilePath = Path.Combine(userRootPath,
                 (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                 (string)ana_menu_form_objesi.config.İl,
                 (string)ana_menu_form_objesi.config.İlçe,
                 (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
-               (string)ana_menu_form_objesi.config.DEK.girdi_dosyası).Replace('/', '\\');
+                (string)ana_menu_form_objesi.config.DEK.girdi_dosyası);
 
             string outputFilePath = Path.Combine(userRootPath,
-             (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-             (string)ana_menu_form_objesi.config.İl,
-             (string)ana_menu_form_objesi.config.İlçe,
-             (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
-            (string)ana_menu_form_objesi.config.DEK.cikti_dosyasi).Replace('/', '\\');
+                (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                (string)ana_menu_form_objesi.config.İl,
+                (string)ana_menu_form_objesi.config.İlçe,
+                (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
+                (string)ana_menu_form_objesi.config.DEK.cikti_dosyasi);
 
+            int startYear = slfStartYear; // Or: int.Parse(comboBox_ea_yıl_secimi.SelectedItem.ToString());
+            int endYear = slfEndYear;     // Or: int.Parse(comboBox_DEK_Yıl.SelectedItem.ToString());
 
-            // ana_menu_form_objesi.config.DEK.yıl = ComboBox.text;
+            // Validate years
+            if (startYear > endYear)
+            {
+                MessageBox.Show("Start year must be less than or equal to end year.",
+                    "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                DEKRunSimulationButton.Enabled = true;
+                DEKSimulasyonSonucGoruntule.Enabled = true;
+                return;
+            }
 
             methodFormObjesi.SaveConfigToFile();
             try
@@ -6459,12 +6537,6 @@ namespace SLF
                     DEKProgressBar.Visible = true;
                 }
 
-                //string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\girdi\new_buildings_2024_2035_1703.xlsx";
-                //string outputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\cıktı\dek_distribution_cumulative_0704.xlsx";
-
-                // string inputFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\İzmir\Karşıyaka\Dağıtık Üretimler\girdi\dek_yeni_binalar.xlsx";
-                // string outputFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\İzmir\Karşıyaka\Dağıtık Üretimler\cıktı\dek_kumulatif_dagilim_sonuclari.xlsx";
-
                 if (!File.Exists(inputFilePath))
                 {
                     MessageBox.Show("Input file not found! Please ensure the file is saved correctly.",
@@ -6472,7 +6544,7 @@ namespace SLF
                     return;
                 }
 
-                await RunPythonDEKScriptAsync(inputFilePath);
+                await RunPythonDEKScriptAsync(inputFilePath, startYear, endYear);
 
                 if (!File.Exists(outputFilePath))
                 {
@@ -6481,7 +6553,6 @@ namespace SLF
                     return;
                 }
 
-                // Add info message box to inform user of completion
                 MessageBox.Show("Simulation process completed successfully!",
                     "Process Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -6499,28 +6570,106 @@ namespace SLF
 
                 DEKRunSimulationButton.Enabled = true;
                 DEKSimulasyonSonucGoruntule.Enabled = true;
-                //DEKSimButton.Enabled = true;
             }
         }
+        /*        private async void DEKRunSimulationButton_Click(object sender, EventArgs e)
+                {
+                    // Disable buttons and TrackBar to prevent interaction while processing
+                    DEKRunSimulationButton.Enabled = false;
+                    DEKSimulasyonSonucGoruntule.Enabled = true;
+                    //DEKSimButton.Enabled = false;
 
-        // Updated RunPythonScriptAsync to match your paths
-        // Updated RunPythonScriptAsync to match your paths
-        private async Task RunPythonDEKScriptAsync(string inputFilePath)
+                    string inputFilePath = Path.Combine(userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.İl,
+                        (string)ana_menu_form_objesi.config.İlçe,
+                        (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
+                       (string)ana_menu_form_objesi.config.DEK.girdi_dosyası).Replace('/', '\\');
+
+                    string outputFilePath = Path.Combine(userRootPath,
+                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                     (string)ana_menu_form_objesi.config.İl,
+                     (string)ana_menu_form_objesi.config.İlçe,
+                     (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
+                    (string)ana_menu_form_objesi.config.DEK.cikti_dosyasi).Replace('/', '\\');
+
+
+                    // ana_menu_form_objesi.config.DEK.yıl = ComboBox.text;
+
+                    methodFormObjesi.SaveConfigToFile();
+                    try
+                    {
+                        Cursor = Cursors.WaitCursor;
+                        if (DEKStatusLabel != null)
+                        {
+                            DEKStatusLabel.Text = "Python script started. This may take a while. Please wait...";
+                            DEKStatusLabel.Visible = true;
+                        }
+                        if (DEKProgressBar != null)
+                        {
+                            DEKProgressBar.Style = ProgressBarStyle.Marquee;
+                            DEKProgressBar.Visible = true;
+                        }
+
+                        //string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\girdi\new_buildings_2024_2035_1703.xlsx";
+                        //string outputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\cıktı\dek_distribution_cumulative_0704.xlsx";
+
+                        // string inputFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\İzmir\Karşıyaka\Dağıtık Üretimler\girdi\dek_yeni_binalar.xlsx";
+                        // string outputFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\İzmir\Karşıyaka\Dağıtık Üretimler\cıktı\dek_kumulatif_dagilim_sonuclari.xlsx";
+
+                        if (!File.Exists(inputFilePath))
+                        {
+                            MessageBox.Show("Input file not found! Please ensure the file is saved correctly.",
+                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        await RunPythonDEKScriptAsync(inputFilePath);
+
+                        if (!File.Exists(outputFilePath))
+                        {
+                            MessageBox.Show("Output file not generated! Please check the Python script.",
+                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        // Add info message box to inform user of completion
+                        MessageBox.Show("Simulation process completed successfully!",
+                            "Process Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        Cursor = Cursors.Default;
+                        if (DEKProgressBar != null)
+                            DEKProgressBar.Visible = false;
+                        if (DEKStatusLabel != null)
+                            DEKStatusLabel.Text = "Simulation process completed";
+
+                        DEKRunSimulationButton.Enabled = true;
+                        DEKSimulasyonSonucGoruntule.Enabled = true;
+                        //DEKSimButton.Enabled = true;
+                    }
+                }*/
+
+        private async Task RunPythonDEKScriptAsync(string inputFilePath, int startYear, int endYear)
         {
             try
             {
                 string pythonScriptPath = Path.Combine(userRootPath,
-                (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                (string)ana_menu_form_objesi.config.İl,
-                (string)ana_menu_form_objesi.config.DEK.program_dosyası_klasörü,
-               (string)ana_menu_form_objesi.config.DEK.dek_python_dosyası).Replace('/', '\\');
-
-                //string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\DEK_0411.py";
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.DEK.program_dosyası_klasörü,
+                    (string)ana_menu_form_objesi.config.DEK.dek_python_dosyası);
 
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
                     FileName = "python",
-                    Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",
+                    // Use verbatim string with concatenation
+                    Arguments = @"""" + pythonScriptPath + @""" """ + inputFilePath + @""" " + startYear + " " + endYear,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
@@ -6541,7 +6690,7 @@ namespace SLF
 
                     if (process.ExitCode != 0)
                     {
-                        throw new Exception($"Python script failed with exit code {process.ExitCode}.\nError: {error}");
+                        throw new Exception($"Python script failed with exit code {process.ExitCode}. Error: {error}");
                     }
                     else if (!string.IsNullOrEmpty(output))
                     {
@@ -6555,6 +6704,58 @@ namespace SLF
             }
         }
 
+        // Updated RunPythonScriptAsync to match your paths
+
+        /*        private async Task RunPythonDEKScriptAsync(string inputFilePath)
+                {
+                    try
+                    {
+                        string pythonScriptPath = Path.Combine(userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.İl,
+                        (string)ana_menu_form_objesi.config.DEK.program_dosyası_klasörü,
+                       (string)ana_menu_form_objesi.config.DEK.dek_python_dosyası).Replace('/', '\\');
+
+                        //string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\DEK_0411.py";
+
+                        ProcessStartInfo startInfo = new ProcessStartInfo
+                        {
+                            FileName = "python",
+                            Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        };
+
+                        using (Process process = new Process { StartInfo = startInfo })
+                        {
+                            process.Start();
+
+                            Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
+                            Task<string> errorTask = process.StandardError.ReadToEndAsync();
+
+                            await Task.Run(() => process.WaitForExit());
+
+                            string output = await outputTask;
+                            string error = await errorTask;
+
+                            if (process.ExitCode != 0)
+                            {
+                                throw new Exception($"Python script failed with exit code {process.ExitCode}.\nError: {error}");
+                            }
+                            else if (!string.IsNullOrEmpty(output))
+                            {
+                                Console.WriteLine($"Python output: {output}");
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception($"Error running Python script: {ex.Message}");
+                    }
+                }
+        */
 
         private async void buton_HTML_Click(object sender, EventArgs e)
         {

@@ -186,6 +186,7 @@
             this.CancelButton.Size = new System.Drawing.Size(180, 45);
             this.CancelButton.TabIndex = 1;
             this.CancelButton.Text = "İPTAL";
+            this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click_1);
             // 
             // TamamButton
             // 

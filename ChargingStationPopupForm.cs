@@ -131,5 +131,10 @@ namespace SLF
                 MessageBox.Show("İşlem iptal edildi.");
             }
         }
+
+        private void CancelButton_Click_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }

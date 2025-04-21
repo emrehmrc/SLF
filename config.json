@@ -9,7 +9,7 @@
     "ŞABLON": "Ekonometrik Yük Tahmini Verileri/ŞABLON.xlsx",
     "Rscript_Yolu_Model": "Program Dosyaları/ELF/model.R",
     "Rscript_Yolu_Senaryolar": "Program Dosyaları/ELF/senaryolar.R",
-    "ufuk_yılı": 11
+    "ufuk_yılı": 6
   },
   "Veritabanı": {
     "Server_Address": "",
@@ -20,7 +20,6 @@
   "Python Kodları": {
     "Sonuçlar_to_Kml": "C:/Users/ehan0/source/repos/emrehmrc/SLF/python_kod/SLF Sonucları/excel_to_kml_sonuçlar.py"
   },
-
   "DEK": {
     "dek_klasörü": "Dağıtık Üretimler",
     "girdi_dosyası": "girdi/dek_yeni_binalar.xlsx",
@@ -28,16 +27,17 @@
     "program_dosyası_klasörü": "Program Dosyaları/DEK",
     "dek_python_dosyası": "dek.py",
     "baslangıc_yılı": 2024,
-    "bitis_yılı": 2035
+    "bitis_yılı": 2030
   },
-
   "EA": {
     "Klasör": "EA Şarj",
     "INPUT_FILE": "VERİLER.xlsx",
     "SONUÇLAR_klasör": "SONUÇLAR",
     "GİRDİLER_ilk": "GİRDİLER/HUCRE_BAZLI_İLK_VERSİYON.xlsx",
     "BİNA_SAYILARI": "GİRDİLER/BİNA_SAYILARI_İMAR_ANALİZİ_SONUCU.xlsx",
-    "DELTA_SONUCLAR": "GİRDİLER/DELTA_SONUCLAR.xlsx"
+    "DELTA_SONUCLAR": "GİRDİLER/DELTA_SONUCLAR.xlsx",
+    "baslangıc_yılı": 2024,
+    "bitis_yılı": 2030
   },
   "Point_Load_Musaade": "Point Load Verileri/point_load_musaade.xlsx"
 }
