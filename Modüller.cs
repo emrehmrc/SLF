@@ -6427,6 +6427,24 @@ namespace SLF
             DEKSimulasyonSonucGoruntule.Enabled = true;
             //DEKSimButton.Enabled = false;
 
+            string inputFilePath = Path.Combine(userRootPath,
+                (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                (string)ana_menu_form_objesi.config.İl,
+                (string)ana_menu_form_objesi.config.İlçe,
+                (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
+               (string)ana_menu_form_objesi.config.DEK.girdi_dosyası).Replace('/', '\\');
+
+            string outputFilePath = Path.Combine(userRootPath,
+             (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+             (string)ana_menu_form_objesi.config.İl,
+             (string)ana_menu_form_objesi.config.İlçe,
+             (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
+            (string)ana_menu_form_objesi.config.DEK.cikti_dosyasi).Replace('/', '\\');
+
+
+            // ana_menu_form_objesi.config.DEK.yıl = ComboBox.text;
+
+            methodFormObjesi.SaveConfigToFile();
             try
             {
                 Cursor = Cursors.WaitCursor;
@@ -6441,8 +6459,11 @@ namespace SLF
                     DEKProgressBar.Visible = true;
                 }
 
-                string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\girdi\new_buildings_2024_2035_1703.xlsx";
-                string outputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\cıktı\dek_distribution_cumulative_0704.xlsx";
+                //string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\girdi\new_buildings_2024_2035_1703.xlsx";
+                //string outputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\cıktı\dek_distribution_cumulative_0704.xlsx";
+
+                // string inputFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\İzmir\Karşıyaka\Dağıtık Üretimler\girdi\dek_yeni_binalar.xlsx";
+                // string outputFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\İzmir\Karşıyaka\Dağıtık Üretimler\cıktı\dek_kumulatif_dagilim_sonuclari.xlsx";
 
                 if (!File.Exists(inputFilePath))
                 {
@@ -6459,9 +6480,6 @@ namespace SLF
                         "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-
-                // Call SimilasyonSonucGoruntule to handle display
-                //SimilasyonSonucGoruntule();
 
                 // Add info message box to inform user of completion
                 MessageBox.Show("Simulation process completed successfully!",
@@ -6486,16 +6504,22 @@ namespace SLF
         }
 
         // Updated RunPythonScriptAsync to match your paths
+        // Updated RunPythonScriptAsync to match your paths
         private async Task RunPythonDEKScriptAsync(string inputFilePath)
         {
             try
             {
-                string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\DEK_0411.py";
-                string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe";
+                string pythonScriptPath = Path.Combine(userRootPath,
+                (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                (string)ana_menu_form_objesi.config.İl,
+                (string)ana_menu_form_objesi.config.DEK.program_dosyası_klasörü,
+               (string)ana_menu_form_objesi.config.DEK.dek_python_dosyası).Replace('/', '\\');
+
+                //string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\DEK_0411.py";
 
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
-                    FileName = pythonExePath,
+                    FileName = "python",
                     Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -6531,6 +6555,7 @@ namespace SLF
             }
         }
 
+
         private async void buton_HTML_Click(object sender, EventArgs e)
         {
             await ExportHeatmapToHtml();
@@ -6543,7 +6568,14 @@ namespace SLF
             DEKSimButton.Enabled = false;
             try
             {
-                string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\cıktı\dek_distribution_cumulative_0704.xlsx";
+                string filePath = Path.Combine(userRootPath,
+             (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+             (string)ana_menu_form_objesi.config.İl,
+             (string)ana_menu_form_objesi.config.İlçe,
+             (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
+            (string)ana_menu_form_objesi.config.DEK.cikti_dosyasi).Replace('/', '\\');
+
+
                 DataTable simulationData;
                 try
                 {
