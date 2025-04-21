@@ -1102,7 +1102,6 @@
     <Content Include="python_kod\imar_analizi\kod\saturasyon\saturasyon_analiz.py" />
     <Content Include="python_kod\imar_analizi\main.py" />
     <Content Include="python_kod\imar_analizi\taks_kaks.py" />
-    <Content Include="python_kod\SLF Sonucları\excel_to_kml_load_density.py" />
     <Content Include="python_kod\yedek_kod\imar_check.py" />
     <Content Include="python_kod\yedek_kod\imar_datalar.py" />
     <Content Include="python_kod\yedek_kod\imar_overpass.py" />
