@@ -1,0 +1,173 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+SLF (Saturation Load Flow) Analysis Main Script
+This script serves as the entry point for the SLF analysis pipeline.
+It receives arguments from the C# PythonHelper class and orchestrates the analysis process.
+"""
+
+import os
+import sys
+import pandas as pd
+import numpy as np
+import argparse
+from datetime import datetime
+
+import sys
+import io
+
+# Fix console encoding for Turkish characters
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+# Import the SLF analysis modules
+# These will be defined in separate files in the slf_analizi directory
+try:
+    from Saturasyon.update_saturation import run_saturation_updates, cluster_with_dbscan_and_split, update_saturation
+except ImportError:
+    # If importing fails, add the current directory to the path
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+    from Saturasyon.update_saturation import run_saturation_updates, cluster_with_dbscan_and_split, update_saturation
+
+def parse_arguments():
+    """Parse command line arguments passed from C# PythonHelper."""
+    parser = argparse.ArgumentParser(description='SLF Analysis Pipeline')
+    
+    # Required arguments as defined in PythonHelper.RunSLFModel
+    parser.add_argument('saturasyon_file', type=str, help='Path to the saturation file')
+    parser.add_argument('city', type=str, help='Selected city name')
+    parser.add_argument('district', type=str, help='Selected district name')
+    parser.add_argument('output_dir', type=str, help='Output directory path')
+    
+    # Optional arguments
+    parser.add_argument('--start-year', type=int, default=2024, help='Start year for analysis')
+    parser.add_argument('--end-year', type=int, default=2035, help='End year for analysis')
+    parser.add_argument('--dynamic-eps', type=int, default=350, help='Initial dynamic EPS value')
+    
+    return parser.parse_args()
+
+def main():
+    """Main function to run the SLF analysis pipeline."""
+    print("Starting SLF Analysis...")
+    
+    # Parse command line arguments
+    args = parse_arguments()
+    
+    # Log the arguments
+    print(f"Arguments received:")
+    print(f"  Saturation File: {args.saturasyon_file}")
+    print(f"  City: {args.city}")
+    print(f"  District: {args.district}")
+    print(f"  Output Directory: {args.output_dir}")
+    print(f"  Analysis Period: {args.start_year} - {args.end_year}")
+    
+    # Normalize file paths to absolute paths
+    saturasyon_file_abs = os.path.abspath(args.saturasyon_file)
+    output_dir_abs = os.path.abspath(args.output_dir)
+    
+    print(f"Absolute paths:")
+    print(f"  Saturation File: {saturasyon_file_abs}")
+    print(f"  Output Directory: {output_dir_abs}")
+    
+    # Check if the saturation file exists in the specified path
+    if not os.path.exists(saturasyon_file_abs):
+        # Try looking in the output directory
+        alt_path = os.path.join(output_dir_abs, os.path.basename(saturasyon_file_abs))
+        print(f"Saturation file not found at primary path. Trying alternative path: {alt_path}")
+        
+        if os.path.exists(alt_path):
+            print(f"Saturation file found at alternative path!")
+            saturasyon_file_abs = alt_path
+        else:
+            # Try looking in the current directory
+            current_dir_path = os.path.join(os.getcwd(), os.path.basename(saturasyon_file_abs))
+            print(f"Trying current directory path: {current_dir_path}")
+            
+            if os.path.exists(current_dir_path):
+                print(f"Saturation file found in current directory!")
+                saturasyon_file_abs = current_dir_path
+            else:
+                raise FileNotFoundError(f"Saturation file not found in any location. Tried:\n"
+                                        f"1. {args.saturasyon_file}\n"
+                                        f"2. {alt_path}\n"
+                                        f"3. {current_dir_path}")
+    
+    print(f"Using saturation file: {saturasyon_file_abs}")
+    
+    # Check if the output directory exists, create if not
+    if not os.path.exists(output_dir_abs):
+        os.makedirs(output_dir_abs)
+        print(f"Created output directory: {output_dir_abs}")
+    
+    # Load the saturation data
+    print(f"Loading saturation data from file: {saturasyon_file_abs}")
+    try:
+        # Determine file type based on extension
+        file_ext = os.path.splitext(saturasyon_file_abs)[1].lower()
+        if file_ext == '.csv':
+            builtup_df = pd.read_csv(saturasyon_file_abs)
+        elif file_ext in ['.xlsx', '.xls']:
+            builtup_df = pd.read_excel(saturasyon_file_abs, sheet_name='builtup')
+        else:
+            raise ValueError(f"Unsupported file format: {file_ext}")
+        
+        print(f"Loaded data with {len(builtup_df)} rows and {len(builtup_df.columns)} columns")
+        
+        # Run the saturation updates
+        print(f"Running saturation updates for years {args.start_year} to {args.end_year}...")
+        builtup_df = run_saturation_updates(
+            builtup_df, 
+            start_year=args.start_year, 
+            end_year=args.end_year, 
+            initial_dynamic_eps=args.dynamic_eps
+        )
+        
+        # Generate output file name
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_filename = f"slf_results_{args.city}_{args.district}_{timestamp}.xlsx"
+        output_path = os.path.join(args.output_dir, output_filename)
+        
+        # Save the results
+        print(f"Saving results to: {output_path}")
+        builtup_df.to_excel(output_path, index=False)
+        
+        # Create a summary CSV file
+        summary_df = create_summary(builtup_df, args.start_year, args.end_year)
+        summary_filename = f"slf_summary_{args.city}_{args.district}_{timestamp}.csv"
+        summary_path = os.path.join(args.output_dir, summary_filename)
+        summary_df.to_csv(summary_path, index=False)
+        
+        print("SLF Analysis completed successfully!")
+        print(f"Results saved to:")
+        print(f"  - Full data: {output_path}")
+        print(f"  - Summary: {summary_path}")
+        
+        return 0
+    
+    except Exception as e:
+        print(f"Error in SLF analysis: {str(e)}")
+        # Raise the exception to be caught by the C# code
+        raise
+
+def create_summary(df, start_year, end_year):
+    """Create a summary dataframe with key statistics for each year."""
+    summary_data = []
+    
+    for year in range(start_year, end_year + 1):
+        year_stats = {
+            'Year': year,
+            'Average_Saturation': df[f'Saturation_updated_{year}'].mean(),
+            'Max_Saturation': df[f'Saturation_updated_{year}'].max(),
+            'Cells_Over_50_Percent': len(df[df[f'Saturation_updated_{year}'] > 0.5]),
+            'Cells_Over_80_Percent': len(df[df[f'Saturation_updated_{year}'] > 0.8]),
+            'Kentsel_Yerlesim_Count': len(df[df['IsDevelopmentArea'] == 'Kentsel Yerleşim Alanı']),
+            'Gecici_Kentsel_Count': len(df[df['IsDevelopmentArea'] == 'Geçici Kentsel Alan']),
+            'Imarli_Genisleme_Count': len(df[df['IsDevelopmentArea'] == 'İmarlı Yeni Genişleme Bölgesi']),
+            'Imarsiz_Genisleme_Count': len(df[df['IsDevelopmentArea'] == 'İmarsız Yeni Genişleme Bölgesi'])
+        }
+        summary_data.append(year_stats)
+    
+    return pd.DataFrame(summary_data)
+
+if __name__ == "__main__":
+    sys.exit(main())
