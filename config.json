@@ -20,11 +20,17 @@
   "Python Kodları": {
     "Sonuçlar_to_Kml": "C:/Users/ehan0/source/repos/emrehmrc/SLF/python_kod/SLF Sonucları/excel_to_kml_sonuçlar.py"
   },
+
   "DEK": {
-    "min_max_path": "Olasılıklar.xlsx",
+    "dek_klasörü": "Dağıtık Üretimler",
+    "girdi_dosyası": "girdi/dek_yeni_binalar.xlsx",
+    "cikti_dosyasi": "cıktı/dek_kumulatif_dagilim_sonuclari.xlsx",
+    "program_dosyası_klasörü": "Program Dosyaları/DEK",
+    "dek_python_dosyası": "dek.py",
     "baslangıc_yılı": 2024,
     "bitis_yılı": 2035
   },
+
   "EA": {
     "Klasör": "EA Şarj",
     "INPUT_FILE": "VERİLER.xlsx",
