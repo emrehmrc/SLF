@@ -1,7 +1,7 @@
 {
   "Ana_Klasör_Yolu": "MRC/MRC - 1.1.3_T&SI/MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı/il_ilce_kırılımları",
   "İl": "İzmir",
-  "İlçe": "Karşıyaka",
+  "İlçe": "Dikili",
   "ELF": {
     "SONUÇLAR_klasör": "Ekonometrik Yük Tahmini Verileri/SONUÇLAR",
     "SONUÇLAR_name": "ELF_Tahmin_Sonuçları_2025-04-17 00_00_58.xlsx",
@@ -9,10 +9,10 @@
     "ŞABLON": "Ekonometrik Yük Tahmini Verileri/ŞABLON.xlsx",
     "Rscript_Yolu_Model": "Program Dosyaları/ELF/model.R",
     "Rscript_Yolu_Senaryolar": "Program Dosyaları/ELF/senaryolar.R",
-    "ufuk_yılı": 12
+    "ufuk_yılı": 8
   },
   "Veritabanı": {
-    "Server Address": "",
+    "Server_Address": "",
     "Host": "",
     "Username": "",
     "Password": ""
@@ -21,8 +21,13 @@
     "Sonuçlar_to_Kml": "C:/Users/ehan0/source/repos/emrehmrc/SLF/python_kod/SLF Sonucları/excel_to_kml_sonuçlar.py"
   },
   "DEK": {
-    "min_max_path": "Olasılıklar.xlsx",
-	"baslangıc_yılı":2024
+    "dek_klasörü": "Dağıtık Üretimler",
+    "girdi_dosyası": "girdi/dek_yeni_binalar.xlsx",
+    "cikti_dosyasi": "cıktı/dek_kumulatif_dagilim_sonuclari.xlsx",
+    "program_dosyası_klasörü": "Program Dosyaları/DEK",
+    "dek_python_dosyası": "dek.py",
+    "baslangıc_yılı": 2024,
+    "bitis_yılı": 2035
   },
   "EA": {
     "Klasör": "EA Şarj",
@@ -32,5 +37,5 @@
     "BİNA_SAYILARI": "GİRDİLER/BİNA_SAYILARI_İMAR_ANALİZİ_SONUCU.xlsx",
     "DELTA_SONUCLAR": "GİRDİLER/DELTA_SONUCLAR.xlsx"
   },
-  "Point Load": "Point Load Verileri/point_load.xlsx"
+  "Point_Load": "Point Load Verileri/point_load.xlsx"
 }
