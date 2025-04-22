@@ -20,14 +20,25 @@ import io
 # Fix console encoding for Turkish characters
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+
 # Import the SLF analysis modules
-# These will be defined in separate files in the slf_analizi directory
 try:
     from Saturasyon.update_saturation import run_saturation_updates, cluster_with_dbscan_and_split, update_saturation
+    from Imar_orani_tahminleri.imar_orani_kod import tahmin_et, preprocess_zoning_data
 except ImportError:
     # If importing fails, add the current directory to the path
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    from Saturasyon.update_saturation import run_saturation_updates, cluster_with_dbscan_and_split, update_saturation
+    try:
+        from Saturasyon.update_saturation import run_saturation_updates, cluster_with_dbscan_and_split, update_saturation
+        from Imar_orani_tahminleri.imar_orani_kod import tahmin_et, preprocess_zoning_data
+    except ImportError:
+        print("Modül içe aktarma hatasi: İlgili modüller bulunamadı.")
+        print("İmar oranı tahmini modülü yüklenmedi. Sadece saturasyon analizi yapılacak.")
+        HAS_IMAR_MODULE = False
+    else:
+        HAS_IMAR_MODULE = True
+else:
+    HAS_IMAR_MODULE = True
 
 def parse_arguments():
     """Parse command line arguments passed from C# PythonHelper."""
@@ -43,6 +54,11 @@ def parse_arguments():
     parser.add_argument('--start-year', type=int, default=2024, help='Start year for analysis')
     parser.add_argument('--end-year', type=int, default=2035, help='End year for analysis')
     parser.add_argument('--dynamic-eps', type=int, default=350, help='Initial dynamic EPS value')
+    
+    # Zorunlu --imar-orani-file argümanını ekleyin
+    parser.add_argument('--imar-orani-file', type=str, required=True, help='Path to the imar orani file')
+
+    parser.add_argument('--skip-imar-analizi', action='store_true', help='Skip imar analysis step')
     
     return parser.parse_args()
 
@@ -60,6 +76,8 @@ def main():
     print(f"  District: {args.district}")
     print(f"  Output Directory: {args.output_dir}")
     print(f"  Analysis Period: {args.start_year} - {args.end_year}")
+    if args.imar_orani_file:
+        print(f"  İmar Oranı File: {args.imar_orani_file}")
     
     # Normalize file paths to absolute paths
     saturasyon_file_abs = os.path.abspath(args.saturasyon_file)
@@ -122,26 +140,84 @@ def main():
             initial_dynamic_eps=args.dynamic_eps
         )
         
-        # Generate output file name
+        # Generate output file name for saturation results
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_filename = f"slf_results_{args.city}_{args.district}_{timestamp}.xlsx"
-        output_path = os.path.join(args.output_dir, output_filename)
+        saturation_output_filename = f"slf_results_{args.city}_{args.district}_{timestamp}.xlsx"
+        saturation_output_path = os.path.join(args.output_dir, saturation_output_filename)
         
-        # Save the results
-        print(f"Saving results to: {output_path}")
-        builtup_df.to_excel(output_path, index=False)
+        # Save the saturation results
+        print(f"Saving saturation results to: {saturation_output_path}")
+        builtup_df.to_excel(saturation_output_path, index=False)
         
-        # Create a summary CSV file
+        # Create a summary CSV file if needed
         summary_df = create_summary(builtup_df, args.start_year, args.end_year)
         summary_filename = f"slf_summary_{args.city}_{args.district}_{timestamp}.csv"
         summary_path = os.path.join(args.output_dir, summary_filename)
         summary_df.to_csv(summary_path, index=False)
         
-        print("SLF Analysis completed successfully!")
+        print("Saturation Analysis completed successfully!")
         print(f"Results saved to:")
-        print(f"  - Full data: {output_path}")
+        print(f"  - Full data: {saturation_output_path}")
         print(f"  - Summary: {summary_path}")
         
+        # Run İmar Oranı Analysis if module exists and not skipped
+        if HAS_IMAR_MODULE and not args.skip_imar_analizi:
+            if args.imar_orani_file:
+                imar_orani_file_abs = os.path.abspath(args.imar_orani_file)
+                
+                if not os.path.exists(imar_orani_file_abs):
+                    print(f"İmar oranı dosyası bulunamadı: {imar_orani_file_abs}")
+                    print("İmar oranı analizi atlanıyor.")
+                else:
+                    print("\n--- Starting İmar Oranı Analysis ---")
+                    print(f"Using İmar Oranı file: {imar_orani_file_abs}")
+                    
+                    try:
+                        # Load the zoning (imar orani) file into a DataFrame
+                        zoning_file_ext = os.path.splitext(imar_orani_file_abs)[1].lower()
+                        if zoning_file_ext == '.csv':
+                            zoning_df = pd.read_csv(imar_orani_file_abs)
+                        elif zoning_file_ext in ['.xlsx', '.xls']:
+                            zoning_df = pd.read_excel(imar_orani_file_abs)
+                        else:
+                            raise ValueError(f"Unsupported zoning file format: {zoning_file_ext}")
+                        
+                        print(f"Loaded zoning data with {len(zoning_df)} rows and {len(zoning_df.columns)} columns")
+                        
+                        # Preprocess zoning data
+                        zoning_df = preprocess_zoning_data(zoning_df)
+                        
+                        # Generate output file name for imar orani results
+                        imar_output_filename = f"imar_orani_tahmin_{args.city}_{args.district}_{timestamp}.xlsx"
+                        imar_output_dir = os.path.join(args.output_dir, "imar_orani")
+                        
+                        # Create imar output directory if not exists
+                        if not os.path.exists(imar_output_dir):
+                            os.makedirs(imar_output_dir)
+                        
+                        imar_output_path = os.path.join(imar_output_dir, imar_output_filename)
+                        
+                        print(f"Running İmar Oranı analysis with saturation data: {saturation_output_path}")
+                        # Call the tahmin_et function with the proper parameters
+                        tahmin_et(
+                            builtup_df=builtup_df,      # Pass the DataFrame
+                            zoning_df=zoning_df,        # Pass the zoning DataFrame (not file path)
+                            output_path=imar_output_path,
+                            start_year=args.start_year,
+                            end_year=args.end_year
+                        )
+                        
+                        print("İmar Oranı Analysis completed successfully!")
+                        print(f"Results saved to: {imar_output_path}")
+                    except Exception as e:
+                        print(f"Error in İmar Oranı analysis: {str(e)}")
+                        import traceback
+                        traceback.print_exc()
+                        print("Continuing with other steps...")
+            else:
+                print("\nİmar oranı dosyası belirtilmediği için İmar Oranı analizi atlanıyor.")
+        
+        print("\nSLF Analysis pipeline completed successfully!")
         return 0
     
     except Exception as e:
@@ -154,18 +230,28 @@ def create_summary(df, start_year, end_year):
     summary_data = []
     
     for year in range(start_year, end_year + 1):
-        year_stats = {
-            'Year': year,
-            'Average_Saturation': df[f'Saturation_updated_{year}'].mean(),
-            'Max_Saturation': df[f'Saturation_updated_{year}'].max(),
-            'Cells_Over_50_Percent': len(df[df[f'Saturation_updated_{year}'] > 0.5]),
-            'Cells_Over_80_Percent': len(df[df[f'Saturation_updated_{year}'] > 0.8]),
-            'Kentsel_Yerlesim_Count': len(df[df['IsDevelopmentArea'] == 'Kentsel Yerleşim Alanı']),
-            'Gecici_Kentsel_Count': len(df[df['IsDevelopmentArea'] == 'Geçici Kentsel Alan']),
-            'Imarli_Genisleme_Count': len(df[df['IsDevelopmentArea'] == 'İmarlı Yeni Genişleme Bölgesi']),
-            'Imarsiz_Genisleme_Count': len(df[df['IsDevelopmentArea'] == 'İmarsız Yeni Genişleme Bölgesi'])
-        }
-        summary_data.append(year_stats)
+        saturation_col = f'Saturation_updated_{year}'
+        
+        # Check if the column exists
+        if saturation_col in df.columns:
+            year_stats = {
+                'Year': year,
+                'Average_Saturation': df[saturation_col].mean(),
+                'Max_Saturation': df[saturation_col].max(),
+                'Cells_Over_50_Percent': len(df[df[saturation_col] > 0.5]),
+                'Cells_Over_80_Percent': len(df[df[saturation_col] > 0.8])
+            }
+            
+            # Add development area statistics if the column exists
+            if 'IsDevelopmentArea' in df.columns:
+                year_stats.update({
+                    'Kentsel_Yerlesim_Count': len(df[df['IsDevelopmentArea'] == 'Kentsel Yerleşim Alanı']),
+                    'Gecici_Kentsel_Count': len(df[df['IsDevelopmentArea'] == 'Geçici Kentsel Alan']),
+                    'Imarli_Genisleme_Count': len(df[df['IsDevelopmentArea'] == 'İmarlı Yeni Genişleme Bölgesi']),
+                    'Imarsiz_Genisleme_Count': len(df[df['IsDevelopmentArea'] == 'İmarsız Yeni Genişleme Bölgesi'])
+                })
+            
+            summary_data.append(year_stats)
     
     return pd.DataFrame(summary_data)
 
