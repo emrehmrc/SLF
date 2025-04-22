@@ -22,6 +22,13 @@ namespace SLF
         // Private field to store NoktaVeri
         private NoktaVeri noktaVeri;
 
+        public HomePageForm ana_menu_form_objesi;
+        private MethodForm methodFormObjesi;
+        private BekleForm bekleForm;
+
+        public string userRootPath;
+        public string configPath;
+
         // Public property to expose NoktaVeri
         public NoktaVeri NoktaVeri => noktaVeri;
 
@@ -56,14 +63,24 @@ namespace SLF
         {
             return Constants.StationTypeToLoad.TryGetValue(stationType, out double load) ? load : 0;
         }
-
-        public EAStationPopupForm(DataTable existingDataTable, NoktaVeri veri)
+        private readonly int slfEndYear;
+        public EAStationPopupForm(DataTable existingDataTable, NoktaVeri veri, int slfEndYear, HomePageForm anaMenuForm)
         {
             InitializeComponent();
             dataTable = existingDataTable;
 
             // Initialize NoktaVeri
             noktaVeri = veri;
+
+            this.slfEndYear = slfEndYear;
+
+            ana_menu_form_objesi = new HomePageForm();
+            methodFormObjesi = new MethodForm(ana_menu_form_objesi);
+            this.ana_menu_form_objesi = anaMenuForm;
+            bekleForm = new BekleForm();
+
+            userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            configPath = Path.Combine(((string)ana_menu_form_objesi.projectRoot).Replace('/', '\\'), "config.json");
 
             InitializeDataGridView(veri);
             SetupEventHandlers();
@@ -83,16 +100,6 @@ namespace SLF
             ChargingStationDataGridView.Rows[rowIndex].Cells["ID"].Value =
                 !string.IsNullOrEmpty(veri.CellId) ? veri.CellId : "Not Selected";
 
-            // Populate the StartYear combobox column with years 2024 to 2035.
-            /*            if (ChargingStationDataGridView.Columns["StartYear"] is DataGridViewComboBoxColumn startYearColumn)
-                        {
-                            List<int> years = Enumerable.Range(2024, 2035 - 2024 + 1).ToList();
-                            startYearColumn.DataSource = years;
-
-                            // Optionally set the default value (here, the first year 2024)
-                            ChargingStationDataGridView.Rows[rowIndex].Cells["StartYear"].Value = years.First();
-                        }*/
-
             // Set ISTASYON_TIPI options to AC types and DC
             if (ChargingStationDataGridView.Columns["ISTASYON_TIPI"] is DataGridViewComboBoxColumn typeComboBoxColumn)
             {
@@ -104,6 +111,27 @@ namespace SLF
             {
                 powerComboBoxColumn.DataSource = acPowers;
             }
+
+            // Initialize StartYear as a ComboBox with valid years
+            if (ChargingStationDataGridView.Columns["StartYear"] is DataGridViewComboBoxColumn startYearComboBox)
+            {
+                // Configure the ComboBox column
+                startYearComboBox.DataSource = Constants.Years; // List<int> [2024, 2025, ..., 2030]
+                startYearComboBox.ValueType = typeof(int); // Ensure the value type is int
+
+                ChargingStationDataGridView.Rows[0].Cells["StartYear"].Value = Constants.Years.Min(); // Set to 2024 initially
+
+                // Log the ComboBox items for debugging
+                Console.WriteLine("StartYear ComboBox items: " + string.Join(", ", startYearComboBox.Items.Cast<int>()));
+                Console.WriteLine($"StartYear cell value after setting: {ChargingStationDataGridView.Rows[0].Cells["StartYear"].Value}");
+            }
+            else if (ChargingStationDataGridView.Columns.Contains("StartYear"))
+            {
+                // Fallback for non-ComboBox column (shouldn't execute in your case)
+                ChargingStationDataGridView.Rows[0].Cells["StartYear"].Value = Constants.Years.Min().ToString();
+            }
+
+
 
             // Populate transformer codes if available
             if (GirdiModülü.dataTablesByType.TryGetValue("DTR Verileri", out DataTable trafoDataTable))
@@ -220,11 +248,13 @@ namespace SLF
             try
             {
                 // Retrieve values from the DataGridView
-                string startYear = ChargingStationDataGridView.Rows[0].Cells["StartYear"].Value?.ToString();
-                string cellId = ChargingStationDataGridView.Rows[0].Cells["ID"].Value?.ToString();
-                string stationType = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_TIPI"].Value?.ToString();
-                double enlem = Convert.ToDouble(ChargingStationDataGridView.Rows[0].Cells["EA_X_KOORDINAT"].Value);
-                double boylam = Convert.ToDouble(ChargingStationDataGridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value);
+
+                var row = ChargingStationDataGridView.Rows[0];
+                string startYear = row.Cells["StartYear"].Value?.ToString();
+                string cellId = row.Cells["ID"].Value?.ToString();
+                string stationType = row.Cells["ISTASYON_TIPI"].Value?.ToString();
+                double enlem = Convert.ToDouble(row.Cells["EA_X_KOORDINAT"].Value);
+                double boylam = Convert.ToDouble(row.Cells["EA_Y_KOORDINAT"].Value);
 
                 if (string.IsNullOrEmpty(startYear) || string.IsNullOrEmpty(cellId) || string.IsNullOrEmpty(stationType))
                 {
@@ -240,12 +270,33 @@ namespace SLF
                     return;
                 }
 
-                string existingFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V3\ÇIKTI\evcs_monte_carlo_distribution_kumulatif_0411.xlsx";
+                // string existingFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V3\ÇIKTI\evcs_monte_carlo_distribution_kumulatif_0411.xlsx";
+
+                // Validate ana_menu_form_objesi and its properties
+                if (ana_menu_form_objesi == null || ana_menu_form_objesi.config == null ||
+                    ana_menu_form_objesi.config.Ana_Klasör_Yolu == null ||
+                    ana_menu_form_objesi.config.İl == null ||
+                    ana_menu_form_objesi.config.İlçe == null ||
+                    ana_menu_form_objesi.config.EA?.ea_klasörü == null ||
+                    ana_menu_form_objesi.config.EA?.cikti_dosyasi == null)
+                {
+                    MessageBox.Show("Configuration is incomplete. Please ensure all configuration settings are provided.",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                string existingFilePath = Path.Combine(userRootPath,
+                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                     (string)ana_menu_form_objesi.config.İl,
+                     (string)ana_menu_form_objesi.config.İlçe,
+                     (string)ana_menu_form_objesi.config.EA.ea_klasörü,
+                    (string)ana_menu_form_objesi.config.EA.cikti_dosyasi).Replace('/', '\\');
+
 
                 using (var package = new OfficeOpenXml.ExcelPackage(new FileInfo(existingFilePath)))
                 {
                     int startYearInt = int.Parse(startYear);
-                    foreach (int year in Constants.Years.Where(y => y >= startYearInt))
+                    foreach (int year in Enumerable.Range(startYearInt, slfEndYear - startYearInt + 1))
                     {
                         var worksheet = package.Workbook.Worksheets[year.ToString()];
                         if (worksheet == null)

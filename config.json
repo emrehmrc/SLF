@@ -39,7 +39,7 @@
     "girdi_dosyası": "girdi/ea_yeni_binalar.xlsx",
     "cikti_dosyasi": "cıktı/ea_kumulatif_dagilim_sonuclari.xlsx",
     "ilce_path": "girdi/ea_delta_yeni_sonuclar.xlsx",
-    "ilk_yıl": "girdi/ea_ilk_durum.xlsx",
+    "ilk_yıl": "girdi/ea_sarj_ilk_durum.xlsx",
     "program_dosyası_klasörü": "Program Dosyaları/EA",
     "ea_python_dosyası": "ea.py",
     "baslangıc_yılı": 2024,

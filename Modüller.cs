@@ -2960,7 +2960,7 @@ namespace SLF
                 };
 
                 // Popup formu göster
-                using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+                using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker, slfEndYear, ana_menu_form_objesi))
                 {
                     if (popupForm.ShowDialog() == DialogResult.OK)
                     {
@@ -2992,7 +2992,7 @@ namespace SLF
                 CellId = cellId
             };
 
-            using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
+            using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker, slfEndYear, ana_menu_form_objesi))
             {
                 if (popupForm.ShowDialog() == DialogResult.OK)
                 {
@@ -7384,7 +7384,7 @@ namespace SLF
         }
         private void CreateReportButton_Click(object sender, EventArgs e)
         {
-            ReportTableForm popup = new ReportTableForm("DEK");
+            ReportTableForm popup = new ReportTableForm("DEK", ana_menu_form_objesi);
             if (popup.ShowDialog() == DialogResult.OK)
             {
                 // Handle OK case if needed
@@ -7794,7 +7794,7 @@ namespace SLF
 
         private void CreateReportButton2_Click(object sender, EventArgs e)
         {
-            ReportTableForm popup = new ReportTableForm("EA");
+            ReportTableForm popup = new ReportTableForm("EA", ana_menu_form_objesi);
             if (popup.ShowDialog() == DialogResult.OK)
             {
                 // Handle OK case if needed

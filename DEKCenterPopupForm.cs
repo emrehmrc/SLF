@@ -34,7 +34,7 @@ namespace SLF
             { "DEK_KURULU_GUCU", "DEK_distributed" }
         };
 
-            public static readonly List<int> Years = Enumerable.Range(2024, 2030 - 2024 + 1).ToList();
+            public static readonly List<int> Years = Enumerable.Range(2024, 2035 - 2024 + 1).ToList();
         }
 
         private string GetCountColumnName(string dekValue)
@@ -115,52 +115,7 @@ namespace SLF
             // Log DataGridView columns
             Console.WriteLine("DataGridView columns: " + string.Join(", ", DEKCenterDataGridView.Columns.Cast<DataGridViewColumn>().Select(c => c.Name)));
         }
-        /*        private void InitializeDataGridView(NoktaVeri veri)
-                {
-                    // Log veri for debugging
-                    Console.WriteLine($"veri.Enlem: {veri.Enlem}, veri.Boylam: {veri.Boylam}, veri.CellId: {veri.CellId ?? "null"}");
 
-                    // Fill initial coordinates from veri object
-                    DEKCenterDataGridView.Rows.Add();
-                    DEKCenterDataGridView.Rows[0].Cells["DEK_X_KOORDINAT"].Value = veri.Enlem;
-                    DEKCenterDataGridView.Rows[0].Cells["DEK_Y_KOORDINAT"].Value = veri.Boylam;
-
-                    // Set the cell (grid) ID
-                    DEKCenterDataGridView.Rows[0].Cells["ID"].Value =
-                        !string.IsNullOrEmpty(veri.CellId) ? veri.CellId : "Not Selected";
-
-                    // Initialize StartYear as a ComboBox with valid years
-                    if (DEKCenterDataGridView.Columns["StartYear"] is DataGridViewComboBoxColumn startYearComboBox)
-                    {
-                        startYearComboBox.DataSource = Constants.Years;
-                        DEKCenterDataGridView.Rows[0].Cells["StartYear"].Value = Constants.Years.Min();
-                    }
-                    else if (DEKCenterDataGridView.Columns.Contains("StartYear"))
-                    {
-                        DEKCenterDataGridView.Rows[0].Cells["StartYear"].Value = Constants.Years.Min().ToString();
-                    }
-
-                    // Populate transformer codes if available
-                    if (GirdiModülü.dataTablesByType.TryGetValue("DTR Verileri", out DataTable trafoDataTable))
-                    {
-                        List<string> trafoKoduListesi = trafoDataTable.AsEnumerable()
-                            .Select(row => row["TRAFO_KODU"].ToString())
-                            .Distinct()
-                            .ToList();
-
-                        if (DEKCenterDataGridView.Columns["DEK_BAGLANDIGI_TRAFO_KODU"] is DataGridViewComboBoxColumn comboBoxColumn)
-                        {
-                            comboBoxColumn.DataSource = trafoKoduListesi;
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("DTR Verileri bulunamadı. Lütfen kontrol edin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-
-                    // Log DataGridView columns
-                    Console.WriteLine("DataGridView columns: " + string.Join(", ", DEKCenterDataGridView.Columns.Cast<DataGridViewColumn>().Select(c => c.Name)));
-                }*/
 
         private void DEKCenterDataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {

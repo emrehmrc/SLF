@@ -19,16 +19,32 @@ namespace SLF
         private bool isOperationCancelled = true;
         public bool OperationCancelled => isOperationCancelled;
 
+
+        public HomePageForm ana_menu_form_objesi;
+        private MethodForm methodFormObjesi;
+        private BekleForm bekleForm;
+
+        public string userRootPath;
+        public string configPath;
+
         public int slfStartYear = 0, slfEndYear = 0;
         private readonly string dataSource; // "EA" or "DEK"
-        private readonly string eaExcelFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V3\ÇIKTI\evcs_monte_carlo_distribution_kumulatif_0411.xlsx";
-        private readonly string dekExcelFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\cıktı\dek_distribution_cumulative_0704.xlsx";
+ 
 
-        public ReportTableForm(string dataSource)
+        public ReportTableForm(string dataSource, HomePageForm anaMenuForm)
         {
             InitializeComponent();
             this.dataSource = dataSource; // Store the data source ("EA" or "DEK")
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+
+
+            ana_menu_form_objesi = new HomePageForm();
+            methodFormObjesi = new MethodForm(ana_menu_form_objesi);
+            this.ana_menu_form_objesi = anaMenuForm;
+            bekleForm = new BekleForm();
+
+            userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            configPath = Path.Combine(((string)ana_menu_form_objesi.projectRoot).Replace('/', '\\'), "config.json");
 
             var yearService = YearService.GetInstance();
             if (this.slfStartYear > 0 && this.slfEndYear > 0)
@@ -83,6 +99,19 @@ namespace SLF
         {
             try
             {
+                string eaExcelFilePath = Path.Combine(userRootPath,
+         (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+         (string)ana_menu_form_objesi.config.İl,
+         (string)ana_menu_form_objesi.config.İlçe,
+         (string)ana_menu_form_objesi.config.EA.ea_klasörü,
+        (string)ana_menu_form_objesi.config.EA.cikti_dosyasi).Replace('/', '\\');
+
+                string dekExcelFilePath = Path.Combine(userRootPath,
+                         (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                         (string)ana_menu_form_objesi.config.İl,
+                         (string)ana_menu_form_objesi.config.İlçe,
+                         (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
+                        (string)ana_menu_form_objesi.config.DEK.cikti_dosyasi).Replace('/', '\\');
                 // Clear existing data in DataGridView
                 ReportsTableDataGridView.DataSource = null;
                 ReportsTableDataGridView.Rows.Clear();
