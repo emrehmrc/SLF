@@ -5923,6 +5923,188 @@ namespace SLF
             polygonToolTip.Hide(gMapControl_yuk);
         }
 
+        private void Slf_Button_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // İşlem sırasında imleç görünümünü değiştir
+                Cursor.Current = Cursors.WaitCursor;
+
+                // Gerekli kontroller (İl-ilçe seçilmiş mi)
+                if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
+                {
+                    MessageBox.Show("Lütfen önce il ve ilçe seçimini yapın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // İmar Analizi sonuçlarını kontrol et
+                string imarAnaliziPath = PathService.GetImarAnaliziPathForType("imar_planlari");
+                if (!Directory.Exists(imarAnaliziPath))
+                {
+                    MessageBox.Show("Lütfen önce İmar Analizi'ni çalıştırın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // PathService üzerinden saturasyon dosyasının yolunu al
+                string saturasyonFile = PathService.GetSaturasyonFilePath();
+                if (string.IsNullOrEmpty(saturasyonFile))
+                {
+                    MessageBox.Show("Saturasyon dosyası bulunamadı. Lütfen önce İmar Analizi'ni çalıştırın.",
+                                   "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // SLF modelini çalıştır
+                string output = PythonHelper.RunSLFModel(saturasyonFile);
+
+                // Sonuçların kaydedildiği yer
+                string slfAnaliziPath = Path.Combine(imarAnaliziPath, "slf_analizi");
+
+                // İşlem tamamlandığında başarı mesajı göster
+                MessageBox.Show("SLF analizi başarıyla tamamlandı.\nSonuçlar 'imar_analizi_sonuclari/imar_planlari/slf_analizi' klasöründe kaydedildi.",
+                               "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Sonuç klasörünü aç
+                System.Diagnostics.Process.Start("explorer.exe", slfAnaliziPath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"SLF analizi sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // İşlem bittiğinde imleci normal duruma getir
+                Cursor.Current = Cursors.Default;
+            }
+        }
+        private string RunSLFModelWithASCIIPaths(string saturasyonFilePath, string slfSonuclarPath)
+        {
+            try
+            {
+                // Dosyayı ASCII karakterli hedef klasöre kopyala
+                string fileName = Path.GetFileName(saturasyonFilePath);
+                string destinationFile = Path.Combine(slfSonuclarPath, fileName);
+                File.Copy(saturasyonFilePath, destinationFile, true);
+                Console.WriteLine($"Saturasyon dosyası kopyalandı: {destinationFile}");
+
+                // Python script yolu
+                string pythonScriptPath = Path.Combine(PathService.PythonKodDirectory, "slf_analizi", "slf_main.py");
+                if (!File.Exists(pythonScriptPath))
+                {
+                    throw new Exception($"Python script bulunamadı: {pythonScriptPath}");
+                }
+
+                // Türkçe karakterleri ASCII'ye çevir
+                string asciiCity = RemoveDiacritics(PathService.SelectedCity);
+                string asciiDistrict = RemoveDiacritics(PathService.SelectedDistrict);
+                string asciiDestinationFile = RemoveDiacritics(destinationFile);
+                string asciiSlfPath = RemoveDiacritics(slfSonuclarPath);
+
+                // Python script için komut satırı argümanları
+                string arguments = $"\"{pythonScriptPath}\" \"{asciiDestinationFile}\" \"{asciiCity}\" \"{asciiDistrict}\" \"{asciiSlfPath}\" --start-year 2024 --end-year 2035";
+
+                Console.WriteLine($"Çalıştırılacak komut: python {arguments}");
+
+                // Python betiğini çalıştır
+                ProcessStartInfo processInfo = new ProcessStartInfo("python")
+                {
+                    Arguments = arguments,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    WorkingDirectory = Path.GetDirectoryName(pythonScriptPath),
+                    StandardOutputEncoding = System.Text.Encoding.UTF8,
+                    StandardErrorEncoding = System.Text.Encoding.UTF8
+                };
+
+                processInfo.EnvironmentVariables["PYTHONIOENCODING"] = "utf-8";
+
+                string output = "";
+                string error = "";
+                using (Process process = Process.Start(processInfo))
+                {
+                    // Eş zamanlı çıktı yakalama
+                    process.OutputDataReceived += (sender, e) =>
+                    {
+                        if (!string.IsNullOrEmpty(e.Data))
+                        {
+                            Console.WriteLine($"PYTHON: {e.Data}");
+                            output += e.Data + Environment.NewLine;
+                        }
+                    };
+
+                    process.ErrorDataReceived += (sender, e) =>
+                    {
+                        if (!string.IsNullOrEmpty(e.Data))
+                        {
+                            Console.WriteLine($"PYTHON ERROR: {e.Data}");
+                            error += e.Data + Environment.NewLine;
+                        }
+                    };
+
+                    // Asenkron okumaları başlat
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
+
+                    // İşlemin tamamlanmasını bekle
+                    process.WaitForExit();
+
+                    // İşlem tamamlandı, çıkış kodunu kontrol et
+                    if (process.ExitCode != 0)
+                    {
+                        throw new Exception($"Python betiği hata ile sonlandı. Çıkış kodu: {process.ExitCode}");
+                    }
+                }
+
+                // İşlem başarılı mesajı
+                Console.WriteLine("SLF analizi başarıyla çalıştırıldı.");
+                return output;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"SLF analizi çalıştırılırken hata: {ex.Message}");
+                throw; // Üst seviye metodların hatayı yakalaması için yeniden fırlat
+            }
+        }
+
+        // Türkçe karakterleri ASCII'ye çeviren yardımcı metod
+        private string RemoveDiacritics(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            string normalizedString = text.Normalize(System.Text.NormalizationForm.FormD);
+            System.Text.StringBuilder stringBuilder = new System.Text.StringBuilder();
+
+            foreach (char c in normalizedString)
+            {
+                System.Globalization.UnicodeCategory unicodeCategory = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != System.Globalization.UnicodeCategory.NonSpacingMark)
+                {
+                    // Özel Türkçe karakterler için manuel dönüşüm
+                    switch (c)
+                    {
+                        case 'ı': stringBuilder.Append('i'); break;
+                        case 'İ': stringBuilder.Append('I'); break;
+                        case 'ğ': stringBuilder.Append('g'); break;
+                        case 'Ğ': stringBuilder.Append('G'); break;
+                        case 'ü': stringBuilder.Append('u'); break;
+                        case 'Ü': stringBuilder.Append('U'); break;
+                        case 'ş': stringBuilder.Append('s'); break;
+                        case 'Ş': stringBuilder.Append('S'); break;
+                        case 'ç': stringBuilder.Append('c'); break;
+                        case 'Ç': stringBuilder.Append('C'); break;
+                        case 'ö': stringBuilder.Append('o'); break;
+                        case 'Ö': stringBuilder.Append('O'); break;
+                        default: stringBuilder.Append(c); break;
+                    }
+                }
+            }
+
+            return stringBuilder.ToString().Normalize(System.Text.NormalizationForm.FormC);
+        }
+
 
         // Show just the single row whenever a polygon is clicked on which corresponds to its row
         private void ShowAttributeRow(DataRow row)

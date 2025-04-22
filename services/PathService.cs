@@ -3,6 +3,8 @@ using System.IO;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
+using System.Text;
 
 namespace SLF.Services
 {
@@ -120,6 +122,8 @@ namespace SLF.Services
         /// <summary>
         /// İmar planları veri seti klasör yolu
         /// </summary>
+        /// 
+        
         public static string ImarPlansDataDirectory => Path.Combine(ImarPlansDirectory, "data");
         // Hücre ve uydu verileri klasörlerinin yolları için özellikler
         // Bunlar il/ilçe klasöründe doğrudan bulunuyor (temp içinde değil)
@@ -339,6 +343,7 @@ namespace SLF.Services
         public static string ImarAnaliziPath => Path.Combine(BaseDirectory, FullWorkingPath, "imar_analizi_sonuclari");
         public static string SonuclarPath => Path.Combine(BaseDirectory, FullWorkingPath, "sonuclar");
 
+       
         /// <summary>
         /// Path bilgisini günceller ve yeni bir geçici çalışma klasörü oluşturur
         /// </summary>
@@ -509,6 +514,64 @@ namespace SLF.Services
         /// Aktif geçici klasörü temizler
         /// </summary>
         /// <returns>İşlem başarılı olduysa true, değilse false</returns>
+        /// <summary>
+        /// SLF analizi için kullanılacak saturasyon dosyasının tam yolunu döndürür
+        /// </summary>
+        /// <returns>Saturasyon dosyasının tam yolu</returns>
+        /// <summary>
+        /// SLF analizi için kullanılacak saturasyon dosyasının tam yolunu döndürür
+        /// </summary>
+        /// <returns>Saturasyon dosyasının tam yolu</returns>
+        public static string GetSaturasyonFilePath()
+        {
+            try
+            {
+                // İmar planları klasörü
+                string imarPlanlariPath = GetImarAnaliziPathForType("imar_planlari");
+
+                // Spesifik olarak belirtilen yol: imar_planlari/saturasyon/saturasyon_sonuc/saturasyon.csv
+                string specificPath = Path.Combine(imarPlanlariPath, "saturasyon", "saturasyon_sonuc", "saturasyon.csv");
+
+                // Öncelikle spesifik yolu kontrol et
+                if (File.Exists(specificPath))
+                {
+                    Console.WriteLine($"Saturasyon dosyası bulundu (spesifik yol): {specificPath}");
+                    return specificPath;
+                }
+
+                // Spesifik dosya bulunamadıysa, saturasyon alt klasörünü kontrol et
+                string saturasyonFolderPath = Path.Combine(imarPlanlariPath, "saturasyon");
+                if (Directory.Exists(saturasyonFolderPath))
+                {
+                    // saturasyon.csv dosyasını ara
+                    string saturasyonFile = Path.Combine(saturasyonFolderPath, "saturasyon.csv");
+                    if (File.Exists(saturasyonFile))
+                    {
+                        Console.WriteLine($"Saturasyon dosyası bulundu (alt klasör): {saturasyonFile}");
+                        return saturasyonFile;
+                    }
+
+                    // Klasördeki tüm csv dosyalarını ara
+                    var csvFiles = Directory.GetFiles(saturasyonFolderPath, "*.csv", SearchOption.AllDirectories);
+                    if (csvFiles.Length > 0)
+                    {
+                        // En son oluşturulan csv dosyasını al
+                        string latestFile = csvFiles.OrderByDescending(f => new FileInfo(f).LastWriteTime).First();
+                        Console.WriteLine($"Saturasyon dosyası bulundu (en son csv): {latestFile}");
+                        return latestFile;
+                    }
+                }
+
+                // Hiçbir dosya bulunamadıysa
+                Console.WriteLine("Saturasyon dosyası bulunamadı!");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Saturasyon dosyası aranırken hata: {ex.Message}");
+                return null;
+            }
+        }
         public static bool CleanupCurrentTempFolder()
         {
             try
@@ -1003,6 +1066,169 @@ namespace SLF.Services
             string pythonKodPath = Path.Combine(projectDir?.FullName ?? "", "python_kod");
             Console.WriteLine($"Python kod yolu: {pythonKodPath}");
             Console.WriteLine($"Python kod klasörü var mı: {Directory.Exists(pythonKodPath)}");
+        }
+        /// <summary>
+        /// SLF (Saturation Load Flow) için path ayarlaması yapar
+        /// </summary>
+        /// <param name="saturasyonFilePath">Saturasyon dosyasının yolu</param>
+        /// <returns>İşlem başarılı olduysa true, değilse false</returns>
+        public static bool SetSLFPath(string saturasyonFilePath)
+        {
+            try
+            {
+                // Parametre kontrolü
+                if (string.IsNullOrEmpty(saturasyonFilePath) || !File.Exists(saturasyonFilePath))
+                {
+                    Debug.WriteLine("SLF path ayarlanamadı: Geçersiz dosya yolu.");
+                    return false;
+                }
+
+                // Saturasyon dosyasından il ve ilçe bilgisini çıkar
+                string fileName = Path.GetFileName(saturasyonFilePath);
+
+                // Dosya adından il ve ilçe bilgisini çıkarmak için varsayılan bir format kullan
+                // Örnek: "saturasyon_izmir_cigli.csv" veya benzer bir formatta olduğunu varsay
+                string[] parts = fileName.ToLower().Replace("saturasyon_", "").Replace(".csv", "").Split('_');
+
+                if (parts.Length < 2)
+                {
+                    Debug.WriteLine("SLF path ayarlanamadı: Dosya adından il/ilçe çıkarılamadı.");
+                    return false;
+                }
+
+                // İlk eleman il, ikinci eleman ilçe olarak kabul edilir
+                string city = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(parts[0]);
+                string district = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(parts[1]);
+
+                // Path'i güncelle
+                bool pathUpdateResult = UpdatePath(city, district);
+
+                if (!pathUpdateResult)
+                {
+                    Debug.WriteLine("SLF path ayarlanamadı: Path güncellenemedi.");
+                    return false;
+                }
+
+                // Saturasyon dosyasını ilgili klasöre kopyala
+                string saturasyonOutputPath = GetImarAnaliziPathForType("slf_sonuclari");
+                string destinationPath = Path.Combine(saturasyonOutputPath, fileName);
+
+                // Dosyayı kopyala (varsa üzerine yaz)
+                File.Copy(saturasyonFilePath, destinationPath, true);
+
+                Debug.WriteLine($"SLF path ayarlandı: {city}/{district}");
+                Debug.WriteLine($"Saturasyon dosyası kopyalandı: {destinationPath}");
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SLF path ayarlanırken hata: {ex.Message}");
+                return false;
+            }
+        }
+        public static string GetImarOraniFilePath()
+        {
+            try
+            {
+                // İmar planları klasörü
+                string imarPlanlariPath = GetImarAnaliziPathForType("imar_planlari");
+
+                // Saturasyon girdiler klasörü - öncelikli olarak burada arayacağız
+                string saturasyonGirdilerPath = Path.Combine(imarPlanlariPath, "saturasyon", "girdiler");
+
+                // Bina kırılımları dosyasını arayacağımız klasörler (öncelik sırasına göre)
+                string[] searchFolders = new string[]
+                {
+            saturasyonGirdilerPath,
+            Path.Combine(imarPlanlariPath, "saturasyon"),
+            imarPlanlariPath,
+            Path.Combine(imarPlanlariPath, "bina_kirilimlari")
+                };
+
+                // Dosya isimleri için arama desenleri
+                string[] searchPatterns = new string[]
+                {
+            $"*bina_kirilimlari*.csv",
+            $"*bina_kirilimlari*.xlsx",
+            $"*{RemoveDiacritics(SelectedCity)}*{RemoveDiacritics(SelectedDistrict)}*bina*.csv",
+            $"*{RemoveDiacritics(SelectedCity)}*{RemoveDiacritics(SelectedDistrict)}*bina*.xlsx"
+                };
+
+                Console.WriteLine($"İmar oranı dosyası aranıyor...");
+
+                // Tüm klasörlerde, tüm desenleri ara
+                foreach (var folder in searchFolders)
+                {
+                    if (!Directory.Exists(folder))
+                    {
+                        Console.WriteLine($"Klasör bulunamadı: {folder}");
+                        continue;
+                    }
+
+                    Console.WriteLine($"Klasörde arama yapılıyor: {folder}");
+
+                    foreach (var pattern in searchPatterns)
+                    {
+                        var files = Directory.GetFiles(folder, pattern, SearchOption.AllDirectories);
+
+                        if (files.Length > 0)
+                        {
+                            // En son oluşturulan dosyayı al
+                            string latestFile = files.OrderByDescending(f => new FileInfo(f).LastWriteTime).First();
+                            Console.WriteLine($"İmar oranı dosyası bulundu: {latestFile}");
+                            return latestFile; // Return the most recent file found
+                        }
+                    }
+                }
+
+                // Hiçbir dosya bulunamadıysa
+                Console.WriteLine("İmar oranı dosyası bulunamadı!");
+                return null; // Return null if no file is found
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"İmar oranı dosyası aranırken hata: {ex.Message}");
+                return null; // Return null if an error occurs
+            }
+        }
+        /// <summary>
+        /// Türkçe karakterleri ASCII karşılıklarına dönüştürür
+        /// </summary>
+        /// <param name="text">Dönüştürülecek metin</param>
+        /// <returns>ASCII karakterli metin</returns>
+        public static string RemoveDiacritics(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            string normalizedString = text.Normalize(NormalizationForm.FormD);
+            StringBuilder stringBuilder = new StringBuilder();
+
+            foreach (char c in normalizedString)
+            {
+                UnicodeCategory unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            // Özel Türkçe karakterler için ek dönüşümler
+            return stringBuilder.ToString()
+                .Normalize(NormalizationForm.FormC)
+                .Replace('ı', 'i')
+                .Replace('İ', 'I')
+                .Replace('ğ', 'g')
+                .Replace('Ğ', 'G')
+                .Replace('ü', 'u')
+                .Replace('Ü', 'U')
+                .Replace('ş', 's')
+                .Replace('Ş', 'S')
+                .Replace('ç', 'c')
+                .Replace('Ç', 'C')
+                .Replace('ö', 'o')
+                .Replace('Ö', 'O');
         }
         public static void ResetWorkingEnvironment()
         {
