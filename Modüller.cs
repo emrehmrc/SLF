@@ -3215,7 +3215,7 @@ namespace SLF
                 Cursor = Cursors.WaitCursor;
                 if (statusLabel != null)
                 {
-                    statusLabel.Text = "Python script started. This may take a while. Please wait...";
+                    statusLabel.Text = "Python kodu çalışıyor. Bu biraz zaman alabilir. Lütfen bekleyiniz...";
                     statusLabel.Visible = true;
                 }
                 if (progressBar != null)
@@ -3223,33 +3223,46 @@ namespace SLF
                     progressBar.Style = ProgressBarStyle.Marquee;
                     progressBar.Visible = true;
                 }
+                string inputFilePath = Path.Combine(userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.İlçe,
+                    (string)ana_menu_form_objesi.config.EA.ea_klasörü,
+                    (string)ana_menu_form_objesi.config.EA.girdi_dosyası);
 
-                string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V3\GİRDİ\new_buildings_2024_2035.xlsx";
-                string outputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V3\ÇIKTI\evcs_monte_carlo_distribution_kumulatif_0411.xlsx";
+                string outputFilePath = Path.Combine(userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.İlçe,
+                    (string)ana_menu_form_objesi.config.EA.ea_klasörü,
+                    (string)ana_menu_form_objesi.config.EA.cikti_dosyasi);
+
+                int startYear = slfStartYear; // Or: int.Parse(comboBox_ea_yıl_secimi.SelectedItem.ToString());
+                int endYear = slfEndYear;     // Or: int.Parse(comboBox_DEK_Yıl.SelectedItem.ToString());
 
                 if (!File.Exists(inputFilePath))
                 {
-                    MessageBox.Show("Input file not found! Please ensure the file is saved correctly.",
+                    MessageBox.Show("Girdi dosyası bulunamadı! Lütfen kaydedildiğinden emin olun.",
                         "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                await RunPythonScriptAsync(inputFilePath);
+                await RunPythonScriptAsync(configPath);
 
                 if (!File.Exists(outputFilePath))
                 {
-                    MessageBox.Show("Output file not generated! Please check the Python script.",
+                    MessageBox.Show("Çıktı dosyası oluşturulamadı! Lütfen python dosyasını kontrol ediniz.",
                         "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
                 // Add info message box to inform user of completion
-                MessageBox.Show("Simulation process completed successfully!",
+                MessageBox.Show("Simülasyon başarıyla tamamlandı!",
                     "Process Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -3257,7 +3270,7 @@ namespace SLF
                 if (progressBar != null)
                     progressBar.Visible = false;
                 if (statusLabel != null)
-                    statusLabel.Text = "Simulation process completed";
+                    statusLabel.Text = "Simülasyon tamamlandı.";
 
                 EANewSimulationResultsButton.Enabled = true;
                 // EAStationAddButton.Enabled = true;
@@ -3265,17 +3278,21 @@ namespace SLF
             }
         }
 
-        private async Task RunPythonScriptAsync(string inputFilePath)
+        private async Task RunPythonScriptAsync(string config_path)
         {
             try
             {
-                string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V3\EA_0411.py";
-                string pythonExePath = @"C:\Users\begum.orhan\AppData\Local\Programs\Python\Python312\python.exe";
+                string pythonScriptPath = Path.Combine(userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.EA.program_dosyası_klasörü,
+                    (string)ana_menu_form_objesi.config.EA.ea_python_dosyası);
+                
 
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
-                    FileName = pythonExePath,
-                    Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",
+                    FileName = "python",
+                    Arguments = $"\"{pythonScriptPath}\" \"{config_path}\"",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
@@ -3296,17 +3313,17 @@ namespace SLF
 
                     if (process.ExitCode != 0)
                     {
-                        throw new Exception($"Python script failed with exit code {process.ExitCode}.\nError: {error}");
+                        throw new Exception($"Python betiği {process.ExitCode} çıkış koduyla başarısız oldu. Hata: {error}");
                     }
                     else if (!string.IsNullOrEmpty(output))
                     {
-                        Console.WriteLine($"Python output: {output}");
+                        Console.WriteLine($"Python çıktısı: {output}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error running Python script: {ex.Message}");
+                throw new Exception($"Python kodu çalıştırma hatası: {ex.Message}");
             }
         }
 
@@ -6509,18 +6526,6 @@ namespace SLF
                 (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
                 (string)ana_menu_form_objesi.config.DEK.cikti_dosyasi);
 
-            int startYear = slfStartYear; // Or: int.Parse(comboBox_ea_yıl_secimi.SelectedItem.ToString());
-            int endYear = slfEndYear;     // Or: int.Parse(comboBox_DEK_Yıl.SelectedItem.ToString());
-
-            // Validate years
-            if (startYear > endYear)
-            {
-                MessageBox.Show("Start year must be less than or equal to end year.",
-                    "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                DEKRunSimulationButton.Enabled = true;
-                DEKSimulasyonSonucGoruntule.Enabled = true;
-                return;
-            }
 
             methodFormObjesi.SaveConfigToFile();
             try
@@ -6528,7 +6533,7 @@ namespace SLF
                 Cursor = Cursors.WaitCursor;
                 if (DEKStatusLabel != null)
                 {
-                    DEKStatusLabel.Text = "Python script started. This may take a while. Please wait...";
+                    DEKStatusLabel.Text = "Python kodu çalışıyor. Bu biraz zaman alabilir. Lütfen bekleyiniz...";
                     DEKStatusLabel.Visible = true;
                 }
                 if (DEKProgressBar != null)
@@ -6539,26 +6544,26 @@ namespace SLF
 
                 if (!File.Exists(inputFilePath))
                 {
-                    MessageBox.Show("Input file not found! Please ensure the file is saved correctly.",
+                    MessageBox.Show("Girdi dosyası bulunamadı! Lütfen kaydedildiğinden emin olun.",
                         "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                await RunPythonDEKScriptAsync(inputFilePath, startYear, endYear);
+                await RunPythonDEKScriptAsync(configPath);
 
                 if (!File.Exists(outputFilePath))
                 {
-                    MessageBox.Show("Output file not generated! Please check the Python script.",
+                    MessageBox.Show("Çıktı dosyası oluşturulamadı! Lütfen python dosyasını kontrol ediniz.",
                         "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                MessageBox.Show("Simulation process completed successfully!",
+                MessageBox.Show("Simülasyon başarıyla tamamlandı!",
                     "Process Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -6566,96 +6571,15 @@ namespace SLF
                 if (DEKProgressBar != null)
                     DEKProgressBar.Visible = false;
                 if (DEKStatusLabel != null)
-                    DEKStatusLabel.Text = "Simulation process completed";
+                    DEKStatusLabel.Text = "Simülasyon tamamlandı";
 
                 DEKRunSimulationButton.Enabled = true;
                 DEKSimulasyonSonucGoruntule.Enabled = true;
             }
         }
-        /*        private async void DEKRunSimulationButton_Click(object sender, EventArgs e)
-                {
-                    // Disable buttons and TrackBar to prevent interaction while processing
-                    DEKRunSimulationButton.Enabled = false;
-                    DEKSimulasyonSonucGoruntule.Enabled = true;
-                    //DEKSimButton.Enabled = false;
-
-                    string inputFilePath = Path.Combine(userRootPath,
-                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                        (string)ana_menu_form_objesi.config.İl,
-                        (string)ana_menu_form_objesi.config.İlçe,
-                        (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
-                       (string)ana_menu_form_objesi.config.DEK.girdi_dosyası).Replace('/', '\\');
-
-                    string outputFilePath = Path.Combine(userRootPath,
-                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                     (string)ana_menu_form_objesi.config.İl,
-                     (string)ana_menu_form_objesi.config.İlçe,
-                     (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
-                    (string)ana_menu_form_objesi.config.DEK.cikti_dosyasi).Replace('/', '\\');
 
 
-                    // ana_menu_form_objesi.config.DEK.yıl = ComboBox.text;
-
-                    methodFormObjesi.SaveConfigToFile();
-                    try
-                    {
-                        Cursor = Cursors.WaitCursor;
-                        if (DEKStatusLabel != null)
-                        {
-                            DEKStatusLabel.Text = "Python script started. This may take a while. Please wait...";
-                            DEKStatusLabel.Visible = true;
-                        }
-                        if (DEKProgressBar != null)
-                        {
-                            DEKProgressBar.Style = ProgressBarStyle.Marquee;
-                            DEKProgressBar.Visible = true;
-                        }
-
-                        //string inputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\girdi\new_buildings_2024_2035_1703.xlsx";
-                        //string outputFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\cıktı\dek_distribution_cumulative_0704.xlsx";
-
-                        // string inputFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\İzmir\Karşıyaka\Dağıtık Üretimler\girdi\dek_yeni_binalar.xlsx";
-                        // string outputFilePath = @"C:\Users\begum.orhan\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\İzmir\Karşıyaka\Dağıtık Üretimler\cıktı\dek_kumulatif_dagilim_sonuclari.xlsx";
-
-                        if (!File.Exists(inputFilePath))
-                        {
-                            MessageBox.Show("Input file not found! Please ensure the file is saved correctly.",
-                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
-                        }
-
-                        await RunPythonDEKScriptAsync(inputFilePath);
-
-                        if (!File.Exists(outputFilePath))
-                        {
-                            MessageBox.Show("Output file not generated! Please check the Python script.",
-                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
-                        }
-
-                        // Add info message box to inform user of completion
-                        MessageBox.Show("Simulation process completed successfully!",
-                            "Process Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    finally
-                    {
-                        Cursor = Cursors.Default;
-                        if (DEKProgressBar != null)
-                            DEKProgressBar.Visible = false;
-                        if (DEKStatusLabel != null)
-                            DEKStatusLabel.Text = "Simulation process completed";
-
-                        DEKRunSimulationButton.Enabled = true;
-                        DEKSimulasyonSonucGoruntule.Enabled = true;
-                        //DEKSimButton.Enabled = true;
-                    }
-                }*/
-
-        private async Task RunPythonDEKScriptAsync(string inputFilePath, int startYear, int endYear)
+        private async Task RunPythonDEKScriptAsync(string config_path)
         {
             try
             {
@@ -6669,7 +6593,7 @@ namespace SLF
                 {
                     FileName = "python",
                     // Use verbatim string with concatenation
-                    Arguments = @"""" + pythonScriptPath + @""" """ + inputFilePath + @""" " + startYear + " " + endYear,
+                    Arguments = @"""" + pythonScriptPath + @""" """ + config_path,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
@@ -6690,17 +6614,17 @@ namespace SLF
 
                     if (process.ExitCode != 0)
                     {
-                        throw new Exception($"Python script failed with exit code {process.ExitCode}. Error: {error}");
+                        throw new Exception($"Python betiği {process.ExitCode} çıkış koduyla başarısız oldu. Hata: {error}");
                     }
                     else if (!string.IsNullOrEmpty(output))
                     {
-                        Console.WriteLine($"Python output: {output}");
+                        Console.WriteLine($"Python çıktısı: {output}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error running Python script: {ex.Message}");
+                throw new Exception($"Python kodu çalıştırma hatası: {ex.Message}");
             }
         }
 

@@ -9,7 +9,7 @@
     "ŞABLON": "Ekonometrik Yük Tahmini Verileri/ŞABLON.xlsx",
     "Rscript_Yolu_Model": "Program Dosyaları/ELF/model.R",
     "Rscript_Yolu_Senaryolar": "Program Dosyaları/ELF/senaryolar.R",
-    "ufuk_yılı": 6
+    "ufuk_yılı": 9
   },
   "Veritabanı": {
     "Server_Address": "",
@@ -22,22 +22,28 @@
   },
   "DEK": {
     "dek_klasörü": "Dağıtık Üretimler",
+    "min_max_path": "girdi/dek_olasiliklar.xlsx",
+    "imar_alanları": "girdi/dek_imar_alanlari.xlsx",
     "girdi_dosyası": "girdi/dek_yeni_binalar.xlsx",
+    "ilce_path": "girdi/dek_delta_yeni_sonuclar.xlsx",
+    "ilk_yıl": "girdi/dek_ilk_durum.xlsx",
     "cikti_dosyasi": "cıktı/dek_kumulatif_dagilim_sonuclari.xlsx",
     "program_dosyası_klasörü": "Program Dosyaları/DEK",
     "dek_python_dosyası": "dek.py",
     "baslangıc_yılı": 2024,
-    "bitis_yılı": 2030
+    "bitis_yılı": 2033
   },
   "EA": {
-    "Klasör": "EA Şarj",
-    "INPUT_FILE": "VERİLER.xlsx",
-    "SONUÇLAR_klasör": "SONUÇLAR",
-    "GİRDİLER_ilk": "GİRDİLER/HUCRE_BAZLI_İLK_VERSİYON.xlsx",
-    "BİNA_SAYILARI": "GİRDİLER/BİNA_SAYILARI_İMAR_ANALİZİ_SONUCU.xlsx",
-    "DELTA_SONUCLAR": "GİRDİLER/DELTA_SONUCLAR.xlsx",
+    "ea_klasörü": "EA Şarj",
+    "min_max_path": "girdi/ea_olasiliklar.xlsx",
+    "girdi_dosyası": "girdi/ea_yeni_binalar.xlsx",
+    "cikti_dosyasi": "cıktı/ea_kumulatif_dagilim_sonuclari.xlsx",
+    "ilce_path": "girdi/ea_delta_yeni_sonuclar.xlsx",
+    "ilk_yıl": "girdi/ea_ilk_durum.xlsx",
+    "program_dosyası_klasörü": "Program Dosyaları/EA",
+    "ea_python_dosyası": "ea.py",
     "baslangıc_yılı": 2024,
-    "bitis_yılı": 2030
+    "bitis_yılı": 2033
   },
   "Point_Load_Musaade": "Point Load Verileri/point_load_musaade.xlsx"
 }
