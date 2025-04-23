@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
-using Npgsql;
-using SLF.services; // DatabaseManager için namespace
+using SLF.Services; // DatabaseManager için namespace
 
 namespace SLF
 {

@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Npgsql;
 using System.Data;
-using System.Diagnostics;
-namespace SLF.services
+namespace SLF.Services
 {
     public static class DatabaseHelper
     {

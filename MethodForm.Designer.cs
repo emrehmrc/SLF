@@ -34,9 +34,9 @@
             this.IlComboBox = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.ForwardButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.MethodComboBox = new System.Windows.Forms.ComboBox();
-            this.ForwardButton = new System.Windows.Forms.Button();
             this.MethodPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -116,6 +116,21 @@
             this.label2.TabIndex = 4;
             this.label2.Text = "İl";
             // 
+            // ForwardButton
+            // 
+            this.ForwardButton.BackColor = System.Drawing.Color.DarkOrange;
+            this.ForwardButton.FlatAppearance.BorderSize = 0;
+            this.ForwardButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ForwardButton.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.ForwardButton.ForeColor = System.Drawing.Color.White;
+            this.ForwardButton.Location = new System.Drawing.Point(77, 293);
+            this.ForwardButton.Name = "ForwardButton";
+            this.ForwardButton.Size = new System.Drawing.Size(150, 40);
+            this.ForwardButton.TabIndex = 3;
+            this.ForwardButton.Text = "İLERLE";
+            this.ForwardButton.UseVisualStyleBackColor = false;
+            this.ForwardButton.Click += new System.EventHandler(this.ForwardButton_Click);
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -144,21 +159,6 @@
             this.MethodComboBox.Size = new System.Drawing.Size(253, 29);
             this.MethodComboBox.TabIndex = 1;
             this.MethodComboBox.Text = "Lütfen ilerlemek için metot seçiniz.";
-            // 
-            // ForwardButton
-            // 
-            this.ForwardButton.BackColor = System.Drawing.Color.DarkOrange;
-            this.ForwardButton.FlatAppearance.BorderSize = 0;
-            this.ForwardButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.ForwardButton.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.ForwardButton.ForeColor = System.Drawing.Color.White;
-            this.ForwardButton.Location = new System.Drawing.Point(77, 293);
-            this.ForwardButton.Name = "ForwardButton";
-            this.ForwardButton.Size = new System.Drawing.Size(150, 40);
-            this.ForwardButton.TabIndex = 3;
-            this.ForwardButton.Text = "İLERLE";
-            this.ForwardButton.UseVisualStyleBackColor = false;
-            this.ForwardButton.Click += new System.EventHandler(this.ForwardButton_Click);
             // 
             // MethodForm
             // 

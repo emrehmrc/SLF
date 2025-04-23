@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using System.IO;
-using System.Reflection;
 using ExcelDataReader;
 using GMap.NET;
 
@@ -23,6 +22,7 @@ namespace SLF
 
         private bool isSelecting_YGA;
         private bool isSelecting_YUK;
+        private bool isSelecting_Musaade;
 
         public bool is_poligon_saved = true;
         private bool isKaydetClicked = false;
@@ -30,7 +30,7 @@ namespace SLF
         // Add a public property to access the DataTable
         public DataTable PolygonDataTable => dataTable;
 
-        public Poligon_Özellik_Tanımlama(bool isSelectingYUK, bool isSelectingYGA,
+        public Poligon_Özellik_Tanımlama(bool isSelectingYUK, bool isSelectingYGA, bool isSelectingMusaade,
             List<PointLatLng> polygonPoints)
         {
             InitializeComponent();
@@ -40,22 +40,13 @@ namespace SLF
             // Set the flags before calling SetupDataGridView
             isSelecting_YUK = isSelectingYUK;
             isSelecting_YGA = isSelectingYGA;
+            isSelecting_Musaade = isSelectingMusaade;
 
-            //PoligonDataGridView.EditingControlShowing += PoligonDataGridView_EditingControlShowing;
-
-
-            // Resolve the Excel file path relative to SLF.exe
-            string exeLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string projectRoot = Directory.GetParent(exeLocation)?.Parent?.FullName;
-            if (projectRoot != null)
-            {
-                excelFilePath = Path.Combine(projectRoot, "Excel Files", "Point Load Karakteristikleri", "point_load.xlsx");
-            }
-            else
-            {
-                excelFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "point_load.xlsx");
-                MessageBox.Show($"Excel dosya yolu çözülemedi. Varsayılan yol kullanılıyor: {excelFilePath}", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
+            excelFilePath = Path.Combine(modül_formu.ana_menu_form_objesi.userRootPath,
+                (string)modül_formu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                (string)modül_formu.ana_menu_form_objesi.config.İl,
+                (string)modül_formu.ana_menu_form_objesi.config.İlçe,
+                (string)modül_formu.ana_menu_form_objesi.config.Point_Load_Musaade).Replace('/', '\\');
 
             // Determine layer index
             layerIndex = FindFirstFreeLayerIndex();
@@ -101,9 +92,9 @@ namespace SLF
                 dataTable.Columns.Add("Çizilen Alan (m2)", typeof(string));
                 dataTable.Columns.Add("Ortalama Kapladığı Alan (m2)", typeof(string));
                 dataTable.Columns.Add("Tüketim Sınıfı", typeof(string));
-                dataTable.Columns.Add("Kurulu Güç", typeof(string));
+                dataTable.Columns.Add("Kurulu Güç (kW)", typeof(string));
                 dataTable.Columns.Add("Pik Yüklenme (%)", typeof(string));
-                dataTable.Columns.Add("Pik Demant", typeof(string));
+                dataTable.Columns.Add("Pik Demant (kW)", typeof(string));
 
                 // Add a single row
                 dataTable.Rows.Add(dataTable.NewRow());
@@ -112,6 +103,36 @@ namespace SLF
                 dataTable.Rows[0]["Polygon ID"] = "Polygon_" + layerIndex;
                 dataTable.Rows[0]["Koordinatlar"] = coordinates;
                 dataTable.Rows[0]["Çizilen Alan (m2)"] = area;
+
+                // Bind DataTable to PoligonDataGridView
+                PoligonDataGridView.DataSource = dataTable;
+                PoligonDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                PoligonDataGridView.AllowUserToAddRows = false; // Prevent adding rows
+                PoligonDataGridView.AllowUserToDeleteRows = false; // Prevent deleting rows
+                PoligonDataGridView.ReadOnly = false; // Allow editing dropdowns
+                PoligonDataGridView.AllowUserToOrderColumns = false; // Prevent column reordering
+
+                // Populate dropdowns and store Excel data
+                LoadExcelData();
+                SetupDropdownColumns(columnValues);
+
+            }
+            else if (isSelecting_Musaade == true)
+            {
+                // Add columns
+                dataTable.Columns.Add("Polygon ID", typeof(string));
+                dataTable.Columns.Add("Tipi", typeof(string));
+                dataTable.Columns.Add("ENERJI_MUSAADE_ABONE_GRUBU", typeof(string));
+                dataTable.Columns.Add("ENERJI_MUSAADE_ENERJILENDIRME_YILI", typeof(string));
+                dataTable.Columns.Add("Kurulu Güç (kW)", typeof(string));
+                dataTable.Columns.Add("Pik Yüklenme (%)", typeof(string));
+                dataTable.Columns.Add("Pik Demant (kW)", typeof(string));
+
+                // Add a single row
+                dataTable.Rows.Add(dataTable.NewRow());
+
+                // Set "Polygon ID" value
+                dataTable.Rows[0]["Polygon ID"] = "Polygon_" + layerIndex;
 
                 // Bind DataTable to PoligonDataGridView
                 PoligonDataGridView.DataSource = dataTable;
@@ -147,7 +168,6 @@ namespace SLF
                 dataTable.Columns.Add("Başlangıç Yılı", typeof(string));
                 dataTable.Columns.Add("Satürasyon Hızı", typeof(string));
                 dataTable.Columns.Add("Park, Yol, Kaldırım Oranı (%)", typeof(string));
-                dataTable.Columns.Add("Sosyal Yapı Parsel Oranı (%)", typeof(string));
 
                 // Add a single row
                 dataTable.Rows.Add(dataTable.NewRow());
@@ -170,15 +190,30 @@ namespace SLF
 
         private void LoadExcelData()
         {
-            columnValues = new Dictionary<string, HashSet<string>>
+            if (isSelecting_YUK)
             {
-                { "Tipi", new HashSet<string>() },
-                { "Ortalama Kapladığı Alan (m2)", new HashSet<string>() },
-                { "Tüketim Sınıfı", new HashSet<string>() },
-                { "Kurulu Güç", new HashSet<string>() },
-                { "Pik Yüklenme (%)", new HashSet<string>() },
-                { "Pik Demant", new HashSet<string>() }
-            };
+                columnValues = new Dictionary<string, HashSet<string>>
+                {
+                    { "Tipi", new HashSet<string>() },
+                    { "Ortalama Kapladığı Alan (m2)", new HashSet<string>() },
+                    { "Tüketim Sınıfı", new HashSet<string>() },
+                    { "Kurulu Güç (kW)", new HashSet<string>() },
+                    { "Pik Yüklenme (%)", new HashSet<string>() },
+                    { "Pik Demant", new HashSet<string>() }
+                };
+                        }
+                        else if (isSelecting_Musaade)
+                        {
+                            columnValues = new Dictionary<string, HashSet<string>>
+                {
+                    { "Tipi", new HashSet<string>() },
+                    { "ENERJI_MUSAADE_ABONE_GRUBU", new HashSet<string>() },
+                    { "ENERJI_MUSAADE_ENERJILENDIRME_YILI", new HashSet<string>() },
+                    { "Kurulu Güç (kW)", new HashSet<string>() },
+                    { "Pik Yüklenme (%)", new HashSet<string>() },
+                    { "Pik Demant (kW)", new HashSet<string>() }
+                };
+            }
 
             excelDataRows = new List<Dictionary<string, string>>(); // Initialize the list to store full rows
 
@@ -196,7 +231,32 @@ namespace SLF
                             }
                         });
 
-                        var excelTable = result.Tables[0];
+                        // Select the appropriate sheet based on the condition
+                        DataTable excelTable;
+                        if (isSelecting_YUK)
+                        {
+                            // Read the first sheet (index 0)
+                            if (result.Tables.Count < 1)
+                            {
+                                throw new Exception("Excel dosyasında 'YUK' için gerekli olan ilk sayfa bulunamadı.");
+                            }
+                            excelTable = result.Tables[0];
+                        }
+                        else if (isSelecting_Musaade)
+                        {
+                            // Read the second sheet (index 1)
+                            if (result.Tables.Count < 2)
+                            {
+                                throw new Exception("Excel dosyasında 'Musaade' için gerekli olan ikinci sayfa bulunamadı.");
+                            }
+                            excelTable = result.Tables[1];
+                        }
+                        else
+                        {
+                            throw new Exception("Geçersiz seçim: Ne YUK ne de Musaade seçildi.");
+                        }
+
+                        // Process the selected sheet
                         foreach (DataRow row in excelTable.Rows)
                         {
                             var rowData = new Dictionary<string, string>();
@@ -223,15 +283,30 @@ namespace SLF
             }
         }
 
+        HashSet<string> manualColumns;
+
         private void SetupDropdownColumns(Dictionary<string, HashSet<string>> columnValues)
         {
-            // Define the columns that should remain manually defined.
-            var manualColumns = new HashSet<string>
-    {
-        "Polygon ID",
-        "Koordinatlar",
-        "Çizilen Alan (m2)"
-    };
+
+            if (isSelecting_YUK)
+            {
+                // Define the columns that should remain manually defined.
+                    manualColumns = new HashSet<string>
+                {
+                    "Polygon ID",
+                    "Koordinatlar",
+                    "Çizilen Alan (m2)"
+                };
+
+            } else if (isSelecting_Musaade)
+            {
+                // Define the columns that should remain manually defined.
+                manualColumns = new HashSet<string>
+                {
+                    "Polygon ID"
+                };
+            }
+
 
             // Store current cell values for dropdown columns (from the first non-new row).
             var currentValues = new Dictionary<string, object>();
@@ -309,19 +384,26 @@ namespace SLF
 
         private void buton_yük_tipleri_Click(object sender, EventArgs e)
         {
-            yük_bilgi_formu_objesi = new Nokta_Yuk_Bilgi_Formu(modül_formu.polygonTypesExcelPath);
+            yük_bilgi_formu_objesi = new Nokta_Yuk_Bilgi_Formu(excelFilePath);
             yük_bilgi_formu_objesi.Owner = this;
             yük_bilgi_formu_objesi.ShowDialog();
             yük_bilgi_formu_objesi.BringToFront();
             yük_bilgi_formu_objesi.Focus();
 
+            // Reload Excel data and update dropdowns
+            LoadExcelData();
+            SetupDropdownColumns(columnValues);
+
             // Check if yukler changed after the dialog closes
             if (yük_bilgi_formu_objesi.is_yukler_changed)
             {
-                // Reload Excel data and update dropdowns
-                LoadExcelData();
-                SetupDropdownColumns(columnValues);
-                yük_bilgi_formu_objesi.is_yukler_changed = false; // Reset the flag
+                yük_bilgi_formu_objesi.is_yukler_changed = false;
+                yük_bilgi_formu_objesi.yuk_select = true;
+
+            } else if (yük_bilgi_formu_objesi.is_musaade_changed)
+            {
+                yük_bilgi_formu_objesi.is_musaade_changed = false;
+                yük_bilgi_formu_objesi.musaade_select = true;
             }
         }
 
@@ -343,9 +425,30 @@ namespace SLF
                             // Update the other columns with the corresponding values
                             PoligonDataGridView.Rows[e.RowIndex].Cells["Ortalama Kapladığı Alan (m2)"].Value = matchingRow["Ortalama Kapladığı Alan (m2)"];
                             PoligonDataGridView.Rows[e.RowIndex].Cells["Tüketim Sınıfı"].Value = matchingRow["Tüketim Sınıfı"];
-                            PoligonDataGridView.Rows[e.RowIndex].Cells["Kurulu Güç"].Value = matchingRow["Kurulu Güç"];
+                            PoligonDataGridView.Rows[e.RowIndex].Cells["Kurulu Güç (kW)"].Value = matchingRow["Kurulu Güç (kW)"];
                             PoligonDataGridView.Rows[e.RowIndex].Cells["Pik Yüklenme (%)"].Value = matchingRow["Pik Yüklenme (%)"];
-                            PoligonDataGridView.Rows[e.RowIndex].Cells["Pik Demant"].Value = matchingRow["Pik Demant"];
+                            PoligonDataGridView.Rows[e.RowIndex].Cells["Pik Demant (kW)"].Value = matchingRow["Pik Demant (kW)"];
+                        }
+                    }
+                }
+
+            } else if (isSelecting_Musaade == true)
+            {
+                // Check if the changed cell is in the "Tipi" column
+                if (e.ColumnIndex == PoligonDataGridView.Columns["Tipi"].Index && e.RowIndex >= 0)
+                {
+                    string selectedTipi = PoligonDataGridView.Rows[e.RowIndex].Cells["Tipi"].Value?.ToString();
+                    if (!string.IsNullOrEmpty(selectedTipi))
+                    {
+                        // Find the row in excelDataRows that matches the selected Tipi
+                        var matchingRow = excelDataRows.FirstOrDefault(row => row["Tipi"] == selectedTipi);
+                        if (matchingRow != null)
+                        {
+                            PoligonDataGridView.Rows[e.RowIndex].Cells["ENERJI_MUSAADE_ABONE_GRUBU"].Value = matchingRow["ENERJI_MUSAADE_ABONE_GRUBU"];
+                            PoligonDataGridView.Rows[e.RowIndex].Cells["ENERJI_MUSAADE_ENERJILENDIRME_YILI"].Value = matchingRow["ENERJI_MUSAADE_ENERJILENDIRME_YILI"];
+                            PoligonDataGridView.Rows[e.RowIndex].Cells["Kurulu Güç (kW)"].Value = matchingRow["Kurulu Güç (kW)"];
+                            PoligonDataGridView.Rows[e.RowIndex].Cells["Pik Yüklenme (%)"].Value = matchingRow["Pik Yüklenme (%)"];
+                            PoligonDataGridView.Rows[e.RowIndex].Cells["Pik Demant (kW)"].Value = matchingRow["Pik Demant (kW)"];
                         }
                     }
                 }
@@ -353,7 +456,6 @@ namespace SLF
             }
 
         }
-
 
         private void Poligon_Özellik_Tanımlama_FormClosed(object sender, FormClosedEventArgs e)
         {
@@ -366,6 +468,7 @@ namespace SLF
             {
                 isSelecting_YUK = false;
                 isSelecting_YGA = false;
+                isSelecting_Musaade = false;
             }
         }
 

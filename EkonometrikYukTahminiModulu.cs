@@ -1,34 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Drawing.Printing;
 using System.Linq;
-using System.Reflection;
-using System.Windows.Forms;
+using System.IO;
 
 namespace SLF
 {
     public class EkonometrikYukTahminiModulu : GirdiModülü
 
     {
-       
-
-        //protected override List<string> Prerequisites => new List<string> { "DTR Verileri", "Abone Verileri" };
-        //private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
-        //{
-        //    { "MESKEN_FATURALANAN", ERROR_ONLY},
-        //    { "SANAYI_FATURALANAN", ERROR_ONLY},
-        //    { "TICARETHANE_FATURALANAN", ERROR_ONLY},
-        //    { "AYDINLATMA_FATURALANAN", ERROR_ONLY},
-        //    {"TARIMSAL_SULAMA_FATURALANAN",ERROR_ONLY },
-        //    {"KKO",WARNING_ONLY },
-        //    {"KKM",WARNING_ONLY },
-        //    { "PUANT_YAZ", ERROR_ONLY},
-        //    { "PUANT_KIŞ", ERROR_ONLY},
-        //    {"TOPLAM_DAGITILAN", WARNING_ONLY};
-        private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> negativeOrZeroLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
+        private int startYear;
+        private bool isDagıtılanİmputed;
+        
+        private readonly Dictionary<string, (float warningThreshold, 
+            float errorThreshold)> negativeOrZeroLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
-
+            
             {"YIL", ERROR_ONLY},
             {"MESKEN_FATURALANAN", ERROR_ONLY},
             {"MESKEN_ABONE_SAYISI", ERROR_ONLY},
@@ -50,20 +37,13 @@ namespace SLF
             {"KKO",ERROR_ONLY },
             {"KKM",ERROR_ONLY },
         };
-        private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> fiveYearsDataCheck = new Dictionary<string, (float warningThreshold, float errorThreshold)>
-{
+
+        private readonly Dictionary<string, (float warningThreshold, 
+            float errorThreshold)> fiveYearsDataCheck = new Dictionary<string, (float warningThreshold, float errorThreshold)>
+        {
             {"YIL", ERROR_ONLY},
-            {"GDP_GROWTH", ERROR_ONLY},
-            {"ULKE_NUFUS", ERROR_ONLY},
-            {"BOLGE_NUFUS", ERROR_ONLY},
-            //{"KKO", ERROR_ONLY},
-            //{"KKM", ERROR_ONLY},
-            //{"MESKEN_DAGITILAN", ERROR_ONLY},
-            //{"SANAYI_DAGITILAN", ERROR_ONLY},
-            //{"TICARETHANE_DAGITILAN", ERROR_ONLY},
-            //{"TARIMSAL_SULAMA_DAGITILAN", ERROR_ONLY},
-            //{"AYDINLATMA_DAGITILAN", ERROR_ONLY},
-            //{"TOPLAM_DAGITILAN", WARNING_ONLY},
+            {"GDP_BUYUME_ORANI", ERROR_ONLY},
+            {"ILCE_NUFUS", ERROR_ONLY},
             {"MESKEN_FATURALANAN", ERROR_ONLY},
             {"SANAYI_FATURALANAN", ERROR_ONLY},
             {"TICARETHANE_FATURALANAN", ERROR_ONLY},
@@ -76,8 +56,6 @@ namespace SLF
             {"TARIMSAL_SULAMA_ABONE_SAYISI", ERROR_ONLY},
             {"AYDINLATMA_ABONE_SAYISI", ERROR_ONLY},
             {"TOPLAM_ABONE_SAYISI", ERROR_ONLY},
-            //{"BOLGE_YAZ_PUANT", ERROR_ONLY},
-            //{"BOLGE_KIS_PUANT", ERROR_ONLY},
             {"GRP", ERROR_ONLY},
             {"GRP_TARIMSAL_URETIM", ERROR_ONLY},
             {"GRP_SANAYI_URETIM", ERROR_ONLY},
@@ -97,14 +75,11 @@ namespace SLF
             {"GDP_HIZMET_URETIM_%", ERROR_ONLY},
             {"GDP_INSAAT_URETIM_%", ERROR_ONLY},
             {"CDD", ERROR_ONLY},
-            {"HDD", ERROR_ONLY},
-            {"ULKE_NUFUS_%", ERROR_ONLY},
-            {"BOLGE_NUFUS_%", ERROR_ONLY},
-            {"EA_Talep", ERROR_ONLY},
-            {"DEK_Uretim", ERROR_ONLY},
-            {"Other", ERROR_ONLY}
-};
-        private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> dagıtılanCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
+            {"HDD", ERROR_ONLY}
+        };
+
+        private readonly Dictionary<string, (float warningThreshold, 
+            float errorThreshold)> dagıtılanCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
 
             { "MESKEN_DAGITILAN", WARNING_ONLY},
@@ -112,26 +87,24 @@ namespace SLF
             { "TICARETHANE_DAGITILAN", WARNING_ONLY},
             { "AYDINLATMA_DAGITILAN", WARNING_ONLY},
             {"TARIMSAL_SULAMA_DAGITILAN",WARNING_ONLY },
+
         };
-        private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> yearDetect = new Dictionary<string, (float warningThreshold, float errorThreshold)>
-        {
-            { "YIL", ERROR_ONLY},
-        };
+
+
         public readonly Dictionary<string, bool> setConvertPercentage = new Dictionary<string, bool>
-    {
-        { "GDP_GROWTH", true },
-        { "KKO", true },
-        { "GRP_TARIMSAL_URETIM_%", true },
-        { "GRP_SANAYI_URETIM_%", true },
-        { "GRP_HIZMET_URETIM_%", true },
-        { "GRP_INSAAT_URETIM_%", true },
-        { "GDP_TARIMSAL_URETIM_%", true },
-        { "GDP_SANAYI_URETIM_%", true },
-        { "GDP_HIZMET_URETIM_%", true },
-        { "GDP_INSAAT_URETIM_%", true },
-        { "ULKE_NUFUS_%", true },
-        { "BOLGE_NUFUS_%", true }
-    };
+        {
+            { "GDP_BUYUME_ORANI", true },
+            { "KKO", true },
+            { "GRP_TARIMSAL_URETIM_%", true },
+            { "GRP_SANAYI_URETIM_%", true },
+            { "GRP_HIZMET_URETIM_%", true },
+            { "GRP_INSAAT_URETIM_%", true },
+            { "GDP_TARIMSAL_URETIM_%", true },
+            { "GDP_SANAYI_URETIM_%", true },
+            { "GDP_HIZMET_URETIM_%", true },
+            { "GDP_INSAAT_URETIM_%", true }
+        };
+
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> loadPercentageIncreaseDetect = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
 
@@ -142,71 +115,12 @@ namespace SLF
             {"KKM",WARNING_ONLY },
         };
 
-        private bool isDagıtılanİmputed;
+
         public override void Preprocess()
         {
             isDagıtılanİmputed = false;
-
+            NormalizePercentageValues(currentDataTable); // Normalize percentage values
         }
-        private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> kkokkmDagCheck = new Dictionary<string, (float warningThreshold, float errorThreshold)>
-        {
-
-            {"TOPLAM_DAGITILAN", ERROR_ONLY},
-            {"KKO",WARNING_ONLY },
-            {"KKM",WARNING_ONLY },
-        };
-        //    private Dictionary<string, bool> GetPercentageColumns()
-        //    {
-        //        // Buraya yüzdelik gösterilmesi gereken sütunlarınızı ekleyin
-        //        return new Dictionary<string, bool>
-        //{
-        //    { "KKO", true },
-        //    { "GDP_GROWTH", true },
-        //    { "GRP_TARIMSAL_URETIM_%", true },
-        //    { "GRP_SANAYI_URETIM_%", true },
-        //    { "GRP_HIZMET_URETIM_%", true },
-        //    { "GRP_INSAAT_URETIM_%", true },
-        //    { "GDP_TARIMSAL_URETIM_%", true },
-        //    { "GDP_SANAYI_URETIM_%", true },
-        //    { "GDP_HIZMET_URETIM_%", true },
-        //    { "GDP_INSAAT_URETIM_%", true },
-        //    { "ULKE_NUFUS_%", true },
-        //    { "BOLGE_NUFUS_%n%", true },
-        //    // Diğer sütunlarınızı da buraya ekleyebilirsiniz
-        //};
-        //    }
-        //private void ReportNullCounts()
-        //{
-        //    float nullPercentage = 0.0f;
-        //    int totalRows = currentDataTable.Rows.Count;
-        //    foreach (DataColumn column in currentDataTable.Columns)
-        //    {
-        //        if (!nullFieldsCheckWithLevel.ContainsKey(column.ColumnName))
-        //        {
-        //            continue;
-        //        }
-        //        List<int> nullRows = new List<int>();
-        //        int nullCount = 0;
-        //        for (int i = 0; i < totalRows; i++)
-        //        {
-        //            var row = currentDataTable.Rows[i];
-        //            if (IsNullLike(row[column]))
-        //            {
-        //                nullCount++;
-        //            }
-        //        }
-        //        columnNullRowsMap[column.ColumnName] = nullRows;
-        //        nullPercentage = (float)nullCount / totalRows;
-        //        if (nullPercentage > 0)
-        //        {
-        //            var thresholds = nullFieldsCheckWithLevel[column.ColumnName];
-        //            var datatableLevel = GetDataTableBasedOnThreshold(nullPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
-        //            datatableLevel.Rows.Add(new object[] {
-        //                column.ColumnName, "boş olan veriler doldurulmalı !", $"{nullPercentage:P1}"
-        //            });
-        //        }
-        //    }
-        //}
 
         private void ReportDagıtılanCounts()
         {
@@ -228,6 +142,7 @@ namespace SLF
                         nullCount++;
                     }
                 }
+                
                 columnNullRowsMap[column.ColumnName] = nullRows;
                 nullPercentage = (float)nullCount / totalRows;
                 if (nullPercentage > 0)
@@ -235,7 +150,7 @@ namespace SLF
                     var thresholds = dagıtılanCheckWithLevel[column.ColumnName];
                     var datatableLevel = GetDataTableBasedOnThreshold(nullPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
                     datatableLevel.Rows.Add(new object[] {
-                        column.ColumnName, "bu datalar faturalanan güç değelerine göre düzenlecektir!", $"{nullPercentage:P1}"
+                        column.ColumnName, "Eksik tüketim verileri mevcutsa faturalanan güç değerlerine göre düzenlecektir!", $"{nullPercentage:P1}"
                     });
                 }
             }
@@ -269,20 +184,12 @@ namespace SLF
                     var thresholds = negativeOrZeroLevel[column.ColumnName];
                     var datatableLevel = GetDataTableBasedOnThreshold(negativeOrZeroPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
                     datatableLevel.Rows.Add(new object[] {
-                column.ColumnName, "negatif veya sıfır olan veriler pozitif olmalı !", $"{negativeOrZeroPercentage:P1}"
+                column.ColumnName, "Negatif veya sıfır olan veriler pozitif olmalı!", $"{negativeOrZeroPercentage:P1}"
             });
                 }
             }
         }
-        //private string ConvertToPercentageIfNeeded(string columnName, double value, Dictionary<string, bool> percentageColumns)
-        //{
-        //    // Eğer bu sütun yüzde gösterilmesi gerekenler arasında varsa yüzde formatına çeviriyoruz
-        //    if (percentageColumns.ContainsKey(columnName) && percentageColumns[columnName])
-        //    {
-        //        return (value * 100).ToString("0.00") + " %"; // Yüzde formatına çevir ve % işareti ekle
-        //    }
-        //    return value.ToString("0.00"); // Yüzde değilse sadece sayısal formatta göster
-        //}
+
         private bool IsNegativeOrZero(object value) // girdimödülüne eklenebilir private degistirilip string to number etc 
         {
             if (value is DBNull || value == null)
@@ -314,52 +221,13 @@ namespace SLF
             }
             return false;
         }
-        //private void CheckConsecutiveYears() // yılların ardısıklık kontrolu
-        //{
 
-        //    List<int> years = new List<int>();
-        //    int totalRows = currentDataTable.Rows.Count;
-        //    string yearColumnName = "YIL";
-        //    for (int i = 0; i < totalRows; i++)
-        //    {
-        //        var row = currentDataTable.Rows[i];
-        //        if (int.TryParse(row[yearColumnName].ToString(), out int year))
-        //        {
-        //            years.Add(year);
-        //        }
-        //    }
-        //    years.Sort(); 
-        //    if (years.Count < 5)
-        //    {     
-        //        return;
-        //    }
-        //    bool areConsecutive = true;
-        //    for (int i = 1; i < years.Count; i++)
-        //    {
-        //        if (years[i] != years[i - 1] + 1)
-        //        {
-        //            areConsecutive = false;
-        //            break;
-        //        }
-        //    }
-        //    if (areConsecutive)
-        //    {
-        //        return;
-        //    }
-        //    else
-        //    {
-        //        var thresholds = yearDetect[yearColumnName];
-        //        float nullDataPercentage = 0 / totalRows; //  tartısılabilir ? ama zaten ustteki nulcheckte bakılıyor ve bosluk oranı soyleniyor
-        //        var datatableLevel = GetDataTableBasedOnThreshold(nullDataPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
-        //        datatableLevel.Rows.Add(new object[] {
-        //        yearColumnName, "Yıllar ardışık değil veya en az 5 yıl değil.","","doldurulmalı" });
-        //    }
-        //}
         private void CheckDataCompleteness(int slfStartYear)
         {
             int startYear = slfStartYear - 1;  // slfStartYear 2024 ise başlangıç yılı 2023 olacak
             List<int> yearsToCheck = Enumerable.Range(startYear - 4, 5).ToList();  // [2023, 2022, 2021, 2020, 2019]
 
+            // Eksik veri ve hatalı veri olan yılları ve hata mesajlarını tutacak yapı
             Dictionary<int, List<string>> missingDataErrors = new Dictionary<int, List<string>>();
 
             foreach (DataColumn column in currentDataTable.Columns)
@@ -377,20 +245,12 @@ namespace SLF
                 for (int i = 0; i < totalRows; i++)
                 {
                     var row = currentDataTable.Rows[i];
+                    int year = Convert.ToInt32(row["YIL"]);
 
-                    // YIL sütununda dönüştürme yapılırken TryParse kullan
-                    if (int.TryParse(row["YIL"]?.ToString(), out int year))
+                    // Eğer yıl, slfStartYear ve 5 yıllık aralık içinde değilse kontrol etme
+                    if (!yearsToCheck.Contains(year))
                     {
-                        // Eğer yıl, slfStartYear ve 5 yıllık aralık içinde değilse kontrol etme
-                        if (!yearsToCheck.Contains(year))
-                        {
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"YIL sütunu hatalı formatta: {row["YIL"]}");
-                        continue; // Eğer dönüşüm başarısızsa, bu satırı geç
+                        continue;
                     }
 
                     // Eğer sütun değeri null veya boş ise null satırlar listesine ekle
@@ -401,10 +261,13 @@ namespace SLF
                     }
                 }
 
+                // Boş satırları map'e ekle
                 columnNullRowsMap[column.ColumnName] = nullRows;
 
+                // Boş veri yüzdesini hesapla
                 float nullPercentage = (float)nullCount / yearsToCheck.Count;
 
+                // Eğer yüzde sıfırdan büyükse, eşikleri kontrol et ve uygun mesajı ekle
                 if (nullPercentage > 0)
                 {
                     var thresholds = fiveYearsDataCheck[column.ColumnName];
@@ -437,10 +300,10 @@ namespace SLF
                 float overDecreaseCount = 0.0f;
                 float kkoImpute = 0.0f;
 
-                        for (int i = 1; i < totalRows; i++)
-                        {
-                            var previousRow = currentDataTable.Rows[i - 1];
-                            var row = currentDataTable.Rows[i];
+                for (int i = 1; i < totalRows; i++)
+                {
+                    var previousRow = currentDataTable.Rows[i - 1];
+                    var row = currentDataTable.Rows[i];
 
                     // Sütunun değeri DBNull değilse işlemi devam ettir
                     if (!IsNullLike(row[column]) && !IsNullLike(previousRow[column]))
@@ -504,7 +367,7 @@ namespace SLF
                     string increaseYilValues = string.Join(", ", increaseYearRows);
                     statDataTable.Rows.Add(new object[]
                     {
-                column.ColumnName, "%10 artış gözlemlendi UYARI", increaseYilValues, "VERİNİN DOĞRULUĞUNDAN EMİN OLUNMALI!!"
+                        column.ColumnName, "%10 artış gözlemlendi UYARI", increaseYilValues, "VERİNİN DOĞRULUĞUNDAN EMİN OLUNMALI!!"
                     });
                 }
 
@@ -517,7 +380,7 @@ namespace SLF
                         string decreaseYilValues = string.Join(", ", decreaseYearRows);
                         statDataTable.Rows.Add(new object[]
                         {
-                    column.ColumnName, "Yıldan yıla kayıp kaçak oranı %50'den fazla UYARI!!", decreaseYilValues, "VERİNİN DOĞRULUĞUNDAN EMİN OLUNMALI!!"
+                            column.ColumnName, "Yıldan yıla kayıp kaçak oranı %50'den fazla UYARI!!", decreaseYilValues, "VERİNİN DOĞRULUĞUNDAN EMİN OLUNMALI!!"
                         });
                     }
                 }
@@ -530,74 +393,13 @@ namespace SLF
                         string kkoYilValues = string.Join(", ", kkoLowYearRows);
                         WarningDataTable.Rows.Add(new object[]
                         {
-                    column.ColumnName, "KKO oranı %5'ten küçük, %5 referans alınarak devam edilecektir", kkoYilValues, "VERİNİN DOĞRULUĞUNDAN EMİN OLUNMALI!!"
+                            column.ColumnName, "KKO oranı %5'ten küçük, %5 referans alınarak devam edilecektir", kkoYilValues, "VERİNİN DOĞRULUĞUNDAN EMİN OLUNMALI!!"
                         });
                     }
                 }
             }
         }
 
-
-        //private void CheckAndReportMissingFields()
-        //{
-        //    int totalRows = currentDataTable.Rows.Count;
-        //    List<int> problematicRows = new List<int>();
-
-        //    for (int i = 0; i < totalRows; i++)
-        //    {
-        //        var row = currentDataTable.Rows[i];
-        //        bool hasValidField = false;
-
-        //        foreach (var field in kkokkmDagCheck.Keys)
-        //        {
-        //            if (!IsNullLike(row[field]))
-        //            {
-        //                hasValidField = true;
-        //                break;
-        //            }
-        //        }
-
-        //        if (!hasValidField)
-        //        {
-        //            problematicRows.Add(i);
-        //        }
-        //    }
-
-        //    if (problematicRows.Count > 0)
-        //    {
-        //        float missingPercentage = (float)problematicRows.Count / totalRows;
-
-        //        foreach (var kvp in kkokkmDagCheck)
-        //        {
-        //            string fieldName = kvp.Key;
-        //            var thresholds = kvp.Value;
-
-        //            DataTable reportTable = GetDataTableBasedOnThreshold(missingPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
-
-        //            if (reportTable != null)
-        //            {
-        //                reportTable.Rows.Add(new object[] {
-        //            fieldName,
-        //            $"{fieldName} alanı veya diğer ilgili alanlar (TICARETHANE_DAGITILAN, KKO, KKM) eksik!",
-        //            $"{missingPercentage:P1}"
-        //        });
-        //            }
-        //        }
-        //    }
-        //}
-
-        //private DataTable GetDataTableBasedOnThreshold(float percentage, float warningThreshold, float errorThreshold)
-        //{
-        //    if (percentage >= errorThreshold)
-        //    {
-        //        return errorDataTable;
-        //    }
-        //    else if (percentage >= warningThreshold)
-        //    {
-        //        return warningDataTable;
-        //    }
-        //    return null;
-        //}
         private void CheckAndReportKkoKkmDag(int slfStartYear)
         {
             List<int> problematicRows = new List<int>();
@@ -739,22 +541,10 @@ namespace SLF
                         row[kkm] = kkmValue;
                     }
 
-
-                    // KKO'yu yüzde formatında göstermek
-                    //if (!IsNullLike(row[kko]))
-                    //{
-                    //    double kkoValue;
-                    //    if (TryParseToDouble(row[kko], out kkoValue))
-                    //    {
-                    //        row[kko] = ConvertToPercentage(kkoValue); // Yüzdeye çeviriyoruz
-                    //    }
                 }
             }
         }
-        //private double ConvertToPercentage(double value)
-        //{
-        //    return value * 100; // Sayısal değeri yüzdelik değere çevirmek için 100 ile çarpıyoruz
-        //}
+
         private bool TryParseToDouble(object value, out double result)
         {
             result = 0;
@@ -764,6 +554,8 @@ namespace SLF
             }
             return double.TryParse(value.ToString(), out result);
         }
+
+
         public void ImputeDagıtılan() // Dağıtılan kısımlarının imputasyonu
         {
             int totalRows = currentDataTable.Rows.Count;
@@ -815,53 +607,28 @@ namespace SLF
 
             isDagıtılanİmputed = true;
         }
-        //public void FormatDataTablePercentages()
-        //{
-        //    // DataTable'ın her bir satırını dolaş
-        //    foreach (DataRow row in currentDataTable.Rows)
-        //    {
-        //        // Sütunlar arasında gezin
-        //        foreach (DataColumn column in currentDataTable.Columns)
-        //        {
-        //            var columnName = column.ColumnName;
-
-        //            // Eğer sütun yüzde formatında gösterilmesi gereken sütunlardansa
-        //            if (setConvertPercentage.ContainsKey(columnName))
-        //            {
-        //                // Hücre değerini kontrol et
-        //                if (double.TryParse(row[columnName]?.ToString(), out double value))
-        //                {
-        //                    // Yüzdelik formatına çeviriyoruz (% işareti ile)
-        //                    row[columnName] = (value * 100).ToString("0.00") + " %";
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
 
         //excelde kaldım
         public override void Validate()
         {
             base.Validate();
-            //ReportNullCounts();
             NegativeOrZeroDetect();
-            //CheckConsecutiveYears();
-            //CheckBetweenDagıtılanAndKayip();
 
             CheckAndReportKkoKkmDag(slfStartYear);
             CheckDataCompleteness(slfStartYear);
             CheckPercentageIncreaseLoadSanayiTicarethaneFaturalanan();
             ReportDagıtılanCounts();
         }
+
+        protected override HashSet<string> GetPercentageColumns()
+        {
+            return new HashSet<string>(setConvertPercentage.Keys);
+        }
+
         public override void Impute()
         {
             ImputeKkmKkoDag();
             ImputeDagıtılan();
-            //FormatDataTablePercentages();
-            string filePath = @"C:\Users\batuhan.yetis\MRC\MRC - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\09_Alinan Veriler\GDZ\Ekonometrik Yük Tahmini Verileri\Arşiv\INPUT_FILE.xlsx"; // Excel dosyasının tam yolu
-            ExcelExporter exporter = new ExcelExporter();
-            exporter.UpdateExcelFileFirstSheet(filePath, currentDataTable);
         }
     }
 }
-

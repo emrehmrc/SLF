@@ -31,8 +31,9 @@ namespace SLF
             DataGridViewRow selectedRow = attribute_table.SelectedRows[0];
             int rowIndex = Convert.ToInt32(selectedRow.Cells["RowIndex"].Value);
 
+            // If RowIndex is populated from Row_No (1-based), we don't need to adjust since ZoomToFeature now expects Row_No
             // Call the parent form's method to zoom to the feature
-            parentForm.ZoomToFeature(rowIndex);
+            parentForm.ZoomToFeature(rowIndex); // Adjust to 0-based if RowIndex is 1-based like Row_No
         }
     }
 }

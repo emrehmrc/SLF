@@ -2,7 +2,7 @@
 using System;
 using System.Data;
 
-namespace SLF.services
+namespace SLF.Services
 {
     public class DatabaseManager
     {

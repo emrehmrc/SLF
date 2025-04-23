@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Windows.Forms;
-using Newtonsoft.Json;
-
+using System.IO;
+using System.Reflection;
 
 namespace SLF
 {
@@ -33,7 +34,7 @@ namespace SLF
                 "MRC\\MRC - 1.1.3_T&SI\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\İzmir\\Program Dosyaları\\config.json").Replace("/", "\\");
 
             // read the json file and create the "config" variable.
-            json_file = File.ReadAllText(config_path);
+            json_file = File.ReadAllText(config_path);        
             config = JsonConvert.DeserializeObject(json_file);
         }
         

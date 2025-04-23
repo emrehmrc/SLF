@@ -285,6 +285,10 @@
     <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.IO.RecyclableMemoryStream.3.0.0\lib\netstandard2.0\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Office.Interop.Excel.15.0.4795.1000\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.2957.106, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Web.WebView2.1.0.2957.106\lib\net462\Microsoft.Web.WebView2.Core.dll</HintPath>
     </Reference>
@@ -591,12 +595,24 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bekle_Formu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Bekle_Formu.Designer.cs">
+      <DependentUpon>Bekle_Formu.cs</DependentUpon>
+    </Compile>
     <Compile Include="AboneVerileri.cs" />
     <Compile Include="Ana_Menü.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Ana_Menü.Designer.cs">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ChargingStationPopupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChargingStationPopupForm.Designer.cs">
+      <DependentUpon>ChargingStationPopupForm.cs</DependentUpon>
     </Compile>
     <Compile Include="DatabaseListForm.cs">
       <SubType>Form</SubType>
@@ -628,18 +644,25 @@
     <Compile Include="Poligon Özellik Tanımlama.Designer.cs">
       <DependentUpon>Poligon Özellik Tanımlama.cs</DependentUpon>
     </Compile>
+    <Compile Include="PoligonOznitelikForm.cs" />
     <Compile Include="ProjectFolderPicker.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ProjectFolderPicker.Designer.cs">
       <DependentUpon>ProjectFolderPicker.cs</DependentUpon>
     </Compile>
-    <Compile Include="services\DatabaseHelpers.cs" />
-    <Compile Include="services\DatabaseManager .cs" />
-    <Compile Include="services\IsImportedModule.cs" />
-    <Compile Include="services\PathService.cs" />
-    <Compile Include="services\PythonHelper.cs" />
-    <Compile Include="services\YearService.cs" />
+    <Compile Include="ReportTableForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ReportTableForm.Designer.cs">
+      <DependentUpon>ReportTableForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Services\ControlExtensions.cs" />
+    <Compile Include="Services\DatabaseHelpers.cs" />
+    <Compile Include="Services\DatabaseManager .cs" />
+    <Compile Include="Services\PathService.cs" />
+    <Compile Include="Services\PythonHelper.cs" />
+    <Compile Include="Services\YearSet.cs" />
     <Compile Include="Tablo_olustur.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -673,12 +696,6 @@
     <Compile Include="MethodForm.Designer.cs">
       <DependentUpon>MethodForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MonteCarloScreen.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MonteCarloScreen.Designer.cs">
-      <DependentUpon>MonteCarloScreen.cs</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -686,7 +703,6 @@
     </Compile>
     <Compile Include="YeniProjelendirilmisDTR.cs" />
     <Compile Include="EnerjiMusaadeleri.cs" />
-    <Compile Include="TMVerileri.cs" />
     <Compile Include="Fider Verileri.cs" />
     <Compile Include="EkonometrikYukTahminiModulu.cs" />
     <Compile Include="DEKModulu.cs" />
@@ -751,8 +767,14 @@
     <Compile Include="Önizleme.Designer.cs">
       <DependentUpon>Önizleme.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Bekle_Formu.resx">
+      <DependentUpon>Bekle_Formu.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Ana_Menü.resx">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ChargingStationPopupForm.resx">
+      <DependentUpon>ChargingStationPopupForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DatabaseListForm.resx">
       <DependentUpon>DatabaseListForm.cs</DependentUpon>
@@ -771,6 +793,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectFolderPicker.resx">
       <DependentUpon>ProjectFolderPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ReportTableForm.resx">
+      <DependentUpon>ReportTableForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Tablo_olustur.resx">
       <DependentUpon>Tablo_olustur.cs</DependentUpon>
@@ -805,9 +830,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="MethodForm.resx">
       <DependentUpon>MethodForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="MonteCarloScreen.resx">
-      <DependentUpon>MonteCarloScreen.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -848,6 +870,7 @@
     <None Include="CBS\SLF\ÇİĞLİ KARŞIYAKA REKORTMAN VERİSİ\REKORTMAN.MAP" />
     <None Include="CBS\SLF\ÇİĞLİ KARŞIYAKA REKORTMAN VERİSİ\REKORTMAN.TAB" />
     <None Include="CBS\SLF\ÇİĞLİ KARŞIYAKA REKORTMAN VERİSİ\REKORTMAN_kars_cigli.csv" />
+    <None Include="config.json" />
     <None Include="docs\VEER.md" />
     <None Include="Excel Files\Point Load Karakteristikleri\point_load.xlsx" />
     <None Include="Excel Files\SLF Sonuçları\SONUCLAR.xlsx" />

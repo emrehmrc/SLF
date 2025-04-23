@@ -13,7 +13,7 @@ namespace SLF
 
     internal class ExcelExporter
     {
-        
+
         public void ExportExcelFileWithMultipleSheets(string filePath, List<DataTable> dataTables, List<string> sheetNames)
         {
             if (dataTables == null || sheetNames == null || dataTables.Count != sheetNames.Count)
@@ -62,6 +62,7 @@ namespace SLF
 
                     package.SaveAs(file); // CHECK THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+
                     MessageBox.Show("Dosya başarıyla kaydedildi.", "Dosya Kaydedildi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (InvalidOperationException)
@@ -80,6 +81,7 @@ namespace SLF
         public void UpdateExcelFileFirstSheet(string filePath, DataTable dataTable) // excel formullu sayfa güncellemeleri yapılabilir .
         {
             FileInfo file = new FileInfo(filePath);
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Add this line
 
             using (ExcelPackage package = new ExcelPackage(file))
             {
@@ -122,7 +124,7 @@ namespace SLF
 
                     // Dosyayı kaydet
                     package.Save();
-                    Console.WriteLine("Excel dosyası başarıyla güncellendi.");
+
                 }
                 catch (Exception ex)
                 {

@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SLF.Services;
 
-namespace SLF.services
+namespace SLF.Services
 {
     public static class PythonHelper
     {
