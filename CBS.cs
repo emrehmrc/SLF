@@ -4,7 +4,6 @@ using MapWinGIS;
 using NetTopologySuite.IO;
 using SharpKml.Base;
 using SharpKml.Dom;
-using SharpKml.Engine;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -14,26 +13,37 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GMap.NET.WindowsForms.Markers;
-using DocumentFormat.OpenXml.Wordprocessing;
-using Font = System.Drawing.Font;
+using System.Globalization;
+using System.Xml.Linq;
 
 namespace SLF
 {
     public class CBS
     {
+        // the main index to use within the arrays and the associated checkboxes
         public int layer_index;
-        public GMapOverlay[] tüm_katmanlar_array;
-        public List<PointLatLng> abone_listesi;  //b------------------------------------------
-        public string[] tüm_katmanlar_array_names;
-        public MapWinGIS.Shapefile[] shapeFileArray_MapWinGIS; // for conversions and built-in formulas only.
-        public System.Data.DataTable[] tüm_katmanlar_datatable;
+
+        private Dictionary<string, Color> currentImarTipiColorMap; // Stores the color mapping for the current KML file
+
+        // GMapOverlay arrays, one per map:
+        public GMapOverlay[] tüm_katmanlar_array_imar = new GMapOverlay[15];
+        public GMapOverlay[] tüm_katmanlar_array_yuk = new GMapOverlay[15];
+
+        public string[] tüm_katmanlar_array_names = new string[15];
+        public System.Data.DataTable[] tüm_katmanlar_datatable = new DataTable[15];
+
+        public MapWinGIS.Shapefile[] shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[15];
+
 
         // see the attributes of a polygon when clicked on it on the map 
-        public Dictionary<GMapPolygon, DataRow> polygonAttributes; // for polygons other than grids
+        public Dictionary<GMapPolygon, DataRow> polygonAttributes_imar;
+        public Dictionary<GMapPolygon, DataRow> polygonAttributes_yuk;
 
         // variables that are to be used to export .kml files
         public Dictionary<GMapPolygon, DataRow> polygonAttributes_kml;
         public Dictionary<GMapRoute, DataRow> routeAttributes_kml;
+
+        public string imported_filename;
 
 
         // ---------- GRID VARIABLES  --------- //
@@ -44,9 +54,8 @@ namespace SLF
         public bool isSelecting_grid = false;
         public PointLatLng starting_point;
         public PointLatLng ending_point;
-        // ------------------------------------//
 
-        public List<PointLatLng> polygonPoints_stokastik;
+        // ------------------------------------//
         private GMapPolygon selectedPolygon;
 
         public Dictionary<NetTopologySuite.Geometries.Polygon, DataRow> polygonAttributes_grid; // for polygons of grids
@@ -60,22 +69,16 @@ namespace SLF
         public string userProfilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         public string targetDirectory;
 
-        public CBS(ModülFormu mainform)
+        public CBS (ModülFormu mainform)
         {
             this.modülFormu = mainform;
 
-            // Initialize the arrays and other components
-            tüm_katmanlar_array_names = new string[13];
-            tüm_katmanlar_array = new GMapOverlay[13];
-            shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[13];
-            tüm_katmanlar_datatable = new System.Data.DataTable[13];
-
+            // define a directory to be opened first in the file dialog screens
             targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
 
-            polygonAttributes = new Dictionary<GMapPolygon, DataRow>();
+            polygonAttributes_imar = new Dictionary<GMapPolygon, DataRow>();
+            polygonAttributes_yuk = new Dictionary<GMapPolygon, DataRow>();
             polygonAttributes_grid = new Dictionary<NetTopologySuite.Geometries.Polygon, DataRow>();
-
-            polygonPoints_stokastik = new List<PointLatLng>();
         }
 
 
@@ -148,24 +151,36 @@ namespace SLF
 
 
         //-----------------------------------------------------------------------------//
+        // helper method to find the first available slot in the arrays
 
-
-        public async Task cbs_dosya_secimi(GMapControl gmapcontrol, Form callingForm, DataGridView dataGridView)
+        private int FindFirstFreeLayerIndex()
         {
-            // Find the first available slot in the array that holds shapefile overlay layers
-            layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
+            for (int i = 0; i < 15; i++)
+            {
+                // If all four overlays at index i are null, that means it’s free
+                if (tüm_katmanlar_array_imar[i] == null && tüm_katmanlar_array_yuk[i] == null)
+                {
+                    return i;
+                }
+            }
+            return -1; // none free
+        }
+
+
+        public async Task cbs_dosya_secimi(GMapControl callingMap, Form callingForm, DataGridView dataGridView)
+        {
+            layer_index = FindFirstFreeLayerIndex();
 
             if (layer_index == -1)
             {
-                MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
+                MessageBox.Show("En fazla 15 adet katman seçilebilmektedir.");
                 return;
             }
 
-            // file dialog to select a file to import
             OpenFileDialog vektorel_veri_seçimi = new OpenFileDialog();
 
             string targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
-            vektorel_veri_seçimi.Filter = "Shapefile|*.shp|Google Earth File|*.kml|CSV File|*.csv";
+            vektorel_veri_seçimi.Filter = "Shapefile|*.shp|Google Earth File|*.kml";
             vektorel_veri_seçimi.InitialDirectory = targetDirectory;
 
             DialogResult result = vektorel_veri_seçimi.ShowDialog();
@@ -173,203 +188,174 @@ namespace SLF
             if (result == DialogResult.OK)
             {
                 string filepath = vektorel_veri_seçimi.FileName;
-                string filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
-                string extension = filename.Substring(filename.Length - 3);
+                imported_filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
+                string extension = imported_filename.Substring(imported_filename.Length - 3);
 
-                if (extension == "shp")
+                GMapOverlay overlay_imar = new GMapOverlay($"overlay_{layer_index + 1}_imar");
+                GMapOverlay overlay_yuk = new GMapOverlay($"overlay_{layer_index + 1}_yuk");
+
+                modülFormu.gMapControl_imar.Overlays.Add(overlay_imar);
+                modülFormu.gMapControl_yuk.Overlays.Add(overlay_yuk);
+
+                DataTable dt = new DataTable();
+                callingForm.Cursor = Cursors.WaitCursor;
+
+                try
                 {
-                    // create a new layer to be added onto the map
-                    GMapOverlay shapeFileOverlay_imar = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_imar");
-                    GMapOverlay shapeFileOverlay_yuk = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_yuk");
-                    GMapOverlay shapeFileOverlay_stokastik = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_stokastik");
-                    GMapOverlay shapeFileOverlay_yga = new GMapOverlay($"shapeFileOverlay_{layer_index + 1}_yga");
-
-                    modülFormu.gMapControl_imar.Overlays.Add(shapeFileOverlay_imar);
-                    modülFormu.gMapControl_yuk.Overlays.Add(shapeFileOverlay_yuk);
-                    modülFormu.gMapControl_stokastik.Overlays.Add(shapeFileOverlay_stokastik);
-                    modülFormu.gMapControl_yga.Overlays.Add(shapeFileOverlay_yga);
-
-                    // create a new datatable to be added to the tüm_katmanlar_datatable array
-                    System.Data.DataTable shapefile_datatable = new System.Data.DataTable();
-
-                    // run the import method
-                    callingForm.Cursor = Cursors.WaitCursor;
-                    await LoadShapefile(filepath, shapeFileOverlay_imar, shapefile_datatable, dataGridView);
-                    callingForm.Cursor = Cursors.Default;
-
-                    // Duplicate the polygons and routes from shapeFileOverlay_imar into each new overlay
-                    CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_yuk);
-                    CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_stokastik);
-                    CopyOverlayContents(shapeFileOverlay_imar, shapeFileOverlay_yga);
-                    // Assign the appropriate overlay based on the layer index
-                    // Assuming you have a mapping between layer indices and overlays
-
-                    // add the layer and its name to the specified arrays
-                    //tüm_katmanlar_array[layer_index] = shapeFileOverlay_imar;
-                    // Assign the overlay for the current layer index across all modules
-                    /*                    switch (layer_index)
-                                        {
-                                            case int idx when idx >= 0 && idx < tüm_katmanlar_array.Length:
-                                                // Assign overlays for the current layer index
-                                                tüm_katmanlar_array[layer_index] = shapeFileOverlay_imar;
-                                                tüm_katmanlar_array[layer_index] = shapeFileOverlay_stokastik; // Stokastik layer
-                                                tüm_katmanlar_array[layer_index] = shapeFileOverlay_yga; // YGA layer
-                                                System.Diagnostics.Debug.WriteLine($"Assigned overlays for layer index: {layer_index}");
-                                                break;
-
-                                            default:
-                                                System.Diagnostics.Debug.WriteLine($"Invalid layer index: {layer_index}");
-                                                break;
-                                        }
-                    */
-                    if (layer_index >= 0 && layer_index < tüm_katmanlar_array.Length)
+                    if (extension == "shp")
                     {
-                        // Create an array of overlays to assign
-                        GMapOverlay[] overlays = { shapeFileOverlay_imar, shapeFileOverlay_stokastik, shapeFileOverlay_yga };
+                        await LoadShapefile(filepath, overlay_imar, dt, dataGridView);
+                        callingForm.Cursor = Cursors.Default;
 
-                        // Loop through overlays and assign them to the array
-                        for (int i = 0; i < overlays.Length; i++)
-                        {
-                            tüm_katmanlar_array[layer_index] = overlays[i];
-                            System.Diagnostics.Debug.WriteLine($"Assigned overlay {overlays[i].Id} to layer index: {layer_index}");
-                        }
+                        CopyOverlayContents(overlay_imar, overlay_yuk, polygonAttributes_imar, polygonAttributes_yuk);
                     }
-                    else
+                    else if (extension == "kml")
                     {
-                        System.Diagnostics.Debug.WriteLine($"Invalid layer index: {layer_index}");
+                        await LoadKmlFile(filepath, overlay_imar, dt, callingMap);
+
+                        CopyOverlayContents(overlay_imar, overlay_yuk, polygonAttributes_imar, polygonAttributes_yuk);
                     }
 
-                    tüm_katmanlar_array_names[layer_index] = filename;
-                    tüm_katmanlar_datatable[layer_index] = shapefile_datatable;
-                    List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
+                    tüm_katmanlar_array_imar[layer_index] = overlay_imar;
+                    tüm_katmanlar_array_yuk[layer_index] = overlay_yuk;
 
-                    if (associatedCheckBoxes != null)
+                    tüm_katmanlar_datatable[layer_index] = dt;
+                    tüm_katmanlar_array_names[layer_index] = imported_filename;
+
+                    List<CheckBox> associatedChecks = modülFormu.GetCheckBoxesByIndex(layer_index);
+                    foreach (var chk in associatedChecks)
                     {
-                        foreach (var checkBox in associatedCheckBoxes)
-                        {
-                            checkBox.Text =  tüm_katmanlar_array_names[layer_index];
-                            Console.WriteLine(checkBox.Text);
-                            // Apply common settings for checkboxes
-                            checkBox.Checked = true;
-                            checkBox.Visible = true;
-                        }
+                        chk.Text = imported_filename;
+                        chk.Visible = true;
+                        chk.Checked = true;
+                        chk.ForeColor = overlayColors[layer_index].BorderColor;
                     }
 
-                    /*                    // Get the list of associated checkboxes for the given layer_index
-                                        List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
+                    // Mark all categories for update
+                    modülFormu.pendingUpdates["imar"] = true;
+                    modülFormu.pendingUpdates["yuk"] = true;
 
-                                        if (associatedCheckBoxes != null)
-                                        {
-                                            // Loop through each checkbox in the list and apply the required settings
-                                            foreach (var checkBox in associatedCheckBoxes)
-                                            {
-                                                checkBox.Checked = true;
-                                                checkBox.Visible = true;
-                                                checkBox.Text = tüm_katmanlar_array_names[layer_index];
-                                            }
-                                        }*/
+                    // Update only the active tab immediately
+                    modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_imar, "imar");
+                    modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_yuk, "yuk");
 
-                    //LoadShapefileIntoOverlay(shapeFileOverlay_imar, tüm_katmanlar_datatable[0]);
+                    // Zoom to the center of the layer
+                    ZoomToLayerCenter(overlay_imar, modülFormu.gMapControl_imar, modülFormu.gMapControl_yuk);
                 }
-                else if (extension == "kml")
+                finally
                 {
-                    GMapOverlay kmlOverlay_imar = new GMapOverlay($"kmlOverlay_{layer_index + 1}_imar");
-                    GMapOverlay kmlOverlay_yuk = new GMapOverlay($"kmlOverlay_{layer_index + 1}_yuk");
-                    GMapOverlay kmlOverlay_stokastik = new GMapOverlay($"kmlOverlay_{layer_index + 1}_stokastik");
-                    GMapOverlay kmlOverlay_yga = new GMapOverlay($"kmlOverlay_{layer_index + 1}_yga");
-
-                    modülFormu.gMapControl_imar.Overlays.Add(kmlOverlay_imar);
-                    modülFormu.gMapControl_yuk.Overlays.Add(kmlOverlay_yuk);
-                    modülFormu.gMapControl_stokastik.Overlays.Add(kmlOverlay_stokastik);
-                    modülFormu.gMapControl_yga.Overlays.Add(kmlOverlay_yga);
-
-                    System.Data.DataTable kml_datatable = new System.Data.DataTable();
-                    callingForm.Cursor = Cursors.WaitCursor;
-                    await LoadKmlFile(filepath, kmlOverlay_imar, kml_datatable, gmapcontrol);
-
-                    tüm_katmanlar_array[layer_index] = kmlOverlay_imar;
-                    tüm_katmanlar_array_names[layer_index] = filename;
-                    tüm_katmanlar_datatable[layer_index] = kml_datatable;
-
-                    // convert .kml overlay into a MapWinGIS.Shapefile object
-                    polygonAttributes_kml = new Dictionary<GMapPolygon, DataRow>();
-                    routeAttributes_kml = new Dictionary<GMapRoute, DataRow>();
-                    MapWinGIS.Shapefile shapefile = ConvertKmlToShapefile(kmlOverlay_imar);
-                    shapeFileArray_MapWinGIS[layer_index] = shapefile;
-
-                    // Duplicate the polygons and routes from shapeFileOverlay_imar into each new overlay
-                    CopyOverlayContents(kmlOverlay_imar, kmlOverlay_yuk);
-                    CopyOverlayContents(kmlOverlay_imar, kmlOverlay_stokastik);
-                    CopyOverlayContents(kmlOverlay_imar, kmlOverlay_yga);
-
                     callingForm.Cursor = Cursors.Default;
-
-                    // Get the list of associated checkboxes for the given layer_index
-                    List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
-
-                    if (associatedCheckBoxes != null)
-                    {
-                        // Loop through each checkbox in the list and apply the required settings
-                        foreach (var checkBox in associatedCheckBoxes)
-                        {
-                            checkBox.Checked = true;
-                            checkBox.Visible = true;
-                            checkBox.Text = tüm_katmanlar_array_names[layer_index];
-                        }
-                    }
                 }
+
+                modülFormu.gMapControl_imar.Refresh();
+                modülFormu.gMapControl_yuk.Refresh();
             }
-            gmapcontrol.Refresh();
-            gmapcontrol.ReloadMap();
-
         }
 
-        private void CopyOverlayContents(GMapOverlay sourceOverlay, GMapOverlay targetOverlay)
+        private void ZoomToLayerCenter(GMapOverlay overlay, GMapControl gMapControlImar, GMapControl gMapControlYuk)
         {
-            foreach (var polygon in sourceOverlay.Polygons)
+            if (overlay == null || !overlay.Polygons.Any()) return;
+
+            // Calculate the bounding box for all polygons
+            double minLat = double.MaxValue, maxLat = double.MinValue;
+            double minLng = double.MaxValue, maxLng = double.MinValue;
+
+            foreach (var polygon in overlay.Polygons)
             {
-                var newPolygon = new GMapPolygon(polygon.Points, polygon.Name)
+                foreach (var point in polygon.Points)
                 {
-                    Stroke = polygon.Stroke,
-                    Fill = polygon.Fill
-                };
-                targetOverlay.Polygons.Add(newPolygon);
+                    minLat = Math.Min(minLat, point.Lat);
+                    maxLat = Math.Max(maxLat, point.Lat);
+                    minLng = Math.Min(minLng, point.Lng);
+                    maxLng = Math.Max(maxLng, point.Lng);
+                }
             }
 
-            foreach (var route in sourceOverlay.Routes)
+            if (minLat == double.MaxValue || maxLat == double.MinValue || minLng == double.MaxValue || maxLng == double.MinValue)
             {
-                var newRoute = new GMapRoute(route.Points, route.Name)
+                // No valid coordinates found
+                return;
+            }
+
+            // Calculate the center point
+            double centerLat = (minLat + maxLat) / 2.0;
+            double centerLng = (minLng + maxLng) / 2.0;
+            PointLatLng centerPoint = new PointLatLng(centerLat, centerLng);
+
+            // Zoom to the center point with a zoom level of 10 (city level)
+            gMapControlImar.Position = centerPoint;
+            gMapControlImar.Zoom = 13;
+
+            gMapControlYuk.Position = centerPoint;
+            gMapControlYuk.Zoom = 13;
+
+            // Refresh both controls
+            gMapControlImar.Refresh();
+            gMapControlYuk.Refresh();
+        }
+
+        public void CopyOverlayContents(
+            GMapOverlay sourceOverlay,
+            GMapOverlay targetOverlay,
+            Dictionary<GMapPolygon, DataRow> sourceDict,
+            Dictionary<GMapPolygon, DataRow> targetDict)
+        {
+            // 1) Copy Polygons
+            foreach (var srcPolygon in sourceOverlay.Polygons)
+            {
+                // Create a new polygon with the same points, name, stroke, fill
+                var newPolygon = new GMapPolygon(srcPolygon.Points, srcPolygon.Name)
                 {
-                    Stroke = route.Stroke
+                    // If you want fully independent Stroke/Fill objects, you can .Clone() them:
+                    Stroke = (Pen)srcPolygon.Stroke.Clone(),
+                    Fill = (Brush)srcPolygon.Fill.Clone()
+                };
+
+                // Add the new polygon to the target overlay
+                targetOverlay.Polygons.Add(newPolygon);
+
+                // Now copy the attribute row from the source dictionary (if present)
+                if (sourceDict.TryGetValue(srcPolygon, out DataRow row))
+                {
+                    // Associate the same DataRow with the new polygon in the target dictionary
+                    targetDict[newPolygon] = row;
+                }
+            }
+
+            // 2) Copy Routes (no dictionary logic shown—add if you have route attributes)
+            foreach (var srcRoute in sourceOverlay.Routes)
+            {
+                var newRoute = new GMapRoute(srcRoute.Points, srcRoute.Name)
+                {
+                    // Same note about .Clone() for stroke if you want separate objects
+                    Stroke = (Pen)srcRoute.Stroke.Clone()
                 };
                 targetOverlay.Routes.Add(newRoute);
             }
 
-            foreach (var marker in sourceOverlay.Markers)
+            // 3) Copy Markers (same idea—no dictionary logic unless you store marker attributes)
+            foreach (var srcMarker in sourceOverlay.Markers)
             {
                 GMapMarker newMarker;
-
-                if (marker is GMarkerGoogle googleMarker)
+                if (srcMarker is GMarkerGoogle googleMarker)
                 {
-                    // Create a GMarkerGoogle with the same type as the original
-                    newMarker = new GMarkerGoogle(marker.Position, googleMarker.Type)
+                    newMarker = new GMarkerGoogle(srcMarker.Position, googleMarker.Type)
                     {
-                        ToolTipText = marker.ToolTipText
+                        ToolTipText = srcMarker.ToolTipText
                     };
                 }
                 else
                 {
-                    // Use a GMarkerGoogle with a default type for non-GMarkerGoogle markers
-                    newMarker = new GMarkerGoogle(marker.Position, GMarkerGoogleType.red)
+                    newMarker = new GMarkerGoogle(srcMarker.Position, GMarkerGoogleType.red)
                     {
-                        ToolTipText = marker.ToolTipText
+                        ToolTipText = srcMarker.ToolTipText
                     };
                 }
-
                 targetOverlay.Markers.Add(newMarker);
+
+                // If you store marker attributes in a dictionary, do a similar lookup + assignment here
             }
         }
-
 
 
         // define default colors for each overlay object
@@ -387,7 +373,9 @@ namespace SLF
             (System.Drawing.Color.Cyan, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Cyan)),
             (System.Drawing.Color.DarkTurquoise, System.Drawing.Color.FromArgb(50, System.Drawing.Color.DarkTurquoise)),
             (System.Drawing.Color.Black, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Black)),
-            (System.Drawing.Color.Violet, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Violet))
+            (System.Drawing.Color.Violet, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Violet)),
+            (System.Drawing.Color.Violet, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Ivory)),
+            (System.Drawing.Color.Violet, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Navy))
         };
 
         private System.Data.DataTable LoadAttributeTable(DataRow row, DataGridView dataGridView,
@@ -410,26 +398,51 @@ namespace SLF
             return (data_table);
         }
 
-        public void AddPolygonToOverlay(NetTopologySuite.Geometries.Polygon polygon,
-                GMapOverlay overlay, string gMapPolygonId, DataRow attributes)
+        public void AddPolygonToOverlay(
+            NetTopologySuite.Geometries.Polygon polygon,
+            GMapOverlay overlay,
+            string gMapPolygonId,
+            DataRow attributes)
         {
-            // oluşturulmuş poligona ait noktaların ekleneceği bir liste oluştur
+            // Build the point list
             List<PointLatLng> points_list = new List<PointLatLng>();
-
-            // poligona ait koordinatları nokta olarak "points" listesine ekle
             foreach (var coord in polygon.Coordinates)
             {
                 points_list.Add(new PointLatLng(coord.Y, coord.X));
             }
 
+            // Create the GMapPolygon
             GMapPolygon gMapPolygon = new GMapPolygon(points_list, gMapPolygonId)
             {
                 Stroke = new Pen(overlayColors[layer_index].BorderColor, 3),
                 Fill = new SolidBrush(overlayColors[layer_index].FillColor)
             };
 
+            // Store the Row_No in the polygon's Tag property
+            if (attributes.Table.Columns.Contains("Row_No") && attributes["Row_No"] != DBNull.Value)
+            {
+                gMapPolygon.Tag = attributes["Row_No"];
+            }
+
+            // Update the checkboxes for that layer in each 4 different map
+            List<CheckBox> associatedChecks = modülFormu.GetCheckBoxesByIndex(layer_index);
+            foreach (var chk in associatedChecks)
+            {
+                chk.ForeColor = overlayColors[layer_index].BorderColor;
+            }
+
+            // Add the polygon to the overlay
             overlay.Polygons.Add(gMapPolygon);
-            polygonAttributes[gMapPolygon] = attributes;
+
+            // Now record the attribute row in the dictionary that corresponds to *this* overlay
+            if (overlay == modülFormu.gMapControl_imar.Overlays.FirstOrDefault(o => o == overlay))
+            {
+                polygonAttributes_imar[gMapPolygon] = attributes;
+            }
+            else if (overlay == modülFormu.gMapControl_yuk.Overlays.FirstOrDefault(o => o == overlay))
+            {
+                polygonAttributes_yuk[gMapPolygon] = attributes;
+            }
 
             if (overlay == gridOverlay)
             {
@@ -437,12 +450,24 @@ namespace SLF
             }
         }
 
-        private void AddLineStringToOverlay_kml(SharpKml.Dom.LineString kmlLineString, GMapOverlay overlay)
-        {
-            // points node list, which has parental nodes as LineString.Coordinates
-            List<PointLatLng> points = kmlLineString.Coordinates.Select(coord => new PointLatLng(coord.Latitude, coord.Longitude)).ToList();
 
-            // create a new route including the points inside the points list.
+        private void AddLineStringToOverlay_kml(string coordinatesString, GMapOverlay overlay)
+        {
+            var points = coordinatesString.Trim()
+                .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(coord =>
+                {
+                    var parts = coord.Split(',');
+                    if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
+                    {
+                        return new PointLatLng(lat, lon);
+                    }
+                    return (PointLatLng?)null;
+                })
+                .Where(p => p.HasValue)
+                .Select(p => p.Value)
+                .ToList();
+
             var route = new GMapRoute(points, "KmlLineString")
             {
                 Stroke = new Pen(overlayColors[layer_index].BorderColor, 3)
@@ -450,21 +475,101 @@ namespace SLF
             overlay.Routes.Add(route);
         }
 
-        private void AddPolygonToOverlay_kml(SharpKml.Dom.Polygon kmlPolygon,
-                                    GMapOverlay overlay,
-                                    DataRow attributes)
+        private static Color[] GenerateDistinguishableColors(int count)
         {
-            // coordinates node, which has parental noods as Polygon.OuterBoundary.LinearRing.Coordinates
-            var coordinates = kmlPolygon.OuterBoundary.LinearRing.Coordinates;
-            List<PointLatLng> points = coordinates.Select(coord => new PointLatLng(coord.Latitude, coord.Longitude)).ToList();
+            Color[] colors = new Color[count];
+            for (int i = 0; i < count; i++)
+            {
+                double hue = i * (360.0 / count);
+                double saturation = 0.7;
+                double value = 0.9;
+
+                int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
+                double f = hue / 60 - Math.Floor(hue / 60);
+
+                value *= 255;
+                int v = Convert.ToInt32(value);
+                int p = Convert.ToInt32(value * (1 - saturation));
+                int q = Convert.ToInt32(value * (1 - f * saturation));
+                int t = Convert.ToInt32(value * (1 - (1 - f) * saturation));
+
+                int r, g, b;
+                if (hi == 0) { r = v; g = t; b = p; }
+                else if (hi == 1) { r = q; g = v; b = p; }
+                else if (hi == 2) { r = p; g = v; b = t; }
+                else if (hi == 3) { r = p; g = q; b = v; }
+                else if (hi == 4) { r = t; g = p; b = v; }
+                else { r = v; g = p; b = q; }
+
+                colors[i] = Color.FromArgb(255, r, g, b);
+            }
+            return colors;
+        }
+
+        private void AddPolygonToOverlay_kml(string coordinatesString, GMapOverlay overlay, DataRow attributes)
+        {
+            if (string.IsNullOrEmpty(coordinatesString))
+                return;
+
+            var points = coordinatesString.Trim()
+                .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(coord =>
+                {
+                    var parts = coord.Split(',');
+                    if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
+                    {
+                        return new PointLatLng(lat, lon);
+                    }
+                    return (PointLatLng?)null;
+                })
+                .Where(p => p.HasValue)
+                .Select(p => p.Value)
+                .ToList();
+
+            // Varsayılan renk
+            Color fillColor = overlayColors[layer_index].FillColor;
+            Color borderColor = overlayColors[layer_index].BorderColor;
+
+            // imported_filename ile kontrol et
+            if (imported_filename == "İMAR_SONUÇLAR.kml" && currentImarTipiColorMap != null)
+            {
+                if (attributes.Table.Columns.Contains("İmar Tipi") && attributes["İmar Tipi"] != DBNull.Value)
+                {
+                    string imarTipi = attributes["İmar Tipi"].ToString();
+                    if (currentImarTipiColorMap.TryGetValue(imarTipi, out Color mappedColor))
+                    {
+                        fillColor = mappedColor;
+                        borderColor = Color.Black;
+                    }
+                    else
+                    {
+                        File.AppendAllText("color_map_log.txt", $"İmar Tipi '{imarTipi}' için renk bulunamadı.\n");
+                    }
+                }
+                else
+                {
+                    File.AppendAllText("color_map_log.txt", "İmar Tipi sütunu bulunamadı veya değer null.\n");
+                }
+            }
+
+            // Opacity'yi 0.5 yapmak için alpha değerini 128'e ayarla
+            fillColor = Color.FromArgb(128, fillColor.R, fillColor.G, fillColor.B);
 
             GMapPolygon polygon = new GMapPolygon(points, "KmlPolygon")
             {
-                Stroke = new Pen(overlayColors[layer_index].BorderColor, 3),
-                Fill = new SolidBrush(overlayColors[layer_index].FillColor)
+                Stroke = new Pen(borderColor, 3),
+                Fill = new SolidBrush(fillColor)
             };
+
+            // Store the Row_No in the polygon's Tag property
+            if (attributes.Table.Columns.Contains("Row_No") && attributes["Row_No"] != DBNull.Value)
+            {
+                polygon.Tag = attributes["Row_No"];
+            }
+
             overlay.Polygons.Add(polygon);
-            polygonAttributes[polygon] = attributes;
+            polygonAttributes_imar[polygon] = attributes;
+            polygonAttributes_yuk[polygon] = attributes;
         }
 
 
@@ -474,10 +579,10 @@ namespace SLF
             shapefile.CreateNewWithShapeID("", ShpfileType.SHP_POLYGON);
 
             // Ensure attributes are added as fields
-            if (polygonAttributes.Count > 0)
+            if (polygonAttributes_imar.Count > 0)
             {
-                var firstPolygon = polygonAttributes.Keys.First();
-                var firstRow = polygonAttributes[firstPolygon];
+                var firstPolygon = polygonAttributes_imar.Keys.First();
+                var firstRow = polygonAttributes_imar[firstPolygon];
                 foreach (DataColumn column in firstRow.Table.Columns)
                 {
                     shapefile.EditAddField(column.ColumnName, MapWinGIS.FieldType.STRING_FIELD, 10, 10);
@@ -503,7 +608,7 @@ namespace SLF
                 shapefile.EditInsertShape(shape, ref shapeIndex);
 
                 // Add attributes to the shape
-                if (polygonAttributes.TryGetValue(gMapPolygon, out DataRow row))
+                if (polygonAttributes_imar.TryGetValue(gMapPolygon, out DataRow row))
                 {
                     for (int i = 0; i < row.Table.Columns.Count; i++)
                     {
@@ -516,7 +621,7 @@ namespace SLF
 
         public void ExportOverlayToKml(GMapOverlay overlay, string filePath)
         {
-            var kmlDocument = new SharpKml.Dom.Document();
+            var kmlDocument = new Document();
             var kml = new Kml { Feature = kmlDocument };
 
             if (overlay.Polygons != null)
@@ -622,10 +727,10 @@ namespace SLF
             shapefile.CreateNewWithShapeID("", ShpfileType.SHP_POLYGON);
 
             // Add fields from the first polygon's attributes (if any)
-            if (polygonAttributes.Count > 0)
+            if (polygonAttributes_imar.Count > 0)
             {
-                var firstPolygon = polygonAttributes.Keys.First();
-                var firstRow = polygonAttributes[firstPolygon];
+                var firstPolygon = polygonAttributes_imar.Keys.First();
+                var firstRow = polygonAttributes_imar[firstPolygon];
                 foreach (DataColumn column in firstRow.Table.Columns)
                 {
                     shapefile.EditAddField(column.ColumnName, MapWinGIS.FieldType.STRING_FIELD, 10, 10);
@@ -651,7 +756,7 @@ namespace SLF
                 int shapeIndex = shapefile.NumShapes;
                 shapefile.EditInsertShape(shape, ref shapeIndex);
 
-                if (polygonAttributes.TryGetValue(polygon, out DataRow row))
+                if (polygonAttributes_imar.TryGetValue(polygon, out DataRow row))
                 {
                     for (int i = 0; i < row.Table.Columns.Count; i++)
                     {
@@ -702,689 +807,301 @@ namespace SLF
             return shapefile;
         }
 
-
-        public async Task LoadKmlFile(string filepath, GMapOverlay kmlOverlay,
-            System.Data.DataTable data_table,
-            GMapControl gMapControl)
+        public async Task LoadKmlFile(string filepath, GMapOverlay kmlOverlay, System.Data.DataTable data_table, GMapControl gMapControl)
         {
-            // eğer dosya bulunamadıysa uyarı ver
             if (!File.Exists(filepath))
             {
-                MessageBox.Show("KML dosyası bulunamadı.!");
+                MessageBox.Show("KML dosyası bulunamadı!");
                 return;
             }
 
-            // oluşturulacak data table'a eklenecek olan row_cnt variable'ının initialization'u
             int row_cnt = 1;
 
-            // wrap the KML file processing into a task to avoid blocking the main thread
-            await Task.Run(() =>
+            try
             {
-                // bir stream yarat ve import edilen kml dosyasını okumaya başla.
-                using (var stream = File.OpenRead(filepath))
+                XDocument kmlDoc = XDocument.Load(filepath);
+                // Handle namespace: use empty namespace if xmlns is missing, otherwise use specified
+                XNamespace ns = kmlDoc.Root?.Attribute("xmlns")?.Value ?? "";
+                XNamespace gx = "http://www.google.com/kml/ext/2.2"; // For 2nd structure's extended namespace
+
+                if (kmlDoc.Root == null || kmlDoc.Root.Name.LocalName != "kml")
                 {
-                    // create a KML parser object and start parsing the KML stream
-                    var parser = new Parser();
-                    parser.Parse(stream);
+                    MessageBox.Show("KML dosyasında kml elementi bulunamadı.");
+                    return;
+                }
 
-                    // root node olan <kml> node'una eriş
-                    var kml = parser.Root as Kml;
-                    var folder = kml?.Feature as SharpKml.Dom.Folder;
+                // Initialize DataTable with base columns
+                if (!data_table.Columns.Contains("Row_No")) data_table.Columns.Add("Row_No");
+                if (!data_table.Columns.Contains("coordinates")) data_table.Columns.Add("coordinates");
 
-                    // <kml> node'unun child node'unun <folder> veya <Document> olup olmadığının kontrolü
-                    if (folder != null)
+                // Pre-process Schema to add SimpleField columns (for 3rd structure)
+                var schema = kmlDoc.Descendants(ns + "Schema").FirstOrDefault();
+                if (schema != null)
+                {
+                    foreach (var simpleField in schema.Elements(ns + "SimpleField"))
                     {
-                        // <folder> node'unun içindeki <Document> node'larını okumaya başla
-                        foreach (var documents in folder.Features)
+                        string fieldName = simpleField.Attribute("name")?.Value;
+                        if (!string.IsNullOrEmpty(fieldName) && !data_table.Columns.Contains(fieldName))
                         {
-                            // eğer halihazrıda "Row_No" isminde bir sütun yoksa ekle
-                            if (!data_table.Columns.Contains("Row_No"))
+                            data_table.Columns.Add(fieldName);
+                        }
+                    }
+                }
+
+                // Collect all Placemarks recursively
+                var placemarks = new List<XElement>();
+                void CollectPlacemarks(XElement element)
+                {
+                    if (element == null) return;
+                    placemarks.AddRange(element.Elements(ns + "Placemark"));
+                    foreach (var child in element.Elements().Where(e => e.Name.LocalName == "Folder" || e.Name.LocalName == "Document"))
+                    {
+                        CollectPlacemarks(child);
+                    }
+                }
+
+                CollectPlacemarks(kmlDoc.Root);
+
+                if (!placemarks.Any())
+                {
+                    MessageBox.Show("KML dosyasında Placemark elementi bulunamadı.");
+                    return;
+                }
+
+                foreach (var placemark in placemarks)
+                {
+                    var row = data_table.NewRow();
+                    row["Row_No"] = row_cnt;
+
+                    // Handle name
+                    var nameElement = placemark.Element(ns + "name");
+                    if (nameElement != null)
+                    {
+                        if (!data_table.Columns.Contains("name")) data_table.Columns.Add("name");
+                        row["name"] = nameElement.Value;
+                    }
+
+                    // Handle description (for 3rd structure)
+                    var descriptionElement = placemark.Element(ns + "description");
+                    if (descriptionElement != null)
+                    {
+                        if (!data_table.Columns.Contains("description")) data_table.Columns.Add("description");
+                        row["description"] = descriptionElement.Value;
+                    }
+
+                    // Handle styleUrl
+                    var styleUrlElement = placemark.Element(ns + "styleUrl");
+                    if (styleUrlElement != null)
+                    {
+                        if (!data_table.Columns.Contains("styleUrl")) data_table.Columns.Add("styleUrl");
+                        row["styleUrl"] = styleUrlElement.Value;
+                    }
+
+                    // Handle ExtendedData (for 1st and 3rd structures)
+                    var extendedData = placemark.Element(ns + "ExtendedData");
+                    if (extendedData != null)
+                    {
+                        // Process <Data> elements (1st structure)
+                        foreach (var data in extendedData.Elements(ns + "Data"))
+                        {
+                            string name = data.Attribute("name")?.Value;
+                            string value = data.Element(ns + "value")?.Value;
+                            if (!string.IsNullOrEmpty(name))
                             {
-                                data_table.Columns.Add("Row_No");
-                            }
-
-                            // eğer halihazrıda "coordinates" isminde bir sütun yoksa ekle
-                            if (!data_table.Columns.Contains("coordinates"))
-                            {
-                                data_table.Columns.Add("coordinates");
-                            }
-
-                            // <document> node'unu flatten ile düzelt, sonrasında içindeki <placemark> node'unu iterate et 
-                            foreach (var placemark in documents.Flatten().OfType<SharpKml.Dom.Placemark>())
-                            {
-                                var row = data_table.NewRow();
-
-                                // Handle ExtendedData
-                                if (placemark.ExtendedData != null)
-                                {
-                                    foreach (var schemaData in placemark.ExtendedData.SchemaData)
-                                    {
-                                        foreach (var simpleData in schemaData.SimpleData)
-                                        {
-                                            if (!data_table.Columns.Contains(simpleData.Name))
-                                            {
-                                                data_table.Columns.Add(simpleData.Name);
-                                            }
-                                            row["Row_No"] = row_cnt;
-                                            row[simpleData.Name] = simpleData.Text;
-                                        }
-                                    }
-
-                                    // <ExtendedData> içindeki dataları Attribute Table'da ilgili sütunlara yaz
-                                    foreach (var data in placemark.ExtendedData.Data)
-                                    {
-                                        if (!data_table.Columns.Contains(data.Name))
-                                        {
-                                            data_table.Columns.Add(data.Name);
-                                        }
-                                        row["Row_No"] = row_cnt;
-                                        row[data.Name] = data.Value;
-                                    }
-                                }
-
-                                // add polygon coordinates to "coordinates" column if any polygon exists
-                                foreach (SharpKml.Dom.Polygon polygon in placemark.Flatten().OfType<SharpKml.Dom.Polygon>())
-                                {
-                                    foreach (SharpKml.Dom.OuterBoundary outerBoundary in polygon.Flatten().OfType<SharpKml.Dom.OuterBoundary>())
-                                    {
-                                        foreach (SharpKml.Dom.LinearRing linearRing in outerBoundary.Flatten().OfType<SharpKml.Dom.LinearRing>())
-                                        {
-                                            // Convert the coordinates to a string
-                                            string coordinatesString = string.Join(" ; ",
-                                                linearRing.Coordinates.Select(coord => $"{Math.Round(coord.Longitude, 6)},{Math.Round(coord.Latitude, 6)}"));
-                                            row["Row_No"] = row_cnt;
-                                            row["coordinates"] = coordinatesString;
-                                        }
-                                    }
-                                }
-
-                                // add point coordinates to "coordinate" column if any point exists
-                                foreach (SharpKml.Dom.Point points in placemark.Flatten().OfType<SharpKml.Dom.Point>())
-                                {
-                                    // Convert the coordinates to a string
-                                    string point_coordinates = Math.Round(points.Coordinate.Longitude, 6).ToString() +
-                                        " ; " + Math.Round(points.Coordinate.Latitude, 6).ToString();
-                                    row["Row_No"] = row_cnt;
-                                    row["coordinates"] = point_coordinates;
-                                }
-
-                                // add linestring coordinates to "coordinates" column if any linestring exists
-                                foreach (SharpKml.Dom.LineString lineString in placemark.Flatten().OfType<SharpKml.Dom.LineString>())
-                                {
-                                    // Convert the coordinates to a string
-                                    string coordinatesString = string.Join(" ; ",
-                                        lineString.Coordinates.Select(coord => $"{Math.Round(coord.Longitude, 6)},{Math.Round(coord.Latitude, 6)}"));
-                                    row["Row_No"] = row_cnt;
-                                    row["coordinates"] = coordinatesString;
-                                }
-
-                                // Handle direct attributes
-                                var attributes = placemark.GetType().GetProperties();
-                                foreach (var attribute in attributes)
-                                {
-                                    if (!data_table.Columns.Contains(attribute.Name))
-                                    {
-                                        data_table.Columns.Add(attribute.Name);
-                                    }
-                                    row["Row_No"] = row_cnt;
-                                    row[attribute.Name] = attribute.GetValue(placemark)?.ToString();
-                                }
-
-                                // oluşturulan satırı tablouya ekle
-                                data_table.Rows.Add(row);
-                                row_cnt++;
-
-                                // geometry bilgisini polygon olarak ya da multiline string olarak ekle
-                                var geometry = placemark.Geometry;
-
-                                if (geometry is SharpKml.Dom.Polygon kmlPolygon)
-                                {
-                                    AddPolygonToOverlay_kml(kmlPolygon, kmlOverlay, row);
-                                }
-                                else if (geometry is SharpKml.Dom.LineString kmlLineString)
-                                {
-                                    AddLineStringToOverlay_kml(kmlLineString, kmlOverlay);
-                                }
+                                if (!data_table.Columns.Contains(name)) data_table.Columns.Add(name);
+                                row[name] = value ?? "";
                             }
                         }
 
+                        // Process <SchemaData> and <SimpleData> elements (3rd structure)
+                        var schemaData = extendedData.Element(ns + "SchemaData");
+                        if (schemaData != null)
+                        {
+                            foreach (var simpleData in schemaData.Elements(ns + "SimpleData"))
+                            {
+                                string name = simpleData.Attribute("name")?.Value;
+                                string value = simpleData.Value;
+                                if (!string.IsNullOrEmpty(name))
+                                {
+                                    if (!data_table.Columns.Contains(name)) data_table.Columns.Add(name);
+                                    row[name] = value ?? "";
+                                }
+                            }
+                        }
+                    }
+
+                    // Handle Polygon
+                    var polygon = placemark.Element(ns + "Polygon");
+                    if (polygon != null)
+                    {
+                        var coordinatesElement = polygon.Element(ns + "outerBoundaryIs")?.Element(ns + "LinearRing")?.Element(ns + "coordinates");
+                        if (coordinatesElement != null)
+                        {
+                            string coordinatesString = coordinatesElement.Value.Trim();
+                            var coords = coordinatesString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                                .Select(coord =>
+                                {
+                                    var parts = coord.Split(',');
+                                    if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
+                                        return $"{Math.Round(lon, 6)},{Math.Round(lat, 6)}";
+                                    return null;
+                                })
+                                .Where(c => c != null);
+                            row["coordinates"] = string.Join(" ; ", coords);
+                        }
+                    }
+
+                    // Handle Point
+                    var point = placemark.Element(ns + "Point");
+                    if (point != null)
+                    {
+                        var coordinatesElement = point.Element(ns + "coordinates");
+                        if (coordinatesElement != null)
+                        {
+                            var parts = coordinatesElement.Value.Trim().Split(',');
+                            if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
+                            {
+                                string point_coordinates = $"{Math.Round(lon, 6)} ; {Math.Round(lat, 6)}";
+                                row["coordinates"] = point_coordinates;
+                            }
+                        }
+                    }
+
+                    // Handle LineString
+                    var lineString = placemark.Element(ns + "LineString");
+                    if (lineString != null)
+                    {
+                        var coordinatesElement = lineString.Element(ns + "coordinates");
+                        if (coordinatesElement != null)
+                        {
+                            string coordinatesString = coordinatesElement.Value.Trim();
+                            var coords = coordinatesString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                                .Select(coord =>
+                                {
+                                    var parts = coord.Split(',');
+                                    if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
+                                        return $"{Math.Round(lon, 6)},{Math.Round(lat, 6)}";
+                                    return null;
+                                })
+                                .Where(c => c != null);
+                            row["coordinates"] = string.Join(" ; ", coords);
+                            AddLineStringToOverlay_kml(coordinatesString, kmlOverlay);
+                        }
+                    }
+
+                    data_table.Rows.Add(row);
+                    row_cnt++;
+                }
+
+                // Handle legend for İMAR_SONUÇLAR.kml (relevant for 1st structure)
+                if (Path.GetFileName(filepath) == "İMAR_SONUÇLAR.kml")
+                {
+                    var imarTipiValues = data_table.AsEnumerable()
+                        .Where(row => row["İmar Tipi"] != DBNull.Value)
+                        .Select(row => row["İmar Tipi"].ToString())
+                        .Distinct()
+                        .ToList();
+
+                    if (imarTipiValues.Any())
+                    {
+                        Color[] colors = GenerateDistinguishableColors(imarTipiValues.Count);
+                        currentImarTipiColorMap = new Dictionary<string, Color>();
+                        for (int i = 0; i < imarTipiValues.Count; i++)
+                        {
+                            currentImarTipiColorMap[imarTipiValues[i]] = colors[i];
+                        }
+
+                        // Create or update legend panel
+                        if (modülFormu.imar_legendPanel == null)
+                        {
+                            modülFormu.imar_legendPanel = new Panel
+                            {
+                                BackColor = Color.White,
+                                BorderStyle = BorderStyle.FixedSingle,
+                                Location = new System.Drawing.Point(gMapControl.Width - 200, 10),
+                                Size = new Size(190, imarTipiValues.Count * 20 + 30),
+                                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                            };
+                            gMapControl.Controls.Add(modülFormu.imar_legendPanel);
+                            modülFormu.imar_legendPanel.BringToFront();
+                        }
+                        else
+                        {
+                            modülFormu.imar_legendPanel.Size = new Size(190, imarTipiValues.Count * 20 + 30);
+                        }
+
+                        modülFormu.imar_legendPanel.Controls.Clear();
+
+                        System.Windows.Forms.Label titleLabel = new System.Windows.Forms.Label
+                        {
+                            Text = "İmar Tipleri",
+                            Location = new System.Drawing.Point(10, 5),
+                            AutoSize = true
+                        };
+                        modülFormu.imar_legendPanel.Controls.Add(titleLabel);
+
+                        int yOffset = 25;
+                        foreach (var kvp in currentImarTipiColorMap)
+                        {
+                            Panel colorBox = new Panel
+                            {
+                                BackColor = kvp.Value,
+                                Location = new System.Drawing.Point(10, yOffset),
+                                Size = new Size(20, 15)
+                            };
+                            System.Windows.Forms.Label imarTipiLabel = new System.Windows.Forms.Label
+                            {
+                                Text = kvp.Key,
+                                Location = new System.Drawing.Point(40, yOffset),
+                                AutoSize = true
+                            };
+                            modülFormu.imar_legendPanel.Controls.Add(colorBox);
+                            modülFormu.imar_legendPanel.Controls.Add(imarTipiLabel);
+                            yOffset += 20;
+                        }
+
+                        modülFormu.imar_legendPanel.Visible = true;
                     }
                     else
                     {
-                        // eğer <kml> root node'unun child/feature'larından biri document ise
-                        var document = kml?.Feature as SharpKml.Dom.Document;
-                        bool columnsAdded = false;
-
-                        // eğer halihazrıda "Row_No" isminde bir sütun yoksa ekle
-                        if (!data_table.Columns.Contains("Row_No"))
-                        {
-                            data_table.Columns.Add("Row_No");
-                        }
-
-                        // eğer halihazrıda "coordinates" isminde bir sütun yoksa ekle
-                        if (!data_table.Columns.Contains("coordinates"))
-                        {
-                            data_table.Columns.Add("coordinates");
-                        }
-
-                        // for each row of the flattened document of KML file, fill the row of the datatable
-                        foreach (var placemark in document.Flatten().OfType<SharpKml.Dom.Placemark>())
-                        {
-                            var row = data_table.NewRow();
-
-                            if (!columnsAdded)
-                            {
-                                // Add columns based on the Schema if available
-                                foreach (var schema in document.Schemas)
-                                {
-                                    foreach (var field in schema.Fields)
-                                    {
-                                        if (!data_table.Columns.Contains(field.Name))
-                                        {
-                                            data_table.Columns.Add(field.Name);
-                                        }
-                                    }
-                                }
-                                columnsAdded = true;
-                            }
-
-                            // Handle ExtendedData
-                            if (placemark.ExtendedData != null)
-                            {
-                                foreach (var schemaData in placemark.ExtendedData.SchemaData)
-                                {
-                                    foreach (var simpleData in schemaData.SimpleData)
-                                    {
-                                        if (!data_table.Columns.Contains(simpleData.Name))
-                                        {
-                                            data_table.Columns.Add(simpleData.Name);
-                                        }
-                                        row["Row_No"] = row_cnt;
-                                        row[simpleData.Name] = simpleData.Text;
-                                    }
-                                }
-
-                                foreach (var data in placemark.ExtendedData.Data)
-                                {
-                                    if (!data_table.Columns.Contains(data.Name))
-                                    {
-                                        data_table.Columns.Add(data.Name);
-                                    }
-                                    row["Row_No"] = row_cnt;
-                                    row[data.Name] = data.Value;
-                                }
-                            }
-
-                            // add polygon coordinates to "coordinates" column if any polygon exists
-                            foreach (SharpKml.Dom.Polygon polygon in placemark.Flatten().OfType<SharpKml.Dom.Polygon>())
-                            {
-                                foreach (SharpKml.Dom.OuterBoundary outerBoundary in polygon.Flatten().OfType<SharpKml.Dom.OuterBoundary>())
-                                {
-                                    foreach (SharpKml.Dom.LinearRing linearRing in outerBoundary.Flatten().OfType<SharpKml.Dom.LinearRing>())
-                                    {
-                                        string coordinatesString = string.Join(" ; ",
-                                            linearRing.Coordinates.Select(coord => $"{Math.Round(coord.Longitude, 6)},{Math.Round(coord.Latitude, 6)}"));
-                                        row["Row_No"] = row_cnt;
-                                        row["coordinates"] = coordinatesString;
-                                    }
-                                }
-                            }
-
-                            // add point coordinates to "coordinate" column if any point exists
-                            foreach (SharpKml.Dom.Point points in placemark.Flatten().OfType<SharpKml.Dom.Point>())
-                            {
-                                string point_coordinates = Math.Round(points.Coordinate.Longitude, 6).ToString() +
-                                    " ; " + Math.Round(points.Coordinate.Latitude, 6).ToString();
-                                row["Row_No"] = row_cnt;
-                                row["coordinates"] = point_coordinates;
-                            }
-
-                            // add linestring coordinates to "coordinates" column if any linestring exists
-                            foreach (SharpKml.Dom.LineString lineString in placemark.Flatten().OfType<SharpKml.Dom.LineString>())
-                            {
-                                string coordinatesString = string.Join(" ; ",
-                                    lineString.Coordinates.Select(coord => $"{Math.Round(coord.Longitude, 6)},{Math.Round(coord.Latitude, 6)}"));
-                                row["Row_No"] = row_cnt;
-                                row["coordinates"] = coordinatesString;
-                            }
-
-                            // Handle direct attributes
-                            var attributes = placemark.GetType().GetProperties();
-                            foreach (var attribute in attributes)
-                            {
-                                if (!data_table.Columns.Contains(attribute.Name))
-                                {
-                                    data_table.Columns.Add(attribute.Name);
-                                }
-                                row["Row_No"] = row_cnt;
-                                row[attribute.Name] = attribute.GetValue(placemark)?.ToString();
-                            }
-
-                            data_table.Rows.Add(row);
-                            row_cnt++;
-
-                            var geometry = placemark.Geometry;
-
-                            if (geometry is SharpKml.Dom.Polygon kmlPolygon)
-                            {
-                                AddPolygonToOverlay_kml(kmlPolygon, kmlOverlay, row);
-                            }
-                            else if (geometry is SharpKml.Dom.LineString kmlLineString)
-                            {
-                                AddLineStringToOverlay_kml(kmlLineString, kmlOverlay);
-                            }
-                        }
+                        modülFormu.imar_legendPanel?.Hide();
                     }
-                }
-            });
-
-            gMapControl.Refresh(); // Refresh the map control after processing the KML file
-        }
-/*        public async Task LoadKmlFile(string filepath, GMapOverlay kmlOverlay,
-           System.Data.DataTable data_table,
-           GMapControl gMapControl)
-        {
-
-            // eğer dosya bulunamadıysa uyarı ver
-            if (!File.Exists(filepath))
-            {
-                MessageBox.Show("KML dosyası bulunamadı.!");
-                return;
-            }
-
-            // oluşturulacak data table'a eklenecek olan row_cnt variable'ının initialization'u
-            int row_cnt = 1;
-
-            // bir stream yarat ve import edilen kml dosyasını okumaya başla.
-            using (var stream = File.OpenRead(filepath))
-            {
-                // create a KML parser object and start parsing the KML stream
-                var parser = new Parser();
-                parser.Parse(stream);
-
-                // root node olan <kml> node'una eriş
-                var kml = parser.Root as Kml;
-                var folder = kml?.Feature as SharpKml.Dom.Folder;
-
-                // <kml> node'unun child node'unun <folder> veya <Document> olup olmadığının kontrolü
-                if (folder != null)
-                {
-                    // <folder> node'unun içindeki <Document> node'larını okumaya başla
-                    foreach (var documents in folder.Features)
-                    {
-                        // eğer halihazrıda "Row_No" isminde bir sütun yoksa ekle
-                        if (!data_table.Columns.Contains("Row_No"))
-                        {
-                            data_table.Columns.Add("Row_No");
-                        }
-
-                        // eğer halihazrıda "coordinates" isminde bir sütun yoksa ekle
-                        if (!data_table.Columns.Contains("coordinates"))
-                        {
-                            data_table.Columns.Add("coordinates");
-                        }
-
-                        // <document> node'unu flatten ile düzelt, sonrasında içindeki <placemark> node'unu iterate et 
-                        foreach (var placemark in documents.Flatten().OfType<SharpKml.Dom.Placemark>())
-                        {
-                            var row = data_table.NewRow();
-
-                            // Handle ExtendedData
-                            if (placemark.ExtendedData != null)
-                            {
-                                foreach (var schemaData in placemark.ExtendedData.SchemaData)
-                                {
-                                    foreach (var simpleData in schemaData.SimpleData)
-                                    {
-                                        if (!data_table.Columns.Contains(simpleData.Name))
-                                        {
-                                            data_table.Columns.Add(simpleData.Name);
-                                        }
-                                        row["Row_No"] = row_cnt;
-                                        row[simpleData.Name] = simpleData.Text;
-                                    }
-                                }
-
-                                // <ExtendedData> içindeki dataları Attribute Table'da ilgili sütunlara yaz
-                                foreach (var data in placemark.ExtendedData.Data)
-                                {
-                                    if (!data_table.Columns.Contains(data.Name))
-                                    {
-                                        data_table.Columns.Add(data.Name);
-                                    }
-                                    row["Row_No"] = row_cnt;
-                                    row[data.Name] = data.Value;
-                                }
-                            }
-
-                            // add polygon coordinates to "coordinates" column if any polygon exists
-                            foreach (SharpKml.Dom.Polygon polygon in placemark.Flatten().OfType<SharpKml.Dom.Polygon>())
-                            {
-                                foreach (SharpKml.Dom.OuterBoundary outerBoundary in polygon.Flatten().OfType<SharpKml.Dom.OuterBoundary>())
-                                {
-                                    foreach (SharpKml.Dom.LinearRing linearRing in outerBoundary.Flatten().OfType<SharpKml.Dom.LinearRing>())
-                                    {
-                                        // Convert the coordinates to a string
-                                        string coordinatesString = string.Join(" ; ",
-                                            linearRing.Coordinates.Select(coord => $"{Math.Round(coord.Longitude, 6)},{Math.Round(coord.Latitude, 6)}"));
-                                        row["Row_No"] = row_cnt;
-                                        row["coordinates"] = coordinatesString;
-                                    }
-                                }
-                            }
-
-                            // add point coordinates to "coordinate" column if any point exists
-                            foreach (SharpKml.Dom.Point points in placemark.Flatten().OfType<SharpKml.Dom.Point>())
-                            {
-                                // Convert the coordinates to a string
-                                string point_coordinates = Math.Round(points.Coordinate.Longitude, 6).ToString() +
-                                    " ; " + Math.Round(points.Coordinate.Latitude, 6).ToString();
-                                row["Row_No"] = row_cnt;
-                                row["coordinates"] = point_coordinates;
-
-                            }
-
-                            // add linestring coordinates to "coordinates" column if any linestring exists
-                            foreach (SharpKml.Dom.LineString lineString in placemark.Flatten().OfType<SharpKml.Dom.LineString>())
-                            {
-                                // Convert the coordinates to a string
-                                string coordinatesString = string.Join(" ; ",
-                                    lineString.Coordinates.Select(coord => $"{Math.Round(coord.Longitude, 6)},{Math.Round(coord.Latitude, 6)}"));
-                                row["Row_No"] = row_cnt;
-                                row["coordinates"] = coordinatesString;
-                            }
-
-                            // Handle direct attributes
-                            var attributes = placemark.GetType().GetProperties();
-                            foreach (var attribute in attributes)
-                            {
-                                if (!data_table.Columns.Contains(attribute.Name))
-                                {
-                                    data_table.Columns.Add(attribute.Name);
-                                }
-                                row["Row_No"] = row_cnt;
-                                row[attribute.Name] = attribute.GetValue(placemark)?.ToString();
-                            }
-
-                            // oluşturulan satırı tablouya ekle
-                            data_table.Rows.Add(row);
-                            row_cnt++;
-
-                            // geometry bilgisini polygon olarak ya da multiline string olarak ekle
-                            var geometry = placemark.Geometry;
-
-                            if (geometry is SharpKml.Dom.Polygon kmlPolygon)
-                            {
-                                AddPolygonToOverlay_kml(kmlPolygon, kmlOverlay, row);
-                            }
-                            else if (geometry is SharpKml.Dom.LineString kmlLineString)
-                            {
-                                AddLineStringToOverlay_kml(kmlLineString, kmlOverlay);
-                            }
-                        }
-                    }
-
                 }
                 else
                 {
-                    // eğer <kml> root node'unun child/feature'larından biri document ise
-                    var document = kml?.Feature as SharpKml.Dom.Document;
-                    bool columnsAdded = false;
+                    currentImarTipiColorMap = null;
+                    if (modülFormu.imar_legendPanel != null)
+                        modülFormu.imar_legendPanel.Visible = false;
+                }
 
-                    // eğer halihazrıda "Row_No" isminde bir sütun yoksa ekle
-                    if (!data_table.Columns.Contains("Row_No"))
+                // Add polygons to overlay
+                for (int i = 0; i < placemarks.Count; i++)
+                {
+                    var placemark = placemarks[i];
+                    var polygon = placemark.Element(ns + "Polygon");
+                    if (polygon != null)
                     {
-                        data_table.Columns.Add("Row_No");
-                    }
-
-                    // eğer halihazrıda "coordinates" isminde bir sütun yoksa ekle
-                    if (!data_table.Columns.Contains("coordinates"))
-                    {
-                        data_table.Columns.Add("coordinates");
-                    }
-
-                    // for each row of the flattened document of KML file, fill the row of the datatable
-                    foreach (var placemark in document.Flatten().OfType<SharpKml.Dom.Placemark>())
-                    {
-                        // her satırı table'a eklemek için her satır için yeni bir "row" objesi oluştur.
-                        var row = data_table.NewRow();
-
-                        if (!columnsAdded)
+                        var coordinatesElement = polygon.Element(ns + "outerBoundaryIs")?.Element(ns + "LinearRing")?.Element(ns + "coordinates");
+                        if (coordinatesElement != null)
                         {
-                            // Add columns based on the Schema if available
-                            foreach (var schema in document.Schemas)
-                            {
-                                // extract the schema.Fields info and add the field names as the column names of 
-                                // the data_table
-                                foreach (var field in schema.Fields)
-                                {
-                                    // halihazırda sütun ismi eklenmişse pas geç, eklenmediyse ekle
-                                    if (!data_table.Columns.Contains(field.Name))
-                                    {
-                                        data_table.Columns.Add(field.Name);
-                                    }
-                                }
-                            }
-                            columnsAdded = true;
-                        }
-
-                        // <ExtendedData> isimli node varsa içerindeki data'yı Attribute Table'a ekle
-                        if (placemark.ExtendedData != null)
-                        {
-                            foreach (var schemaData in placemark.ExtendedData.SchemaData)
-                            {
-                                foreach (var simpleData in schemaData.SimpleData)
-                                {
-                                    if (!data_table.Columns.Contains(simpleData.Name))
-                                    {
-                                        data_table.Columns.Add(simpleData.Name);
-                                    }
-                                    row["Row_No"] = row_cnt;
-                                    row[simpleData.Name] = simpleData.Text;
-                                }
-                            }
-
-                            foreach (var data in placemark.ExtendedData.Data)
-                            {
-                                if (!data_table.Columns.Contains(data.Name))
-                                {
-                                    data_table.Columns.Add(data.Name);
-                                }
-                                row["Row_No"] = row_cnt;
-                                row[data.Name] = data.Value;
-                            }
-                        }
-
-                        // add polygon coordinates to "coordinates" column if any polygon exists
-                        foreach (SharpKml.Dom.Polygon polygon in placemark.Flatten().OfType<SharpKml.Dom.Polygon>())
-                        {
-                            foreach (SharpKml.Dom.OuterBoundary outerBoundary in polygon.Flatten().OfType<SharpKml.Dom.OuterBoundary>())
-                            {
-                                foreach (SharpKml.Dom.LinearRing linearRing in outerBoundary.Flatten().OfType<SharpKml.Dom.LinearRing>())
-                                {
-                                    // Convert the coordinates to a string
-                                    string coordinatesString = string.Join(" ; ",
-                                        linearRing.Coordinates.Select(coord => $"{Math.Round(coord.Longitude, 6)},{Math.Round(coord.Latitude, 6)}"));
-                                    row["Row_No"] = row_cnt;
-                                    row["coordinates"] = coordinatesString;
-                                }
-                            }
-                        }
-
-                        // add point coordinates to "coordinate" column if any point exists
-                        foreach (SharpKml.Dom.Point points in placemark.Flatten().OfType<SharpKml.Dom.Point>())
-                        {
-                            // Convert the coordinates to a string
-                            string point_coordinates = Math.Round(points.Coordinate.Longitude, 6).ToString() +
-                                " ; " + Math.Round(points.Coordinate.Latitude, 6).ToString();
-                            row["Row_No"] = row_cnt;
-                            row["coordinates"] = point_coordinates;
-
-                        }
-
-                        // add linestring coordinates to "coordinates" column if any linestring exists
-                        foreach (SharpKml.Dom.LineString lineString in placemark.Flatten().OfType<SharpKml.Dom.LineString>())
-                        {
-                            // Convert the coordinates to a string
-                            string coordinatesString = string.Join(" ; ",
-                                lineString.Coordinates.Select(coord => $"{Math.Round(coord.Longitude, 6)},{Math.Round(coord.Latitude, 6)}"));
-                            row["Row_No"] = row_cnt;
-                            row["coordinates"] = coordinatesString;
-                        }
-
-                        // Handle direct attributes
-                        var attributes = placemark.GetType().GetProperties();
-                        foreach (var attribute in attributes)
-                        {
-                            if (!data_table.Columns.Contains(attribute.Name))
-                            {
-                                data_table.Columns.Add(attribute.Name);
-                            }
-                            row["Row_No"] = row_cnt;
-                            row[attribute.Name] = attribute.GetValue(placemark)?.ToString();
-                        }
-
-                        data_table.Rows.Add(row);
-                        row_cnt++;
-
-                        // geometry bilgisini polygon olarak ya da multiline string olarak ekle
-                        var geometry = placemark.Geometry;
-
-                        if (geometry is SharpKml.Dom.Polygon kmlPolygon)
-                        {
-                            AddPolygonToOverlay_kml(kmlPolygon, kmlOverlay, row);
-                        }
-                        else if (geometry is SharpKml.Dom.LineString kmlLineString)
-                        {
-                            AddLineStringToOverlay_kml(kmlLineString, kmlOverlay);
+                            string coordinatesString = coordinatesElement.Value.Trim();
+                            DataRow row = data_table.Rows[row_cnt - placemarks.Count + i];
+                            AddPolygonToOverlay_kml(coordinatesString, kmlOverlay, row);
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                return;
             }
 
             gMapControl.Refresh();
-        }*/
-
-
-
-        private void EnsureColumnExists(DataTable dataTable, string columnName)
-        {
-            if (!dataTable.Columns.Contains(columnName))
-            {
-                dataTable.Columns.Add(columnName);
-            }
         }
 
-        private void ProcessPlacemark(SharpKml.Dom.Feature document, DataTable dataTable, GMapOverlay kmlOverlay, ref int rowCnt)
-        {
-            foreach (var placemark in document.Flatten().OfType<SharpKml.Dom.Placemark>())
-            {
-                var row = dataTable.NewRow();
-
-                ProcessPlacemarkData(placemark, dataTable, ref rowCnt); // Process placemark data
-
-                dataTable.Rows.Add(row);
-                rowCnt++;  // Increment row count
-
-                AddGeometryToOverlay(placemark, kmlOverlay, row);
-            }
-        }
-
-        private void ProcessPlacemarkData(SharpKml.Dom.Placemark placemark, DataTable dataTable, ref int rowCnt)
-        {
-            var row = dataTable.NewRow();
-
-            // Handle ExtendedData
-            if (placemark.ExtendedData != null)
-            {
-                foreach (var schemaData in placemark.ExtendedData.SchemaData)
-                {
-                    foreach (var simpleData in schemaData.SimpleData)
-                    {
-                        EnsureColumnExists(dataTable, simpleData.Name);
-                        row[simpleData.Name] = simpleData.Text;
-                    }
-                }
-
-                foreach (var data in placemark.ExtendedData.Data)
-                {
-                    EnsureColumnExists(dataTable, data.Name);
-                    row[data.Name] = data.Value;
-                }
-            }
-
-            // Handle Coordinates (polygon, point, line)
-            HandleCoordinates(placemark, row, ref rowCnt);
-
-            // Handle Direct Attributes
-            var attributes = placemark.GetType().GetProperties();
-            foreach (var attribute in attributes)
-            {
-                EnsureColumnExists(dataTable, attribute.Name);
-                row[attribute.Name] = attribute.GetValue(placemark)?.ToString();
-            }
-
-            dataTable.Rows.Add(row);
-        }
-
-        private void HandleCoordinates(SharpKml.Dom.Placemark placemark, DataRow row, ref int rowCnt)
-        {
-            foreach (var polygon in placemark.Flatten().OfType<SharpKml.Dom.Polygon>())
-            {
-                var coordinatesString = string.Join(" ; ",
-                    polygon.Flatten().OfType<SharpKml.Dom.OuterBoundary>()
-                    .SelectMany(outerBoundary => outerBoundary.Flatten().OfType<SharpKml.Dom.LinearRing>())
-                    .Select(coord => $"{Math.Round(coord.Coordinates.First().Longitude, 6)},{Math.Round(coord.Coordinates.First().Latitude, 6)}"));
-                row["Row_No"] = rowCnt;
-                row["coordinates"] = coordinatesString;
-            }
-
-            foreach (var point in placemark.Flatten().OfType<SharpKml.Dom.Point>())
-            {
-                string pointCoordinates = $"{Math.Round(point.Coordinate.Longitude, 6)} ; {Math.Round(point.Coordinate.Latitude, 6)}";
-                row["Row_No"] = rowCnt;
-                row["coordinates"] = pointCoordinates;
-            }
-
-            foreach (var lineString in placemark.Flatten().OfType<SharpKml.Dom.LineString>())
-            {
-                var coordinatesString = string.Join(" ; ",
-                    lineString.Coordinates.Select(coord => $"{Math.Round(coord.Longitude, 6)},{Math.Round(coord.Latitude, 6)}"));
-                row["Row_No"] = rowCnt;
-                row["coordinates"] = coordinatesString;
-            }
-        }
-
-        private void AddColumnsFromSchema(SharpKml.Dom.Document document, DataTable dataTable)
-        {
-            foreach (var schema in document.Schemas)
-            {
-                foreach (var field in schema.Fields)
-                {
-                    EnsureColumnExists(dataTable, field.Name);
-                }
-            }
-        }
-
-        private void AddGeometryToOverlay(SharpKml.Dom.Placemark placemark, GMapOverlay kmlOverlay, DataRow row)
-        {
-            var geometry = placemark.Geometry;
-
-            if (geometry is SharpKml.Dom.Polygon polygon)
-            {
-                AddPolygonToOverlay_kml(polygon, kmlOverlay, row);
-            }
-            else if (geometry is SharpKml.Dom.LineString lineString)
-            {
-                AddLineStringToOverlay_kml(lineString, kmlOverlay);
-            }
-        }
-
-        // method that loads a shapefile object to the specified GMapOverlay map object
         public async Task LoadShapefile(string filepath, GMapOverlay shapeFileOverlay,
-                               System.Data.DataTable shapefile_datatable, DataGridView dataGridView)
+            System.Data.DataTable shapefile_datatable, DataGridView dataGridView)
         {
-            // eğer dosya bulunamadıysa uyarı ver
             if (!File.Exists(filepath))
             {
                 MessageBox.Show("Herhangi bir dosya bulunamadı. Lütfen tekrardan kontrol ediniz.");
@@ -1393,69 +1110,57 @@ namespace SLF
 
             if (!shapefile_datatable.Columns.Contains("Row_No"))
             {
-                // datatable that will hold the attribute table of the .shp file
                 shapefile_datatable.Columns.Add("Row_No");
             }
 
-            // shpReader object to read from the shp file that is being imported
             var shpReader = new ShapefileDataReader(filepath, new NetTopologySuite.Geometries.GeometryFactory());
 
             // Initialize the DataTable columns based on the shapefile's attribute fields
             for (int i = 0; i < shpReader.DbaseHeader.NumFields; i++)
             {
                 var sütunlar = shpReader.DbaseHeader.Fields[i];
-
                 if (!shapefile_datatable.Columns.Contains(sütunlar.Name))
                 {
-                    shapefile_datatable.Columns.Add(sütunlar.Name, typeof(string)); // Simplified to string for all fields
+                    shapefile_datatable.Columns.Add(sütunlar.Name, typeof(string));
                 }
             }
 
             int row_cnt = 1;
 
-            // Wrap the entire processing part in Task.Run to make it non-blocking
-            await Task.Run(() =>
+            while (shpReader.Read())
             {
-                // read the lines of the .shp file one by one until no more line/row is left
-                while (shpReader.Read())
+                var geometry = shpReader.Geometry;
+                DataRow row = shapefile_datatable.NewRow();
+                shapefile_datatable = LoadAttributeTable(row, dataGridView, shpReader, shapefile_datatable, row_cnt);
+
+                // Ensure Row_No is set before passing to AddPolygonToOverlay
+                row["Row_No"] = row_cnt;
+
+                if (geometry is NetTopologySuite.Geometries.Polygon polygon)
                 {
-                    // extract the geometry information of each line in the .shp file
-                    var geometry = shpReader.Geometry;
-
-                    // create a new row for the datatable and then populate it by
-                    // using the LoadAttributeTable() method
-                    DataRow row = shapefile_datatable.NewRow();
-                    shapefile_datatable = LoadAttributeTable(row, dataGridView,
-                               shpReader, shapefile_datatable, row_cnt);
-
-                    row_cnt++;
-
-                    // check if the geometry of the shapefile includes one polygon or is a multipolygon,
-                    // add each of the polygons to the shapeFileOverlay by a for loop if multipolygon.
-                    if (geometry is NetTopologySuite.Geometries.Polygon polygon)
+                    AddPolygonToOverlay(polygon, shapeFileOverlay, "shapeFilePolygon", row);
+                }
+                else if (geometry is NetTopologySuite.Geometries.MultiPolygon multiPolygon)
+                {
+                    foreach (NetTopologySuite.Geometries.Polygon poly in multiPolygon.Geometries)
                     {
-                        AddPolygonToOverlay(polygon, shapeFileOverlay, "shapeFilePolygon", row);
-                    }
-                    else if (geometry is NetTopologySuite.Geometries.MultiPolygon multiPolygon)
-                    {
-                        foreach (NetTopologySuite.Geometries.Polygon poly in multiPolygon.Geometries)
-                        {
-                            AddPolygonToOverlay(poly, shapeFileOverlay, "shapeFilePolygon", row);
-                        }
+                        AddPolygonToOverlay(poly, shapeFileOverlay, "shapeFilePolygon", row);
                     }
                 }
-            });
 
-            // Find the first available slot in the array that holds shapefile overlay layers
-            layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
+                row_cnt++;
+            }
 
+            // Log the DataTable to verify Row_No values
+            File.WriteAllText("shapefile_datatable.txt", string.Join("\n", shapefile_datatable.Rows.Cast<DataRow>().Select(r => $"Row_No: {r["Row_No"]}")));
+
+            layer_index = Array.FindIndex(tüm_katmanlar_array_imar, s => s == null);
             if (layer_index == -1)
             {
-                MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
+                MessageBox.Show("En fazla 15 adet katman seçilebilmektedir.");
                 return;
             }
 
-            // Convert GMapOverlay to MapWinGIS.Shapefile
             MapWinGIS.Shapefile myShapefile = ConvertOverlayToShapefile(shapeFileOverlay);
             shapeFileArray_MapWinGIS[layer_index] = myShapefile;
         }
@@ -1557,7 +1262,7 @@ namespace SLF
             // grid e ait oluşturulmuş mxm hücreleri "polygons" listesiyle return et.
             return polygons;
         }
-
+        
         // creates a grid and adds it onto the map
         public void AddGridToMap(GMapControl gMapControl)
         {
@@ -1591,10 +1296,20 @@ namespace SLF
             }
 
             gMapControl.Refresh();
-
+            
             // Find the first available slot in the array that holds shapefile overlay layers
-            layer_index = Array.FindIndex(tüm_katmanlar_array, s => s == null);
-            tüm_katmanlar_array[layer_index] = gridOverlay;
+            layer_index = Array.FindIndex(tüm_katmanlar_array_imar, s => s == null);
+            tüm_katmanlar_array_imar[layer_index] = gridOverlay;
+            tüm_katmanlar_array_yuk[layer_index] = gridOverlay;
+
+            // add grid overlay to the specified gmapcontrol objects
+            modülFormu.gMapControl_imar.Overlays.Add(gridOverlay);
+
+            // copy the contents of the grid in the imar tab to the grid in the yuk tab
+            GMapOverlay grid_overlay_yuk = new GMapOverlay($"grid_overlay_{layer_index + 1}_yuk");
+            modülFormu.gMapControl_yuk.Overlays.Add(grid_overlay_yuk);
+            CopyOverlayContents(gridOverlay, grid_overlay_yuk, polygonAttributes_imar, polygonAttributes_yuk);
+
             tüm_katmanlar_array_names[layer_index] = "Grid_" + grid_size + "_" + (layer_index + 1).ToString();
             tüm_katmanlar_datatable[layer_index] = gridTable;
 
@@ -1603,24 +1318,30 @@ namespace SLF
             MapWinGIS.Shapefile myShapefile = ConvertOverlayToShapefile(gridOverlay);
             shapeFileArray_MapWinGIS[layer_index] = myShapefile;
 
-            // Get the list of associated checkboxes for the given layer_index
-            List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
 
-            if (associatedCheckBoxes != null)
+            List<CheckBox> associatedChecks = modülFormu.GetCheckBoxesByIndex(layer_index);
+            foreach (var chk in associatedChecks)
             {
-                // Loop through each checkbox in the list and apply the required settings
-                foreach (var checkBox in associatedCheckBoxes)
-                {
-                    checkBox.Checked = true;
-                    checkBox.Visible = true;
-                    checkBox.Text = tüm_katmanlar_array_names[layer_index];
-                }
+                chk.Text = tüm_katmanlar_array_names[layer_index];
+                chk.Visible = true;
+                chk.Checked = true;
             }
+
+            // Mark all categories for update
+            //modülFormu.pendingUpdates["imar"] = true; ////////////////////////////////////////////////////////////////////////////////////////
+            //modülFormu.pendingUpdates["yuk"] = true;////////////////////////////////////////////////////////////////////////////////////////
+
+            // Update only the active tab immediately
+            //modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_imar, "imar");////////////////////////////////////////////////////////////////////////////////////////
+            //modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_yuk, "yuk");////////////////////////////////////////////////////////////////////////////////////////
+
+            modülFormu.gMapControl_imar.Refresh();
         }
 
 
-
         // ------------------------------------ EXTRAS --------------------------------------//
+
+
         public GMapControl GetActiveGMapControl()
         {
             TabPage selectedTab = modülFormu.Modül_Tabları.SelectedTab;
@@ -1673,6 +1394,29 @@ namespace SLF
             return null;
         }
 
+        // Helper method to recursively search for GMapControl in nested containers
+        private Microsoft.Web.WebView2.WinForms.WebView2 FindWebViewInContainer(System.Windows.Forms.Control container)
+        {
+            foreach (System.Windows.Forms.Control control in container.Controls)
+            {
+                if (control is Microsoft.Web.WebView2.WinForms.WebView2 webViewControl)
+                {
+                    return webViewControl;
+                }
+
+                // Recursively check if the control is a container (e.g., Panel)
+                if (control is Panel panel)
+                {
+                    Microsoft.Web.WebView2.WinForms.WebView2 nestedControl = FindWebViewInContainer(panel);
+                    if (nestedControl != null)
+                    {
+                        return nestedControl;
+                    }
+                }
+            }
+            return null;
+        }
+
 
         public Microsoft.Web.WebView2.WinForms.WebView2 GetActiveWebView()
         {
@@ -1682,9 +1426,20 @@ namespace SLF
             {
                 foreach (System.Windows.Forms.Control control in selectedTab.Controls)
                 {
-                    if (control is Microsoft.Web.WebView2.WinForms.WebView2 webView)
+                    // If the control is a GMapControl, return it
+                    if (control is Microsoft.Web.WebView2.WinForms.WebView2 webViewObject)
                     {
-                        return webView;
+                        return webViewObject;
+                    }
+
+                    // If it's a container, recursively search for a GMapControl inside it
+                    if (control is Panel panel)
+                    {
+                        Microsoft.Web.WebView2.WinForms.WebView2 nestedControl = FindWebViewInContainer(panel);
+                        if (nestedControl != null)
+                        {
+                            return nestedControl;
+                        }
                     }
                 }
             }
@@ -1716,7 +1471,6 @@ namespace SLF
             return oddNodes;
         }
 
-        //highlight the polygon which is double clicked on
         public void HighlightPolygon(GMapPolygon polygon, int index, GMapControl gMapControl)
         {
             if (gridOverlay.Polygons.Contains(polygon))
@@ -1725,71 +1479,194 @@ namespace SLF
                 foreach (var poly in gridOverlay.Polygons)
                 {
                     poly.Stroke = new Pen(overlayColors[index].BorderColor, 3);
-                    poly.Fill = new SolidBrush(overlayColors[index].FillColor);
+                    poly.Fill = new SolidBrush(Color.FromArgb(100, overlayColors[index].FillColor));
                 }
 
                 // Highlight new selected polygon
-                polygon.Stroke = new Pen(System.Drawing.Color.LawnGreen, 3);
-                polygon.Fill = new SolidBrush(System.Drawing.Color.FromArgb(50, System.Drawing.Color.LawnGreen));
-
-
+                polygon.Stroke = new Pen(Color.LawnGreen, 3);
+                polygon.Fill = new SolidBrush(Color.FromArgb(50, Color.LawnGreen));
 
                 gMapControl.Refresh();
             }
             else
             {
-                // Reset previous selected polygon to the previously defined default map colors
-                if (selectedPolygon != null)
+                // Find the overlay index for the new polygon
+                int newOverlayIndexImar = -1;
+                int newOverlayIndexYuk = -1;
+                for (int i = 0; i < tüm_katmanlar_array_imar.Length; i++)
                 {
-                    selectedPolygon.Stroke = new Pen(overlayColors[index].BorderColor, 3);
-                    selectedPolygon.Fill = new SolidBrush(overlayColors[index].FillColor);
+                    if (tüm_katmanlar_array_imar[i] != null && tüm_katmanlar_array_imar[i].Polygons.Contains(polygon))
+                    {
+                        newOverlayIndexImar = i;
+                        break;
+                    }
+                }
+                for (int i = 0; i < tüm_katmanlar_array_yuk.Length; i++)
+                {
+                    if (tüm_katmanlar_array_yuk[i] != null && tüm_katmanlar_array_yuk[i].Polygons.Contains(polygon))
+                    {
+                        newOverlayIndexYuk = i;
+                        break;
+                    }
                 }
 
-                // Highlight new selected polygon with a different border and fill color
+                // Reset previous selected polygon
+                if (selectedPolygon != null)
+                {
+                    // Find the overlay that contains the selectedPolygon in both imar and yuk
+                    int overlayIndexImar = -1;
+                    int overlayIndexYuk = -1;
+                    for (int i = 0; i < tüm_katmanlar_array_imar.Length; i++)
+                    {
+                        if (tüm_katmanlar_array_imar[i] != null && tüm_katmanlar_array_imar[i].Polygons.Contains(selectedPolygon))
+                        {
+                            overlayIndexImar = i;
+                            break;
+                        }
+                    }
+                    for (int i = 0; i < tüm_katmanlar_array_yuk.Length; i++)
+                    {
+                        if (tüm_katmanlar_array_yuk[i] != null && tüm_katmanlar_array_yuk[i].Polygons.Contains(selectedPolygon))
+                        {
+                            overlayIndexYuk = i;
+                            break;
+                        }
+                    }
+
+                    // Reset the selectedPolygon in both imar and yuk if found
+                    if (overlayIndexImar != -1 || overlayIndexYuk != -1)
+                    {
+                        // Use the overlayIndex from either imar or yuk (they should be the same due to CopyOverlayContents)
+                        int overlayIndex = overlayIndexImar != -1 ? overlayIndexImar : overlayIndexYuk;
+                        string layerName = tüm_katmanlar_array_names[overlayIndex];
+
+                        // Find the corresponding polygons in both imar and yuk
+                        GMapPolygon selectedPolygonImar = null;
+                        GMapPolygon selectedPolygonYuk = null;
+                        if (overlayIndexImar != -1)
+                        {
+                            selectedPolygonImar = tüm_katmanlar_array_imar[overlayIndexImar].Polygons.FirstOrDefault(p => p.Equals(selectedPolygon));
+                        }
+                        if (overlayIndexYuk != -1)
+                        {
+                            selectedPolygonYuk = tüm_katmanlar_array_yuk[overlayIndexYuk].Polygons.FirstOrDefault(p => p.Equals(selectedPolygon));
+                        }
+
+                        if (layerName == "İMAR_SONUÇLAR.kml" && currentImarTipiColorMap != null)
+                        {
+                            // Restore color based on İmar Tipi
+                            if (polygonAttributes_yuk.TryGetValue(selectedPolygon, out DataRow row) &&
+                                row.Table.Columns.Contains("İmar Tipi") && row["İmar Tipi"] != DBNull.Value)
+                            {
+                                string imarTipi = row["İmar Tipi"].ToString();
+                                if (currentImarTipiColorMap.TryGetValue(imarTipi, out Color mappedColor))
+                                {
+                                    if (selectedPolygonImar != null)
+                                    {
+                                        selectedPolygonImar.Stroke = new Pen(Color.Black, 3);
+                                        selectedPolygonImar.Fill = new SolidBrush(Color.FromArgb(100, mappedColor));
+                                    }
+                                    if (selectedPolygonYuk != null)
+                                    {
+                                        selectedPolygonYuk.Stroke = new Pen(Color.Black, 3);
+                                        selectedPolygonYuk.Fill = new SolidBrush(Color.FromArgb(100, mappedColor));
+                                    }
+                                }
+                                else
+                                {
+                                    // Fallback to default color if İmar Tipi not found
+                                    if (selectedPolygonImar != null)
+                                    {
+                                        selectedPolygonImar.Stroke = new Pen(overlayColors[overlayIndex].BorderColor, 3);
+                                        selectedPolygonImar.Fill = new SolidBrush(Color.FromArgb(100, overlayColors[overlayIndex].FillColor));
+                                    }
+                                    if (selectedPolygonYuk != null)
+                                    {
+                                        selectedPolygonYuk.Stroke = new Pen(overlayColors[overlayIndex].BorderColor, 3);
+                                        selectedPolygonYuk.Fill = new SolidBrush(Color.FromArgb(100, overlayColors[overlayIndex].FillColor));
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // Fallback to default color if attributes not found
+                                if (selectedPolygonImar != null)
+                                {
+                                    selectedPolygonImar.Stroke = new Pen(overlayColors[overlayIndex].BorderColor, 3);
+                                    selectedPolygonImar.Fill = new SolidBrush(Color.FromArgb(100, overlayColors[overlayIndex].FillColor));
+                                }
+                                if (selectedPolygonYuk != null)
+                                {
+                                    selectedPolygonYuk.Stroke = new Pen(overlayColors[overlayIndex].BorderColor, 3);
+                                    selectedPolygonYuk.Fill = new SolidBrush(Color.FromArgb(100, overlayColors[overlayIndex].FillColor));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Default reset for non-İMAR_SONUÇLAR.kml layers
+                            if (selectedPolygonImar != null)
+                            {
+                                selectedPolygonImar.Stroke = new Pen(overlayColors[overlayIndex].BorderColor, 3);
+                                selectedPolygonImar.Fill = new SolidBrush(Color.FromArgb(100, overlayColors[overlayIndex].FillColor));
+                            }
+                            if (selectedPolygonYuk != null)
+                            {
+                                selectedPolygonYuk.Stroke = new Pen(overlayColors[overlayIndex].BorderColor, 3);
+                                selectedPolygonYuk.Fill = new SolidBrush(Color.FromArgb(100, overlayColors[overlayIndex].FillColor));
+                            }
+                        }
+                    }
+                }
+
+                // Highlight new selected polygon in both imar and yuk
                 selectedPolygon = polygon;
-                selectedPolygon.Stroke = new Pen(System.Drawing.Color.LawnGreen, 3);
-                selectedPolygon.Fill = new SolidBrush(System.Drawing.Color.FromArgb(50, System.Drawing.Color.LawnGreen));
+                if (newOverlayIndexImar != -1)
+                {
+                    GMapPolygon polygonImar = tüm_katmanlar_array_imar[newOverlayIndexImar].Polygons.FirstOrDefault(p => p.Equals(polygon));
+                    if (polygonImar != null)
+                    {
+                        polygonImar.Stroke = new Pen(Color.LawnGreen, 3);
+                        polygonImar.Fill = new SolidBrush(Color.FromArgb(50, Color.LawnGreen));
+                    }
+                }
+                if (newOverlayIndexYuk != -1)
+                {
+                    GMapPolygon polygonYuk = tüm_katmanlar_array_yuk[newOverlayIndexYuk].Polygons.FirstOrDefault(p => p.Equals(polygon));
+                    if (polygonYuk != null)
+                    {
+                        polygonYuk.Stroke = new Pen(Color.LawnGreen, 3);
+                        polygonYuk.Fill = new SolidBrush(Color.FromArgb(50, Color.LawnGreen));
+                    }
+                }
 
-                gMapControl.Refresh();
+                // Refresh both GMapControls if necessary
+                if (gMapControl == modülFormu.gMapControl_imar)
+                {
+                    modülFormu.gMapControl_imar.Refresh();
+                    modülFormu.gMapControl_yuk.Refresh();
+                }
+                else if (gMapControl == modülFormu.gMapControl_yuk)
+                {
+                    modülFormu.gMapControl_yuk.Refresh();
+                    modülFormu.gMapControl_imar.Refresh();
+                }
             }
-
         }
+
         public void Draw_Polygon(List<PointLatLng> polygonPoints, GMapOverlay polygonOverlay, GMapControl gmap)
         {
-            // Bu noktalar arasında poligon çiz, mavi ile işaretle ve polygonOverlay katmanına ekle.
+            // bu noktalar arasında poligon çiz, mavi ile işaretle, ve de 
+            // polygonOverlay katmanına ekle.
             string poligonIsim = $"Poligon_{polygonOverlay.Polygons.Count + 1}";
             GMapPolygon polygon = new GMapPolygon(polygonPoints, poligonIsim)
             {
                 Stroke = new Pen(System.Drawing.Color.DarkBlue, 3)
             };
 
-            // Mevcut poligonları silmeden yeni poligonu ekle
+            polygonOverlay.Polygons.Clear();
             polygonOverlay.Polygons.Add(polygon);
-
-            // Haritayı yenile
             gmap.Refresh();
-        }
-
-        public System.Data.DataTable CreatePolygonDataTable(List<PointLatLng> polygonPoints, int polygonId)
-        {
-            System.Data.DataTable dt = new System.Data.DataTable();
-            dt.Columns.Add("PolygonID", typeof(int));
-            dt.Columns.Add("Coordinates", typeof(string));
-            dt.Columns.Add("Area_Size(m2)", typeof(string));
-
-            // Create a string representation of the coordinates
-            string coordinates = string.Join(", ", polygonPoints.Select(p => $"({p.Lat}, {p.Lng})"));
-
-            double area = CalculatePolygonArea(polygonPoints);
-
-            // Create a new row
-            DataRow row = dt.NewRow();
-            row["PolygonID"] = polygonId;
-            row["Coordinates"] = coordinates;
-            row["Area_Size(m2)"] = Math.Round(area, 0).ToString();
-            dt.Rows.Add(row);
-
-            return dt;
         }
 
         public double CalculatePolygonArea(List<PointLatLng> points)
@@ -1816,103 +1693,136 @@ namespace SLF
         }
 
 
-        public System.Drawing.Color GetHeatmapColor(double value, double min, double max)
+        public void CreateHeatmap(GMapOverlay overlay, DataTable dataTable, string columnName, 
+            Dictionary<GMapPolygon, DataRow> polygonAttributes)
         {
-            double ratio = (value - min) / (max - min);
-            int red = (int)(255 * ratio);
-            int blue = (int)(255 * (1 - ratio));
-            return System.Drawing.Color.FromArgb(100, red, 0, blue); // Semi-transparent color
-        }
+            double[] brackets = { 0, 3, 5, 10, 20, 30, 40, 50, 75, 100, double.PositiveInfinity };
+            int bracketCount = brackets.Length - 1; // 10 intervals
 
-
-        public void CreateHeatmap(GMapOverlay overlay, System.Data.DataTable dataTable, string columnName)
-        {
-            // Step 1: Find the min and max values for normalization
-            double min = double.MaxValue;
-            double max = double.MinValue;
-
-            foreach (DataRow row in dataTable.Rows)
-            {
-                if (row[columnName] != DBNull.Value && double.TryParse(row[columnName].ToString(),
-                    out double value))
-                {
-                    if (value < min) min = value;
-                    if (value > max) max = value;
-                }
-            }
-
-            // Step 2: Apply heatmap color to each polygon based on the column value
+            // Now continue with your original logic:
             foreach (GMapPolygon polygon in overlay.Polygons)
             {
-                // Get the corresponding DataRow for the polygon
                 if (polygonAttributes.TryGetValue(polygon, out DataRow attributes))
                 {
-
-                    if (attributes[columnName] != DBNull.Value && double.TryParse(attributes[columnName].ToString(),
-                        out double value))
+                    // Check if the DataRow contains the specified column.
+                    if (!attributes.Table.Columns.Contains(columnName))
                     {
+                        MessageBox.Show("Seçilen yıla ait veri bulunamadı.");
+                        break;
+                    }
 
-                        System.Drawing.Color heatColor = GetHeatmapColor(value, min, max);
-                        polygon.Stroke = new Pen(heatColor, 1);
-                        polygon.Fill = new SolidBrush(heatColor);
+                    string rawValue = attributes[columnName].ToString();
+
+                    // Attempt to parse the string using InvariantCulture
+                    if (!string.IsNullOrWhiteSpace(rawValue) &&
+                    double.TryParse(rawValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+                    {
+                        // Determine which bracket the value falls into
+                        int bracketIndex = -1;
+                        for (int i = 0; i < bracketCount; i++)
+                        {
+                            if (value >= brackets[i] && value < brackets[i + 1])
+                            {
+                                bracketIndex = i;
+                                break;
+                            }
+                        }
+
+                        if (bracketIndex >= 0)
+                        {
+                            // Normalize the bracket index to a value between 0 and 1 for color mapping
+                            double normalizedValue = (double)bracketIndex / (bracketCount - 1);
+                            Color heatColor = GetHeatmapColor(normalizedValue);
+                            polygon.Stroke = new Pen(heatColor, 1);
+                            polygon.Fill = new SolidBrush(heatColor);
+                            continue;
+                        }
                     }
                 }
+
+                // If parsing fails or no value is provided, color the polygon with a default gray.
+                polygon.Stroke = new Pen(Color.Gray, 1);
+                polygon.Fill = new SolidBrush(Color.Gray);
             }
 
-            // Refresh the map control to show updated colors
+            // Refresh the map control to show updated colors.
             modülFormu.gMapControl_yuk.Refresh();
         }
 
-        public void CreateHeatmapLegend(double min, double max)
+        // In cbs class
+        public void UpdateHeatmapLegend()
         {
-            // Clear previous legend if it exists
-            if (modülFormu.Controls.ContainsKey("heatmapLegend"))
+            // Define the fixed brackets
+            double[] brackets = { 0, 3, 5, 10, 20, 30, 40, 50, 75, 100, double.PositiveInfinity };
+            string[] bracketLabels = { "0-3", "3-5", "5-10", "10-20", "20-30", "30-40", "40-50", "50-75", "75-100", "100-Inf" };
+            int bracketCount = bracketLabels.Length; // Should be 10
+
+            // Ensure the arrays exist (they should have been created in InitializeHeatmapLegendControls)
+            if (modülFormu.colorBoxes == null || modülFormu.rangeLabels == null || modülFormu.unitLabel == null)
             {
-                modülFormu.Controls.RemoveByKey("heatmapLegend");
+                MessageBox.Show("Heatmap legend controls not initialized.");
+                return;
             }
 
-            // Divide the range into 10 equal brackets
-            double range = max - min;
-            double bracketSize = range / 10;
+            // Update the unit label (just ensure it's visible)
+            modülFormu.unitLabel.Text = "Yük Yoğunluğu (MW/km²)";
+            modülFormu.unitLabel.Visible = true;
 
-            // Generate labels and color boxes for each bracket
-            for (int i = 0; i < 10; i++)
+            // Update color boxes and range labels for each bracket
+            for (int i = 0; i < bracketCount; i++)
             {
-                double bracketMin = min + (i * bracketSize);
-                double bracketMax = bracketMin + bracketSize;
+                // Calculate color gradient from blue to yellow based on the bracket index
+                double normalizedValue = (double)i / (bracketCount - 1);
+                System.Drawing.Color color = GetHeatmapColor(normalizedValue);
 
-                // Calculate color gradient from blue to red
-                System.Drawing.Color color = GetHeatmapColor(i / 9.0); // Pass a normalized value (0 to 1)
+                // Update the color box
+                modülFormu.colorBoxes[i].BackColor = color;
+                modülFormu.colorBoxes[i].Visible = true;
 
-                // Create a color box
-                Panel colorBox = new Panel
-                {
-                    Size = new System.Drawing.Size(20, 20),
-                    Location = new System.Drawing.Point(10, i * 20 + 10),
-                    BackColor = color
-                };
-
-                modülFormu.legendPanel.Controls.Add(colorBox);
-
-                // Create a label for the bracket range
-                System.Windows.Forms.Label rangeLabel = new System.Windows.Forms.Label
-                {
-                    Text = $"{bracketMin:F2} - {bracketMax:F2}",
-                    Location = new System.Drawing.Point(35, i * 20 + 10),
-                    AutoSize = true,
-                    Font = new Font("Arial", 8)
-                };
-
-                modülFormu.legendPanel.Controls.Add(rangeLabel);
+                // Update the range label
+                modülFormu.rangeLabels[i].Text = bracketLabels[i];
+                modülFormu.rangeLabels[i].Visible = true;
             }
+
+            // Force layout update on the legend panel
+            modülFormu.legendPanel.PerformLayout();
         }
 
-        // Color gradient method for blue to red
-        private System.Drawing.Color GetHeatmapColor(double ratio)
+        public System.Drawing.Color GetHeatmapColor(double normalized)
         {
-            int red = (int)(255 * ratio);
-            int blue = (int)(255 * (1 - ratio));
-            return System.Drawing.Color.FromArgb(255, red, 0, blue); // Opaque colors
+            // Clamp normalized to the range [0,1]
+            normalized = Math.Max(0, Math.Min(1, normalized));
+
+            // Define an alpha value for transparency (0 = fully transparent, 255 = opaque)
+            int alpha = 150; // Adjust as needed
+
+            int r, g, b;
+
+            // Split the gradient into two segments:
+            // - 0 to 0.5: Blue to Yellow
+            // - 0.5 to 1: Yellow to Red
+            if (normalized <= 0.5)
+            {
+                // Segment 1: Blue (0, 0, 255) to Yellow (255, 255, 0)
+                // Scale normalized from [0, 0.5] to [0, 1] for this segment
+                double segmentValue = normalized / 0.5; // Maps 0->0, 0.5->1
+
+                r = (int)(segmentValue * 255);      // Increases from 0 to 255
+                g = (int)(segmentValue * 255);      // Increases from 0 to 255
+                b = (int)((1 - segmentValue) * 255); // Decreases from 255 to 0
+            }
+            else
+            {
+                // Segment 2: Yellow (255, 255, 0) to Red (255, 0, 0)
+                // Scale normalized from [0.5, 1] to [0, 1] for this segment
+                double segmentValue = (normalized - 0.5) / 0.5; // Maps 0.5->0, 1->1
+
+                r = 255;                            // Stays at 255
+                g = (int)((1 - segmentValue) * 255); // Decreases from 255 to 0
+                b = 0;                              // Stays at 0
+            }
+
+            return System.Drawing.Color.FromArgb(alpha, r, g, b);
         }
 
 
@@ -2002,7 +1912,7 @@ namespace SLF
 
             foreach (GMapPolygon polygon in overlay.Polygons)
             {
-                if (polygonAttributes.TryGetValue(polygon, out DataRow attributes))
+                if (polygonAttributes_imar.TryGetValue(polygon, out DataRow attributes))
                 {
                     polygonData.Add((polygon, attributes));
                 }
@@ -2014,19 +1924,48 @@ namespace SLF
         // check whether two polygons intersect
         private bool PolygonsIntersect(GMapPolygon polygon1, GMapPolygon polygon2)
         {
-            // Convert GMapPolygon to NTS Polygon
             var geometryFactory = new NetTopologySuite.Geometries.GeometryFactory();
-            
 
-            var coordinates1 = polygon1.Points.Select(p => new NetTopologySuite.Geometries.Coordinate(p.Lng, p.Lat)).ToArray();
-            var coordinates2 = polygon2.Points.Select(p => new NetTopologySuite.Geometries.Coordinate(p.Lng, p.Lat)).ToArray();
-            //abone_listesi.points;
+            // Convert polygon1
+            var coords1 = polygon1.Points
+                .Select(p => new NetTopologySuite.Geometries.Coordinate(p.Lng, p.Lat))
+                .ToList();
 
-            var ntsPolygon1 = geometryFactory.CreatePolygon(coordinates1);
-            var ntsPolygon2 = geometryFactory.CreatePolygon(coordinates2);
+            if (!AreCoordinatesClosed(coords1))
+            {
+                coords1.Add(coords1[0]);
+            }
+
+            var ntsPolygon1 = geometryFactory.CreatePolygon(coords1.ToArray());
+
+            // Convert polygon2
+            var coords2 = polygon2.Points
+                .Select(p => new NetTopologySuite.Geometries.Coordinate(p.Lng, p.Lat))
+                .ToList();
+
+            if (!AreCoordinatesClosed(coords2))
+            {
+                coords2.Add(coords2[0]);
+            }
+
+            var ntsPolygon2 = geometryFactory.CreatePolygon(coords2.ToArray());
 
             return ntsPolygon1.Intersects(ntsPolygon2);
         }
+
+        // Helper that checks if the last coordinate equals the first
+        private bool AreCoordinatesClosed(List<NetTopologySuite.Geometries.Coordinate> coords)
+        {
+            if (coords.Count < 2) return false;
+
+            var first = coords[0];
+            var last = coords[coords.Count - 1];
+
+            // The standard 'closed' test is that first == last
+            // If your data is lat/long, you might do a tolerance-based comparison
+            return first.Equals2D(last);
+        }
+
 
         // Method to extract consumption value from DataRow
         private double ExtractConsumptionValue(DataRow row, string columnName)
@@ -2035,7 +1974,6 @@ namespace SLF
                 ? value
                 : 0.0;
         }
-
 
 
         // combine the attributes of the polygons which intersect one another
@@ -2216,7 +2154,7 @@ namespace SLF
             foreach (var (resultingPolygon, resultingAttributes) in joinedData)
             {
                 resultingOverlay.Polygons.Add(resultingPolygon);
-                polygonAttributes[resultingPolygon] = resultingAttributes;
+                polygonAttributes_imar[resultingPolygon] = resultingAttributes;
 
                 resultingPolygon.Stroke = new Pen(System.Drawing.Color.LightSeaGreen, 3);
                 resultingPolygon.Fill = new SolidBrush(System.Drawing.Color.FromArgb(50, System.Drawing.Color.Transparent));
@@ -2272,7 +2210,7 @@ namespace SLF
 
                 }
                 resultingOverlay.Polygons.Add(resultingPolygon);
-                polygonAttributes[resultingPolygon] = resultingAttributes;
+                polygonAttributes_imar[resultingPolygon] = resultingAttributes;
 
                 resultingPolygon.Stroke = new Pen(System.Drawing.Color.LightSeaGreen, 5);
                 resultingPolygon.Fill = new SolidBrush(System.Drawing.Color.FromArgb(50, System.Drawing.Color.Transparent));
@@ -2281,6 +2219,8 @@ namespace SLF
 
             return resultingOverlay;
         }
+
+
         // join the two layers by their indexes within the tüm_katmanlar_array GMapOverlay array
         public async Task JoinAttributesByLocation(GMapControl gMapControl)
         {
@@ -2288,14 +2228,15 @@ namespace SLF
             List<string> selectedColumns = modülFormu.fonksiyonFormu.agrege_olacak_sutunlar;
 
             // find the indices of the layers that are selected in the "jabl" functionality/interface
+            // in the "tüm_katmanlar_array_names"
             modülFormu.firstLayerToJoin = Array.FindIndex(tüm_katmanlar_array_names,
                 name => name == modülFormu.firstLayerName);
             modülFormu.secondLayerToJoin = Array.FindIndex(tüm_katmanlar_array_names,
                 name => name == modülFormu.secondLayerName);
 
             // extract the first and second overlay layers according to their specified indices
-            GMapOverlay firstOverlay = tüm_katmanlar_array[modülFormu.firstLayerToJoin];
-            GMapOverlay secondOverlay = tüm_katmanlar_array[modülFormu.secondLayerToJoin];
+            GMapOverlay firstOverlay = tüm_katmanlar_array_imar[modülFormu.firstLayerToJoin];
+            GMapOverlay secondOverlay = tüm_katmanlar_array_imar[modülFormu.secondLayerToJoin];
 
             // extract the data of the first layer from the "tüm_katmanlar_datatable" array
             List<(GMapPolygon Polygon, DataRow Attributes)> firstLayerData =
@@ -2305,17 +2246,14 @@ namespace SLF
             List<(GMapPolygon Polygon, DataRow Attributes)> secondLayerData =
                 ExtractPolygonsAndAttributes(secondOverlay, tüm_katmanlar_datatable[modülFormu.secondLayerToJoin]);
 
-            // Perform the spatial join and aggregation in a background task
-            List<(GMapPolygon ResultingPolygon, DataRow ResultingAttributes)> joinedData = await Task.Run(() =>
-            {
-                return PerformSpatialJoin(firstLayerData, secondLayerData);
-            });
+            // spatially join the two layers and store the results in the "joinedData" List object
+            List<(GMapPolygon ResultingPolygon, DataRow ResultingAttributes)> joinedData = PerformSpatialJoin(firstLayerData, secondLayerData);
 
             // create the resulting overlay with respect to the "joinedData" object
             GMapOverlay resultingOverlay = CreateResultingOverlay(joinedData);
 
             // Find the first available slot in the array that holds shapefile overlay layers
-            layer_index = Array.FindIndex(tüm_katmanlar_array, i => i == null);
+            layer_index = Array.FindIndex(tüm_katmanlar_array_imar, i => i == null);
 
             if (layer_index == -1)
             {
@@ -2324,7 +2262,8 @@ namespace SLF
             }
 
             // add the resulting layer and its name to the specified arrays
-            tüm_katmanlar_array[layer_index] = resultingOverlay;
+            tüm_katmanlar_array_imar[layer_index] = resultingOverlay;
+
             tüm_katmanlar_array_names[layer_index] = "Birleştirilmiş_Katman_" + layer_index.ToString();
 
             // create a data table object and fill it with the information from the joinedData object
@@ -2332,10 +2271,10 @@ namespace SLF
 
             if (joinedData.Count > 0)
             {
+
                 // Use the first DataRow to define the columns of the DataTable
                 DataRow firstRow = joinedData[0].ResultingAttributes;
 
-                // Add columns from firstRow
                 foreach (DataColumn column in firstRow.Table.Columns)
                 {
                     joined_data_table.Columns.Add(column.ColumnName, column.DataType);
@@ -2351,6 +2290,7 @@ namespace SLF
                     }
                     joined_data_table.Rows.Add(newRow);
                 }
+
             }
 
             // add the datatable to the array so that it can be summoned later
@@ -2370,23 +2310,25 @@ namespace SLF
                 }
             }
 
-            // Add the overlay to the GMapControl and refresh
             gMapControl.Overlays.Add(resultingOverlay);
             gMapControl.Refresh();
+
         }
 
+        // method to find the aggregate summary measures for each cell within the grid specified
         public async Task JoinAttributesByLocation_summary(GMapControl gMapControl)
         {
             // Assume selectedColumns is populated from the ComboBox selections
             List<string> selectedColumns = modülFormu.fonksiyonFormu.agrege_olacak_sutunlar;
 
             // find the indices of the layers that are selected in the "jabl-summary" functionality/interface
+            // in the "tüm_katmanlar_array_names"
             modülFormu.firstLayerToJoin = Array.FindIndex(tüm_katmanlar_array_names, name => name == modülFormu.firstLayerName);
             modülFormu.secondLayerToJoin = Array.FindIndex(tüm_katmanlar_array_names, name => name == modülFormu.secondLayerName);
 
             // extract the first and second overlay layers according to their specified indices
-            GMapOverlay firstOverlay = tüm_katmanlar_array[modülFormu.firstLayerToJoin];
-            GMapOverlay secondOverlay = tüm_katmanlar_array[modülFormu.secondLayerToJoin];
+            GMapOverlay firstOverlay = tüm_katmanlar_array_imar[modülFormu.firstLayerToJoin];
+            GMapOverlay secondOverlay = tüm_katmanlar_array_imar[modülFormu.secondLayerToJoin];
 
             // extract the data of the first layer from the "tüm_katmanlar_datatable" array
             List<(GMapPolygon Polygon, DataRow Attributes)> firstLayerData =
@@ -2396,17 +2338,14 @@ namespace SLF
             List<(GMapPolygon Polygon, DataRow Attributes)> secondLayerData =
                 ExtractPolygonsAndAttributes(secondOverlay, tüm_katmanlar_datatable[modülFormu.secondLayerToJoin]);
 
-            // Perform the spatial join and aggregation in a background task
-            var joinedData = await Task.Run(() =>
-            {
-                return PerformSpatialJoinWithAggregations(firstLayerData, secondLayerData, selectedColumns);
-            });
+            // spatially join the two layers and store the results in the "joinedData" List object
+            var joinedData = PerformSpatialJoinWithAggregations(firstLayerData, secondLayerData, selectedColumns);
 
             // create the resulting overlay with respect to the "joinedData" object
             GMapOverlay resultingOverlay = CreateResultingOverlayWithSummaries(joinedData, selectedColumns);
 
             // Find the first available slot in the array that holds shapefile overlay layers
-            layer_index = Array.FindIndex(tüm_katmanlar_array, i => i == null);
+            layer_index = Array.FindIndex(tüm_katmanlar_array_imar, i => i == null);
 
             if (layer_index == -1)
             {
@@ -2415,7 +2354,8 @@ namespace SLF
             }
 
             // add the resulting layer and its name to the specified arrays
-            tüm_katmanlar_array[layer_index] = resultingOverlay;
+            tüm_katmanlar_array_imar[layer_index] = resultingOverlay;
+
             tüm_katmanlar_array_names[layer_index] = "Birleştirilmiş_Katman_" + layer_index.ToString();
 
             // create a data table object and fill it with the information from the joinedData object
@@ -2423,6 +2363,7 @@ namespace SLF
 
             if (joinedData.Count > 0)
             {
+
                 // Use the first DataRow to define the columns of the DataTable
                 DataRow firstRow = joinedData[0].ResultingAttributes;
 
@@ -2437,6 +2378,7 @@ namespace SLF
                         joined_data_table.Columns.Add(column.ColumnName, column.DataType);
                     }
                 }
+
 
                 // Add the selected aggregate columns based on checkboxes
                 foreach (string column in selectedColumns)
@@ -2487,6 +2429,7 @@ namespace SLF
 
                     joined_data_table.Rows.Add(newRow);
                 }
+
             }
 
             // add the datatable to the array so that it can be summoned later
@@ -2508,8 +2451,8 @@ namespace SLF
 
             gMapControl.Overlays.Add(resultingOverlay);
             gMapControl.Refresh();
-        }
 
+        }
 
         ///////////////////////////////////////////////////////////////////////////////////////
 

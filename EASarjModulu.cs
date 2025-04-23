@@ -36,7 +36,7 @@ namespace SLF
         private void ImputeCoordinate()
         {
             // "DTR Verileri" tablosunu al
-            DataTable trafoDataTable = dataTablesByType["DTR Verileri"]; 
+            DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
 
             // Her satırı dolaş
             foreach (DataRow row in currentDataTable.Rows)
@@ -124,6 +124,8 @@ namespace SLF
             ImputeIstasyonTipi();
 
             ImputeCoordinate();
+
+            ImputeOutOfBoundsCoordinates(); // Add the new imputation step
         }
         public override void Remove()
         {
@@ -153,12 +155,12 @@ namespace SLF
 
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = WarningErrorBoundary(0.1f);
 
-        private readonly Dictionary<string, (float Min, float Max)> minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
-        {
-            { "EA_X_KOORDINAT", (float.MinValue, float.MaxValue) }, // TODO: Update these values from the other data
-            { "EA_Y_KOORDINAT", (float.MinValue, float.MaxValue) } // TODO: Update these values from the other data
-            
-        };
+        /*        private readonly Dictionary<string, (float Min, float Max)> minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
+                {
+                    { "EA_X_KOORDINAT", (float.MinValue, float.MaxValue) }, // TODO: Update these values from the other data
+                    { "EA_Y_KOORDINAT", (float.MinValue, float.MaxValue) } // TODO: Update these values from the other data
+
+                };*/
 
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
@@ -169,36 +171,189 @@ namespace SLF
             { "EA_TRAFO_KODU", InfoErrorBoundary(0.2f) },
             { "ISTASYON_TIPI", WARNING_ONLY},
         };
+        private const float COORDINATE_BUFFER_PERCENTAGE = 10f; // 10% buffer for dynamic bounds
+
+        private Dictionary<string, (float Min, float Max)> minMaxCheckMap;
+
+        // New field to store out-of-bounds rows and their EA_TRAFO_KODU
+        private Dictionary<int, string> outOfBoundsRowsToTrafoKodu;
+
+        // Method to compute dynamic coordinate bounds (unchanged)
+        private void InitializeCoordinateBounds()
+        {
+            DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+            if (trafoDataTable == null || trafoDataTable.Rows.Count == 0)
+            {
+                throw new InvalidOperationException("Transformer data ('DTR Verileri') is missing or empty. Cannot compute coordinate bounds.");
+            }
+
+            // Extract all valid X and Y coordinates from transformer data
+            var xCoords = trafoDataTable.AsEnumerable()
+                .Select(row => row.Field<string>("TRAFO_X_KOORDINAT"))
+                .Where(coord => float.TryParse(coord, out _))
+                .Select(coord => float.Parse(coord))
+                .ToList();
+
+            var yCoords = trafoDataTable.AsEnumerable()
+                .Select(row => row.Field<string>("TRAFO_Y_KOORDINAT"))
+                .Where(coord => float.TryParse(coord, out _))
+                .Select(coord => float.Parse(coord))
+                .ToList();
+
+            if (xCoords.Count == 0 || yCoords.Count == 0)
+            {
+                throw new InvalidOperationException("No valid transformer coordinates found in 'DTR Verileri'. Cannot compute coordinate bounds.");
+            }
+
+            // Calculate min/max with buffer
+            float xMin = xCoords.Min();
+            float xMax = xCoords.Max();
+            float yMin = yCoords.Min();
+            float yMax = yCoords.Max();
+
+            float xRange = xMax - xMin;
+            float yRange = yMax - yMin;
+
+            minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
+        {
+            { "EA_X_KOORDINAT", (xMin - xRange * COORDINATE_BUFFER_PERCENTAGE, xMax + xRange * COORDINATE_BUFFER_PERCENTAGE) },
+            { "EA_Y_KOORDINAT", (yMin - yRange * COORDINATE_BUFFER_PERCENTAGE, yMax + yRange * COORDINATE_BUFFER_PERCENTAGE) }
+        };
+        }
+
+        // Updated ReportCoordinatesOutOfLimits to track out-of-bounds rows and their EA_TRAFO_KODU
         private void ReportCoordinatesOutOfLimits()
         {
+            // Initialize the dictionary to store out-of-bounds rows
+            outOfBoundsRowsToTrafoKodu = new Dictionary<int, string>();
+
+            // Step 1: Initialize dynamic bounds for range check
+            try
+            {
+                if (minMaxCheckMap == null)
+                {
+                    InitializeCoordinateBounds();
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Log the error if bounds cannot be computed
+                var datatableLevel = GetDataTableBasedOnThreshold(1.0f, 0.0f, 0.0f); // Treat as error
+                datatableLevel.Rows.Add(new object[]
+                {
+                "EA_X_KOORDINAT & EA_Y_KOORDINAT",
+                "Koordinat Sınırları",
+                "N/A",
+                ex.Message
+                });
+                return; // Cannot proceed with range check
+            }
+
+            // Step 2: Check if coordinates are within transformer bounds
             var (minXValue, maxXValue) = minMaxCheckMap["EA_X_KOORDINAT"];
             var (minYValue, maxYValue) = minMaxCheckMap["EA_Y_KOORDINAT"];
+            int outOfBoundsCount = 0;
 
-            int countOutOfThresholdCoordinates = 0;
-
-            foreach (DataRow row in currentDataTable.Rows)
+            for (int i = 0; i < currentDataTable.Rows.Count; i++)
             {
-                if (float.TryParse(row["EA_X_KOORDINAT"]?.ToString(), out float valueX) && float.TryParse(row["EA_Y_KOORDINAT"]?.ToString(), out float valueY))
+                DataRow row = currentDataTable.Rows[i];
+                bool isXValid = float.TryParse(row["EA_X_KOORDINAT"]?.ToString(), out float xValue);
+                bool isYValid = float.TryParse(row["EA_Y_KOORDINAT"]?.ToString(), out float yValue);
+
+                // Skip if coordinates are not parseable (null check is handled by ReportNullCounts)
+                if (!isXValid || !isYValid)
                 {
-                    if (valueX < minXValue || valueX > maxXValue || valueY < minYValue || valueY > maxYValue)
+                    continue;
+                }
+
+                if (xValue < minXValue || xValue > maxXValue || yValue < minYValue || yValue > maxYValue)
+                {
+                    outOfBoundsCount++;
+                    string eaTrafoKodu = row.Field<string>("EA_TRAFO_KODU");
+                    if (!string.IsNullOrEmpty(eaTrafoKodu))
                     {
-                        countOutOfThresholdCoordinates++;
+                        outOfBoundsRowsToTrafoKodu[i] = eaTrafoKodu;
                     }
                 }
             }
 
-            float outOfThresholdPercentage = (float)countOutOfThresholdCoordinates / currentDataTable.Rows.Count;
-
-            if (outOfThresholdPercentage > 0)
+            if (outOfBoundsCount > 0)
             {
+                float outOfBoundsPercentage = (float)outOfBoundsCount / currentDataTable.Rows.Count;
                 var thresholds = COORDINATE_ERROR_THRESHOLD;
-                var datatableLevel = GetDataTableBasedOnThreshold(outOfThresholdPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
-
-                // Add the warning to the DataTable
-                datatableLevel.Rows.Add(new object[] {
-                    "EA_X_KOORDINAT & EA_Y_KOORDINAT", "Koordinat Sınırları", $"{outOfThresholdPercentage:P1}", "%10'dan fazla abonede konum bilgisi doğru değildir."
+                var datatableLevel = GetDataTableBasedOnThreshold(outOfBoundsPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+                datatableLevel.Rows.Add(new object[]
+                {
+                "EA_X_KOORDINAT & EA_Y_KOORDINAT",
+                "Koordinat Sınırları",
+                $"{outOfBoundsPercentage:P1}",
+                $"EA_X_KOORDINAT ve/veya EA_Y_KOORDINAT parametresi ilgili trafo koordinat aralığında değil. Trafo koordinat aralığı dışına çıkılamaz. (Sınırlar: X [{minXValue}, {maxXValue}], Y [{minYValue}, {maxYValue}]). Hata oranı %10 üzeri değilse bu değerler imputasyon aşamasında düzeltilecektir."
                 });
             }
+        }
+
+        // New method to impute out-of-bounds coordinates
+        private void ImputeOutOfBoundsCoordinates()
+        {
+            if (outOfBoundsRowsToTrafoKodu == null || outOfBoundsRowsToTrafoKodu.Count == 0)
+            {
+                return; // Nothing to impute
+            }
+
+            DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+            if (trafoDataTable == null || trafoDataTable.Rows.Count == 0)
+            {
+                // Log a warning if transformer data is missing during imputation
+                var datatableLevel = GetDataTableBasedOnThreshold(1.0f, 0.0f, 0.0f); // Treat as error
+                datatableLevel.Rows.Add(new object[]
+                {
+                "EA_X_KOORDINAT & EA_Y_KOORDINAT",
+                "Koordinat Imputasyonu",
+                "N/A",
+                "Transformer data ('DTR Verileri') is missing or empty. Cannot impute out-of-bounds coordinates."
+                });
+                return;
+            }
+
+            // Create a lookup for transformer coordinates to avoid nested loops
+            var trafoLookup = trafoDataTable.AsEnumerable()
+                .ToDictionary(
+                    row => row.Field<string>("TRAFO_KODU"),
+                    row => (X: row.Field<string>("TRAFO_X_KOORDINAT"), Y: row.Field<string>("TRAFO_Y_KOORDINAT")));
+
+            // Impute out-of-bounds coordinates
+            foreach (var kvp in outOfBoundsRowsToTrafoKodu)
+            {
+                int rowIndex = kvp.Key;
+                string eaTrafoKodu = kvp.Value;
+
+                if (rowIndex >= currentDataTable.Rows.Count)
+                {
+                    continue; // Skip if row index is out of bounds (e.g., after removals)
+                }
+
+                DataRow row = currentDataTable.Rows[rowIndex];
+                if (trafoLookup.TryGetValue(eaTrafoKodu, out var coords))
+                {
+                    row["EA_X_KOORDINAT"] = coords.X;
+                    row["EA_Y_KOORDINAT"] = coords.Y;
+                }
+                else
+                {
+                    // Log a warning if the transformer code is not found
+                    var datatableLevel = GetDataTableBasedOnThreshold(1.0f, 0.0f, 0.0f); // Treat as error
+                    datatableLevel.Rows.Add(new object[]
+                    {
+                    "EA_X_KOORDINAT & EA_Y_KOORDINAT",
+                    "Koordinat Imputasyonu",
+                    "N/A",
+                    $"Transformer code '{eaTrafoKodu}' not found in 'DTR Verileri'. Cannot impute coordinates for row {rowIndex}."
+                    });
+                }
+            }
+
+            // Clear the dictionary after imputation
+            outOfBoundsRowsToTrafoKodu.Clear();
         }
 
         private void ReportNullCounts()

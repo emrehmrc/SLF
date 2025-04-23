@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json;
+using System;
 using System.Windows.Forms;
-
+using System.IO;
+using System.Reflection;
 
 namespace SLF
 {
@@ -15,6 +10,11 @@ namespace SLF
     {
         public ModülFormu mod1;
         public Hakkında mod2;
+
+        public string json_file;
+        public dynamic config;
+        public string userRootPath;
+        public string config_path;
 
         public HomePageForm()
         {
@@ -26,6 +26,15 @@ namespace SLF
 
             // Ensure StartButton has focus when the form is shown
             this.Shown += HomePageForm_Shown;
+
+            userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+            config_path = Path.Combine(userRootPath,
+                "MRC\\MRC - 1.1.3_T&SI\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\İzmir\\Program Dosyaları\\config.json").Replace("/", "\\");
+
+            // read the json file and create the "config" variable.
+            json_file = File.ReadAllText(config_path);        
+            config = JsonConvert.DeserializeObject(json_file);
         }
 
         private void HomePageForm_Shown(object sender, EventArgs e)
@@ -53,16 +62,16 @@ namespace SLF
             this.Hide();
         }
 
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        private void buton_yardım_Click(object sender, EventArgs e)
         {
-            // Only trigger the StartButton's click event if HomePageForm is the active form
-            if (keyData == Keys.Enter && this == Form.ActiveForm)
-            {
-                // Trigger StartButton's Click event
-                StartButton.PerformClick();
-                return true; // Mark the key as handled
-            }
-            return base.ProcessCmdKey(ref msg, keyData);
+            Yardım yardım = new Yardım();
+            yardım.Show();
+        }
+
+        private void buton_hakkında_Click(object sender, EventArgs e)
+        {
+            Hakkında hakkında = new Hakkında();
+            hakkında.Show();
         }
     }
 

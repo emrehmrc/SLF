@@ -1,4 +1,6 @@
-﻿namespace SLF
+﻿using System.Web.UI.WebControls;
+
+namespace SLF
 {
     partial class imarFileSelectionPopup
     {
@@ -36,7 +38,7 @@
             this.imarCitySelectionPanel = new System.Windows.Forms.Panel();
             this.imarEskisehirRadioButton = new System.Windows.Forms.RadioButton();
             this.imarizmirRadioButton = new System.Windows.Forms.RadioButton();
-            this.OkButton = new SLF.CustomButton();
+            this.OkButton = new System.Windows.Forms.Button();
             this.imarFileSelectionPanel.SuspendLayout();
             this.imarCitySelectionPanel.SuspendLayout();
             this.SuspendLayout();
@@ -138,23 +140,10 @@
             // 
             // OkButton
             // 
-
             this.OkButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.OkButton.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.OkButton.BorderColor = System.Drawing.Color.PaleVioletRed;
-            this.OkButton.BorderRadius = 0;
-            this.OkButton.BorderSize = 0;
-            this.OkButton.FlatAppearance.BorderSize = 0;
-            this.OkButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.OkButton.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.OkButton.ForeColor = System.Drawing.Color.White;
-            this.OkButton.Location = new System.Drawing.Point(113, 381);
-            this.OkButton.Name = "OkButton";
-            this.OkButton.Size = new System.Drawing.Size(150, 40);
             this.OkButton.TabIndex = 5;
             this.OkButton.Text = "TAMAM";
-            this.OkButton.TextColor = System.Drawing.Color.White;
-            this.OkButton.UseVisualStyleBackColor = false;
             this.OkButton.Click += new System.EventHandler(this.OkButton_Click);
             // 
             // imarFileSelectionPopup
@@ -185,7 +174,7 @@
         private System.Windows.Forms.Button SelectCsvButton;
         private System.Windows.Forms.Button SelectKmlButton;
         private System.Windows.Forms.Panel imarFileSelectionPanel;
-        private SLF.CustomButton OkButton;
+        private System.Windows.Forms.Button OkButton;
         private System.Windows.Forms.ComboBox imarMethodSelectionComboBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel imarCitySelectionPanel;

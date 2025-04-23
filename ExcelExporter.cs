@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace SLF
@@ -61,13 +60,7 @@ namespace SLF
 
                     FileInfo file = new FileInfo(filePath);
 
-
-
-
-
                     package.SaveAs(file); // CHECK THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
 
 
                     MessageBox.Show("Dosya başarıyla kaydedildi.", "Dosya Kaydedildi", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -88,6 +81,7 @@ namespace SLF
         public void UpdateExcelFileFirstSheet(string filePath, DataTable dataTable) // excel formullu sayfa güncellemeleri yapılabilir .
         {
             FileInfo file = new FileInfo(filePath);
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Add this line
 
             using (ExcelPackage package = new ExcelPackage(file))
             {
@@ -130,7 +124,7 @@ namespace SLF
 
                     // Dosyayı kaydet
                     package.Save();
-                    Console.WriteLine("Excel dosyası başarıyla güncellendi.");
+
                 }
                 catch (Exception ex)
                 {
@@ -192,23 +186,5 @@ namespace SLF
             }
         }
 
-
-        private void ReleaseObject(object obj)
-        {
-            try
-            {
-                System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
-                obj = null;
-            }
-            catch (Exception ex)
-            {
-                obj = null;
-                Console.WriteLine("Exception Occured while releasing object " + ex.ToString());
-            }
-            finally
-            {
-                GC.Collect();
-            }
-        }
     }
 }

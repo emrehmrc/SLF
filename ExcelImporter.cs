@@ -1,11 +1,11 @@
-﻿//using Excel = Microsoft.Office.Interop.Excel; // Alias for the Excel namespace
-using OfficeOpenXml; // Import the EPPlus library
+﻿using OfficeOpenXml; 
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Windows.Forms;
 
 namespace SLF
 {
@@ -48,7 +48,7 @@ namespace SLF
                         "YIL_DEMANT_2023",
                     }
             },
-            { "EA Şarj Verileri", new List<string> { 
+            { "EA Şarj Verileri", new List<string> {
                 "ISTASYON_ADI", "ISTASYON_TIPI", "ISTASYON_GUCU", "EA_TRAFO_KODU","EA_X_KOORDINAT","EA_Y_KOORDINAT"
             } },
             {
@@ -88,62 +88,52 @@ namespace SLF
                     "DEK_BAGLANDIGI_TRAFO_KODU",
             }
             },
-                        {
-"Ekonometrik Yük Tahmini Verileri", new List<string> {
-    "YIL",
-    "GDP_GROWTH",
-    "ULKE_NUFUS",
-    "BOLGE_NUFUS",
-    "KKO",
-    "KKM",
-    "MESKEN_DAGITILAN",
-    "SANAYI_DAGITILAN",
-    "TICARETHANE_DAGITILAN",
-    "TARIMSAL_SULAMA_DAGITILAN",
-    "AYDINLATMA_DAGITILAN",
-    "TOPLAM_DAGITILAN",
-    "MESKEN_FATURALANAN",
-    "SANAYI_FATURALANAN",
-    "TICARETHANE_FATURALANAN",
-    "TARIMSAL_SULAMA_FATURALANAN",
-    "AYDINLATMA_FATURALANAN",
-    "TOPLAM_FATURALANAN",
-    "MESKEN_ABONE_SAYISI",
-    "SANAYI_ABONE_SAYISI",
-    "TICARETHANE_ABONE_SAYISI",
-    "TARIMSAL_SULAMA_ABONE_SAYISI",
-    "AYDINLATMA_ABONE_SAYISI",
-    "TOPLAM_ABONE_SAYISI",
-    "BOLGE_YAZ_PUANT",
-    "BOLGE_KIS_PUANT",
-    "GRP",
-    "GRP_TARIMSAL_URETIM",
-    "GRP_SANAYI_URETIM",
-    "GRP_HIZMET_URETIM",
-    "GRP_INSAAT_URETIM",
-    "GRP_TARIMSAL_URETIM_%",
-    "GRP_SANAYI_URETIM_%",
-    "GRP_HIZMET_URETIM_%",
-    "GRP_INSAAT_URETIM_%",
-    "GDP",
-    "GDP_TARIMSAL_URETIM",
-    "GDP_SANAYI_URETIM",
-    "GDP_HIZMET_URETIM",
-    "GDP_INSAAT_URETIM",
-    "GDP_TARIMSAL_URETIM_%",
-    "GDP_SANAYI_URETIM_%",
-    "GDP_HIZMET_URETIM_%",
-    "GDP_INSAAT_URETIM_%",
-    "CDD",
-    "HDD",
-    "ULKE_NUFUS_%",
-    "BOLGE_NUFUS_%",
-    "EA_Talep",
-    "DEK_Uretim",
-    "Other"
-}
-
-
+            {
+                "Ekonometrik Yük Tahmini Verileri", new List<string> {
+                    "YIL",
+                    "GDP_BUYUME_ORANI",
+                    "ILCE_NUFUS",
+                    "KKO",
+                    "KKM",
+                    "MESKEN_DAGITILAN",
+                    "SANAYI_DAGITILAN",
+                    "TICARETHANE_DAGITILAN",
+                    "TARIMSAL_SULAMA_DAGITILAN",
+                    "AYDINLATMA_DAGITILAN",
+                    "TOPLAM_DAGITILAN",
+                    "MESKEN_FATURALANAN",
+                    "SANAYI_FATURALANAN",
+                    "TICARETHANE_FATURALANAN",
+                    "TARIMSAL_SULAMA_FATURALANAN",
+                    "AYDINLATMA_FATURALANAN",
+                    "TOPLAM_FATURALANAN",
+                    "MESKEN_ABONE_SAYISI",
+                    "SANAYI_ABONE_SAYISI",
+                    "TICARETHANE_ABONE_SAYISI",
+                    "TARIMSAL_SULAMA_ABONE_SAYISI",
+                    "AYDINLATMA_ABONE_SAYISI",
+                    "TOPLAM_ABONE_SAYISI",
+                    "GRP",
+                    "GRP_TARIMSAL_URETIM",
+                    "GRP_SANAYI_URETIM",
+                    "GRP_HIZMET_URETIM",
+                    "GRP_INSAAT_URETIM",
+                    "GRP_TARIMSAL_URETIM_%",
+                    "GRP_SANAYI_URETIM_%",
+                    "GRP_HIZMET_URETIM_%",
+                    "GRP_INSAAT_URETIM_%",
+                    "GDP",
+                    "GDP_TARIMSAL_URETIM",
+                    "GDP_SANAYI_URETIM",
+                    "GDP_HIZMET_URETIM",
+                    "GDP_INSAAT_URETIM",
+                    "GDP_TARIMSAL_URETIM_%",
+                    "GDP_SANAYI_URETIM_%",
+                    "GDP_HIZMET_URETIM_%",
+                    "GDP_INSAAT_URETIM_%",
+                    "CDD",
+                    "HDD"
+                }
 
             },
             {
@@ -207,45 +197,86 @@ namespace SLF
         {
             DataTable dataTable = new DataTable();
 
-            // Example of measuring import time
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            
-            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            try
             {
-                ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // Assuming data is in the first worksheet
-
-                // Validate column headers. In case it fails, it throws an exception.
-                ValidateColumnHeaders(worksheet, seçilenVeriTipi);
-
-                int rowCount = worksheet.Dimension.Rows;
-                int colCount = worksheet.Dimension.Columns;
-
-                // Create columns in DataTable
-                for (int col = 1; col <= colCount; col++)
+                using (var package = new ExcelPackage(new FileInfo(filePath)))
                 {
-                    DataColumn column = new DataColumn();
-                    column.ColumnName = worksheet.Cells[1, col].Text;
-                    dataTable.Columns.Add(column);
-                }
-               
-                // Populate DataTable with Excel data
-                // Row starts from 2 because 1st row is column headers
-                for (int row = 2; row <= rowCount; row++)
-                {
-                    DataRow dataRow = dataTable.NewRow();
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // First sheet, adjust if needed
+
+                    // Validate headers
+                    ValidateColumnHeaders(worksheet, seçilenVeriTipi);
+
+                    int rowCount = worksheet.Dimension?.Rows ?? 0;
+                    int colCount = worksheet.Dimension?.Columns ?? 0;
+                    if (rowCount < 2 || colCount < 1)
+                    {
+                        throw new Exception("Excel dosyasında veri veya sütun başlığı bulunamadı.");
+                    }
+
+                    // Debug: Log worksheet dimensions
+                    System.Diagnostics.Debug.WriteLine($"Worksheet dimensions: {rowCount} rows, {colCount} columns.");
+
+                    // Create columns
                     for (int col = 1; col <= colCount; col++)
                     {
-                        dataRow[col - 1] = worksheet.Cells[row, col].Value;
+                        string columnName = worksheet.Cells[1, col].Text?.Trim() ?? $"Column{col}";
+                        dataTable.Columns.Add(new DataColumn
+                        {
+                            ColumnName = columnName,
+                            DataType = typeof(string), // Store as string initially
+                            AllowDBNull = true
+                        });
                     }
-                    dataTable.Rows.Add(dataRow);
-                }
-                 }
-            stopwatch.Stop();
 
-            Console.WriteLine($"Excel file import took: {stopwatch.ElapsedMilliseconds} ms");
+                    // Populate all rows
+                    int rowsAdded = 0;
+                    for (int row = 2; row <= rowCount; row++)
+                    {
+                        DataRow dataRow = dataTable.NewRow();
+                        bool rowHasData = false;
+
+                        for (int col = 1; col <= colCount; col++)
+                        {
+                            var cell = worksheet.Cells[row, col];
+                            string valueAsString = cell.Value?.ToString()?.Trim();
+
+                            if (string.IsNullOrEmpty(valueAsString) || valueAsString == "#N/A")
+                            {
+                                dataRow[col - 1] = DBNull.Value;
+                            }
+                            else
+                            {
+                                dataRow[col - 1] = valueAsString;
+                                rowHasData = true;
+                            }
+                        }
+
+                        if (rowHasData)
+                        {
+                            dataTable.Rows.Add(dataRow);
+                            rowsAdded++;
+                        }
+                    }
+
+                    // Debug: Log the imported table
+                    System.Diagnostics.Debug.WriteLine($"Imported {dataTable.Rows.Count} rows, {dataTable.Columns.Count} columns (rows added: {rowsAdded}).");
+                    foreach (DataColumn col in dataTable.Columns)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Column: {col.ColumnName}, Type: {col.DataType}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"ImportExcelFile exception: {ex.Message}\nStack Trace: {ex.StackTrace}");
+                MessageBox.Show($"Excel dosyasını okurken hata oluştu: {ex.Message}\nStack Trace: {ex.StackTrace}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return new DataTable();
+            }
+
             return dataTable;
         }
+
+
         private void ValidateColumnHeaders(ExcelWorksheet worksheet, string seçilenVeriTipi)
         {
             int colCount = worksheet.Dimension.Columns;
@@ -276,22 +307,5 @@ namespace SLF
             }
         }
 
-        private void ReleaseObject(object obj)
-        {
-            try
-            {
-                System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
-                obj = null;
-            }
-            catch (Exception ex)
-            {
-                obj = null;
-                Console.WriteLine("Exception Occured while releasing object " + ex.ToString());
-            }
-            finally
-            {
-                GC.Collect();
-            }
-        }
     }
 }

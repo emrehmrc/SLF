@@ -48,6 +48,7 @@ namespace SLF
                 }
             }
         }
+
         private void OkButton_Click(object sender, EventArgs e)
         {
             try
@@ -96,6 +97,7 @@ namespace SLF
                 Cursor.Current = Cursors.Default;
             }
         }
+
         private void UploadOutputToGridView()
         {
             try
@@ -141,70 +143,6 @@ namespace SLF
                 MessageBox.Show($"CSV verileri yüklenirken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-        /*        private void OkButton_Click(object sender, EventArgs e)
-                {
-                    try
-                    {
-                        // Set cursor to wait
-                        Cursor.Current = Cursors.WaitCursor;
-
-                        // Check which method is selected
-                        if (imarMethodSelectionComboBox.SelectedIndex == 0) // First method selected
-                        {
-                            if (!imarizmirRadioButton.Checked && !imarEskisehirRadioButton.Checked)
-                            {
-                                MessageBox.Show("Lütfen bir şehir seçin.", "Eksik Seçim", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                return;
-                            }
-
-                            // Get selected city
-                            string selectedRegion = imarizmirRadioButton.Checked ? "İzmir" : "Eskişehir";
-
-                            if (string.IsNullOrEmpty(KmlFilePath))
-                            {
-                                MessageBox.Show("Lütfen bir KML dosyası seçin.", "Eksik Dosya", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                return;
-                            }
-
-                            RunPythonScript(selectedRegion: selectedRegion, kmlFilePath: KmlFilePath);
-                        }
-                        else if (imarMethodSelectionComboBox.SelectedIndex == 1) // Second method selected
-                        {
-                            if (string.IsNullOrEmpty(CsvFilePath) || string.IsNullOrEmpty(KmlFilePath))
-                            {
-                                MessageBox.Show("Lütfen hem CSV hem de KML dosyalarını seçin.", "Eksik Dosya", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                return;
-                            }
-
-                            if (!File.Exists(CsvFilePath))
-                            {
-                                MessageBox.Show($"CSV dosyası bulunamadı: {CsvFilePath}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
-
-                            if (!File.Exists(KmlFilePath))
-                            {
-                                MessageBox.Show($"KML dosyası bulunamadı: {KmlFilePath}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
-
-                            RunPythonScript(csvFilePath: CsvFilePath, kmlFilePath: KmlFilePath);
-                        }
-                        else
-                        {
-                            MessageBox.Show("Lütfen geçerli bir yöntem seçin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    finally
-                    {
-                        Cursor.Current = Cursors.Default;
-                    }
-                }*/
 
         private void RunPythonScript(string csvFilePath = null, string kmlFilePath = null, string selectedRegion = null)
         {
@@ -275,17 +213,6 @@ namespace SLF
             }
         }
 
-        private void CityRadioButton_CheckedChanged(object sender, EventArgs e)
-        {
-            if (imarizmirRadioButton.Checked)
-            {
-                SelectedCity = "İzmir";
-            }
-            else if (imarEskisehirRadioButton.Checked)
-            {
-                SelectedCity = "Eskişehir";
-            }
-        }
     }
 }
 
