@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 
 
 namespace SLF
@@ -8,6 +10,11 @@ namespace SLF
     {
         public ModülFormu mod1;
         public Hakkında mod2;
+
+        public string json_file;
+        public dynamic config;
+        public string userRootPath;
+        public string config_path;
 
         public HomePageForm()
         {
@@ -19,9 +26,18 @@ namespace SLF
 
             // Ensure StartButton has focus when the form is shown
             this.Shown += HomePageForm_Shown;
-        }
 
-        private void HomePageForm_Shown(object sender, EventArgs e)
+            userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+            config_path = Path.Combine(userRootPath,
+                "MRC\\MRC - 1.1.3_T&SI\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\İzmir\\Program Dosyaları\\config.json").Replace("/", "\\");
+
+            // read the json file and create the "config" variable.
+            json_file = File.ReadAllText(config_path);
+            config = JsonConvert.DeserializeObject(json_file);
+        }
+        
+            private void HomePageForm_Shown(object sender, EventArgs e)
         {
             StartButton.Focus();
         }
