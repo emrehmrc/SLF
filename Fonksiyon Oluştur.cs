@@ -1,4 +1,7 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using GMap.NET.Avalonia;
+using GMap.NET;
+using GMap.NET.WindowsForms;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SharpMap.Layers;
 using System;
 using System.Collections.Generic;
@@ -19,21 +22,22 @@ namespace SLF
         public List<object> tum_sutunlar_listesi = new List<object>();
         public List<object> secilen_sutunlar_listesi = new List<object>();
 
+        // acquires the active gmapcontrol object that the join operation will be done on.
+        public GMap.NET.WindowsForms.GMapControl activeGMapControl;
+
         public Fonksiyon_Oluştur()
         {
             InitializeComponent();
-            Height = 240;
-            MaximumSize = new Size(height: 700, width: this.Width);
         }
 
         private async void buton_jabl_Click(object sender, EventArgs e)
         {
-            foreach(string cols in secilen_sutunlar.Items)
+            foreach(string cols in secilen_sutunlar_fonksiyonForm.Items)
             {
                 agrege_olacak_sutunlar.Add(cols);
             }
 
-            mod1 = (ModülFormu)Tag;
+            mod1 = Tag as ModülFormu;
             mod1.firstLayerName = comboBox_fonksiyonlar_1.Text;
             mod1.secondLayerName = comboBox_fonksiyonlar_2.Text;
             Cursor = Cursors.WaitCursor;
@@ -41,11 +45,11 @@ namespace SLF
             // either do a "jabl" or "jabl-summary"
             if(checkBox_cell_statistics.Checked == false)
             {
-                await mod1.JoinAttributesByLocation();
+                await mod1.cbs.JoinAttributesByLocation(activeGMapControl);
             }
             else
             {
-                await mod1.JoinAttributesByLocation_summary();
+                await mod1.cbs.JoinAttributesByLocation_summary(activeGMapControl);
             }
 
             Cursor = Cursors.Default;
@@ -66,9 +70,9 @@ namespace SLF
         // tum sutunlar listesi
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-            if (tum_sutunlar.SelectedItems != null && tum_sutunlar.Items.Count != 0)
+            if (tum_sutunlar_fonksiyonForm.SelectedItems != null && tum_sutunlar_fonksiyonForm.Items.Count != 0)
             {
-                foreach (var selectedItem in tum_sutunlar.SelectedItems)
+                foreach (var selectedItem in tum_sutunlar_fonksiyonForm.SelectedItems)
                 {
                     if(!tum_sutunlar_listesi.Contains(selectedItem))
                     {
@@ -78,15 +82,15 @@ namespace SLF
 
                 foreach (var item in tum_sutunlar_listesi)
                 {
-                    if (!secilen_sutunlar.Items.Contains(item))
+                    if (!secilen_sutunlar_fonksiyonForm.Items.Contains(item))
                     {
-                        secilen_sutunlar.Items.Add(item);
-                        tum_sutunlar.Items.Remove(item);
+                        secilen_sutunlar_fonksiyonForm.Items.Add(item);
+                        tum_sutunlar_fonksiyonForm.Items.Remove(item);
                     }             
                     
                 }
-                secilen_sutunlar.ClearSelected();
-                tum_sutunlar.ClearSelected();
+                secilen_sutunlar_fonksiyonForm.ClearSelected();
+                tum_sutunlar_fonksiyonForm.ClearSelected();
                 tum_sutunlar_listesi.Clear();
                 secilen_sutunlar_listesi.Clear();
             }
@@ -95,9 +99,9 @@ namespace SLF
         // secilen sutun listesi
         private void pictureBox3_Click(object sender, EventArgs e)
         {
-            if (secilen_sutunlar.SelectedItems != null && secilen_sutunlar.Items.Count != 0)
+            if (secilen_sutunlar_fonksiyonForm.SelectedItems != null && secilen_sutunlar_fonksiyonForm.Items.Count != 0)
             {
-                foreach (var selectedItem in secilen_sutunlar.SelectedItems)
+                foreach (var selectedItem in secilen_sutunlar_fonksiyonForm.SelectedItems)
                 {
                     if (!secilen_sutunlar_listesi.Contains(selectedItem))
                     {
@@ -108,16 +112,16 @@ namespace SLF
 
                 foreach (var item in secilen_sutunlar_listesi)
                 {
-                    secilen_sutunlar.Items.Remove(item);
+                    secilen_sutunlar_fonksiyonForm.Items.Remove(item);
 
-                    if (!tum_sutunlar.Items.Contains(item))
+                    if (!tum_sutunlar_fonksiyonForm.Items.Contains(item))
                     {
-                        tum_sutunlar.Items.Add(item);
+                        tum_sutunlar_fonksiyonForm.Items.Add(item);
                     }
                   
                 }
-                secilen_sutunlar.ClearSelected();
-                tum_sutunlar.ClearSelected();
+                secilen_sutunlar_fonksiyonForm.ClearSelected();
+                tum_sutunlar_fonksiyonForm.ClearSelected();
                 tum_sutunlar_listesi.Clear();
                 secilen_sutunlar_listesi.Clear();
             }
@@ -134,25 +138,25 @@ namespace SLF
             mod1 = (ModülFormu)Tag;
 
             // Find the first item that matches the search text
-            string selected_table_name = mod1.tüm_katmanlar_array_names
+            string selected_table_name = mod1.cbs.tüm_katmanlar_array_names
                 .FirstOrDefault(name => name.Contains(comboBox_fonksiyonlar_2.Text));
 
-            int index = Array.IndexOf(mod1.tüm_katmanlar_array_names, selected_table_name);
+            int index = Array.IndexOf(mod1.cbs.tüm_katmanlar_array_names, selected_table_name);
 
             // create an example row so that the columns of the second table could be displayed
             // in the list box
-            DataRow example_row = mod1.tüm_katmanlar_datatable[index].NewRow();
+            DataRow example_row = mod1.cbs.tüm_katmanlar_datatable[index].NewRow();
 
-            secilen_sutunlar.ClearSelected();
-            tum_sutunlar.ClearSelected();
+            secilen_sutunlar_fonksiyonForm.ClearSelected();
+            tum_sutunlar_fonksiyonForm.ClearSelected();
             tum_sutunlar_listesi.Clear();
             secilen_sutunlar_listesi.Clear();
-            tum_sutunlar.Items.Clear();
-            secilen_sutunlar.Items.Clear();
+            tum_sutunlar_fonksiyonForm.Items.Clear();
+            secilen_sutunlar_fonksiyonForm.Items.Clear();
 
             foreach (var columns in example_row.Table.Columns)
             {
-                tum_sutunlar.Items.Add(columns.ToString());
+                tum_sutunlar_fonksiyonForm.Items.Add(columns.ToString());
             }
         }
     }

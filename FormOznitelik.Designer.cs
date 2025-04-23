@@ -60,7 +60,7 @@ namespace SLF
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.oznitelik);
             this.Name = "formOznitelik";
-            this.Text = "Form2";
+            this.Text = "formOznitelik";
             this.Load += new System.EventHandler(this.formOznitelik_Load);
             ((System.ComponentModel.ISupportInitialize)(this.oznitelik)).EndInit();
             this.ResumeLayout(false);

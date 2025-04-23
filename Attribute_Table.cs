@@ -18,6 +18,7 @@ namespace SLF
         {
             InitializeComponent();
             attribute_table = this.vektörel_attribute_table;
+
         }
 
         private void Tablo_Formu_FormClosing(object sender, FormClosingEventArgs e)

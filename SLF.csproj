@@ -18,6 +18,22 @@
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>C:\proje2\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -37,6 +53,19 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>03FD58DFFB61A3152FC31626CF3935B40189E5A4</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>
+    </ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Avalonia, Version=11.0.10.0, Culture=neutral, PublicKeyToken=c8d484a7012f9a8b, processorArchitecture=MSIL">
@@ -184,11 +213,8 @@
     <Reference Include="JetBrains.Annotations, Version=4242.42.42.42, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>packages\JetBrains.Annotations.2023.3.0\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>
-    <Reference Include="LINQPad, Version=1.0.0.0, Culture=neutral, PublicKeyToken=21353812cd2a2db5, processorArchitecture=MSIL">
-      <HintPath>packages\LINQPad.5.46.0\lib\net46\LINQPad.exe</HintPath>
-    </Reference>
-    <Reference Include="lprun, Version=1.0.0.0, Culture=neutral, PublicKeyToken=21353812cd2a2db5, processorArchitecture=x86">
-      <HintPath>packages\LINQPad.5.46.0\lib\net46\lprun.exe</HintPath>
+    <Reference Include="MaterialSkin, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\MaterialSkin.2.2.3.1\lib\net461\MaterialSkin.dll</HintPath>
     </Reference>
     <Reference Include="MicroCom.Runtime, Version=0.11.0.0, Culture=neutral, PublicKeyToken=b30be05a5f7688e9, processorArchitecture=MSIL">
       <HintPath>packages\MicroCom.Runtime.0.11.0\lib\netstandard2.0\MicroCom.Runtime.dll</HintPath>
@@ -360,14 +386,14 @@
     <Reference Include="System.Data.SqlClient, Version=4.6.1.6, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\System.Data.SqlClient.4.8.6\lib\net461\System.Data.SqlClient.dll</HintPath>
     </Reference>
-    <Reference Include="System.Data.SQLite, Version=1.0.118.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\lib\net46\System.Data.SQLite.dll</HintPath>
+    <Reference Include="System.Data.SQLite, Version=1.0.119.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\lib\net46\System.Data.SQLite.dll</HintPath>
     </Reference>
-    <Reference Include="System.Data.SQLite.EF6, Version=1.0.118.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>packages\System.Data.SQLite.EF6.1.0.118.0\lib\net46\System.Data.SQLite.EF6.dll</HintPath>
+    <Reference Include="System.Data.SQLite.EF6, Version=1.0.119.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>packages\System.Data.SQLite.EF6.1.0.119.0\lib\net46\System.Data.SQLite.EF6.dll</HintPath>
     </Reference>
-    <Reference Include="System.Data.SQLite.Linq, Version=1.0.118.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>packages\System.Data.SQLite.Linq.1.0.118.0\lib\net46\System.Data.SQLite.Linq.dll</HintPath>
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.119.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>packages\System.Data.SQLite.Linq.1.0.119.0\lib\net46\System.Data.SQLite.Linq.dll</HintPath>
     </Reference>
     <Reference Include="System.Design" />
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=8.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -553,12 +579,6 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Tmds.DBus, Version=0.18.0.0, Culture=neutral, PublicKeyToken=9abd76e9812c1bca, processorArchitecture=MSIL">
-      <HintPath>packages\Tmds.DBus.0.18.0\lib\netstandard2.0\Tmds.DBus.dll</HintPath>
-    </Reference>
-    <Reference Include="Tmds.DBus.Protocol, Version=0.18.0.0, Culture=neutral, PublicKeyToken=9abd76e9812c1bca, processorArchitecture=MSIL">
-      <HintPath>packages\Tmds.DBus.Protocol.0.18.0\lib\netstandard2.0\Tmds.DBus.Protocol.dll</HintPath>
-    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="XLParser, Version=1.5.2.0, Culture=neutral, PublicKeyToken=63397e1e46bb91b4, processorArchitecture=MSIL">
       <HintPath>packages\XLParser.1.5.2\lib\net461\XLParser.dll</HintPath>
@@ -572,13 +592,23 @@
     <Compile Include="Ana_Menü.Designer.cs">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
     </Compile>
-    <Compile Include="ChargingStationPopupForm.cs">
+    <Compile Include="YGAPopupForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ChargingStationPopupForm.Designer.cs">
-      <DependentUpon>ChargingStationPopupForm.cs</DependentUpon>
+    <Compile Include="YGAPopupForm.Designer.cs">
+      <DependentUpon>YGAPopupForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CBS.cs" />
+    <Compile Include="EAStationPopupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EAStationPopupForm.Designer.cs">
+      <DependentUpon>EAStationPopupForm.cs</DependentUpon>
     </Compile>
     <Compile Include="CsvHandler.cs" />
+    <Compile Include="CustomButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DEKCenterPopupForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -586,6 +616,12 @@
       <DependentUpon>DEKCenterPopupForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ExcelExporter.cs" />
+    <Compile Include="imarFileSelectionPopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="imarFileSelectionPopup.Designer.cs">
+      <DependentUpon>imarFileSelectionPopup.cs</DependentUpon>
+    </Compile>
     <Compile Include="MethodForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -617,11 +653,11 @@
     <Compile Include="Fonksiyon Oluştur.Designer.cs">
       <DependentUpon>Fonksiyon Oluştur.cs</DependentUpon>
     </Compile>
-    <Compile Include="Form2.cs">
+    <Compile Include="FormOznitelik.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form2.Designer.cs">
-      <DependentUpon>Form2.cs</DependentUpon>
+    <Compile Include="FormOznitelik.Designer.cs">
+      <DependentUpon>FormOznitelik.cs</DependentUpon>
     </Compile>
     <Compile Include="Attribute_Table.cs">
       <SubType>Form</SubType>
@@ -683,11 +719,18 @@
     <EmbeddedResource Include="Ana_Menü.resx">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="YGAPopupForm.resx">
+      <DependentUpon>YGAPopupForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Attribute_Table.resx">
       <DependentUpon>Attribute_Table.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ChargingStationPopupForm.resx">
-      <DependentUpon>ChargingStationPopupForm.cs</DependentUpon>
+    <EmbeddedResource Include="CustomButton.resx">
+      <DependentUpon>CustomButton.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EAStationPopupForm.resx">
+      <DependentUpon>EAStationPopupForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DEKCenterPopupForm.resx">
       <DependentUpon>DEKCenterPopupForm.cs</DependentUpon>
@@ -704,8 +747,11 @@
     <EmbeddedResource Include="Hakkında.resx">
       <DependentUpon>Hakkında.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form2.resx">
-      <DependentUpon>Form2.cs</DependentUpon>
+    <EmbeddedResource Include="FormOznitelik.resx">
+      <DependentUpon>FormOznitelik.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="imarFileSelectionPopup.resx">
+      <DependentUpon>imarFileSelectionPopup.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Modüller.resx">
       <DependentUpon>Modüller.cs</DependentUpon>
@@ -720,6 +766,9 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="rounded_button.resx">
+      <DependentUpon>rounded_button.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Yardım.resx">
       <DependentUpon>Yardım.cs</DependentUpon>
@@ -742,6 +791,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="SLF_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -806,8 +856,38 @@
     <None Include="Pictures\Exterior1.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Pictures\Next page2.png" />
+    <None Include="Pictures\Next page.png" />
+    <None Include="Pictures\homepage %281%29.png" />
+    <None Include="Pictures\homepage.png" />
+    <None Include="Pictures\HomeDepot_41088.png" />
+    <None Include="Pictures\KML2.ico" />
+    <None Include="Pictures\KML2.png" />
     <None Include="Pictures\Done.png" />
+    <None Include="Pictures\CSV2.png" />
+    <None Include="Pictures\CSV2.ico" />
+    <None Include="Pictures\Home Page.png" />
+    <None Include="Pictures\Home Address.png" />
+    <None Include="Pictures\home %283%29.png" />
+    <None Include="Pictures\home %282%29.png" />
+    <None Include="Pictures\Gears.png" />
+    <None Include="Pictures\Gears4.png" />
+    <None Include="Pictures\Back To2.png" />
+    <None Include="Pictures\Double Right.png" />
+    <None Include="Pictures\Double Left.png" />
     <Content Include="Pictures\Home3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.7.2 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -818,7 +898,6 @@
     <Error Condition="!Exists('packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
     <Error Condition="!Exists('packages\Avalonia.11.0.10\build\Avalonia.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Avalonia.11.0.10\build\Avalonia.targets'))" />
     <Error Condition="!Exists('packages\Avalonia.BuildServices.0.0.31\build\Avalonia.BuildServices.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Avalonia.BuildServices.0.0.31\build\Avalonia.BuildServices.targets'))" />
-    <Error Condition="!Exists('packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets'))" />
     <Error Condition="!Exists('packages\Avalonia.Angle.Windows.Natives.2.1.22087.20231008\build\Avalonia.Angle.Windows.Natives.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Avalonia.Angle.Windows.Natives.2.1.22087.20231008\build\Avalonia.Angle.Windows.Natives.targets'))" />
     <Error Condition="!Exists('packages\HarfBuzzSharp.NativeAssets.macOS.7.3.0.2\build\net462\HarfBuzzSharp.NativeAssets.macOS.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\HarfBuzzSharp.NativeAssets.macOS.7.3.0.2\build\net462\HarfBuzzSharp.NativeAssets.macOS.targets'))" />
     <Error Condition="!Exists('packages\HarfBuzzSharp.NativeAssets.Win32.7.3.0.2\build\net462\HarfBuzzSharp.NativeAssets.Win32.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\HarfBuzzSharp.NativeAssets.Win32.7.3.0.2\build\net462\HarfBuzzSharp.NativeAssets.Win32.targets'))" />
@@ -833,11 +912,11 @@
     <Error Condition="!Exists('packages\GDAL.Native.3.8.5\build\netstandard2.0\GDAL.Native.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\GDAL.Native.3.8.5\build\netstandard2.0\GDAL.Native.targets'))" />
     <Error Condition="!Exists('packages\Microsoft.Web.WebView2.1.0.2535.41\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Web.WebView2.1.0.2535.41\build\Microsoft.Web.WebView2.targets'))" />
     <Error Condition="!Exists('packages\Avalonia.11.0.10\build\Avalonia.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Avalonia.11.0.10\build\Avalonia.props'))" />
+    <Error Condition="!Exists('packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets'))" />
   </Target>
   <Import Project="packages\Avalonia.11.0.10\build\Avalonia.targets" Condition="Exists('packages\Avalonia.11.0.10\build\Avalonia.targets')" />
   <Import Project="packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
   <Import Project="packages\Avalonia.BuildServices.0.0.31\build\Avalonia.BuildServices.targets" Condition="Exists('packages\Avalonia.BuildServices.0.0.31\build\Avalonia.BuildServices.targets')" />
-  <Import Project="packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets" Condition="Exists('packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" />
   <Import Project="packages\Avalonia.Angle.Windows.Natives.2.1.22087.20231008\build\Avalonia.Angle.Windows.Natives.targets" Condition="Exists('packages\Avalonia.Angle.Windows.Natives.2.1.22087.20231008\build\Avalonia.Angle.Windows.Natives.targets')" />
   <Import Project="packages\HarfBuzzSharp.NativeAssets.macOS.7.3.0.2\build\net462\HarfBuzzSharp.NativeAssets.macOS.targets" Condition="Exists('packages\HarfBuzzSharp.NativeAssets.macOS.7.3.0.2\build\net462\HarfBuzzSharp.NativeAssets.macOS.targets')" />
   <Import Project="packages\HarfBuzzSharp.NativeAssets.Win32.7.3.0.2\build\net462\HarfBuzzSharp.NativeAssets.Win32.targets" Condition="Exists('packages\HarfBuzzSharp.NativeAssets.Win32.7.3.0.2\build\net462\HarfBuzzSharp.NativeAssets.Win32.targets')" />
@@ -849,4 +928,5 @@
   <Import Project="packages\SkiaSharp.NativeAssets.WebAssembly.2.88.8\build\netstandard1.0\SkiaSharp.NativeAssets.WebAssembly.targets" Condition="Exists('packages\SkiaSharp.NativeAssets.WebAssembly.2.88.8\build\netstandard1.0\SkiaSharp.NativeAssets.WebAssembly.targets')" />
   <Import Project="packages\GDAL.Native.3.8.5\build\netstandard2.0\GDAL.Native.targets" Condition="Exists('packages\GDAL.Native.3.8.5\build\netstandard2.0\GDAL.Native.targets')" />
   <Import Project="packages\Microsoft.Web.WebView2.1.0.2535.41\build\Microsoft.Web.WebView2.targets" Condition="Exists('packages\Microsoft.Web.WebView2.1.0.2535.41\build\Microsoft.Web.WebView2.targets')" />
+  <Import Project="packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets" Condition="Exists('packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" />
 </Project>
