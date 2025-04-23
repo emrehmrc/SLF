@@ -662,7 +662,7 @@
     <Compile Include="Services\DatabaseManager .cs" />
     <Compile Include="Services\PathService.cs" />
     <Compile Include="Services\PythonHelper.cs" />
-    <Compile Include="Services\YearSet.cs" />
+    <Compile Include="Services\YearServices.cs" />
     <Compile Include="Tablo_olustur.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1089,7 +1089,6 @@
     <None Include="Pictures\Exterior1.png" />
   </ItemGroup>
   <ItemGroup>
-    
     <None Include="Pictures\oedaş.jpg" />
     <None Include="Pictures\Next page2.png" />
     <None Include="Pictures\Next page.png" />

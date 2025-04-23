@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using SLF.Services;
 
-namespace SLF.Services
+namespace SLF.services
 {
     public static class PythonHelper
     {
@@ -23,7 +26,7 @@ namespace SLF.Services
 
                 // YearService'ten lastYear bilgisini al
                 var yearService = YearService.GetInstance();
-                string lastYear = yearService.lastYear.ToString();
+                string lastYear = yearService.LastYear.ToString();
 
                 Console.WriteLine($"Deep Learning model çalıştırılıyor: {selectedCity}/{selectedDistrict}, LastYear: {lastYear}");
 

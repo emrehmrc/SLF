@@ -20,7 +20,7 @@ using System.Text;
 using SLF.Services;
 using System.Globalization;
 using Newtonsoft.Json;
-
+using SLF.services;
 
 namespace SLF
 {
@@ -6114,7 +6114,7 @@ namespace SLF
                 yearService.SetYears(slfStartYear, slfEndYear);
 
                 Console.WriteLine($"YearService başarıyla güncellendi - Başlangıç: {yearService.slfStartYear}, Bitiş: {yearService.slfEndYear}");
-                Console.WriteLine($"LastYear: {yearService.lastYear}");
+                Console.WriteLine($"LastYear: {yearService.LastYear}");
                 Console.WriteLine($"PenultimateYear: {yearService.PenultimateYear}");
                 Console.WriteLine($"HorizonYear: {yearService.HorizonYear}");
 
