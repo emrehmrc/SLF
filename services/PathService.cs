@@ -6,70 +6,320 @@ using System.Linq;
 using System.Globalization;
 using System.Text;
 using GMap.NET.MapProviders;
+using Newtonsoft.Json;
 
 namespace SLF.Services
 {
     /// <summary>
     /// Uygulama genelinde path yönetimi sağlayan servis sınıfı
     /// </summary>
+    /// 
+ 
     public class PathService
     {
+        /// <summary>
+        /// Uygulama genelinde path yönetimi sağlayan servis sınıfı
+        /// </summary>
+            private static string _configPythonKodPath;
+            private static string _configImarAnaliziPath;
         // Proje klasörüne göre relatif il-ilçe kırılımı klasörü yolu
-        private readonly string _relativeDataPath;
-
-        // Constructor to initialize the PathService with config
-        public PathService(string config)
-        {
-
-            HomePageForm ana_menu = new HomePageForm();
-
-            _relativeDataPath = Path.Combine(ana_menu.userRootPath,
-                ana_menu.config.Ana_Klasör_Yolu) ?? throw new ArgumentNullException(nameof(config));
-        }
-
-        // Optional: Property to access the relative data path
-        public string RelativeDataPath => _relativeDataPath;
-
+            private static string _relativeDataPath = "il_ilce_kırılımları"; // Varsayılan değer
+            private static string _configSLFMainPath;
         // Temel dizin - ilk çalıştırmada hesaplanır
         private static string _baseDirectory;
 
-        // Seçilen il
-        public static string SelectedCity { get; private set; }
+            // Seçilen il
+            public static string SelectedCity { get; private set; }
 
-        // Seçilen ilçe
-        public static string SelectedDistrict { get; private set; }
+            // Seçilen ilçe
+            public static string SelectedDistrict { get; private set; }
 
-        // Aktif çalışma klasörü (temp veya proje)
-        public static string CurrentWorkingFolder { get; private set; }
+            // Aktif çalışma klasörü (temp veya proje)
+            public static string CurrentWorkingFolder { get; private set; }
 
-        // Çalışma modu
-        public static WorkingMode CurrentMode { get; private set; } = WorkingMode.Temporary;
+            // Çalışma modu
+            public static WorkingMode CurrentMode { get; private set; } = WorkingMode.Temporary;
 
-        // Çalışma modları
-        public enum WorkingMode
-        {
-            Temporary, // Geçici çalışma klasörü
-            Project    // Kaydedilmiş proje klasörü
-        }
+            // Çalışma modları
+            public enum WorkingMode
+            {
+                Temporary, // Geçici çalışma klasörü
+                Project    // Kaydedilmiş proje klasörü
+            }
+
+        /// <summary>
+        /// Config dosyası yolundan veri klasörü yolunu ayarlar
+        /// </summary>
 
         /// <summary>
         /// Uygulama tarafından kullanılacak temel veri dizini
         /// </summary>
+        /// 
+        public static string SLFMainPath
+        {
+            get
+            {
+                // If set from config, use that path
+                if (!string.IsNullOrEmpty(_configSLFMainPath) && File.Exists(_configSLFMainPath))
+                {
+                    return _configSLFMainPath;
+                }
+
+                // Otherwise, use a default path based on PythonKodDirectory
+                return Path.Combine(PythonKodDirectory, "SLF_analizi", "slf_main.py");
+            }
+        }
         public static string BaseDirectory
         {
             get
             {
                 if (string.IsNullOrEmpty(_baseDirectory))
                 {
-                    // Since _relativeDataPath is instance-specific, we need an instance to access it.
-                    // For simplicity, assume PathService is instantiated elsewhere and config is passed.
-                    // If no instance is available, use a default or throw an exception.
-                    throw new InvalidOperationException("PathService must be instantiated with a config value before accessing BaseDirectory.");
-                    // Alternatively, call InitializeBaseDirectory with a default or injected config (see below).
+                    InitializeBaseDirectory();
                 }
                 return _baseDirectory;
             }
         }
+        public static void SetConfigPath(string configPath)
+        {
+            try
+            {
+                // Config dosyasını oku
+                if (File.Exists(configPath))
+                {
+                    string jsonFile = File.ReadAllText(configPath);
+                    dynamic config = JsonConvert.DeserializeObject(jsonFile);
+
+                    // Ana_Klasör_Yolu değerini al
+                    if (config != null && config.Ana_Klasör_Yolu != null)
+                    {
+                        string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                        string anaKlasorYolu = config.Ana_Klasör_Yolu.ToString();
+
+                        // Tam yolu oluştur
+                        string fullPath = Path.Combine(userRootPath, anaKlasorYolu);
+
+                        // Eğer bu dizin varsa, _baseDirectory olarak ayarla
+                        if (Directory.Exists(fullPath))
+                        {
+                            _baseDirectory = fullPath;
+                            Debug.WriteLine($"Config'den alınan veri klasörü yolu: {_baseDirectory}");
+
+                            // Program dosyaları klasörü (temel yapı için gerekli)
+                            string programDosyalariPath = config.program_dosyaları_path?.ToString() ?? "Program Dosyaları";
+                            string programDosyalariFullPath = Path.Combine(fullPath, programDosyalariPath);
+
+                            // Eğer yoksa oluştur
+                            if (!Directory.Exists(programDosyalariFullPath))
+                            {
+                                Directory.CreateDirectory(programDosyalariFullPath);
+                            }
+
+                            // "Python Kodları" bölümünü oku
+                            if (config["Python Kodları"] != null)
+                            {
+                                // İmar Analizi yolunu oku
+                                if (config["Python Kodları"].IMAR_ANALİZİ != null)
+                                {
+                                    string marAnaliziRelativePath = config["Python Kodları"].IMAR_ANALİZİ.ToString();
+
+                                    // Eğer yol "/" ile başlıyorsa, başındaki "/" karakterini kaldır
+                                    if (marAnaliziRelativePath.StartsWith("/"))
+                                    {
+                                        marAnaliziRelativePath = marAnaliziRelativePath.Substring(1);
+                                    }
+
+                                    // IMAR_ANALİZİ yolunu ana dizinle birleştir
+                                    string marAnaliziFullPath = Path.Combine(fullPath, marAnaliziRelativePath);
+
+                                    // Dizin kısmını al (dosya adını çıkar)
+                                    string marAnaliziDirPath = Path.GetDirectoryName(marAnaliziFullPath);
+
+                                    // Klasörü oluştur (yoksa)
+                                    if (!Directory.Exists(marAnaliziDirPath))
+                                    {
+                                        Directory.CreateDirectory(marAnaliziDirPath);
+                                    }
+
+                                    // İmar analizi yolunu ayarla (dosya yolu)
+                                    _configImarAnaliziPath = marAnaliziFullPath;
+                                    Debug.WriteLine($"Config'den alınan İmar Analizi kod yolu: {_configImarAnaliziPath}");
+
+                                    // Python kodları ana dizinini de ayarla
+                                    string pythonKodDir = Path.GetDirectoryName(marAnaliziDirPath);
+                                    _configPythonKodPath = pythonKodDir;
+                                    Debug.WriteLine($"Config'den alınan Python kod yolu: {_configPythonKodPath}");
+                                }
+
+                                // SLF_Main yolunu oku
+                                if (config["Python Kodları"].SLF_Main != null)
+                                {
+                                    string slfMainRelativePath = config["Python Kodları"].SLF_Main.ToString();
+
+                                    // Eğer yol "/" ile başlıyorsa, başındaki "/" karakterini kaldır
+                                    if (slfMainRelativePath.StartsWith("/"))
+                                    {
+                                        slfMainRelativePath = slfMainRelativePath.Substring(1);
+                                    }
+
+                                    // SLF_Main yolunu ana dizinle birleştir
+                                    string slfMainFullPath = Path.Combine(fullPath, slfMainRelativePath);
+
+                                    // Dizin kısmını al (dosya adını çıkar)
+                                    string slfMainDirPath = Path.GetDirectoryName(slfMainFullPath);
+
+                                    // Klasörü oluştur (yoksa)
+                                    if (!Directory.Exists(slfMainDirPath))
+                                    {
+                                        Directory.CreateDirectory(slfMainDirPath);
+                                    }
+
+                                    // SLF Main yolunu ayarla
+                                    _configSLFMainPath = slfMainFullPath;
+                                    Debug.WriteLine($"Config'den alınan SLF Main kod yolu: {_configSLFMainPath}");
+                                }
+                            }
+                            else
+                            {
+                                // Python Kodları bölümü yoksa varsayılan yapıya devam et
+                                string pythonKodlariPath = Path.Combine(programDosyalariFullPath, "python_kodlari");
+                                if (!Directory.Exists(pythonKodlariPath))
+                                {
+                                    Directory.CreateDirectory(pythonKodlariPath);
+                                }
+
+                                // MAR_ANALİZİ dizini
+                                string marAnaliziPath = Path.Combine(pythonKodlariPath, "MAR_ANALİZİ");
+                                if (!Directory.Exists(marAnaliziPath))
+                                {
+                                    Directory.CreateDirectory(marAnaliziPath);
+                                }
+
+                                // SLF_Main dizini
+                                string slfMainPath = Path.Combine(pythonKodlariPath, "SLF_analizi");
+                                if (!Directory.Exists(slfMainPath))
+                                {
+                                    Directory.CreateDirectory(slfMainPath);
+                                }
+
+                                // Python kodu yolunu ayarla
+                                _configPythonKodPath = pythonKodlariPath;
+                                Debug.WriteLine($"Config'den alınan Python kod yolu: {_configPythonKodPath}");
+
+                                // İmar analizi yolunu ayarla (MAR_ANALİZİ)
+                                _configImarAnaliziPath = marAnaliziPath;
+                                Debug.WriteLine($"Config'den alınan İmar Analizi kod yolu: {_configImarAnaliziPath}");
+
+                                // SLF Main yolunu ayarla
+                                _configSLFMainPath = Path.Combine(slfMainPath, "slf_main.py");
+                                Debug.WriteLine($"Config'den alınan SLF Main kod yolu: {_configSLFMainPath}");
+                            }
+                        }
+                    }
+
+                    return;
+                }
+
+                // Config kullanılamazsa mevcut yöntemi kullan
+                InitializeBaseDirectory();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Config ayarlanırken hata: {ex.Message}");
+                // Hata durumunda varsayılan yöntemle devam et
+                InitializeBaseDirectory();
+            }
+        }
+        /// <summary>
+        /// Temel veri dizinini başlatır, relative path'i bulur
+        /// </summary>
+        private static void InitializeBaseDirectory()
+        {
+            try
+            {
+                // Uygulama dizini (exe'nin bulunduğu yer)
+                string exeDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+                // Ana veri klasörünü bulabilmek için birkaç seviye yukarı çıkarak arama
+                string currentDir = exeDirectory;
+                bool foundDataFolder = false;
+
+                // Önce mevcut dizinde ara
+                if (Directory.Exists(Path.Combine(currentDir, _relativeDataPath)))
+                {
+                    _baseDirectory = Path.Combine(currentDir, _relativeDataPath);
+                    foundDataFolder = true;
+                }
+
+                // Bulunamadıysa 5 seviye yukarı kadar arama yap
+                if (!foundDataFolder)
+                {
+                    for (int i = 0; i < 5; i++)
+                    {
+                        // Bir üst dizine çık
+                        DirectoryInfo parentDir = Directory.GetParent(currentDir);
+
+                        // Eğer üst dizin yoksa veya kök dizine ulaşıldıysa döngüden çık
+                        if (parentDir == null)
+                            break;
+
+                        currentDir = parentDir.FullName;
+
+                        // Veri klasörünü kontrol et
+                        if (Directory.Exists(Path.Combine(currentDir, _relativeDataPath)))
+                        {
+                            _baseDirectory = Path.Combine(currentDir, _relativeDataPath);
+                            foundDataFolder = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Hala bulunamadıysa, son çare olarak tam path'i dene
+               
+
+                // Veri klasörü bulunamadıysa, exe dizini altında yeni bir klasör oluştur
+                if (!foundDataFolder)
+                {
+                    _baseDirectory = Path.Combine(exeDirectory, _relativeDataPath);
+                    Directory.CreateDirectory(_baseDirectory);
+                    Debug.WriteLine($"Veri klasörü bulunamadı, yeni klasör oluşturuldu: {_baseDirectory}");
+                }
+
+                Debug.WriteLine($"Veri klasörü yolu: {_baseDirectory}");
+            }
+            catch (Exception ex)
+            {
+                // Herhangi bir hata durumunda, exe dizini altında bir klasör kullan
+                string fallbackPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _relativeDataPath);
+                _baseDirectory = fallbackPath;
+
+                if (!Directory.Exists(fallbackPath))
+                {
+                    Directory.CreateDirectory(fallbackPath);
+                }
+
+                Debug.WriteLine($"Veri klasörü belirlenirken hata oluştu: {ex.Message}");
+                Debug.WriteLine($"Varsayılan klasör kullanılıyor: {fallbackPath}");
+            }
+        }
+        /// <summary>
+        /// Uygulama tarafından kullanılacak temel veri dizini
+        /// </summary>
+        //public static string BaseDirectory
+        //{
+        //    get
+        //    {
+        //        if (string.IsNullOrEmpty(_baseDirectory))
+        //        {
+        //            InitializeBaseDirectory();
+        //        }
+        //        return _baseDirectory;
+        //    }
+        //}
+        /// <summary>
+        /// Temel veri dizinini başlatır, relative path'i bulur
+        /// </summary>
 
 
         /// <summary>
@@ -78,7 +328,11 @@ namespace SLF.Services
         public static string PythonKodDirectory
         {
             get
-            {
+            {    // Eğer config'den ayarlanmışsa, o yolu kullan
+                if (!string.IsNullOrEmpty(_configPythonKodPath) && Directory.Exists(_configPythonKodPath))
+                {
+                    return _configPythonKodPath;
+                }
                 try
                 {
                     // SLF ana dizininde python_kod klasörü
@@ -917,85 +1171,85 @@ namespace SLF.Services
         /// <summary>
         /// Temel veri dizinini başlatır, relative path'i bulur
         /// </summary>
-        private static void InitializeBaseDirectory(string relativeDataPath)
-        {
-            try
-            {
-                // Uygulama dizini (exe'nin bulunduğu yer)
-                string exeDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        //private static void InitializeBaseDirectory(string relativeDataPath)
+        //{
+        //    try
+        //    {
+        //        // Uygulama dizini (exe'nin bulunduğu yer)
+        //        string exeDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-                // Ana veri klasörünü bulabilmek için birkaç seviye yukarı çıkarak arama
-                string currentDir = exeDirectory;
-                bool foundDataFolder = false;
+        //        // Ana veri klasörünü bulabilmek için birkaç seviye yukarı çıkarak arama
+        //        string currentDir = exeDirectory;
+        //        bool foundDataFolder = false;
 
-                // Önce mevcut dizinde ara
-                if (Directory.Exists(Path.Combine(currentDir, relativeDataPath)))
-                {
-                    _baseDirectory = Path.Combine(currentDir, relativeDataPath);
-                    foundDataFolder = true;
-                }
+        //        // Önce mevcut dizinde ara
+        //        if (Directory.Exists(Path.Combine(currentDir, relativeDataPath)))
+        //        {
+        //            _baseDirectory = Path.Combine(currentDir, relativeDataPath);
+        //            foundDataFolder = true;
+        //        }
 
-                // Bulunamadıysa 5 seviye yukarı kadar arama yap
-                if (!foundDataFolder)
-                {
-                    for (int i = 0; i < 5; i++)
-                    {
-                        // Bir üst dizine çık
-                        DirectoryInfo parentDir = Directory.GetParent(currentDir);
+        //        // Bulunamadıysa 5 seviye yukarı kadar arama yap
+        //        if (!foundDataFolder)
+        //        {
+        //            for (int i = 0; i < 5; i++)
+        //            {
+        //                // Bir üst dizine çık
+        //                DirectoryInfo parentDir = Directory.GetParent(currentDir);
 
-                        // Eğer üst dizin yoksa veya kök dizine ulaşıldıysa döngüden çık
-                        if (parentDir == null)
-                            break;
+        //                // Eğer üst dizin yoksa veya kök dizine ulaşıldıysa döngüden çık
+        //                if (parentDir == null)
+        //                    break;
 
-                        currentDir = parentDir.FullName;
+        //                currentDir = parentDir.FullName;
 
-                        // Veri klasörünü kontrol et
-                        if (Directory.Exists(Path.Combine(currentDir, relativeDataPath)))
-                        {
-                            _baseDirectory = Path.Combine(currentDir, relativeDataPath);
-                            foundDataFolder = true;
-                            break;
-                        }
-                    }
-                }
+        //                // Veri klasörünü kontrol et
+        //                if (Directory.Exists(Path.Combine(currentDir, relativeDataPath)))
+        //                {
+        //                    _baseDirectory = Path.Combine(currentDir, relativeDataPath);
+        //                    foundDataFolder = true;
+        //                    break;
+        //                }
+        //            }
+        //        }
 
-                // Hala bulunamadıysa, son çare olarak tam path'i dene
-                if (!foundDataFolder)
-                {
-                    string gitRepoPath = @"C:\Users\batuhan.yetis\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı";
+        //        // Hala bulunamadıysa, son çare olarak tam path'i dene
+        //        if (!foundDataFolder)
+        //        {
+        //            string gitRepoPath = @"C:\Users\batuhan.yetis\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı";
 
-                    if (Directory.Exists(Path.Combine(gitRepoPath, relativeDataPath)))
-                    {
-                        _baseDirectory = Path.Combine(gitRepoPath, relativeDataPath);
-                        foundDataFolder = true;
-                    }
-                }
+        //            if (Directory.Exists(Path.Combine(gitRepoPath, relativeDataPath)))
+        //            {
+        //                _baseDirectory = Path.Combine(gitRepoPath, relativeDataPath);
+        //                foundDataFolder = true;
+        //            }
+        //        }
 
-                // Veri klasörü bulunamadıysa, exe dizini altında yeni bir klasör oluştur
-                if (!foundDataFolder)
-                {
-                    _baseDirectory = Path.Combine(exeDirectory, relativeDataPath);
-                    Directory.CreateDirectory(_baseDirectory);
-                    Debug.WriteLine($"Veri klasörü bulunamadı, yeni klasör oluşturuldu: {_baseDirectory}");
-                }
+        //        // Veri klasörü bulunamadıysa, exe dizini altında yeni bir klasör oluştur
+        //        if (!foundDataFolder)
+        //        {
+        //            _baseDirectory = Path.Combine(exeDirectory, relativeDataPath);
+        //            Directory.CreateDirectory(_baseDirectory);
+        //            Debug.WriteLine($"Veri klasörü bulunamadı, yeni klasör oluşturuldu: {_baseDirectory}");
+        //        }
 
-                Debug.WriteLine($"Veri klasörü yolu: {_baseDirectory}");
-            }
-            catch (Exception ex)
-            {
-                // Herhangi bir hata durumunda, exe dizini altında bir klasör kullan
-                string fallbackPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, relativeDataPath);
-                _baseDirectory = fallbackPath;
+        //        Debug.WriteLine($"Veri klasörü yolu: {_baseDirectory}");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Herhangi bir hata durumunda, exe dizini altında bir klasör kullan
+        //        string fallbackPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, relativeDataPath);
+        //        _baseDirectory = fallbackPath;
 
-                if (!Directory.Exists(fallbackPath))
-                {
-                    Directory.CreateDirectory(fallbackPath);
-                }
+        //        if (!Directory.Exists(fallbackPath))
+        //        {
+        //            Directory.CreateDirectory(fallbackPath);
+        //        }
 
-                Debug.WriteLine($"Veri klasörü belirlenirken hata oluştu: {ex.Message}");
-                Debug.WriteLine($"Varsayılan klasör kullanılıyor: {fallbackPath}");
-            }
-        }
+        //        Debug.WriteLine($"Veri klasörü belirlenirken hata oluştu: {ex.Message}");
+        //        Debug.WriteLine($"Varsayılan klasör kullanılıyor: {fallbackPath}");
+        //    }
+        //}
 
         /// <summary>
         /// Python betiği çalıştırır ve seçili path'i argüman olarak geçer
