@@ -33,10 +33,8 @@ namespace SLF
                 "MRC\\MRC - 1.1.3_T&SI\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\İzmir\\Program Dosyaları\\config.json").Replace("/", "\\");
 
             // read the json file and create the "config" variable.
-            json_file = File.ReadAllText(config_path);
-            
+            json_file = File.ReadAllText(config_path);        
             config = JsonConvert.DeserializeObject(json_file);
-
         }
 
         private void HomePageForm_Shown(object sender, EventArgs e)

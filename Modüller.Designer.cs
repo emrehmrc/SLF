@@ -3658,7 +3658,6 @@ namespace SLF
 
         }
 
-
         public System.Windows.Forms.TabControl Modül_Tabları;
         private System.Windows.Forms.TabPage tab_girdi;
         private System.Windows.Forms.TabPage tab_imar;

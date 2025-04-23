@@ -115,12 +115,10 @@ namespace SLF
 
                 // Write the updated JSON back to the file
                 File.WriteAllText(homePageForm.config_path, updatedJson);
-
-               
+      
             }
             catch (Exception ex)
             {
-                MessageBox.Show(homePageForm.json_file);
                 MessageBox.Show($"Error saving config: {ex.Message}");
             }
         }

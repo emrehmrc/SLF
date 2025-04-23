@@ -49,9 +49,6 @@ namespace SLF
         private MethodForm methodFormObjesi;
         private BekleForm bekleForm;
 
-        public string userRootPath;
-        public string configPath;
-
         public Panel imar_legendPanel;
 
         public bool isImported;
@@ -876,7 +873,7 @@ namespace SLF
             if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
             {
 
-                string filePath = Path.Combine(userRootPath,
+                string filePath = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
@@ -2294,7 +2291,7 @@ namespace SLF
             else if (Modül_Tabları.SelectedTab == tab_yükHaritası)
             {
                 // Find the index of the overlay in tüm_katmanlar_array_imar_names that contains "xxx"
-                string searchText = "SONUCLAR_Load_Density.kml"; // The text to search for
+                string searchText = "SONUCLAR_Yük_Yoğunluğu.kml"; // The text to search for
                 overlayIndex = Array.FindIndex(cbs.tüm_katmanlar_array_names,
                     name => name != null && name.Contains(searchText));
 
@@ -4561,18 +4558,6 @@ namespace SLF
             cbs.CBS_ölç(mesafe_metre_imar, Mesafe_imar);
         }
 
-        private void İmar_Kaydır_Click(object sender, EventArgs e)
-        {
-            cbs.CBS_kaydır(markerOverlay_imar, rulerRoute_imar, gMapControl_imar,
-                mesafe_metre_imar, Mesafe_imar);
-        }
-
-        private void İmar_Seç_Click(object sender, EventArgs e)
-        {
-            cbs.CBS_sec(markerOverlay_imar, rulerRoute_imar, gMapControl_imar,
-                    mesafe_metre_imar, Mesafe_imar);
-        }
-
         private void gMapControl_imar_MouseDown(object sender, MouseEventArgs e)
         {
             MouseDownEvent(sender, e, gMapControl_imar, Mesafe_imar, mesafe_metre_imar,
@@ -4770,14 +4755,14 @@ namespace SLF
 
 
             // Find the index of the overlay in tüm_katmanlar_array_imar_names that contains "xxx"
-            string searchText = "SONUCLAR_Load_Density.kml"; // The text to search for
+            string searchText = "SONUCLAR_Yük_Yoğunluğu.kml"; // The text to search for
             overlayIndex = Array.FindIndex(cbs.tüm_katmanlar_array_names,
                 name => name != null && name.Contains(searchText));
 
             // Check if the overlay was found
             if (overlayIndex == -1 || cbs.tüm_katmanlar_array_imar[overlayIndex] == null)
             {
-                MessageBox.Show($"SONUCLAR_Load_Density.kml dosyası bulunamadı. Lütfen ilgili dosyanın SLF hesabı sonucu " +
+                MessageBox.Show($"SONUCLAR_Yük_Yoğunluğu.kml dosyası bulunamadı. Lütfen ilgili dosyanın SLF hesabı sonucu " +
                     $"oluşturulduğundan emin olunuz.");
 
             }
@@ -4941,9 +4926,7 @@ namespace SLF
         // Save button logic to update Excel file with changes from DataGridViews
         private async void ELFScenerioSaveButton_Click(object sender, EventArgs e)
         {
-            string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-            string originalFilePath = Path.Combine(userRootPath,
+            string originalFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
                 (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                 (string)ana_menu_form_objesi.config.İl,
                 (string)ana_menu_form_objesi.config.İlçe,
@@ -5808,7 +5791,7 @@ namespace SLF
                                         gMapControl_yuk.Refresh();
                                     }
 
-                                    if (checkBox.Text == "SONUCLAR_Load_Density.kml")
+                                    if (checkBox.Text == "SONUCLAR_Yük_Yoğunluğu.kml")
                                     {
                                         checkBox_yuk_main.Checked = false;
                                         checkBox_yuk_main.Visible = false;
@@ -7120,7 +7103,7 @@ namespace SLF
         {
 
             // Get the input strings and replace forward slashes with backslashes
-            ELFrScriptModelPath = Path.Combine(userRootPath,
+            ELFrScriptModelPath = Path.Combine(ana_menu_form_objesi.userRootPath,
                 (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                 (string)ana_menu_form_objesi.config.İl,
                (string)ana_menu_form_objesi.config.ELF.Rscript_Yolu_Model).Replace('/', '\\');
@@ -7128,7 +7111,7 @@ namespace SLF
             var processInfo = new ProcessStartInfo
             {
                 FileName = "Rscript.exe",
-                Arguments = $"--vanilla \"{ELFrScriptModelPath}\" \"{configPath}\"",
+                Arguments = $"--vanilla \"{ELFrScriptModelPath}\" \"{ana_menu_form_objesi.config_path}\"",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -7231,7 +7214,7 @@ namespace SLF
                 };
                 cursorTimer.Start();
 
-                ELFSenaryolarFilePath = Path.Combine(userRootPath,
+                ELFSenaryolarFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
@@ -7307,9 +7290,7 @@ namespace SLF
                 label_graphics.Visible = false;
                 comboBox_ekonometrik.Visible = false;
 
-                string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-                string results_path = Path.Combine(userRootPath,
+                string results_path = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
@@ -7350,11 +7331,8 @@ namespace SLF
             try
             {
 
-                string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-
                 // Construct the graphics path
-                string graphicsPath = Path.Combine(userRootPath,
+                string graphicsPath = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,

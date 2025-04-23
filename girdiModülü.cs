@@ -466,12 +466,8 @@ namespace SLF
                 {
                     try
                     {
-
-                        string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-
                         var excelExporter = new ExcelExporter();
-                        excelExporter.UpdateExcelFileFirstSheet(Path.Combine(userRootPath,
+                        excelExporter.UpdateExcelFileFirstSheet(Path.Combine(modülFormu.ana_menu_form_objesi.userRootPath,
                             (string)modülFormu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                                 (string)modülFormu.ana_menu_form_objesi.config.İl,
                                 (string)modülFormu.ana_menu_form_objesi.config.İlçe,
@@ -627,7 +623,7 @@ namespace SLF
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = "Rscript.exe",
-                        Arguments = $"--vanilla \"{rScriptPath}\" \"{modülFormu.ana_menu_form_objesi.json_file}\"",
+                        Arguments = $"--vanilla \"{rScriptPath}\" \"{modülFormu.ana_menu_form_objesi.config_path}\"",
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
                         UseShellExecute = false,
