@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace SLF
 {
@@ -155,13 +152,6 @@ namespace SLF
 
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = WarningErrorBoundary(0.1f);
 
-        /*        private readonly Dictionary<string, (float Min, float Max)> minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
-                {
-                    { "EA_X_KOORDINAT", (float.MinValue, float.MaxValue) }, // TODO: Update these values from the other data
-                    { "EA_Y_KOORDINAT", (float.MinValue, float.MaxValue) } // TODO: Update these values from the other data
-
-                };*/
-
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> nullFieldsCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
             { "EA_X_KOORDINAT", WARNING_ONLY },
@@ -178,50 +168,54 @@ namespace SLF
         // New field to store out-of-bounds rows and their EA_TRAFO_KODU
         private Dictionary<int, string> outOfBoundsRowsToTrafoKodu;
 
-        // Method to compute dynamic coordinate bounds (unchanged)
         private void InitializeCoordinateBounds()
+
         {
+
             DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+
             if (trafoDataTable == null || trafoDataTable.Rows.Count == 0)
+
             {
+
                 throw new InvalidOperationException("Transformer data ('DTR Verileri') is missing or empty. Cannot compute coordinate bounds.");
+
             }
 
-            // Extract all valid X and Y coordinates from transformer data
+
             var xCoords = trafoDataTable.AsEnumerable()
-                .Select(row => row.Field<string>("TRAFO_X_KOORDINAT"))
-                .Where(coord => float.TryParse(coord, out _))
-                .Select(coord => float.Parse(coord))
+                .Select(row => Convert.ToSingle(row.Field<double>("TRAFO_X_KOORDINAT")))
                 .ToList();
 
             var yCoords = trafoDataTable.AsEnumerable()
-                .Select(row => row.Field<string>("TRAFO_Y_KOORDINAT"))
-                .Where(coord => float.TryParse(coord, out _))
-                .Select(coord => float.Parse(coord))
+                .Select(row => Convert.ToSingle(row.Field<double>("TRAFO_Y_KOORDINAT")))
                 .ToList();
 
             if (xCoords.Count == 0 || yCoords.Count == 0)
+
             {
+
                 throw new InvalidOperationException("No valid transformer coordinates found in 'DTR Verileri'. Cannot compute coordinate bounds.");
+
             }
 
             // Calculate min/max with buffer
+
             float xMin = xCoords.Min();
             float xMax = xCoords.Max();
             float yMin = yCoords.Min();
             float yMax = yCoords.Max();
-
             float xRange = xMax - xMin;
             float yRange = yMax - yMin;
 
             minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
-        {
-            { "EA_X_KOORDINAT", (xMin - xRange * COORDINATE_BUFFER_PERCENTAGE, xMax + xRange * COORDINATE_BUFFER_PERCENTAGE) },
-            { "EA_Y_KOORDINAT", (yMin - yRange * COORDINATE_BUFFER_PERCENTAGE, yMax + yRange * COORDINATE_BUFFER_PERCENTAGE) }
-        };
+            {
+                { "EA_X_KOORDINAT", (xMin - xRange * COORDINATE_BUFFER_PERCENTAGE, xMax + xRange * COORDINATE_BUFFER_PERCENTAGE) },
+
+                { "EA_Y_KOORDINAT", (yMin - yRange * COORDINATE_BUFFER_PERCENTAGE, yMax + yRange * COORDINATE_BUFFER_PERCENTAGE) }
+            };
         }
 
-        // Updated ReportCoordinatesOutOfLimits to track out-of-bounds rows and their EA_TRAFO_KODU
         private void ReportCoordinatesOutOfLimits()
         {
             // Initialize the dictionary to store out-of-bounds rows
