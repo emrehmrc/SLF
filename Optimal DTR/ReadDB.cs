@@ -6,7 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
-using static Trafo;
+using static SLF.Optimal_DTR.Trafo;
+
 
 namespace SLF.Optimal_DTR
 {

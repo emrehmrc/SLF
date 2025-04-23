@@ -25,6 +25,7 @@ namespace SLF
             //Application.Run(new Rapor_Arayuz());
             //Application.Run(new DTR_Arayuz());
             Application.Run(new ModülFormu());
+            //Application.Run(new HomePageForm());
             //Application.Run(new ChargingStationPopupForm());
         }
     }

@@ -17,12 +17,24 @@ using SLF.Services;
 using GMap.NET.WindowsForms.Markers;
 using System.Data.SQLite;
 using System.Security.Cryptography;
+using Microsoft.Extensions.Configuration;
+using Common.Logging;
+using SharpKml.Dom;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using System.Xml;
+using Parquet;
+using Parquet.Schema;
+using ParquetSharp;
+using System.Diagnostics;
+using Point = System.Drawing.Point;
+using System.Data.Entity.Infrastructure;
+using Encoding = System.Text.Encoding;
 
 namespace SLF.RaporlamaDosyası
 {
     public partial class Rapor_Arayuz : Form
     {
-        string SonucYolu;
 
         EA eA;
         DTR dTR;
@@ -39,24 +51,92 @@ namespace SLF.RaporlamaDosyası
         public DataTable DataTableDTR { get; set; } = new DataTable();
         public DataTable DataTableEA { get; set; } = new DataTable();
         public DataTable DataTableYuk { get; set; } = new DataTable();
-        public DataTable DataTableDEK { get; set; } = new DataTable();
+        public DataTable DataTableDEK { get; set; } = new DataTable(); 
+
+        public DataTable currentDt { get; set; }
 
         string KullanilanModul = string.Empty;
 
+        string İlİlceYol;
+
+        string ProjeYolu;
+
+        string ODTRSonucYolu;
+
+        string ELFSonucYolu;
+
+        
+        string İlYol;
+
+        string YükVeriYolu;
+
+        string İmarVeriYolu;
+
+        string SonucYolu;
+
+        string PythonFilePath;
+
+        string ArsivVeriYolu;
+
+        string PythonPath;
 
         public Rapor_Arayuz()
         {
             InitializeComponent();
-            InitializeMap();
 
+            /*var config = new ConfigurationBuilder()
+           .SetBasePath(Directory.GetCurrentDirectory())
+           .AddJsonFile("config 1.json")
+           .Build();
 
+            İlİlceYol = Path.Combine(config["Ana_Klasör_Yolu"], config["İl"], config["İlçe"]);
 
-            //DosyaYolu = PathService.ImarAnaliziPath;
-            //SonucYolu = PathService.SonuclarPath;
-            SonucYolu = @"C:\Users\vural.bayrakli\source\repos\SLF\bin\Debug\il_ilce_kırılımları\İzmir\Aliağa\proje\sonuçlar";
+            ELFSonucYolu = Path.Combine(İlİlceYol, config["ELF:SONUÇLAR_klasör"]);
+
+            İlYol = Path.Combine(config["Ana_Klasör_Yolu"], config["İl"]);
+
+            SonucYolu = Path.Combine(İlİlceYol, config["ODTR:Klasör"]);
+
+            YükVeriYolu = Path.Combine(İlİlceYol, config["ODTR:INPUT_klasör2"]);
+
+            İmarVeriYolu = Path.Combine(İlİlceYol, config["ODTR:INPUT_klasör1"]);
+
+            currentDt = new DataTable();*/
+
+            var configPath = @"C:\Users\vural.bayrakli\OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\İzmir\Program Dosyaları\configVural.json";
+            var config = new ConfigurationBuilder()
+                .AddJsonFile(configPath, optional: false, reloadOnChange: true)
+                .Build();
+
+            İlYol = Path.Combine(config["Ana_Klasör_Yolu"], config["İl"]);
+
+            İlİlceYol = Path.Combine(config["Ana_Klasör_Yolu"], config["İl"], config["İlçe"]);
+
+            SonucYolu = Path.Combine(İlİlceYol, config["proje_dosyası"], config["ODTR:Sonuçlar_klasör"]);
+
+            PythonFilePath = Path.Combine(İlYol, config["program_dosyaları_path"], config["ODTR:PYTHON_klasör"]);
+
+            YükVeriYolu = Path.Combine(İlİlceYol, config["proje_dosyası"], config["ODTR:INPUT_Yük_klasör"]);
+
+            İmarVeriYolu = Path.Combine(İlİlceYol, config["proje_dosyası"], config["ODTR:INPUT_Trafo_klasör"]);
+            
+            PythonPath = GetPythonPath();
+
+            if (PythonPath == null)
+            {
+                MessageBox.Show("Python yolu bulunamadı. Lütfen Python yükleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            ArsivVeriYolu = Path.Combine(SonucYolu, "Arşiv");
+
+            if (!Directory.Exists(ArsivVeriYolu))
+            {
+                Directory.CreateDirectory(ArsivVeriYolu);
+            }
+
         }
 
-        private void InitializeMap()
+        /*private void InitializeMap()
         {
 
             overlay = new GMapOverlay("map");
@@ -70,9 +150,107 @@ namespace SLF.RaporlamaDosyası
             gMapControl1.Position = new PointLatLng(38.5, 27.0); // Başlangıç konumu
             gMapControl1.DragButton = MouseButtons.Left;
 
+        }*/
+
+
+        public static async Task<DataTable> LoadParquetAsync(string filePath)
+        {
+            var table = new DataTable();
+
+            var fs = System.IO.File.OpenRead(filePath);
+            var reader = await ParquetReader.CreateAsync(fs); // ✅ new static async API
+
+            DataField[] dataFields = reader.Schema.GetDataFields();
+
+            // Add columns
+            foreach (var field in dataFields)
+            {
+                table.Columns.Add(field.Name, field.ClrNullableIfHasNullsType);
+            }
+
+            for (int rg = 0; rg < reader.RowGroupCount; rg++)
+            {
+                var groupReader = reader.OpenRowGroupReader(rg);
+                var dataColumns = new DataColumn[dataFields.Length];
+
+                var columnsData = new Array[dataFields.Length];
+                for (int i = 0; i < dataFields.Length; i++)
+                {
+                    var column = await groupReader.ReadColumnAsync(dataFields[i]);  // ✅ await the task
+                    columnsData[i] = column.Data;
+                }
+
+                int rowCount = columnsData[0].Length;
+
+                for (int r = 0; r < rowCount; r++)
+                {
+                    var row = table.NewRow();
+                    for (int c = 0; c < dataFields.Length; c++)
+                    {
+                        object val = columnsData[c].GetValue(r);
+                        row[c] = val ?? DBNull.Value;
+                    }
+                    table.Rows.Add(row);
+                }
+            }
+
+            return table;
         }
 
-        
+        public static DataTable ReadParquetToDataTable(string filePath)
+        {
+            var table = new DataTable();
+
+            using var reader = new ParquetFileReader(filePath);
+            int rowGroupCount = reader.FileMetaData.NumRowGroups;
+            int columnCount = reader.FileMetaData.Schema.NumColumns;
+
+            // Kolon adlarını ve tiplerini al
+            for (int i = 0; i < columnCount; i++)
+            {
+                var column = reader.FileMetaData.Schema.Column(i);
+                string name = column.Name;
+                Type colType = column.PhysicalType switch
+                {
+                    PhysicalType.Int32 => typeof(int),
+                    PhysicalType.Int64 => typeof(long),
+                    PhysicalType.Float => typeof(float),
+                    PhysicalType.Double => typeof(double),
+                    PhysicalType.Boolean => typeof(bool),
+                    PhysicalType.ByteArray => typeof(string), // varsayım
+                    _ => typeof(object)
+                };
+
+                table.Columns.Add(name, colType);
+            }
+
+            for (int rg = 0; rg < rowGroupCount; rg++)
+            {
+                using var rowGroupReader = reader.RowGroup(rg);
+                long numRows = rowGroupReader.MetaData.NumRows;
+
+                // Tüm kolonları oku
+                var columnData = new object[columnCount][];
+                for (int col = 0; col < columnCount; col++)
+                {
+                    using var logicalReader = rowGroupReader.Column(col).LogicalReader<object>();
+                    columnData[col] = logicalReader.ReadAll((int)numRows);
+                }
+
+                // Satırları oluştur
+                for (int row = 0; row < numRows; row++)
+                {
+                    var newRow = table.NewRow();
+                    for (int col = 0; col < columnCount; col++)
+                    {
+                        newRow[col] = columnData[col][row] ?? DBNull.Value;
+                    }
+                    table.Rows.Add(newRow);
+                }
+            }
+
+            return table;
+        }
 
         public bool DosyaMevcutMu(string yol, string dosya)
         {
@@ -95,7 +273,7 @@ namespace SLF.RaporlamaDosyası
 
         public void FiltrelemeKismi(Form a, string modul)
         {
-            this.panel3.Controls.Clear();
+            /*this.panel3.Controls.Clear();
 
             a.Name = modul;
             a.Text = modul;
@@ -103,7 +281,7 @@ namespace SLF.RaporlamaDosyası
             a.FormBorderStyle = FormBorderStyle.None;
             a.Dock = DockStyle.Fill;
             a.Parent = this.panel3;
-            a.Show();
+            a.Show();*/
 
         }
 
@@ -111,7 +289,7 @@ namespace SLF.RaporlamaDosyası
         {
             this.panel4.Controls.Clear();
 
-            DataTable dt = excelImporter.ImportExcelFile(yol, null, false);
+            DataTable dt = ImportExcelFile(yol);
 
             /*tablo_Formu.vektörel_attribute_table.DataSource = dt;
             tablo_Formu.FormBorderStyle = FormBorderStyle.None;
@@ -134,7 +312,23 @@ namespace SLF.RaporlamaDosyası
             
         }
 
-    
+        public void VeriYazdir2(DataTable dt)
+        {
+            this.panel5.Controls.Clear();
+
+            tablo_Formu.vektörel_attribute_table.DataSource = dt;
+            tablo_Formu.FormBorderStyle = FormBorderStyle.None;
+            tablo_Formu.vektörel_attribute_table.Dock = DockStyle.Fill;
+            tablo_Formu.TopLevel = false;
+            tablo_Formu.Show();
+
+
+            this.panel5.Controls.Add(tablo_Formu.vektörel_attribute_table);
+            
+
+        }
+
+
 
 
 
@@ -212,33 +406,70 @@ namespace SLF.RaporlamaDosyası
 
         private void button1_Click(object sender, EventArgs e)
         {
+            label1.Visible = true;
+            button2.Visible = true;
+            label7.Visible = true;
+            button5.Visible = true;
+
             KullanilanModul = "DTR";
 
-            string isim = "DTR";
+            this.panel3.Controls.Clear();
 
-            string yolDir = Path.Combine(SonucYolu, isim);
+            string dtyol = DosyaSeciciGoster(SonucYolu);
 
-            string d = DosyaSeciciGoster(yolDir);
-            string dosya = Path.Combine(yolDir, d);
-
-
-            MessageBox.Show(dosya);
-
-
-            if (DosyaMevcutMu(yolDir, dosya))
+            try
             {
-                DataTableDTR = excelImporter.ImportExcelFile(dosya, null, false);
+                dtyol = Path.Combine(SonucYolu, dtyol);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            
 
-                if (dTR == null)
+            try
+            {
+                
+
+                /*if (DosyaMevcutMu(ProjeYolu, ODTRSonucYolu))
                 {
-                    dTR = new DTR(DataTableDTR);
-                    dTR.FiltrelemeYapildi += Form_FiltrelemeYapildi;
+                    DataTableDTR = excelImporter.ImportExcelFile(ODTRSonucYolu, null, false);
 
+                    VeriYazdir2(DataTableDTR);
 
+                }*/
+
+                if (DosyaMevcutMu(SonucYolu, dtyol))
+                {
+                    DataTableDTR = ImportExcelFile(dtyol);
+
+                    currentDt = DataTableDTR.Copy();
+
+                    // Şimdi, DataTableYuk'un satırlarını currentDt'ye ekliyoruz
+                    
+
+                    if (dTR == null)
+                    {
+                        dTR = new DTR(DataTableDTR);
+                        dTR.TopLevel = false;
+                        dTR.FormBorderStyle = FormBorderStyle.None;
+
+                        dTR.FiltrelemeYapildi += Form_FiltrelemeYapildi;
+
+                    }
+
+                    this.panel3.Controls.Add(dTR.panel3);
+
+                    FiltrelemeKismi(dTR, "DTR");
+
+                    VeriYazdir2(DataTableDTR);
                 }
-                FiltrelemeKismi(dTR, "DTR");
+            }
 
-            }            
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
 
         }
 
@@ -257,11 +488,14 @@ namespace SLF.RaporlamaDosyası
 
             if (KullanilanModul == "DTR")
             {
-                dTR.DrawMap(dTR.FiltrelenmisSonuc, overlay, gMapControl1);
+                //dTR.DrawMap(dTR.FiltrelenmisSonuc, overlay, gMapControl1);
+                currentDt = dt.Copy();
+                VeriYazdir2(dt);
             }
-            else if (KullanilanModul == "EA")
+            else if (KullanilanModul == "YUK")
             {
-                
+                currentDt = dt.Copy();
+                VeriYazdir2(dt);
             }
 
             else if (KullanilanModul == "DEK")
@@ -291,7 +525,7 @@ namespace SLF.RaporlamaDosyası
 
             if (!DosyaMevcutMu(yolDir, dosya))
             {
-                DataTableEA = excelImporter.ImportExcelFile(dosya, null, false);
+                DataTableEA = ImportExcelFile(dosya);
 
                 if (eA == null)
                 {
@@ -317,7 +551,7 @@ namespace SLF.RaporlamaDosyası
 
             if (!DosyaMevcutMu(yolDir, dosya))
             {
-                DataTableDEK = excelImporter.ImportExcelFile(dosya, null, false);
+                DataTableDEK = ImportExcelFile(dosya);
 
                 if (dek == null)
                 {
@@ -329,38 +563,76 @@ namespace SLF.RaporlamaDosyası
             }
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private async void button4_Click(object sender, EventArgs e)
         {
-            string isim = "Yuk";
+            label1.Visible = false;
+            button2.Visible = false;
+            label7.Visible = false;
+            button5.Visible = false;
 
-            string yolDir = Path.Combine(SonucYolu, isim);
+            KullanilanModul = "YUK";
+
+
+            this.panel3.Controls.Clear();
+            this.panel5.Controls.Clear();
+
+
+
+            string veritabaniYolu = Path.Combine(PythonFilePath, "veriler.db");
+
+            // LOADING GIF EKLE
+            PictureBox loadingGif = new PictureBox();
+            loadingGif.SizeMode = PictureBoxSizeMode.AutoSize;
+            string gifPath = Path.Combine(PythonFilePath, "l1.gif");
+            loadingGif.Image = Image.FromFile(gifPath);
+            loadingGif.Location = new Point(
+                (panel5.Width - loadingGif.Width) / 2,
+                (panel5.Height - loadingGif.Height) / 2
+            );
+            panel5.Controls.Add(loadingGif);
+            panel5.Refresh();
+
+            // ✨ UI thread'e nefes ver
+            await Task.Delay(1);
+            Application.DoEvents();
+
 
             try
             {
-                string d = DosyaSeciciGoster(yolDir);
-
-                string dosya = Path.Combine(yolDir, d);
-
-                if (!DosyaMevcutMu(yolDir, dosya))
+                if (DosyaMevcutMu(SonucYolu, veritabaniYolu))
                 {
-                    DataTableYuk = excelImporter.ImportExcelFile(dosya, null, false);
+                    string sqlQuery = "SELECT * FROM dfYukButun";
+                    //DataTableYuk = await GetDataTableFromSQLite(veritabaniYolu, sqlQuery).ConfigureAwait(false);
+
+                    DataTableYuk = await Task.Run(() =>
+                    {
+                        return GetDataTableFromSQLite(veritabaniYolu, sqlQuery).Result;
+                    });
+
+                    currentDt = DataTableYuk.Copy();
 
                     if (yuk == null)
                     {
                         yuk = new Alansal(DataTableYuk);
-                        eA.FiltrelemeYapildi += Form_FiltrelemeYapildi;
+                        yuk.FiltrelemeYapildi += Form_FiltrelemeYapildi;
                     }
 
-                    FiltrelemeKismi(dek, "DEK");
+                    this.panel3.Controls.Add(yuk.panel3);
+                    VeriYazdir2(DataTableYuk);
                 }
             }
-
             catch (Exception ex)
             {
-                MessageBox.Show("Herhangi dosya seçilmedi.");
+                MessageBox.Show("Hata: " + ex.Message);
             }
-
+            finally
+            {
+                // ✅ LOADING ANİMASYONUNU KALDIR
+                panel5.Controls.Remove(loadingGif);
+                loadingGif.Dispose();
+            }
         }
+
 
 
 
@@ -386,7 +658,598 @@ namespace SLF.RaporlamaDosyası
                 return dt;
             }
 
-        
+        private void ExcelDownloadButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private async void ExcelDownloadButton_Click_1(object sender, EventArgs e)
+        {
+            // Örnek DataTable oluşturma
+            string gifPath = Path.Combine(PythonFilePath, "l1.gif");
+
+            PictureBox aktifGif = ShowLoadingGifNextToButton(ExcelDownloadButton, panel7, gifPath);
+
+            await Task.Delay(1);         // animasyonun başlama şansı olsun
+            Application.DoEvents();      // UI thread'e nefes ver       
+
+            // Excel dosyasını oluşturma
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "Excel Files|*.xlsx",
+                Title = "Save an Excel File"
+            };
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string filePath = saveFileDialog.FileName;
+
+                try
+                {
+                    // EPPlus kullanarak DataTable'ı Excel dosyasına kaydet
+                    //ExportDataTableToExcel(currentDt, filePath);
+                    await Task.Run(() =>
+                    {
+                        ExportExcelFile(filePath, currentDt, KullanilanModul);
+                    });
+                    
+
+                }
+
+                catch 
+                {
+                    MessageBox.Show(e.ToString());
+                }
+
+                finally
+                {
+                    // ✅ LOADING ANİMASYONUNU KALDIR
+                    panel7.Controls.Remove(aktifGif);
+                    aktifGif.Dispose();
+                }
+
+
+
+            }
+
+            
+        }
+
+        private void ExportDataTableToExcel(DataTable dt, string filePath)
+        {
+            MessageBox.Show(dt.Rows.Count.ToString());
+            using (ExcelPackage package = new ExcelPackage())
+            {
+                // Yeni bir çalışma sayfası oluştur
+                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Sheet1");
+
+                // DataTable'ı Excel'e yazma
+                worksheet.Cells["A1"].LoadFromDataTable(dt, PrintHeaders: true);
+
+                // Excel dosyasını kaydet
+                FileInfo file = new FileInfo(filePath);
+                package.SaveAs(file);
+            }
+
+            MessageBox.Show("Excel dosyası başarıyla kaydedildi!", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        public void ExportExcelFile(string filePath, DataTable dt, string seçilenVeriTipi="excel")
+        {
+            // Create a new Excel package
+            using (ExcelPackage package = new ExcelPackage())
+            {
+                try
+                {
+                    // Create a worksheet for each DataTable
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets.Add(seçilenVeriTipi);
+
+                    // Load the DataTable into the worksheet, starting from cell A1
+                    worksheet.Cells["A1"].LoadFromDataTable(dt, true);
+                    // Format the header row
+                    using (ExcelRange range = worksheet.Cells[1, 1, 1, dt.Columns.Count])
+                    {
+                        range.Style.Font.Bold = true;
+                        range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        range.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                        range.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                        range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                        range.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    }
+
+                    // AutoFit columns
+                    worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+                    // Optionally, set the column width to a minimum value if AutoFit makes it too small
+                    for (int col = 1; col <= dt.Columns.Count; col++)
+                    {
+                        if (worksheet.Column(col).Width < 15)
+                        {
+                            worksheet.Column(col).Width = 15;
+                        }
+                    }
+                    FileInfo file = new FileInfo(filePath);
+                    package.Workbook.CalcMode = ExcelCalcMode.Automatic;
+                    package.SaveAs(file);
+                    MessageBox.Show("Dosya başarıyla kaydedildi.", "Dosya Kaydedildi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (InvalidOperationException)
+                {
+                    MessageBox.Show("Halihazırda böyle bir dosya açık ve kullanımda. Dosyayı kapatıp yeniden deneyin.", "Dosya Kaydetme Hatası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return; // Exit the method after showing the message
+                }
+                catch (OutOfMemoryException)
+                {
+                    MessageBox.Show("Bu işlemi gerçekleştirmek için bellek yetersiz. Kaydetmek istediğiniz dosya çok büyük olabilir.", "Dosya Kaydetme Hatası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return; // Exit the method after showing the message
+                }
+            }
+        }
+
+        public void ExportDataTableToKML(DataTable dt)
+        {
+            // SaveFileDialog ile kullanıcıdan dosya yolu alalım
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "KML Files|*.kml";
+            saveFileDialog.Title = "Save KML File";
+
+            // Kullanıcı bir dosya yolu seçerse
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string filePath = saveFileDialog.FileName; // Seçilen dosya yolu
+
+                // KML belgesi oluşturma
+                XmlDocument xmlDoc = new XmlDocument();
+
+                // KML kök elemanını oluştur
+                XmlElement kmlElement = xmlDoc.CreateElement("kml");
+                kmlElement.SetAttribute("xmlns", "http://www.opengis.net/kml/2.2");
+                xmlDoc.AppendChild(kmlElement);
+
+                // KML Document elemanı ekleyelim
+                XmlElement documentElement = xmlDoc.CreateElement("Document");
+                kmlElement.AppendChild(documentElement);
+
+                try
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        // Placemark elemanı
+                        XmlElement placemarkElement = xmlDoc.CreateElement("Placemark");
+                        documentElement.AppendChild(placemarkElement);
+
+                        // Name elemanı
+                        XmlElement nameElement = xmlDoc.CreateElement("name");
+                        nameElement.InnerText = row["trafo_id"].ToString();  // "trafo_id" kolonunu kullan
+                        placemarkElement.AppendChild(nameElement);
+
+                        // Description elemanı
+                        XmlElement descriptionElement = xmlDoc.CreateElement("description");
+                        descriptionElement.InnerText = $"Trafo Yaşı: {row["trafo_yasi"]}, Kapasite: {row["kapasite"]}, Aksiyon: {row["Trafo Aksiyon"]}";
+                        placemarkElement.AppendChild(descriptionElement);
+
+                        // Point elemanı (koordinatlar)
+                        XmlElement pointElement = xmlDoc.CreateElement("Point");
+                        placemarkElement.AppendChild(pointElement);
+
+                        // Koordinatlar elemanı (Koord_x ve Koord_y'yi kullanıyoruz)
+                        XmlElement coordinatesElement = xmlDoc.CreateElement("coordinates");
+                        string x = row["Koord_x"].ToString(); // "Koord_x" kolonunu kullan
+                        string y = row["Koord_y"].ToString();  // "Koord_y" kolonunu kullan
+                        coordinatesElement.InnerText = $"{x},{y},0"; // X, Y, 0 (yükseklik)
+                        pointElement.AppendChild(coordinatesElement);
+                    }
+                    xmlDoc.Save(filePath);
+
+                    MessageBox.Show("KML dosyası başarıyla kaydedildi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"KML dosyası kaydedilirken hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+            }
+        }
+
+        private async void button5_Click(object sender, EventArgs e)
+        {
+
+            // Örnek DataTable oluşturma
+            string gifPath = Path.Combine(PythonFilePath, "l1.gif");
+
+            PictureBox aktifGif = ShowLoadingGifNextToButton(button5, panel7, gifPath);
+
+            await Task.Delay(1);         // animasyonun başlama şansı olsun
+            Application.DoEvents();
+
+            await Task.Run(() =>
+            {
+                ExportDataTableToKML(currentDt);
+            });
+
+            // ✅ LOADING ANİMASYONUNU KALDIR
+            panel7.Controls.Remove(aktifGif);
+            aktifGif.Dispose();
+
+
+        }
+
+        public DataTable ImportExcelFile(string filePath)
+        {
+            DataTable dataTable = new DataTable();
+
+            // Example of measuring import time
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // Assuming data is in the first worksheet               
+
+                int rowCount = worksheet.Dimension.Rows;
+                int colCount = worksheet.Dimension.Columns;
+
+                // Create columns in DataTable
+                for (int col = 1; col <= colCount; col++)
+                {
+                    DataColumn column = new DataColumn();
+                    column.ColumnName = worksheet.Cells[1, col].Text;
+                    dataTable.Columns.Add(column);
+                }
+
+                // Populate DataTable with Excel data
+                // Row starts from 2 because 1st row is column headers
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    DataRow dataRow = dataTable.NewRow();
+                    for (int col = 1; col <= colCount; col++)
+                    {
+                        dataRow[col - 1] = worksheet.Cells[row, col].Value;
+                    }
+                    dataTable.Rows.Add(dataRow);
+                }
+            }
+
+            stopwatch.Stop();
+            Console.WriteLine($"Excel file import took: {stopwatch.ElapsedMilliseconds} ms");
+
+            return dataTable;
+        }
+
+        private async void button2_Click_1(object sender, EventArgs e)
+        {
+            string gifPath = Path.Combine(PythonFilePath, "l1.gif");
+
+            PictureBox aktifGif = ShowLoadingGifNextToButton(button2, panel7, gifPath);
+
+
+            await Task.Delay(1);         // animasyonun başlama şansı olsun
+            Application.DoEvents();      // UI thread'e nefes ver
+
+            string filePath = Path.Combine(ArsivVeriYolu, "Sonuç.xlsx");
+
+            await Task.Run(() =>
+            {
+                ExportExcelFile(filePath, currentDt, KullanilanModul);
+            });       
+
+            string python_path = Path.Combine(PythonFilePath, "PydeckRun.py");
+
+            MessageBox.Show("Python dosyası çalıştırılıyor...");         
+
+            try
+            {
+                
+                await PythonScriptCalistir(python_path, filePath);
+
+                MessageBox.Show("İşlem başarıyla tamamlandı.");
+                
+            }
+
+
+            catch (Exception ex)
+            {
+                MessageBox.Show("Hata: " + ex.Message);
+            }
+            finally
+            {
+                // ✅ LOADING ANİMASYONUNU KALDIR
+                panel7.Controls.Remove(aktifGif);
+                aktifGif.Dispose();
+            }
+
+
+        }
+
+        public async Task PythonScriptCalistir(string python_path, string inputpath)
+        {
+
+            Form form = new Form
+            {
+                // Formun başlangıç pozisyonunu ekranın merkezine ayarlıyoruz
+                StartPosition = FormStartPosition.CenterScreen,
+                // Form boyutunu belirliyoruz
+                Size = new Size(300, 400),
+                // Form başlığını ayarlıyoruz
+                Text = "İşlem devam ediyor...",
+
+                TopMost = true,
+                AutoScroll = true,
+
+            };
+
+            form.Show();
+
+            // Yeni bir ProgressBar oluşturuluyor
+            ProgressBar progressBar1 = new ProgressBar
+            {
+                // ProgressBar stilini Marquee olarak ayarlıyoruz
+                Style = ProgressBarStyle.Marquee,
+                // ProgressBar boyutunu ayarlıyoruz
+                Size = new Size(200, 20),
+
+                AutoSize = true,
+                // Yükseklik ve genişlik için formun merkezine yerleştirilecek
+            };
+
+            progressBar1.Location = new Point((form.Width - progressBar1.Width) / 2, 50);  // 50px uzaklıkta yerleştiriyoruz
+
+            // Yeni bir Label oluşturuluyor
+            Label label = new Label
+            {
+                // Label metnini boş bırakıyoruz, istediğiniz metni buraya ekleyebilirsiniz
+                Text = "",
+
+                AutoSize = true, // Label'ın boyutunu otomatik olarak ayarlıyoruz
+                // Label'ın yerini ayarlıyoruz (alt tarafta ve ortada)
+            };
+
+            label.Location = new Point(progressBar1.Left, progressBar1.Bottom + 10); // ProgressBar'ın altında
+
+            label.Show();
+
+            // Form'a ProgressBar'ı ve Label'ı ekliyoruz
+            form.Controls.Add(progressBar1);
+
+            form.Controls.Add(label);
+
+            try
+            {
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = $"{PythonPath}", // Python'ın yüklü olduğu path
+                    //Arguments = $"{PythonFilePath} \"{inputpath}\"",
+                    Arguments = $"\"{python_path}\" \"{inputpath}\"",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    StandardOutputEncoding = Encoding.UTF8 // Çıktıyı UTF-8 olarak al
+
+                };
+
+                using (var process = new Process { StartInfo = startInfo })
+                {
+                    process.Start();
+
+                    Console.WriteLine("Python script çalıştırıldı");
+                    // Python script'inin çıktısını UTF-8 ile yakalıyoruz ve gerçek zamanlı olarak okuyoruz
+
+                    var outputTask = Task.Run(() =>
+                    {
+                        using (StreamReader reader = new StreamReader(process.StandardOutput.BaseStream, System.Text.Encoding.UTF8))
+                        {
+                            while (!reader.EndOfStream)
+                            {
+                                string output = reader.ReadLine();
+                                Invoke(new Action(() =>
+                                {
+                                    label.Text += output + "\n\n";
+                                    Console.WriteLine(output);  // Konsola yazdırma
+                                                                // Burada isterseniz progress bar'ı veya başka bir UI elementini güncelleyebilirsiniz
+                                }));
+                            }
+                        }
+                    });
+
+                    // Hata çıktılarını asenkron olarak okuyalım
+                    var errorTask = Task.Run(() =>
+                    {
+                        using (StreamReader reader = new StreamReader(process.StandardError.BaseStream, Encoding.UTF8))
+                        {
+                            while (!reader.EndOfStream)
+                            {
+                                string error = reader.ReadLine();
+                                Invoke(new Action(() =>
+                                {
+                                    Console.WriteLine($"Hata: {error}");
+                                }));
+                            }
+                        }
+                    });
+
+                    // Python script'inin tamamlanmasını bekleyelim
+                    await Task.WhenAll(outputTask, errorTask);  // Her iki görevi de bekliyoruz
+
+                    process.WaitForExit();
+
+                }
+
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine("Hata: " + ex.Message);
+            }
+
+            //progressBar1.Visible = false;
+
+            form.Close();
+
+            MessageBox.Show("İşlem tamamlandı", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+             
+        }
+
+        public async Task PythonScriptCalistir2(string pythonPath, string inputPath)
+        {
+            // Geçici Form oluştur
+            Form form = new Form
+            {
+                StartPosition = FormStartPosition.CenterScreen,
+                Size = new Size(400, 300),
+                Text = "İşlem devam ediyor...",
+                TopMost = true
+            };
+
+            // ProgressBar oluştur
+            ProgressBar progressBar = new ProgressBar
+            {
+                Style = ProgressBarStyle.Marquee,
+                Size = new Size(200, 20),
+                Location = new Point((form.ClientSize.Width - 200) / 2, 20)
+            };
+
+            // RichTextBox: Canlı çıktı görüntüleme
+            RichTextBox rtb = new RichTextBox
+            {
+                ReadOnly = true,
+                Multiline = true,
+                ScrollBars = RichTextBoxScrollBars.Vertical,
+                Location = new Point(10, progressBar.Bottom + 10),
+                Size = new Size(form.ClientSize.Width - 20, form.ClientSize.Height - 80),
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right
+            };
+
+            // Form'a ekle
+            form.Controls.Add(progressBar);
+            form.Controls.Add(rtb);
+            form.Show();
+
+            try
+            {
+                var psi = new ProcessStartInfo
+                {
+                    FileName = "python", // python.exe tam yolu gerekiyorsa: @"C:\Python39\python.exe"
+                    Arguments = $"\"{pythonPath}\" \"{inputPath}\"",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    StandardOutputEncoding = Encoding.UTF8
+                };
+
+                using var process = new Process { StartInfo = psi, EnableRaisingEvents = true };
+
+                process.Start();
+
+                var outputTask = Task.Run(async () =>
+                {
+                    using var reader = process.StandardOutput;
+                    while (!reader.EndOfStream)
+                    {
+                        string line = await reader.ReadLineAsync();
+                        rtb.Invoke(new MethodInvoker(() =>
+                        {
+                            rtb.AppendText(line + Environment.NewLine);
+                        }));
+                    }
+                });
+
+                var errorTask = Task.Run(async () =>
+                {
+                    using var reader = process.StandardError;
+                    while (!reader.EndOfStream)
+                    {
+                        string error = await reader.ReadLineAsync();
+                        rtb.Invoke(new MethodInvoker(() =>
+                        {
+                            rtb.AppendText("[HATA] " + error + Environment.NewLine);
+                        }));
+
+                    }
+                });
+
+                await Task.WhenAll(outputTask, errorTask);
+
+                await Task.Run(() =>
+                {
+                    process.WaitForExit();
+                });
+
+
+                form.Close(); // İşlem formunu kapat
+                MessageBox.Show("Python scripti başarıyla tamamlandı.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                var sonuc = MessageBox.Show("Veriler sisteme yüklensin mi?", "Onay", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (sonuc == DialogResult.Yes)
+                {
+                    MessageBox.Show("Veriler sisteme yüklenecek.", "Bilgi");
+                }
+            }
+            catch (Exception ex)
+            {
+                form.Close(); // Hata olsa bile formu kapat
+                MessageBox.Show("Hata oluştu: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public string GetPythonPath()
+        {
+            string systemPathVariable = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+            
+
+            // Sistem genelindeki PATH çevresel değişkenini alıyoruz
+            // Eğer çevresel değişken mevcutsa
+            if (!string.IsNullOrEmpty(systemPathVariable))
+            {
+                // PATH değişkenini ';' ile böldük
+                var entries = systemPathVariable.Split(';');
+
+                // Her bir PATH girişi ekrana yazdırılır
+                foreach (string path in entries)
+                {
+                    // Eğer yol 'AppData\Local\Programs\Python' içeriğine sahipse, bu doğru Python yolu olmalı
+                    if (path.Contains(@"AppData\Local\Programs\Python"))
+                    {
+                        string pythonPath = path;
+                        return pythonPath + @"\python.exe";
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("Sistem PATH çevresel değişkeni bulunamadı.");
+            }
+
+            return null;
+        }
+
+        public PictureBox ShowLoadingGifNextToButton(Button button, Panel targetPanel, string gifPath)
+        {
+            PictureBox loadingGif = new PictureBox();
+
+            int targetHeight = button.Height;
+            int targetWidth = targetHeight;
+
+            loadingGif.Size = new Size(targetWidth, targetHeight);
+            loadingGif.SizeMode = PictureBoxSizeMode.Zoom;
+
+            loadingGif.Image = Image.FromFile(gifPath);
+
+            loadingGif.Location = new Point(
+                button.Right + 5,
+                button.Top + (button.Height - loadingGif.Height) / 2
+            );
+
+            targetPanel.Controls.Add(loadingGif);
+            loadingGif.BringToFront();
+            targetPanel.Refresh();
+
+            return loadingGif; // sonradan kaldırmak için referans döndür
+        }
+
+   
     }
 }
 

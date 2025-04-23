@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using GMap.NET.WindowsForms.Markers;
 using GMap.NET;
 using GMap.NET.WindowsForms;
+using SLF.Optimal_DTR;
 
 namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
 {
@@ -128,13 +129,18 @@ namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
                 bool check = (e.NewValue == CheckState.Checked);
 
                 // İşlemi event tamamlandıktan sonra yapmamız gerekiyor
-                this.BeginInvoke((MethodInvoker)(() =>
+                /*this.BeginInvoke((MethodInvoker)(() =>
                 {
                     for (int i = 1; i < checkedListBox1.Items.Count; i++)
                     {
                         checkedListBox1.SetItemChecked(i, check);
                     }
-                }));
+                }));*/
+
+                for (int i = 1; i < checkedListBox1.Items.Count; i++)
+                {
+                    checkedListBox1.SetItemChecked(i, check);
+                }
             }
         }
 
@@ -147,17 +153,22 @@ namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
                 bool check = (e.NewValue == CheckState.Checked);
 
                 // İşlemi event tamamlandıktan sonra yapmamız gerekiyor
-                this.BeginInvoke((MethodInvoker)(() =>
+                /*this.BeginInvoke((MethodInvoker)(() =>
                 {
                     for (int i = 1; i < checkedListBox2.Items.Count; i++)
                     {
                         checkedListBox2.SetItemChecked(i, check);
                     }
-                }));
+                }));*/
+
+                for (int i = 1; i < checkedListBox2.Items.Count; i++)
+                {
+                    checkedListBox2.SetItemChecked(i, check);
+                }
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button1__Click(object sender, EventArgs e)
         {
 
             // 1. Mülkiyet
@@ -197,5 +208,87 @@ namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
                 dt = FiltrelenmisSonuc
             });
         }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            // Seçili yılları listeye al
+            List<int> secilenYillar = new List<int>();
+            List<string> secilenDurumlar = new List<string>();
+
+            foreach (var item in checkedListBox1.CheckedItems)
+            {
+                if (item.ToString() != "Hepsi")
+                {
+                    secilenYillar.Add(int.Parse(item.ToString()));
+                }
+
+            }
+
+            foreach (var item in checkedListBox2.CheckedItems)
+            {
+                secilenDurumlar.Add(item.ToString());
+            }
+
+            // Trafo Aksiyonları eşleşmesi için sözlük oluştur
+            var aksiyonEslestirme = new Dictionary<string, string>
+            {
+                { "Mevcut", "mevcut" },
+                { "Trafo Yükseltme-Yükten", "trafo yükseltme-yükten" },
+                { "Yeni Trafo Tesis", "yeni trafo tesis" }, // "Eklenen" -> "yeni trafo tesis"
+                { "Trafo Yenileme-Yaştan", "trafo yenileme-yaştan" },
+                { "Trafo Yenileme-Kapasiteden", "trafo yükseltme-kapasiteden" },
+
+            };
+
+
+
+            // Seçilen aksiyonu al
+            List<string> secilenAksiyonlar = checkedListBox2.CheckedItems.Cast<string>().ToList();
+
+
+            // Eğer "Hepsi" seçilmediyse, aksiyonları eşleştir
+            List<string> eslesenAksiyonlar = new List<string>();
+
+            foreach (var aksiyon in secilenAksiyonlar)
+            {
+                if (aksiyonEslestirme.ContainsKey(aksiyon))
+                {
+                    eslesenAksiyonlar.Add(aksiyonEslestirme[aksiyon]);
+                }
+            }
+
+
+            // Filtreleme işlemi
+            var radiobuttonvalue = GetSelectedRadioButton(panel2) ?? "Hepsi";  // Default to "Hepsi" if null
+
+            var filtrelenmisData = _orijinalTablo.AsEnumerable()
+                .Where(row =>
+                    (secilenYillar.Count == 0 ||
+                    (int.TryParse(row.Field<string>("year"), out int year) && secilenYillar.Contains(year))) && // Yıla göre filtreleme
+                    (radiobuttonvalue == "Hepsi" || row.Field<string>("Trafo Mülkiyeti") == radiobuttonvalue) && // Sahiplik filtreleme
+                    (eslesenAksiyonlar.Count == 0 || eslesenAksiyonlar.Contains(row.Field<string>("Trafo Aksiyon"))) // Trafo Aksiyonları filtreleme
+            )
+            .ToList();
+
+            FiltrelenmisSonuc = filtrelenmisData.Any() ? filtrelenmisData.CopyToDataTable() : _orijinalTablo.Clone();
+
+            FiltrelemeYapildi?.Invoke(this, new FiltreEventArgs
+            {
+                dt = FiltrelenmisSonuc
+            });
+
+        }
+
+        private string GetSelectedRadioButton(Panel panel)
+        {
+            foreach (Control control in panel.Controls) // panel1 yerine kendi panel adını yaz
+            {
+                if (control is RadioButton radioButton && radioButton.Checked)
+                {
+                    return radioButton.Text; // Seçili RadioButton'un metnini döndür
+                }
+            }
+            return "Hiçbiri seçili değil";
+        }
+
     }
 }

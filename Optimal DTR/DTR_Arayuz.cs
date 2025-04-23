@@ -13,19 +13,25 @@ using GMap.NET.WindowsForms;
 using GMap.NET;
 using Newtonsoft.Json;
 using System.IO;
-using static Trafo;
 using SLF.Services;
 using System.Diagnostics;
 using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Control = System.Windows.Forms.Control;
 using Microsoft.Win32;
+using Font = System.Drawing.Font;
+using Microsoft.Extensions.Configuration;
+using System.Security.Cryptography;
+using DocumentFormat.OpenXml.Office2021.DocumentTasks;
+using Task = System.Threading.Tasks.Task;
+using OfficeOpenXml;
 
 
 namespace SLF.Optimal_DTR
 {
     public partial class DTR_Arayuz : Form
     {
+        ExcelImporter excelImporter = new ExcelImporter();
 
         public static string PythonPath;
 
@@ -43,23 +49,134 @@ namespace SLF.Optimal_DTR
 
         private int highResFactor = 3; // Yüksek çözünürlük katsayısı
 
+        string İlİlceYol;
+
+        string ODTRAlgoritmaYolu;
+
+        string İmarYolu;
+
+        string YükTahminVeriYolu;
+
+        string TrafoVeriYolu;
+
+        string TrafoAlanlarıVeriYolu;
+
+        string SonucYolu;
+
+        string ODTRSonucYolu;
+
+
+        string İlYol;
+        string ProgramDosyalarıYolu;
+
+        string ProjeYolu;
+
+        string YükVeriYolu;
+
+        string İmarVeriYolu;
+        string ODTRJson;
+
+        DataTable trafodt;
+        YearService yearService;
+
+        string il;
+
         public DTR_Arayuz()
         {
             InitializeComponent();
             InitializeMap();
             ToolTipKismi();
-           
 
-            MessageBox.Show("Veriler Sisteme Yüklesin mi?", "Bilgi", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            // Config dosyası için ayarları tanımla
 
-            if (DialogResult == DialogResult.Yes)
+
+
+            /*var config = new ConfigurationBuilder()
+               .SetBasePath(Directory.GetCurrentDirectory())
+               .AddJsonFile("config.json")
+               .Build();*/
+
+            var configPath = @"C:\Users\vural.bayrakli\OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\İzmir\Program Dosyaları\configVural.json";
+            var config = new ConfigurationBuilder()
+                .AddJsonFile(configPath, optional: false, reloadOnChange: true)
+                .Build();
+
+            İlYol = Path.Combine(config["Ana_Klasör_Yolu"], config["İl"]);
+
+            İlİlceYol = Path.Combine(config["Ana_Klasör_Yolu"], config["İl"], config["İlçe"]);
+
+            SonucYolu = Path.Combine(İlİlceYol, config["proje_dosyası"], config["ODTR:Sonuçlar_klasör"]);
+
+            PythonFilePath = Path.Combine(İlYol, config["program_dosyaları_path"], config["ODTR:PYTHON_klasör"]);
+
+            YükVeriYolu = Path.Combine(İlİlceYol, config["proje_dosyası"], config["ODTR:INPUT_Yük_klasör"]);
+
+            İmarVeriYolu = Path.Combine(İlİlceYol, config["proje_dosyası"], config["ODTR:INPUT_Trafo_klasör"]);
+         
+            il = config["İl"]; 
+
+            var configODTR = new
             {
-                VerilerSisteme();
-            }
-            else
-            {
-                MessageBox.Show("Veriler sisteme yüklenmedi", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
+                FilePaths = new
+                {
+
+                    İlYol = İlYol,
+
+                    İlİlceYol = İlİlceYol,
+
+                    SonucYolu = SonucYolu,
+
+                    PythonFilePath = PythonFilePath,
+
+                    YükVeriYolu = YükVeriYolu,
+
+                    İmarVeriYolu = İmarVeriYolu,
+
+                },
+
+                Degiskenler = new
+                {
+                    İl = config["İl"],
+                    İlçe = config["İlçe"],
+                    İlkYıl = config["DEK:baslangıc_yılı"],
+                    SonYıl = config["DEK:bitis_yılı"],
+
+                }
+            };
+
+            ODTRJson = Path.Combine(PythonFilePath, "ODTR.json");
+            // JSON formatında serileştirme
+            string json = JsonConvert.SerializeObject(configODTR, Formatting.Indented);
+
+            // JSON dosyasını yazma
+            File.WriteAllText(ODTRJson, json);
+
+            Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
+                {
+                    { "İzmir", new PointLatLng(38.4192, 27.1287) }, // Example coordinates for İzmir
+                    { "Eskişehir", new PointLatLng(39.7768, 30.5206) } // Example coordinates for Eskişehir
+                    // Add more cities and their coordinates as needed
+                };
+                  
+            //VerilerSisteme2();
+            /*İlİlceYol = Path.Combine(config["Ana_Klasör_Yolu"], config["İl"], config["İlçe"]);
+
+            ODTRAlgoritmaYolu = Path.Combine(config["SLF_Yolu"], config["Python Kodları:DTR_Algoritması"]);
+
+            ProjeYolu = Path.Combine(İlİlceYol, config["Proje_Yolu"]);
+
+            İmarYolu = Path.Combine(ProjeYolu, "imar");
+
+            YükTahminVeriYolu = Path.Combine(İmarYolu, "Tuketim.xlsx");
+
+            TrafoVeriYolu = Path.Combine(İmarYolu, "Trafo.xlsx");
+
+            TrafoAlanlarıVeriYolu = Path.Combine(İmarYolu, "TrafoAlan.xlsx");
+
+            sonucYolu = Path.Combine(ProjeYolu, "sonuçlar");
+
+            ODTRSonucYolu = Path.Combine(sonucYolu, "ODTR");*/
+
             //VerilerSisteme();
 
             /*
@@ -77,20 +194,156 @@ namespace SLF.Optimal_DTR
 
         }
 
+        public void DrawMap2(DataTable trafoTable)
+        {
+            overlay.Markers.Clear();
+            overlay.Polygons.Clear();
+
+            foreach (DataRow trafo in trafoTable.Rows)
+            {
+                int hucreId = Convert.ToInt32(trafo["merkez_hucre"]);
+
+                // Bu hücreye ait trafoları filtrele
+                var trafolar = trafoTable.AsEnumerable()
+                    .Where(t => Convert.ToInt32(t["merkez_hucre"]) == hucreId)
+                    .ToList();
+
+                if (trafolar.Count == 0)
+                    continue;
+
+                // Hücre sınırları
+                double top = Convert.ToDouble(trafo["Top"]);
+                double bottom = Convert.ToDouble(trafo["Bottom"]);
+                double left = Convert.ToDouble(trafo["Left"]);
+                double right = Convert.ToDouble(trafo["Right"]);
+
+                // Trafo konumlarını tutacak liste
+                List<PointLatLng> markerKonumlari = new List<PointLatLng>();
+
+                if (trafolar.Count == 1)
+                {
+                    markerKonumlari.Add(new PointLatLng((top + bottom) / 2, (left + right) / 2));
+                }
+                else if (trafolar.Count <= 4)
+                {
+                    markerKonumlari.Add(new PointLatLng(top, left));
+                    markerKonumlari.Add(new PointLatLng(top, right));
+                    markerKonumlari.Add(new PointLatLng(bottom, left));
+                    markerKonumlari.Add(new PointLatLng(bottom, right));
+                }
+                else
+                {
+                    int satirSayisi = (int)Math.Ceiling(Math.Sqrt(trafolar.Count));
+                    int sutunSayisi = (int)Math.Ceiling((double)trafolar.Count / satirSayisi);
+
+                    double latStep = (top - bottom) / (satirSayisi + 1);
+                    double lngStep = (right - left) / (sutunSayisi + 1);
+
+                    for (int i = 1; i <= satirSayisi; i++)
+                    {
+                        for (int j = 1; j <= sutunSayisi; j++)
+                        {
+                            if (markerKonumlari.Count >= trafolar.Count)
+                                break;
+
+                            double lat = bottom + (i * latStep);
+                            double lng = left + (j * lngStep);
+                            markerKonumlari.Add(new PointLatLng(lat, lng));
+                        }
+                    }
+                }
+
+                for (int i = 0; i < trafolar.Count; i++)
+                {
+                    var t = trafolar[i];
+                    PointLatLng konum = markerKonumlari[i % markerKonumlari.Count];
+
+                    string owner = trafo["sahip"].ToString();
+                    GMarkerGoogleType markerType = owner == "Özel" ? GMarkerGoogleType.red_dot : GMarkerGoogleType.blue_dot;
+
+                    string tooltip = $"TrafoID: {t["trafo_id"]}\n" +
+                                     $"Owner: {t["sahip"]}\n" +
+                                     $"Year: {t["year"]}\n" +
+                                     $"Trafo Durumu: {t["Durum"]}";
+
+                    var marker = new GMarkerGoogle(konum, markerType)
+                    {
+                        ToolTipText = tooltip,
+                        Tag = trafo["trafo_id"]
+                    };
+
+                    overlay.Markers.Add(marker);
+                }
+            }
+
+            gMapControl1.Overlays.Add(overlay);
+        }
+
+        public void DrawMap3(DataTable trafoTable)
+        {
+            overlay.Markers.Clear();
+            overlay.Polygons.Clear();
+
+            double unique_x;
+            double unique_y;
+            foreach (DataRow trafo in trafoTable.Rows)
+            {
+
+                try
+                {
+                    unique_x = Convert.ToDouble(trafo["Koord_x"]);
+                    unique_y = Convert.ToDouble(trafo["Koord_y"]);
+                }
+
+                catch
+                {
+                    MessageBox.Show("Koordinat bilgisi bulunamadı", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                // Unique X ve Y koordinatları (DataTable'dan alınıyor)
+                
+
+                // Eğer unique koordinatlar varsa, onları kullan
+                PointLatLng konum = new PointLatLng(unique_y, unique_x);  // Unique X ve Y'yi buraya ekliyoruz
+
+                string owner = trafo["Trafo Mülkiyeti"].ToString();
+                GMarkerGoogleType markerType = owner == "Özel" ? GMarkerGoogleType.red_dot : GMarkerGoogleType.blue_dot;
+
+                string tooltip = $"TrafoID: {trafo["trafo_id"]}\n" +
+                                    $"Owner: {trafo["Trafo Mülkiyeti"]}\n" +
+                                    $"Year: {trafo["year"]}\n" +
+                                    $"Trafo Durumu: {trafo["Trafo Aksiyon"]}";
+
+                var marker = new GMarkerGoogle(konum, markerType)
+                {
+                    ToolTipText = tooltip,
+                    Tag = trafo["trafo_id"]
+                };
+
+                overlay.Markers.Add(marker);
+
+            }
+
+            gMapControl1.Overlays.Add(overlay);
+            gMapControl1.Refresh(); // Haritayı güncelle
+        }
+
+
+
         private bool CalismaYoluKontrol()
         {
-            TuketimDosyaAdi = "Tuketim.xlsx";
+            TuketimDosyaAdi = "SONUCLAR.xlsx";
             TrafoDosyaAdi = "Trafo.xlsx";
             TrafoAlanDosyaAdi = "TrafoAlan.xlsx";
 
             //string path = PathService.CurrentWorkingFolder;
-            //string imar_path = PathService.ImarAnaliziPath;
+            //string imar_path = PathService.ImarAnaliziPath; // 
+            //string imar_path = @"C:\Users\vural.bayrakli\source\repos\SLF\bin\Debug\il_ilce_kırılımları\İzmir\Aliağa\proje\imar";
+            
 
-            string imar_path = @"C:\Users\vural.bayrakli\source\repos\SLF\bin\Debug\il_ilce_kırılımları\İzmir\Aliağa\proje\imar";
-
-            tuketim_path = Path.Combine(imar_path, TuketimDosyaAdi);
-            string trafo_path = Path.Combine(imar_path, TrafoDosyaAdi);
-            string trafo_alan_path = Path.Combine(imar_path, TrafoAlanDosyaAdi);
+            tuketim_path = Path.Combine(YükVeriYolu, TuketimDosyaAdi);
+            string trafo_path = Path.Combine(İmarVeriYolu, TrafoDosyaAdi);
+            string trafo_alan_path = Path.Combine(İmarVeriYolu, TrafoAlanDosyaAdi);
 
             if (!File.Exists(tuketim_path) & !File.Exists(trafo_path) & !File.Exists(trafo_alan_path))
             {
@@ -148,8 +401,6 @@ namespace SLF.Optimal_DTR
             string systemPathVariable = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
             string python_location = null;
 
-            Console.WriteLine(systemPathVariable);
-
             // Sistem genelindeki PATH çevresel değişkenini alıyoruz
             // Eğer çevresel değişken mevcutsa
             if (!string.IsNullOrEmpty(systemPathVariable))
@@ -164,7 +415,7 @@ namespace SLF.Optimal_DTR
                     if (path.Contains(@"AppData\Local\Programs\Python"))
                     {
                         string pythonPath = path;
-                        return pythonPath+@"\python.exe"; 
+                        return pythonPath + @"\python.exe";
                     }
                 }
             }
@@ -224,29 +475,38 @@ namespace SLF.Optimal_DTR
             }
         }
 
-        // Tüketim verileri var mı yok mu sorgulama
-        private async void TuketimVeriSorgulama()
-        {
-
-            await PythonScriptCalistir(TuketimDosyaAdi);
-   
-        }
+        // Tüketim verileri var mı yok mu sorgulam     
 
         private async Task VerilerSisteme()
-        {       
-            progressBar1.Location = new Point((gMapControl1.Width - gMapControl1.Width) / 2, 50);  // 50px uzaklıkta yerleştiriyoruz
-            //progressBar1.Show();
+        {
+
 
             ReadDB.Hucreverioku("veriler.db", "Hucre");
-            ReadDB.Maindatabase("veriler.db", "Trafo2603");           
+            ReadDB.Maindatabase("veriler.db", "Trafo2603");
 
-            await Task.Run(() => DrawMap(ReadDB.trafoData, ReadDB.HucreData));
+            //await Task.Run(() => DrawMap(ReadDB.trafoData, ReadDB.HucreData));
 
             MessageBox.Show("Veriler sisteme yüklendi", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
         }
 
-        private async Task PythonScriptCalistir(string inputpath)
+        private async Task VerilerSisteme2()
+        {
+            Console.WriteLine("Veriler sisteme yükleniyor...");
+
+            //string dosya = Path.Combine(ODTRSonucYolu, "trafo.xlsx");
+            string dosya = @"C:\Users\vural.bayrakli\source\repos\SLF\bin\Debug\il_ilce_kırılımları\İzmir\Program Dosyaları\Optimal DTR\dftrafo_hucre20250420_163943.xlsx";
+            trafodt = ImportExcelFile(dosya);
+
+            //MessageBox.Show(trafodt.Rows.Count.ToString());  
+
+            //await Task.Run(() => DrawMap3(trafodt));
+            DrawMap3(trafodt);
+            //MessageBox.Show("Veriler sisteme yüklendi", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        }
+
+        public async Task PythonScriptCalistir(string python_path, string inputpath)
         {
 
             Form form = new Form
@@ -258,7 +518,7 @@ namespace SLF.Optimal_DTR
                 // Form başlığını ayarlıyoruz
                 Text = "İşlem devam ediyor...",
 
-                TopMost = true, 
+                TopMost = true,
                 AutoScroll = true,
 
             };
@@ -295,15 +555,16 @@ namespace SLF.Optimal_DTR
 
             // Form'a ProgressBar'ı ve Label'ı ekliyoruz
             form.Controls.Add(progressBar1);
-            form.Controls.Add(label);
-
+            
+            form.Controls.Add(label);                
 
             try
             {
                 var startInfo = new ProcessStartInfo
                 {
                     FileName = $"{PythonPath}", // Python'ın yüklü olduğu path
-                    Arguments = $"{PythonFilePath} \"{inputpath}\"",
+                    //Arguments = $"{PythonFilePath} \"{inputpath}\"",
+                    Arguments = $"\"{python_path}\" \"{inputpath}\"",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -318,7 +579,7 @@ namespace SLF.Optimal_DTR
 
                     Console.WriteLine("Python script çalıştırıldı");
                     // Python script'inin çıktısını UTF-8 ile yakalıyoruz ve gerçek zamanlı olarak okuyoruz
-                    
+
                     var outputTask = Task.Run(() =>
                     {
                         using (StreamReader reader = new StreamReader(process.StandardOutput.BaseStream, Encoding.UTF8))
@@ -372,18 +633,14 @@ namespace SLF.Optimal_DTR
 
             MessageBox.Show("İşlem tamamlandı", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-            MessageBox.Show("Veriler Sisteme Yüklesin mi?", "Bilgi", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            /*MessageBox.Show("Veriler Sisteme Yüklesin mi?", "Bilgi", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
 
-            if (DialogResult == DialogResult.Yes)
-            {
-                VerilerSisteme();
-            }
 
-            else
-            {
+            MessageBox.Show("Veriler sisteme yüklenecek", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            await VerilerSisteme2();*/
 
-                MessageBox.Show("Veriler sisteme yüklenmedi", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
+
+
 
         }
 
@@ -392,100 +649,20 @@ namespace SLF.Optimal_DTR
 
             overlay = new GMapOverlay("map");
 
-            gMapControl1.Dock = DockStyle.Fill;
+            gMapControl1.Dock = DockStyle.None;
             gMapControl1.CanDragMap = true;
             gMapControl1.MapProvider = GMapProviders.GoogleMap;
             gMapControl1.MinZoom = 5;
             gMapControl1.MaxZoom = 18;
             gMapControl1.Zoom = 12;
+
             gMapControl1.Position = new PointLatLng(38.5, 27.0); // Başlangıç konumu
+           
             gMapControl1.DragButton = MouseButtons.Left;
 
         }
 
-        private void DrawMap(List<Trafo> trafoData, List<Hucre> hucreData)
-        {
-            overlay.Markers.Clear();
-            overlay.Polygons.Clear();
 
-            foreach (var hucre in hucreData)
-            {
-                // O hücredeki tüm trafoları al
-                var trafolar = trafoData.Where(t => t.HucreID == hucre.HucreId).ToList();
-
-                if (trafolar.Count == 0)
-                    continue;
-
-                // Hücre sınırları
-                double top = hucre.Top;
-                double bottom = hucre.Bottom;
-                double left = hucre.Left;
-                double right = hucre.Right;
-
-                // Trafo sayısına bağlı olarak farklı yerleşimler yap
-                List<PointLatLng> markerKonumlari = new List<PointLatLng>();
-
-                if (trafolar.Count == 1)
-                {
-                    // Tek trafo varsa merkeze koy
-                    markerKonumlari.Add(new PointLatLng((top + bottom) / 2, (left + right) / 2));
-                }
-                else if (trafolar.Count <= 4)
-                {
-                    // 2-4 trafo varsa köşeleri kullan
-                    markerKonumlari.Add(new PointLatLng(top, left));    // Sol üst köşe
-                    markerKonumlari.Add(new PointLatLng(top, right));   // Sağ üst köşe
-                    markerKonumlari.Add(new PointLatLng(bottom, left)); // Sol alt köşe
-                    markerKonumlari.Add(new PointLatLng(bottom, right));// Sağ alt köşe
-                }
-                else
-                {
-                    // 4'ten fazla trafo varsa, içeri doğru grid oluştur (3x3 gibi)
-                    int satirSayisi = (int)Math.Ceiling(Math.Sqrt(trafolar.Count)); // Kaç satır olmalı
-                    int sutunSayisi = (int)Math.Ceiling((double)trafolar.Count / satirSayisi); // Kaç sütun olmalı
-
-                    double latStep = (top - bottom) / (satirSayisi + 1);
-                    double lngStep = (right - left) / (sutunSayisi + 1);
-
-                    for (int i = 1; i <= satirSayisi; i++)
-                    {
-                        for (int j = 1; j <= sutunSayisi; j++)
-                        {
-                            if (markerKonumlari.Count >= trafolar.Count)
-                                break;
-
-                            double lat = bottom + (i * latStep);
-                            double lng = left + (j * lngStep);
-                            markerKonumlari.Add(new PointLatLng(lat, lng));
-                        }
-                    }
-                }
-
-                // Trafoları belirlenen konumlara ekle
-                for (int i = 0; i < trafolar.Count; i++)
-                {
-                    var trafo = trafolar[i];
-                    PointLatLng konum = markerKonumlari[i % markerKonumlari.Count]; // Fazla olursa döngüye girer
-
-                    GMarkerGoogleType markerType = trafo.Owner == "Özel" ? GMarkerGoogleType.red_dot : GMarkerGoogleType.blue_dot;
-
-                    var marker = new GMarkerGoogle(konum, markerType)
-                    {
-                        ToolTipText = $"TrafoID: {trafo.TrafoID}\nOwner: {trafo.Owner}\nYear: {trafo.Year}\nTrafo Durumu: {trafo.Durumu}",
-                        Tag = trafo.TrafoID,
-                    };
-
-                    overlay.Markers.Add(marker);
-                }
-            }
-            //gMapControl1.MouseClick += GMapControl1_MouseClick;
-
-            gMapControl1.OnMarkerClick += (s, e) =>
-            {
-
-            };
-            gMapControl1.Overlays.Add(overlay);
-        }
 
         private void pictureBox2_Click(object sender, EventArgs e)
         {
@@ -501,9 +678,76 @@ namespace SLF.Optimal_DTR
         {
 
         }
-
         private void button1_Click(object sender, EventArgs e)
         {
+            // Seçili yılları listeye al
+            List<int> secilenYillar = new List<int>();
+            List<string> secilenDurumlar = new List<string>();
+
+            foreach (var item in checkedListBox1.CheckedItems)
+            {
+                if (item.ToString() != "Hepsi")
+                {
+                    secilenYillar.Add(int.Parse(item.ToString()));
+                }
+
+            }
+
+            foreach (var item in checkedListBox2.CheckedItems)
+            {
+                secilenDurumlar.Add(item.ToString());
+            }
+
+            Console.WriteLine(string.Join(", ", secilenYillar));
+            Console.WriteLine(string.Join(", ", secilenDurumlar));
+
+            // Trafo Aksiyonları eşleşmesi için sözlük oluştur
+            var aksiyonEslestirme = new Dictionary<string, string>
+            {
+                { "Mevcut", "mevcut" },
+                { "Trafo Yükseltme-Yükten", "trafo yükseltme-yükten" },
+                { "Yeni Trafo Tesis", "yeni trafo tesis" }, // "Eklenen" -> "yeni trafo tesis"
+                { "Trafo Yenileme-Yaştan", "trafo yenileme-yaştan" },
+                { "Trafo Yenileme-Kapasiteden", "trafo yükseltme-kapasiteden" },
+
+            };
+
+
+
+            // Seçilen aksiyonu al
+            List<string> secilenAksiyonlar = checkedListBox2.CheckedItems.Cast<string>().ToList();
+
+            // Eğer "Hepsi" seçilmediyse, aksiyonları eşleştir
+            List<string> eslesenAksiyonlar = new List<string>();
+
+            foreach (var aksiyon in secilenAksiyonlar)
+            {
+                if (aksiyonEslestirme.ContainsKey(aksiyon))
+                {
+                    eslesenAksiyonlar.Add(aksiyonEslestirme[aksiyon]);
+                }
+            }
+
+            // Filtreleme işlemi
+            var radiobuttonvalue = GetSelectedRadioButton(panel2) ?? "Hepsi";  // Default to "Hepsi" if null
+
+            var filtrelenmisData = trafodt.AsEnumerable()
+                .Where(row =>
+                    (secilenYillar.Count == 0 ||
+                    (int.TryParse(row.Field<string>("year"), out int year) && secilenYillar.Contains(year))) && // Yıla göre filtreleme
+                    (radiobuttonvalue == "Hepsi" || row.Field<string>("Trafo Mülkiyeti") == radiobuttonvalue) && // Sahiplik filtreleme
+                    (eslesenAksiyonlar.Count == 0 || eslesenAksiyonlar.Contains(row.Field<string>("Trafo Aksiyon"))) // Trafo Aksiyonları filtreleme
+                )
+                .ToList();
+
+            DataTable filtrelenmis = filtrelenmisData.Any() ? filtrelenmisData.CopyToDataTable() : trafodt.Clone();
+
+            // Filtrelenmiş verileri haritada göster
+            DrawMap3(filtrelenmis);
+        }
+        private void button1__Click(object sender, EventArgs e)
+        {
+
             // Seçili yılları listeye al
             List<int> secilenYillar = new List<int>();
             List<string> secilenDurumlar = new List<string>();
@@ -533,9 +777,9 @@ namespace SLF.Optimal_DTR
                 .ToList();
 
 
-            
 
-            DrawMap(filtrelenmisTrafolar, ReadDB.HucreData);
+
+            //DrawMap(filtrelenmisTrafolar, ReadDB.HucreData);
 
         }
 
@@ -612,16 +856,20 @@ namespace SLF.Optimal_DTR
 
         }
 
-        private async void button2_Click(object sender, EventArgs e)
+        public async void button2_Click(object sender, EventArgs e)
         {
-            //İslem();
-            PythonFilePath = Path.Combine(@"C:\Users\vural.bayrakli\Desktop\OneDrive_1_03.02.2025\SuperHucreAlgoritma12.py");
+
+
+            //PythonFilePath = Path.Combine(@"C:\Users\vural.bayrakli\Desktop\OneDrive_1_03.02.2025\SuperHucreAlgoritma12.py");
 
             string pythonPath = GetPythonPath();
 
             PythonPath = Path.Combine(pythonPath);
 
             bool islemeDevam = CalismaYoluKontrol();
+
+            string python_path = Path.Combine(PythonFilePath, "algoritmaÇalıştır.py");
+            //bool islemeDevam = true;
 
             if (PythonPath == null)
             {
@@ -630,11 +878,13 @@ namespace SLF.Optimal_DTR
 
             else
             {
-                if(islemeDevam)
+                if (islemeDevam)
                 {
-                    await PythonScriptCalistir(tuketim_path);
+
+                    //await PythonScriptCalistir(tuketim_path);
+                    await PythonScriptCalistir(python_path, ODTRJson);
                 }
-            }           
+            }
 
         }
 
@@ -647,51 +897,225 @@ namespace SLF.Optimal_DTR
         {
             await VerilerSisteme();
         }
-    }
 
-}
-
-
-public class Trafo
-{
-    public string TrafoID { get; set; }
-    public int HucreID { get; set; }
-
-    public double BosKapasite { get; set; }
-    public string Owner { get; set; }
-
-    public int Year { get; set; }
-
-    public string Durumu { get; set; }
-
-
-
-    public Trafo(string trafoID, int hucreID, string owner, int year, string durum)
-    {
-        TrafoID = trafoID;
-        HucreID = hucreID;
-        Owner = owner;
-        Year = year;
-        Durumu = durum;
-    }
-
-
-
-    public class Hucre
-    {
-        public int HucreId { get; set; }
-        public double Left { get; set; }
-        public double Top { get; set; }
-        public double Right { get; set; }
-        public double Bottom { get; set; }
-
-        public Hucre(int id, double left, double top, double right, double bottom)
+        private void panel7_Paint(object sender, PaintEventArgs e)
         {
-            HucreId = id;
-            Left = left;
-            Top = top;
-            Right = right;
-            Bottom = bottom;
+
+        }
+
+
+        private void DTR_Arayuz_Load(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void checkedListBox_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            CheckedListBox checkedListBox = sender as CheckedListBox;
+            if (checkedListBox == null)
+                return;
+
+
+            // Eğer "Hepsi" (index 0) işaretleniyorsa
+            if (e.Index == 0)
+            {
+                // Hepsi işaretleniyorsa tümünü işaretle
+                bool check = (e.NewValue == CheckState.Checked);
+
+                // İşlemi event tamamlandıktan sonra yapmamız gerekiyor
+                this.BeginInvoke((MethodInvoker)(() =>
+                {
+                    for (int i = 1; i < checkedListBox.Items.Count; i++)
+                    {
+                        checkedListBox.SetItemChecked(i, check);
+                    }
+                }));
+            }
+        }
+        public string DosyaSeciciGoster(string klasorYolu)
+        {
+            Form form = new Form();
+            form.Text = "Dosya Seç";
+            form.Width = 500;
+            form.Height = 400;
+            form.StartPosition = FormStartPosition.CenterParent;
+
+            ListBox listBox = new ListBox();
+            listBox.Dock = DockStyle.Fill;
+            listBox.Font = new Font("Segoe UI", 12); // Yazı boyutu büyütüldü
+
+            Button btnSec = new Button();
+            btnSec.Text = "Seç";
+            btnSec.Dock = DockStyle.Bottom;
+            btnSec.Font = new Font("Segoe UI", 12); // Buton yazısı büyük
+
+            Panel contentPanel = new Panel();
+            contentPanel.Dock = DockStyle.Fill;
+
+            listBox.Dock = DockStyle.Fill;
+            listBox.Font = new Font("Segoe UI", 12);
+            contentPanel.Controls.Add(listBox);
+
+            btnSec.Height = 50;
+            btnSec.Dock = DockStyle.Bottom;
+            btnSec.Font = new Font("Segoe UI", 12);
+
+            // Form’a ekle
+            form.Controls.Add(contentPanel);
+            form.Controls.Add(btnSec);
+
+            string secilenDosya = null;
+
+            if (Directory.Exists(klasorYolu))
+            {
+                string[] dosyaYollari = Directory.GetFiles(klasorYolu);
+                foreach (var yol in dosyaYollari)
+                {
+                    listBox.Items.Add(Path.GetFileName(yol)); // sadece dosya adı
+                }
+            }
+            else
+            {
+                listBox.Items.Add("Dosya bulunamadı.");
+                btnSec.Enabled = false;
+            }
+
+            btnSec.Click += (s, e) =>
+            {
+                if (listBox.SelectedItem != null)
+                {
+                    secilenDosya = listBox.SelectedItem.ToString(); // sadece dosya adı döner
+                    form.DialogResult = DialogResult.OK;
+                    form.Close();
+                }
+                else
+                {
+                    MessageBox.Show("Lütfen bir dosya seçin.");
+                }
+            };
+
+
+            form.ShowDialog();
+
+            return secilenDosya;
+        }
+        public DataTable ImportExcelFile(string filePath)
+        {
+            DataTable dataTable = new DataTable();
+
+            // Example of measuring import time
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // Assuming data is in the first worksheet               
+
+                int rowCount = worksheet.Dimension.Rows;
+                int colCount = worksheet.Dimension.Columns;
+
+                // Create columns in DataTable
+                for (int col = 1; col <= colCount; col++)
+                {
+                    DataColumn column = new DataColumn();
+                    column.ColumnName = worksheet.Cells[1, col].Text;
+                    dataTable.Columns.Add(column);
+                }
+
+                // Populate DataTable with Excel data
+                // Row starts from 2 because 1st row is column headers
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    DataRow dataRow = dataTable.NewRow();
+                    for (int col = 1; col <= colCount; col++)
+                    {
+                        dataRow[col - 1] = worksheet.Cells[row, col].Value;
+                    }
+                    dataTable.Rows.Add(dataRow);
+                }
+            }
+
+            stopwatch.Stop();
+            Console.WriteLine($"Excel file import took: {stopwatch.ElapsedMilliseconds} ms");
+
+            return dataTable;
+        }
+        private void button3_Click_1(object sender, EventArgs e)
+        {
+            string trafo_path = DosyaSeciciGoster(SonucYolu);
+            try
+            {
+                trafo_path = Path.Combine(SonucYolu, trafo_path);
+                trafodt = ImportExcelFile(trafo_path);
+
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show("Dosya Seçilmedi.");
+                return;
+            }
+
+            if (DialogResult.Yes == MessageBox.Show("Veri sisteme yüklensin mi?", "Bilgi", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
+            {
+                // Verileri sisteme yükle
+                DrawMap3(trafodt);
+            }
+            else
+            {
+                MessageBox.Show("Veri yüklenmedi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
+           
+    }
+
+    }
+
+
+
+
+    public class Trafo
+    {
+        public string TrafoID { get; set; }
+        public int HucreID { get; set; }
+
+        public double BosKapasite { get; set; }
+        public string Owner { get; set; }
+
+        public int Year { get; set; }
+
+        public string Durumu { get; set; }
+
+
+
+        public Trafo(string trafoID, int hucreID, string owner, int year, string durum)
+        {
+            TrafoID = trafoID;
+            HucreID = hucreID;
+            Owner = owner;
+            Year = year;
+            Durumu = durum;
+        }
+
+
+
+        public class Hucre
+        {
+            public int HucreId { get; set; }
+            public double Left { get; set; }
+            public double Top { get; set; }
+            public double Right { get; set; }
+            public double Bottom { get; set; }
+
+            public Hucre(int id, double left, double top, double right, double bottom)
+            {
+                HucreId = id;
+                Left = left;
+                Top = top;
+                Right = right;
+                Bottom = bottom;
+            }
+
         }
 
     }

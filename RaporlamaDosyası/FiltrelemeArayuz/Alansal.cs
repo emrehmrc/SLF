@@ -35,17 +35,22 @@ namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
                 bool check = (e.NewValue == CheckState.Checked);
 
                 // İşlemi event tamamlandıktan sonra yapmamız gerekiyor
-                this.BeginInvoke((MethodInvoker)(() =>
+                /*this.BeginInvoke((MethodInvoker)(() =>
                 {
                     for (int i = 1; i < checkedListBox1.Items.Count; i++)
                     {
                         checkedListBox1.SetItemChecked(i, check);
                     }
                 }));
+                */
+                for (int i = 1; i < checkedListBox1.Items.Count; i++)
+                {
+                    checkedListBox1.SetItemChecked(i, check);
+                }
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button1__Click(object sender, EventArgs e)
         {
             // 2. Yıl Listesi
             secilenYillar = new List<string>();
@@ -67,6 +72,39 @@ namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
             {
                 dt = FiltrelenmisSonuc
             });
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            // Seçili yılları listeye al
+            List<int> secilenYillar = new List<int>();
+            List<string> secilenDurumlar = new List<string>();
+
+            foreach (var item in checkedListBox1.CheckedItems)
+            {
+                if (item.ToString() != "Hepsi")
+                {
+                    secilenYillar.Add(int.Parse(item.ToString()));
+                }
+
+            }
+
+            var filtrelenmisData = _orijinalTablo.AsEnumerable()
+                .Where(row =>
+                    secilenYillar.Count == 0 ||
+                    secilenYillar.Contains(Convert.ToInt32(row.Field<long>("year")))
+                )
+
+            .ToList();
+
+            FiltrelenmisSonuc = filtrelenmisData.Any() ? filtrelenmisData.CopyToDataTable() : _orijinalTablo.Clone();
+
+
+            FiltrelemeYapildi?.Invoke(this, new FiltreEventArgs
+            {
+                dt = FiltrelenmisSonuc
+            });
+
         }
     }
 }

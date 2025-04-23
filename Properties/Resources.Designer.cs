@@ -243,6 +243,10 @@ namespace SLF.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap KML2 {
             get {
                 object obj = ResourceManager.GetObject("KML2", resourceCulture);

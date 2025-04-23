@@ -22,6 +22,8 @@ using System.Text;
 using SLF.services;
 using OSGeo.OGR;
 using SLF.Services;
+using SLF.Optimal_DTR;
+using SLF.RaporlamaDosyası;
 
 
 namespace SLF
@@ -40,6 +42,10 @@ namespace SLF
                 return instance;
             }
         }
+
+        DTR_Arayuz dtr;
+
+        Rapor_Arayuz Rapor_Arayuz;
 
         public readonly CBS cbs;
         private readonly double startX = 0;
@@ -332,7 +338,6 @@ namespace SLF
             InitializeGMap(gMapControl_EA);
             InitializeGMap(gMapControl_yuk);
             InitializeGMap(gMapControl_imar);
-            InitializeGMap(gMapControl_optimalDTR);
             InitializeGMap(gMapControl_DEK);
             InitializeGMap(gMapControl_yga);
 
@@ -2459,6 +2464,8 @@ namespace SLF
             // Gerekli kontrolleri yapmak için seçilen sekmeyi ve modülleri kontrol et
             string selectedTabText = Modül_Tabları.SelectedTab.Text;
 
+
+
             // Modüllerin yüklü olup olmadığını kontrol et
             if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
@@ -2481,11 +2488,22 @@ namespace SLF
                     Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
                     return;
                 }*/
-                else if (selectedTabText == "Optimal DTR Konumlandırma"
+               else if (selectedTabText == "Optimal DTR Konumlandırma"
                            && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")
                            && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri")))
                 {
                     // Sekme geçişini tamamen iptal et
+
+                    
+
+                    dtr = new DTR_Arayuz();
+                    dtr.TopLevel = false;
+                    dtr.FormBorderStyle = FormBorderStyle.None;
+                    dtr.Dock = DockStyle.Fill;
+                    dtr.Show();
+
+                    dtr.Parent = this.tab_optDTR;
+
                     MessageBox.Show("DTR verileri ve İmar planı yüklenmeden bu sekmeye geçiş yapılamaz.");
                     Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
                     Modül_Tabları.SelectedTab = tab_girdi;
@@ -2493,6 +2511,60 @@ namespace SLF
                     return;
                 }
             }
+
+            else if (selectedTabText == "Optimal DTR Konumlandırma")
+            {
+                // Sekme geçişini tamamen iptal et
+
+                Panel panel = new Panel();
+                panel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+                panel.Location = new System.Drawing.Point(0, 0);
+                // Form'un boyutunu kullanarak panel'in genişliğini 50 piksel eksik yapma
+                panel.Size = new Size(this.ClientSize.Width - 25, this.ClientSize.Height - 85);
+                this.tab_optDTR.Controls.Add(panel);
+
+                if (dtr == null)
+                {
+                    dtr = new DTR_Arayuz();
+                    dtr.TopLevel = false;
+                    dtr.FormBorderStyle = FormBorderStyle.None;
+                    dtr.Dock = DockStyle.Fill;
+                    dtr.Show();
+
+                    panel.Controls.Add(dtr);
+                    //dtr.Parent = this.tab_optDTR;
+
+                    
+                }               
+
+                return;
+            }
+
+            else if (selectedTabText == "Raporlama")
+            {
+                // Form'un boyutunu kullanarak panel'in genişliğini 50 piksel eksik yapma
+                this.panel2.Size = new Size(this.ClientSize.Width - 25, this.ClientSize.Height - 85);
+                
+
+
+                if (Rapor_Arayuz == null)
+                {
+                    Rapor_Arayuz =new Rapor_Arayuz();
+
+                    Rapor_Arayuz.TopLevel = false;
+                    Rapor_Arayuz.FormBorderStyle = FormBorderStyle.None;
+                    Rapor_Arayuz.Dock = DockStyle.Fill;
+                    Rapor_Arayuz.Show();
+
+                    this.panel2.Controls.Add(Rapor_Arayuz);
+                    //Rapor_Arayuz.Parent = this.panel2;
+
+
+                }
+
+                return;
+            }
+
 
             // EA Şarj Modülü tabına tıklanmışsa
             if (selectedTabText == "EA Şarj Modülü")
@@ -5847,11 +5919,7 @@ namespace SLF
                     gMapControl_yga.Refresh();
                 }
 
-                if (gMapControl_optimalDTR != null && gMapControl_optimalDTR.Overlays != null)
-                {
-                    gMapControl_optimalDTR.Overlays.Clear();
-                    gMapControl_optimalDTR.Refresh();
-                }
+                
 
                 // CBS sınıfındaki overlay dizisini de sıfırla
                 if (cbs != null)
@@ -5935,10 +6003,6 @@ namespace SLF
                     gMapControl_yga.MapProvider = GMapProviders.GoogleSatelliteMap;
                 }
 
-                if (gMapControl_optimalDTR != null)
-                {
-                    gMapControl_optimalDTR.MapProvider = GMapProviders.GoogleSatelliteMap;
-                }
 
                 Console.WriteLine("Harita renkleri sıfırlandı");
             }

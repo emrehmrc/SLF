@@ -38,8 +38,8 @@ namespace SLF.Services
         private YearService()
         {
             // Default değerler
-            _slfStartYear = 0;
-            _slfEndYear = 0;
+            _slfStartYear = 2025;
+            _slfEndYear = 2035;
         }
 
         /// <summary>

@@ -69,7 +69,7 @@ namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button1__Click(object sender, EventArgs e)
         {
             // 2. Yıl Listesi
             secilenYillar = new List<string>();
@@ -101,6 +101,38 @@ namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
             });
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            // Seçili yılları listeye al
+            List<int> secilenYillar = new List<int>();
+            List<string> secilenDurumlar = new List<string>();
+
+            foreach (var item in checkedListBox1.CheckedItems)
+            {
+                if (item.ToString() != "Hepsi")
+                {
+                    secilenYillar.Add(int.Parse(item.ToString()));
+                }
+
+            }
+
+            var filtrelenmisData = _orijinalTablo.AsEnumerable()
+                .Where(row =>
+                    (secilenYillar.Count == 0 ||
+                    (int.TryParse(row.Field<string>("year"), out int year) && secilenYillar.Contains(year))) // Yıla göre filtreleme
+                                )
+            .ToList();
+
+            FiltrelenmisSonuc = filtrelenmisData.Any() ? filtrelenmisData.CopyToDataTable() : _orijinalTablo.Clone();
+
+            MessageBox.Show(FiltrelenmisSonuc.Rows.Count.ToString());
+            
+            FiltrelemeYapildi?.Invoke(this, new FiltreEventArgs
+            {
+                dt = FiltrelenmisSonuc
+            });
+
+        }
         public void DrawMap(DataTable eaTable, GMapOverlay overlay, GMapControl gMapControl1)
         {
             overlay.Markers.Clear();
