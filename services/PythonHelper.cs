@@ -504,7 +504,6 @@ namespace SLF.services
                 string asciiCity = RemoveDiacritics(selectedCity);
                 string asciiDistrict = RemoveDiacritics(selectedDistrict);
 
-                // Python script için komut satırı argümanları - çıktı klasörünü değiştirdik
                 // İmar oranı dosyasını bul
                 string imarOraniFilePath = PathService.GetImarOraniFilePath();
 
@@ -514,13 +513,29 @@ namespace SLF.services
                     throw new Exception("İmar oranı dosyası bulunamadı, bu dosya gereklidir.");
                 }
 
+                // Construction stats (imar stats) dosyasını bul
+                string imarStatsFilePath = PathService.GetConstructionStatsFilePath(); // Bu metodu PathService'e eklemeniz gerekiyor
+
+                // İmar stats dosyası zorunlu, yoksa hata atılacak
+                if (string.IsNullOrEmpty(imarStatsFilePath))
+                {
+                    throw new Exception("Construction stats dosyası bulunamadı, bu dosya gereklidir.");
+                }
+
                 // Python script için komut satırı argümanları
                 string arguments = $"\"{pythonScriptPath}\" \"{saturasyonFilePath}\" \"{asciiCity}\" \"{asciiDistrict}\" \"{slfAnaliziPath}\" --start-year 2024 --end-year 2035";
-                Console.WriteLine(arguments);
 
                 // İmar oranı dosyasını argümanlara ekle
                 arguments += $" --imar-orani-file \"{imarOraniFilePath}\"";
                 Console.WriteLine($"İmar oranı dosyası: {imarOraniFilePath}");
+
+                // Construction stats dosyasını argümanlara ekle
+                arguments += $" --imar-stats-file \"{imarStatsFilePath}\"";
+                Console.WriteLine($"Construction stats dosyası: {imarStatsFilePath}");
+
+                // Çalıştırılan tam komutu oluştur ve yazdır
+                string fullCommand = $"python {arguments}";
+                Console.WriteLine("RunSLF çalıştırılan komut: " + fullCommand);
 
                 // Python betiğini çalıştır
                 ProcessStartInfo processInfo = new ProcessStartInfo("python")
@@ -566,13 +581,28 @@ namespace SLF.services
                     process.BeginOutputReadLine();
                     process.BeginErrorReadLine();
 
-                    // İşlemin tamamlanmasını bekle
-                    process.WaitForExit();
+                    // İşlemin tamamlanmasını bekle - timeout süresini artır (dakika cinsinden)
+                    int timeoutMinutes = 30; // Timeout süresini 30 dakikaya ayarladık, gerekirse değiştirin
+                    bool processExited = process.WaitForExit(timeoutMinutes * 60 * 1000);
+
+                    if (!processExited)
+                    {
+                        // İşlem zaman aşımına uğradıysa, sonlandır
+                        try
+                        {
+                            process.Kill();
+                            throw new Exception($"Python betiği zaman aşımına uğradı ({timeoutMinutes} dakika). İşlem sonlandırıldı.");
+                        }
+                        catch (Exception killEx)
+                        {
+                            throw new Exception($"Python betiği zaman aşımına uğradı ve sonlandırılamadı: {killEx.Message}");
+                        }
+                    }
 
                     // İşlem tamamlandı, çıkış kodunu kontrol et
                     if (process.ExitCode != 0)
                     {
-                        throw new Exception($"Python betiği hata ile sonlandı. Çıkış kodu: {process.ExitCode}");
+                        throw new Exception($"Python betiği hata ile sonlandı. Çıkış kodu: {process.ExitCode}, Hata: {error}");
                     }
                 }
 

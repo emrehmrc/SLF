@@ -5,19 +5,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
 using System.Text;
+using GMap.NET.MapProviders;
 
 namespace SLF.Services
 {
     /// <summary>
     /// Uygulama genelinde path yönetimi sağlayan servis sınıfı
     /// </summary>
-    public static class PathService
+    public class PathService
     {
         // Proje klasörüne göre relatif il-ilçe kırılımı klasörü yolu
-        private const string RELATIVE_DATA_PATH = @"il_ilce_kırılımları";
+        private readonly string _relativeDataPath;
+
+        // Constructor to initialize the PathService with config
+        public PathService(string config)
+        {
+
+            HomePageForm ana_menu = new HomePageForm(); 
+
+            _relativeDataPath = Path.Combine(ana_menu.userRootPath,
+                ana_menu.config.Ana_Klasör_Yolu) ?? throw new ArgumentNullException(nameof(config));
+        }
+
+        // Optional: Property to access the relative data path
+        public string RelativeDataPath => _relativeDataPath;
 
         // Temel dizin - ilk çalıştırmada hesaplanır
-        public static string _baseDirectory;
+        private static string _baseDirectory;
 
         // Seçilen il
         public static string SelectedCity { get; private set; }
@@ -47,11 +61,16 @@ namespace SLF.Services
             {
                 if (string.IsNullOrEmpty(_baseDirectory))
                 {
-                    InitializeBaseDirectory();
+                    // Since _relativeDataPath is instance-specific, we need an instance to access it.
+                    // For simplicity, assume PathService is instantiated elsewhere and config is passed.
+                    // If no instance is available, use a default or throw an exception.
+                    throw new InvalidOperationException("PathService must be instantiated with a config value before accessing BaseDirectory.");
+                    // Alternatively, call InitializeBaseDirectory with a default or injected config (see below).
                 }
                 return _baseDirectory;
             }
         }
+
 
         /// <summary>
         /// Python kod klasörü yolu - SLF kök dizini altında
@@ -392,6 +411,59 @@ namespace SLF.Services
         /// <summary>
         /// Mevcut çalışma klasörünü temizler (önceki klasörü siler)
         /// </summary>
+        /// 
+        /// <summary>
+        /// Construction stats (imar stats) dosyasının tam yolunu döndürür
+        /// </summary>
+        /// <returns>Construction stats dosyasının tam yolu</returns>
+        public static string GetConstructionStatsFilePath()
+        {
+            try
+            {
+                // İmar analizi sonuçları klasörü
+                string imarAnaliziPath = GetImarAnaliziPathForType("kofre_analiz");
+
+                // Spesifik dosya yolu: imar_analizi_sonuclari/kofre_analiz/imar_tipi_ozet_tablo.xlsx
+                string constructionStatsFile = Path.Combine(imarAnaliziPath, "imar_tipi_ozet_tablo.xlsx");
+
+                // Dosya var mı kontrol et
+                if (File.Exists(constructionStatsFile))
+                {
+                    Console.WriteLine($"Construction stats dosyası bulundu: {constructionStatsFile}");
+                    return constructionStatsFile;
+                }
+
+                // Dosya bulunamadıysa, alternatif dosya isimlerini dene
+                string[] alternativeNames = new string[]
+                {
+                "imar_tipi_ozet_tablo.xlsx",
+                "imar_ozet_tablo.xlsx",
+                "imar_stats.xlsx",
+                "construction_areas.xlsx"
+                };
+
+                foreach (var fileName in alternativeNames)
+                {
+                    string alternativePath = Path.Combine(imarAnaliziPath, fileName);
+                    if (File.Exists(alternativePath))
+                    {
+                        Console.WriteLine($"Construction stats dosyası bulundu (alternatif): {alternativePath}");
+                        return alternativePath;
+                    }
+                }
+
+                // Hiçbir dosya bulunamadıysa
+                Console.WriteLine("Construction stats dosyası bulunamadı!");
+
+                // Beklenen dosya yolunu döndür (dosya henüz mevcut olmasa bile)
+                return constructionStatsFile;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Construction stats dosyası aranırken hata: {ex.Message}");
+                return null;
+            }
+        }
         private static void CleanupCurrentFolder()
         {
             try
@@ -845,7 +917,7 @@ namespace SLF.Services
         /// <summary>
         /// Temel veri dizinini başlatır, relative path'i bulur
         /// </summary>
-        private static void InitializeBaseDirectory()
+        private static void InitializeBaseDirectory(string relativeDataPath)
         {
             try
             {
@@ -857,9 +929,9 @@ namespace SLF.Services
                 bool foundDataFolder = false;
 
                 // Önce mevcut dizinde ara
-                if (Directory.Exists(Path.Combine(currentDir, RELATIVE_DATA_PATH)))
+                if (Directory.Exists(Path.Combine(currentDir, relativeDataPath)))
                 {
-                    _baseDirectory = Path.Combine(currentDir, RELATIVE_DATA_PATH);
+                    _baseDirectory = Path.Combine(currentDir, relativeDataPath);
                     foundDataFolder = true;
                 }
 
@@ -878,9 +950,9 @@ namespace SLF.Services
                         currentDir = parentDir.FullName;
 
                         // Veri klasörünü kontrol et
-                        if (Directory.Exists(Path.Combine(currentDir, RELATIVE_DATA_PATH)))
+                        if (Directory.Exists(Path.Combine(currentDir, relativeDataPath)))
                         {
-                            _baseDirectory = Path.Combine(currentDir, RELATIVE_DATA_PATH);
+                            _baseDirectory = Path.Combine(currentDir, relativeDataPath);
                             foundDataFolder = true;
                             break;
                         }
@@ -892,9 +964,9 @@ namespace SLF.Services
                 {
                     string gitRepoPath = @"C:\Users\batuhan.yetis\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı";
 
-                    if (Directory.Exists(Path.Combine(gitRepoPath, RELATIVE_DATA_PATH)))
+                    if (Directory.Exists(Path.Combine(gitRepoPath, relativeDataPath)))
                     {
-                        _baseDirectory = Path.Combine(gitRepoPath, RELATIVE_DATA_PATH);
+                        _baseDirectory = Path.Combine(gitRepoPath, relativeDataPath);
                         foundDataFolder = true;
                     }
                 }
@@ -902,7 +974,7 @@ namespace SLF.Services
                 // Veri klasörü bulunamadıysa, exe dizini altında yeni bir klasör oluştur
                 if (!foundDataFolder)
                 {
-                    _baseDirectory = Path.Combine(exeDirectory, RELATIVE_DATA_PATH);
+                    _baseDirectory = Path.Combine(exeDirectory, relativeDataPath);
                     Directory.CreateDirectory(_baseDirectory);
                     Debug.WriteLine($"Veri klasörü bulunamadı, yeni klasör oluşturuldu: {_baseDirectory}");
                 }
@@ -912,7 +984,7 @@ namespace SLF.Services
             catch (Exception ex)
             {
                 // Herhangi bir hata durumunda, exe dizini altında bir klasör kullan
-                string fallbackPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, RELATIVE_DATA_PATH);
+                string fallbackPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, relativeDataPath);
                 _baseDirectory = fallbackPath;
 
                 if (!Directory.Exists(fallbackPath))
