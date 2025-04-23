@@ -66,9 +66,6 @@ namespace SLF
         public readonly CBS cbs;
         public int slfStartYear = 0, slfEndYear = 0;
 
-        // point load degerlerini iceren Excel dosyası pathi.
-        public string polygonTypesExcelPath;
-
         System.Windows.Forms.TextBox logTextBox; // Declare logTextBox here --------------
         private ExcelService _excelService;
         private ExcelService excelService = new ExcelService();
@@ -211,23 +208,7 @@ namespace SLF
                 // YearService'ten değerleri alma
                 this.slfStartYear = yearService.slfStartYear;
                 this.slfEndYear = yearService.slfEndYear;
-            }
-
-            
-            if (ana_menu_form_objesi.projectRoot != null)
-            {
-                polygonTypesExcelPath = Path.Combine(ana_menu_form_objesi.projectRoot, "Excel Files", 
-                    "Point Load Karakteristikleri.xlsx", "point_load.xlsx"); 
-                // e.g., C:\Users\ehan0\source\repos\emrehmrc\SLF\Excel Files\point_load.xlsx
-            }
-            else
-            {
-                // Fallback to a default path if resolution fails
-                polygonTypesExcelPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), 
-                    "point_load.xlsx");
-                MessageBox.Show($"Excel dosya yolu çözülemedi. Varsayılan yol kullanılıyor: {polygonTypesExcelPath}", 
-                    "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
+            }       
 
             _excelService = new ExcelService();
             InitializeLogTextBox(); // Initialize logTextBox
@@ -274,9 +255,6 @@ namespace SLF
 
             // Initialize tab_ekonometrik accessibility on form load
             UpdateTabEkonometrikAccessibility();
-
-            userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            configPath = Path.Combine(((string)ana_menu_form_objesi.projectRoot).Replace('/', '\\'),"config.json");
         }
 
         public ModülFormu() : this("", "")
@@ -7190,14 +7168,10 @@ namespace SLF
                     Console.WriteLine("HATA: " + errorData);
                 }
 
-                // Read the JSON file and create the "config" variable
-                ana_menu_form_objesi.json_file = await Task.Run(() =>
-                    File.ReadAllText(Path.Combine(ana_menu_form_objesi.projectRoot, "config.json")));
-
                 // Deserialize on the UI thread since it might be used by UI components
                 ana_menu_form_objesi.config = JsonConvert.DeserializeObject(ana_menu_form_objesi.json_file);
 
-                string results_path = Path.Combine(userRootPath,
+                string results_path = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,

@@ -11,11 +11,10 @@ namespace SLF
         public ModülFormu mod1;
         public Hakkında mod2;
 
-        public string exeLocation;
-        public string projectRoot;
-
         public string json_file;
         public dynamic config;
+        public string userRootPath;
+        public string config_path;
 
         public HomePageForm()
         {
@@ -28,12 +27,14 @@ namespace SLF
             // Ensure StartButton has focus when the form is shown
             this.Shown += HomePageForm_Shown;
 
-            // Resolve the Excel file path relative to SLF.exe
-            exeLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); // e.g., C:\Users\ehan0\source\repos\emrehmrc\SLF\bin\Debug
-            projectRoot = Directory.GetParent(exeLocation)?.Parent?.FullName; // Move up two levels to SLF root (C:\Users\ehan0\source\repos\emrehmrc\SLF)
+            userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+            config_path = Path.Combine(userRootPath,
+                "MRC\\MRC - 1.1.3_T&SI\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\İzmir\\Program Dosyaları\\config.json").Replace("/", "\\");
 
             // read the json file and create the "config" variable.
-            json_file = File.ReadAllText(Path.Combine(projectRoot, "config.json"));
+            json_file = File.ReadAllText(config_path);
+            
             config = JsonConvert.DeserializeObject(json_file);
 
         }
