@@ -1,14 +1,9 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using ClosedXML.Excel;
-using OSGeo.OGR;
 using static SLF.ModülFormu;
 
 namespace SLF
@@ -17,24 +12,22 @@ namespace SLF
     {
         private readonly DataTable dataTable;
         private bool isOperationCancelled = true;
-        public bool OperationCancelled => isOperationCancelled;
 
         // Private field to store NoktaVeri
         private NoktaVeri noktaVeri;
 
-        // Public property to expose NoktaVeri
-        public NoktaVeri NoktaVeri => noktaVeri;
+        public HomePageForm ana_menu_form_objesi;
 
         private readonly List<string> acPowers = new List<string> { "11 kW", "22 kW" };
         private static class Constants
         {
             public static readonly Dictionary<string, string> StationTypeToCountColumn = new Dictionary<string, string>
-    {
-        { "AC (Home)_count", "AC (Home)_count" },
-        { "AC (Work)_count", "AC (Work)_count" },
-        { "AC (Public)_count", "AC (Public)_count" },
-        { "Fast DC_count", "Fast DC_count" }
-    };
+            {
+                { "AC (Home)_count", "AC (Home)_count" },
+                { "AC (Work)_count", "AC (Work)_count" },
+                { "AC (Public)_count", "AC (Public)_count" },
+                { "Fast DC_count", "Fast DC_count" }
+            };
 
             public static readonly Dictionary<string, double> StationTypeToLoad = new Dictionary<string, double>
             {
@@ -57,7 +50,9 @@ namespace SLF
             return Constants.StationTypeToLoad.TryGetValue(stationType, out double load) ? load : 0;
         }
 
-        public EAStationPopupForm(DataTable existingDataTable, NoktaVeri veri)
+        private readonly int slfEndYear;
+
+        public EAStationPopupForm(DataTable existingDataTable, NoktaVeri veri, int slfEndYear)
         {
             InitializeComponent();
             dataTable = existingDataTable;
@@ -65,6 +60,9 @@ namespace SLF
             // Initialize NoktaVeri
             noktaVeri = veri;
 
+            this.slfEndYear = slfEndYear;
+
+            ana_menu_form_objesi = new HomePageForm();
             InitializeDataGridView(veri);
             SetupEventHandlers();
         }
@@ -83,16 +81,6 @@ namespace SLF
             ChargingStationDataGridView.Rows[rowIndex].Cells["ID"].Value =
                 !string.IsNullOrEmpty(veri.CellId) ? veri.CellId : "Not Selected";
 
-            // Populate the StartYear combobox column with years 2024 to 2035.
-            /*            if (ChargingStationDataGridView.Columns["StartYear"] is DataGridViewComboBoxColumn startYearColumn)
-                        {
-                            List<int> years = Enumerable.Range(2024, 2035 - 2024 + 1).ToList();
-                            startYearColumn.DataSource = years;
-
-                            // Optionally set the default value (here, the first year 2024)
-                            ChargingStationDataGridView.Rows[rowIndex].Cells["StartYear"].Value = years.First();
-                        }*/
-
             // Set ISTASYON_TIPI options to AC types and DC
             if (ChargingStationDataGridView.Columns["ISTASYON_TIPI"] is DataGridViewComboBoxColumn typeComboBoxColumn)
             {
@@ -104,6 +92,27 @@ namespace SLF
             {
                 powerComboBoxColumn.DataSource = acPowers;
             }
+
+            // Initialize StartYear as a ComboBox with valid years
+            if (ChargingStationDataGridView.Columns["StartYear"] is DataGridViewComboBoxColumn startYearComboBox)
+            {
+                // Configure the ComboBox column
+                startYearComboBox.DataSource = Constants.Years; // List<int> [2024, 2025, ..., 2030]
+                startYearComboBox.ValueType = typeof(int); // Ensure the value type is int
+
+                ChargingStationDataGridView.Rows[0].Cells["StartYear"].Value = Constants.Years.Min(); // Set to 2024 initially
+
+                // Log the ComboBox items for debugging
+                Console.WriteLine("StartYear ComboBox items: " + string.Join(", ", startYearComboBox.Items.Cast<int>()));
+                Console.WriteLine($"StartYear cell value after setting: {ChargingStationDataGridView.Rows[0].Cells["StartYear"].Value}");
+            }
+            else if (ChargingStationDataGridView.Columns.Contains("StartYear"))
+            {
+                // Fallback for non-ComboBox column (shouldn't execute in your case)
+                ChargingStationDataGridView.Rows[0].Cells["StartYear"].Value = Constants.Years.Min().ToString();
+            }
+
+
 
             // Populate transformer codes if available
             if (GirdiModülü.dataTablesByType.TryGetValue("DTR Verileri", out DataTable trafoDataTable))
@@ -220,11 +229,13 @@ namespace SLF
             try
             {
                 // Retrieve values from the DataGridView
-                string startYear = ChargingStationDataGridView.Rows[0].Cells["StartYear"].Value?.ToString();
-                string cellId = ChargingStationDataGridView.Rows[0].Cells["ID"].Value?.ToString();
-                string stationType = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_TIPI"].Value?.ToString();
-                double enlem = Convert.ToDouble(ChargingStationDataGridView.Rows[0].Cells["EA_X_KOORDINAT"].Value);
-                double boylam = Convert.ToDouble(ChargingStationDataGridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value);
+
+                var row = ChargingStationDataGridView.Rows[0];
+                string startYear = row.Cells["StartYear"].Value?.ToString();
+                string cellId = row.Cells["ID"].Value?.ToString();
+                string stationType = row.Cells["ISTASYON_TIPI"].Value?.ToString();
+                double enlem = Convert.ToDouble(row.Cells["EA_X_KOORDINAT"].Value);
+                double boylam = Convert.ToDouble(row.Cells["EA_Y_KOORDINAT"].Value);
 
                 if (string.IsNullOrEmpty(startYear) || string.IsNullOrEmpty(cellId) || string.IsNullOrEmpty(stationType))
                 {
@@ -240,12 +251,18 @@ namespace SLF
                     return;
                 }
 
-                string existingFilePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V3\ÇIKTI\evcs_monte_carlo_distribution_kumulatif_0411.xlsx";
+                string existingFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                     (string)ana_menu_form_objesi.config.İl,
+                     (string)ana_menu_form_objesi.config.İlçe,
+                     (string)ana_menu_form_objesi.config.EA.ea_klasörü,
+                    (string)ana_menu_form_objesi.config.EA.cikti_dosyasi).Replace('/', '\\');
+
 
                 using (var package = new OfficeOpenXml.ExcelPackage(new FileInfo(existingFilePath)))
                 {
                     int startYearInt = int.Parse(startYear);
-                    foreach (int year in Constants.Years.Where(y => y >= startYearInt))
+                    foreach (int year in Enumerable.Range(startYearInt, slfEndYear - startYearInt + 1))
                     {
                         var worksheet = package.Workbook.Worksheets[year.ToString()];
                         if (worksheet == null)
