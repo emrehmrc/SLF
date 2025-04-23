@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace SLF.Services
 {
@@ -652,10 +653,10 @@ namespace SLF.Services
             }
 
             return stringBuilder.ToString().Normalize(System.Text.NormalizationForm.FormC);
-        
+
+        }
     }
-    }
-    }
+}
 
 
 
