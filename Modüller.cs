@@ -1255,13 +1255,6 @@ namespace SLF
             { "İzmir", new List<string> {/* "Aliağa", "Balçova", "Bayındır", "Bayraklı", "Bergama", "Beydağ", "Bornova", "Buca", "Çeşme", */ "Çiğli", /*"Dikili", "Foça", "Gaziemir", "Güzelbahçe", "Karabağlar", "Karaburun", */"Karşıyaka",/* "Kemalpaşa", "Kınık", "Kiraz", "Konak", "Menderes", "Menemen", "Narlıdere", "Ödemiş", "Seferihisar", "Selçuk", "Tire", "Torbalı"*/ } },
             { "Eskişehir", new List<string> { /*"Alpu", "Beylikova", "Çifteler", "Günyüzü", "Han", "İnönü", "Mahmudiye", "Mihalgazi", "Mihalıççık", "Odunpazarı", "Sarıcakaya", "Seyitgazi", "Sivrihisar", */ "Tepebaşı" } }
         };
-                private readonly Dictionary<string, string> districtIdMap = new Dictionary<string, string>
-        {
-            { "Çiğli", "1" },
-            { "Karşıyaka", "2" },
-            { "Tepebaşı", "1" }
-        };
-
 
         private string SelectedSpeed = "";
         public bool isAddingChargingStation = false; // Sadece şarj istasyonu eklenirken true olacak.
