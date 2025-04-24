@@ -21,11 +21,6 @@ namespace SLF
 
 
         public HomePageForm ana_menu_form_objesi;
-        private MethodForm methodFormObjesi;
-        private BekleForm bekleForm;
-
-        public string userRootPath;
-        public string configPath;
 
         public int slfStartYear = 0, slfEndYear = 0;
         private readonly string dataSource; // "EA" or "DEK"
@@ -39,12 +34,8 @@ namespace SLF
 
 
             ana_menu_form_objesi = new HomePageForm();
-            methodFormObjesi = new MethodForm(ana_menu_form_objesi);
             this.ana_menu_form_objesi = anaMenuForm;
-            bekleForm = new BekleForm();
 
-            userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            configPath = Path.Combine(((string)ana_menu_form_objesi.projectRoot).Replace('/', '\\'), "config.json");
 
             var yearService = YearService.GetInstance();
             if (this.slfStartYear > 0 && this.slfEndYear > 0)
@@ -99,14 +90,14 @@ namespace SLF
         {
             try
             {
-                string eaExcelFilePath = Path.Combine(userRootPath,
+                string eaExcelFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
          (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
          (string)ana_menu_form_objesi.config.İl,
          (string)ana_menu_form_objesi.config.İlçe,
          (string)ana_menu_form_objesi.config.EA.ea_klasörü,
         (string)ana_menu_form_objesi.config.EA.cikti_dosyasi).Replace('/', '\\');
 
-                string dekExcelFilePath = Path.Combine(userRootPath,
+                string dekExcelFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
                          (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                          (string)ana_menu_form_objesi.config.İl,
                          (string)ana_menu_form_objesi.config.İlçe,

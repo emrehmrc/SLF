@@ -1,7 +1,9 @@
 {
   "Ana_Klasör_Yolu": "MRC/MRC - 1.1.3_T&SI/MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı/il_ilce_kırılımları",
+  "program_dosyaları_path": "Program Dosyaları",
   "İl": "İzmir",
   "İlçe": "Karşıyaka",
+  "proje_ismi": "proje_karsıyaka_deneme",
   "ELF": {
     "SONUÇLAR_klasör": "Ekonometrik Yük Tahmini Verileri/SONUÇLAR",
     "SONUÇLAR_name": "ELF_Tahmin_Sonuçları_2025-04-17 00_00_58.xlsx",
@@ -9,7 +11,7 @@
     "ŞABLON": "Ekonometrik Yük Tahmini Verileri/ŞABLON.xlsx",
     "Rscript_Yolu_Model": "Program Dosyaları/ELF/model.R",
     "Rscript_Yolu_Senaryolar": "Program Dosyaları/ELF/senaryolar.R",
-    "ufuk_yılı": 9
+    "ufuk_yılı": 10
   },
   "Veritabanı": {
     "Server_Address": "",
@@ -18,10 +20,15 @@
     "Password": ""
   },
   "Python Kodları": {
-    "Sonuçlar_to_Kml": "C:/Users/ehan0/source/repos/emrehmrc/SLF/python_kod/SLF Sonucları/excel_to_kml_sonuçlar.py"
+    "SLF_Main": "/İmar/python_kod/SLF_analizi/slf_main.py",
+    "IMAR_ANALİZİ": "/İmar/python_kod/imar_analizi/main.py"
   },
   "DEK": {
     "dek_klasörü": "Dağıtık Üretimler",
+    "senaryo_klasörü": "senaryolar",
+    "senaryo_baz": "dek_baz_gelecek_senaryo_sonuclari.xlsx",
+    "senaryo_yuksek": "dek_yuksek_gelecek_senaryo_sonuclari.xlsx",
+    "senaryo_dusuk": "dek_dusuk_gelecek_senaryo_sonuclari.xlsx",
     "min_max_path": "girdi/dek_olasiliklar.xlsx",
     "imar_alanları": "girdi/dek_imar_alanlari.xlsx",
     "girdi_dosyası": "girdi/dek_yeni_binalar.xlsx",
@@ -31,10 +38,14 @@
     "program_dosyası_klasörü": "Program Dosyaları/DEK",
     "dek_python_dosyası": "dek.py",
     "baslangıc_yılı": 2024,
-    "bitis_yılı": 2033
+    "bitis_yılı": 2032
   },
   "EA": {
     "ea_klasörü": "EA Şarj",
+    "senaryo_klasörü": "senaryolar",
+    "senaryo_baz": "ea_baz_gelecek_senaryo_sonuclari.xlsx",
+    "senaryo_yuksek": "ea_yuksek_gelecek_senaryo_sonuclari.xlsx",
+    "senaryo_dusuk": "ea_dusuk_gelecek_senaryo_sonuclari.xlsx",
     "min_max_path": "girdi/ea_olasiliklar.xlsx",
     "girdi_dosyası": "girdi/ea_yeni_binalar.xlsx",
     "cikti_dosyasi": "cıktı/ea_kumulatif_dagilim_sonuclari.xlsx",
@@ -43,7 +54,43 @@
     "program_dosyası_klasörü": "Program Dosyaları/EA",
     "ea_python_dosyası": "ea.py",
     "baslangıc_yılı": 2024,
-    "bitis_yılı": 2033
+    "bitis_yılı": 2032
   },
-  "Point_Load_Musaade": "Point Load Verileri/point_load_musaade.xlsx"
+  "İmar Analizi": {
+    "Ana_Klasör": "imar_analizi_sonuclari",
+    "Python_Script_Yolu": "/imar_analizi/main.py",
+    "GİRDİLER_klasör": "imar_analizi_sonuclari/",
+    "Hücre_data_path": "hücre",
+    "Uydu_verileri_path": "uydu_verileri",
+    "Alt_Klasörler": {
+      "İmar_Planları": "imar_planlari",
+      "Deep_Learning": "deep_learning_modeli",
+      "Saturasyon": "saturasyon"
+    }
+  },
+  "SLF": {
+    "Ana_Klasör": "sonuclar/saturasyon",
+    "Python_Kod_Dizini": "slf_analizi",
+    "Script_Adı": "slf_main.py",
+    "Saturasyon_Dosyası": "imar_analizi_sonuclari/imar_planlari/saturasyon/saturasyon_v8_İzmir.csv",
+    "Başlangıç_Yılı": 2024,
+    "Bitiş_Yılı": 2031,
+    "Dynamic_EPS_Başlangıç": 350,
+    "imar_oranı_tahmini_kodu": "SLF/imar_oranı_tahmini.py",
+    "abone_sayısı_tahmini_kodu": "SLF/abone_sayısı_tahmini.py",
+    "SLF_yük_tahmini_kodu": "SLF/SLF_yük_tahmini.py"
+  },
+  "Point_Load_Musaade": "Point Load Verileri/point_load_musaade.xlsx",
+  "Yük_Yoğunluğu": {
+    "kod": "SLF/Yük_Yoğunluğu/excel_to_kml_load_density.py",
+    "sonuclar_kml": "sonuclar/SLF Sonuçları/5.Yük Tahmini/çıktı/SONUCLAR_Yük_Yoğunluğu.kml",
+    "sonuclar_xlsx": "sonuclar/SLF Sonuçları/5.Yük Tahmini/çıktı/SONUCLAR.xlsx"
+  },
+  "ODTR": {
+    "Sonuçlar_klasör": "sonuclar/Optimal DTR Sonuçları",
+    "INPUT_Trafo_klasör": "imar_analizi_sonuclari/imar_planlari/hucresel_dtr_verileri",
+    "INPUT_Yük_klasör": "sonuclar/SLF Sonuçları",
+    "PYTHON_klasör": "Optimal DTR",
+    "PYTHON_dosya": "Optimal DTR\\SuperHucreAlgoritma12.py"
+  }
 }

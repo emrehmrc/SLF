@@ -361,5 +361,5 @@ namespace SLF
                    MessageBox.Show("İşlem iptal edildi.");
                }
            }
-       }*/
+       }
 }

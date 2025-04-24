@@ -2932,8 +2932,20 @@ namespace SLF
 
                     DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
                     DataRow updatedRow = dataTable.Rows.Cast<DataRow>().FirstOrDefault(r => r["id"].ToString() == cellId);
+                    if (updatedRow != null)
+                    {
+                        Console.WriteLine($"Cell {cellId}: AC (Home): {updatedRow["AC (Home)_count"]}, " +
+                                          $"AC (Work): {updatedRow["AC (Work)_count"]}, " +
+                                          $"AC (Public): {updatedRow["AC (Public)_count"]}, " +
+                                          $"Fast DC: {updatedRow["Fast DC_count"]}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"No row found for Cell {cellId} in DataTable.");
+                    }
 
                     await HaritaUzerindeSimulasyonGosterimi(dataTable);
+                    Console.WriteLine("HaritaUzerindeSimulasyonGosterimi completed.");
                 }
             }
         }
@@ -3080,7 +3092,12 @@ namespace SLF
 
             try
             {
-                string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V3\ÇIKTI\evcs_monte_carlo_distribution_kumulatif_0411.xlsx";
+                string filePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.İlçe,
+                    (string)ana_menu_form_objesi.config.EA.ea_klasörü,
+                    (string)ana_menu_form_objesi.config.EA.cikti_dosyasi);
                 DataTable simulationData;
                 
                 try
@@ -3203,7 +3220,7 @@ namespace SLF
             {
                 string pythonScriptPath = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.program_dosyaları_path,
                     (string)ana_menu_form_objesi.config.EA.program_dosyası_klasörü,
                     (string)ana_menu_form_objesi.config.EA.ea_python_dosyası);
 
@@ -3534,29 +3551,35 @@ namespace SLF
             // Şehir ve hız seçimine göre dosya yolunu ayarla
             string filePath = "";
 
-            if (SelectedCity == "İzmir" && SelectedSpeed == "Hızlı")
+            if (SelectedSpeed == "Hızlı")
             {
-                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Yüksek.xlsx";
+                filePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.İlçe,
+                    (string)ana_menu_form_objesi.config.EA.ea_klasörü,
+                    (string)ana_menu_form_objesi.config.EA.senaryo_klasörü,
+                    (string)ana_menu_form_objesi.config.EA.senaryo_yuksek);
             }
-            else if (SelectedCity == "İzmir" && SelectedSpeed == "Yavaş")
+            else if (SelectedSpeed == "Yavaş")
             {
-                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_Düşük.xlsx";
+                filePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.İlçe,
+                    (string)ana_menu_form_objesi.config.EA.ea_klasörü,
+                    (string)ana_menu_form_objesi.config.EA.senaryo_klasörü,
+                    (string)ana_menu_form_objesi.config.EA.senaryo_dusuk);
             }
-            else if (SelectedCity == "İzmir" && SelectedSpeed == "Varsayılan")
+            else if (SelectedSpeed == "Varsayılan")
             {
-                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\EV\İzmir\evcs_monte_carlo_distribution_2024_2030_İzmir_baz.xlsx";
-            }
-            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Hızlı")
-            {
-                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Yüksek.xlsx";
-            }
-            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Yavaş")
-            {
-                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_Esk_Düşük.xlsx";
-            }
-            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Varsayılan")
-            {
-                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\EV\Esk\evcs_monte_carlo_distribution_2024_2030_esk_baz.xlsx";
+                filePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.İlçe,
+                    (string)ana_menu_form_objesi.config.EA.ea_klasörü,
+                    (string)ana_menu_form_objesi.config.EA.senaryo_klasörü,
+                    (string)ana_menu_form_objesi.config.EA.senaryo_baz);
             }
             else
             {
@@ -3585,25 +3608,6 @@ namespace SLF
 
                     // Load the DataTable
                     veriMonteCarlo = excelService.LoadWorksheetIntoDataTable(worksheet);
-
-                    // Filter DataTable based on SelectedDistrict and its ID
-                    if (SelectedDistrict != null)
-                    {
-                        if (districtIdMap.TryGetValue(SelectedDistrict, out string districtId))
-                        {
-                            var filteredRows = veriMonteCarlo.AsEnumerable()
-                                .Where(row => row.Field<string>("ilce") == districtId)
-                                .CopyToDataTable();
-                            veriMonteCarlo = filteredRows; // Update with filtered data
-                        }
-                        else
-                        {
-                            MessageBox.Show($"No ID mapping found for district: {SelectedDistrict}. No data will be displayed.",
-                                "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            veriMonteCarlo.Clear(); // Clear data to prevent displaying all districts
-                            return; // Exit the method
-                        }
-                    }
                 }
 
                 // Veri başarıyla yüklendiğinde bir bildirim gösterin
@@ -3940,41 +3944,6 @@ namespace SLF
                 }
             }
         }
-        private async void gMapControl_DEK_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
-        {
-            OnMapClickEventi(pointClick, e, markerOverlay_DEK, ref polygonPoints_DEK,
-                ref polygonOverlay_DEK, Mesafe_Dek, mesafe_metre_DeK);
-
-            if (isAddingDekPoint)
-            {
-                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green)
-                {
-                    ToolTipText = "Yeni DEK Noktası"
-                };
-                markerOverlay_DEK.Markers.Add(marker);
-
-                NoktaVeri noktaVeri_marker = new NoktaVeri
-                {
-                    Enlem = Math.Round(pointClick.Lat, 4),
-                    Boylam = Math.Round(pointClick.Lng, 4)
-                };
-
-                using (DEKCenterPopupForm popupForm = new DEKCenterPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker, slfEndYear, ana_menu_form_objesi))
-                {
-                    if (popupForm.ShowDialog() == DialogResult.OK)
-                    {
-                        await dekHaritayaVeriYukleAsync();
-                    }
-                    else if (popupForm.OperationCancelled)
-                    {
-                        markerOverlay_DEK.Markers.Remove(marker);
-                    }
-                }
-
-                isAddingDekPoint = false;
-                return;
-            }
-        }
 
         private async void gMapControl_DEK_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
@@ -4025,10 +3994,21 @@ namespace SLF
             {
                 if (popupForm.ShowDialog() == DialogResult.OK)
                 {
+                    Console.WriteLine("Popup form closed with OK. Updating data...");
                     DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
                     DataRow updatedRow = dataTable.Rows.Cast<DataRow>().FirstOrDefault(r => r["id"].ToString() == cellId);
+                    if (updatedRow != null)
+                    {
+                        Console.WriteLine($"Cell {cellId}: ");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"No row found for Cell {cellId} in DataTable.");
+                    }
 
+                    Console.WriteLine("Calling HaritaUzerindeSimulasyonGosterimi...");
                     await HaritaUzerindeDEKSimulasyonGosterimi(dataTable);
+                    Console.WriteLine("HaritaUzerindeSimulasyonGosterimi completed.");
                 }
             }
         }
@@ -4060,34 +4040,40 @@ namespace SLF
             // Şehir ve hız seçimine göre dosya yolunu ayarla
             string filePath = "";
 
-            if (SelectedCity == "İzmir" && SelectedSpeed == "Hızlı")
+            if (SelectedSpeed == "Hızlı")
             {
-                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\DEK\İzmir\dek_distribution_2024_2030_İzmir_yüksek.xlsx";
+                filePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.İlçe,
+                    (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
+                    (string)ana_menu_form_objesi.config.DEK.senaryo_klasörü,
+                    (string)ana_menu_form_objesi.config.DEK.senaryo_yuksek);
             }
-            else if (SelectedCity == "İzmir" && SelectedSpeed == "Yavaş")
+            else if (SelectedSpeed == "Yavaş")
             {
-                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\DEK\İzmir\dek_distribution_2024_2030_İzmir_düşük.xlsx";
+                filePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.İlçe,
+                    (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
+                    (string)ana_menu_form_objesi.config.DEK.senaryo_klasörü,
+                    (string)ana_menu_form_objesi.config.DEK.senaryo_dusuk);
             }
-            else if (SelectedCity == "İzmir" && SelectedSpeed == "varsayılan")
+            else if (SelectedSpeed == "Varsayılan")
             {
-                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\DEK\İzmir\dek_distribution_2024_2030_3_İzmir_baz.xlsx";
-            }
-            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Hızlı")
-            {
-                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_yüksek.xlsx";
-            }
-            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "Yavaş")
-            {
-                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_düşük.xlsx";
-            }
-            else if (SelectedCity == "Eskişehir" && SelectedSpeed == "varsayılan")
-            {
-                filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\EA-DEK\senaryolar\DEK\Esk\dek_distribution_2024_2030_esk_baz.xlsx";
+                filePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.İlçe,
+                    (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
+                    (string)ana_menu_form_objesi.config.DEK.senaryo_klasörü,
+                    (string)ana_menu_form_objesi.config.DEK.senaryo_baz);
             }
             else
             {
                 MessageBox.Show("Lütfen geçerli bir senaryo seçiniz.");
-                return; // Geçerli bir şehir veya hız seçilmediyse işlemi sonlandır
+                return;
             }
 
             DataTable dek_veri;
@@ -4113,25 +4099,6 @@ namespace SLF
 
                     // Load the DataTable
                     dek_veri = excelService.LoadWorksheetIntoDataTable(worksheet);
-
-                    // Filter DataTable based on SelectedDistrict and its ID
-                    if (SelectedDistrict != null)
-                    {
-                        if (districtIdMap.TryGetValue(SelectedDistrict, out string districtId))
-                        {
-                            var filteredRows = dek_veri.AsEnumerable()
-                                .Where(row => row.Field<string>("ilce") == districtId)
-                                .CopyToDataTable();
-                            dek_veri = filteredRows; // Update with filtered data
-                        }
-                        else
-                        {
-                            MessageBox.Show($"No ID mapping found for district: {SelectedDistrict}. No data will be displayed.",
-                                "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            dek_veri.Clear(); // Clear data to prevent displaying all districts
-                            return; // Exit the method
-                        }
-                    }
                 }
 
                 // Veri başarıyla yüklendiğinde bir bildirim gösterin
@@ -6368,21 +6335,6 @@ namespace SLF
                 (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
                 (string)ana_menu_form_objesi.config.DEK.cikti_dosyasi);
 
-            string inputFilePath = Path.Combine(userRootPath,
-                (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                (string)ana_menu_form_objesi.config.İl,
-                (string)ana_menu_form_objesi.config.İlçe,
-                (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
-                (string)ana_menu_form_objesi.config.DEK.girdi_dosyası);
-
-            string outputFilePath = Path.Combine(userRootPath,
-                (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                (string)ana_menu_form_objesi.config.İl,
-                (string)ana_menu_form_objesi.config.İlçe,
-                (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
-                (string)ana_menu_form_objesi.config.DEK.cikti_dosyasi);
-
-
             methodFormObjesi.SaveConfigToFile();
             try
             {
@@ -6441,7 +6393,7 @@ namespace SLF
             {
                 string pythonScriptPath = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.program_dosyaları_path,
                     (string)ana_menu_form_objesi.config.DEK.program_dosyası_klasörü,
                     (string)ana_menu_form_objesi.config.DEK.dek_python_dosyası);
 
@@ -6496,7 +6448,7 @@ namespace SLF
             DEKSimButton.Enabled = false;
             try
             {
-                string filePath = Path.Combine(userRootPath,
+                string filePath = Path.Combine(ana_menu_form_objesi.userRootPath,
              (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
              (string)ana_menu_form_objesi.config.İl,
              (string)ana_menu_form_objesi.config.İlçe,
