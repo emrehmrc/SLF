@@ -25,6 +25,7 @@ using System.Security.Cryptography;
 using DocumentFormat.OpenXml.Office2021.DocumentTasks;
 using Task = System.Threading.Tasks.Task;
 using OfficeOpenXml;
+using System.Web;
 
 
 namespace SLF.Optimal_DTR
@@ -81,6 +82,12 @@ namespace SLF.Optimal_DTR
 
         string il;
 
+        string ilce;
+
+        string İlkYıl;
+
+        string SonYıl;
+
         public DTR_Arayuz()
         {
             InitializeComponent();
@@ -113,43 +120,13 @@ namespace SLF.Optimal_DTR
 
             İmarVeriYolu = Path.Combine(İlİlceYol, config["proje_dosyası"], config["ODTR:INPUT_Trafo_klasör"]);
          
-            il = config["İl"]; 
+            il = config["İl"];
 
-            var configODTR = new
-            {
-                FilePaths = new
-                {
+            ilce = config["İlçe"];
 
-                    İlYol = İlYol,
+            İlkYıl = config["DEK:baslangıc_yılı"];
 
-                    İlİlceYol = İlİlceYol,
-
-                    SonucYolu = SonucYolu,
-
-                    PythonFilePath = PythonFilePath,
-
-                    YükVeriYolu = YükVeriYolu,
-
-                    İmarVeriYolu = İmarVeriYolu,
-
-                },
-
-                Degiskenler = new
-                {
-                    İl = config["İl"],
-                    İlçe = config["İlçe"],
-                    İlkYıl = config["DEK:baslangıc_yılı"],
-                    SonYıl = config["DEK:bitis_yılı"],
-
-                }
-            };
-
-            ODTRJson = Path.Combine(PythonFilePath, "ODTR.json");
-            // JSON formatında serileştirme
-            string json = JsonConvert.SerializeObject(configODTR, Formatting.Indented);
-
-            // JSON dosyasını yazma
-            File.WriteAllText(ODTRJson, json);
+            SonYıl = config["DEK:bitis_yılı"];          
 
             Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
                 {
@@ -332,9 +309,9 @@ namespace SLF.Optimal_DTR
 
         private bool CalismaYoluKontrol()
         {
-            TuketimDosyaAdi = "SONUCLAR.xlsx";
-            TrafoDosyaAdi = "Trafo.xlsx";
-            TrafoAlanDosyaAdi = "TrafoAlan.xlsx";
+            TuketimDosyaAdi = "SONUCLAR2.xlsx";
+            TrafoDosyaAdi = $"trafo_merkez_hucre_{il}_{ilce}.xlsx";
+            TrafoAlanDosyaAdi = $"trafo_rezerv_alanlar_{il.ToLower()}.xlsx";
 
             //string path = PathService.CurrentWorkingFolder;
             //string imar_path = PathService.ImarAnaliziPath; // 
@@ -856,6 +833,48 @@ namespace SLF.Optimal_DTR
 
         }
 
+        private void ODTRconfig()
+        {
+            var configODTR = new
+            {
+                FilePaths = new
+                {
+
+                    İlYol = İlYol,
+
+                    İlİlceYol = İlİlceYol,
+
+                    SonucYolu = SonucYolu,
+
+                    PythonFilePath = PythonFilePath,
+
+                    YükVeriYolu = YükVeriYolu,
+
+                    İmarVeriYolu = İmarVeriYolu,
+
+                },
+
+                Degiskenler = new
+                {
+                    İl = il,
+                    İlçe = ilce,
+                    İlkYıl = İlkYıl,
+                    SonYıl = SonYıl,
+                    TuketimDosyaAdi = TuketimDosyaAdi,
+                    TrafoDosyaAdi = TrafoDosyaAdi,
+                    TrafoAlanDosyaAdi = TrafoAlanDosyaAdi,
+
+                }
+            };
+
+            ODTRJson = Path.Combine(PythonFilePath, "ODTR.json");
+            // JSON formatında serileştirme
+            string json = JsonConvert.SerializeObject(configODTR, Formatting.Indented);
+
+            // JSON dosyasını yazma
+            File.WriteAllText(ODTRJson, json);
+        }
+
         public async void button2_Click(object sender, EventArgs e)
         {
 
@@ -880,6 +899,7 @@ namespace SLF.Optimal_DTR
             {
                 if (islemeDevam)
                 {
+                    await Task.Run(() => ODTRconfig());
 
                     //await PythonScriptCalistir(tuketim_path);
                     await PythonScriptCalistir(python_path, ODTRJson);

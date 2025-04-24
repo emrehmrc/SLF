@@ -133,6 +133,7 @@
             this.panel7.Name = "panel7";
             this.panel7.Size = new System.Drawing.Size(212, 566);
             this.panel7.TabIndex = 4;
+            this.panel7.Paint += new System.Windows.Forms.PaintEventHandler(this.panel7_Paint);
             // 
             // label1
             // 

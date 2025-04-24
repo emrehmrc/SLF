@@ -668,6 +668,8 @@ namespace SLF.RaporlamaDosyası
             // Örnek DataTable oluşturma
             string gifPath = Path.Combine(PythonFilePath, "l1.gif");
 
+            string filePath = null;
+
             PictureBox aktifGif = ShowLoadingGifNextToButton(ExcelDownloadButton, panel7, gifPath);
 
             await Task.Delay(1);         // animasyonun başlama şansı olsun
@@ -682,38 +684,40 @@ namespace SLF.RaporlamaDosyası
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                string filePath = saveFileDialog.FileName;
+                filePath = saveFileDialog.FileName;
 
-                try
+            }
+            try
+            {
+                // EPPlus kullanarak DataTable'ı Excel dosyasına kaydet
+                //ExportDataTableToExcel(currentDt, filePath);
+                await Task.Run(() =>
                 {
-                    // EPPlus kullanarak DataTable'ı Excel dosyasına kaydet
-                    //ExportDataTableToExcel(currentDt, filePath);
-                    await Task.Run(() =>
-                    {
-                        ExportExcelFile(filePath, currentDt, KullanilanModul);
-                    });
-                    
+                    ExportExcelFile(filePath, currentDt, KullanilanModul);
+                });
+                   
+                MessageBox.Show("Excel dosyası başarıyla kaydedildi!", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                }
+            }
 
-                catch 
-                {
-                    MessageBox.Show(e.ToString());
-                }
+            catch 
+            {
+                MessageBox.Show(e.ToString());
+            }
 
-                finally
-                {
-                    // ✅ LOADING ANİMASYONUNU KALDIR
-                    panel7.Controls.Remove(aktifGif);
-                    aktifGif.Dispose();
-                }
+            finally
+            {
+                // ✅ LOADING ANİMASYONUNU KALDIR
+                panel7.Controls.Remove(aktifGif);
+                aktifGif.Dispose();
+            }
 
 
 
             }
 
             
-        }
+        
 
         private void ExportDataTableToExcel(DataTable dt, string filePath)
         {
@@ -771,7 +775,8 @@ namespace SLF.RaporlamaDosyası
                     FileInfo file = new FileInfo(filePath);
                     package.Workbook.CalcMode = ExcelCalcMode.Automatic;
                     package.SaveAs(file);
-                    MessageBox.Show("Dosya başarıyla kaydedildi.", "Dosya Kaydedildi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    
+                    //MessageBox.Show("Dosya başarıyla kaydedildi.", "Dosya Kaydedildi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (InvalidOperationException)
                 {
@@ -786,18 +791,8 @@ namespace SLF.RaporlamaDosyası
             }
         }
 
-        public void ExportDataTableToKML(DataTable dt)
-        {
-            // SaveFileDialog ile kullanıcıdan dosya yolu alalım
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "KML Files|*.kml";
-            saveFileDialog.Title = "Save KML File";
-
-            // Kullanıcı bir dosya yolu seçerse
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                string filePath = saveFileDialog.FileName; // Seçilen dosya yolu
-
+        public void ExportDataTableToKML(DataTable dt, string filePath)
+        {                     
                 // KML belgesi oluşturma
                 XmlDocument xmlDoc = new XmlDocument();
 
@@ -850,7 +845,6 @@ namespace SLF.RaporlamaDosyası
                 }
 
             }
-        }
 
         private async void button5_Click(object sender, EventArgs e)
         {
@@ -863,9 +857,22 @@ namespace SLF.RaporlamaDosyası
             await Task.Delay(1);         // animasyonun başlama şansı olsun
             Application.DoEvents();
 
-            await Task.Run(() =>
+            // SaveFileDialog ile kullanıcıdan dosya yolu alalım
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "KML Files|*.kml";
+            saveFileDialog.Title = "Save KML File";
+
+            string filePath = null;
+
+            // Kullanıcı bir dosya yolu seçerse
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                ExportDataTableToKML(currentDt);
+                filePath = saveFileDialog.FileName; // Seçilen dosya yolu
+            }
+
+                await Task.Run(() =>
+            {
+                ExportDataTableToKML(currentDt, filePath);
             });
 
             // ✅ LOADING ANİMASYONUNU KALDIR
@@ -1020,7 +1027,7 @@ namespace SLF.RaporlamaDosyası
                 {
                     FileName = $"{PythonPath}", // Python'ın yüklü olduğu path
                     //Arguments = $"{PythonFilePath} \"{inputpath}\"",
-                    Arguments = $"\"{python_path}\" \"{inputpath}\"",
+                    Arguments = $"\"{python_path}\" \"{inputpath}\"  \"{SonucYolu}\"",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -1249,7 +1256,38 @@ namespace SLF.RaporlamaDosyası
             return loadingGif; // sonradan kaldırmak için referans döndür
         }
 
-   
+        static void Arsivleme(string arananDesen)
+        {
+            string kaynakKlasor = @"C:\Dosyalar\Gelen";
+            string hedefKlasor = @"C:\Dosyalar\Yedek";
+            //string arananDesen = "rapor"; // Dosya adında aranacak ifade
+
+            if (!Directory.Exists(hedefKlasor))
+            {
+                Directory.CreateDirectory(hedefKlasor);
+            }
+
+            string[] dosyalar = Directory.GetFiles(kaynakKlasor);
+
+            foreach (string dosya in dosyalar)
+            {
+                string dosyaAdi = Path.GetFileName(dosya);
+
+                if (dosyaAdi.IndexOf(arananDesen, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    string hedefYol = Path.Combine(hedefKlasor, dosyaAdi);
+                    File.Copy(dosya, hedefYol, overwrite: true);
+                    Console.WriteLine($"Kopyalandı: {dosyaAdi}");
+                }
+            }
+
+            Console.WriteLine("İşlem tamamlandı.");
+        }
+
+        private void panel7_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }
 
