@@ -1245,12 +1245,7 @@ namespace SLF
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------ EA MODÜLÜ DEĞİŞKENLER ------------------------------------------- //
 
-        private readonly Dictionary<string, List<string>> cityDistricts = new Dictionary<string, List<string>>
-        {
-            { "İzmir", new List<string> {/* "Aliağa", "Balçova", "Bayındır", "Bayraklı", "Bergama", "Beydağ", "Bornova", "Buca", "Çeşme", */ "Çiğli", /*"Dikili", "Foça", "Gaziemir", "Güzelbahçe", "Karabağlar", "Karaburun", */"Karşıyaka",/* "Kemalpaşa", "Kınık", "Kiraz", "Konak", "Menderes", "Menemen", "Narlıdere", "Ödemiş", "Seferihisar", "Selçuk", "Tire", "Torbalı"*/ } },
-            { "Eskişehir", new List<string> { /*"Alpu", "Beylikova", "Çifteler", "Günyüzü", "Han", "İnönü", "Mahmudiye", "Mihalgazi", "Mihalıççık", "Odunpazarı", "Sarıcakaya", "Seyitgazi", "Sivrihisar", */ "Tepebaşı" } }
-        };
-                private readonly Dictionary<string, string> districtIdMap = new Dictionary<string, string>
+        private readonly Dictionary<string, string> districtIdMap = new Dictionary<string, string>
         {
             { "Çiğli", "1" },
             { "Karşıyaka", "2" },
@@ -1284,13 +1279,6 @@ namespace SLF
             }
             comboBox_ea_yıl_secimi.DataSource = yearList; // Yıl seçimi için ComboBox1
             comboBox_DEK_Yıl.DataSource = yearList; // DEK yılı seçimi için ComboBox3
-                                                    // Şehir isimlerini ComboBox2'ye ekleyin
-/*            comboBox_DEK_il.Items.Clear(); // dek
-            comboBox_ea_il_secimi.Items.Clear();   // ea 
-            comboBox_ea_il_secimi.Items.Add("İzmir");
-            comboBox_ea_il_secimi.Items.Add("Eskişehir");
-            comboBox_DEK_il.Items.Add("İzmir");
-            comboBox_DEK_il.Items.Add("Eskişehir");*/
 
         }
 
@@ -6387,7 +6375,7 @@ namespace SLF
             {
                 string pythonScriptPath = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.program_dosyaları_path,
                     (string)ana_menu_form_objesi.config.DEK.program_dosyası_klasörü,
                     (string)ana_menu_form_objesi.config.DEK.dek_python_dosyası);
 
@@ -7043,7 +7031,7 @@ namespace SLF
             // Get the input strings and replace forward slashes with backslashes
             ELFrScriptModelPath = Path.Combine(ana_menu_form_objesi.userRootPath,
                 (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                (string)ana_menu_form_objesi.config.İl,
+                (string)ana_menu_form_objesi.config.program_dosyaları_path,
                (string)ana_menu_form_objesi.config.ELF.Rscript_Yolu_Model).Replace('/', '\\');
 
             var processInfo = new ProcessStartInfo
@@ -7081,12 +7069,6 @@ namespace SLF
                 if (!string.IsNullOrEmpty(outputData))
                 {
                     ELFResultsFilePath = outputData.Trim(); // Capture the file path
-                }
-
-                // Log any errors
-                if (!string.IsNullOrEmpty(errorData))
-                {
-                    Console.WriteLine("HATA: " + errorData);
                 }
 
                 // Deserialize on the UI thread since it might be used by UI components
@@ -7145,11 +7127,13 @@ namespace SLF
 
                 // Start a timer to reinforce the wait cursor every 500ms
                 cursorTimer = new System.Windows.Forms.Timer { Interval = 500 };
+
                 cursorTimer.Tick += (s, args) =>
                 {
                     this.Cursor = Cursors.WaitCursor;
                     SetFormCursors(this, Cursors.WaitCursor);
                 };
+
                 cursorTimer.Start();
 
                 ELFSenaryolarFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
@@ -7550,6 +7534,139 @@ namespace SLF
             if (cbs.GetActiveGMapControl() == gMapControl_imar)
             {
                 ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar, rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
+            }
+        }
+
+        private void buton_imar_tahmini_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+                // Construct the path to the R script
+                string imar_tahmini_path = Path.Combine(ana_menu_form_objesi.userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.program_dosyaları_path,
+                    (string)ana_menu_form_objesi.config.SLF.imar_oranı_tahmini_kodu).Replace('/', '\\');
+
+
+                // Run Rscript.exe directly with quoted paths
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "python",
+                        Arguments = $"\"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+
+                process.Start();
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+
+                // Show result
+                if (process.ExitCode != 0)
+                    MessageBox.Show($"Bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
+                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                else
+                    MessageBox.Show($"Ufuk yılları için imar tahminleri oluşturuldu!",
+                        "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Bir hata meydana geldi: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+            }
+        }
+
+        private void buton_abone_sayısı_tahmini_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Construct the path to the R script
+                string abone_sayısı_tahmini_path = Path.Combine(ana_menu_form_objesi.userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.program_dosyaları_path,
+                    (string)ana_menu_form_objesi.config.SLF.abone_sayısı_tahmini_kodu).Replace('/', '\\');
+
+
+                // Run Rscript.exe directly with quoted paths
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "python",
+                        Arguments = $"\"{abone_sayısı_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+
+                process.Start();
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+
+                // Show result
+                if (process.ExitCode != 0)
+                    MessageBox.Show($"Bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
+                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                else
+                    MessageBox.Show($"Ufuk yılları için abone sayısı tahminleri oluşturuldu!",
+                        "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Bir hata meydana geldi: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+            }
+        }
+
+        private void buton_SLF_tahmini_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Construct the path to the R script
+                string slf_tahmini_path = Path.Combine(ana_menu_form_objesi.userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.program_dosyaları_path,
+                    (string)ana_menu_form_objesi.config.SLF.SLF_yük_tahmini_kodu).Replace('/', '\\');
+
+
+                // Run Rscript.exe directly with quoted paths
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "python",
+                        Arguments = $"\"{slf_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+
+                process.Start();
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+
+                // Show result
+                if (process.ExitCode != 0)
+                    MessageBox.Show($"Bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
+                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                else
+                    MessageBox.Show($"Ufuk yılları için abone sayısı tahminleri oluşturuldu!",
+                        "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Bir hata meydana geldi: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
             }
         }
 

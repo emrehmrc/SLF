@@ -607,15 +607,11 @@ namespace SLF
         {
             try
             {
-
-                // Get the input strings and replace forward slashes with backslashes
-                string anaKlasorYolu = ((string)modülFormu.ana_menu_form_objesi.config.Ana_Klasör_Yolu).Replace('/', '\\');
-                string il = ((string)modülFormu.ana_menu_form_objesi.config.İl).Replace('/', '\\');
-                string rScriptYolu = ((string)modülFormu.ana_menu_form_objesi.config.ELF.Rscript_Yolu_Senaryolar).Replace('/', '\\');
-
                 // Construct the path to the R script
-                string rScriptPath = Path.Combine(modülFormu.ana_menu_form_objesi.userRootPath, 
-                    anaKlasorYolu, il, rScriptYolu);
+                string rScriptPath = Path.Combine(modülFormu.ana_menu_form_objesi.userRootPath,
+                    (string)modülFormu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)modülFormu.ana_menu_form_objesi.config.program_dosyaları_path,
+                    (string)modülFormu.ana_menu_form_objesi.config.ELF.Rscript_Yolu_Senaryolar).Replace('/', '\\');
 
                 // Run Rscript.exe directly with quoted paths
                 var process = new Process
