@@ -24,7 +24,6 @@ using Newtonsoft.Json;
 
 namespace SLF
 {
-
     public partial class ModülFormu : Form
     {
         private static ModülFormu instance;
@@ -7178,7 +7177,6 @@ namespace SLF
         {
             if (!File.Exists(resultsFilePath))
             {
-                // Use Invoke to show the MessageBox on the UI thread
                 this.Invoke((MethodInvoker)delegate
                 {
                     MessageBox.Show("Sonuç dosyası bulunamadı.");
@@ -7186,20 +7184,44 @@ namespace SLF
                 return;
             }
 
-            using (var package = new ExcelPackage(new FileInfo(resultsFilePath)))
+            try
             {
-                // Load the corresponding results into each DataGridView
-                // Use Invoke to update the UI on the UI thread
+                using (var package = new ExcelPackage(new FileInfo(resultsFilePath)))
+                {
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        LoadWorksheetToDataGridView(package.Workbook.Worksheets[0], ELFMinimumResultsTable);
+                        LoadWorksheetToDataGridView(package.Workbook.Worksheets[1], ELFDüşükResultsTable);
+                        LoadWorksheetToDataGridView(package.Workbook.Worksheets[2], ELFBazResultsTable);
+                        LoadWorksheetToDataGridView(package.Workbook.Worksheets[3], ELFYüksekResultsTable);
+                        LoadWorksheetToDataGridView(package.Workbook.Worksheets[4], ELFMaksimumResultsTable);
+
+                        SenaryoModuleTabControl.SelectedTab = EkonometrikSonuclarTabPage;
+                    });
+                }
+            }
+            catch (System.IO.IOException ex) when (ex.Message.Contains("başka bir işlem tarafından kullanıldığından"))
+            {
                 this.Invoke((MethodInvoker)delegate
                 {
-                    LoadWorksheetToDataGridView(package.Workbook.Worksheets[0], ELFMinimumResultsTable);
-                    LoadWorksheetToDataGridView(package.Workbook.Worksheets[1], ELFDüşükResultsTable);
-                    LoadWorksheetToDataGridView(package.Workbook.Worksheets[2], ELFBazResultsTable);
-                    LoadWorksheetToDataGridView(package.Workbook.Worksheets[3], ELFYüksekResultsTable);
-                    LoadWorksheetToDataGridView(package.Workbook.Worksheets[4], ELFMaksimumResultsTable);
-
-                    // Switch to the results tab after loading all the data
-                    SenaryoModuleTabControl.SelectedTab = EkonometrikSonuclarTabPage;
+                    MessageBox.Show(
+                        "Excel dosyası şu anda başka bir programda açık. Lütfen dosyayı kapatıp tekrar deneyin.",
+                        "Dosya Erişim Hatası",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+                });
+            }
+            catch (Exception ex)
+            {
+                this.Invoke((MethodInvoker)delegate
+                {
+                    MessageBox.Show(
+                        $"Dosya yüklenirken bir hata oluştu: {ex.Message}",
+                        "Hata",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error
+                    );
                 });
             }
         }
@@ -7208,7 +7230,6 @@ namespace SLF
         {
             if(SenaryoModuleTabControl.SelectedTab == EkonometrikSonuclarTabPage)
             {
-                EkonometrikSenaryoElementsPanel.Visible = false;
                 label_graphics.Visible = false;
                 comboBox_ekonometrik.Visible = false;
 
@@ -7220,13 +7241,15 @@ namespace SLF
                     (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_name).Replace('/', '\\');
                 LoadEkonometrikResults(results_path);
 
-
+                buton_ELF_tablo_sec.Visible = true;
                 label_s_ELF.Visible = true;
                 textBox_sonuc_ELF.Visible = true;
                 textBox_sonuc_ELF.Text = (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_name;
             }
             else if (SenaryoModuleTabControl.SelectedTab == EkonometrikGrafiklerTabPage)
             {
+                buton_ELF_tablo_sec.Visible = false;
+
                 EkonometrikSenaryoElementsPanel.Visible = true;
                 label_graphics.Visible = true;
                 PopulateEkonometrikComboBox();
@@ -7239,6 +7262,7 @@ namespace SLF
 
             else
             {
+                buton_ELF_tablo_sec.Visible = false;
                 EkonometrikSenaryoElementsPanel.Visible = true;
                 label_graphics.Visible = false;
                 comboBox_ekonometrik.Visible = false;
@@ -7669,6 +7693,66 @@ namespace SLF
                 MessageBox.Show($"Bir hata meydana geldi: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
             }
         }
+
+        private void buton_ELF_tablo_sec_Click(object sender, EventArgs e)
+        {
+            // Show the confirmation dialog for navigating to the home page
+            DialogResult result = MessageBox.Show("Şu an seçili olan sonuçlar: " + 
+                ELFSonuçlarTabControls.SelectedTab.Text + ". ELF sonucu olarak bu sonuçları onaylamak istiyor musunuz?",
+                "ELF Sonuçları Onay",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                try
+                {
+                    this.Cursor = Cursors.WaitCursor;
+
+                    // Construct the path to the R script
+                    string rScriptPath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.program_dosyaları_path,
+                        (string)ana_menu_form_objesi.config.ELF.hor_ver_hesap_kodu).Replace('/', '\\');
+
+                    // Run Rscript.exe directly with quoted paths
+                    var process = new Process
+                    {
+                        StartInfo = new ProcessStartInfo
+                        {
+                            FileName = "Rscript.exe",
+                            Arguments = $"--vanilla \"{rScriptPath}\" \"{ana_menu_form_objesi.config_path}\" \"{ELFSonuçlarTabControls.SelectedIndex + 1}\"",
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        }
+                    };
+
+                    process.Start();
+                    string output = process.StandardOutput.ReadToEnd();
+                    string error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
+
+                    this.Cursor = Cursors.Default;
+
+                    // Show result
+                    if (process.ExitCode != 0)
+                        MessageBox.Show($"R script çalışmasında bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
+                            "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    else
+                        MessageBox.Show($"Yatay ve dikey büyüme rakamları başarıyla oluşturuldu. SLF ile konsolidasyon" +
+                            $" şu ELF sonuçları ile yapılacak: " + ELFSonuçlarTabControls.SelectedTab.Text,
+                            "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Bir hata meydana geldi: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                }
+            }
+        }
+
 
         private void TextBox_KeyPress_NumbersOnly(object sender, KeyPressEventArgs e)
         {

@@ -101,7 +101,6 @@
             this.toolStripMenuItem_tablo.Name = "toolStripMenuItem_tablo";
             this.toolStripMenuItem_tablo.Size = new System.Drawing.Size(214, 26);
             this.toolStripMenuItem_tablo.Text = "Haritada Göster";
-            this.toolStripMenuItem_tablo.Click += new System.EventHandler(this.toolStripMenuItem_tablo_Click);
             // 
             // Tablo_Formu
             // 

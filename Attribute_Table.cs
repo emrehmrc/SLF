@@ -13,6 +13,15 @@ namespace SLF
             InitializeComponent();
             attribute_table = this.vektörel_attribute_table;
             parentForm = parent; // Store the reference to ModülFormu
+            this.toolStripMenuItem_tablo.Click += new System.EventHandler(this.toolStripMenuItem_tablo_Click);
+
+        }
+
+        public Tablo_Formu()
+        {
+            InitializeComponent();
+            attribute_table = this.vektörel_attribute_table;
+            this.toolStripMenuItem_tablo.Click -= new System.EventHandler(this.toolStripMenuItem_tablo_Click);
 
         }
 
