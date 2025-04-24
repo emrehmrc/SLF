@@ -1367,7 +1367,7 @@ namespace SLF
             this.EAStationAddButton.Location = new System.Drawing.Point(28, 202);
             this.EAStationAddButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.EAStationAddButton.Name = "EAStationAddButton";
-            this.EAStationAddButton.Size = new System.Drawing.Size(105, 34);
+            this.EAStationAddButton.Size = new System.Drawing.Size(140, 53);
             this.EAStationAddButton.TabIndex = 49;
             this.EAStationAddButton.Text = "EA Şarj İstasyonu Ekle";
             this.EAStationAddButton.UseVisualStyleBackColor = false;
@@ -2883,8 +2883,9 @@ namespace SLF
             // 
             this.buton_HTML.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buton_HTML.BackgroundImage")));
             this.buton_HTML.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.buton_HTML.Location = new System.Drawing.Point(179, 30);
-            this.buton_HTML.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.buton_HTML.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.buton_HTML.Location = new System.Drawing.Point(239, 37);
+            this.buton_HTML.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buton_HTML.Name = "buton_HTML";
             this.buton_HTML.Size = new System.Drawing.Size(33, 36);
             this.buton_HTML.TabIndex = 74;
@@ -3682,7 +3683,6 @@ namespace SLF
             this.ResumeLayout(false);
 
         }
-
 
         public System.Windows.Forms.TabControl Modül_Tabları;
         private System.Windows.Forms.TabPage tab_girdi;

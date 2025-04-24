@@ -466,12 +466,8 @@ namespace SLF
                 {
                     try
                     {
-
-                        string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-
                         var excelExporter = new ExcelExporter();
-                        excelExporter.UpdateExcelFileFirstSheet(Path.Combine(userRootPath,
+                        excelExporter.UpdateExcelFileFirstSheet(Path.Combine(modülFormu.ana_menu_form_objesi.userRootPath,
                             (string)modülFormu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                                 (string)modülFormu.ana_menu_form_objesi.config.İl,
                                 (string)modülFormu.ana_menu_form_objesi.config.İlçe,
@@ -612,20 +608,14 @@ namespace SLF
             try
             {
 
-                // Get the user's home directory (e.g., C:\Users\ehan0)
-                string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
                 // Get the input strings and replace forward slashes with backslashes
                 string anaKlasorYolu = ((string)modülFormu.ana_menu_form_objesi.config.Ana_Klasör_Yolu).Replace('/', '\\');
                 string il = ((string)modülFormu.ana_menu_form_objesi.config.İl).Replace('/', '\\');
                 string rScriptYolu = ((string)modülFormu.ana_menu_form_objesi.config.ELF.Rscript_Yolu_Senaryolar).Replace('/', '\\');
 
                 // Construct the path to the R script
-                string rScriptPath = Path.Combine(userRootPath, anaKlasorYolu, il, rScriptYolu);
-
-                // Construct the path to the config file
-
-                string configPath = Path.Combine(((string)modülFormu.ana_menu_form_objesi.projectRoot).Replace('/', '\\'), "config.json");
+                string rScriptPath = Path.Combine(modülFormu.ana_menu_form_objesi.userRootPath, 
+                    anaKlasorYolu, il, rScriptYolu);
 
                 // Run Rscript.exe directly with quoted paths
                 var process = new Process
@@ -633,7 +623,7 @@ namespace SLF
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = "Rscript.exe",
-                        Arguments = $"--vanilla \"{rScriptPath}\" \"{configPath}\"",
+                        Arguments = $"--vanilla \"{rScriptPath}\" \"{modülFormu.ana_menu_form_objesi.config_path}\"",
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
                         UseShellExecute = false,

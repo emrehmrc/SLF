@@ -42,10 +42,7 @@ namespace SLF
             isSelecting_YGA = isSelectingYGA;
             isSelecting_Musaade = isSelectingMusaade;
 
-            string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-
-            excelFilePath = Path.Combine(userRootPath,
+            excelFilePath = Path.Combine(modül_formu.ana_menu_form_objesi.userRootPath,
                 (string)modül_formu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                 (string)modül_formu.ana_menu_form_objesi.config.İl,
                 (string)modül_formu.ana_menu_form_objesi.config.İlçe,

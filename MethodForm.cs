@@ -114,7 +114,8 @@ namespace SLF
                 string updatedJson = JsonConvert.SerializeObject(homePageForm.config, Newtonsoft.Json.Formatting.Indented);
 
                 // Write the updated JSON back to the file
-                File.WriteAllText(Path.Combine(homePageForm.projectRoot, "config.json"), updatedJson);
+                File.WriteAllText(homePageForm.config_path, updatedJson);
+      
             }
             catch (Exception ex)
             {

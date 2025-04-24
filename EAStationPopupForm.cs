@@ -1,14 +1,9 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using ClosedXML.Excel;
-using OSGeo.OGR;
 using static SLF.ModülFormu;
 
 namespace SLF
@@ -17,31 +12,22 @@ namespace SLF
     {
         private readonly DataTable dataTable;
         private bool isOperationCancelled = true;
-        public bool OperationCancelled => isOperationCancelled;
 
         // Private field to store NoktaVeri
         private NoktaVeri noktaVeri;
 
         public HomePageForm ana_menu_form_objesi;
-        private MethodForm methodFormObjesi;
-        private BekleForm bekleForm;
-
-        public string userRootPath;
-        public string configPath;
-
-        // Public property to expose NoktaVeri
-        public NoktaVeri NoktaVeri => noktaVeri;
 
         private readonly List<string> acPowers = new List<string> { "11 kW", "22 kW" };
         private static class Constants
         {
             public static readonly Dictionary<string, string> StationTypeToCountColumn = new Dictionary<string, string>
-    {
-        { "AC (Home)_count", "AC (Home)_count" },
-        { "AC (Work)_count", "AC (Work)_count" },
-        { "AC (Public)_count", "AC (Public)_count" },
-        { "Fast DC_count", "Fast DC_count" }
-    };
+            {
+                { "AC (Home)_count", "AC (Home)_count" },
+                { "AC (Work)_count", "AC (Work)_count" },
+                { "AC (Public)_count", "AC (Public)_count" },
+                { "Fast DC_count", "Fast DC_count" }
+            };
 
             public static readonly Dictionary<string, double> StationTypeToLoad = new Dictionary<string, double>
             {
@@ -63,8 +49,10 @@ namespace SLF
         {
             return Constants.StationTypeToLoad.TryGetValue(stationType, out double load) ? load : 0;
         }
+
         private readonly int slfEndYear;
-        public EAStationPopupForm(DataTable existingDataTable, NoktaVeri veri, int slfEndYear, HomePageForm anaMenuForm)
+
+        public EAStationPopupForm(DataTable existingDataTable, NoktaVeri veri, int slfEndYear)
         {
             InitializeComponent();
             dataTable = existingDataTable;
@@ -75,13 +63,6 @@ namespace SLF
             this.slfEndYear = slfEndYear;
 
             ana_menu_form_objesi = new HomePageForm();
-            methodFormObjesi = new MethodForm(ana_menu_form_objesi);
-            this.ana_menu_form_objesi = anaMenuForm;
-            bekleForm = new BekleForm();
-
-            userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            configPath = Path.Combine(((string)ana_menu_form_objesi.projectRoot).Replace('/', '\\'), "config.json");
-
             InitializeDataGridView(veri);
             SetupEventHandlers();
         }
@@ -285,7 +266,7 @@ namespace SLF
                     return;
                 }
 
-                string existingFilePath = Path.Combine(userRootPath,
+                string existingFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
                      (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                      (string)ana_menu_form_objesi.config.İl,
                      (string)ana_menu_form_objesi.config.İlçe,

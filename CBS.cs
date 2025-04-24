@@ -807,14 +807,11 @@ namespace SLF
             return shapefile;
         }
 
-
-        public async Task LoadKmlFile(string filepath, GMapOverlay kmlOverlay,
-            System.Data.DataTable data_table,
-            GMapControl gMapControl)
+        public async Task LoadKmlFile(string filepath, GMapOverlay kmlOverlay, System.Data.DataTable data_table, GMapControl gMapControl)
         {
             if (!File.Exists(filepath))
             {
-                MessageBox.Show("KML dosyası bulunamadı.!");
+                MessageBox.Show("KML dosyası bulunamadı!");
                 return;
             }
 
@@ -823,7 +820,9 @@ namespace SLF
             try
             {
                 XDocument kmlDoc = XDocument.Load(filepath);
+                // Handle namespace: use empty namespace if xmlns is missing, otherwise use specified
                 XNamespace ns = kmlDoc.Root?.Attribute("xmlns")?.Value ?? "";
+                XNamespace gx = "http://www.google.com/kml/ext/2.2"; // For 2nd structure's extended namespace
 
                 if (kmlDoc.Root == null || kmlDoc.Root.Name.LocalName != "kml")
                 {
@@ -831,6 +830,25 @@ namespace SLF
                     return;
                 }
 
+                // Initialize DataTable with base columns
+                if (!data_table.Columns.Contains("Row_No")) data_table.Columns.Add("Row_No");
+                if (!data_table.Columns.Contains("coordinates")) data_table.Columns.Add("coordinates");
+
+                // Pre-process Schema to add SimpleField columns (for 3rd structure)
+                var schema = kmlDoc.Descendants(ns + "Schema").FirstOrDefault();
+                if (schema != null)
+                {
+                    foreach (var simpleField in schema.Elements(ns + "SimpleField"))
+                    {
+                        string fieldName = simpleField.Attribute("name")?.Value;
+                        if (!string.IsNullOrEmpty(fieldName) && !data_table.Columns.Contains(fieldName))
+                        {
+                            data_table.Columns.Add(fieldName);
+                        }
+                    }
+                }
+
+                // Collect all Placemarks recursively
                 var placemarks = new List<XElement>();
                 void CollectPlacemarks(XElement element)
                 {
@@ -850,39 +868,69 @@ namespace SLF
                     return;
                 }
 
-                if (!data_table.Columns.Contains("Row_No"))
-                {
-                    data_table.Columns.Add("Row_No");
-                }
-
-                if (!data_table.Columns.Contains("coordinates"))
-                {
-                    data_table.Columns.Add("coordinates");
-                }
-
                 foreach (var placemark in placemarks)
                 {
                     var row = data_table.NewRow();
+                    row["Row_No"] = row_cnt;
 
+                    // Handle name
+                    var nameElement = placemark.Element(ns + "name");
+                    if (nameElement != null)
+                    {
+                        if (!data_table.Columns.Contains("name")) data_table.Columns.Add("name");
+                        row["name"] = nameElement.Value;
+                    }
+
+                    // Handle description (for 3rd structure)
+                    var descriptionElement = placemark.Element(ns + "description");
+                    if (descriptionElement != null)
+                    {
+                        if (!data_table.Columns.Contains("description")) data_table.Columns.Add("description");
+                        row["description"] = descriptionElement.Value;
+                    }
+
+                    // Handle styleUrl
+                    var styleUrlElement = placemark.Element(ns + "styleUrl");
+                    if (styleUrlElement != null)
+                    {
+                        if (!data_table.Columns.Contains("styleUrl")) data_table.Columns.Add("styleUrl");
+                        row["styleUrl"] = styleUrlElement.Value;
+                    }
+
+                    // Handle ExtendedData (for 1st and 3rd structures)
                     var extendedData = placemark.Element(ns + "ExtendedData");
                     if (extendedData != null)
                     {
+                        // Process <Data> elements (1st structure)
                         foreach (var data in extendedData.Elements(ns + "Data"))
                         {
                             string name = data.Attribute("name")?.Value;
                             string value = data.Element(ns + "value")?.Value;
                             if (!string.IsNullOrEmpty(name))
                             {
-                                if (!data_table.Columns.Contains(name))
+                                if (!data_table.Columns.Contains(name)) data_table.Columns.Add(name);
+                                row[name] = value ?? "";
+                            }
+                        }
+
+                        // Process <SchemaData> and <SimpleData> elements (3rd structure)
+                        var schemaData = extendedData.Element(ns + "SchemaData");
+                        if (schemaData != null)
+                        {
+                            foreach (var simpleData in schemaData.Elements(ns + "SimpleData"))
+                            {
+                                string name = simpleData.Attribute("name")?.Value;
+                                string value = simpleData.Value;
+                                if (!string.IsNullOrEmpty(name))
                                 {
-                                    data_table.Columns.Add(name);
+                                    if (!data_table.Columns.Contains(name)) data_table.Columns.Add(name);
+                                    row[name] = value ?? "";
                                 }
-                                row["Row_No"] = row_cnt;
-                                row[name] = value;
                             }
                         }
                     }
 
+                    // Handle Polygon
                     var polygon = placemark.Element(ns + "Polygon");
                     if (polygon != null)
                     {
@@ -895,17 +943,15 @@ namespace SLF
                                 {
                                     var parts = coord.Split(',');
                                     if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
-                                    {
                                         return $"{Math.Round(lon, 6)},{Math.Round(lat, 6)}";
-                                    }
                                     return null;
                                 })
                                 .Where(c => c != null);
-                            row["Row_No"] = row_cnt;
                             row["coordinates"] = string.Join(" ; ", coords);
                         }
                     }
 
+                    // Handle Point
                     var point = placemark.Element(ns + "Point");
                     if (point != null)
                     {
@@ -916,12 +962,12 @@ namespace SLF
                             if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
                             {
                                 string point_coordinates = $"{Math.Round(lon, 6)} ; {Math.Round(lat, 6)}";
-                                row["Row_No"] = row_cnt;
                                 row["coordinates"] = point_coordinates;
                             }
                         }
                     }
 
+                    // Handle LineString
                     var lineString = placemark.Element(ns + "LineString");
                     if (lineString != null)
                     {
@@ -934,47 +980,21 @@ namespace SLF
                                 {
                                     var parts = coord.Split(',');
                                     if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
-                                    {
                                         return $"{Math.Round(lon, 6)},{Math.Round(lat, 6)}";
-                                    }
                                     return null;
                                 })
                                 .Where(c => c != null);
-                            row["Row_No"] = row_cnt;
                             row["coordinates"] = string.Join(" ; ", coords);
-
                             AddLineStringToOverlay_kml(coordinatesString, kmlOverlay);
                         }
-                    }
-
-                    var nameElement = placemark.Element(ns + "name");
-                    if (nameElement != null)
-                    {
-                        if (!data_table.Columns.Contains("name"))
-                        {
-                            data_table.Columns.Add("name");
-                        }
-                        row["Row_No"] = row_cnt;
-                        row["name"] = nameElement.Value;
-                    }
-
-                    var styleUrlElement = placemark.Element(ns + "styleUrl");
-                    if (styleUrlElement != null)
-                    {
-                        if (!data_table.Columns.Contains("styleUrl"))
-                        {
-                            data_table.Columns.Add("styleUrl");
-                        }
-                        row["Row_No"] = row_cnt;
-                        row["styleUrl"] = styleUrlElement.Value;
                     }
 
                     data_table.Rows.Add(row);
                     row_cnt++;
                 }
 
-                // DataTable tamamen dolduruldu, şimdi renk haritasını oluştur
-                if (imported_filename == "İMAR_SONUÇLAR.kml")
+                // Handle legend for İMAR_SONUÇLAR.kml (relevant for 1st structure)
+                if (Path.GetFileName(filepath) == "İMAR_SONUÇLAR.kml")
                 {
                     var imarTipiValues = data_table.AsEnumerable()
                         .Where(row => row["İmar Tipi"] != DBNull.Value)
@@ -982,78 +1002,82 @@ namespace SLF
                         .Distinct()
                         .ToList();
 
-                    Color[] colors = GenerateDistinguishableColors(imarTipiValues.Count);
-                    currentImarTipiColorMap = new Dictionary<string, Color>();
-                    for (int i = 0; i < imarTipiValues.Count; i++)
+                    if (imarTipiValues.Any())
                     {
-                        currentImarTipiColorMap[imarTipiValues[i]] = colors[i];
-                    }
-
-                    // Legend Panel'ini oluştur veya güncelle
-                    if (modülFormu.imar_legendPanel == null)
-                    {
-                        modülFormu.imar_legendPanel = new Panel
+                        Color[] colors = GenerateDistinguishableColors(imarTipiValues.Count);
+                        currentImarTipiColorMap = new Dictionary<string, Color>();
+                        for (int i = 0; i < imarTipiValues.Count; i++)
                         {
-                            BackColor = Color.White,
-                            BorderStyle = BorderStyle.FixedSingle,
-                            Location = new System.Drawing.Point(gMapControl.Width - 200, 10), // Top-right corner
-                            Size = new Size(190, imarTipiValues.Count * 20 + 30),
-                            Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                            currentImarTipiColorMap[imarTipiValues[i]] = colors[i];
+                        }
+
+                        // Create or update legend panel
+                        if (modülFormu.imar_legendPanel == null)
+                        {
+                            modülFormu.imar_legendPanel = new Panel
+                            {
+                                BackColor = Color.White,
+                                BorderStyle = BorderStyle.FixedSingle,
+                                Location = new System.Drawing.Point(gMapControl.Width - 200, 10),
+                                Size = new Size(190, imarTipiValues.Count * 20 + 30),
+                                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                            };
+                            gMapControl.Controls.Add(modülFormu.imar_legendPanel);
+                            modülFormu.imar_legendPanel.BringToFront();
+                        }
+                        else
+                        {
+                            modülFormu.imar_legendPanel.Size = new Size(190, imarTipiValues.Count * 20 + 30);
+                        }
+
+                        modülFormu.imar_legendPanel.Controls.Clear();
+
+                        System.Windows.Forms.Label titleLabel = new System.Windows.Forms.Label
+                        {
+                            Text = "İmar Tipleri",
+                            Location = new System.Drawing.Point(10, 5),
+                            AutoSize = true
                         };
-                        gMapControl.Controls.Add(modülFormu.imar_legendPanel);
-                        modülFormu.imar_legendPanel.BringToFront();
+                        modülFormu.imar_legendPanel.Controls.Add(titleLabel);
+
+                        int yOffset = 25;
+                        foreach (var kvp in currentImarTipiColorMap)
+                        {
+                            Panel colorBox = new Panel
+                            {
+                                BackColor = kvp.Value,
+                                Location = new System.Drawing.Point(10, yOffset),
+                                Size = new Size(20, 15)
+                            };
+                            System.Windows.Forms.Label imarTipiLabel = new System.Windows.Forms.Label
+                            {
+                                Text = kvp.Key,
+                                Location = new System.Drawing.Point(40, yOffset),
+                                AutoSize = true
+                            };
+                            modülFormu.imar_legendPanel.Controls.Add(colorBox);
+                            modülFormu.imar_legendPanel.Controls.Add(imarTipiLabel);
+                            yOffset += 20;
+                        }
+
+                        modülFormu.imar_legendPanel.Visible = true;
                     }
                     else
                     {
-                        modülFormu.imar_legendPanel.Size = new Size(170, imarTipiValues.Count * 20 + 30);
+                        modülFormu.imar_legendPanel?.Hide();
                     }
-
-                    modülFormu.imar_legendPanel.Controls.Clear();
-
-                    System.Windows.Forms.Label titleLabel = new System.Windows.Forms.Label
-                    {
-                        Text = "İmar Tipleri",
-                        Location = new System.Drawing.Point(10, 5),
-                        AutoSize = true
-                    };
-
-                    modülFormu.imar_legendPanel.Controls.Add(titleLabel);
-
-                    int yOffset = 25;
-                    foreach (var kvp in currentImarTipiColorMap)
-                    {
-                        Panel colorBox = new Panel
-                        {
-                            BackColor = kvp.Value,
-                            Location = new System.Drawing.Point(10, yOffset),
-                            Size = new Size(20, 15)
-                        };
-
-                        System.Windows.Forms.Label imarTipiLabel = new System.Windows.Forms.Label
-                        {
-                            Text = kvp.Key,
-                            Location = new System.Drawing.Point(40, yOffset),
-                            AutoSize = true
-                        };
-
-                        modülFormu.imar_legendPanel.Controls.Add(colorBox);
-                        modülFormu.imar_legendPanel.Controls.Add(imarTipiLabel);
-                        yOffset += 20;
-                    }
-
-                    modülFormu.imar_legendPanel.Visible = true;
                 }
                 else
                 {
                     currentImarTipiColorMap = null;
                     if (modülFormu.imar_legendPanel != null)
-                    {
                         modülFormu.imar_legendPanel.Visible = false;
-                    }
                 }
 
-                foreach (var placemark in placemarks)
+                // Add polygons to overlay
+                for (int i = 0; i < placemarks.Count; i++)
                 {
+                    var placemark = placemarks[i];
                     var polygon = placemark.Element(ns + "Polygon");
                     if (polygon != null)
                     {
@@ -1061,7 +1085,7 @@ namespace SLF
                         if (coordinatesElement != null)
                         {
                             string coordinatesString = coordinatesElement.Value.Trim();
-                            DataRow row = data_table.Rows[row_cnt - placemarks.Count + placemarks.IndexOf(placemark)];
+                            DataRow row = data_table.Rows[row_cnt - placemarks.Count + i];
                             AddPolygonToOverlay_kml(coordinatesString, kmlOverlay, row);
                         }
                     }

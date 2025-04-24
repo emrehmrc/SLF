@@ -21,7 +21,7 @@ using SLF.Services;
 using System.Globalization;
 using Newtonsoft.Json;
 
-
+ 
 namespace SLF
 {
 
@@ -49,9 +49,6 @@ namespace SLF
         private MethodForm methodFormObjesi;
         private BekleForm bekleForm;
 
-        public string userRootPath;
-        public string configPath;
-
         public Panel imar_legendPanel;
 
         public bool isImported;
@@ -65,9 +62,6 @@ namespace SLF
         List<string> modulescheck = new List<string>();
         public readonly CBS cbs;
         public int slfStartYear = 0, slfEndYear = 0;
-
-        // point load degerlerini iceren Excel dosyası pathi.
-        public string polygonTypesExcelPath;
 
         System.Windows.Forms.TextBox logTextBox; // Declare logTextBox here --------------
         private ExcelService _excelService;
@@ -211,23 +205,7 @@ namespace SLF
                 // YearService'ten değerleri alma
                 this.slfStartYear = yearService.slfStartYear;
                 this.slfEndYear = yearService.slfEndYear;
-            }
-
-            
-            if (ana_menu_form_objesi.projectRoot != null)
-            {
-                polygonTypesExcelPath = Path.Combine(ana_menu_form_objesi.projectRoot, "Excel Files", 
-                    "Point Load Karakteristikleri.xlsx", "point_load.xlsx"); 
-                // e.g., C:\Users\ehan0\source\repos\emrehmrc\SLF\Excel Files\point_load.xlsx
-            }
-            else
-            {
-                // Fallback to a default path if resolution fails
-                polygonTypesExcelPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), 
-                    "point_load.xlsx");
-                MessageBox.Show($"Excel dosya yolu çözülemedi. Varsayılan yol kullanılıyor: {polygonTypesExcelPath}", 
-                    "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
+            }       
 
             _excelService = new ExcelService();
             InitializeLogTextBox(); // Initialize logTextBox
@@ -274,9 +252,6 @@ namespace SLF
 
             // Initialize tab_ekonometrik accessibility on form load
             UpdateTabEkonometrikAccessibility();
-
-            userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            configPath = Path.Combine(((string)ana_menu_form_objesi.projectRoot).Replace('/', '\\'),"config.json");
         }
 
         public ModülFormu() : this("", "")
@@ -898,7 +873,7 @@ namespace SLF
             if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
             {
 
-                string filePath = Path.Combine(userRootPath,
+                string filePath = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
@@ -2321,7 +2296,7 @@ namespace SLF
             else if (Modül_Tabları.SelectedTab == tab_yükHaritası)
             {
                 // Find the index of the overlay in tüm_katmanlar_array_imar_names that contains "xxx"
-                string searchText = "SONUCLAR_Load_Density.kml"; // The text to search for
+                string searchText = "SONUCLAR_Yük_Yoğunluğu.kml"; // The text to search for
                 overlayIndex = Array.FindIndex(cbs.tüm_katmanlar_array_names,
                     name => name != null && name.Contains(searchText));
 
@@ -2940,49 +2915,6 @@ namespace SLF
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
 
-                private async void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
-        {
-
-            if (isAddingChargingStation)
-            {
-                // Yeni marker oluştur
-                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.yellow)
-                {
-                    ToolTipText = "Yeni Şarj İstasyonu"
-                };
-                markerOverlay_ea.Markers.Add(marker);
-
-                // Nokta verisini oluştur
-                NoktaVeri noktaVeri_marker = new NoktaVeri
-                {
-                    Enlem = Math.Round(pointClick.Lat, 4),
-                    Boylam = Math.Round(pointClick.Lng, 4)
-                };
-
-                // Popup formu göster
-                using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker, slfEndYear, ana_menu_form_objesi))
-                {
-                    if (popupForm.ShowDialog() == DialogResult.OK)
-                    {
-                        // Başarılı olduğunda harita verilerini yükle
-                        await eaHaritayaVeriYukleAsync();
-                    }
-                    else if (popupForm.OperationCancelled)
-                    {
-                        // İşlem iptal edilirse marker'ı kaldır
-                        markerOverlay_ea.Markers.Remove(marker);
-                    }
-                }
-
-                // İşaretleme işlemini sıfırla
-                isAddingChargingStation = false;
-                return;
-            }
-
-            OnMapClickEventi(pointClick, e, markerOverlay_ea, ref polygonPoints_ea,
-                ref polygonOverlay_ea, Mesafe_Dek, mesafe_metre_DeK);
-
-        }
         private async Task HandlePopupFormAsync(PointLatLng point, string cellId)
         {
             NoktaVeri noktaVeri_marker = new NoktaVeri
@@ -2992,7 +2924,7 @@ namespace SLF
                 CellId = cellId
             };
 
-            using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker, slfEndYear, ana_menu_form_objesi))
+            using (EAStationPopupForm popupForm = new EAStationPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker, slfEndYear))
             {
                 if (popupForm.ShowDialog() == DialogResult.OK)
                 {
@@ -3000,23 +2932,12 @@ namespace SLF
 
                     DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
                     DataRow updatedRow = dataTable.Rows.Cast<DataRow>().FirstOrDefault(r => r["id"].ToString() == cellId);
-                    if (updatedRow != null)
-                    {
-                        Console.WriteLine($"Cell {cellId}: AC (Home): {updatedRow["AC (Home)_count"]}, " +
-                                          $"AC (Work): {updatedRow["AC (Work)_count"]}, " +
-                                          $"AC (Public): {updatedRow["AC (Public)_count"]}, " +
-                                          $"Fast DC: {updatedRow["Fast DC_count"]}");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"No row found for Cell {cellId} in DataTable.");
-                    }
 
                     await HaritaUzerindeSimulasyonGosterimi(dataTable);
-                    Console.WriteLine("HaritaUzerindeSimulasyonGosterimi completed.");
                 }
             }
         }
+
         private void RemoveMarkerFromOverlays(GMapMarker marker)
         {
             if (markerOverlay_ea.Markers.Contains(marker))
@@ -3034,6 +2955,7 @@ namespace SLF
                 cellToolTipOverlay.Markers.Remove(marker);
             }
         }
+
         private async void gMapControl_EA_OnMarkerClick(GMapMarker item, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -3160,6 +3082,7 @@ namespace SLF
             {
                 string filePath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\ea\V3\ÇIKTI\evcs_monte_carlo_distribution_kumulatif_0411.xlsx";
                 DataTable simulationData;
+                
                 try
                 {
                     // Excel dosyasını aç
@@ -3179,17 +3102,14 @@ namespace SLF
                     return; // Hata durumunda işlemi sonlandır
                 }
 
-                // Log column names for debugging
-                Console.WriteLine("DataTable Columns: " + string.Join(", ", simulationData.Columns.Cast<DataColumn>().Select(c => c.ColumnName)));
-
                 gMapControl_EA.Overlays.Clear();
                 gMapControl_EA.Refresh();
 
                 HesaplaMerkezNoktaVeEkle(simulationData);
                 await HaritaUzerindeSimulasyonGosterimi(simulationData);
 
-
                 MessageBox.Show("Veri başarıyla yüklendi.");
+
             }
             catch (Exception ex)
             {
@@ -3202,7 +3122,6 @@ namespace SLF
 
             }
         }
-
 
         private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
         {
@@ -3223,14 +3142,14 @@ namespace SLF
                     progressBar.Style = ProgressBarStyle.Marquee;
                     progressBar.Visible = true;
                 }
-                string inputFilePath = Path.Combine(userRootPath,
+                string inputFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
                     (string)ana_menu_form_objesi.config.EA.ea_klasörü,
                     (string)ana_menu_form_objesi.config.EA.girdi_dosyası);
 
-                string outputFilePath = Path.Combine(userRootPath,
+                string outputFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
@@ -3247,7 +3166,7 @@ namespace SLF
                     return;
                 }
 
-                await RunPythonScriptAsync(configPath);
+                await RunPythonScriptEAAsync(ana_menu_form_objesi.config_path);
 
                 if (!File.Exists(outputFilePath))
                 {
@@ -3278,16 +3197,16 @@ namespace SLF
             }
         }
 
-        private async Task RunPythonScriptAsync(string config_path)
+        private async Task RunPythonScriptEAAsync(string config_path)
         {
             try
             {
-                string pythonScriptPath = Path.Combine(userRootPath,
+                string pythonScriptPath = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.EA.program_dosyası_klasörü,
                     (string)ana_menu_form_objesi.config.EA.ea_python_dosyası);
-                
+
 
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
@@ -3446,6 +3365,7 @@ namespace SLF
 
             return formattedEATable;
         }
+
         private void EAStationAddButton_Click(object sender, EventArgs e)
         {
 
@@ -3500,8 +3420,6 @@ namespace SLF
                 Cursor = Cursors.Default;
             }
         }
-
-        //private GMapOverlay eaOverlay; // Add this as a class-level variable
 
         private async Task eaHaritayaVeriYukleAsync()
         {
@@ -4058,49 +3976,41 @@ namespace SLF
             }
         }
 
-        /*        private async void gMapControl_DEK_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        private async void gMapControl_DEK_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        {
+            OnMapClickEventi(pointClick, e, markerOverlay_DEK, ref polygonPoints_DEK,
+                ref polygonOverlay_DEK, Mesafe_Dek, mesafe_metre_DeK);
+
+            if (isAddingDekPoint)
+            {
+                GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green)
                 {
-                    // DEK modülü için OnMapClickEventi çağrısı
-                    OnMapClickEventi(pointClick, e, markerOverlay_DEK, ref polygonPoints_DEK,
-                        ref polygonOverlay_DEK, Mesafe_Dek, mesafe_metre_DeK);
+                    ToolTipText = "Yeni DEK Noktası"
+                };
+                markerOverlay_DEK.Markers.Add(marker);
 
-                    if (isAddingDekPoint)
+                NoktaVeri noktaVeri_marker = new NoktaVeri
+                {
+                    Enlem = Math.Round(pointClick.Lat, 4),
+                    Boylam = Math.Round(pointClick.Lng, 4)
+                };
+
+                using (DEKCenterPopupForm popupForm = new DEKCenterPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker, slfEndYear))
+                {
+                    if (popupForm.ShowDialog() == DialogResult.OK)
                     {
-                        // Use the selected CellId from ModülFormu
-                        // Yeni marker oluştur
-                        GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.green)
-                        {
-                            ToolTipText = "Yeni DEK Noktası"
-                        };
-                        markerOverlay_DEK.Markers.Add(marker);
-
-                        // Nokta verisini oluştur
-                        NoktaVeri noktaVeri_marker = new NoktaVeri
-                        {
-                            Enlem = Math.Round(pointClick.Lat, 4),
-                            Boylam = Math.Round(pointClick.Lng, 4)
-                        };
-
-                        // Popup formu göster
-                        using (DEKCenterPopupForm popupForm = new DEKCenterPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
-                        {
-                            if (popupForm.ShowDialog() == DialogResult.OK)
-                            {
-                                // Başarılı olduğunda harita verilerini yükle
-                                await dekHaritayaVeriYukleAsync();
-                            }
-                            else if (popupForm.OperationCancelled)
-                            {
-                                // İşlem iptal edilirse marker'ı kaldır
-                                markerOverlay_DEK.Markers.Remove(marker);
-                            }
-                        }
-
-                        // İşaretleme işlemini sıfırla
-                        isAddingDekPoint = false;
-                        return;
+                        await dekHaritayaVeriYukleAsync();
                     }
-                }*/
+                    else if (popupForm.OperationCancelled)
+                    {
+                        markerOverlay_DEK.Markers.Remove(marker);
+                    }
+                }
+
+                isAddingDekPoint = false;
+                return;
+            }
+        }
 
         private async Task HandleDEKPopupFormAsync(PointLatLng point, string cellId)
         {
@@ -4111,70 +4021,21 @@ namespace SLF
                 CellId = cellId
             };
 
-            using (DEKCenterPopupForm popupForm = new DEKCenterPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker, slfEndYear, ana_menu_form_objesi))
+            using (DEKCenterPopupForm popupForm = new DEKCenterPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker, slfEndYear))
             {
                 if (popupForm.ShowDialog() == DialogResult.OK)
                 {
-                    Console.WriteLine("Popup form closed with OK. Updating data...");
                     DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
                     DataRow updatedRow = dataTable.Rows.Cast<DataRow>().FirstOrDefault(r => r["id"].ToString() == cellId);
-                    if (updatedRow != null)
-                    {
-                        Console.WriteLine($"Cell {cellId}: ");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"No row found for Cell {cellId} in DataTable.");
-                    }
 
-                    Console.WriteLine("Calling HaritaUzerindeSimulasyonGosterimi...");
                     await HaritaUzerindeDEKSimulasyonGosterimi(dataTable);
-                    Console.WriteLine("HaritaUzerindeSimulasyonGosterimi completed.");
                 }
             }
         }
-        /*        private async Task HandleDEKPopupFormAsync(PointLatLng point, string cellId)
-                {
-                    NoktaVeri noktaVeri_marker = new NoktaVeri
-                    {
-                        Enlem = Math.Round(point.Lat, 4),
-                        Boylam = Math.Round(point.Lng, 4),
-                        CellId = cellId
-                    };
-
-                    using (DEKCenterPopupForm popupForm = new DEKCenterPopupForm(dataGridView_girdi.DataSource as DataTable, noktaVeri_marker))
-                    {
-                        if (popupForm.ShowDialog() == DialogResult.OK)
-                        {
-                            Console.WriteLine("Popup form closed with OK. Updating data...");
-                            // await eaHaritayaVeriYukleAsync();
-
-                            DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
-                            DataRow updatedRow = dataTable.Rows.Cast<DataRow>().FirstOrDefault(r => r["id"].ToString() == cellId);
-                            if (updatedRow != null)
-                            {
-                                Console.WriteLine($"Cell {cellId}: ");
-                            }
-                            else
-                            {
-                                Console.WriteLine($"No row found for Cell {cellId} in DataTable.");
-                            }
-
-                            Console.WriteLine("Calling HaritaUzerindeSimulasyonGosterimi...");
-                            await HaritaUzerindeDEKSimulasyonGosterimi(dataTable);
-                            Console.WriteLine("HaritaUzerindeSimulasyonGosterimi completed.");
-                        }
-                    }
-                }*/
 
         // DEK şehri seçildiğinde çağrılan metot
-        // Helper method to safely remove a marker from overlays
         private void RemoveDEKMarkerFromOverlays(GMapMarker marker)
         {
-            /*            if (markerOverlay_ea.Markers.Contains(marker))
-                        {
-                            markerOverlay_ea.Markers.Remove(marker);
-                        }*/
 
             if (DEKSimulationOverlay.Markers.Contains(marker))
             {
@@ -4405,11 +4266,6 @@ namespace SLF
                     MessageBox.Show("Veri kaynağı bulunamadı. Lütfen verileri kontrol edin.");
                     return;
                 }
-
-                /*                if (gMapControl_DEK.Overlays.Contains(dekOverlay))
-                                {
-                                    gMapControl_DEK.Overlays.Remove(dekOverlay);
-                                }*/
 
                 // Initialize the overlay if not already created
                 if (dekOverlay == null)
@@ -4671,18 +4527,6 @@ namespace SLF
             cbs.CBS_ölç(mesafe_metre_imar, Mesafe_imar);
         }
 
-        private void İmar_Kaydır_Click(object sender, EventArgs e)
-        {
-            cbs.CBS_kaydır(markerOverlay_imar, rulerRoute_imar, gMapControl_imar,
-                mesafe_metre_imar, Mesafe_imar);
-        }
-
-        private void İmar_Seç_Click(object sender, EventArgs e)
-        {
-            cbs.CBS_sec(markerOverlay_imar, rulerRoute_imar, gMapControl_imar,
-                    mesafe_metre_imar, Mesafe_imar);
-        }
-
         private void gMapControl_imar_MouseDown(object sender, MouseEventArgs e)
         {
             MouseDownEvent(sender, e, gMapControl_imar, Mesafe_imar, mesafe_metre_imar,
@@ -4880,14 +4724,14 @@ namespace SLF
 
 
             // Find the index of the overlay in tüm_katmanlar_array_imar_names that contains "xxx"
-            string searchText = "SONUCLAR_Load_Density.kml"; // The text to search for
+            string searchText = "SONUCLAR_Yük_Yoğunluğu.kml"; // The text to search for
             overlayIndex = Array.FindIndex(cbs.tüm_katmanlar_array_names,
                 name => name != null && name.Contains(searchText));
 
             // Check if the overlay was found
             if (overlayIndex == -1 || cbs.tüm_katmanlar_array_imar[overlayIndex] == null)
             {
-                MessageBox.Show($"SONUCLAR_Load_Density.kml dosyası bulunamadı. Lütfen ilgili dosyanın SLF hesabı sonucu " +
+                MessageBox.Show($"SONUCLAR_Yük_Yoğunluğu.kml dosyası bulunamadı. Lütfen ilgili dosyanın SLF hesabı sonucu " +
                     $"oluşturulduğundan emin olunuz.");
 
             }
@@ -5051,9 +4895,7 @@ namespace SLF
         // Save button logic to update Excel file with changes from DataGridViews
         private async void ELFScenerioSaveButton_Click(object sender, EventArgs e)
         {
-            string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-            string originalFilePath = Path.Combine(userRootPath,
+            string originalFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
                 (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                 (string)ana_menu_form_objesi.config.İl,
                 (string)ana_menu_form_objesi.config.İlçe,
@@ -5918,7 +5760,7 @@ namespace SLF
                                         gMapControl_yuk.Refresh();
                                     }
 
-                                    if (checkBox.Text == "SONUCLAR_Load_Density.kml")
+                                    if (checkBox.Text == "SONUCLAR_Yük_Yoğunluğu.kml")
                                     {
                                         checkBox_yuk_main.Checked = false;
                                         checkBox_yuk_main.Visible = false;
@@ -6512,6 +6354,20 @@ namespace SLF
             DEKRunSimulationButton.Enabled = false;
             DEKSimulasyonSonucGoruntule.Enabled = true;
 
+            string inputFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                (string)ana_menu_form_objesi.config.İl,
+                (string)ana_menu_form_objesi.config.İlçe,
+                (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
+                (string)ana_menu_form_objesi.config.DEK.girdi_dosyası);
+
+            string outputFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                (string)ana_menu_form_objesi.config.İl,
+                (string)ana_menu_form_objesi.config.İlçe,
+                (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
+                (string)ana_menu_form_objesi.config.DEK.cikti_dosyasi);
+
             string inputFilePath = Path.Combine(userRootPath,
                 (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                 (string)ana_menu_form_objesi.config.İl,
@@ -6549,7 +6405,7 @@ namespace SLF
                     return;
                 }
 
-                await RunPythonDEKScriptAsync(configPath);
+                await RunPythonDEKScriptAsync(ana_menu_form_objesi.config_path);
 
                 if (!File.Exists(outputFilePath))
                 {
@@ -6578,12 +6434,12 @@ namespace SLF
             }
         }
 
-
+        // Updated RunPythonScriptAsync to match your paths
         private async Task RunPythonDEKScriptAsync(string config_path)
         {
             try
             {
-                string pythonScriptPath = Path.Combine(userRootPath,
+                string pythonScriptPath = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.DEK.program_dosyası_klasörü,
@@ -6600,17 +6456,17 @@ namespace SLF
                     CreateNoWindow = true
                 };
 
-                using (Process process = new Process { StartInfo = startInfo })
-                {
-                    process.Start();
+                        using (Process process = new Process { StartInfo = startInfo })
+                        {
+                            process.Start();
 
-                    Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
-                    Task<string> errorTask = process.StandardError.ReadToEndAsync();
+                            Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
+                            Task<string> errorTask = process.StandardError.ReadToEndAsync();
 
-                    await Task.Run(() => process.WaitForExit());
+                            await Task.Run(() => process.WaitForExit());
 
-                    string output = await outputTask;
-                    string error = await errorTask;
+                            string output = await outputTask;
+                            string error = await errorTask;
 
                     if (process.ExitCode != 0)
                     {
@@ -6627,59 +6483,6 @@ namespace SLF
                 throw new Exception($"Python kodu çalıştırma hatası: {ex.Message}");
             }
         }
-
-        // Updated RunPythonScriptAsync to match your paths
-
-        /*        private async Task RunPythonDEKScriptAsync(string inputFilePath)
-                {
-                    try
-                    {
-                        string pythonScriptPath = Path.Combine(userRootPath,
-                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                        (string)ana_menu_form_objesi.config.İl,
-                        (string)ana_menu_form_objesi.config.DEK.program_dosyası_klasörü,
-                       (string)ana_menu_form_objesi.config.DEK.dek_python_dosyası).Replace('/', '\\');
-
-                        //string pythonScriptPath = @"C:\Users\begum.orhan\OneDrive - MRC\Masaüstü\SLF\arda\EA-DEK\dek\v2\DEK_0411.py";
-
-                        ProcessStartInfo startInfo = new ProcessStartInfo
-                        {
-                            FileName = "python",
-                            Arguments = $"\"{pythonScriptPath}\" \"{inputFilePath}\"",
-                            RedirectStandardOutput = true,
-                            RedirectStandardError = true,
-                            UseShellExecute = false,
-                            CreateNoWindow = true
-                        };
-
-                        using (Process process = new Process { StartInfo = startInfo })
-                        {
-                            process.Start();
-
-                            Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
-                            Task<string> errorTask = process.StandardError.ReadToEndAsync();
-
-                            await Task.Run(() => process.WaitForExit());
-
-                            string output = await outputTask;
-                            string error = await errorTask;
-
-                            if (process.ExitCode != 0)
-                            {
-                                throw new Exception($"Python script failed with exit code {process.ExitCode}.\nError: {error}");
-                            }
-                            else if (!string.IsNullOrEmpty(output))
-                            {
-                                Console.WriteLine($"Python output: {output}");
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new Exception($"Error running Python script: {ex.Message}");
-                    }
-                }
-        */
 
         private async void buton_HTML_Click(object sender, EventArgs e)
         {
@@ -7299,7 +7102,7 @@ namespace SLF
         {
 
             // Get the input strings and replace forward slashes with backslashes
-            ELFrScriptModelPath = Path.Combine(userRootPath,
+            ELFrScriptModelPath = Path.Combine(ana_menu_form_objesi.userRootPath,
                 (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                 (string)ana_menu_form_objesi.config.İl,
                (string)ana_menu_form_objesi.config.ELF.Rscript_Yolu_Model).Replace('/', '\\');
@@ -7307,7 +7110,7 @@ namespace SLF
             var processInfo = new ProcessStartInfo
             {
                 FileName = "Rscript.exe",
-                Arguments = $"--vanilla \"{ELFrScriptModelPath}\" \"{configPath}\"",
+                Arguments = $"--vanilla \"{ELFrScriptModelPath}\" \"{ana_menu_form_objesi.config_path}\"",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -7347,14 +7150,10 @@ namespace SLF
                     Console.WriteLine("HATA: " + errorData);
                 }
 
-                // Read the JSON file and create the "config" variable
-                ana_menu_form_objesi.json_file = await Task.Run(() =>
-                    File.ReadAllText(Path.Combine(ana_menu_form_objesi.projectRoot, "config.json")));
-
                 // Deserialize on the UI thread since it might be used by UI components
                 ana_menu_form_objesi.config = JsonConvert.DeserializeObject(ana_menu_form_objesi.json_file);
 
-                string results_path = Path.Combine(userRootPath,
+                string results_path = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
@@ -7414,7 +7213,7 @@ namespace SLF
                 };
                 cursorTimer.Start();
 
-                ELFSenaryolarFilePath = Path.Combine(userRootPath,
+                ELFSenaryolarFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
@@ -7490,9 +7289,7 @@ namespace SLF
                 label_graphics.Visible = false;
                 comboBox_ekonometrik.Visible = false;
 
-                string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-                string results_path = Path.Combine(userRootPath,
+                string results_path = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
@@ -7533,11 +7330,8 @@ namespace SLF
             try
             {
 
-                string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-
                 // Construct the graphics path
-                string graphicsPath = Path.Combine(userRootPath,
+                string graphicsPath = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
