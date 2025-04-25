@@ -113,13 +113,13 @@ namespace SLF.RaporlamaDosyası
 
             İlİlceYol = Path.Combine(config["Ana_Klasör_Yolu"], config["İl"], config["İlçe"]);
 
-            SonucYolu = Path.Combine(İlİlceYol, config["proje_dosyası"], config["ODTR:Sonuçlar_klasör"]);
+            SonucYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:Sonuçlar_klasör"]);
 
             PythonFilePath = Path.Combine(İlYol, config["program_dosyaları_path"], config["ODTR:PYTHON_klasör"]);
 
-            YükVeriYolu = Path.Combine(İlİlceYol, config["proje_dosyası"], config["ODTR:INPUT_Yük_klasör"]);
+            YükVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Yük_klasör"]);
 
-            İmarVeriYolu = Path.Combine(İlİlceYol, config["proje_dosyası"], config["ODTR:INPUT_Trafo_klasör"]);
+            İmarVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Trafo_klasör"]);
             
             PythonPath = GetPythonPath();
 
