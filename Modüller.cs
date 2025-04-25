@@ -354,7 +354,6 @@ namespace SLF
             InitializeGMap(gMapControl_EA);
             InitializeGMap(gMapControl_yuk);
             InitializeGMap(gMapControl_imar);
-            InitializeGMap(gMapControl_optimalDTR);
             InitializeGMap(gMapControl_DEK);
 
             // Sort TabPages Alphabetically
@@ -1588,11 +1587,6 @@ namespace SLF
                 }
 
 
-                if (gMapControl_optimalDTR != null)
-                {
-                    gMapControl_optimalDTR.MapProvider = GMapProviders.GoogleSatelliteMap;
-                }
-
                 Console.WriteLine("Harita renkleri sıfırlandı");
             }
             catch (Exception ex)
@@ -1697,13 +1691,6 @@ namespace SLF
                 {
                     gMapControl_imar.Overlays.Clear();
                     gMapControl_imar.Refresh();
-                }
-
-
-                if (gMapControl_optimalDTR != null && gMapControl_optimalDTR.Overlays != null)
-                {
-                    gMapControl_optimalDTR.Overlays.Clear();
-                    gMapControl_optimalDTR.Refresh();
                 }
 
                 // CBS sınıfındaki overlay dizisini de sıfırla

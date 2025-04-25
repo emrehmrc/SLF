@@ -95,6 +95,35 @@ namespace SLF.Optimal_DTR
 
         }
 
+        public GMapControl GetActiveGMapControl()
+        {
+            TabPage selectedTab = modülFormu.Modül_Tabları.SelectedTab;
+
+            if (selectedTab != null)
+            {
+                foreach (System.Windows.Forms.Control control in selectedTab.Controls)
+                {
+                    // If the control is a GMapControl, return it
+                    if (control is GMapControl gmapControl)
+                    {
+                        return gmapControl;
+                    }
+
+                    // If it's a container, recursively search for a GMapControl inside it
+                    if (control is Panel panel)
+                    {
+                        GMapControl nestedControl = FindGMapControlInContainer(panel);
+                        if (nestedControl != null)
+                        {
+                            return nestedControl;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public void DrawMap2(DataTable trafoTable)
         {
             overlay.Markers.Clear();
