@@ -61,6 +61,7 @@ namespace SLF
             PreprocessMismatchedTrafoKodu();
             BinaKoordinatMatchCheck(); // Moved here
             CheckConnectivity();
+            InitializeColumnNullRowsMap();
         }
         public override void Postprocess()
         {
@@ -143,10 +144,7 @@ namespace SLF
             {
                 TrafoKoduImpute();
             }
-            //ImputeCoordinates();
-            //ImputeOutOfLimitCoordinates("COORDINATE_LIMITS");
-            //ImputeOutOfLimitCoordinates("ABONE_X_KOORDINAT");
-            //ImputeOutOfLimitCoordinates("ABONE_Y_KOORDINAT");
+            ImputeCoordinates();
             AboneGrubuImpute();
             BaglantiGucuImpute();
             ImputeLastYearTuketim();
@@ -169,8 +167,21 @@ namespace SLF
             var imputedRows = new List<int>();
             var failedRows = new List<int>();
 
+            if (!columnNullRowsMap.ContainsKey(column))
+            {
+                System.Diagnostics.Debug.WriteLine($"No null rows found for column: {column}");
+                return;
+            }
+
             foreach (int missingIndex in columnNullRowsMap[column])
             {
+                // Validate the index before accessing the row
+                if (missingIndex < 0 || missingIndex >= currentDataTable.Rows.Count)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Invalid row index {missingIndex} for column {column}. Current row count: {currentDataTable.Rows.Count}");
+                    continue; // Skip invalid indices
+                }
+
                 var missingRow = currentDataTable.Rows[missingIndex];
                 var trafoKodu = missingRow["BAGLANDIGI_TRAFO_KODU"]?.ToString();
                 if (!IsNullLike(trafoKodu) && trafoKodu != "TO_BE_IMPUTED")
@@ -188,8 +199,8 @@ namespace SLF
                         }
                     }
                 }
-                missingRow["ABONE_X_KOORDINAT"] = "KOORDINATI_YOK";
-                missingRow["ABONE_Y_KOORDINAT"] = "KOORDINATI_YOK";
+                missingRow["ABONE_X_KOORDINAT"] = DBNull.Value;
+                missingRow["ABONE_Y_KOORDINAT"] = DBNull.Value;
                 failedRows.Add(missingIndex);
             }
 
@@ -208,8 +219,63 @@ namespace SLF
             "ABONE_X_KOORDINAT & ABONE_Y_KOORDINAT",
             "Koordinat Imputasyonu Başarısız",
             $"{failedRows.Count} satır",
-            $"Abone koordinatları doldurulamadı, 'KOORDINATI_YOK' olarak işaretlendi. (Satır: {string.Join(", ", failedRows)})"
+            $"Abone koordinatları doldurulamadı, null olarak işaretlendi. (Satır: {string.Join(", ", failedRows)})"
         });
+            }
+        }
+        private void InitializeColumnNullRowsMap()
+        {
+            columnNullRowsMap = new Dictionary<string, List<int>>();
+
+            // List of columns that ImputeOutOfLimitCoordinates will check
+            var columnsToCheck = new List<string> { "COORDINATE_LIMITS", "ABONE_X_KOORDINAT", "ABONE_Y_KOORDINAT" };
+
+            // Initialize dictionary with empty lists for each column
+            foreach (var column in columnsToCheck)
+            {
+                columnNullRowsMap[column] = new List<int>();
+            }
+
+            // Populate the dictionary by scanning the DataTable for null values
+            for (int rowIndex = 0; rowIndex < currentDataTable.Rows.Count; rowIndex++)
+            {
+                var row = currentDataTable.Rows[rowIndex];
+                foreach (var column in columnsToCheck)
+                {
+                    // Skip COORDINATE_LIMITS as it might not be a real column in the DataTable
+                    if (column == "COORDINATE_LIMITS") continue;
+
+                    if (row[column] == DBNull.Value || row[column] == null)
+                    {
+                        columnNullRowsMap[column].Add(rowIndex);
+                    }
+                }
+            }
+
+            // Special handling for COORDINATE_LIMITS if it represents rows with out-of-limit coordinates
+            // This depends on your application's logic for COORDINATE_LIMITS
+            columnNullRowsMap["COORDINATE_LIMITS"] = new List<int>();
+            for (int rowIndex = 0; rowIndex < currentDataTable.Rows.Count; rowIndex++)
+            {
+                var row = currentDataTable.Rows[rowIndex];
+                if (row["ABONE_X_KOORDINAT"] != DBNull.Value && row["ABONE_Y_KOORDINAT"] != DBNull.Value)
+                {
+                    if (float.TryParse(row["ABONE_X_KOORDINAT"]?.ToString(), out float x) &&
+                        float.TryParse(row["ABONE_Y_KOORDINAT"]?.ToString(), out float y))
+                    {
+                        // Define your coordinate limits (example)
+                        if (x < -180 || x > 180 || y < -90 || y > 90) // Adjust limits as needed
+                        {
+                            columnNullRowsMap["COORDINATE_LIMITS"].Add(rowIndex);
+                        }
+                    }
+                }
+            }
+
+            // Debug log to verify initialization
+            foreach (var kvp in columnNullRowsMap)
+            {
+                System.Diagnostics.Debug.WriteLine($"Column {kvp.Key} has {kvp.Value.Count} null/out-of-limit rows.");
             }
         }
 

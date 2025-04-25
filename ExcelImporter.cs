@@ -220,10 +220,15 @@ namespace SLF
                     for (int col = 1; col <= colCount; col++)
                     {
                         string columnName = worksheet.Cells[1, col].Text?.Trim() ?? $"Column{col}";
+                        Type columnType = typeof(string); // Default to string
+                        if (columnName == "ABONE_X_KOORDINAT" || columnName == "ABONE_Y_KOORDINAT")
+                        {
+                            columnType = typeof(double); // Enforce double for coordinate columns
+                        }
                         dataTable.Columns.Add(new DataColumn
                         {
                             ColumnName = columnName,
-                            DataType = typeof(string), // Store as string initially
+                            DataType = columnType,
                             AllowDBNull = true
                         });
                     }
@@ -239,10 +244,23 @@ namespace SLF
                         {
                             var cell = worksheet.Cells[row, col];
                             string valueAsString = cell.Value?.ToString()?.Trim();
+                            string columnName = dataTable.Columns[col - 1].ColumnName;
 
                             if (string.IsNullOrEmpty(valueAsString) || valueAsString == "#N/A")
                             {
                                 dataRow[col - 1] = DBNull.Value;
+                            }
+                            else if (columnName == "ABONE_X_KOORDINAT" || columnName == "ABONE_Y_KOORDINAT")
+                            {
+                                if (double.TryParse(valueAsString, out double value))
+                                {
+                                    dataRow[col - 1] = value;
+                                    rowHasData = true;
+                                }
+                                else
+                                {
+                                    dataRow[col - 1] = DBNull.Value;
+                                }
                             }
                             else
                             {

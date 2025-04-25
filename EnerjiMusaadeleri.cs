@@ -15,13 +15,14 @@ namespace SLF
     {
         protected override List<string> Prerequisites => new List<string> { "DTR Verileri", "Yeni Projelendirilmiş DTR Verileri" };
         private int veerUniqID = 1; // Class-level field
-
         private void ImputeMustakilOlmayanTrafoID(List<int> missingCoordinatesRows, List<int> imputedTrafoRows, List<int> noNearestTrafoRows, List<int> newTrafoCreatedRows)
         {
             DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
             DataTable yeniProjelendirilmisTrafoDataTable = dataTablesByType["Yeni Projelendirilmiş DTR Verileri"];
 
+            // Filter out rows with DBNull.Value in coordinates directly in the LINQ query
             var trafoList = trafoDataTable.AsEnumerable()
+                .Where(row => row["TRAFO_X_KOORDINAT"] != DBNull.Value && row["TRAFO_Y_KOORDINAT"] != DBNull.Value)
                 .Select(row => new
                 {
                     TrafoKodu = row["TRAFO_KODU"].ToString(),
@@ -30,6 +31,7 @@ namespace SLF
                 })
                 .ToList();
 
+            // Filter out rows with DBNull.Value in coordinates or ID directly in the LINQ query
             var yeniTrafoList = yeniProjelendirilmisTrafoDataTable.AsEnumerable()
                 .Where(row => row["PROJELENDIRILMIS_TRAFO_ID"] != DBNull.Value &&
                               row["PROJELENDIRILMIS_TRAFO_X_KOORDINAT"] != DBNull.Value &&
@@ -52,7 +54,7 @@ namespace SLF
                     if (!IsNullLike(row["ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL"]) &&
                         row["ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL"].ToString() == "0")
                     {
-                        string connectedTrafo = row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"].ToString();
+                        string connectedTrafo = row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"]?.ToString();
 
                         if (IsNullLike(row["ENERJI_MUSAADE_X_KOORDINAT"]) || IsNullLike(row["ENERJI_MUSAADE_Y_KOORDINAT"]))
                         {
@@ -96,8 +98,8 @@ namespace SLF
                 if (!IsNullLike(row["ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL"]) &&
                     row["ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL"].ToString() == "1")
                 {
-                    string connectedTrafo = row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"].ToString();
-                    // Skip if the row already has a VEER-uniq- ID
+                    string connectedTrafo = row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"]?.ToString();
+                    // Skip if the row already has a VEER-uniq-ID
                     if (!IsNullLike(connectedTrafo) && connectedTrafo.StartsWith("VEER-uniq-"))
                     {
                         continue;
@@ -107,7 +109,10 @@ namespace SLF
                         Console.WriteLine($"Row {i}: Creating new transformer ID for independent transformer. Current veerUniqID: {veerUniqID}");
 
                         string uniqueId = $"VEER-uniq-{veerUniqID++}";
-                        double yeniTrafoKapasitesi = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]) * 10;
+                        // Add a null check for ENERJI_MUSAADE_BAGLANTI_GUCU to avoid InvalidCastException
+                        double yeniTrafoKapasitesi = IsNullLike(row["ENERJI_MUSAADE_BAGLANTI_GUCU"])
+                            ? 0.0 // Default value if null; adjust as needed
+                            : Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]) * 10;
                         int roundedYeniTrafoKapasitesi = RoundUpTrafoKapasitesi(yeniTrafoKapasitesi);
                         row["ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID"] = uniqueId;
                         yeniProjelendirilmisTrafoDataTable.Rows.Add(
@@ -124,6 +129,7 @@ namespace SLF
                 }
             }
         }
+
         private void ReportMustakilOlmayanTrafo()
         {
             List<int> missingCoordinatesRows = new List<int>();
@@ -248,7 +254,7 @@ namespace SLF
                     try
                     {
                         double baglantiGucuWatt = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
-                        row["ENERJI_MUSAADE_BAGLANTI_GUCU"] = baglantiGucuWatt / 1000;
+                        row["ENERJI_MUSAADE_BAGLANTI_GUCU"] = baglantiGucuWatt;
                     }
                     catch (FormatException)
                     {
