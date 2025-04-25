@@ -97,26 +97,21 @@ namespace SLF.Optimal_DTR
 
         public GMapControl GetActiveGMapControl()
         {
-            TabPage selectedTab = modülFormu.Modül_Tabları.SelectedTab;
-
-            if (selectedTab != null)
+            foreach (System.Windows.Forms.Control control in this.Controls)
             {
-                foreach (System.Windows.Forms.Control control in selectedTab.Controls)
+                // If the control is a GMapControl, return it
+                if (control is GMapControl gmapControl)
                 {
-                    // If the control is a GMapControl, return it
-                    if (control is GMapControl gmapControl)
-                    {
-                        return gmapControl;
-                    }
+                    return gmapControl;
+                }
 
-                    // If it's a container, recursively search for a GMapControl inside it
-                    if (control is Panel panel)
+                // If it's a container, recursively search for a GMapControl inside it
+                if (control is Panel panel)
+                {
+                    GMapControl nestedControl = FindGMapControlInContainer(panel);
+                    if (nestedControl != null)
                     {
-                        GMapControl nestedControl = FindGMapControlInContainer(panel);
-                        if (nestedControl != null)
-                        {
-                            return nestedControl;
-                        }
+                        return nestedControl;
                     }
                 }
             }
@@ -124,90 +119,29 @@ namespace SLF.Optimal_DTR
             return null;
         }
 
-        public void DrawMap2(DataTable trafoTable)
+        // Helper method to recursively search for GMapControl in nested containers
+        private GMapControl FindGMapControlInContainer(System.Windows.Forms.Control container)
         {
-            overlay.Markers.Clear();
-            overlay.Polygons.Clear();
-
-            foreach (DataRow trafo in trafoTable.Rows)
+            foreach (System.Windows.Forms.Control control in container.Controls)
             {
-                int hucreId = Convert.ToInt32(trafo["merkez_hucre"]);
-
-                // Bu hücreye ait trafoları filtrele
-                var trafolar = trafoTable.AsEnumerable()
-                    .Where(t => Convert.ToInt32(t["merkez_hucre"]) == hucreId)
-                    .ToList();
-
-                if (trafolar.Count == 0)
-                    continue;
-
-                // Hücre sınırları
-                double top = Convert.ToDouble(trafo["Top"]);
-                double bottom = Convert.ToDouble(trafo["Bottom"]);
-                double left = Convert.ToDouble(trafo["Left"]);
-                double right = Convert.ToDouble(trafo["Right"]);
-
-                // Trafo konumlarını tutacak liste
-                List<PointLatLng> markerKonumlari = new List<PointLatLng>();
-
-                if (trafolar.Count == 1)
+                if (control is GMapControl gmapControl)
                 {
-                    markerKonumlari.Add(new PointLatLng((top + bottom) / 2, (left + right) / 2));
+                    return gmapControl;
                 }
-                else if (trafolar.Count <= 4)
-                {
-                    markerKonumlari.Add(new PointLatLng(top, left));
-                    markerKonumlari.Add(new PointLatLng(top, right));
-                    markerKonumlari.Add(new PointLatLng(bottom, left));
-                    markerKonumlari.Add(new PointLatLng(bottom, right));
-                }
-                else
-                {
-                    int satirSayisi = (int)Math.Ceiling(Math.Sqrt(trafolar.Count));
-                    int sutunSayisi = (int)Math.Ceiling((double)trafolar.Count / satirSayisi);
 
-                    double latStep = (top - bottom) / (satirSayisi + 1);
-                    double lngStep = (right - left) / (sutunSayisi + 1);
-
-                    for (int i = 1; i <= satirSayisi; i++)
+                // Recursively check if the control is a container (e.g., Panel)
+                if (control is Panel panel)
+                {
+                    GMapControl nestedControl = FindGMapControlInContainer(panel);
+                    if (nestedControl != null)
                     {
-                        for (int j = 1; j <= sutunSayisi; j++)
-                        {
-                            if (markerKonumlari.Count >= trafolar.Count)
-                                break;
-
-                            double lat = bottom + (i * latStep);
-                            double lng = left + (j * lngStep);
-                            markerKonumlari.Add(new PointLatLng(lat, lng));
-                        }
+                        return nestedControl;
                     }
                 }
-
-                for (int i = 0; i < trafolar.Count; i++)
-                {
-                    var t = trafolar[i];
-                    PointLatLng konum = markerKonumlari[i % markerKonumlari.Count];
-
-                    string owner = trafo["sahip"].ToString();
-                    GMarkerGoogleType markerType = owner == "Özel" ? GMarkerGoogleType.red_dot : GMarkerGoogleType.blue_dot;
-
-                    string tooltip = $"TrafoID: {t["trafo_id"]}\n" +
-                                     $"Owner: {t["sahip"]}\n" +
-                                     $"Year: {t["year"]}\n" +
-                                     $"Trafo Durumu: {t["Durum"]}";
-
-                    var marker = new GMarkerGoogle(konum, markerType)
-                    {
-                        ToolTipText = tooltip,
-                        Tag = trafo["trafo_id"]
-                    };
-
-                    overlay.Markers.Add(marker);
-                }
             }
-
-            gMapControl1.Overlays.Add(overlay);
+            return null;
         }
+
 
         public void DrawMap3(DataTable trafoTable)
         {
@@ -331,20 +265,6 @@ namespace SLF.Optimal_DTR
             return null;
         }
 
-
-        // Tüketim verileri var mı yok mu sorgulam     
-        private async Task VerilerSisteme()
-        {
-
-
-            ReadDB.Hucreverioku("veriler.db", "Hucre");
-            ReadDB.Maindatabase("veriler.db", "Trafo2603");
-
-            //await Task.Run(() => DrawMap(ReadDB.trafoData, ReadDB.HucreData));
-
-            MessageBox.Show("Veriler sisteme yüklendi", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-        }
 
         public async Task PythonScriptCalistir(string python_path, string inputpath)
         {
@@ -862,56 +782,19 @@ namespace SLF.Optimal_DTR
 
         private void Arazi_Click(object sender, EventArgs e)
         {
-            cbs.GetActiveGMapControl().Visible = true;
-            cbs.GetActiveWebView().Visible = false;
-            cbs.GetActiveGMapControl().MapProvider = GMapProviders.GoogleTerrainMap;
+            GetActiveGMapControl().Visible = true;
+            GetActiveGMapControl().MapProvider = GMapProviders.GoogleTerrainMap;
         }
 
         private void Google_Earth_Click(object sender, EventArgs e)
         {
-            cbs.GetActiveGMapControl().Visible = true;
-            cbs.GetActiveWebView().Visible = false;
+            GetActiveGMapControl().Visible = true;
 
             Google_Earth google_earth_form = new Google_Earth();
             google_earth_form.Owner = this;
             google_earth_form.Show();
             google_earth_form.BringToFront();
             google_earth_form.Focus();
-        }
-
-        private void Google_Earth_Desktop_Click(object sender, EventArgs e)
-        {
-            cbs.GetActiveGMapControl().Visible = true;
-            cbs.GetActiveWebView().Visible = false;
-
-            string google_earth_path = @"C:\Program Files\Google\Google Earth Pro\client\googleearth.exe";
-
-            try
-            {
-                // Ensure centerX and centerY are not null or empty
-                if (!string.IsNullOrEmpty(centerX) && !string.IsNullOrEmpty(centerY))
-                {
-                    // Create the KML file with the current coordinates
-                    cbs.CreateKMLFile(centerY, centerX); // Note: Latitude (Y) first, then Longitude (X)
-
-                    // Path to the created KML file
-                    string kmlFilePath = Path.Combine(Path.GetTempPath(), "center_location.kml");
-
-                    // Start the process with the KML file as argument
-                    Process.Start(google_earth_path, kmlFilePath);
-                }
-                else
-                {
-                    MessageBox.Show("Bir sorun oluştu. Lütfen haritada başka bir yeri seçiniz.",
-                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Google Earth Desktop uygulaması açılamadı. Lütfen ilgili yüklemenin bilgi" +
-                    "sayarınızda halihazırda yüklü olduğunu teyit ediniz!   >" +
-                    $"Hata Mesajı: {ex.Message}", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
         }
 
         private void gMapControl1_MouseMove(object sender, MouseEventArgs e)
@@ -926,32 +809,20 @@ namespace SLF.Optimal_DTR
 
         private void Harita_Click(object sender, EventArgs e)
         {
-            cbs.GetActiveGMapControl().Visible = true;
-            cbs.GetActiveWebView().Visible = false;
-            cbs.GetActiveGMapControl().MapProvider = GMapProviders.GoogleMap;
+            GetActiveGMapControl().Visible = true;
+            GetActiveGMapControl().MapProvider = GMapProviders.GoogleMap;
         }
 
         private void OSM_Click(object sender, EventArgs e)
         {
-            cbs.GetActiveGMapControl().Visible = true;
-            cbs.GetActiveWebView().Visible = false;
-            cbs.GetActiveGMapControl().MapProvider = GMapProviders.OpenStreetMap;
-        }
-
-        private void Sokak_Görünümü_Click(object sender, EventArgs e)
-        {
-            cbs.GetActiveGMapControl().Visible = false;
-            cbs.GetActiveWebView().Visible = true;
-
-            string url = "https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu";
-            cbs.GetActiveWebView().CoreWebView2.Navigate(url);
+            GetActiveGMapControl().Visible = true;
+            GetActiveGMapControl().MapProvider = GMapProviders.OpenStreetMap;
         }
 
         private void Uydu_Click(object sender, EventArgs e)
         {
-            cbs.GetActiveGMapControl().Visible = true;
-            cbs.GetActiveWebView().Visible = false;
-            cbs.GetActiveGMapControl().MapProvider = GMapProviders.GoogleSatelliteMap;
+            GetActiveGMapControl().Visible = true;
+            GetActiveGMapControl().MapProvider = GMapProviders.GoogleSatelliteMap;
         }
     }
 
