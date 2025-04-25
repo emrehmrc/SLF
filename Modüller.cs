@@ -2358,10 +2358,14 @@ namespace SLF
 
             else if (selectedTabText == "Raporlama")
             {
+                Panel panel2 = new Panel();
+                panel2.Dock = DockStyle.Fill;
+                panel2.Padding = new Padding(0, 0, 0, 70); // Bottom margin gibi davranır
+
                 // Form'un boyutunu kullanarak panel'in genişliğini 50 piksel eksik yapma
-                this.panel2.Size = new Size(this.ClientSize.Width - 25, this.ClientSize.Height - 85);
+                //panel2.Size = new Size(this.ClientSize.Width - 25, this.ClientSize.Height - 85);
 
-
+                tab_rapor.Controls.Add(panel2); 
 
                 if (Rapor_Arayuz == null)
                 {
@@ -2372,7 +2376,7 @@ namespace SLF
                     Rapor_Arayuz.Dock = DockStyle.Fill;
                     Rapor_Arayuz.Show();
 
-                    this.panel2.Controls.Add(Rapor_Arayuz);
+                    panel2.Controls.Add(Rapor_Arayuz);
                     //Rapor_Arayuz.Parent = this.panel2;
 
 

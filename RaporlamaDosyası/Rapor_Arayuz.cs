@@ -44,7 +44,7 @@ namespace SLF.RaporlamaDosyası
 
         ExcelImporter excelImporter = new ExcelImporter();
 
-        Tablo_Formu tablo_Formu = new Tablo_Formu2();
+        Tablo_Formu tablo_Formu = new Tablo_Formu();
 
         public DataTable DataTableDTR { get; set; } = new DataTable();
         public DataTable DataTableEA { get; set; } = new DataTable();
@@ -101,7 +101,10 @@ namespace SLF.RaporlamaDosyası
 
             currentDt = new DataTable();*/
 
-            var configPath = @"C:\Users\vural.bayrakli\OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\İzmir\Program Dosyaları\configVural.json";
+            //var configPath = @"C:\Users\vural.bayrakli\OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\config.json";
+            var configPath = HomePageForm.config_path2;
+
+
             var config = new ConfigurationBuilder()
                 .AddJsonFile(configPath, optional: false, reloadOnChange: true)
                 .Build();

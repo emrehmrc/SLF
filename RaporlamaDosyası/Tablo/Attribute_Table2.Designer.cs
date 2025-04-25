@@ -1,4 +1,4 @@
-﻿namespace SLF
+﻿namespace SLF.RaporlamaDosyası.Tablo
 {
     partial class Tablo_Formu2
     {

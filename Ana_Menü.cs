@@ -15,6 +15,7 @@ namespace SLF
         public dynamic config;
         public string userRootPath;
         public string config_path;
+        public static string config_path2;
 
         public HomePageForm()
         {
@@ -30,8 +31,9 @@ namespace SLF
             userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
             config_path = Path.Combine(userRootPath,
-                "MRC\\MRC - 1.1.3_T&SI\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\İzmir\\Program Dosyaları\\config.json").Replace("/", "\\");
+                @"C:\Users\vural.bayrakli\OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\config.json").Replace("/", "\\");
 
+            config_path2 = config_path;
             // read the json file and create the "config" variable.
             json_file = File.ReadAllText(config_path);        
             config = JsonConvert.DeserializeObject(json_file);

@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SLF
+namespace SLF.RaporlamaDosyası.Tablo
 {
     public partial class Tablo_Formu2 : Form
     {

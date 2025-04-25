@@ -97,6 +97,7 @@
             // button1
             // 
             this.button1.BackColor = System.Drawing.Color.ForestGreen;
+            this.button1.ForeColor = System.Drawing.SystemColors.ButtonFace;
             this.button1.Location = new System.Drawing.Point(12, 727);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(223, 57);
