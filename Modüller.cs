@@ -6134,43 +6134,56 @@ namespace SLF
 
         private void buton_DL_calıstır_Click(object sender, EventArgs e)
         {
-            try
-            {
-                // İşlem sırasında imleç görünümünü değiştir
-                Cursor.Current = Cursors.WaitCursor;
+            // Show the confirmation dialog for navigating to the home page
+            DialogResult result_dialog = MessageBox.Show("Bina tiplerini oluşturan makine öğrenmesi modelini " +
+                "çalıştırmak üzeresiniz. Emin misiniz? Bu kodun çalışması biraz zaman alabilir\n\n" +
+                "Çıktı olarak her binaya ait bina tipleri (örneğin 1-2 katlı mesken, villa, orta ticarethane, vb.)" +
+                " oluşturulacaktır.",
+                "Bina Tiplerini Oluştur",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
 
-                // Gerekli kontroller (Abone verisi yüklü mü, il-ilçe seçilmiş mi)
-                if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
+            if ( result_dialog == DialogResult.Yes)
+            {
+                try
                 {
-                    MessageBox.Show("Lütfen önce il ve ilçe seçimini yapın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
+                    // İşlem sırasında imleç görünümünü değiştir
+                    Cursor.Current = Cursors.WaitCursor;
 
-                if (!GirdiModülü.dataTablesByType.ContainsKey("Abone Verileri"))
+                    // Gerekli kontroller (Abone verisi yüklü mü, il-ilçe seçilmiş mi)
+                    if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
+                    {
+                        MessageBox.Show("Lütfen önce il ve ilçe seçimini yapın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    if (!GirdiModülü.dataTablesByType.ContainsKey("Abone Verileri"))
+                    {
+                        MessageBox.Show("Lütfen önce Abone Verileri'ni yükleyin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    // Deep Learning modelini çalıştır
+                    string result = PythonHelper.RunDeepLearningModel();
+
+                    // İşlem tamamlandığında başarı mesajı göster
+                    MessageBox.Show("İmar analizi başarıyla tamamlandı.\nSonuçlar 'imar_analizi_sonuclari/deep_learning_modeli' klasöründe kaydedildi.",
+                                    "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    // İsteğe bağlı olarak sonuç klasörünü aç
+                    string imarAnaliziPath = PathService.GetImarAnaliziPathForType("deep_learning_modeli");
+                    System.Diagnostics.Process.Start("explorer.exe", imarAnaliziPath);
+                }
+                catch (Exception ex)
                 {
-                    MessageBox.Show("Lütfen önce Abone Verileri'ni yükleyin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
+                    MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
-                // Deep Learning modelini çalıştır
-                string result = PythonHelper.RunDeepLearningModel();
-
-                // İşlem tamamlandığında başarı mesajı göster
-                MessageBox.Show("İmar analizi başarıyla tamamlandı.\nSonuçlar 'imar_analizi_sonuclari/deep_learning_modeli' klasöründe kaydedildi.",
-                                "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                // İsteğe bağlı olarak sonuç klasörünü aç
-                string imarAnaliziPath = PathService.GetImarAnaliziPathForType("deep_learning_modeli");
-                System.Diagnostics.Process.Start("explorer.exe", imarAnaliziPath);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                // İşlem bittiğinde imleci normal duruma getir
-                Cursor.Current = Cursors.Default;
+                finally
+                {
+                    // İşlem bittiğinde imleci normal duruma getir
+                    Cursor.Current = Cursors.Default;
+                }
             }
         }
 
@@ -7563,134 +7576,178 @@ namespace SLF
 
         private void buton_imar_tahmini_Click(object sender, EventArgs e)
         {
-            try
+            // Show the confirmation dialog for navigating to the home page
+            DialogResult result = MessageBox.Show("Zaman ufku boyunca hücre bazlı satürasyon ve imar tahmininin yapıldığı kodu " +
+                "çalıştırmak üzeresiniz. Emin misiniz? Bu kodun çalışması biraz zaman alabilir",
+                "İmar Tahmini Yap",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (result == DialogResult.Yes)
             {
-
-                // Construct the path to the R script
-                string imar_tahmini_path = Path.Combine(ana_menu_form_objesi.userRootPath,
-                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                    (string)ana_menu_form_objesi.config.program_dosyaları_path,
-                    (string)ana_menu_form_objesi.config.SLF.imar_oranı_tahmini_kodu).Replace('/', '\\');
-
-
-                // Run Rscript.exe directly with quoted paths
-                var process = new Process
+                try
                 {
-                    StartInfo = new ProcessStartInfo
+                    // Construct the path to the R script
+                    string imar_tahmini_path = Path.Combine(ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.program_dosyaları_path,
+                        (string)ana_menu_form_objesi.config.SLF.imar_oranı_tahmini_kodu).Replace('/', '\\');
+
+
+                    // Run Rscript.exe directly with quoted paths
+                    var process = new Process
                     {
-                        FileName = "python",
-                        Arguments = $"\"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    }
-                };
+                        StartInfo = new ProcessStartInfo
+                        {
+                            FileName = "python",
+                            Arguments = $"\"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        }
+                    };
 
-                process.Start();
-                string output = process.StandardOutput.ReadToEnd();
-                string error = process.StandardError.ReadToEnd();
-                process.WaitForExit();
+                    process.Start();
+                    string output = process.StandardOutput.ReadToEnd();
+                    string error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
 
-                // Show result
-                if (process.ExitCode != 0)
-                    MessageBox.Show($"Bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
-                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
-                else
-                    MessageBox.Show($"Ufuk yılları için imar tahminleri oluşturuldu!",
-                        "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Bir hata meydana geldi: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    // Show result
+                    if (process.ExitCode != 0)
+                        MessageBox.Show($"Bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
+                            "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    else
+                        MessageBox.Show($"Ufuk yılları için imar tahminleri oluşturuldu!",
+                            "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Bir hata meydana geldi: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                }
             }
         }
 
         private void buton_abone_sayısı_tahmini_Click(object sender, EventArgs e)
         {
-            try
+
+            // Show the confirmation dialog for navigating to the home page
+            DialogResult result = MessageBox.Show("Her hücreye gelecek abone sayıları tahmini kodunu çalıştırmak üzeresiniz. " +
+                "Emin misiniz? Bu kodun çalışması biraz zaman alabilir. \n\nÇıktı olarak her hücreye gelebilecek abone tipleri bazında" +
+                " toplam abone sayıları oluşturulacaktır.",
+                "Abone Sayıları Tahmini Yap",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (result == DialogResult.Yes)
             {
-                // Construct the path to the R script
-                string abone_sayısı_tahmini_path = Path.Combine(ana_menu_form_objesi.userRootPath,
-                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                    (string)ana_menu_form_objesi.config.program_dosyaları_path,
-                    (string)ana_menu_form_objesi.config.SLF.abone_sayısı_tahmini_kodu).Replace('/', '\\');
 
+                this.Cursor = Cursors.WaitCursor;
 
-                // Run Rscript.exe directly with quoted paths
-                var process = new Process
+                try
                 {
-                    StartInfo = new ProcessStartInfo
+                    // Construct the path to the R script
+                    string abone_sayısı_tahmini_path = Path.Combine(ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.program_dosyaları_path,
+                        (string)ana_menu_form_objesi.config.SLF.abone_sayısı_tahmini_kodu).Replace('/', '\\');
+
+
+                    // Run Rscript.exe directly with quoted paths
+                    var process = new Process
                     {
-                        FileName = "python",
-                        Arguments = $"\"{abone_sayısı_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    }
-                };
+                        StartInfo = new ProcessStartInfo
+                        {
+                            FileName = "python",
+                            Arguments = $"\"{abone_sayısı_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        }
+                    };
 
-                process.Start();
-                string output = process.StandardOutput.ReadToEnd();
-                string error = process.StandardError.ReadToEnd();
-                process.WaitForExit();
+                    process.Start();
+                    string output = process.StandardOutput.ReadToEnd();
+                    string error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
 
-                // Show result
-                if (process.ExitCode != 0)
-                    MessageBox.Show($"Bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
-                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
-                else
-                    MessageBox.Show($"Ufuk yılları için abone sayısı tahminleri oluşturuldu!",
-                        "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Bir hata meydana geldi: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    this.Cursor = Cursors.Default;
+
+                    // Show result
+                    if (process.ExitCode != 0)
+                        MessageBox.Show($"Bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
+                            "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    else
+                        MessageBox.Show($"Ufuk yılları için abone sayısı tahminleri oluşturuldu!",
+                            "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Bir hata meydana geldi: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                }
             }
         }
 
         private void buton_SLF_tahmini_Click(object sender, EventArgs e)
         {
-            try
+            // Show the confirmation dialog for navigating to the home page
+            DialogResult result = MessageBox.Show("SLF tahmini kodunu çalıştırmak istediğinize emin misiniz? Bu kodun" +
+                " çalışması biraz zaman alabilir. \n\nÇıktı olarak hücre bazlı yük değerleri oluşturulacaktır",
+                "SLF Tahmini Yap",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (result == DialogResult.Yes)
             {
-                // Construct the path to the R script
-                string slf_tahmini_path = Path.Combine(ana_menu_form_objesi.userRootPath,
-                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                    (string)ana_menu_form_objesi.config.program_dosyaları_path,
-                    (string)ana_menu_form_objesi.config.SLF.SLF_yük_tahmini_kodu).Replace('/', '\\');
+                this.Cursor = Cursors.WaitCursor;
 
-
-                // Run Rscript.exe directly with quoted paths
-                var process = new Process
+                try
                 {
-                    StartInfo = new ProcessStartInfo
+                    // Construct the path to the R script
+                    string slf_tahmini_path = Path.Combine(ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.program_dosyaları_path,
+                        (string)ana_menu_form_objesi.config.SLF.SLF_yük_tahmini_kodu).Replace('/', '\\');
+
+
+                    // Run Rscript.exe directly with quoted paths
+                    var process = new Process
                     {
-                        FileName = "python",
-                        Arguments = $"\"{slf_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    }
-                };
+                        StartInfo = new ProcessStartInfo
+                        {
+                            FileName = "python",
+                            Arguments = $"\"{slf_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        }
+                    };
 
-                process.Start();
-                string output = process.StandardOutput.ReadToEnd();
-                string error = process.StandardError.ReadToEnd();
-                process.WaitForExit();
+                    process.Start();
+                    string output = process.StandardOutput.ReadToEnd();
+                    string error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
 
-                // Show result
-                if (process.ExitCode != 0)
-                    MessageBox.Show($"Bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
-                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
-                else
-                    MessageBox.Show($"Ufuk yılları için abone sayısı tahminleri oluşturuldu!",
-                        "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Bir hata meydana geldi: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    this.Cursor = Cursors.Default;
+
+                    // Show result
+                    if (process.ExitCode != 0)
+                        MessageBox.Show($"Bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
+                            "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    else
+                        MessageBox.Show($"Ufuk yılları için hücre bazında SLF tahminleri oluşturuldu! Şimdi Yük Haritası Modülü'nü kullanarak" +
+                            $"her hücreye ait tahminleri ve yük yoğunluğu haritasını görebilirsiniz.",
+                            "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Bir hata meydana geldi: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                }
             }
         }
 
