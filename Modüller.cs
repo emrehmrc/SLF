@@ -5367,8 +5367,8 @@ namespace SLF
 
                 isRulerEnabled = false;
                 isRulerActive = false;
-                rulerOverlay.Clear();
-                rulerRoute.Clear();
+                rulerOverlay?.Clear();
+                rulerRoute?.Clear();
 
                 cbs.GetActiveGMapControl().Refresh();
             }
