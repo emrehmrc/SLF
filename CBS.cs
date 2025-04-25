@@ -81,6 +81,11 @@ namespace SLF
             polygonAttributes_grid = new Dictionary<NetTopologySuite.Geometries.Polygon, DataRow>();
         }
 
+        public CBS()
+        {
+
+        }
+
 
         //---------------------------- CBS TOOLBOX METHODLARI ----------------------------------//
 

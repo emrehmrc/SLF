@@ -638,6 +638,20 @@
     <Compile Include="Nokta_Yük_Bilgi_Formu.Designer.cs">
       <DependentUpon>Nokta_Yük_Bilgi_Formu.cs</DependentUpon>
     </Compile>
+    <Compile Include="Optimal DTR\ConfigDosyasi.cs" />
+    <Compile Include="Optimal DTR\DTR_Arayuz.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Optimal DTR\DTR_Arayuz.Designer.cs">
+      <DependentUpon>DTR_Arayuz.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Optimal DTR\Ogeler.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Optimal DTR\Ogeler.Designer.cs">
+      <DependentUpon>Ogeler.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Optimal DTR\ReadDB.cs" />
     <Compile Include="Poligon Özellik Tanımlama.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -650,6 +664,42 @@
     </Compile>
     <Compile Include="ProjectFolderPicker.Designer.cs">
       <DependentUpon>ProjectFolderPicker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\Alansal.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\Alansal.Designer.cs">
+      <DependentUpon>Alansal.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\DEK.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\DEK.Designer.cs">
+      <DependentUpon>DEK.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\DTR.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\DTR.Designer.cs">
+      <DependentUpon>DTR.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\EA.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\EA.Designer.cs">
+      <DependentUpon>EA.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\Rapor_Arayuz.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\Rapor_Arayuz.Designer.cs">
+      <DependentUpon>Rapor_Arayuz.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\Tablo\Attribute_Table2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\Tablo\Attribute_Table2.Designer.cs">
+      <DependentUpon>Attribute_Table2.cs</DependentUpon>
     </Compile>
     <Compile Include="ReportTableForm.cs">
       <SubType>Form</SubType>
@@ -788,11 +838,35 @@
     <EmbeddedResource Include="Nokta_Yük_Bilgi_Formu.resx">
       <DependentUpon>Nokta_Yük_Bilgi_Formu.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Optimal DTR\DTR_Arayuz.resx">
+      <DependentUpon>DTR_Arayuz.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Optimal DTR\Ogeler.resx">
+      <DependentUpon>Ogeler.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Poligon Özellik Tanımlama.resx">
       <DependentUpon>Poligon Özellik Tanımlama.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectFolderPicker.resx">
       <DependentUpon>ProjectFolderPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RaporlamaDosyası\FiltrelemeArayuz\Alansal.resx">
+      <DependentUpon>Alansal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RaporlamaDosyası\FiltrelemeArayuz\DEK.resx">
+      <DependentUpon>DEK.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RaporlamaDosyası\FiltrelemeArayuz\DTR.resx">
+      <DependentUpon>DTR.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RaporlamaDosyası\FiltrelemeArayuz\EA.resx">
+      <DependentUpon>EA.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RaporlamaDosyası\Rapor_Arayuz.resx">
+      <DependentUpon>Rapor_Arayuz.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RaporlamaDosyası\Tablo\Attribute_Table2.resx">
+      <DependentUpon>Attribute_Table2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ReportTableForm.resx">
       <DependentUpon>ReportTableForm.cs</DependentUpon>
@@ -885,130 +959,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="python_kod\deep_learning\Arşiv\241004_WORKING_EMRE_IMAR_ID_FORECAST_gdz_RESULTS.csv" />
-    <None Include="python_kod\deep_learning\Arşiv\241004_WORKING_mesken_data_gdz.csv" />
-    <None Include="python_kod\deep_learning\Arşiv\241004_WORKING_NIZAM_v6.xlsx" />
-    <None Include="python_kod\deep_learning\Arşiv\corrected_final_pivot_table.csv" />
-    <None Include="python_kod\deep_learning\Arşiv\EMRE_IMAR_ID_FORECAST_gdz.xlsx" />
-    <None Include="python_kod\deep_learning\Arşiv\EMRE_IMAR_ID_FORECAST_oedas.xlsx" />
-    <None Include="python_kod\deep_learning\Arşiv\final_pivot_table.csv" />
-    <None Include="python_kod\deep_learning\Arşiv\final_pivot_table_with_additions.csv" />
-    <None Include="python_kod\deep_learning\Arşiv\final_pivot_table_with_additions_oedas.csv" />
-    <None Include="python_kod\deep_learning\Arşiv\NIZAM_v4.xlsx" />
-    <None Include="python_kod\deep_learning\Arşiv\NIZAM_v4_Eskisehir.xlsx" />
-    <None Include="python_kod\deep_learning\Arşiv\NIZAM_v4_İzmir.xlsx" />
-    <None Include="python_kod\deep_learning\Arşiv\train_seti_gogole_Aearth.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Arşiv\241004_WORKING_EMRE_IMAR_ID_FORECAST_gdz_RESULTS.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Arşiv\241004_WORKING_mesken_data_gdz.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Arşiv\241004_WORKING_NIZAM_v6.xlsx" />
-    <None Include="python_kod\deep_learning\düzenleme\Arşiv\corrected_final_pivot_table.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Arşiv\EMRE_IMAR_ID_FORECAST_gdz.xlsx" />
-    <None Include="python_kod\deep_learning\düzenleme\Arşiv\EMRE_IMAR_ID_FORECAST_oedas.xlsx" />
-    <None Include="python_kod\deep_learning\düzenleme\Arşiv\final_pivot_table.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Arşiv\final_pivot_table_with_additions.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Arşiv\final_pivot_table_with_additions_oedas.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Arşiv\NIZAM_v4.xlsx" />
-    <None Include="python_kod\deep_learning\düzenleme\Arşiv\NIZAM_v4_Eskisehir.xlsx" />
-    <None Include="python_kod\deep_learning\düzenleme\Arşiv\NIZAM_v4_İzmir.xlsx" />
-    <None Include="python_kod\deep_learning\düzenleme\Arşiv\train_seti_gogole_Aearth.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Input File\241004_WORKING_NIZAM_v6.xlsx" />
-    <None Include="python_kod\deep_learning\düzenleme\Input File\mesken_data_gdz.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Input File\ML_TRAIN_DATA.xlsx" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\Arşiv\241004_mesken_gdz.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\Arşiv\241004_mesken_harici_gdz.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\Arşiv\241004_mesken_harici_oedas.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\Arşiv\241004_mesken_oedas.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\Arşiv\mesken_data_gdz.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\Arşiv\mesken_data_oedas.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\combined_results_GDZ.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\mesken_data_gdz.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\mesken_data_oedas.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\mesken_results.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\mesken_results_deneme.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\min_max_tip_kirilimlar.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\min_max_tip_kirilimlar.xlsx" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\model_performance.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\other_data_gdz-MRC106.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\other_data_gdz.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\other_data_oedas.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\other_results.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\other_results_deneme.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Sonuçlar\prediction_summary.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Veriler\241004_Abone_Verileri_GDZ.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Veriler\241004_Abone_Verileri_OEDAS.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Veriler\Archive\241004_Abone_Verileri_GDZ.csv" />
-    <None Include="python_kod\deep_learning\düzenleme\Veriler\Archive\241004_Abone_Verileri_OEDAS.csv" />
-    <None Include="python_kod\deep_learning\Input File\241004_WORKING_NIZAM_v6.xlsx" />
-    <None Include="python_kod\deep_learning\Input File\mesken_data_gdz.csv" />
-    <None Include="python_kod\deep_learning\Input File\ML_TRAIN_DATA.xlsx" />
-    <None Include="python_kod\deep_learning\kod\config.conf" />
-    <None Include="python_kod\deep_learning\kod\IMAR_ID_Forecast_Model_emre.pkl" />
-    <None Include="python_kod\deep_learning\kod\mesken_data_analiz.csv" />
-    <None Include="python_kod\deep_learning\ml_train\241004_WORKING_NIZAM_v6.xlsx" />
-    <None Include="python_kod\deep_learning\ml_train\ML_TRAIN_DATA.xlsx" />
-    <None Include="python_kod\deep_learning\Modeller\config.conf" />
-    <None Include="python_kod\deep_learning\Modeller\IMAR_ID_Forecast_Model_emre.pkl" />
-    <None Include="python_kod\deep_learning\Modeller\mesken_data_analiz.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\Arşiv\241004_mesken_gdz.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\Arşiv\241004_mesken_harici_gdz.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\Arşiv\241004_mesken_harici_oedas.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\Arşiv\241004_mesken_oedas.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\Arşiv\mesken_data_gdz.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\Arşiv\mesken_data_oedas.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\combined_results_GDZ.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\mesken_data_gdz.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\mesken_data_oedas.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\mesken_results.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\mesken_results_deneme.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\min_max_tip_kirilimlar.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\min_max_tip_kirilimlar.xlsx" />
-    <None Include="python_kod\deep_learning\Sonuçlar\model_performance.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\other_data_gdz-MRC106.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\other_data_gdz.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\other_data_oedas.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\other_results.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\other_results_deneme.csv" />
-    <None Include="python_kod\deep_learning\Sonuçlar\prediction_summary.csv" />
-    <None Include="python_kod\deep_learning\Veriler\241004_Abone_Verileri_GDZ.csv" />
-    <None Include="python_kod\deep_learning\Veriler\241004_Abone_Verileri_OEDAS.csv" />
-    <None Include="python_kod\deep_learning\Veriler\Archive\241004_Abone_Verileri_GDZ.csv" />
-    <None Include="python_kod\deep_learning\Veriler\Archive\241004_Abone_Verileri_OEDAS.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\imar_kirilimlari\ciktilar\eskisehir_ada_imar_tipi_sayisi.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\imar_kirilimlari\girdiler\Copy of eskisehir_hucreleri.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\imar_kirilimlari\girdiler\eskisehir_hucreleri.xlsx" />
-    <None Include="python_kod\imar_analizi\database_kodlari\imar_kirilimlari\girdiler\ESKISEHIR_IMAR_PL.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\imar_kirilimlari\girdiler\Eskişehir-data.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\imar_kirilimlari\girdiler\imar_id_sonuclari_İzmir.xlsx" />
-    <None Include="python_kod\imar_analizi\database_kodlari\imar_kirilimlari\girdiler\ticarethane_sanayi_analizleri-İzmir.xlsx" />
-    <None Include="python_kod\imar_analizi\database_kodlari\imar_kirilimlari\girdiler\İzmir-data.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\overpass_tablolari\ciktilar\g4_eskisehir_overpass_dagilim.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\overpass_tablolari\ciktilar\g4_eskisehir_overpass_m2.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\overpass_tablolari\ciktilar\g4_izmir_overpass_dagilim.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\overpass_tablolari\ciktilar\g4_izmir_overpass_m2.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\overpass_tablolari\ciktilar\v4_eskişehir_overpass_dagilim.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\overpass_tablolari\ciktilar\v4_eskişehir_overpass_m2.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\overpass_tablolari\girdiler\eskisehir_hucreleri.xlsx" />
-    <None Include="python_kod\imar_analizi\database_kodlari\overpass_tablolari\girdiler\Eskişehir_buildings.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\overpass_tablolari\girdiler\overpass-data-Eskişehir.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\saturasyon\ciktilar\saturasyon_v4_i̇zmir.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\saturasyon\ciktilar\saturasyon_v8_eskişehir.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\saturasyon\ciktilar\saturasyon_v8_i̇zmir.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\saturasyon\girdiler\eskisehir\eskisehir_ada_imar_tipi_sayisi.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\saturasyon\girdiler\eskisehir\eskisehir_hucre_bina_kirilimlari.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\saturasyon\girdiler\eskisehir\eskisehir_uydu_verileri.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\saturasyon\girdiler\eskisehir\eskisehir_uydu_verileri.xlsx" />
-    <None Include="python_kod\imar_analizi\database_kodlari\saturasyon\girdiler\eskisehir\imar_id_sonuclari_Eskişehir.xlsx" />
-    <None Include="python_kod\imar_analizi\database_kodlari\saturasyon\girdiler\eskisehir\ticarethane_sanayi_analizleri-Eskişehir.xlsx" />
-    <None Include="python_kod\imar_analizi\database_kodlari\saturasyon\girdiler\imar_id_sonuclari_İzmir.xlsx" />
-    <None Include="python_kod\imar_analizi\database_kodlari\saturasyon\girdiler\izmir_ada_imar_tipi_sayisi.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\saturasyon\girdiler\saturation_update_i̇zmir.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\saturasyon\girdiler\ticarethane_sanayi_analizleri-İzmir.xlsx" />
-    <None Include="python_kod\imar_analizi\database_kodlari\saturasyon\girdiler\uyduverisi-izmir.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\saturasyon\girdiler\v4_gdz_birlestirilmis_veri_bina_sanayi_kirilimlari.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\stokastik\girdiler\imar_id_sonuclari_İzmir.xlsx" />
-    <None Include="python_kod\imar_analizi\database_kodlari\stokastik\girdiler\saturation_update_eskişehir.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\stokastik\girdiler\saturation_update_i̇zmir.csv" />
-    <None Include="python_kod\imar_analizi\database_kodlari\stokastik\girdiler\ticarethane_sanayi_analizleri-İzmir.xlsx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -1073,43 +1023,6 @@
     <None Include="Pictures\Exterior1.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="python_kod\deep_learning\Arşiv\EMRE.py" />
-    <Content Include="python_kod\deep_learning\Arşiv\XGBoost IMAR_ID Classification Traning_Emre.py" />
-    <Content Include="python_kod\deep_learning\düzenleme\Arşiv\EMRE.py" />
-    <Content Include="python_kod\deep_learning\düzenleme\Arşiv\XGBoost IMAR_ID Classification Traning_Emre.py" />
-    <Content Include="python_kod\deep_learning\düzenleme\program_set\model_gdz.py" />
-    <Content Include="python_kod\deep_learning\kod\Arşiv\EMRE.py" />
-    <Content Include="python_kod\deep_learning\kod\Arşiv\model_gdz.py" />
-    <Content Include="python_kod\deep_learning\kod\Arşiv\model_oedas.py" />
-    <Content Include="python_kod\deep_learning\kod\Arşiv\XGBoost IMAR_ID Classification Traning_Emre.py" />
-    <Content Include="python_kod\deep_learning\kod\batu-sql\deneme_database.py" />
-    <Content Include="python_kod\deep_learning\kod\batu-sql\model_database.py" />
-    <Content Include="python_kod\deep_learning\kod\model_gdz.py" />
-    <Content Include="python_kod\deep_learning\kod\model_oedas.py" />
-    <Content Include="python_kod\deep_learning\kod\oedas_database.py" />
-    <Content Include="python_kod\deep_learning\Modeller\Arşiv\EMRE.py" />
-    <Content Include="python_kod\deep_learning\Modeller\Arşiv\model_gdz.py" />
-    <Content Include="python_kod\deep_learning\Modeller\Arşiv\model_oedas.py" />
-    <Content Include="python_kod\deep_learning\Modeller\Arşiv\XGBoost IMAR_ID Classification Traning_Emre.py" />
-    <Content Include="python_kod\deep_learning\Modeller\batu-sql\deneme_database.py" />
-    <Content Include="python_kod\deep_learning\Modeller\batu-sql\model_database.py" />
-    <Content Include="python_kod\deep_learning\Modeller\model_gdz.py" />
-    <Content Include="python_kod\deep_learning\Modeller\model_oedas.py" />
-    <Content Include="python_kod\deep_learning\Modeller\oedas_database.py" />
-    <Content Include="python_kod\deep_learning\program_set\model_learning.py" />
-    <Content Include="python_kod\imar_analizi\database_kodlari\imar_kirilimlari\kod\kod_imar_kesisim_imar_tipi_v2.py" />
-    <Content Include="python_kod\imar_analizi\database_kodlari\overpass_database.py" />
-    <Content Include="python_kod\imar_analizi\database_kodlari\overpass_tablolari\kod\overpass_tablolar.py" />
-    <Content Include="python_kod\imar_analizi\database_kodlari\saturasyon\kod\deneme_saturasyon_imar.py" />
-    <Content Include="python_kod\imar_analizi\deneme_12345.py" />
-    <Content Include="python_kod\imar_analizi\imar_check.py" />
-    <Content Include="python_kod\imar_analizi\imar_datalari.py" />
-    <Content Include="python_kod\imar_analizi\imar_overpass.py" />
-    <Content Include="python_kod\imar_analizi\imar_tipleri_analizi_eskisehir_ok.py" />
-    <Content Include="python_kod\imar_analizi\imar_tipleri_analizi_v2.py" />
-    <Content Include="python_kod\imar_analizi\imar_tipleri_analiz_v3.py" />
-    <Content Include="python_kod\imar_analizi\task_kask_check.py" />
-    <Content Include="python_kod\SLF Sonucları\excel_to_kml_load_density.py" />
     <None Include="Pictures\oedaş.jpg" />
     <None Include="Pictures\Next page2.png" />
     <None Include="Pictures\Next page.png" />
