@@ -24,8 +24,6 @@ using SLF.Optimal_DTR;
 using SLF.RaporlamaDosyası;
 
 
-
-
 namespace SLF
 {
     public partial class ModülFormu : Form
@@ -50,6 +48,10 @@ namespace SLF
 
         DTR_Arayuz dtr;
         Rapor_Arayuz Rapor_Arayuz;
+
+        GMapOverlay simulationOverlay = new GMapOverlay("Simulasyon_Layer");
+        GMapOverlay cellToolTipOverlay = new GMapOverlay("CellToolTips");
+        public static string SelectedCellId { get; set; }
 
 
         public HomePageForm ana_menu_form_objesi;
@@ -181,6 +183,9 @@ namespace SLF
         private int lastSelectedCheckboxIndex = -1; // Track the last selected checkbox index
 
         private GMapOverlay eaOverlay; // Add this as a class-level variable
+
+        GMapOverlay DEKSimulationOverlay = new GMapOverlay("Simulasyon_Layer");
+        GMapOverlay DEKCellToolTipOverlay = new GMapOverlay("CellToolTips");
 
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
@@ -354,7 +359,6 @@ namespace SLF
             InitializeGMap(gMapControl_EA);
             InitializeGMap(gMapControl_yuk);
             InitializeGMap(gMapControl_imar);
-            InitializeGMap(gMapControl_optimalDTR);
             InitializeGMap(gMapControl_DEK);
 
             // Sort TabPages Alphabetically
@@ -1591,11 +1595,6 @@ namespace SLF
                 }
 
 
-                if (gMapControl_optimalDTR != null)
-                {
-                    gMapControl_optimalDTR.MapProvider = GMapProviders.GoogleSatelliteMap;
-                }
-
                 Console.WriteLine("Harita renkleri sıfırlandı");
             }
             catch (Exception ex)
@@ -1700,13 +1699,6 @@ namespace SLF
                 {
                     gMapControl_imar.Overlays.Clear();
                     gMapControl_imar.Refresh();
-                }
-
-
-                if (gMapControl_optimalDTR != null && gMapControl_optimalDTR.Overlays != null)
-                {
-                    gMapControl_optimalDTR.Overlays.Clear();
-                    gMapControl_optimalDTR.Refresh();
                 }
 
                 // CBS sınıfındaki overlay dizisini de sıfırla
@@ -3115,6 +3107,7 @@ namespace SLF
                 SelectedSpeed = "Varsayılan";
             }
         }
+
         private void ToggleMarkers(string markerType, bool isVisible)
         {
             // Iterate through all overlays and markers
@@ -3135,6 +3128,7 @@ namespace SLF
             gMapControl_EA.Refresh();
         }
 
+
         private async void SimulasyonSonucGoruntule_Click(object sender, EventArgs e)
         {
             // Disable the button to prevent multiple clicks while processing
@@ -3150,7 +3144,7 @@ namespace SLF
                     (string)ana_menu_form_objesi.config.EA.ea_klasörü,
                     (string)ana_menu_form_objesi.config.EA.cikti_dosyasi);
                 DataTable simulationData;
-                
+
                 try
                 {
                     // Excel dosyasını aç
@@ -3190,6 +3184,7 @@ namespace SLF
 
             }
         }
+
 
         private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
         {
@@ -3595,7 +3590,6 @@ namespace SLF
             SelectedDistrict = PathService.SelectedDistrict;
             SelectedCity = PathService.SelectedCity;
 
-
             gMapControl_EA.Overlays.Clear();
             gMapControl_EA.Refresh();
 
@@ -3698,11 +3692,9 @@ namespace SLF
             };
 
             popupForm.Controls.Add(dataGridView);
-            // popupForm.Show();
         }
-        GMapOverlay simulationOverlay = new GMapOverlay("Simulasyon_Layer");
-        GMapOverlay cellToolTipOverlay = new GMapOverlay("CellToolTips");
-        public static string SelectedCellId { get; set; }
+
+
         private Task HaritaUzerindeSimulasyonGosterimi(DataTable veriTablosu)
         {
             // Clear existing overlays and re-add them
@@ -3946,10 +3938,7 @@ namespace SLF
                 isAddingDekPoint = true; // Set flag for DEK point marking
                 return;
             }
-            else
-            {
-                Console.WriteLine("Bilinmeyen tıklama türü");
-            }
+
             var pointClick = gMapControl_DEK.FromLocalToLatLng(MousePosition.X, MousePosition.Y);
 
             // Refresh the map to show the new marker
@@ -4162,6 +4151,7 @@ namespace SLF
                 MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
                 return;
             }
+
             // Yeni bir DataGridView oluştur
             HesaplaMerkezNoktaVeEkle(dek_veri);
             DataTable dekResultPopup = FormatDEKTableForDisplay(dek_veri);
@@ -4176,7 +4166,6 @@ namespace SLF
             // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
 
             await HaritaUzerindeDEKSimulasyonGosterimi(dek_veri);
-            //await HaritaUzerindeDekSimulasyonGosterimi(dek_veri);
 
             // Önceki popupForm varsa kapatın
             if (popupForm != null && !popupForm.IsDisposed)
@@ -4402,9 +4391,8 @@ namespace SLF
 
             return formattedDEKTable;
         }
-        GMapOverlay DEKSimulationOverlay = new GMapOverlay("Simulasyon_Layer");
-        GMapOverlay DEKCellToolTipOverlay = new GMapOverlay("CellToolTips");
-        public static string DEKSelectedCellId { get; set; }
+
+
         private Task HaritaUzerindeDEKSimulasyonGosterimi(DataTable veriTablosu)
         {
             // Clear existing overlays and re-add the global overlays
@@ -4460,15 +4448,12 @@ namespace SLF
                     DEKSimulationOverlay.Markers.Add(marker);
                 }
 
-                // Debug output per row (optional)
-                Console.WriteLine($"Processed cell {cellId} at ({enlem}, {boylam}) with DEK: {dekValue}");
             }
 
             // Refresh the map control to display the new markers
             Invoke(new Action(() =>
             {
                 gMapControl_DEK.Refresh();
-                Console.WriteLine("Map refreshed.");
             }));
 
             return Task.CompletedTask;
@@ -6399,54 +6384,66 @@ namespace SLF
                 (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
                 (string)ana_menu_form_objesi.config.DEK.cikti_dosyasi);
 
-            methodFormObjesi.SaveConfigToFile();
-            try
+
+            // Show the confirmation dialog for navigating to the home page
+            DialogResult result_dialog = MessageBox.Show("\n\n" +
+                "Çıktı olarak her binaya ait bina tipleri (örneğin 1-2 katlı mesken, villa, orta ticarethane, vb.)" +
+                " oluşturulacaktır.",
+                "Bina Tiplerini Oluştur",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (result_dialog == DialogResult.Yes)
             {
-                Cursor = Cursors.WaitCursor;
-                if (DEKStatusLabel != null)
+                try
                 {
-                    DEKStatusLabel.Text = "Python kodu çalışıyor. Bu biraz zaman alabilir. Lütfen bekleyiniz...";
-                    DEKStatusLabel.Visible = true;
+                    Cursor = Cursors.WaitCursor;
+                    if (DEKStatusLabel != null)
+                    {
+                        DEKStatusLabel.Text = "Python kodu çalışıyor. Bu biraz zaman alabilir. Lütfen bekleyiniz...";
+                        DEKStatusLabel.Visible = true;
+                    }
+                    if (DEKProgressBar != null)
+                    {
+                        DEKProgressBar.Style = ProgressBarStyle.Marquee;
+                        DEKProgressBar.Visible = true;
+                    }
+
+                    if (!File.Exists(inputFilePath))
+                    {
+                        MessageBox.Show("Girdi dosyası bulunamadı! Lütfen kaydedildiğinden emin olun.",
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    await RunPythonDEKScriptAsync(ana_menu_form_objesi.config_path);
+
+                    if (!File.Exists(outputFilePath))
+                    {
+                        MessageBox.Show("Çıktı dosyası oluşturulamadı! Lütfen python dosyasını kontrol ediniz.",
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    MessageBox.Show("Simülasyon başarıyla tamamlandı!",
+                        "Process Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-                if (DEKProgressBar != null)
+                catch (Exception ex)
                 {
-                    DEKProgressBar.Style = ProgressBarStyle.Marquee;
-                    DEKProgressBar.Visible = true;
+                    MessageBox.Show($"Bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
-                if (!File.Exists(inputFilePath))
+                finally
                 {
-                    MessageBox.Show("Girdi dosyası bulunamadı! Lütfen kaydedildiğinden emin olun.",
-                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                    Cursor = Cursors.Default;
+                    if (DEKProgressBar != null)
+                        DEKProgressBar.Visible = false;
+                    if (DEKStatusLabel != null)
+                        DEKStatusLabel.Text = "Simülasyon tamamlandı";
+
+                    DEKRunSimulationButton.Enabled = true;
+                    DEKSimulasyonSonucGoruntule.Enabled = true;
                 }
-
-                await RunPythonDEKScriptAsync(ana_menu_form_objesi.config_path);
-
-                if (!File.Exists(outputFilePath))
-                {
-                    MessageBox.Show("Çıktı dosyası oluşturulamadı! Lütfen python dosyasını kontrol ediniz.",
-                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                MessageBox.Show("Simülasyon başarıyla tamamlandı!",
-                    "Process Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                Cursor = Cursors.Default;
-                if (DEKProgressBar != null)
-                    DEKProgressBar.Visible = false;
-                if (DEKStatusLabel != null)
-                    DEKStatusLabel.Text = "Simülasyon tamamlandı";
-
-                DEKRunSimulationButton.Enabled = true;
-                DEKSimulasyonSonucGoruntule.Enabled = true;
             }
         }
 
@@ -6510,14 +6507,15 @@ namespace SLF
             // Disable the button to prevent multiple clicks while processing
             DEKCenterAddButton.Enabled = false;
             DEKSimButton.Enabled = false;
+
             try
             {
                 string filePath = Path.Combine(ana_menu_form_objesi.userRootPath,
-             (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-             (string)ana_menu_form_objesi.config.İl,
-             (string)ana_menu_form_objesi.config.İlçe,
-             (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
-            (string)ana_menu_form_objesi.config.DEK.cikti_dosyasi).Replace('/', '\\');
+                         (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                         (string)ana_menu_form_objesi.config.İl,
+                         (string)ana_menu_form_objesi.config.İlçe,
+                         (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
+                        (string)ana_menu_form_objesi.config.DEK.cikti_dosyasi).Replace('/', '\\');
 
 
                 DataTable simulationData;
@@ -6542,7 +6540,7 @@ namespace SLF
 
                 gMapControl_DEK.Overlays.Clear();
                 gMapControl_DEK.Refresh();
-                // Merkezi Nokta Hesaplama ve Harita Üzerinde Gösterim
+
                 HesaplaMerkezNoktaVeEkle(simulationData);
                 await HaritaUzerindeDEKSimulasyonGosterimi(simulationData);
 

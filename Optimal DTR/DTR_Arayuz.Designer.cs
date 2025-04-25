@@ -44,10 +44,8 @@
             this.harita_katmanları_right_click = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.Arazi = new System.Windows.Forms.ToolStripMenuItem();
             this.Google_Earth = new System.Windows.Forms.ToolStripMenuItem();
-            this.Google_Earth_Desktop = new System.Windows.Forms.ToolStripMenuItem();
             this.Harita = new System.Windows.Forms.ToolStripMenuItem();
             this.OSM = new System.Windows.Forms.ToolStripMenuItem();
-            this.Sokak_Görünümü = new System.Windows.Forms.ToolStripMenuItem();
             this.Uydu = new System.Windows.Forms.ToolStripMenuItem();
             this.panel3.SuspendLayout();
             this.panel7.SuspendLayout();
@@ -91,6 +89,7 @@
             // panel3
             // 
             this.panel3.AutoScroll = true;
+            this.panel3.BackColor = System.Drawing.Color.OldLace;
             this.panel3.Controls.Add(this.panel7);
             this.panel3.Controls.Add(this.button1);
             this.panel3.Controls.Add(this.panel4);
@@ -301,13 +300,11 @@
             this.harita_katmanları_right_click.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.Arazi,
             this.Google_Earth,
-            this.Google_Earth_Desktop,
             this.Harita,
             this.OSM,
-            this.Sokak_Görünümü,
             this.Uydu});
             this.harita_katmanları_right_click.Name = "harita_katmanları_right_click";
-            this.harita_katmanları_right_click.Size = new System.Drawing.Size(215, 214);
+            this.harita_katmanları_right_click.Size = new System.Drawing.Size(196, 134);
             // 
             // Arazi
             // 
@@ -325,14 +322,6 @@
             this.Google_Earth.Text = "GE Online";
             this.Google_Earth.Click += new System.EventHandler(this.Google_Earth_Click);
             // 
-            // Google_Earth_Desktop
-            // 
-            this.Google_Earth_Desktop.Image = ((System.Drawing.Image)(resources.GetObject("Google_Earth_Desktop.Image")));
-            this.Google_Earth_Desktop.Name = "Google_Earth_Desktop";
-            this.Google_Earth_Desktop.Size = new System.Drawing.Size(214, 26);
-            this.Google_Earth_Desktop.Text = "GE Pro Desktop";
-            this.Google_Earth_Desktop.Click += new System.EventHandler(this.Google_Earth_Desktop_Click);
-            // 
             // Harita
             // 
             this.Harita.Image = ((System.Drawing.Image)(resources.GetObject("Harita.Image")));
@@ -348,14 +337,6 @@
             this.OSM.Size = new System.Drawing.Size(214, 26);
             this.OSM.Text = "Open Street Map";
             this.OSM.Click += new System.EventHandler(this.OSM_Click);
-            // 
-            // Sokak_Görünümü
-            // 
-            this.Sokak_Görünümü.Image = ((System.Drawing.Image)(resources.GetObject("Sokak_Görünümü.Image")));
-            this.Sokak_Görünümü.Name = "Sokak_Görünümü";
-            this.Sokak_Görünümü.Size = new System.Drawing.Size(214, 26);
-            this.Sokak_Görünümü.Text = "Sokak Görünümü";
-            this.Sokak_Görünümü.Click += new System.EventHandler(this.Sokak_Görünümü_Click);
             // 
             // Uydu
             // 
@@ -377,7 +358,7 @@
             this.Controls.Add(this.gMapControl1);
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "DTR_Arayuz";
-            this.Text = "Form1";
+            this.Text = "Optimal DTR Konumlandırma";
             this.Load += new System.EventHandler(this.DTR_Arayuz_Load);
             this.panel3.ResumeLayout(false);
             this.panel7.ResumeLayout(false);
@@ -420,10 +401,8 @@
         private System.Windows.Forms.ContextMenuStrip harita_katmanları_right_click;
         private System.Windows.Forms.ToolStripMenuItem Arazi;
         private System.Windows.Forms.ToolStripMenuItem Google_Earth;
-        private System.Windows.Forms.ToolStripMenuItem Google_Earth_Desktop;
         private System.Windows.Forms.ToolStripMenuItem Harita;
         private System.Windows.Forms.ToolStripMenuItem OSM;
-        private System.Windows.Forms.ToolStripMenuItem Sokak_Görünümü;
         private System.Windows.Forms.ToolStripMenuItem Uydu;
     }
 }
