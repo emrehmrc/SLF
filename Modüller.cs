@@ -20,7 +20,6 @@ using System.Text;
 using SLF.Services;
 using System.Globalization;
 using Newtonsoft.Json;
-using System.Collections;
 using SLF.Optimal_DTR;
 using SLF.RaporlamaDosyası;
 
@@ -50,7 +49,6 @@ namespace SLF
         // ---------------------------------------------- GENEL DEĞİŞKENLER ---------------------------------------------- //
 
         DTR_Arayuz dtr;
-
         Rapor_Arayuz Rapor_Arayuz;
 
 

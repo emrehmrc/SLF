@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms.Markers;
@@ -15,28 +13,24 @@ using Newtonsoft.Json;
 using System.IO;
 using SLF.Services;
 using System.Diagnostics;
-using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Spreadsheet;
 using Control = System.Windows.Forms.Control;
-using Microsoft.Win32;
 using Font = System.Drawing.Font;
 using Microsoft.Extensions.Configuration;
-using System.Security.Cryptography;
-using DocumentFormat.OpenXml.Office2021.DocumentTasks;
 using Task = System.Threading.Tasks.Task;
 using OfficeOpenXml;
-using System.Web;
 
 
 namespace SLF.Optimal_DTR
 {
     public partial class DTR_Arayuz : Form
     {
-        ExcelImporter excelImporter = new ExcelImporter();
+        CBS cbs;
 
         public static string PythonPath;
-
         public static string PythonFilePath;
+
+        public string centerX;
+        public string centerY;
 
         string TuketimDosyaAdi;
         string TrafoDosyaAdi;
@@ -46,48 +40,20 @@ namespace SLF.Optimal_DTR
 
         GMapOverlay overlay;
 
-        private bool isSelecting = false;
-
-        private int highResFactor = 3; // Yüksek çözünürlük katsayısı
-
         public string userRootPath;
         string İlİlceYol;
-
-        string ODTRAlgoritmaYolu;
-
-        string İmarYolu;
-
-        string YükTahminVeriYolu;
-
-        string TrafoVeriYolu;
-
-        string TrafoAlanlarıVeriYolu;
-
         string SonucYolu;
-
-        string ODTRSonucYolu;
-
-
         string İlYol;
-        string ProgramDosyalarıYolu;
-
-        string ProjeYolu;
-
         string YükVeriYolu;
-
         string İmarVeriYolu;
         string ODTRJson;
 
         DataTable trafodt;
         YearService yearService;
 
-
         string il;
-
         string ilce;
-
         string İlkYıl;
-
         string SonYıl;
 
         public DTR_Arayuz()
@@ -96,16 +62,8 @@ namespace SLF.Optimal_DTR
             InitializeMap();
             ToolTipKismi();
 
-            // Config dosyası için ayarları tanımla
+            cbs = new CBS();
 
-
-
-            /*var config = new ConfigurationBuilder()
-               .SetBasePath(Directory.GetCurrentDirectory())
-               .AddJsonFile("config.json")
-               .Build();*/
-
-            //var configPath = @"C:\Users\vural.bayrakli\OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\config.json";
             var configPath = HomePageForm.config_path2;
 
             var config = new ConfigurationBuilder()
@@ -118,23 +76,14 @@ namespace SLF.Optimal_DTR
 
 
             İlYol = Path.Combine(Ana_Klasör_Yolu, config["İl"]);
-
             İlİlceYol = Path.Combine(İlYol, config["İlçe"]);
-
             SonucYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:Sonuçlar_klasör"]);
-
             PythonFilePath = Path.Combine(Ana_Klasör_Yolu, config["program_dosyaları_path"], config["ODTR:PYTHON_klasör"]);
-
             YükVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Yük_klasör"]);
-
             İmarVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Trafo_klasör"]);
-         
             il = config["İl"];
-
             ilce = config["İlçe"];
-
             İlkYıl = config["DEK:baslangıc_yılı"];
-
             SonYıl = config["DEK:bitis_yılı"];          
 
             Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
@@ -142,41 +91,7 @@ namespace SLF.Optimal_DTR
                     { "İzmir", new PointLatLng(38.4192, 27.1287) }, // Example coordinates for İzmir
                     { "Eskişehir", new PointLatLng(39.7768, 30.5206) } // Example coordinates for Eskişehir
                     // Add more cities and their coordinates as needed
-                };
-                  
-            //VerilerSisteme2();
-            /*İlİlceYol = Path.Combine(config["Ana_Klasör_Yolu"], config["İl"], config["İlçe"]);
-
-            ODTRAlgoritmaYolu = Path.Combine(config["SLF_Yolu"], config["Python Kodları:DTR_Algoritması"]);
-
-            ProjeYolu = Path.Combine(İlİlceYol, config["Proje_Yolu"]);
-
-            İmarYolu = Path.Combine(ProjeYolu, "imar");
-
-            YükTahminVeriYolu = Path.Combine(İmarYolu, "Tuketim.xlsx");
-
-            TrafoVeriYolu = Path.Combine(İmarYolu, "Trafo.xlsx");
-
-            TrafoAlanlarıVeriYolu = Path.Combine(İmarYolu, "TrafoAlan.xlsx");
-
-            sonucYolu = Path.Combine(ProjeYolu, "sonuçlar");
-
-            ODTRSonucYolu = Path.Combine(sonucYolu, "ODTR");*/
-
-            //VerilerSisteme();
-
-            /*
-            PythonPath = Path.Combine(@"C:\Users\vural.bayrakli\AppData\Local\Programs\Python\Python311\python.exe");
-            * ReadDB.Hucreverioku();
-            //ReadDB.Maindatabase();
-
-            //DrawMap(ReadDB.trafoData, ReadDB.HucreData);
-
-
-            // Sadece burada, kullanıcı onayladığında PathService'i güncelle ve klasör oluştur
-            //PathService.UpdatePath(selectedCity, selectedDistrict);
-
-            */
+                };                 
 
         }
 
@@ -315,17 +230,11 @@ namespace SLF.Optimal_DTR
         }
 
 
-
         private bool CalismaYoluKontrol()
         {
             TuketimDosyaAdi = "SONUCLAR2.xlsx";
             TrafoDosyaAdi = $"trafo_merkez_hucre_{il}_{ilce}.xlsx";
             TrafoAlanDosyaAdi = $"trafo_rezerv_alanlar_{il.ToLower()}.xlsx";
-
-            //string path = PathService.CurrentWorkingFolder;
-            //string imar_path = PathService.ImarAnaliziPath; // 
-            //string imar_path = @"C:\Users\vural.bayrakli\source\repos\SLF\bin\Debug\il_ilce_kırılımları\İzmir\Aliağa\proje\imar";
-            
 
             tuketim_path = Path.Combine(YükVeriYolu, TuketimDosyaAdi);
             string trafo_path = Path.Combine(İmarVeriYolu, TrafoDosyaAdi);
@@ -342,20 +251,6 @@ namespace SLF.Optimal_DTR
                 return true;
             }
 
-
-
-        }
-
-        private bool DosyaKontrol(string path)
-        {
-            if (File.Exists(path))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
         }
 
 
@@ -369,16 +264,10 @@ namespace SLF.Optimal_DTR
         private void ToolTipKismi()
         {
             SetToolTip(panel2, "Bu kısımda trafonun kurum ya da özel olma durumuna göre filtreleme yapabilirsiniz.");
-
             SetToolTip(panel4, "Bu kısımda yıllara göre filtreleme yapabilirsiniz.");
-
             SetToolTip(panel7, "Bu kısımda trafonun durumuna göre filtreleme yapabilirsiniz.");
-
             SetToolTip(button1, "Bu butona tıklayarak filtreleme işlemini başlatabilirsiniz");
-
             SetToolTip(button2, "Bu butona tıklayarak Optimal DTR algoritmasını çalıştırabilirsiniz. İşlem 3-5 dk sürer.");
-
-
         }
 
 
@@ -413,56 +302,8 @@ namespace SLF.Optimal_DTR
             return null;
         }
 
-        private void İslem()
-        {
-            // Kaynak dosya yolunu belirleyin (örneğin, var olan bir dosya)
-            string sourceFilePath = @"C:\Users\vural.bayrakli\Downloads\output_abone_dagilimi_1303_4.xlsx";
-
-            // Python dosyasının bulunduğu dizini alın
-            string PythonFileP = Path.Combine(PathService._baseDirectory);
-
-            // Base dizini bir DirectoryInfo nesnesine dönüştür
-            DirectoryInfo baseDirInfo = new DirectoryInfo(PythonFileP);
-
-            // Parent (üst) dizini alıyoruz
-            DirectoryInfo parentDirInfo = baseDirInfo.Parent.Parent.Parent;
-
-            // Parent dizini null değilse, Python dosyasının tam yolunu oluşturuyoruz
-            if (parentDirInfo != null)
-            {
-                //PythonFilePath = Path.Combine(parentDirInfo.FullName, @"PythonFiles\SuperHucreAlgoritma12.py");
-
-                PythonFilePath = Path.Combine(@"C:\Users\vural.bayrakli\Desktop\OneDrive_1_03.02.2025\SuperHucreAlgoritma12.py");
-
-                PythonPath = Path.Combine(@"C:\Users\vural.bayrakli\AppData\Local\Programs\Python\Python311\python.exe");
-
-                // PythonFilePath'i yazdırıyoruz
-                Console.WriteLine(PythonFilePath);
-            }
-            else
-            {
-                Console.WriteLine("Parent directory not found.");
-            }
-
-            // Hedef dosya yolunu oluşturun
-            string destinationFilePath = Path.Combine(PathService.ImarAnaliziPath, "Tuketim.xlsx");
-
-            try
-            {
-                // Dosyayı kopyalayın
-                File.Copy(sourceFilePath, destinationFilePath, overwrite: true);
-
-                Console.WriteLine($"Dosya başarıyla kopyalandı: {destinationFilePath}");
-            }
-            catch (Exception ex)
-            {
-                // Hata yakalama
-                Console.WriteLine($"Bir hata oluştu: {ex.Message}");
-            }
-        }
 
         // Tüketim verileri var mı yok mu sorgulam     
-
         private async Task VerilerSisteme()
         {
 
@@ -473,22 +314,6 @@ namespace SLF.Optimal_DTR
             //await Task.Run(() => DrawMap(ReadDB.trafoData, ReadDB.HucreData));
 
             MessageBox.Show("Veriler sisteme yüklendi", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-        }
-
-        private async Task VerilerSisteme2()
-        {
-            Console.WriteLine("Veriler sisteme yükleniyor...");
-
-            //string dosya = Path.Combine(ODTRSonucYolu, "trafo.xlsx");
-            string dosya = @"C:\Users\vural.bayrakli\source\repos\SLF\bin\Debug\il_ilce_kırılımları\İzmir\Program Dosyaları\Optimal DTR\dftrafo_hucre20250420_163943.xlsx";
-            trafodt = ImportExcelFile(dosya);
-
-            //MessageBox.Show(trafodt.Rows.Count.ToString());  
-
-            //await Task.Run(() => DrawMap3(trafodt));
-            DrawMap3(trafodt);
-            //MessageBox.Show("Veriler sisteme yüklendi", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
         }
 
@@ -613,21 +438,8 @@ namespace SLF.Optimal_DTR
                 Console.WriteLine("Hata: " + ex.Message);
             }
 
-            //progressBar1.Visible = false;
-
             form.Close();
-
             MessageBox.Show("İşlem tamamlandı", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-            /*MessageBox.Show("Veriler Sisteme Yüklesin mi?", "Bilgi", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-
-
-            MessageBox.Show("Veriler sisteme yüklenecek", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            await VerilerSisteme2();*/
-
-
-
-
         }
 
         private void InitializeMap()
@@ -641,29 +453,11 @@ namespace SLF.Optimal_DTR
             gMapControl1.MinZoom = 5;
             gMapControl1.MaxZoom = 18;
             gMapControl1.Zoom = 12;
-
             gMapControl1.Position = new PointLatLng(38.5, 27.0); // Başlangıç konumu
-           
             gMapControl1.DragButton = MouseButtons.Left;
 
         }
 
-
-
-        private void pictureBox2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label6_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void radioButton6_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
         private void button1_Click(object sender, EventArgs e)
         {
             // Seçili yılları listeye al
@@ -699,7 +493,6 @@ namespace SLF.Optimal_DTR
             };
 
 
-
             // Seçilen aksiyonu al
             List<string> secilenAksiyonlar = checkedListBox2.CheckedItems.Cast<string>().ToList();
 
@@ -730,43 +523,6 @@ namespace SLF.Optimal_DTR
 
             // Filtrelenmiş verileri haritada göster
             DrawMap3(filtrelenmis);
-        }
-        private void button1__Click(object sender, EventArgs e)
-        {
-
-            // Seçili yılları listeye al
-            List<int> secilenYillar = new List<int>();
-            List<string> secilenDurumlar = new List<string>();
-
-            foreach (var item in checkedListBox1.CheckedItems)
-            {
-                secilenYillar.Add(int.Parse(item.ToString()));
-            }
-
-            foreach (var item in checkedListBox2.CheckedItems)
-            {
-                secilenDurumlar.Add(item.ToString());
-            }
-
-            Console.WriteLine(string.Join(", ", secilenYillar));
-
-            Console.WriteLine(string.Join(", ", secilenDurumlar));
-
-
-            var radiobuttonvalue = GetSelectedRadioButton(panel2) ?? "Hepsi";  // Default to "Hepsi" if null
-
-            // Filtreleme işlemi
-            var filtrelenmisTrafolar = ReadDB.trafoData
-                .Where(t => secilenYillar.Contains(t.Year))  // Yıla göre filtreleme
-                .Where(t => radiobuttonvalue == "Hepsi" || t.Owner == radiobuttonvalue)  // Sahiplik filtreleme
-                .Where(t => secilenDurumlar.Contains("Hepsi") || secilenDurumlar.Contains(t.Durumu)) // Trafo Durumu filtreleme
-                .ToList();
-
-
-
-
-            //DrawMap(filtrelenmisTrafolar, ReadDB.HucreData);
-
         }
 
         private string GetSelectedRadioButton(Panel panel)
@@ -827,21 +583,6 @@ namespace SLF.Optimal_DTR
         }
 
 
-        private void checkedListBox2_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void pictureBox2_Click_1(object sender, EventArgs e)
-        {
-            SaveTransformersAsGeoJSON();
-        }
-
-        private void progressBar1_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void ODTRconfig()
         {
             var configODTR = new
@@ -887,9 +628,6 @@ namespace SLF.Optimal_DTR
         public async void button2_Click(object sender, EventArgs e)
         {
 
-
-            //PythonFilePath = Path.Combine(@"C:\Users\vural.bayrakli\Desktop\OneDrive_1_03.02.2025\SuperHucreAlgoritma12.py");
-
             string pythonPath = GetPythonPath();
 
             PythonPath = Path.Combine(pythonPath);
@@ -920,11 +658,6 @@ namespace SLF.Optimal_DTR
         private void checkedListBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
-        }
-
-        private async void button3_Click(object sender, EventArgs e)
-        {
-            await VerilerSisteme();
         }
 
         private void panel7_Paint(object sender, PaintEventArgs e)
@@ -1096,19 +829,112 @@ namespace SLF.Optimal_DTR
             }
 
            
+        }
+
+        private void Arazi_Click(object sender, EventArgs e)
+        {
+            cbs.GetActiveGMapControl().Visible = true;
+            cbs.GetActiveWebView().Visible = false;
+            cbs.GetActiveGMapControl().MapProvider = GMapProviders.GoogleTerrainMap;
+        }
+
+        private void Google_Earth_Click(object sender, EventArgs e)
+        {
+            cbs.GetActiveGMapControl().Visible = true;
+            cbs.GetActiveWebView().Visible = false;
+
+            Google_Earth google_earth_form = new Google_Earth();
+            google_earth_form.Owner = this;
+            google_earth_form.Show();
+            google_earth_form.BringToFront();
+            google_earth_form.Focus();
+        }
+
+        private void Google_Earth_Desktop_Click(object sender, EventArgs e)
+        {
+            cbs.GetActiveGMapControl().Visible = true;
+            cbs.GetActiveWebView().Visible = false;
+
+            string google_earth_path = @"C:\Program Files\Google\Google Earth Pro\client\googleearth.exe";
+
+            try
+            {
+                // Ensure centerX and centerY are not null or empty
+                if (!string.IsNullOrEmpty(centerX) && !string.IsNullOrEmpty(centerY))
+                {
+                    // Create the KML file with the current coordinates
+                    cbs.CreateKMLFile(centerY, centerX); // Note: Latitude (Y) first, then Longitude (X)
+
+                    // Path to the created KML file
+                    string kmlFilePath = Path.Combine(Path.GetTempPath(), "center_location.kml");
+
+                    // Start the process with the KML file as argument
+                    Process.Start(google_earth_path, kmlFilePath);
+                }
+                else
+                {
+                    MessageBox.Show("Bir sorun oluştu. Lütfen haritada başka bir yeri seçiniz.",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Google Earth Desktop uygulaması açılamadı. Lütfen ilgili yüklemenin bilgi" +
+                    "sayarınızda halihazırda yüklü olduğunu teyit ediniz!   >" +
+                    $"Hata Mesajı: {ex.Message}", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+        }
+
+        private void gMapControl1_MouseMove(object sender, MouseEventArgs e)
+        {
+            // Get the current position of the center of the map
+            PointLatLng centerPosition = gMapControl1.Position;
+
+            // Update the strings with the center position coordinates
+            centerX = centerPosition.Lng.ToString();
+            centerY = centerPosition.Lat.ToString();
+        }
+
+        private void Harita_Click(object sender, EventArgs e)
+        {
+            cbs.GetActiveGMapControl().Visible = true;
+            cbs.GetActiveWebView().Visible = false;
+            cbs.GetActiveGMapControl().MapProvider = GMapProviders.GoogleMap;
+        }
+
+        private void OSM_Click(object sender, EventArgs e)
+        {
+            cbs.GetActiveGMapControl().Visible = true;
+            cbs.GetActiveWebView().Visible = false;
+            cbs.GetActiveGMapControl().MapProvider = GMapProviders.OpenStreetMap;
+        }
+
+        private void Sokak_Görünümü_Click(object sender, EventArgs e)
+        {
+            cbs.GetActiveGMapControl().Visible = false;
+            cbs.GetActiveWebView().Visible = true;
+
+            string url = "https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu";
+            cbs.GetActiveWebView().CoreWebView2.Navigate(url);
+        }
+
+        private void Uydu_Click(object sender, EventArgs e)
+        {
+            cbs.GetActiveGMapControl().Visible = true;
+            cbs.GetActiveWebView().Visible = false;
+            cbs.GetActiveGMapControl().MapProvider = GMapProviders.GoogleSatelliteMap;
+        }
     }
-
-    }
-
-
 
 
     public class Trafo
     {
         public string TrafoID { get; set; }
+
         public int HucreID { get; set; }
 
         public double BosKapasite { get; set; }
+
         public string Owner { get; set; }
 
         public int Year { get; set; }
