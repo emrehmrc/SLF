@@ -20,6 +20,11 @@ using System.Text;
 using SLF.Services;
 using System.Globalization;
 using Newtonsoft.Json;
+using System.Collections;
+using SLF.Optimal_DTR;
+using SLF.RaporlamaDosyası;
+
+
 
 
 namespace SLF
@@ -43,6 +48,11 @@ namespace SLF
 
         // ------------------------------------------------------------------------------------------------------------ //
         // ---------------------------------------------- GENEL DEĞİŞKENLER ---------------------------------------------- //
+
+        DTR_Arayuz dtr;
+
+        Rapor_Arayuz Rapor_Arayuz;
+
 
         public HomePageForm ana_menu_form_objesi;
         private MethodForm methodFormObjesi;
@@ -2303,7 +2313,65 @@ namespace SLF
                     legendPanel.Visible = false;
                 }
 
-            } 
+            }
+
+            else if (selectedTabText == "Optimal DTR Konumlandırma")
+            {
+                // Sekme geçişini tamamen iptal et
+
+                Panel panel = new Panel();
+                panel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+                panel.Location = new System.Drawing.Point(0, 0);
+                // Form'un boyutunu kullanarak panel'in genişliğini 50 piksel eksik yapma
+                panel.Size = new Size(this.ClientSize.Width - 25, this.ClientSize.Height - 85);
+                this.tab_optDTR.Controls.Add(panel);
+
+                if (dtr == null)
+                {
+                    dtr = new DTR_Arayuz();
+                    dtr.TopLevel = false;
+                    dtr.FormBorderStyle = FormBorderStyle.None;
+                    dtr.Dock = DockStyle.Fill;
+                    dtr.Show();
+
+                    panel.Controls.Add(dtr);
+                    //dtr.Parent = this.tab_optDTR;
+
+
+                }
+
+                return;
+            }
+
+            else if (selectedTabText == "Raporlama")
+            {
+                Panel panel2 = new Panel();
+                panel2.Dock = DockStyle.Fill;
+                panel2.Padding = new Padding(0, 0, 0, 70); // Bottom margin gibi davranır
+
+                // Form'un boyutunu kullanarak panel'in genişliğini 50 piksel eksik yapma
+                //panel2.Size = new Size(this.ClientSize.Width - 25, this.ClientSize.Height - 85);
+
+                tab_rapor.Controls.Add(panel2); 
+
+                if (Rapor_Arayuz == null)
+                {
+                    Rapor_Arayuz = new Rapor_Arayuz();
+
+                    Rapor_Arayuz.TopLevel = false;
+                    Rapor_Arayuz.FormBorderStyle = FormBorderStyle.None;
+                    Rapor_Arayuz.Dock = DockStyle.Fill;
+                    Rapor_Arayuz.Show();
+
+                    panel2.Controls.Add(Rapor_Arayuz);
+                    //Rapor_Arayuz.Parent = this.panel2;
+
+
+                }
+
+                return;
+            }
+
         }
 
         public void ProjeEkleButton_Click(object sender, EventArgs e)

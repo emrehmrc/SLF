@@ -638,6 +638,20 @@
     <Compile Include="Nokta_Yük_Bilgi_Formu.Designer.cs">
       <DependentUpon>Nokta_Yük_Bilgi_Formu.cs</DependentUpon>
     </Compile>
+    <Compile Include="Optimal DTR\ConfigDosyasi.cs" />
+    <Compile Include="Optimal DTR\DTR_Arayuz.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Optimal DTR\DTR_Arayuz.Designer.cs">
+      <DependentUpon>DTR_Arayuz.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Optimal DTR\Ogeler.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Optimal DTR\Ogeler.Designer.cs">
+      <DependentUpon>Ogeler.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Optimal DTR\ReadDB.cs" />
     <Compile Include="Poligon Özellik Tanımlama.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -650,6 +664,42 @@
     </Compile>
     <Compile Include="ProjectFolderPicker.Designer.cs">
       <DependentUpon>ProjectFolderPicker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\Alansal.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\Alansal.Designer.cs">
+      <DependentUpon>Alansal.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\DEK.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\DEK.Designer.cs">
+      <DependentUpon>DEK.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\DTR.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\DTR.Designer.cs">
+      <DependentUpon>DTR.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\EA.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\FiltrelemeArayuz\EA.Designer.cs">
+      <DependentUpon>EA.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\Rapor_Arayuz.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\Rapor_Arayuz.Designer.cs">
+      <DependentUpon>Rapor_Arayuz.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\Tablo\Attribute_Table2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RaporlamaDosyası\Tablo\Attribute_Table2.Designer.cs">
+      <DependentUpon>Attribute_Table2.cs</DependentUpon>
     </Compile>
     <Compile Include="ReportTableForm.cs">
       <SubType>Form</SubType>
@@ -788,11 +838,35 @@
     <EmbeddedResource Include="Nokta_Yük_Bilgi_Formu.resx">
       <DependentUpon>Nokta_Yük_Bilgi_Formu.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Optimal DTR\DTR_Arayuz.resx">
+      <DependentUpon>DTR_Arayuz.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Optimal DTR\Ogeler.resx">
+      <DependentUpon>Ogeler.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Poligon Özellik Tanımlama.resx">
       <DependentUpon>Poligon Özellik Tanımlama.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectFolderPicker.resx">
       <DependentUpon>ProjectFolderPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RaporlamaDosyası\FiltrelemeArayuz\Alansal.resx">
+      <DependentUpon>Alansal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RaporlamaDosyası\FiltrelemeArayuz\DEK.resx">
+      <DependentUpon>DEK.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RaporlamaDosyası\FiltrelemeArayuz\DTR.resx">
+      <DependentUpon>DTR.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RaporlamaDosyası\FiltrelemeArayuz\EA.resx">
+      <DependentUpon>EA.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RaporlamaDosyası\Rapor_Arayuz.resx">
+      <DependentUpon>Rapor_Arayuz.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RaporlamaDosyası\Tablo\Attribute_Table2.resx">
+      <DependentUpon>Attribute_Table2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ReportTableForm.resx">
       <DependentUpon>ReportTableForm.cs</DependentUpon>
