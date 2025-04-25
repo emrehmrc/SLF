@@ -138,7 +138,7 @@ namespace SLF
                 string yatırımSınıfı = row["PROJELENDIRILMIS_TRAFO_YATIRIM_SINIFI"]?.ToString();
                 if (yatırımSınıfı == "1" || yatırımSınıfı == "2" || yatırımSınıfı == "3")
                 {
-                    string connectedTrafo = row["PROJELENDIRILMIS_TRAFO_PROJE_KODU"].ToString();
+                    string connectedTrafo = row["PROJELENDIRILMIS_TRAFO_ID"].ToString();
                     if (IsNullLike(connectedTrafo))
                     {
                         // Değer null ya da boşsa işlem yapma
