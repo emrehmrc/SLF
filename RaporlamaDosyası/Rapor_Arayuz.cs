@@ -77,6 +77,7 @@ namespace SLF.RaporlamaDosyası
         string ArsivVeriYolu;
 
         string PythonPath;
+        string userRootPath;
 
         public Rapor_Arayuz()
         {
@@ -109,13 +110,18 @@ namespace SLF.RaporlamaDosyası
                 .AddJsonFile(configPath, optional: false, reloadOnChange: true)
                 .Build();
 
-            İlYol = Path.Combine(config["Ana_Klasör_Yolu"], config["İl"]);
+            userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
-            İlİlceYol = Path.Combine(config["Ana_Klasör_Yolu"], config["İl"], config["İlçe"]);
+            string Ana_Klasör_Yolu = Path.Combine(userRootPath, config["Ana_Klasör_Yolu"]);
+
+
+            İlYol = Path.Combine(Ana_Klasör_Yolu, config["İl"]);
+
+            İlİlceYol = Path.Combine(Ana_Klasör_Yolu, config["İl"], config["İlçe"]);
 
             SonucYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:Sonuçlar_klasör"]);
 
-            PythonFilePath = Path.Combine(İlYol, config["program_dosyaları_path"], config["ODTR:PYTHON_klasör"]);
+            PythonFilePath = Path.Combine(Ana_Klasör_Yolu, config["program_dosyaları_path"], config["ODTR:PYTHON_klasör"]);
 
             YükVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Yük_klasör"]);
 

@@ -50,6 +50,7 @@ namespace SLF.Optimal_DTR
 
         private int highResFactor = 3; // Yüksek çözünürlük katsayısı
 
+        public string userRootPath;
         string İlİlceYol;
 
         string ODTRAlgoritmaYolu;
@@ -79,6 +80,7 @@ namespace SLF.Optimal_DTR
 
         DataTable trafodt;
         YearService yearService;
+
 
         string il;
 
@@ -110,13 +112,18 @@ namespace SLF.Optimal_DTR
                 .AddJsonFile(configPath, optional: false, reloadOnChange: true)
                 .Build();
 
-            İlYol = Path.Combine(config["Ana_Klasör_Yolu"], config["İl"]);
+            userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+            string Ana_Klasör_Yolu = Path.Combine(userRootPath, config["Ana_Klasör_Yolu"]);
+
+
+            İlYol = Path.Combine(Ana_Klasör_Yolu, config["İl"]);
 
             İlİlceYol = Path.Combine(İlYol, config["İlçe"]);
 
             SonucYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:Sonuçlar_klasör"]);
 
-            PythonFilePath = Path.Combine(İlYol, config["program_dosyaları_path"], config["ODTR:PYTHON_klasör"]);
+            PythonFilePath = Path.Combine(Ana_Klasör_Yolu, config["program_dosyaları_path"], config["ODTR:PYTHON_klasör"]);
 
             YükVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Yük_klasör"]);
 

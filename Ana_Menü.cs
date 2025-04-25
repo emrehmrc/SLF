@@ -31,7 +31,7 @@ namespace SLF
             userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
             config_path = Path.Combine(userRootPath,
-                @"C:\Users\vural.bayrakli\OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\config.json").Replace("/", "\\");
+                @"OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\config.json").Replace("/", "\\");
 
             config_path2 = config_path;
             // read the json file and create the "config" variable.
