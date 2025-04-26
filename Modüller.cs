@@ -51,6 +51,8 @@ namespace SLF
 
         GMapOverlay simulationOverlay = new GMapOverlay("Simulasyon_Layer");
         GMapOverlay cellToolTipOverlay = new GMapOverlay("CellToolTips");
+
+        private Dictionary<GMapOverlay, string> overlayTags = new Dictionary<GMapOverlay, string>();
         public static string SelectedCellId { get; set; }
 
 
@@ -121,6 +123,7 @@ namespace SLF
         public bool isSelecting_YGA = false;
         public bool isSelecting_YUK = false;
         public bool isSelecting_Musaade = false;
+        public bool isSelecting_Kentsel_Donusum = false;
 
         // X and Y coordinates of the center location of the gMapControl object to be used to create a sample
         // kml file to be opened in the Google Earth Desktop
@@ -5091,17 +5094,22 @@ namespace SLF
         {
             if (isSelecting_YUK == true)
             {
-                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(true, false, false, polygonPoints_imar);
+                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(true, false, false, false, polygonPoints_imar);
 
             }
             else if (isSelecting_YGA == true)
             {
-                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, true, false, polygonPoints_imar);
+                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, true, false, false, polygonPoints_imar);
                 poligonOzellikFormu.buton_yük_tipleri.Visible = false;
             }
             else if (isSelecting_Musaade == true)
             {
-                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, false, true, polygonPoints_imar);
+                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, false, true, false, polygonPoints_imar);
+            }
+            else if (isSelecting_Kentsel_Donusum == true)
+            {
+                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, false, false, true, polygonPoints_imar);
+                poligonOzellikFormu.buton_yük_tipleri.Visible = false;
             }
 
             poligonOzellikFormu.Owner = this;
@@ -5221,127 +5229,147 @@ namespace SLF
             GMapOverlay polygonOverlay,     // the overlay that user just drew the polygon(s) in
             List<PointLatLng> polygonPoints)
         {
-            // make sure there's actually a polygon
+            // Make sure there's actually a polygon
             if (polygonOverlay == null || polygonOverlay.Polygons.Count == 0)
             {
                 MessageBox.Show("Herhangi bir poligon çizilmemiştir. Önce poligon çiziniz.");
                 return;
             }
+
+            // Determine the tag based on the active condition
+            string overlayTag = "";
+            if (isSelecting_YGA)
+                overlayTag = "YGA";
+            else if (isSelecting_YUK)
+                overlayTag = "YUK";
+            else if (isSelecting_Musaade)
+                overlayTag = "MUSAADE";
+            else if (isSelecting_Kentsel_Donusum)
+                overlayTag = "KENTSEL_DONUSUM";
             else
             {
-                markerOverlay_ea.Markers?.Clear();
-                markerOverlay_DEK.Markers?.Clear();
-                markerOverlay_imar.Markers?.Clear();
-                markerOverlay_yuk.Markers?.Clear();
-
-                //Figure out which map array & layerIndex this overlay belongs to
-                layer_index = FindLayerIndexFromOverlay(polygonOverlay);
-
-                if (layer_index < 0)
-                {
-                    MessageBox.Show("Çizilen poligon geçersiz bir katmana ait!");
-                    return;
-                }
-
-                // re-color the polygon
-                foreach (var poly in polygonOverlay.Polygons)
-                {
-                    poly.Stroke = new Pen(cbs.overlayColors[layer_index].BorderColor, 3);
-                    poly.Fill = new SolidBrush(cbs.overlayColors[layer_index].FillColor);
-                }
-
-                // identify the dictionary for that overlay
-                Dictionary<GMapPolygon, DataRow> sourceDict = null;
-                if (polygonOverlay == cbs.tüm_katmanlar_array_imar[layer_index])
-                    sourceDict = cbs.polygonAttributes_imar;
-                else if (polygonOverlay == cbs.tüm_katmanlar_array_yuk[layer_index])
-                    sourceDict = cbs.polygonAttributes_yuk;
-
-                else
-                {
-                    MessageBox.Show("Overlay dictionary eşleşmedi!");
-                    return;
-                }
-
-                // create a DataTable for the layer
-                DataTable polygonDataTable = poligonOzellikFormu.PolygonDataTable;
-                cbs.tüm_katmanlar_datatable[layer_index] = polygonDataTable;
-
-                // if you assume just one polygon => one row, store it in the dictionary
-                DataRow singleRow = (polygonDataTable.Rows.Count > 0) ? polygonDataTable.Rows[0] : null;
-                if (singleRow != null)
-                {
-                    foreach (var userPoly in polygonOverlay.Polygons)
-                    {
-                        sourceDict[userPoly] = singleRow;
-                    }
-                }
-
-                //name for this layer
-                string layerName = "Polygon_" + (layer_index + 1);
-                cbs.tüm_katmanlar_array_names[layer_index] = layerName;
-
-                // convert to shapefile
-                MapWinGIS.Shapefile shp = cbs.ConvertOverlayToShapefile(polygonOverlay);
-                cbs.shapeFileArray_MapWinGIS[layer_index] = shp;
-
-                // copy to other overlays + dictionaries
-                if (polygonOverlay != cbs.tüm_katmanlar_array_imar[layer_index])
-                {
-                    GMapOverlay newImar = new GMapOverlay($"PolygonLayer_{layer_index + 1}");
-                    gMapControl_imar.Overlays.Add(newImar);
-                    cbs.tüm_katmanlar_array_imar[layer_index] = newImar;
-
-                    cbs.CopyOverlayContents(
-                        polygonOverlay,
-                        cbs.tüm_katmanlar_array_imar[layer_index],
-                        sourceDict,
-                        cbs.polygonAttributes_imar
-                    );
-                }
-
-                if (polygonOverlay != cbs.tüm_katmanlar_array_yuk[layer_index])
-                {
-
-                    GMapOverlay newYuk = new GMapOverlay($"PolygonLayer_{layer_index + 1}");
-                    gMapControl_yuk.Overlays.Add(newYuk);
-                    cbs.tüm_katmanlar_array_yuk[layer_index] = newYuk;
-
-                    cbs.CopyOverlayContents(
-                        polygonOverlay,
-                        cbs.tüm_katmanlar_array_yuk[layer_index],
-                        sourceDict,
-                        cbs.polygonAttributes_yuk
-                    );
-                }
-
-
-                // Update the checkboxes for that layer in each 4 different map
-                List<CheckBox> associatedChecks = GetCheckBoxesByIndex(layer_index);
-                foreach (var chk in associatedChecks)
-                {
-                    chk.Text = polygonOverlay.Id;   // display layer name
-                    chk.Visible = true;
-                    chk.Checked = true;
-                    chk.ForeColor = cbs.overlayColors[layer_index].BorderColor;
-                }
-
-                // Prepare a new overlay for future use
-                polygonOverlay = null;
-                polygonPoints.Clear();
-                isSelecting_polygon = false;
-
-                gMapControl_imar.Refresh();
-                gMapControl_yuk.Refresh();
-
-                mesafe_metre_imar.Text = "";
-                Mesafe_imar.Text = "";
-
-                MessageBox.Show("Poligon kaydedildi!");
-
-                isSelecting_YGA = false;
-                isSelecting_YUK = false;
+                MessageBox.Show("Geçerli bir poligon türü seçilmemiş!");
+                return;
             }
+
+            // Store the tag for the original polygon overlay
+            overlayTags[polygonOverlay] = overlayTag; 
+
+            // Clear markers from all overlays
+            markerOverlay_ea.Markers?.Clear();
+            markerOverlay_DEK.Markers?.Clear();
+            markerOverlay_imar.Markers?.Clear();
+            markerOverlay_yuk.Markers?.Clear();
+
+            // Figure out which map array & layerIndex this overlay belongs to
+            layer_index = FindLayerIndexFromOverlay(polygonOverlay);
+
+            if (layer_index < 0)
+            {
+                MessageBox.Show("Çizilen poligon geçersiz bir katmana ait!");
+                return;
+            }
+
+            // Re-color the polygon
+            foreach (var poly in polygonOverlay.Polygons)
+            {
+                poly.Stroke = new Pen(cbs.overlayColors[layer_index].BorderColor, 3);
+                poly.Fill = new SolidBrush(cbs.overlayColors[layer_index].FillColor);
+            }
+
+            // Identify the dictionary for that overlay
+            Dictionary<GMapPolygon, DataRow> sourceDict = null;
+            if (polygonOverlay == cbs.tüm_katmanlar_array_imar[layer_index])
+                sourceDict = cbs.polygonAttributes_imar;
+            else if (polygonOverlay == cbs.tüm_katmanlar_array_yuk[layer_index])
+                sourceDict = cbs.polygonAttributes_yuk;
+            else
+            {
+                MessageBox.Show("Overlay dictionary eşleşmedi!");
+                return;
+            }
+
+            // Create a DataTable for the layer
+            DataTable polygonDataTable = poligonOzellikFormu.PolygonDataTable;
+            cbs.tüm_katmanlar_datatable[layer_index] = polygonDataTable;
+
+            // If you assume just one polygon => one row, store it in the dictionary
+            DataRow singleRow = (polygonDataTable.Rows.Count > 0) ? polygonDataTable.Rows[0] : null;
+            if (singleRow != null)
+            {
+                foreach (var userPoly in polygonOverlay.Polygons)
+                {
+                    sourceDict[userPoly] = singleRow;
+                }
+            }
+
+            // Name for this layer
+            string layerName = "Polygon_" + (layer_index + 1);
+            cbs.tüm_katmanlar_array_names[layer_index] = layerName;
+
+            // Convert to shapefile
+            MapWinGIS.Shapefile shp = cbs.ConvertOverlayToShapefile(polygonOverlay);
+            cbs.shapeFileArray_MapWinGIS[layer_index] = shp;
+
+            // Copy to other overlays + dictionaries
+            if (polygonOverlay != cbs.tüm_katmanlar_array_imar[layer_index])
+    {
+                GMapOverlay newImar = new GMapOverlay($"PolygonLayer_{layer_index + 1}");
+                overlayTags[newImar] = overlayTag; // Store tag for the new imar overlay
+                gMapControl_imar.Overlays.Add(newImar);
+                cbs.tüm_katmanlar_array_imar[layer_index] = newImar;
+
+                cbs.CopyOverlayContents(
+                    polygonOverlay,
+                    cbs.tüm_katmanlar_array_imar[layer_index],
+                    sourceDict,
+                    cbs.polygonAttributes_imar
+                );
+            }
+
+            if (polygonOverlay != cbs.tüm_katmanlar_array_yuk[layer_index])
+            {
+                GMapOverlay newYuk = new GMapOverlay($"PolygonLayer_{layer_index + 1}");
+                overlayTags[newYuk] = overlayTag; // Store tag for the new yuk overlay
+                gMapControl_yuk.Overlays.Add(newYuk);
+                cbs.tüm_katmanlar_array_yuk[layer_index] = newYuk;
+
+                cbs.CopyOverlayContents(
+                    polygonOverlay,
+                    cbs.tüm_katmanlar_array_yuk[layer_index],
+                    sourceDict,
+                    cbs.polygonAttributes_yuk
+                );
+            }
+
+            // Update the checkboxes for that layer in each 4 different map
+            List<CheckBox> associatedChecks = GetCheckBoxesByIndex(layer_index);
+            foreach (var chk in associatedChecks)
+            {
+                chk.Text = polygonOverlay.Id;   // Display layer name
+                chk.Visible = true;
+                chk.Checked = true;
+                chk.ForeColor = cbs.overlayColors[layer_index].BorderColor;
+                chk.Tag = overlayTag; // Set tag for the checkbox
+            }
+
+            // Prepare a new overlay for future use
+            polygonOverlay = null;
+            polygonPoints.Clear();
+            isSelecting_polygon = false;
+
+            gMapControl_imar.Refresh();
+            gMapControl_yuk.Refresh();
+
+            mesafe_metre_imar.Text = "";
+            Mesafe_imar.Text = "";
+
+            MessageBox.Show("Poligon kaydedildi!");
+
+            isSelecting_YGA = false;
+            isSelecting_YUK = false;
+            isSelecting_Musaade = false;
+            isSelecting_Kentsel_Donusum = false;
         }
 
 
@@ -7861,6 +7889,21 @@ namespace SLF
             }
         }
 
+        private void Kentsel_Donusum_Ekle_Click(object sender, EventArgs e)
+        {
+            isSelecting_polygon = true;
+            isSelecting_Kentsel_Donusum = true;
+
+            isRulerEnabled = false;
+            isRulerActive = false;
+
+            // Determine the active map control and reset accordingly
+            if (cbs.GetActiveGMapControl() == gMapControl_imar)
+            {
+                ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar, 
+                    rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
+            }
+        }
 
         private void TextBox_KeyPress_NumbersOnly(object sender, KeyPressEventArgs e)
         {
