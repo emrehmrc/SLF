@@ -15,6 +15,8 @@ using System.Windows.Forms;
 using GMap.NET.WindowsForms.Markers;
 using System.Globalization;
 using System.Xml.Linq;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using System.IO.Ports;
 
 namespace SLF
 {
@@ -23,11 +25,12 @@ namespace SLF
         // the main index to use within the arrays and the associated checkboxes
         public int layer_index;
 
-        private Dictionary<string, Color> currentImarTipiColorMap; // Stores the color mapping for the current KML file
+        private Dictionary<string, System.Drawing.Color> currentImarTipiColorMap; // Stores the color mapping for the current KML file
 
         // GMapOverlay arrays, one per map:
         public GMapOverlay[] tüm_katmanlar_array_imar = new GMapOverlay[15];
         public GMapOverlay[] tüm_katmanlar_array_yuk = new GMapOverlay[15];
+        public string[] tüm_katmanlar_array_polygon_tags = new string[15];
 
         public string[] tüm_katmanlar_array_names = new string[15];
         public System.Data.DataTable[] tüm_katmanlar_datatable = new DataTable[15];
@@ -45,6 +48,8 @@ namespace SLF
 
         public string imported_filename;
 
+        // the opacity of the Overlay leyers
+        private const int opacity = 50;
 
         // ---------- GRID VARIABLES  --------- //
         public GMapOverlay bounding_box_overlay;
@@ -226,6 +231,7 @@ namespace SLF
 
                     tüm_katmanlar_datatable[layer_index] = dt;
                     tüm_katmanlar_array_names[layer_index] = imported_filename;
+                    tüm_katmanlar_array_polygon_tags[layer_index] = "IMPORTED"; // Default tag for imported layers
 
                     List<CheckBox> associatedChecks = modülFormu.GetCheckBoxesByIndex(layer_index);
                     foreach (var chk in associatedChecks)
@@ -234,6 +240,7 @@ namespace SLF
                         chk.Visible = true;
                         chk.Checked = true;
                         chk.ForeColor = overlayColors[layer_index].BorderColor;
+                        chk.Tag = (layer_index + 1).ToString(); // Set Tag to 1-based layer index
                     }
 
                     // Mark all categories for update
@@ -366,21 +373,21 @@ namespace SLF
         // define default colors for each overlay object
         public (System.Drawing.Color BorderColor, System.Drawing.Color FillColor)[] overlayColors = new (System.Drawing.Color, System.Drawing.Color)[]
         {
-            (System.Drawing.Color.Red, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Red)),
-            (System.Drawing.Color.Blue, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Blue)),
-            (System.Drawing.Color.Green, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Green)),
-            (System.Drawing.Color.DarkGoldenrod, System.Drawing.Color.FromArgb(50, System.Drawing.Color.DarkGoldenrod)),
-            (System.Drawing.Color.Purple, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Purple)),
-            (System.Drawing.Color.Orange, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Orange)),
-            (System.Drawing.Color.Pink, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Pink)),
-            (System.Drawing.Color.Brown, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Brown)),
-            (System.Drawing.Color.Gray, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Gray)),
-            (System.Drawing.Color.Cyan, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Cyan)),
-            (System.Drawing.Color.DarkTurquoise, System.Drawing.Color.FromArgb(50, System.Drawing.Color.DarkTurquoise)),
-            (System.Drawing.Color.Black, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Black)),
-            (System.Drawing.Color.Violet, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Violet)),
-            (System.Drawing.Color.Violet, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Ivory)),
-            (System.Drawing.Color.Violet, System.Drawing.Color.FromArgb(50, System.Drawing.Color.Navy))
+            (System.Drawing.Color.Red, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Red)),
+            (System.Drawing.Color.Blue, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Blue)),
+            (System.Drawing.Color.Green, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Green)),
+            (System.Drawing.Color.DarkGoldenrod, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.DarkGoldenrod)),
+            (System.Drawing.Color.Purple, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Purple)),
+            (System.Drawing.Color.Orange, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Orange)),
+            (System.Drawing.Color.Pink, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Pink)),
+            (System.Drawing.Color.Brown, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Brown)),
+            (System.Drawing.Color.Gray, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Gray)),
+            (System.Drawing.Color.Cyan, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Cyan)),
+            (System.Drawing.Color.DarkTurquoise, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.DarkTurquoise)),
+            (System.Drawing.Color.Black, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Black)),
+            (System.Drawing.Color.Violet, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Violet)),
+            (System.Drawing.Color.Violet, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Ivory)),
+            (System.Drawing.Color.Violet, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Navy))
         };
 
         private System.Data.DataTable LoadAttributeTable(DataRow row, DataGridView dataGridView,
@@ -416,11 +423,18 @@ namespace SLF
                 points_list.Add(new PointLatLng(coord.Y, coord.X));
             }
 
+            // Get the base fill and border colors
+            System.Drawing.Color baseFillColor = overlayColors[layer_index].FillColor;
+            System.Drawing.Color baseBorderColor = overlayColors[layer_index].BorderColor;
+
+            // Set the alpha value to 50 for 20% opacity for the fill
+            System.Drawing.Color transparentFillColor = System.Drawing.Color.FromArgb(opacity, baseFillColor.R, baseFillColor.G, baseFillColor.B);
+
             // Create the GMapPolygon
             GMapPolygon gMapPolygon = new GMapPolygon(points_list, gMapPolygonId)
             {
-                Stroke = new Pen(overlayColors[layer_index].BorderColor, 3),
-                Fill = new SolidBrush(overlayColors[layer_index].FillColor)
+                Stroke = new Pen(baseBorderColor, 3), // Use original border color or transparentBorderColor if uncommented
+                Fill = new SolidBrush(transparentFillColor)
             };
 
             // Store the Row_No in the polygon's Tag property
@@ -473,16 +487,24 @@ namespace SLF
                 .Select(p => p.Value)
                 .ToList();
 
+
+            // Get the base border color
+            System.Drawing.Color borderColor = overlayColors[layer_index].BorderColor;
+
+            // Set the alpha value to 50 for 20% opacity
+            System.Drawing.Color transparentBorderColor = System.Drawing.Color.FromArgb(opacity, borderColor.R, borderColor.G, borderColor.B);
+
             var route = new GMapRoute(points, "KmlLineString")
             {
-                Stroke = new Pen(overlayColors[layer_index].BorderColor, 3)
+                Stroke = new Pen(transparentBorderColor, 3)
             };
+
             overlay.Routes.Add(route);
         }
 
-        private static Color[] GenerateDistinguishableColors(int count)
+        private static System.Drawing.Color[] GenerateDistinguishableColors(int count)
         {
-            Color[] colors = new Color[count];
+            System.Drawing.Color[] colors = new System.Drawing.Color[count];
             for (int i = 0; i < count; i++)
             {
                 double hue = i * (360.0 / count);
@@ -506,7 +528,7 @@ namespace SLF
                 else if (hi == 4) { r = t; g = p; b = v; }
                 else { r = v; g = p; b = q; }
 
-                colors[i] = Color.FromArgb(255, r, g, b);
+                colors[i] = System.Drawing.Color.FromArgb(255, r, g, b);
             }
             return colors;
         }
@@ -532,8 +554,8 @@ namespace SLF
                 .ToList();
 
             // Varsayılan renk
-            Color fillColor = overlayColors[layer_index].FillColor;
-            Color borderColor = overlayColors[layer_index].BorderColor;
+            System.Drawing.Color fillColor = overlayColors[layer_index].FillColor;
+            System.Drawing.Color borderColor = overlayColors[layer_index].BorderColor;
 
             // imported_filename ile kontrol et
             if (imported_filename == "İMAR_SONUÇLAR.kml" && currentImarTipiColorMap != null)
@@ -541,10 +563,10 @@ namespace SLF
                 if (attributes.Table.Columns.Contains("İmar Tipi") && attributes["İmar Tipi"] != DBNull.Value)
                 {
                     string imarTipi = attributes["İmar Tipi"].ToString();
-                    if (currentImarTipiColorMap.TryGetValue(imarTipi, out Color mappedColor))
+                    if (currentImarTipiColorMap.TryGetValue(imarTipi, out System.Drawing.Color mappedColor))
                     {
                         fillColor = mappedColor;
-                        borderColor = Color.Black;
+                        borderColor = System.Drawing.Color.Black;
                     }
                     else
                     {
@@ -557,8 +579,7 @@ namespace SLF
                 }
             }
 
-            // Opacity'yi 0.5 yapmak için alpha değerini 128'e ayarla
-            fillColor = Color.FromArgb(128, fillColor.R, fillColor.G, fillColor.B);
+            fillColor = System.Drawing.Color.FromArgb(opacity, fillColor.R, fillColor.G, fillColor.B);
 
             GMapPolygon polygon = new GMapPolygon(points, "KmlPolygon")
             {
@@ -1009,8 +1030,8 @@ namespace SLF
 
                     if (imarTipiValues.Any())
                     {
-                        Color[] colors = GenerateDistinguishableColors(imarTipiValues.Count);
-                        currentImarTipiColorMap = new Dictionary<string, Color>();
+                        System.Drawing.Color[] colors = GenerateDistinguishableColors(imarTipiValues.Count);
+                        currentImarTipiColorMap = new Dictionary<string, System.Drawing.Color>();
                         for (int i = 0; i < imarTipiValues.Count; i++)
                         {
                             currentImarTipiColorMap[imarTipiValues[i]] = colors[i];
@@ -1021,7 +1042,7 @@ namespace SLF
                         {
                             modülFormu.imar_legendPanel = new Panel
                             {
-                                BackColor = Color.White,
+                                BackColor = System.Drawing.Color.White,
                                 BorderStyle = BorderStyle.FixedSingle,
                                 Location = new System.Drawing.Point(gMapControl.Width - 200, 10),
                                 Size = new Size(190, imarTipiValues.Count * 20 + 30),
@@ -1484,12 +1505,12 @@ namespace SLF
                 foreach (var poly in gridOverlay.Polygons)
                 {
                     poly.Stroke = new Pen(overlayColors[index].BorderColor, 3);
-                    poly.Fill = new SolidBrush(Color.FromArgb(100, overlayColors[index].FillColor));
+                    poly.Fill = new SolidBrush(System.Drawing.Color.FromArgb(opacity, overlayColors[index].FillColor));
                 }
 
                 // Highlight new selected polygon
-                polygon.Stroke = new Pen(Color.LawnGreen, 3);
-                polygon.Fill = new SolidBrush(Color.FromArgb(50, Color.LawnGreen));
+                polygon.Stroke = new Pen(System.Drawing.Color.LawnGreen, 3);
+                polygon.Fill = new SolidBrush(System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.LawnGreen));
 
                 gMapControl.Refresh();
             }
@@ -1564,17 +1585,17 @@ namespace SLF
                                 row.Table.Columns.Contains("İmar Tipi") && row["İmar Tipi"] != DBNull.Value)
                             {
                                 string imarTipi = row["İmar Tipi"].ToString();
-                                if (currentImarTipiColorMap.TryGetValue(imarTipi, out Color mappedColor))
+                                if (currentImarTipiColorMap.TryGetValue(imarTipi, out System.Drawing.Color mappedColor))
                                 {
                                     if (selectedPolygonImar != null)
                                     {
-                                        selectedPolygonImar.Stroke = new Pen(Color.Black, 3);
-                                        selectedPolygonImar.Fill = new SolidBrush(Color.FromArgb(100, mappedColor));
+                                        selectedPolygonImar.Stroke = new Pen(System.Drawing.Color.Black, 3);
+                                        selectedPolygonImar.Fill = new SolidBrush(System.Drawing.Color.FromArgb(opacity, mappedColor));
                                     }
                                     if (selectedPolygonYuk != null)
                                     {
-                                        selectedPolygonYuk.Stroke = new Pen(Color.Black, 3);
-                                        selectedPolygonYuk.Fill = new SolidBrush(Color.FromArgb(100, mappedColor));
+                                        selectedPolygonYuk.Stroke = new Pen(System.Drawing.Color.Black, 3);
+                                        selectedPolygonYuk.Fill = new SolidBrush(System.Drawing.Color.FromArgb(opacity, mappedColor));
                                     }
                                 }
                                 else
@@ -1583,12 +1604,12 @@ namespace SLF
                                     if (selectedPolygonImar != null)
                                     {
                                         selectedPolygonImar.Stroke = new Pen(overlayColors[overlayIndex].BorderColor, 3);
-                                        selectedPolygonImar.Fill = new SolidBrush(Color.FromArgb(100, overlayColors[overlayIndex].FillColor));
+                                        selectedPolygonImar.Fill = new SolidBrush(System.Drawing.Color.FromArgb(opacity, overlayColors[overlayIndex].FillColor));
                                     }
                                     if (selectedPolygonYuk != null)
                                     {
                                         selectedPolygonYuk.Stroke = new Pen(overlayColors[overlayIndex].BorderColor, 3);
-                                        selectedPolygonYuk.Fill = new SolidBrush(Color.FromArgb(100, overlayColors[overlayIndex].FillColor));
+                                        selectedPolygonYuk.Fill = new SolidBrush(System.Drawing.Color.FromArgb(opacity, overlayColors[overlayIndex].FillColor));
                                     }
                                 }
                             }
@@ -1598,12 +1619,12 @@ namespace SLF
                                 if (selectedPolygonImar != null)
                                 {
                                     selectedPolygonImar.Stroke = new Pen(overlayColors[overlayIndex].BorderColor, 3);
-                                    selectedPolygonImar.Fill = new SolidBrush(Color.FromArgb(100, overlayColors[overlayIndex].FillColor));
+                                    selectedPolygonImar.Fill = new SolidBrush(System.Drawing.Color.FromArgb(opacity, overlayColors[overlayIndex].FillColor));
                                 }
                                 if (selectedPolygonYuk != null)
                                 {
                                     selectedPolygonYuk.Stroke = new Pen(overlayColors[overlayIndex].BorderColor, 3);
-                                    selectedPolygonYuk.Fill = new SolidBrush(Color.FromArgb(100, overlayColors[overlayIndex].FillColor));
+                                    selectedPolygonYuk.Fill = new SolidBrush(System.Drawing.Color.FromArgb(opacity, overlayColors[overlayIndex].FillColor));
                                 }
                             }
                         }
@@ -1613,12 +1634,12 @@ namespace SLF
                             if (selectedPolygonImar != null)
                             {
                                 selectedPolygonImar.Stroke = new Pen(overlayColors[overlayIndex].BorderColor, 3);
-                                selectedPolygonImar.Fill = new SolidBrush(Color.FromArgb(100, overlayColors[overlayIndex].FillColor));
+                                selectedPolygonImar.Fill = new SolidBrush(System.Drawing.Color.FromArgb(opacity, overlayColors[overlayIndex].FillColor));
                             }
                             if (selectedPolygonYuk != null)
                             {
                                 selectedPolygonYuk.Stroke = new Pen(overlayColors[overlayIndex].BorderColor, 3);
-                                selectedPolygonYuk.Fill = new SolidBrush(Color.FromArgb(100, overlayColors[overlayIndex].FillColor));
+                                selectedPolygonYuk.Fill = new SolidBrush(System.Drawing.Color.FromArgb(opacity, overlayColors[overlayIndex].FillColor));
                             }
                         }
                     }
@@ -1631,8 +1652,8 @@ namespace SLF
                     GMapPolygon polygonImar = tüm_katmanlar_array_imar[newOverlayIndexImar].Polygons.FirstOrDefault(p => p.Equals(polygon));
                     if (polygonImar != null)
                     {
-                        polygonImar.Stroke = new Pen(Color.LawnGreen, 3);
-                        polygonImar.Fill = new SolidBrush(Color.FromArgb(50, Color.LawnGreen));
+                        polygonImar.Stroke = new Pen(System.Drawing.Color.LawnGreen, 3);
+                        polygonImar.Fill = new SolidBrush(System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.LawnGreen));
                     }
                 }
                 if (newOverlayIndexYuk != -1)
@@ -1640,8 +1661,8 @@ namespace SLF
                     GMapPolygon polygonYuk = tüm_katmanlar_array_yuk[newOverlayIndexYuk].Polygons.FirstOrDefault(p => p.Equals(polygon));
                     if (polygonYuk != null)
                     {
-                        polygonYuk.Stroke = new Pen(Color.LawnGreen, 3);
-                        polygonYuk.Fill = new SolidBrush(Color.FromArgb(50, Color.LawnGreen));
+                        polygonYuk.Stroke = new Pen(System.Drawing.Color.LawnGreen, 3);
+                        polygonYuk.Fill = new SolidBrush(System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.LawnGreen));
                     }
                 }
 
@@ -1737,7 +1758,7 @@ namespace SLF
                         {
                             // Normalize the bracket index to a value between 0 and 1 for color mapping
                             double normalizedValue = (double)bracketIndex / (bracketCount - 1);
-                            Color heatColor = GetHeatmapColor(normalizedValue);
+                            System.Drawing.Color heatColor = GetHeatmapColor(normalizedValue);
                             polygon.Stroke = new Pen(heatColor, 1);
                             polygon.Fill = new SolidBrush(heatColor);
                             continue;
@@ -1746,8 +1767,8 @@ namespace SLF
                 }
 
                 // If parsing fails or no value is provided, color the polygon with a default gray.
-                polygon.Stroke = new Pen(Color.Gray, 1);
-                polygon.Fill = new SolidBrush(Color.Gray);
+                polygon.Stroke = new Pen(System.Drawing.Color.Gray, 1);
+                polygon.Fill = new SolidBrush(System.Drawing.Color.Gray);
             }
 
             // Refresh the map control to show updated colors.
@@ -2315,6 +2336,11 @@ namespace SLF
                 }
             }
 
+            modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_imar, "imar");
+            modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_yuk, "yük");
+
+            MessageBox.Show("Katmanlar başarıyla birleştirildi.!");
+
             gMapControl.Overlays.Add(resultingOverlay);
             gMapControl.Refresh();
 
@@ -2360,7 +2386,6 @@ namespace SLF
 
             // add the resulting layer and its name to the specified arrays
             tüm_katmanlar_array_imar[layer_index] = resultingOverlay;
-
             tüm_katmanlar_array_names[layer_index] = "Birleştirilmiş_Katman_" + layer_index.ToString();
 
             // create a data table object and fill it with the information from the joinedData object
@@ -2453,6 +2478,11 @@ namespace SLF
                     checkBox.Text = tüm_katmanlar_array_names[layer_index];
                 }
             }
+
+            modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_imar, "imar");
+            modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_yuk, "yük");
+
+            MessageBox.Show("Katmanlar başarıyla birleştirildi.!");
 
             gMapControl.Overlays.Add(resultingOverlay);
             gMapControl.Refresh();

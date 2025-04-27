@@ -19,10 +19,14 @@ namespace SLF
         public bool yuk_select;
         public bool musaade_select;
 
-        public Nokta_Yuk_Bilgi_Formu(string filePath)
+        public Nokta_Yuk_Bilgi_Formu(string filePath, bool yukSelect, bool musaadeSelect)
         {
             InitializeComponent();
+
             excelFilePath = filePath;
+            yuk_select = yukSelect;
+            musaade_select = musaadeSelect;
+
             LoadDataFromExcel();
             modül_formu = new ModülFormu();
         }
@@ -55,7 +59,7 @@ namespace SLF
             else
             {
                 // Handle invalid case (neither YUK nor Musaade selected)
-                MessageBox.Show("Geçersiz seçim: Ne YUK ne de Musaade seçildi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Geçersiz seçim", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 PopulateDefaultData();
                 return;
             }
@@ -78,7 +82,7 @@ namespace SLF
 
                         // Select the appropriate sheet
                         DataTable excelTable;
-                        if (modül_formu.isSelecting_YUK)
+                        if (yuk_select)
                         {
                             // Read the first sheet (index 0)
                             if (result.Tables.Count < 1)
@@ -87,7 +91,7 @@ namespace SLF
                             }
                             excelTable = result.Tables[0];
                         }
-                        else if (modül_formu.isSelecting_Musaade)
+                        else if (musaade_select)
                         {
                             // Read the second sheet (index 1)
                             if (result.Tables.Count < 2)
@@ -98,14 +102,14 @@ namespace SLF
                         }
                         else
                         {
-                            throw new Exception("Geçersiz seçim: Ne YUK ne de Musaade seçildi.");
+                            throw new Exception("Geçersiz seçim");
                         }
 
                         // Copy data from Excel table to our DataTable
                         foreach (DataRow row in excelTable.Rows)
                         {
                             var newRow = dataTable.NewRow();
-                            if (modül_formu.isSelecting_YUK)
+                            if (yuk_select)
                             {
                                 newRow["Tipi"] = row["Tipi"]?.ToString() ?? string.Empty;
                                 newRow["Ortalama Kapladığı Alan (m2)"] = row["Ortalama Kapladığı Alan (m2)"]?.ToString() ?? string.Empty;
@@ -114,7 +118,7 @@ namespace SLF
                                 newRow["Pik Yüklenme (%)"] = row["Pik Yüklenme (%)"]?.ToString() ?? string.Empty;
                                 newRow["Pik Demant (kW)"] = row["Pik Demant (kW)"]?.ToString() ?? string.Empty;
                             }
-                            else if (modül_formu.isSelecting_Musaade)
+                            else if (musaade_select)
                             {
                                 newRow["Tipi"] = row["Tipi"]?.ToString() ?? string.Empty;
                                 newRow["ENERJI_MUSAADE_ABONE_GRUBU"] = row["ENERJI_MUSAADE_ABONE_GRUBU"]?.ToString() ?? string.Empty;
@@ -155,8 +159,9 @@ namespace SLF
                 dataTable.Columns.Clear();
             }
 
+
             // Define columns and default data based on the selected condition
-            if (modül_formu.isSelecting_YUK)
+            if (yuk_select)
             {
                 // Define columns for the first sheet (YUK)
                 dataTable.Columns.Add("Tipi", typeof(string));
@@ -206,7 +211,7 @@ namespace SLF
                     dataTable.Rows.Add(row);
                 }
             }
-            else if (modül_formu.isSelecting_Musaade)
+            else if (musaade_select)
             {
                 // Define columns for the second sheet (Musaade)
                 dataTable.Columns.Add("Tipi", typeof(string));

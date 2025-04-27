@@ -110,7 +110,6 @@
             this.panel7.Name = "panel7";
             this.panel7.Size = new System.Drawing.Size(228, 160);
             this.panel7.TabIndex = 13;
-            this.panel7.Paint += new System.Windows.Forms.PaintEventHandler(this.panel7_Paint);
             // 
             // checkedListBox2
             // 
@@ -195,7 +194,6 @@
             this.checkedListBox1.Size = new System.Drawing.Size(168, 157);
             this.checkedListBox1.TabIndex = 1;
             this.checkedListBox1.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.checkedListBox_ItemCheck);
-            this.checkedListBox1.SelectedIndexChanged += new System.EventHandler(this.checkedListBox1_SelectedIndexChanged);
             // 
             // panel2
             // 
@@ -359,7 +357,6 @@
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "DTR_Arayuz";
             this.Text = "Optimal DTR Konumlandırma";
-            this.Load += new System.EventHandler(this.DTR_Arayuz_Load);
             this.panel3.ResumeLayout(false);
             this.panel7.ResumeLayout(false);
             this.panel7.PerformLayout();

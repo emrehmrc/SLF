@@ -167,6 +167,7 @@ namespace SLF
                             worksheet.Column(col).Width = 15;
                         }
                     }
+
                     FileInfo file = new FileInfo(filePath);
                     package.Workbook.CalcMode = ExcelCalcMode.Automatic;
                     package.SaveAs(file);

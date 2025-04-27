@@ -486,52 +486,6 @@ namespace SLF.Optimal_DTR
             return "Hiçbiri seçili değil";
         }
 
-        private void SaveTransformersAsGeoJSON()
-        {
-            List<object> features = new List<object>();
-
-            foreach (var marker in overlay.Markers)
-            {
-                string[] tooltipParts = marker.ToolTipText.Split('\n');
-
-                var properties = new
-                {
-                    TrafoID = tooltipParts[0].Replace("TrafoID: ", ""),
-                    Owner = tooltipParts[1].Replace("Owner: ", ""),
-                    Year = tooltipParts[2].Replace("Year: ", ""),
-                    Durum = tooltipParts[3].Replace("Trafo Durumu: ", "")
-                };
-
-                var point = new
-                {
-                    type = "Feature",
-                    geometry = new
-                    {
-                        type = "Point",
-                        coordinates = new double[] { marker.Position.Lng, marker.Position.Lat }
-                    },
-                    properties = properties // Tüm trafo bilgileri burada saklanıyor
-                };
-
-                features.Add(point);
-            }
-
-            var geoJson = new
-            {
-                type = "FeatureCollection",
-                features = features
-            };
-
-            string json = JsonConvert.SerializeObject(geoJson, Formatting.Indented);
-            string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Trafos.geojson");
-
-            File.WriteAllText(filePath, json, Encoding.UTF8);
-
-            MessageBox.Show($"GeoJSON dosyası kaydedildi:\n{filePath}\nQGIS'te açabilirsiniz.",
-                            "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-
         private void ODTRconfig()
         {
             var configODTR = new
@@ -602,22 +556,6 @@ namespace SLF.Optimal_DTR
                 }
             }
 
-        }
-
-        private void checkedListBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void panel7_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-
-        private void DTR_Arayuz_Load(object sender, EventArgs e)
-        {
-            
         }
 
         private void checkedListBox_ItemCheck(object sender, ItemCheckEventArgs e)

@@ -52,7 +52,8 @@ namespace SLF
         GMapOverlay simulationOverlay = new GMapOverlay("Simulasyon_Layer");
         GMapOverlay cellToolTipOverlay = new GMapOverlay("CellToolTips");
 
-        private Dictionary<GMapOverlay, string> overlayTags = new Dictionary<GMapOverlay, string>();
+        public Dictionary<GMapOverlay, string> overlayTags = new Dictionary<GMapOverlay, string>();
+
         public static string SelectedCellId { get; set; }
 
 
@@ -5253,7 +5254,8 @@ namespace SLF
             }
 
             // Store the tag for the original polygon overlay
-            overlayTags[polygonOverlay] = overlayTag; 
+            overlayTags[polygonOverlay] = overlayTag; // Keep for compatibility
+            cbs.tüm_katmanlar_array_polygon_tags[layer_index] = overlayTag; // Store in new array
 
             // Clear markers from all overlays
             markerOverlay_ea.Markers?.Clear();
@@ -5285,8 +5287,7 @@ namespace SLF
                 sourceDict = cbs.polygonAttributes_yuk;
             else
             {
-                MessageBox.Show("Overlay dictionary eşleşmedi!");
-                return;
+                sourceDict = cbs.polygonAttributes_imar; // Default to imar for user-drawn polygons
             }
 
             // Create a DataTable for the layer
@@ -5313,9 +5314,9 @@ namespace SLF
 
             // Copy to other overlays + dictionaries
             if (polygonOverlay != cbs.tüm_katmanlar_array_imar[layer_index])
-    {
+            {
                 GMapOverlay newImar = new GMapOverlay($"PolygonLayer_{layer_index + 1}");
-                overlayTags[newImar] = overlayTag; // Store tag for the new imar overlay
+                overlayTags[newImar] = overlayTag; // Keep for compatibility
                 gMapControl_imar.Overlays.Add(newImar);
                 cbs.tüm_katmanlar_array_imar[layer_index] = newImar;
 
@@ -5330,7 +5331,7 @@ namespace SLF
             if (polygonOverlay != cbs.tüm_katmanlar_array_yuk[layer_index])
             {
                 GMapOverlay newYuk = new GMapOverlay($"PolygonLayer_{layer_index + 1}");
-                overlayTags[newYuk] = overlayTag; // Store tag for the new yuk overlay
+                overlayTags[newYuk] = overlayTag; // Keep for compatibility
                 gMapControl_yuk.Overlays.Add(newYuk);
                 cbs.tüm_katmanlar_array_yuk[layer_index] = newYuk;
 
@@ -5342,15 +5343,15 @@ namespace SLF
                 );
             }
 
-            // Update the checkboxes for that layer in each 4 different map
+            // Update the checkboxes for that layer in each map
             List<CheckBox> associatedChecks = GetCheckBoxesByIndex(layer_index);
             foreach (var chk in associatedChecks)
             {
-                chk.Text = polygonOverlay.Id;   // Display layer name
+                chk.Text = layerName; // e.g., "Polygon_1"
                 chk.Visible = true;
                 chk.Checked = true;
                 chk.ForeColor = cbs.overlayColors[layer_index].BorderColor;
-                chk.Tag = overlayTag; // Set tag for the checkbox
+                chk.Tag = (layer_index + 1).ToString(); // Set Tag to 1-based layer index (e.g., "1")
             }
 
             // Prepare a new overlay for future use
@@ -5554,36 +5555,72 @@ namespace SLF
         {
             if (lastSelectedCheckboxIndex < 0 ||
                 lastSelectedCheckboxIndex >= cbs.tüm_katmanlar_array_imar.Length ||
-                lastSelectedCheckboxIndex >= cbs.tüm_katmanlar_array_yuk.Length) return;
+                lastSelectedCheckboxIndex >= cbs.tüm_katmanlar_array_yuk.Length)
+            {
+                MessageBox.Show($"Geçersiz katman indeksi: {lastSelectedCheckboxIndex}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             // Get the overlays associated with the last selected checkbox
             GMapOverlay imarOverlay = cbs.tüm_katmanlar_array_imar[lastSelectedCheckboxIndex];
             GMapOverlay yukOverlay = cbs.tüm_katmanlar_array_yuk[lastSelectedCheckboxIndex];
 
-            if (imarOverlay == null && yukOverlay == null) return; // If both overlays are null, exit
+            if (imarOverlay == null && yukOverlay == null)
+            {
+                MessageBox.Show("Hem imar hem de yük katmanı boş.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             // Find the polygons with the matching Row_No
             GMapPolygon imarPolygon = null;
             GMapPolygon yukPolygon = null;
 
-            // Adjust rowIndex to match Row_No (Row_No starts at 1, rowIndex might be 0-based from DataGridView)
+            // Adjust rowIndex to match Row_No (Row_No starts at 1, rowIndex is 0-based from DataGridView)
             int targetRowNo = rowIndex + 1; // Assuming rowIndex is 0-based in DataGridView
 
-            if (imarOverlay != null)
+            // Try to find imarPolygon
+            if (imarOverlay != null && imarOverlay.Polygons.Count > 0)
             {
                 imarPolygon = imarOverlay.Polygons.FirstOrDefault(p => p.Tag != null && Convert.ToInt32(p.Tag) == targetRowNo);
+                if (imarPolygon == null)
+                {
+                    // Fallback: Try matching by index if Tag doesn't work
+                    if (rowIndex < imarOverlay.Polygons.Count)
+                    {
+                        imarPolygon = imarOverlay.Polygons[rowIndex];
+                        Console.WriteLine($"imarPolygon için Tag eşleşmedi, index {rowIndex} kullanıldı.");
+                    }
+                }
             }
 
-            if (yukOverlay != null)
+            // Try to find yukPolygon
+            if (yukOverlay != null && yukOverlay.Polygons.Count > 0)
             {
                 yukPolygon = yukOverlay.Polygons.FirstOrDefault(p => p.Tag != null && Convert.ToInt32(p.Tag) == targetRowNo);
+                if (yukPolygon == null)
+                {
+                    // Fallback: Try matching by index if Tag doesn't work
+                    if (rowIndex < yukOverlay.Polygons.Count)
+                    {
+                        yukPolygon = yukOverlay.Polygons[rowIndex];
+                        Console.WriteLine($"yukPolygon için Tag eşleşmedi, index {rowIndex} kullanıldı.");
+                    }
+                }
             }
 
-            if (imarPolygon == null && yukPolygon == null) return; // If no polygons are found, exit
+            if (imarPolygon == null && yukPolygon == null)
+            {
+                string debugInfo = $"Row_No: {targetRowNo}, imarOverlay Polygons: {(imarOverlay?.Polygons.Count ?? 0)}, yukOverlay Polygons: {(yukOverlay?.Polygons.Count ?? 0)}";
+                MessageBox.Show($"Seçilen satıra karşılık gelen poligon bulunamadı.\n{debugInfo}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             // Calculate the bounding box (use either polygon, assuming they represent the same feature)
             GMapPolygon targetPolygon = imarPolygon ?? yukPolygon; // Use imarPolygon if available, otherwise yukPolygon
-            if (targetPolygon == null) return;
+            if (targetPolygon == null)
+            {
+                return;
+            }
 
             double minLat = double.MaxValue, maxLat = double.MinValue;
             double minLng = double.MaxValue, maxLng = double.MinValue;
@@ -5607,22 +5644,46 @@ namespace SLF
             // Create the bounding box
             GMap.NET.RectLatLng bounds = new GMap.NET.RectLatLng(maxLat, minLng, maxLng - minLng, maxLat - minLat);
 
+            // Reset previously highlighted polygons
+            if (highlightedPolygon != null)
+            {
+                if (imarOverlay?.Polygons.Contains(highlightedPolygon) == true)
+                {
+                    highlightedPolygon.Stroke = new Pen(cbs.overlayColors[lastSelectedCheckboxIndex].BorderColor, 3);
+                }
+                if (yukOverlay?.Polygons.Contains(highlightedPolygon) == true)
+                {
+                    highlightedPolygon.Stroke = new Pen(cbs.overlayColors[lastSelectedCheckboxIndex].BorderColor, 3);
+                }
+            }
+
             // Highlight and zoom in gMapControl_imar if the polygon exists
-            if (imarPolygon != null)
+            if (imarPolygon != null && imarOverlay != null)
             {
                 highlightedPolygon = imarPolygon;
                 imarPolygon.Stroke = new Pen(Color.Yellow, 3); // Highlight with a yellow border
+                gMapControl_imar.Position = new GMap.NET.PointLatLng((minLat + maxLat) / 2, (minLng + maxLng) / 2); // Center the map
                 gMapControl_imar.SetZoomToFitRect(bounds);
                 gMapControl_imar.Refresh();
+                Console.WriteLine("gMapControl_imar zoomed and highlighted.");
             }
 
-            // Highlight and zoom in gMapControl_yuk if the polygon exists
-            if (yukPolygon != null)
+            // Highlight and zoom in gMapControl_yuk if the polygon exists or if imarPolygon was used
+            if (yukOverlay != null)
             {
-                highlightedPolygon = yukPolygon; // Update highlightedPolygon to the yukPolygon if it exists
-                yukPolygon.Stroke = new Pen(Color.Yellow, 3); // Highlight with a yellow border
+                if (yukPolygon != null)
+                {
+                    highlightedPolygon = yukPolygon;
+                    yukPolygon.Stroke = new Pen(Color.Yellow, 3); // Highlight with a yellow border
+                }
+                gMapControl_yuk.Position = new GMap.NET.PointLatLng((minLat + maxLat) / 2, (minLng + maxLng) / 2); // Center the map
                 gMapControl_yuk.SetZoomToFitRect(bounds);
                 gMapControl_yuk.Refresh();
+                Console.WriteLine("gMapControl_yuk zoomed and highlighted.");
+            }
+            else
+            {
+                Console.WriteLine("yukOverlay null, skipping zoom on gMapControl_yuk.");
             }
         }
 
@@ -5731,38 +5792,42 @@ namespace SLF
                 // Ensure the Tag is set and is a valid number
                 if (checkBox != null && checkBox.Tag != null)
                 {
-                    int checkbox_index;
+                    Console.WriteLine($"Checkbox: {checkBox.Name}, Tag: {checkBox.Tag}, Text: {checkBox.Text}");
 
+                    int checkbox_index;
                     if (int.TryParse(checkBox.Tag.ToString(), out checkbox_index))
                     {
-                        checkbox_index -= 1;  // Adjust for 0-based indexing
+                        checkbox_index -= 1; // Adjust for 0-based indexing
 
                         // Ensure the index is within bounds of the array and the item exists
                         if (checkbox_index >= 0 && checkbox_index < cbs.tüm_katmanlar_array_imar.Length &&
                             cbs.tüm_katmanlar_array_imar[checkbox_index] != null)
                         {
-                            string katman_ismi = cbs.tüm_katmanlar_array_names[checkbox_index];
+                            string katman_ismi = cbs.tüm_katmanlar_array_names[checkbox_index] ?? "Bilinmeyen Katman";
+                            Console.WriteLine($"Deleting layer: {katman_ismi}, Index: {checkbox_index}");
 
                             DialogResult temizle_result = MessageBox.Show(katman_ismi + " isimli katman " +
                                 "silinecektir. Emin misiniz?", "", MessageBoxButtons.YesNo);
 
                             if (temizle_result == DialogResult.Yes)
                             {
+                                var overlay_imar = cbs.tüm_katmanlar_array_imar[checkbox_index];
+                                var overlay_yuk = cbs.tüm_katmanlar_array_yuk[checkbox_index];
+
                                 // Safe removal from overlays
                                 if (cbs.tüm_katmanlar_array_imar[checkbox_index] != null)
                                 {
-                                    // Check if the overlay exists and remove it safely
-                                    var overlay_imar = cbs.tüm_katmanlar_array_imar[checkbox_index];
-                                    var overlay_yuk = cbs.tüm_katmanlar_array_yuk[checkbox_index];
-
                                     var activeMap = cbs.GetActiveGMapControl();
 
-                                    if (activeMap.Overlays.Contains(overlay_imar) || activeMap.Overlays.Contains(overlay_yuk))
+                                    if (activeMap.Overlays.Contains(overlay_imar) )
                                     {
                                         gMapControl_imar.Overlays.Remove(overlay_imar);
-                                        gMapControl_yuk.Overlays.Remove(overlay_yuk);
-
                                         gMapControl_imar.Refresh();
+                                    }
+
+                                    if (activeMap.Overlays.Contains(overlay_yuk))
+                                    {
+                                        gMapControl_yuk.Overlays.Remove(overlay_yuk);
                                         gMapControl_yuk.Refresh();
                                     }
 
@@ -5794,6 +5859,20 @@ namespace SLF
 
                                 cbs.tüm_katmanlar_datatable[checkbox_index] = null;
                                 cbs.tüm_katmanlar_array_names[checkbox_index] = null;
+                                cbs.tüm_katmanlar_array_polygon_tags[checkbox_index] = null; // Clear tag
+
+                                // Remove from overlayTags
+                                if(overlay_imar != null)
+                                {
+                                    if (overlayTags.ContainsKey(overlay_imar))
+                                        overlayTags.Remove(overlay_imar);
+                                }
+
+                                if (overlay_yuk != null)
+                                {
+                                    if (overlayTags.ContainsKey(overlay_yuk))
+                                        overlayTags.Remove(overlay_yuk);
+                                }
 
                                 // Clear checkboxes for all maps
                                 ClearCheckboxesForAllMaps(checkbox_index);
@@ -5801,13 +5880,17 @@ namespace SLF
                         }
                         else
                         {
-                            MessageBox.Show("Silinecek katman bulunamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show($"Silinecek katman bulunamadı. Index: {checkbox_index}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
                     else
                     {
-                        MessageBox.Show("Silinecek katman sorunu.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"Silinecek katman sorunu. Checkbox Tag: {checkBox.Tag}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
+                }
+                else
+                {
+                    MessageBox.Show("Checkbox veya Tag null.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -6163,7 +6246,10 @@ namespace SLF
         private void YGA_Ekle_Click(object sender, EventArgs e)
         {
             isSelecting_polygon = true;
+            isSelecting_Kentsel_Donusum = false;
+            isSelecting_Musaade = false;
             isSelecting_YGA = true;
+            isSelecting_YUK = false;
 
             isRulerEnabled = false;
             isRulerActive = false;
@@ -6178,6 +6264,9 @@ namespace SLF
         private void Point_Load_Ekle_Click(object sender, EventArgs e)
         {
             isSelecting_polygon = true;
+            isSelecting_Kentsel_Donusum = false;
+            isSelecting_Musaade = false;
+            isSelecting_YGA = false;
             isSelecting_YUK = true;
 
             isRulerEnabled = false;
@@ -6202,7 +6291,7 @@ namespace SLF
                 MessageBoxIcon.Warning
             );
 
-            if ( result_dialog == DialogResult.Yes)
+            if (result_dialog == DialogResult.Yes)
             {
                 try
                 {
@@ -7641,7 +7730,10 @@ namespace SLF
         private void Enerji_Müsaadesi_Ekle_Click(object sender, EventArgs e)
         {
             isSelecting_polygon = true;
+            isSelecting_Kentsel_Donusum = false;
             isSelecting_Musaade = true;
+            isSelecting_YGA = false;
+            isSelecting_YUK = false;
 
             isRulerEnabled = false;
             isRulerActive = false;
@@ -7667,7 +7759,7 @@ namespace SLF
             {
                 try
                 {
-                    // Export DataTables for KENTSEL_DONUSUM overlays
+                    // Export DataTables for tagged overlays
                     string exportFolderPath_kentsel = Path.Combine(
                         ana_menu_form_objesi.userRootPath,
                         (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
@@ -7676,7 +7768,7 @@ namespace SLF
                         (string)ana_menu_form_objesi.config.proje_ismi,
                         (string)ana_menu_form_objesi.config.SLF.kentsel_donusum_poligonu).Replace('/', '\\');
 
-                    string exportFolderPath_YGA= Path.Combine(
+                    string exportFolderPath_YGA = Path.Combine(
                         ana_menu_form_objesi.userRootPath,
                         (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                         (string)ana_menu_form_objesi.config.İl,
@@ -7700,6 +7792,7 @@ namespace SLF
                         (string)ana_menu_form_objesi.config.proje_ismi,
                         (string)ana_menu_form_objesi.config.SLF.musaade_poligonu).Replace('/', '\\');
 
+
                     // Initialize the Excel exporter
                     var excelExporter = new ExcelExporter();
 
@@ -7709,46 +7802,28 @@ namespace SLF
                         GMapOverlay overlay = cbs.tüm_katmanlar_array_imar[i];
                         if (overlay != null && overlay.Id != null && overlay.Id.ToLower().Contains("polygon"))
                         {
-                            // Check if the overlay has a KENTSEL_DONUSUM tag
-                            if (overlayTags.ContainsKey(overlay) && overlayTags[overlay] == "KENTSEL_DONUSUM")
-                            {
-                                // Get the corresponding DataTable
-                                DataTable dt = cbs.tüm_katmanlar_datatable[i];
-                                if (dt != null && dt.Rows.Count > 0)
-                                {
-                                    // Export the DataTable to Excel
-                                    excelExporter.ExportExcelFile(exportFolderPath_kentsel, dt, $"Kentsel_Donusum_{i + 1}", true);
-                                }
+                            string tag = cbs.tüm_katmanlar_array_polygon_tags[i];
+                            if (tag == null) continue;
 
-                            } else if (overlayTags.ContainsKey(overlay) && overlayTags[overlay] == "YGA")
+                            DataTable dt = cbs.tüm_katmanlar_datatable[i];
+                            if (dt == null || dt.Rows.Count == 0) continue;
+
+                            MessageBox.Show(tag.ToString());
+
+                            switch (tag)
                             {
-                                // Get the corresponding DataTable
-                                DataTable dt = cbs.tüm_katmanlar_datatable[i];
-                                if (dt != null && dt.Rows.Count > 0)
-                                {
-                                    // Export the DataTable to Excel
+                                case "KENTSEL_DONUSUM":
+                                    excelExporter.ExportExcelFile(exportFolderPath_kentsel, dt, $"Kentsel_Donusum_{i + 1}", true);
+                                    break;
+                                case "YGA":
                                     excelExporter.ExportExcelFile(exportFolderPath_YGA, dt, $"YGA_{i + 1}", true);
-                                }
-                            }
-                            else if (overlayTags.ContainsKey(overlay) && overlayTags[overlay] == "YUK")
-                            {
-                                // Get the corresponding DataTable
-                                DataTable dt = cbs.tüm_katmanlar_datatable[i];
-                                if (dt != null && dt.Rows.Count > 0)
-                                {
-                                    // Export the DataTable to Excel
+                                    break;
+                                case "YUK":
                                     excelExporter.ExportExcelFile(exportFolderPath_YUK, dt, $"YUK_{i + 1}", true);
-                                }
-                            }
-                            else if (overlayTags.ContainsKey(overlay) && overlayTags[overlay] == "MUSAADE")
-                            {
-                                // Get the corresponding DataTable
-                                DataTable dt = cbs.tüm_katmanlar_datatable[i];
-                                if (dt != null && dt.Rows.Count > 0)
-                                {
-                                    // Export the DataTable to Excel
+                                    break;
+                                case "MUSAADE":
                                     excelExporter.ExportExcelFile(exportFolderPath_Musaade, dt, $"MUSAADE_{i + 1}", true);
-                                }
+                                    break;
                             }
                         }
                     }
@@ -8039,6 +8114,9 @@ namespace SLF
         {
             isSelecting_polygon = true;
             isSelecting_Kentsel_Donusum = true;
+            isSelecting_Musaade = false;
+            isSelecting_YGA = false;
+            isSelecting_YUK = false;
 
             isRulerEnabled = false;
             isRulerActive = false;

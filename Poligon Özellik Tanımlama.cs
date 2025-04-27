@@ -129,6 +129,10 @@ namespace SLF
 
                 // Populate dropdowns and store Excel data
                 LoadExcelData();
+                if (columnValues == null)
+                {
+                    return;
+                }
                 SetupDropdownColumns(columnValues);
 
             }
@@ -168,6 +172,10 @@ namespace SLF
 
                 // Populate dropdowns and store Excel data
                 LoadExcelData();
+                if (columnValues == null)
+                {
+                    return;
+                }
                 SetupDropdownColumns(columnValues);
 
             }
@@ -297,6 +305,8 @@ namespace SLF
 
         private void LoadExcelData()
         {
+
+            // Initialize columnValues based on selection
             if (isSelecting_YUK)
             {
                 columnValues = new Dictionary<string, HashSet<string>>
@@ -306,9 +316,9 @@ namespace SLF
                     { "Tüketim Sınıfı", new HashSet<string>() },
                     { "Kurulu Güç (kW)", new HashSet<string>() },
                     { "Pik Yüklenme (%)", new HashSet<string>() },
-                    { "Pik Demant", new HashSet<string>() }
+                    { "Pik Demant (kW)", new HashSet<string>() }
                 };
-              }
+            }
             else if (isSelecting_Musaade)
             {
                 columnValues = new Dictionary<string, HashSet<string>>
@@ -320,6 +330,11 @@ namespace SLF
                     { "Pik Yüklenme (%)", new HashSet<string>() },
                     { "Pik Demant (kW)", new HashSet<string>() }
                 };
+            }
+            else
+            {
+                MessageBox.Show("Geçersiz seçim: Ne YUK ne de Musaade seçildi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
             excelDataRows = new List<Dictionary<string, string>>(); // Initialize the list to store full rows
@@ -342,7 +357,6 @@ namespace SLF
                         DataTable excelTable;
                         if (isSelecting_YUK)
                         {
-                            // Read the first sheet (index 0)
                             if (result.Tables.Count < 1)
                             {
                                 throw new Exception("Excel dosyasında 'YUK' için gerekli olan ilk sayfa bulunamadı.");
@@ -351,7 +365,6 @@ namespace SLF
                         }
                         else if (isSelecting_Musaade)
                         {
-                            // Read the second sheet (index 1)
                             if (result.Tables.Count < 2)
                             {
                                 throw new Exception("Excel dosyasında 'Musaade' için gerekli olan ikinci sayfa bulunamadı.");
@@ -361,6 +374,20 @@ namespace SLF
                         else
                         {
                             throw new Exception("Geçersiz seçim: Ne YUK ne de Musaade seçildi.");
+                        }
+
+                        // Log column names for debugging
+                        string columnNames = string.Join(", ", excelTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
+                        Console.WriteLine($"Excel Sheet Columns: {columnNames}");
+
+                        // Validate that all expected columns exist
+                        foreach (var expectedColumn in columnValues.Keys)
+                        {
+                            if (!excelTable.Columns.Contains(expectedColumn))
+                            {
+                                MessageBox.Show($"Excel dosyasında beklenen sütun bulunamadı: {expectedColumn}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
                         }
 
                         // Process the selected sheet
@@ -373,8 +400,8 @@ namespace SLF
                                 string value = row[columnName]?.ToString() ?? string.Empty;
                                 rowData[columnName] = value;
 
-                                // Also populate columnValues for dropdowns
-                                if (!string.IsNullOrWhiteSpace(value))
+                                // Only add to columnValues if the column is defined in columnValues
+                                if (columnValues.ContainsKey(columnName) && !string.IsNullOrWhiteSpace(value))
                                 {
                                     columnValues[columnName].Add(value);
                                 }
@@ -389,7 +416,6 @@ namespace SLF
                 MessageBox.Show($"Excel dosyasını okurken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
 
         private void SetupDropdownColumns(Dictionary<string, HashSet<string>> columnValues)
         {
@@ -573,27 +599,47 @@ namespace SLF
 
         private void buton_yük_tipleri_Click(object sender, EventArgs e)
         {
-            yük_bilgi_formu_objesi = new Nokta_Yuk_Bilgi_Formu(excelFilePath);
+
+            if (isSelecting_YUK)
+            {
+                yük_bilgi_formu_objesi = new Nokta_Yuk_Bilgi_Formu(excelFilePath,true,false);
+            }
+
+            if (isSelecting_Musaade)
+            {
+                yük_bilgi_formu_objesi = new Nokta_Yuk_Bilgi_Formu(excelFilePath, false, true);
+            }
+
             yük_bilgi_formu_objesi.Owner = this;
             yük_bilgi_formu_objesi.ShowDialog();
             yük_bilgi_formu_objesi.BringToFront();
             yük_bilgi_formu_objesi.Focus();
 
-            // Reload Excel data and update dropdowns
-            LoadExcelData();
-            SetupDropdownColumns(columnValues);
+             // Reload Excel data and update dropdowns
+             LoadExcelData();
+             if (columnValues == null)
+             {
+                 MessageBox.Show("Excel dosyası okunamadı, dropdown listeleri doldurulamıyor. Lütfen Excel dosyasını kapatıp tekrar deneyin.",
+                     "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                 return;
+             }
 
-            // Check if yukler changed after the dialog closes
-            if (yük_bilgi_formu_objesi.is_yukler_changed)
-            {
-                yük_bilgi_formu_objesi.is_yukler_changed = false;
-                yük_bilgi_formu_objesi.yuk_select = true;
+             SetupDropdownColumns(columnValues);
 
-            } else if (yük_bilgi_formu_objesi.is_musaade_changed)
-            {
-                yük_bilgi_formu_objesi.is_musaade_changed = false;
-                yük_bilgi_formu_objesi.musaade_select = true;
-            }
+             // Check if yukler or musaade changed after the dialog closes
+             if (yük_bilgi_formu_objesi.is_yukler_changed)
+             {
+                 yük_bilgi_formu_objesi.is_yukler_changed = false;
+                 yük_bilgi_formu_objesi.yuk_select = true;
+                 yük_bilgi_formu_objesi.musaade_select = false;
+             }
+             else if (yük_bilgi_formu_objesi.is_musaade_changed)
+             {
+                 yük_bilgi_formu_objesi.is_musaade_changed = false;
+                 yük_bilgi_formu_objesi.musaade_select = true;
+                 yük_bilgi_formu_objesi.yuk_select = false;
+             }
+
         }
 
         private void PoligonDataGridView_CellValueChanged_1(object sender, DataGridViewCellEventArgs e)

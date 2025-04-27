@@ -93,13 +93,13 @@
             this.contextMenuStrip_tablo.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem_tablo});
             this.contextMenuStrip_tablo.Name = "contextMenuStrip_tablo";
-            this.contextMenuStrip_tablo.Size = new System.Drawing.Size(215, 58);
+            this.contextMenuStrip_tablo.Size = new System.Drawing.Size(188, 30);
             // 
             // toolStripMenuItem_tablo
             // 
             this.toolStripMenuItem_tablo.Image = ((System.Drawing.Image)(resources.GetObject("toolStripMenuItem_tablo.Image")));
             this.toolStripMenuItem_tablo.Name = "toolStripMenuItem_tablo";
-            this.toolStripMenuItem_tablo.Size = new System.Drawing.Size(214, 26);
+            this.toolStripMenuItem_tablo.Size = new System.Drawing.Size(187, 26);
             this.toolStripMenuItem_tablo.Text = "Haritada Göster";
             // 
             // Tablo_Formu
