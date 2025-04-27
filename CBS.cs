@@ -2253,30 +2253,39 @@ namespace SLF
             // Assume selectedColumns is populated from the ComboBox selections
             List<string> selectedColumns = modülFormu.fonksiyonFormu.agrege_olacak_sutunlar;
 
-            // find the indices of the layers that are selected in the "jabl" functionality/interface
-            // in the "tüm_katmanlar_array_names"
+            // Find the indices of the layers that are selected in the "jabl" functionality/interface
             modülFormu.firstLayerToJoin = Array.FindIndex(tüm_katmanlar_array_names,
                 name => name == modülFormu.firstLayerName);
             modülFormu.secondLayerToJoin = Array.FindIndex(tüm_katmanlar_array_names,
                 name => name == modülFormu.secondLayerName);
 
-            // extract the first and second overlay layers according to their specified indices
+            // Validate layer indices
+            if (modülFormu.firstLayerToJoin == -1 || modülFormu.secondLayerToJoin == -1)
+            {
+                MessageBox.Show("Seçilen katmanlar bulunamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Extract the first and second overlay layers according to their specified indices
             GMapOverlay firstOverlay = tüm_katmanlar_array_imar[modülFormu.firstLayerToJoin];
             GMapOverlay secondOverlay = tüm_katmanlar_array_imar[modülFormu.secondLayerToJoin];
 
-            // extract the data of the first layer from the "tüm_katmanlar_datatable" array
+            // Extract the data of the first layer from the "tüm_katmanlar_datatable" array
             List<(GMapPolygon Polygon, DataRow Attributes)> firstLayerData =
                 ExtractPolygonsAndAttributes(firstOverlay, tüm_katmanlar_datatable[modülFormu.firstLayerToJoin]);
 
-            // extract the data of the second layer from the "tüm_katmanlar_datatable" array
+            // Extract the data of the second layer from the "tüm_katmanlar_datatable" array
             List<(GMapPolygon Polygon, DataRow Attributes)> secondLayerData =
                 ExtractPolygonsAndAttributes(secondOverlay, tüm_katmanlar_datatable[modülFormu.secondLayerToJoin]);
 
-            // spatially join the two layers and store the results in the "joinedData" List object
+            // Spatially join the two layers and store the results in the "joinedData" List object
             List<(GMapPolygon ResultingPolygon, DataRow ResultingAttributes)> joinedData = PerformSpatialJoin(firstLayerData, secondLayerData);
 
-            // create the resulting overlay with respect to the "joinedData" object
+            // Create the resulting overlay with respect to the "joinedData" object
             GMapOverlay resultingOverlay = CreateResultingOverlay(joinedData);
+
+            // Set the Id to ensure it contains "polygon"
+            resultingOverlay.Id = $"PolygonLayer_{layer_index + 1}"; // Match the pattern used in PoligonKaydetEventi
 
             // Find the first available slot in the array that holds shapefile overlay layers
             layer_index = Array.FindIndex(tüm_katmanlar_array_imar, i => i == null);
@@ -2287,17 +2296,42 @@ namespace SLF
                 return;
             }
 
-            // add the resulting layer and its name to the specified arrays
+            // Determine the tag for the resulting overlay based on input layers' tags
+            string overlayTag = "JOINED"; // Default tag
+            string firstLayerTag = tüm_katmanlar_array_polygon_tags[modülFormu.firstLayerToJoin];
+            string secondLayerTag = tüm_katmanlar_array_polygon_tags[modülFormu.secondLayerToJoin];
+
+            // List of valid base tags
+            string[] validBaseTags = { "YGA", "YUK", "MUSAADE", "KENTSEL_DONUSUM" };
+
+            // Check if either layer has a valid base tag
+            if (validBaseTags.Contains(firstLayerTag))
+            {
+                overlayTag = $"{firstLayerTag}_JOINED"; // e.g., "KENTSEL_DONUSUM_JOINED"
+            }
+            else if (validBaseTags.Contains(secondLayerTag))
+            {
+                overlayTag = $"{secondLayerTag}_JOINED"; // e.g., "YGA_JOINED"
+            }
+            else
+            {
+                // If neither layer has a valid tag, set a default _JOINED tag
+                overlayTag = "DEFAULT_JOINED";
+            }
+
+            // Store the tag
+            tüm_katmanlar_array_polygon_tags[layer_index] = overlayTag;
+            modülFormu.overlayTags[resultingOverlay] = overlayTag; // Keep for compatibility
+
+            // Add the resulting layer and its name to the specified arrays
             tüm_katmanlar_array_imar[layer_index] = resultingOverlay;
+            tüm_katmanlar_array_names[layer_index] = "Birleştirilmiş_Katman_" + (layer_index + 1).ToString();
 
-            tüm_katmanlar_array_names[layer_index] = "Birleştirilmiş_Katman_" + layer_index.ToString();
-
-            // create a data table object and fill it with the information from the joinedData object
+            // Create a data table object and fill it with the information from the joinedData object
             System.Data.DataTable joined_data_table = new System.Data.DataTable();
 
             if (joinedData.Count > 0)
             {
-
                 // Use the first DataRow to define the columns of the DataTable
                 DataRow firstRow = joinedData[0].ResultingAttributes;
 
@@ -2316,10 +2350,13 @@ namespace SLF
                     }
                     joined_data_table.Rows.Add(newRow);
                 }
-
+            }
+            else
+            {
+                Console.WriteLine("JoinAttributesByLocation - Warning: No resulting polygons after spatial join.");
             }
 
-            // add the datatable to the array so that it can be summoned later
+            // Add the datatable to the array so that it can be summoned later
             tüm_katmanlar_datatable[layer_index] = joined_data_table;
 
             // Get the list of associated checkboxes for the given layer_index
@@ -2333,18 +2370,20 @@ namespace SLF
                     checkBox.Checked = true;
                     checkBox.Visible = true;
                     checkBox.Text = tüm_katmanlar_array_names[layer_index];
+                    checkBox.Tag = (layer_index + 1).ToString(); // Set Tag to 1-based layer index
                 }
             }
 
             modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_imar, "imar");
-            modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_yuk, "yük");
+            modülFormu.UpdateCheckboxPositions(modülFormu.checkBoxes_yuk, "yuk");
 
-            MessageBox.Show("Katmanlar başarıyla birleştirildi.!");
+            MessageBox.Show($"Katmanlar başarıyla birleştirildi! Tag: {overlayTag}");
 
             gMapControl.Overlays.Add(resultingOverlay);
             gMapControl.Refresh();
-
         }
+
+
 
         // method to find the aggregate summary measures for each cell within the grid specified
         public async Task JoinAttributesByLocation_summary(GMapControl gMapControl)

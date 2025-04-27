@@ -5225,10 +5225,10 @@ namespace SLF
         }
 
         public void PoligonKaydetEventi(
-            object sender,
-            EventArgs e,
-            GMapOverlay polygonOverlay,     // the overlay that user just drew the polygon(s) in
-            List<PointLatLng> polygonPoints)
+    object sender,
+    EventArgs e,
+    GMapOverlay polygonOverlay,     // the overlay that user just drew the polygon(s) in
+    List<PointLatLng> polygonPoints)
         {
             // Make sure there's actually a polygon
             if (polygonOverlay == null || polygonOverlay.Polygons.Count == 0)
@@ -5253,16 +5253,6 @@ namespace SLF
                 return;
             }
 
-            // Store the tag for the original polygon overlay
-            overlayTags[polygonOverlay] = overlayTag; // Keep for compatibility
-            cbs.tüm_katmanlar_array_polygon_tags[layer_index] = overlayTag; // Store in new array
-
-            // Clear markers from all overlays
-            markerOverlay_ea.Markers?.Clear();
-            markerOverlay_DEK.Markers?.Clear();
-            markerOverlay_imar.Markers?.Clear();
-            markerOverlay_yuk.Markers?.Clear();
-
             // Figure out which map array & layerIndex this overlay belongs to
             layer_index = FindLayerIndexFromOverlay(polygonOverlay);
 
@@ -5271,6 +5261,17 @@ namespace SLF
                 MessageBox.Show("Çizilen poligon geçersiz bir katmana ait!");
                 return;
             }
+
+            // Store the tag for the original polygon overlay
+            overlayTags[polygonOverlay] = overlayTag; // Keep for compatibility
+            cbs.tüm_katmanlar_array_polygon_tags[layer_index] = overlayTag; // Store in new array
+            Console.WriteLine($"PoligonKaydetEventi - Layer Index: {layer_index}, Tag: {overlayTag}");
+
+            // Clear markers from all overlays
+            markerOverlay_ea.Markers?.Clear();
+            markerOverlay_DEK.Markers?.Clear();
+            markerOverlay_imar.Markers?.Clear();
+            markerOverlay_yuk.Markers?.Clear();
 
             // Re-color the polygon
             foreach (var poly in polygonOverlay.Polygons)
@@ -7796,36 +7797,50 @@ namespace SLF
                     // Initialize the Excel exporter
                     var excelExporter = new ExcelExporter();
 
+                    // Flag to track if any joined layers were exported
+                    bool exportedAnyJoinedLayer = false;
+
+
                     // Check cbs.tüm_katmanlar_array_imar for overlays
                     for (int i = 0; i < cbs.tüm_katmanlar_array_imar.Length; i++)
                     {
                         GMapOverlay overlay = cbs.tüm_katmanlar_array_imar[i];
-                        if (overlay != null && overlay.Id != null && overlay.Id.ToLower().Contains("polygon"))
+
+                        string tag = cbs.tüm_katmanlar_array_polygon_tags[i];
+
+                        DataTable dt = cbs.tüm_katmanlar_datatable[i];
+
+                        switch (tag)
                         {
-                            string tag = cbs.tüm_katmanlar_array_polygon_tags[i];
-                            if (tag == null) continue;
-
-                            DataTable dt = cbs.tüm_katmanlar_datatable[i];
-                            if (dt == null || dt.Rows.Count == 0) continue;
-
-                            MessageBox.Show(tag.ToString());
-
-                            switch (tag)
-                            {
-                                case "KENTSEL_DONUSUM":
-                                    excelExporter.ExportExcelFile(exportFolderPath_kentsel, dt, $"Kentsel_Donusum_{i + 1}", true);
-                                    break;
-                                case "YGA":
-                                    excelExporter.ExportExcelFile(exportFolderPath_YGA, dt, $"YGA_{i + 1}", true);
-                                    break;
-                                case "YUK":
-                                    excelExporter.ExportExcelFile(exportFolderPath_YUK, dt, $"YUK_{i + 1}", true);
-                                    break;
-                                case "MUSAADE":
-                                    excelExporter.ExportExcelFile(exportFolderPath_Musaade, dt, $"MUSAADE_{i + 1}", true);
-                                    break;
-                            }
+                            case "KENTSEL_DONUSUM_JOINED":
+                                excelExporter.ExportExcelFile(exportFolderPath_kentsel, dt, $"Kentsel_Donusum_Joined_{i + 1}", true);
+                                exportedAnyJoinedLayer = true;
+                                break;
+                            case "YGA_JOINED":
+                                excelExporter.ExportExcelFile(exportFolderPath_YGA, dt, $"YGA_Joined_{i + 1}", true);
+                                exportedAnyJoinedLayer = true;
+                                break;
+                            case "YUK_JOINED":
+                                excelExporter.ExportExcelFile(exportFolderPath_YUK, dt, $"YUK_Joined_{i + 1}", true);
+                                exportedAnyJoinedLayer = true;
+                                break;
+                            case "MUSAADE_JOINED":
+                                excelExporter.ExportExcelFile(exportFolderPath_Musaade, dt, $"MUSAADE_Joined_{i + 1}", true);
+                                exportedAnyJoinedLayer = true;
+                                break;
+                            default:
+                                MessageBox.Show($"Geçersiz etiket: {tag}. Bu katman dışa aktarılmayacak.",
+                                    "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                continue;
                         }
+                    }
+
+                    // Check if any joined layers were exported
+                    if (!exportedAnyJoinedLayer)
+                    {
+                        MessageBox.Show("Dışa aktarılacak '_JOINED' etiketine sahip bir katman bulunamadı.",
+                            "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
                     }
 
                     // Construct the path to the python script
@@ -7863,10 +7878,13 @@ namespace SLF
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Bir hata meydana geldi: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    MessageBox.Show($"Bir hata meydana geldi: {ex.Message}\nStack Trace: {ex.StackTrace}",
+                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 }
             }
         }
+
+
 
         private void buton_abone_sayısı_tahmini_Click(object sender, EventArgs e)
         {
