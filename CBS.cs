@@ -257,7 +257,7 @@ namespace SLF
             }
         }
 
-        private void ZoomToLayerCenter(GMapOverlay overlay, GMapControl gMapControlImar, GMapControl gMapControlYuk)
+        public void ZoomToLayerCenter(GMapOverlay overlay, GMapControl gMapControlImar, GMapControl gMapControlYuk)
         {
             if (overlay == null || !overlay.Polygons.Any()) return;
 

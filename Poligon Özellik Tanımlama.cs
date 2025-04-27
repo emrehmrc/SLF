@@ -524,6 +524,7 @@ namespace SLF
                 "3-4 KATLI MESKEN",
                 "5-7 KATLI MESKEN",
                 "8 USTU KATLI MESKEN",
+                "VILLA MESKEN",
                 "AYDINLATMA",
                 "BUYUK SANAYI",
                 "BUYUK TICARETHANE",
@@ -568,8 +569,6 @@ namespace SLF
                 return false;
             }
         }
-
-
 
 
         private void buton_yük_tipleri_Click(object sender, EventArgs e)

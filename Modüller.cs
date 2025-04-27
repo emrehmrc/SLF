@@ -7667,12 +7667,97 @@ namespace SLF
             {
                 try
                 {
-                    // Construct the path to the R script
+                    // Export DataTables for KENTSEL_DONUSUM overlays
+                    string exportFolderPath_kentsel = Path.Combine(
+                        ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.İl,
+                        (string)ana_menu_form_objesi.config.İlçe,
+                        (string)ana_menu_form_objesi.config.proje_ismi,
+                        (string)ana_menu_form_objesi.config.SLF.kentsel_donusum_poligonu).Replace('/', '\\');
+
+                    string exportFolderPath_YGA= Path.Combine(
+                        ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.İl,
+                        (string)ana_menu_form_objesi.config.İlçe,
+                        (string)ana_menu_form_objesi.config.proje_ismi,
+                        (string)ana_menu_form_objesi.config.SLF.YGA_poligonu).Replace('/', '\\');
+
+                    string exportFolderPath_YUK = Path.Combine(
+                        ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.İl,
+                        (string)ana_menu_form_objesi.config.İlçe,
+                        (string)ana_menu_form_objesi.config.proje_ismi,
+                        (string)ana_menu_form_objesi.config.SLF.YUK_poligonu).Replace('/', '\\');
+
+                    string exportFolderPath_Musaade = Path.Combine(
+                        ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.İl,
+                        (string)ana_menu_form_objesi.config.İlçe,
+                        (string)ana_menu_form_objesi.config.proje_ismi,
+                        (string)ana_menu_form_objesi.config.SLF.musaade_poligonu).Replace('/', '\\');
+
+                    // Initialize the Excel exporter
+                    var excelExporter = new ExcelExporter();
+
+                    // Check cbs.tüm_katmanlar_array_imar for overlays
+                    for (int i = 0; i < cbs.tüm_katmanlar_array_imar.Length; i++)
+                    {
+                        GMapOverlay overlay = cbs.tüm_katmanlar_array_imar[i];
+                        if (overlay != null && overlay.Id != null && overlay.Id.ToLower().Contains("polygon"))
+                        {
+                            // Check if the overlay has a KENTSEL_DONUSUM tag
+                            if (overlayTags.ContainsKey(overlay) && overlayTags[overlay] == "KENTSEL_DONUSUM")
+                            {
+                                // Get the corresponding DataTable
+                                DataTable dt = cbs.tüm_katmanlar_datatable[i];
+                                if (dt != null && dt.Rows.Count > 0)
+                                {
+                                    // Export the DataTable to Excel
+                                    excelExporter.ExportExcelFile(exportFolderPath_kentsel, dt, $"Kentsel_Donusum_{i + 1}", true);
+                                }
+
+                            } else if (overlayTags.ContainsKey(overlay) && overlayTags[overlay] == "YGA")
+                            {
+                                // Get the corresponding DataTable
+                                DataTable dt = cbs.tüm_katmanlar_datatable[i];
+                                if (dt != null && dt.Rows.Count > 0)
+                                {
+                                    // Export the DataTable to Excel
+                                    excelExporter.ExportExcelFile(exportFolderPath_YGA, dt, $"YGA_{i + 1}", true);
+                                }
+                            }
+                            else if (overlayTags.ContainsKey(overlay) && overlayTags[overlay] == "YUK")
+                            {
+                                // Get the corresponding DataTable
+                                DataTable dt = cbs.tüm_katmanlar_datatable[i];
+                                if (dt != null && dt.Rows.Count > 0)
+                                {
+                                    // Export the DataTable to Excel
+                                    excelExporter.ExportExcelFile(exportFolderPath_YUK, dt, $"YUK_{i + 1}", true);
+                                }
+                            }
+                            else if (overlayTags.ContainsKey(overlay) && overlayTags[overlay] == "MUSAADE")
+                            {
+                                // Get the corresponding DataTable
+                                DataTable dt = cbs.tüm_katmanlar_datatable[i];
+                                if (dt != null && dt.Rows.Count > 0)
+                                {
+                                    // Export the DataTable to Excel
+                                    excelExporter.ExportExcelFile(exportFolderPath_Musaade, dt, $"MUSAADE_{i + 1}", true);
+                                }
+                            }
+                        }
+                    }
+
+                    // Construct the path to the python script
                     string imar_tahmini_path = Path.Combine(ana_menu_form_objesi.userRootPath,
                         (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                         (string)ana_menu_form_objesi.config.program_dosyaları_path,
                         (string)ana_menu_form_objesi.config.SLF.imar_oranı_tahmini_kodu).Replace('/', '\\');
-
 
                     // Run Rscript.exe directly with quoted paths
                     var process = new Process
@@ -7727,7 +7812,7 @@ namespace SLF
 
                 try
                 {
-                    // Construct the path to the R script
+                    // Construct the path to the python script
                     string abone_sayısı_tahmini_path = Path.Combine(ana_menu_form_objesi.userRootPath,
                         (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                         (string)ana_menu_form_objesi.config.program_dosyaları_path,
@@ -7770,7 +7855,7 @@ namespace SLF
             }
         }
 
-        private void buton_SLF_tahmini_Click(object sender, EventArgs e)
+        private async void buton_SLF_tahmini_Click(object sender, EventArgs e)
         {
             // Show the confirmation dialog for navigating to the home page
             DialogResult result = MessageBox.Show("SLF tahmini kodunu çalıştırmak istediğinize emin misiniz? Bu kodun" +
@@ -7786,13 +7871,13 @@ namespace SLF
 
                 try
                 {
-                    // Construct the path to the R script
+                    // Construct the path to the python script
                     string slf_tahmini_path = Path.Combine(ana_menu_form_objesi.userRootPath,
                         (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                         (string)ana_menu_form_objesi.config.program_dosyaları_path,
                         (string)ana_menu_form_objesi.config.SLF.SLF_yük_tahmini_kodu).Replace('/', '\\');
 
-
+                    
                     // Run Rscript.exe directly with quoted paths
                     var process = new Process
                     {
@@ -7811,14 +7896,75 @@ namespace SLF
                     string output = process.StandardOutput.ReadToEnd();
                     string error = process.StandardError.ReadToEnd();
                     process.WaitForExit();
-
-                    this.Cursor = Cursors.Default;
+                      
 
                     // Show result
                     if (process.ExitCode != 0)
+
                         MessageBox.Show($"Bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
                             "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+
                     else
+
+                        layer_index = FindFirstFreeLayerIndex();
+
+                        if (layer_index == -1)
+                        {
+                            MessageBox.Show("En fazla 15 adet katman seçilebilmektedir.");
+                            return;
+                        }
+
+                        string filepath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                            (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                            (string)ana_menu_form_objesi.config.İl,
+                            (string)ana_menu_form_objesi.config.İlçe,
+                            (string)ana_menu_form_objesi.config.proje_ismi,
+                            (string)ana_menu_form_objesi.config.Yük_Yoğunluğu.sonuclar_kml).Replace('/', '\\');
+
+                        string imported_filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
+
+                        GMapOverlay overlay_imar = new GMapOverlay($"overlay_{layer_index + 1}_imar");
+                        GMapOverlay overlay_yuk = new GMapOverlay($"overlay_{layer_index + 1}_yuk");
+
+                        gMapControl_imar.Overlays.Add(overlay_imar);
+                        gMapControl_yuk.Overlays.Add(overlay_yuk);
+
+                        DataTable dt = new DataTable();
+
+                        await cbs.LoadKmlFile(filepath, overlay_imar, dt, gMapControl_imar);
+
+                        cbs.CopyOverlayContents(overlay_imar, overlay_yuk, cbs.polygonAttributes_imar, cbs.polygonAttributes_yuk);
+                        cbs.tüm_katmanlar_array_imar[layer_index] = overlay_imar;
+                        cbs.tüm_katmanlar_array_yuk[layer_index] = overlay_yuk;
+
+                        cbs.tüm_katmanlar_datatable[layer_index] = dt;
+                        cbs.tüm_katmanlar_array_names[layer_index] = imported_filename;
+
+                        List<CheckBox> associatedChecks = GetCheckBoxesByIndex(layer_index);
+                        foreach (var chk in associatedChecks)
+                        {
+                            chk.Text = imported_filename;
+                            chk.Visible = true;
+                            chk.Checked = true;
+                            chk.ForeColor = cbs.overlayColors[layer_index].BorderColor;
+                        }
+
+                        // Mark all categories for update
+                        pendingUpdates["imar"] = true;
+                        pendingUpdates["yuk"] = true;
+
+                        // Update only the active tab immediately
+                        UpdateCheckboxPositions(checkBoxes_imar, "imar");
+                        UpdateCheckboxPositions(checkBoxes_yuk, "yuk");
+
+                        // Zoom to the center of the layer
+                        cbs.ZoomToLayerCenter(overlay_imar, gMapControl_imar, gMapControl_yuk);
+
+                        gMapControl_imar.Refresh();
+                        gMapControl_yuk.Refresh();
+
+                        this.Cursor = Cursors.Default;
+
                         MessageBox.Show($"Ufuk yılları için hücre bazında SLF tahminleri oluşturuldu! Şimdi Yük Haritası Modülü'nü kullanarak" +
                             $"her hücreye ait tahminleri ve yük yoğunluğu haritasını görebilirsiniz.",
                             "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -7904,6 +8050,7 @@ namespace SLF
                     rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
             }
         }
+
 
         private void TextBox_KeyPress_NumbersOnly(object sender, KeyPressEventArgs e)
         {
