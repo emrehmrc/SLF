@@ -27,8 +27,8 @@ namespace SLF
             _dataGridViewGirdi = dataGridViewGirdi;
 
             // Radio butonları gizleyelim veya kaldıralım çünkü artık kullanılmayacak
-            if (imarizmirRadioButton != null) imarizmirRadioButton.Visible = false;
-            if (imarEskisehirRadioButton != null) imarEskisehirRadioButton.Visible = false;
+            //if (imarizmirRadioButton != null) imarizmirRadioButton.Visible = false;
+            //if (imarEskisehirRadioButton != null) imarEskisehirRadioButton.Visible = false;
 
             // Dosya yolu etiketlerini oluştur
             CreateFilePathLabels();
