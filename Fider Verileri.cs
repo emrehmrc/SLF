@@ -132,7 +132,9 @@ namespace SLF
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> dateFormatCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
             { "FIDER_TARIH", INFO_ONLY },
+            { "FIDER_SAAT", INFO_ONLY },
         };
+
         private void ReportDateFormatErrors()
         {
             float invalidPercentage = 0.0f;

@@ -42,7 +42,7 @@
             this.DEK_KURULU_GUCU = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DEK_X_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DEK_Y_KOORDINAT = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.DEK_TM_ADI = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.DEK_DTR_ADI = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DEK_KURULUM_YERI = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.StartYear = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.DEKCenterpanel2_Dek_Popup.SuspendLayout();
@@ -133,7 +133,7 @@
             this.DEK_KURULU_GUCU,
             this.DEK_X_KOORDINAT,
             this.DEK_Y_KOORDINAT,
-            this.DEK_TM_ADI,
+            this.DEK_DTR_ADI,
             this.DEK_KURULUM_YERI,
             this.StartYear});
             this.DEKCenterDataGridView.Cursor = System.Windows.Forms.Cursors.Default;
@@ -211,12 +211,12 @@
             this.DEK_Y_KOORDINAT.ReadOnly = true;
             this.DEK_Y_KOORDINAT.Width = 187;
             // 
-            // DEK_TM_ADI
+            // DEK_DTR_ADI
             // 
-            this.DEK_TM_ADI.HeaderText = "DEK_TM_ADI";
-            this.DEK_TM_ADI.MinimumWidth = 6;
-            this.DEK_TM_ADI.Name = "DEK_TM_ADI";
-            this.DEK_TM_ADI.Width = 135;
+            this.DEK_DTR_ADI.HeaderText = "DEK_DTR_ADI";
+            this.DEK_DTR_ADI.MinimumWidth = 6;
+            this.DEK_DTR_ADI.Name = "DEK_DTR_ADI";
+            this.DEK_DTR_ADI.Width = 141;
             // 
             // DEK_KURULUM_YERI
             // 
@@ -274,7 +274,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn DEK_KURULU_GUCU;
         private System.Windows.Forms.DataGridViewTextBoxColumn DEK_X_KOORDINAT;
         private System.Windows.Forms.DataGridViewTextBoxColumn DEK_Y_KOORDINAT;
-        private System.Windows.Forms.DataGridViewTextBoxColumn DEK_TM_ADI;
+        private System.Windows.Forms.DataGridViewTextBoxColumn DEK_DTR_ADI;
         private System.Windows.Forms.DataGridViewTextBoxColumn DEK_KURULUM_YERI;
         private System.Windows.Forms.DataGridViewComboBoxColumn StartYear;
     }

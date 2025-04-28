@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace SLF
 {
@@ -13,6 +8,7 @@ namespace SLF
 
     {
         protected override List<string> Prerequisites => new List<string> { "DTR Verileri" };
+
         private void ReportKuruluGuc()
         {
             // 1000'den büyük değerlerin yüzdesi için bir değişken tanımla ve başlangıç değeri olarak 0.0f ata
@@ -162,7 +158,7 @@ namespace SLF
             }
         }
 
-        private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = WarningErrorBoundary(0.1f);
+        private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = WarningErrorBoundary(0.05f);
         private Dictionary<string, (float Min, float Max)> minMaxCheckMap;
 
         // Helper method to calculate dynamic bounds (unchanged from previous)
@@ -172,10 +168,10 @@ namespace SLF
             if (trafoDataTable == null || trafoDataTable.Rows.Count == 0)
             {
                 minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
-        {
-            { "DEK_X_KOORDINAT", (float.MinValue, float.MaxValue) },
-            { "DEK_Y_KOORDINAT", (float.MinValue, float.MaxValue) }
-        };
+                {
+                    { "DEK_X_KOORDINAT", (float.MinValue, float.MaxValue) },
+                    { "DEK_Y_KOORDINAT", (float.MinValue, float.MaxValue) }
+                };
                 return;
             }
 
@@ -192,10 +188,10 @@ namespace SLF
             if (xCoords.Count == 0 || yCoords.Count == 0)
             {
                 minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
-        {
-            { "DEK_X_KOORDINAT", (float.MinValue, float.MaxValue) },
-            { "DEK_Y_KOORDINAT", (float.MinValue, float.MaxValue) }
-        };
+                {
+                    { "DEK_X_KOORDINAT", (float.MinValue, float.MaxValue) },
+                    { "DEK_Y_KOORDINAT", (float.MinValue, float.MaxValue) }
+                };
                 return;
             }
 
@@ -210,10 +206,10 @@ namespace SLF
             float yTolerance = yRange * 10f;
 
             minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
-    {
-        { "DEK_X_KOORDINAT", (minX - xTolerance, maxX + xTolerance) },
-        { "DEK_Y_KOORDINAT", (minY - yTolerance, maxY + yTolerance) }
-    };
+            {
+                { "DEK_X_KOORDINAT", (minX - xTolerance, maxX + xTolerance) },
+                { "DEK_Y_KOORDINAT", (minY - yTolerance, maxY + yTolerance) }
+            };
         }
 
         private void ReportCoordinatesOutOfLimits()
@@ -386,5 +382,3 @@ namespace SLF
 
     }
 }
-
-

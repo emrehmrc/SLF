@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -84,7 +83,7 @@ namespace SLF
                     "DEK_KURULU_GUCU",
                     "DEK_X_KOORDINAT",
                     "DEK_Y_KOORDINAT",
-                    "DEK_TM_ADI",
+                    "DEK_DTR_ADI",
                     "DEK_KURULUM_YERI",
                     "DEK_BAGLANDIGI_TRAFO_KODU",
             }
@@ -197,41 +196,6 @@ namespace SLF
         private YearService _yearService = YearService.GetInstance();
 
         // Abone verileri için yıl kolonlarını ekleme
-        private void AddYearColumnsToAboneVerileri(List<string> headers)
-        {
-            // Son 5 yıl için tüketim ve talep kolonları ekle
-            for (int year = _yearService.PenultimateYear - 3; year <= _yearService.LastYear; year++)
-            {
-                if (year > 0) // Geçerli bir yıl ise
-                {
-                    headers.Add($"YIL_TUKETIM_{year}");
-                }
-            }
-
-            for (int year = _yearService.PenultimateYear - 3; year <= _yearService.LastYear; year++)
-            {
-                if (year > 0) // Geçerli bir yıl ise
-                {
-                    headers.Add($"YIL_DEMANT_{year}");
-                }
-            }
-        }
-
-        // DTR verileri için yıl kolonlarını ekleme
-        private void AddYearColumnsToDTRVerileri(List<string> headers)
-        {
-            // Son 3 yıl için talep ve tüketim kolonları ekle
-            for (int year = _yearService.PenultimateYear - 1; year <= _yearService.LastYear; year++)
-            {
-                if (year > 0) // Geçerli bir yıl ise
-                {
-                    headers.Add($"YIL_DEMANT_{year}");
-                    headers.Add($"YIL_TUKETIM_{year}");
-                }
-            }
-        }
-
-  
 
 
 

@@ -7980,8 +7980,28 @@ namespace SLF
 
             if (result == DialogResult.Yes)
             {
+                this.Cursor = Cursors.WaitCursor;
+
                 try
                 {
+                    // Check if any of the required tags exist in cbs.tüm_katmanlar_array_polygon_tags
+                    bool hasRequiredTag = false;
+                    string[] requiredTags = { "KENTSEL_DONUSUM_JOINED", "YGA_JOINED", "YUK_JOINED", "MUSAADE_JOINED" };
+                    foreach (string tag in cbs.tüm_katmanlar_array_polygon_tags)
+                    {
+                        if (requiredTags.Contains(tag))
+                        {
+                            hasRequiredTag = true;
+                            break;
+                        }
+                    }
+
+                    // If no required tags are found, show message and return early
+                    if (!hasRequiredTag)
+                    {
+                        return;
+                    }
+
                     // Export DataTables for tagged overlays
                     string exportFolderPath_kentsel = Path.Combine(
                         ana_menu_form_objesi.userRootPath,
@@ -8015,6 +8035,7 @@ namespace SLF
                         (string)ana_menu_form_objesi.config.proje_ismi,
                         (string)ana_menu_form_objesi.config.SLF.musaade_poligonu).Replace('/', '\\');
 
+                    this.Cursor = Cursors.WaitCursor;
 
                     // Initialize the Excel exporter
                     var excelExporter = new ExcelExporter();
@@ -8022,14 +8043,11 @@ namespace SLF
                     // Flag to track if any joined layers were exported
                     bool exportedAnyJoinedLayer = false;
 
-
                     // Check cbs.tüm_katmanlar_array_imar for overlays
                     for (int i = 0; i < cbs.tüm_katmanlar_array_imar.Length; i++)
                     {
                         GMapOverlay overlay = cbs.tüm_katmanlar_array_imar[i];
-
                         string tag = cbs.tüm_katmanlar_array_polygon_tags[i];
-
                         DataTable dt = cbs.tüm_katmanlar_datatable[i];
 
                         switch (tag)
@@ -8060,10 +8078,10 @@ namespace SLF
                     // Check if any joined layers were exported
                     if (!exportedAnyJoinedLayer)
                     {
-                        MessageBox.Show("Dışa aktarılacak '_JOINED' etiketine sahip bir katman bulunamadı.",
-                            "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         return;
                     }
+
+                    this.Cursor = Cursors.WaitCursor;
 
                     // Construct the path to the python script
                     string imar_tahmini_path = Path.Combine(ana_menu_form_objesi.userRootPath,
@@ -8089,6 +8107,8 @@ namespace SLF
                     string output = process.StandardOutput.ReadToEnd();
                     string error = process.StandardError.ReadToEnd();
                     process.WaitForExit();
+
+                    this.Cursor = Cursors.Default;
 
                     // Show result
                     if (process.ExitCode != 0)
