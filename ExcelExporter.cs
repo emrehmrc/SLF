@@ -1,5 +1,4 @@
-﻿//using Excel = Microsoft.Office.Interop.Excel; // Alias for the Excel namespace
-using OfficeOpenXml; // Import the EPPlus library
+﻿using OfficeOpenXml; 
 using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
@@ -134,7 +133,7 @@ namespace SLF
         }
 
 
-        public void ExportExcelFile(string filePath, DataTable dt, string seçilenVeriTipi)
+        public void ExportExcelFile(string filePath, DataTable dt, string seçilenVeriTipi, bool poligon_aktarma = false)
         {
             // Create a new Excel package
             using (ExcelPackage package = new ExcelPackage())
@@ -168,10 +167,16 @@ namespace SLF
                             worksheet.Column(col).Width = 15;
                         }
                     }
+
                     FileInfo file = new FileInfo(filePath);
                     package.Workbook.CalcMode = ExcelCalcMode.Automatic;
                     package.SaveAs(file);
-                    MessageBox.Show("Dosya başarıyla kaydedildi.", "Dosya Kaydedildi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    if(poligon_aktarma == false)
+                    {
+                        MessageBox.Show("Dosya başarıyla kaydedildi.", "Dosya Kaydedildi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+
                 }
                 catch (InvalidOperationException)
                 {

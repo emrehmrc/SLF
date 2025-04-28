@@ -20,9 +20,12 @@ namespace SLF
         private Dictionary<string, HashSet<string>> columnValues; // For dropdown options
         private List<Dictionary<string, string>> excelDataRows; // Store full Excel table data
 
+        HashSet<string> manualColumns;
+
         private bool isSelecting_YGA;
         private bool isSelecting_YUK;
         private bool isSelecting_Musaade;
+        private bool isSelecting_KentselDonusum;
 
         public bool is_poligon_saved = true;
         private bool isKaydetClicked = false;
@@ -30,7 +33,7 @@ namespace SLF
         // Add a public property to access the DataTable
         public DataTable PolygonDataTable => dataTable;
 
-        public Poligon_Özellik_Tanımlama(bool isSelectingYUK, bool isSelectingYGA, bool isSelectingMusaade,
+        public Poligon_Özellik_Tanımlama(bool isSelectingYUK, bool isSelectingYGA, bool isSelectingMusaade, bool isSelectingKentselDonusum,
             List<PointLatLng> polygonPoints)
         {
             InitializeComponent();
@@ -41,6 +44,7 @@ namespace SLF
             isSelecting_YUK = isSelectingYUK;
             isSelecting_YGA = isSelectingYGA;
             isSelecting_Musaade = isSelectingMusaade;
+            isSelecting_KentselDonusum = isSelectingKentselDonusum;
 
             excelFilePath = Path.Combine(modül_formu.ana_menu_form_objesi.userRootPath,
                 (string)modül_formu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
@@ -112,8 +116,23 @@ namespace SLF
                 PoligonDataGridView.ReadOnly = false; // Allow editing dropdowns
                 PoligonDataGridView.AllowUserToOrderColumns = false; // Prevent column reordering
 
+                // Set tooltips for column headers
+                PoligonDataGridView.Columns["Polygon ID"].ToolTipText = "Poligona ait özgün ID numarası";
+                PoligonDataGridView.Columns["Tipi"].ToolTipText = "Poligonun tipi veya kategorisi - AVM, Restoran vb.";
+                PoligonDataGridView.Columns["Koordinatlar"].ToolTipText = "Poligonun WKT formatındaki koordinatları";
+                PoligonDataGridView.Columns["Çizilen Alan (m2)"].ToolTipText = "Poligonun hesaplanan alanı (metrekare)";
+                PoligonDataGridView.Columns["Ortalama Kapladığı Alan (m2)"].ToolTipText = "Poligonun ortalama kapladığı alan (metrekare)";
+                PoligonDataGridView.Columns["Tüketim Sınıfı"].ToolTipText = "Poligonun enerji tüketim sınıfı - Büyük Ticarethane, Orta Sanayi, vb.";
+                PoligonDataGridView.Columns["Kurulu Güç (kW)"].ToolTipText = "Poligonun kurulu güç kapasitesi (kilowatt)";
+                PoligonDataGridView.Columns["Pik Yüklenme (%)"].ToolTipText = "Poligonun pik yüklenme oranı (yüzde)";
+                PoligonDataGridView.Columns["Pik Demant (kW)"].ToolTipText = "Poligonun pik güç talebi (kilowatt)";
+
                 // Populate dropdowns and store Excel data
                 LoadExcelData();
+                if (columnValues == null)
+                {
+                    return;
+                }
                 SetupDropdownColumns(columnValues);
 
             }
@@ -142,8 +161,21 @@ namespace SLF
                 PoligonDataGridView.ReadOnly = false; // Allow editing dropdowns
                 PoligonDataGridView.AllowUserToOrderColumns = false; // Prevent column reordering
 
+                // Set tooltips for column headers
+                PoligonDataGridView.Columns["Polygon ID"].ToolTipText = "Poligona ait özgün ID numarası";
+                PoligonDataGridView.Columns["Tipi"].ToolTipText = "Poligonun tipi veya kategorisi - AVM, Restoran vb.";
+                PoligonDataGridView.Columns["ENERJI_MUSAADE_ABONE_GRUBU"].ToolTipText = "Enerji müsaadesi için abone grubu - Büyük Ticarethane, Orta Sanayi, vb.";
+                PoligonDataGridView.Columns["ENERJI_MUSAADE_ENERJILENDIRME_YILI"].ToolTipText = "Enerji müsaadesinin verileceği yıl";
+                PoligonDataGridView.Columns["Kurulu Güç (kW)"].ToolTipText = "Enerji müsaadesi verilecek yapıya ait kurulu güç kapasitesi (kilowatt)";
+                PoligonDataGridView.Columns["Pik Yüklenme (%)"].ToolTipText = "Enerji müsaadesi verilecek yapıya ait tahmini pik yüklenme oranı (yüzde)";
+                PoligonDataGridView.Columns["Pik Demant (kW)"].ToolTipText = "Enerji müsaadesi verilecek yapıya ait tahmini pik güç talebi (kilowatt)";
+
                 // Populate dropdowns and store Excel data
                 LoadExcelData();
+                if (columnValues == null)
+                {
+                    return;
+                }
                 SetupDropdownColumns(columnValues);
 
             }
@@ -157,6 +189,7 @@ namespace SLF
                 dataTable.Columns.Add("3-4 KATLI MESKEN", typeof(string));
                 dataTable.Columns.Add("5-7 KATLI MESKEN", typeof(string));
                 dataTable.Columns.Add("8 USTU KATLI MESKEN", typeof(string));
+                dataTable.Columns.Add("VILLA MESKEN", typeof(string));
                 dataTable.Columns.Add("AYDINLATMA", typeof(string));
                 dataTable.Columns.Add("BUYUK SANAYI", typeof(string));
                 dataTable.Columns.Add("BUYUK TICARETHANE", typeof(string));
@@ -185,11 +218,95 @@ namespace SLF
                 PoligonDataGridView.ReadOnly = false; // Allow editing dropdowns
                 PoligonDataGridView.AllowUserToOrderColumns = false; // Prevent column reordering
 
+                // Set tooltips for column headers
+                PoligonDataGridView.Columns["Polygon ID"].ToolTipText = "Poligona ait özgün ID numarası";
+                PoligonDataGridView.Columns["Koordinatlar"].ToolTipText = "Poligonun WKT formatındaki koordinatları";
+                PoligonDataGridView.Columns["Çizilen Alan (m2)"].ToolTipText = "Poligonun hesaplanan alanı (metrekare)";
+                PoligonDataGridView.Columns["1-2 KATLI MESKEN"].ToolTipText = "Poligon içindeki tahmini 1-2 katlı mesken yapılarının oranı (0-100)";
+                PoligonDataGridView.Columns["3-4 KATLI MESKEN"].ToolTipText = "Poligon içindeki tahmini 3-4 katlı mesken yapılarının oranı (0-100)";
+                PoligonDataGridView.Columns["5-7 KATLI MESKEN"].ToolTipText = "Poligon içindeki tahmini 5-7 katlı mesken yapılarının oranı (0-100)";
+                PoligonDataGridView.Columns["8 USTU KATLI MESKEN"].ToolTipText = "Poligon içindeki tahmini 8 ve üzeri katlı mesken yapılarının oranı (0-100)";
+                PoligonDataGridView.Columns["VILLA MESKEN"].ToolTipText = "Poligon içindeki tahmini Villa mesken yapılarının oranı (0-100)";
+                PoligonDataGridView.Columns["AYDINLATMA"].ToolTipText = "Poligon içindeki tahmini Aydınlatma amaçlı oluşacak kullanım oranı (0-100)";
+                PoligonDataGridView.Columns["BUYUK SANAYI"].ToolTipText = "Poligon içindeki tahmini Büyük sanayi tesislerinin oranı (0-100)";
+                PoligonDataGridView.Columns["BUYUK TICARETHANE"].ToolTipText = "Poligon içindeki tahmini Büyük ticari işletmelerin oranı (0-100)";
+                PoligonDataGridView.Columns["KUCUK SANAYI"].ToolTipText = "Poligon içindeki tahmini Küçük sanayi tesislerinin oranı (0-100)";
+                PoligonDataGridView.Columns["KUCUK TICARETHANE"].ToolTipText = "Poligon içindeki tahmini Küçük ticari işletmelerin oranı (0-100)";
+                PoligonDataGridView.Columns["ORTA SANAYI"].ToolTipText = "Poligon içindeki tahmini Orta ölçekli sanayi tesislerinin oranı (0-100)";
+                PoligonDataGridView.Columns["ORTA TICARETHANE"].ToolTipText = "Poligon içindeki tahmini Orta ölçekli ticari işletmelerin oranı (0-100)";
+                PoligonDataGridView.Columns["TARIMSAL SULAMA"].ToolTipText = "Poligon içindeki tahmini Tarımsal sulama amaçlı kullanım oranı (0-100)";
+                PoligonDataGridView.Columns["Başlangıç Yılı"].ToolTipText = "Poligon için planlanan başlangıç yılı";
+                PoligonDataGridView.Columns["Satürasyon Hızı"].ToolTipText = "Poligonun tahmini doygunluğa ulaşma hızı (1-5)";
+                PoligonDataGridView.Columns["Park, Yol, Kaldırım Oranı (%)"].ToolTipText = "Poligon içindeki tahmini Park, yol ve kaldırım alanlarının oranı (0-100)";
+
+            }
+            else if (isSelecting_KentselDonusum == true)
+            {
+                // Add "Polygon ID" column
+                dataTable.Columns.Add("Polygon ID", typeof(string));
+                dataTable.Columns.Add("Koordinatlar", typeof(string));
+                dataTable.Columns.Add("Çizilen Alan (m2)", typeof(string));
+                dataTable.Columns.Add("1-2 KATLI MESKEN", typeof(string));
+                dataTable.Columns.Add("3-4 KATLI MESKEN", typeof(string));
+                dataTable.Columns.Add("5-7 KATLI MESKEN", typeof(string));
+                dataTable.Columns.Add("8 USTU KATLI MESKEN", typeof(string));
+                dataTable.Columns.Add("VILLA MESKEN", typeof(string));
+                dataTable.Columns.Add("AYDINLATMA", typeof(string));
+                dataTable.Columns.Add("BUYUK SANAYI", typeof(string));
+                dataTable.Columns.Add("BUYUK TICARETHANE", typeof(string));
+                dataTable.Columns.Add("KUCUK SANAYI", typeof(string));
+                dataTable.Columns.Add("KUCUK TICARETHANE", typeof(string));
+                dataTable.Columns.Add("ORTA SANAYI", typeof(string));
+                dataTable.Columns.Add("ORTA TICARETHANE", typeof(string));
+                dataTable.Columns.Add("TARIMSAL SULAMA", typeof(string));
+                dataTable.Columns.Add("Başlangıç Yılı", typeof(string));
+                dataTable.Columns.Add("Satürasyon Hızı", typeof(string));
+                dataTable.Columns.Add("Park, Yol, Kaldırım Oranı (%)", typeof(string));
+
+                // Add a single row
+                dataTable.Rows.Add(dataTable.NewRow());
+
+                // Set "Polygon ID" value
+                dataTable.Rows[0]["Polygon ID"] = "Polygon_" + layerIndex;
+                dataTable.Rows[0]["Koordinatlar"] = coordinates;
+                dataTable.Rows[0]["Çizilen Alan (m2)"] = area;
+
+                // Bind DataTable to PoligonDataGridView
+                PoligonDataGridView.DataSource = dataTable;
+                PoligonDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                PoligonDataGridView.AllowUserToAddRows = false; // Prevent adding rows
+                PoligonDataGridView.AllowUserToDeleteRows = false; // Prevent deleting rows
+                PoligonDataGridView.ReadOnly = false; // Allow editing dropdowns
+                PoligonDataGridView.AllowUserToOrderColumns = false; // Prevent column reordering
+
+                // Set tooltips for column headers
+                PoligonDataGridView.Columns["Polygon ID"].ToolTipText = "Poligona ait özgün ID numarası";
+                PoligonDataGridView.Columns["Koordinatlar"].ToolTipText = "Poligonun WKT formatındaki koordinatları";
+                PoligonDataGridView.Columns["Çizilen Alan (m2)"].ToolTipText = "Poligonun hesaplanan alanı (metrekare)";
+                PoligonDataGridView.Columns["1-2 KATLI MESKEN"].ToolTipText = "Poligon içindeki tahmini 1-2 katlı mesken yapılarının oranı (0-100)";
+                PoligonDataGridView.Columns["3-4 KATLI MESKEN"].ToolTipText = "Poligon içindeki tahmini 3-4 katlı mesken yapılarının oranı (0-100)";
+                PoligonDataGridView.Columns["5-7 KATLI MESKEN"].ToolTipText = "Poligon içindeki tahmini 5-7 katlı mesken yapılarının oranı (0-100)";
+                PoligonDataGridView.Columns["8 USTU KATLI MESKEN"].ToolTipText = "Poligon içindeki tahmini 8 ve üzeri katlı mesken yapılarının oranı (0-100)";
+                PoligonDataGridView.Columns["VILLA MESKEN"].ToolTipText = "Poligon içindeki tahmini Villa mesken yapılarının oranı (0-100)";
+                PoligonDataGridView.Columns["AYDINLATMA"].ToolTipText = "Poligon içindeki tahmini Aydınlatma amaçlı oluşacak kullanım oranı (0-100)";
+                PoligonDataGridView.Columns["BUYUK SANAYI"].ToolTipText = "Poligon içindeki tahmini Büyük sanayi tesislerinin oranı (0-100)";
+                PoligonDataGridView.Columns["BUYUK TICARETHANE"].ToolTipText = "Poligon içindeki tahmini Büyük ticari işletmelerin oranı (0-100)";
+                PoligonDataGridView.Columns["KUCUK SANAYI"].ToolTipText = "Poligon içindeki tahmini Küçük sanayi tesislerinin oranı (0-100)";
+                PoligonDataGridView.Columns["KUCUK TICARETHANE"].ToolTipText = "Poligon içindeki tahmini Küçük ticari işletmelerin oranı (0-100)";
+                PoligonDataGridView.Columns["ORTA SANAYI"].ToolTipText = "Poligon içindeki tahmini Orta ölçekli sanayi tesislerinin oranı (0-100)";
+                PoligonDataGridView.Columns["ORTA TICARETHANE"].ToolTipText = "Poligon içindeki tahmini Orta ölçekli ticari işletmelerin oranı (0-100)";
+                PoligonDataGridView.Columns["TARIMSAL SULAMA"].ToolTipText = "Poligon içindeki tahmini Tarımsal sulama amaçlı kullanım oranı (0-100)";
+                PoligonDataGridView.Columns["Başlangıç Yılı"].ToolTipText = "Poligon için planlanan başlangıç yılı";
+                PoligonDataGridView.Columns["Satürasyon Hızı"].ToolTipText = "Poligonun tahmini doygunluğa ulaşma hızı (1-5)";
+                PoligonDataGridView.Columns["Park, Yol, Kaldırım Oranı (%)"].ToolTipText = "Poligon içindeki tahmini Park, yol ve kaldırım alanlarının oranı (0-100)";
+
             }
         }
 
         private void LoadExcelData()
         {
+
+            // Initialize columnValues based on selection
             if (isSelecting_YUK)
             {
                 columnValues = new Dictionary<string, HashSet<string>>
@@ -199,12 +316,12 @@ namespace SLF
                     { "Tüketim Sınıfı", new HashSet<string>() },
                     { "Kurulu Güç (kW)", new HashSet<string>() },
                     { "Pik Yüklenme (%)", new HashSet<string>() },
-                    { "Pik Demant", new HashSet<string>() }
+                    { "Pik Demant (kW)", new HashSet<string>() }
                 };
-                        }
-                        else if (isSelecting_Musaade)
-                        {
-                            columnValues = new Dictionary<string, HashSet<string>>
+            }
+            else if (isSelecting_Musaade)
+            {
+                columnValues = new Dictionary<string, HashSet<string>>
                 {
                     { "Tipi", new HashSet<string>() },
                     { "ENERJI_MUSAADE_ABONE_GRUBU", new HashSet<string>() },
@@ -213,6 +330,11 @@ namespace SLF
                     { "Pik Yüklenme (%)", new HashSet<string>() },
                     { "Pik Demant (kW)", new HashSet<string>() }
                 };
+            }
+            else
+            {
+                MessageBox.Show("Geçersiz seçim: Ne YUK ne de Musaade seçildi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
             excelDataRows = new List<Dictionary<string, string>>(); // Initialize the list to store full rows
@@ -235,7 +357,6 @@ namespace SLF
                         DataTable excelTable;
                         if (isSelecting_YUK)
                         {
-                            // Read the first sheet (index 0)
                             if (result.Tables.Count < 1)
                             {
                                 throw new Exception("Excel dosyasında 'YUK' için gerekli olan ilk sayfa bulunamadı.");
@@ -244,7 +365,6 @@ namespace SLF
                         }
                         else if (isSelecting_Musaade)
                         {
-                            // Read the second sheet (index 1)
                             if (result.Tables.Count < 2)
                             {
                                 throw new Exception("Excel dosyasında 'Musaade' için gerekli olan ikinci sayfa bulunamadı.");
@@ -254,6 +374,20 @@ namespace SLF
                         else
                         {
                             throw new Exception("Geçersiz seçim: Ne YUK ne de Musaade seçildi.");
+                        }
+
+                        // Log column names for debugging
+                        string columnNames = string.Join(", ", excelTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
+                        Console.WriteLine($"Excel Sheet Columns: {columnNames}");
+
+                        // Validate that all expected columns exist
+                        foreach (var expectedColumn in columnValues.Keys)
+                        {
+                            if (!excelTable.Columns.Contains(expectedColumn))
+                            {
+                                MessageBox.Show($"Excel dosyasında beklenen sütun bulunamadı: {expectedColumn}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
                         }
 
                         // Process the selected sheet
@@ -266,8 +400,8 @@ namespace SLF
                                 string value = row[columnName]?.ToString() ?? string.Empty;
                                 rowData[columnName] = value;
 
-                                // Also populate columnValues for dropdowns
-                                if (!string.IsNullOrWhiteSpace(value))
+                                // Only add to columnValues if the column is defined in columnValues
+                                if (columnValues.ContainsKey(columnName) && !string.IsNullOrWhiteSpace(value))
                                 {
                                     columnValues[columnName].Add(value);
                                 }
@@ -283,15 +417,13 @@ namespace SLF
             }
         }
 
-        HashSet<string> manualColumns;
-
         private void SetupDropdownColumns(Dictionary<string, HashSet<string>> columnValues)
         {
 
             if (isSelecting_YUK)
             {
                 // Define the columns that should remain manually defined.
-                    manualColumns = new HashSet<string>
+                manualColumns = new HashSet<string>
                 {
                     "Polygon ID",
                     "Koordinatlar",
@@ -378,33 +510,136 @@ namespace SLF
 
         private void buton_poligon_ozellik_Click(object sender, EventArgs e)
         {
-            isKaydetClicked = true;
-            this.Close();
+            if (ValidatePolygonData())
+            {
+                isKaydetClicked = true;
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Hata: İmar tiplerinin toplamı 100(%) olmalıdır!\n\n" +
+                    "İlgili imar tipleri şunlardır:\n\n" +
+                    "1-2 KATLI MESKEN\n" +
+                    "3-4 KATLI MESKEN\n" +
+                    "5-7 KATLI MESKEN\n" +
+                    "8 USTU KATLI MESKEN\n" +
+                    "BUYUK SANAYI\n" +
+                    "BUYUK TICARETHANE\n" +
+                    "KUCUK SANAYI\n" +
+                    "KUCUK TICARETHANE\n" +
+                    "ORTA SANAYI\n" +
+                    "ORTA TICARETHANE\n" +
+                    "VILLA MESKEN\n" +
+                    "TARIMSAL SULAMA\n" +
+                    "Park, Yol, Kaldırım Oranı (%)", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
+
+        private bool ValidatePolygonData()
+        {
+            // Validation only applies to isSelecting_YGA or isSelecting_KentselDonusum
+            if (!isSelecting_YGA && !isSelecting_KentselDonusum)
+            {
+                return true; // No validation needed for other conditions
+            }
+
+            // Columns to validate
+            string[] columnsToValidate = new string[]
+            {
+                "1-2 KATLI MESKEN",
+                "3-4 KATLI MESKEN",
+                "5-7 KATLI MESKEN",
+                "8 USTU KATLI MESKEN",
+                "VILLA MESKEN",
+                "AYDINLATMA",
+                "BUYUK SANAYI",
+                "BUYUK TICARETHANE",
+                "KUCUK SANAYI",
+                "KUCUK TICARETHANE",
+                "ORTA SANAYI",
+                "ORTA TICARETHANE",
+                "TARIMSAL SULAMA",
+                "Park, Yol, Kaldırım Oranı (%)"
+            };
+
+            try
+            {
+                double total = 0;
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    foreach (string column in columnsToValidate)
+                    {
+                        // Check if the column exists and the value is not null or empty
+                        if (dataTable.Columns.Contains(column) && !string.IsNullOrEmpty(row[column]?.ToString()))
+                        {
+                            // Try to parse the value as a double
+                            if (double.TryParse(row[column].ToString(), out double value))
+                            {
+                                total += value;
+                            }
+                            else
+                            {
+                                // If parsing fails, show error and return false
+                                MessageBox.Show($"Hata: '{column}' sütununda geçersiz bir değer var.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return false;
+                            }
+                        }
+                    }
+                }
+
+                // Check if total is approximately 1 (allowing for small floating-point errors)
+                return Math.Abs(total - 100) < 0.1;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
 
         private void buton_yük_tipleri_Click(object sender, EventArgs e)
         {
-            yük_bilgi_formu_objesi = new Nokta_Yuk_Bilgi_Formu(excelFilePath);
+
+            if (isSelecting_YUK)
+            {
+                yük_bilgi_formu_objesi = new Nokta_Yuk_Bilgi_Formu(excelFilePath,true,false);
+            }
+
+            if (isSelecting_Musaade)
+            {
+                yük_bilgi_formu_objesi = new Nokta_Yuk_Bilgi_Formu(excelFilePath, false, true);
+            }
+
             yük_bilgi_formu_objesi.Owner = this;
             yük_bilgi_formu_objesi.ShowDialog();
             yük_bilgi_formu_objesi.BringToFront();
             yük_bilgi_formu_objesi.Focus();
 
-            // Reload Excel data and update dropdowns
-            LoadExcelData();
-            SetupDropdownColumns(columnValues);
+             // Reload Excel data and update dropdowns
+             LoadExcelData();
+             if (columnValues == null)
+             {
+                 MessageBox.Show("Excel dosyası okunamadı, dropdown listeleri doldurulamıyor. Lütfen Excel dosyasını kapatıp tekrar deneyin.",
+                     "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                 return;
+             }
 
-            // Check if yukler changed after the dialog closes
-            if (yük_bilgi_formu_objesi.is_yukler_changed)
-            {
-                yük_bilgi_formu_objesi.is_yukler_changed = false;
-                yük_bilgi_formu_objesi.yuk_select = true;
+             SetupDropdownColumns(columnValues);
 
-            } else if (yük_bilgi_formu_objesi.is_musaade_changed)
-            {
-                yük_bilgi_formu_objesi.is_musaade_changed = false;
-                yük_bilgi_formu_objesi.musaade_select = true;
-            }
+             // Check if yukler or musaade changed after the dialog closes
+             if (yük_bilgi_formu_objesi.is_yukler_changed)
+             {
+                 yük_bilgi_formu_objesi.is_yukler_changed = false;
+                 yük_bilgi_formu_objesi.yuk_select = true;
+                 yük_bilgi_formu_objesi.musaade_select = false;
+             }
+             else if (yük_bilgi_formu_objesi.is_musaade_changed)
+             {
+                 yük_bilgi_formu_objesi.is_musaade_changed = false;
+                 yük_bilgi_formu_objesi.musaade_select = true;
+                 yük_bilgi_formu_objesi.yuk_select = false;
+             }
+
         }
 
         private void PoligonDataGridView_CellValueChanged_1(object sender, DataGridViewCellEventArgs e)
@@ -469,6 +704,7 @@ namespace SLF
                 isSelecting_YUK = false;
                 isSelecting_YGA = false;
                 isSelecting_Musaade = false;
+                isSelecting_KentselDonusum = false;
             }
         }
 
@@ -482,6 +718,23 @@ namespace SLF
                 // Optional: Enable autocomplete for better UX
                 comboBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
                 comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
+            }
+
+            // Ensure the editing control is a TextBox
+            if (e.Control is TextBox textBox)
+            {
+                // Remove any existing KeyPress event handlers to avoid duplicates
+                textBox.KeyPress -= TextBox_KeyPress_NumbersOnly;
+                textBox.KeyPress += TextBox_KeyPress_NumbersOnly;
+            }
+        }
+
+        private void TextBox_KeyPress_NumbersOnly(object sender, KeyPressEventArgs e)
+        {
+            // Allow digits (0-9), backspace, and control characters (e.g., Enter, Tab)
+            if (!char.IsDigit(e.KeyChar) && e.KeyChar != (char)Keys.Back && !char.IsControl(e.KeyChar))
+            {
+                e.Handled = true; // Block the key press
             }
         }
     }
