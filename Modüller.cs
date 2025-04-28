@@ -6364,7 +6364,7 @@ namespace SLF
                     }
 
                     // Deep Learning modelini çalıştır
-                    string result = PythonHelper.RunDeepLearningModel();
+                    string result = SLF.services.PythonHelper.RunDeepLearningModel();
 
                     // İşlem tamamlandığında başarı mesajı göster
                     MessageBox.Show("İmar analizi başarıyla tamamlandı.\nSonuçlar 'imar_analizi_sonuclari/deep_learning_modeli' klasöründe kaydedildi.",
