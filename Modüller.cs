@@ -7725,7 +7725,7 @@ namespace SLF
             else if (popup.OperationCancelled)
             {
                 MessageBox.Show("İşlem iptal edildi.");
-            }
+            } 
         }
 
         private void Enerji_Müsaadesi_Ekle_Click(object sender, EventArgs e)
