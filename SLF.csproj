@@ -712,6 +712,9 @@
     <Compile Include="Services\DatabaseManager .cs" />
     <Compile Include="Services\PathService.cs" />
     <Compile Include="Services\PythonHelper.cs" />
+    <Compile Include="Services\TurkceDiyalog.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Services\YearServices.cs" />
     <Compile Include="Tablo_olustur.cs">
       <SubType>Form</SubType>

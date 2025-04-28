@@ -1559,6 +1559,25 @@ namespace SLF
                 }
             }
 
+            // Form kapatılmadan önce veri_listesi_seçimi'ndeki yeşil öğeleri kırmızıya çevir
+            if (!e.Cancel)
+            {
+                // Veri seçimi listesindeki modüller için durum bilgisini sıfırla
+                // Bu, sonraki açılışta tüm öğelerin kırmızı görünmesini sağlar
+                modulescheck.Clear();
+
+                // GirdiModülü.dataTablesByType sözlüğünü temizle
+                // Bu, içeri aktarılmış verilerin kaydını temizler
+                foreach (var girdiModül in girdiModülleri.Values)
+                {
+                    girdiModül.importedDataTable = new DataTable();
+                }
+                GirdiModülü.dataTablesByType.Clear();
+
+                // Veri listesini yeniden çiz, böylece tüm öğeler kırmızı renkte gösterilecek
+                veri_listesi_seçimi.Invalidate();
+            }
+
             // Çıkış işlemine devam et
             try
             {
