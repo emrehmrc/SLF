@@ -19,21 +19,21 @@ namespace SLF
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
-    
+
     public class PrerequisiteException : Exception
     {
         public PrerequisiteException(string message) : base(message)
         {
         }
     }
-  
+
     public class GirdiModülü
     {
         public ModülFormu modülFormu;
         public HomePageForm homePageObjesi;
         protected Önizleme onizleme1 = new Önizleme();
         protected Raporlama raporlama1 = new Raporlama(); // excel sayfası için yapılmıs calısma excelexporter ve excel importer için bakılabilir ileri durumlarda 
-        protected readonly List<string> veri_listesi_requires_xlsx = new List<string> {  
+        protected readonly List<string> veri_listesi_requires_xlsx = new List<string> {
             "Ekonometrik Yük Tahmini Verileri",
             "EA Şarj Verileri",
             "Fider Verileri",
@@ -44,12 +44,12 @@ namespace SLF
             "Enerji Müsaadeleri Verileri",
             "Yeni Projelendirilmiş DTR Verileri"
         };
-        
+
         protected static readonly List<int> TRAFO_KAPASITE_LISTESI = new List<int> // trafo yakınsama için kullanılan list
         {
             15, 25, 40, 50, 63, 100, 160, 200, 250, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500
         };
-        protected readonly List<string> veri_listesi_requires_csv = new List<string> { }; 
+        protected readonly List<string> veri_listesi_requires_csv = new List<string> { };
         protected readonly List<string> veri_listesi_requires_tabular = new List<string> { };
         protected readonly Dictionary<string, string> veri_listesi_requires_database = new Dictionary<string, string>
         {
@@ -113,7 +113,7 @@ namespace SLF
 
         public DataTable currentDataTable = new DataTable();
         public DataTable importedDataTable = new DataTable();
-        
+
         public static Dictionary<string, DataTable> dataTablesByType = new Dictionary<string, DataTable>();
         protected static readonly object _dataTablesLock = new object();
 
@@ -126,7 +126,7 @@ namespace SLF
         protected DataTable infoDataTableReport = new DataTable();
         protected DataTable statDataTableReport = new DataTable();
         protected DataTable reportDataTableReport = new DataTable();
-        
+
         protected Dictionary<string, List<int>> columnNullRowsMap = new Dictionary<string, List<int>>();
         protected Dictionary<string, List<int>> imputableRowsMap = new Dictionary<string, List<int>>();
         protected Dictionary<string, (double X, double Y)> binaIdToMostFrequentCoordinates = new Dictionary<string, (double X, double Y)>();
@@ -289,7 +289,7 @@ namespace SLF
                     MessageBox.Show("Veri tablosu boş veya yüklenemedi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 Onizleme1.Onizleme_DataGrid1.ScrollBars = ScrollBars.Both;
-                
+
             }
             catch (Exception ex)
             {
@@ -303,7 +303,7 @@ namespace SLF
         public void ShowImportedMessage()
         {
             StringBuilder sb = new StringBuilder();
-            
+
             sb.AppendLine($"{seçilenVeriTipi} başarıyla yüklendi.");
             sb.AppendLine($"Toplam satır sayısı: {importedDataTable.Rows.Count}");
 
@@ -348,12 +348,12 @@ namespace SLF
 
 
         // Public read-only property
-        public DataTable CurrentDataTable { get { return currentDataTable; }}
-        public DataTable ErrorDataTable { get { return errorDataTable; }}
-        public DataTable WarningDataTable { get { return warningDataTable; }}
-        public DataTable InfoDataTable { get { return infoDataTable; }}
-        public Önizleme Onizleme1 { get { return onizleme1; }}
-        
+        public DataTable CurrentDataTable { get { return currentDataTable; } }
+        public DataTable ErrorDataTable { get { return errorDataTable; } }
+        public DataTable WarningDataTable { get { return warningDataTable; } }
+        public DataTable InfoDataTable { get { return infoDataTable; } }
+        public Önizleme Onizleme1 { get { return onizleme1; } }
+
         public GirdiModülü()
         {
             modülFormu = new ModülFormu();
@@ -424,7 +424,7 @@ namespace SLF
                     destination.ImportRow(row);
                 }
             }
-            
+
         }
 
         // VEER prosesi tamamlanıp düzgün veriler elde edildikten sonra çağrılan metot
@@ -471,7 +471,7 @@ namespace SLF
                             (string)modülFormu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                                 (string)modülFormu.ana_menu_form_objesi.config.İl,
                                 (string)modülFormu.ana_menu_form_objesi.config.İlçe,
-                                (string)modülFormu.ana_menu_form_objesi.config.ELF.INPUT_FILE).Replace('/', '\\'), 
+                                (string)modülFormu.ana_menu_form_objesi.config.ELF.INPUT_FILE).Replace('/', '\\'),
                             importedDataTable);
                         RunRScriptSenaryolar();
                     }
@@ -867,7 +867,7 @@ namespace SLF
             statDataTableReport.Rows.Clear();
         }
 
-        protected DataTable GetDataTableBasedOnThreshold( float currentPercentage,float warningThreshold,float errorThreshold)
+        protected DataTable GetDataTableBasedOnThreshold(float currentPercentage, float warningThreshold, float errorThreshold)
         {
             if (currentPercentage >= errorThreshold)
             {
@@ -1115,4 +1115,3 @@ namespace SLF
         }
     }
 }
-

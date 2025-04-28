@@ -1,7 +1,10 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.IO;
 using System.Windows.Forms;
 using System.IO;
+using System.Reflection;
+using SLF.Services;
 
 namespace SLF
 {
@@ -14,7 +17,6 @@ namespace SLF
         public dynamic config;
         public string userRootPath;
         public string config_path;
-        public static string config_path2;
 
         public HomePageForm()
         {
@@ -28,15 +30,22 @@ namespace SLF
             this.Shown += HomePageForm_Shown;
 
             userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
             config_path = Path.Combine(userRootPath,
                 "MRC\\MRC - 1.1.3_T&SI\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\Program Dosyaları\\config.json").Replace("/", "\\");
 
-            config_path2 = config_path;
-            // read the json file and create the "config" variable.
-            json_file = File.ReadAllText(config_path);        
-            config = JsonConvert.DeserializeObject(json_file);
+            if (File.Exists(config_path))
+            {
+                // Config dosyasından PathService'e yolu ilet
+                PathService.SetConfigPath(config_path);
 
+                // Config dosyasını kendi sınıfında kullanmak için oku
+                json_file = File.ReadAllText(config_path);
+                config = JsonConvert.DeserializeObject(json_file);
+            }
+            else
+            {
+                MessageBox.Show("Config dosyası bulunamadı!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void HomePageForm_Shown(object sender, EventArgs e)

@@ -83,28 +83,8 @@ namespace SLF.RaporlamaDosyası
         {
             InitializeComponent();
 
-            /*var config = new ConfigurationBuilder()
-           .SetBasePath(Directory.GetCurrentDirectory())
-           .AddJsonFile("config 1.json")
-           .Build();
-
-            İlİlceYol = Path.Combine(config["Ana_Klasör_Yolu"], config["İl"], config["İlçe"]);
-
-            ELFSonucYolu = Path.Combine(İlİlceYol, config["ELF:SONUÇLAR_klasör"]);
-
-            İlYol = Path.Combine(config["Ana_Klasör_Yolu"], config["İl"]);
-
-            SonucYolu = Path.Combine(İlİlceYol, config["ODTR:Klasör"]);
-
-            YükVeriYolu = Path.Combine(İlİlceYol, config["ODTR:INPUT_klasör2"]);
-
-            İmarVeriYolu = Path.Combine(İlİlceYol, config["ODTR:INPUT_klasör1"]);
-
-            currentDt = new DataTable();*/
-
-            //var configPath = @"C:\Users\vural.bayrakli\OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\config.json";
-            var configPath = HomePageForm.config_path2;
-
+            HomePageForm anaMenu = new HomePageForm();
+            var configPath = anaMenu.config_path;
 
             var config = new ConfigurationBuilder()
                 .AddJsonFile(configPath, optional: false, reloadOnChange: true)

@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.IO;
 using ExcelDataReader;
 using ClosedXML.Excel;
+using System.Globalization;
 
 namespace SLF
 {
@@ -283,19 +284,119 @@ namespace SLF
             }
         }
 
-        private void NoktaYukTableSaveButton_Click(object sender, EventArgs e)
+
+        private bool ValidatePolygonData()
         {
+            // Column to validate
+            string columnToValidate = "Kurulu Güç (kW)";
+
             try
             {
-                // Use ClosedXML to write the DataTable back to the Excel file
-                using (var workbook = new XLWorkbook())
+                // Check if the column exists in the DataGridView
+                if (!NoktaYukDataGridView.Columns.Contains(columnToValidate))
                 {
-                    var worksheet = workbook.Worksheets.Add("PolygonTypes");
+                    MessageBox.Show($"Hata: '{columnToValidate}' sütunu bulunamadı.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+
+                // Get the column index for "Kurulu Güç (kW)"
+                int columnIndex = NoktaYukDataGridView.Columns[columnToValidate].Index;
+
+                // Iterate over each row in the DataGridView
+                for (int rowIndex = 0; rowIndex < NoktaYukDataGridView.Rows.Count; rowIndex++)
+                {
+                    var row = NoktaYukDataGridView.Rows[rowIndex];
+
+                    // Skip the new row placeholder if it exists
+                    if (row.IsNewRow) continue;
+
+                    // Get the cell value for "Kurulu Güç (kW)"
+                    var cellValue = row.Cells[columnIndex].Value;
+
+                    // Check if the value is not null or empty
+                    if (cellValue != null && !string.IsNullOrEmpty(cellValue.ToString()))
+                    {
+                        // Try to parse the value as a double
+                        if (double.TryParse(cellValue.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+                        {
+                            // Check if the value exceeds 10,000
+                            if (value > 10000)
+                            {
+                                MessageBox.Show($"Satır {rowIndex + 1}: '{columnToValidate}' değeri 10,000'i aşamaz. Değer: {value}",
+                                    "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            // If parsing fails, show error and return false
+                            MessageBox.Show($"Satır {rowIndex + 1}: '{columnToValidate}' sütununda geçersiz bir değer var: {cellValue}",
+                                "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+                    }
+                }
+
+                // If all values are valid, return true
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Doğrulama sırasında bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+
+
+
+        private void NoktaYukTableSaveButton_Click(object sender, EventArgs e)
+        {
+
+            // Validate the data before saving
+            if (!ValidatePolygonData())
+            {
+                return; // Stop saving if validation fails
+            }
+
+
+            try
+            {
+                // Load the existing Excel file
+                using (var workbook = new XLWorkbook(excelFilePath))
+                {
+                    // Determine which sheet to update
+                    IXLWorksheet worksheet;
+                    string sheetName;
+                    int sheetIndex;
+
+                    if (yuk_select)
+                    {
+                        sheetName = workbook.Worksheets.Count > 0 ? workbook.Worksheet(1).Name : "YUK";
+                        sheetIndex = 1; // First sheet (index 1 in ClosedXML)
+                    }
+                    else if (musaade_select)
+                    {
+                        sheetName = workbook.Worksheets.Count > 1 ? workbook.Worksheet(2).Name : "Musaade";
+                        sheetIndex = 2; // Second sheet (index 2 in ClosedXML)
+                    }
+                    else
+                    {
+                        throw new Exception("Geçersiz seçim: Yuk veya Musaade seçilmelidir.");
+                    }
+
+                    // Delete the existing sheet and recreate it to ensure clean data
+                    if (workbook.Worksheets.Contains(sheetName))
+                    {
+                        workbook.Worksheets.Delete(sheetName);
+                    }
+                    worksheet = workbook.Worksheets.Add(sheetName, sheetIndex);
+
                     // Write headers
                     for (int col = 0; col < dataTable.Columns.Count; col++)
                     {
                         worksheet.Cell(1, col + 1).Value = dataTable.Columns[col].ColumnName;
                     }
+
                     // Write data rows
                     for (int row = 0; row < dataTable.Rows.Count; row++)
                     {
@@ -304,16 +405,19 @@ namespace SLF
                             worksheet.Cell(row + 2, col + 1).Value = dataTable.Rows[row][col]?.ToString();
                         }
                     }
-                    workbook.SaveAs(excelFilePath);
+
+                    // Save the workbook
+                    workbook.Save();
                 }
 
                 MessageBox.Show("Değişiklikler kaydedildi!", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this.DialogResult = DialogResult.OK;
                 this.Close();
 
-                is_yukler_changed = true;
-                is_musaade_changed = true;  
-
+                if (yuk_select)
+                    is_yukler_changed = true;
+                else if (musaade_select)
+                    is_musaade_changed = true;
             }
             catch (Exception ex)
             {
