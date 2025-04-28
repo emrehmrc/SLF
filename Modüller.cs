@@ -998,8 +998,14 @@ namespace SLF
             // Default color is red
             Color textColor = Color.Red;
 
-            // Check if the module exists and has data
-            if (girdiModülleri.ContainsKey(text) && girdiModülleri[text].importedDataTable.Rows.Count > 0)
+            // Check if module is completed according to project_state.json
+            List<string> completedModules = GetCompletedModulesFromJson();
+            if (completedModules != null && completedModules.Contains(text))
+            {
+                textColor = Color.Green;
+            }
+            // Fallback to old method if JSON check fails
+            else if (girdiModülleri.ContainsKey(text) && girdiModülleri[text].importedDataTable.Rows.Count > 0)
             {
                 textColor = Color.Green;
             }
@@ -1016,7 +1022,35 @@ namespace SLF
             // Draw the focus rectangle if the item is selected
             e.DrawFocusRectangle();
         }
+        private List<string> GetCompletedModulesFromJson()
+        {
+            try
+            {
+                // Proje dosyasının yolu
+                string statePath = Path.Combine(
+                    PathService.BaseDirectory,
+                    PathService.FullPath,
+                    PathService.CurrentWorkingFolder,
+                    "project_state.json");
 
+                if (File.Exists(statePath))
+                {
+                    string json = File.ReadAllText(statePath);
+                    Dictionary<string, object> projectState = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+
+                    if (projectState != null && projectState.TryGetValue("CompletedModules", out object modulesObj))
+                    {
+                        return JsonConvert.DeserializeObject<List<string>>(modulesObj.ToString());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"JSON dosyası okunurken hata: {ex.Message}");
+            }
+
+            return null;
+        }
         private void raporGoruntuleButonu_Click(object sender, EventArgs e)
         {
             // Girdi modülündeki dosya yükleme butonuna tıklandığında çalışacak kodlar

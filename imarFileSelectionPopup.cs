@@ -161,7 +161,7 @@ namespace SLF
                 }
 
                 // Populate the DataGridView after successful script execution
-                UploadOutputToGridView();
+                //UploadOutputToGridView();
                 this.Close();
             }
             catch (Exception ex)
@@ -190,12 +190,16 @@ namespace SLF
 
                 // Çıktı klasörünü kontrol et
                 string outputDir = PathService.GetImarAnaliziPathForType("imar_planlari");
+                string csvOutputDir = Path.Combine(outputDir, "csv");
                 string selectedCity = PathService.SelectedCity;
                 string selectedDistrict = PathService.SelectedDistrict;
-                string outputPrefix = $"İMAR_SONUÇLAR";
-                string outputCsvPath = Path.Combine(outputDir, $"{outputPrefix}.csv");
 
-                bool outputExists = File.Exists(outputCsvPath);
+                // Herhangi bir çıktı dosyasını kontrol et
+                bool outputExists = Directory.Exists(outputDir) &&
+                   (Directory.Exists(csvOutputDir) && Directory.GetFiles(csvOutputDir, "*.csv").Length > 0 ||
+                    Directory.GetFiles(outputDir, "*.csv").Length > 0 ||
+                    Directory.GetFiles(outputDir, "*.kml").Length > 0 ||
+                    Directory.GetDirectories(outputDir).Length > 0);
 
                 if (outputExists)
                 {
@@ -285,8 +289,6 @@ namespace SLF
                                 writer.Write(updatedJson);
                             }
 
-                            
-
                             Console.WriteLine($"Proje durumu güncellendi: {statePath}");
                         }
                         catch (Exception ex)
@@ -322,75 +324,53 @@ namespace SLF
             catch (Exception ex)
             {
                 MessageBox.Show($"İmar planı analizi çalıştırılırken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
+                return false;  // Hata durumunda false döndür
             }
         }
-        private void UploadOutputToGridView()
+        private string GetOutputFileInfo(string outputDir)
         {
-            try
+            StringBuilder info = new StringBuilder();
+            info.AppendLine("Çıktı klasörü içeriği:");
+
+            // Ana klasördeki CSV'leri kontrol et
+            string[] csvFiles = Directory.GetFiles(outputDir, "*.csv", SearchOption.TopDirectoryOnly);
+            if (csvFiles.Length > 0)
             {
-                // Çıktı klasörünü belirle
-                string outputDir = PathService.GetImarAnaliziPathForType("imar_planlari");
-                string selectedCity = PathService.SelectedCity;
-                string selectedDistrict = PathService.SelectedDistrict;
-                string outputPrefix = $"imar_plan_{selectedCity}_{selectedDistrict}";
-                string outputCsvPath = Path.Combine(outputDir, $"{outputPrefix}.csv");
-
-                if (!File.Exists(outputCsvPath))
+                info.AppendLine("Ana klasördeki CSV dosyaları:");
+                foreach (var file in csvFiles)
                 {
-                    MessageBox.Show("Çıktı CSV dosyası bulunamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                    info.AppendLine($"- {Path.GetFileName(file)}");
                 }
+            }
 
-                // CSV dosyasını DataTable'a yükle
-                var dataTable = new DataTable();
-                using (var reader = new StreamReader(outputCsvPath))
+            // csv alt klasörünü kontrol et
+            string csvOutputDir = Path.Combine(outputDir, "csv");
+            if (Directory.Exists(csvOutputDir))
+            {
+                string[] csvSubFiles = Directory.GetFiles(csvOutputDir, "*.csv", SearchOption.TopDirectoryOnly);
+                if (csvSubFiles.Length > 0)
                 {
-                    string headerLine = reader.ReadLine();
-                    if (headerLine != null)
+                    info.AppendLine("CSV alt klasöründeki dosyalar:");
+                    foreach (var file in csvSubFiles)
                     {
-                        string[] headers = headerLine.Split(',');
-                        foreach (string header in headers)
-                        {
-                            dataTable.Columns.Add(header.Trim('\"'));
-                        }
-
-                        while (!reader.EndOfStream)
-                        {
-                            string dataLine = reader.ReadLine();
-                            if (dataLine != null)
-                            {
-                                string[] dataValues = dataLine.Split(',');
-                                for (int i = 0; i < dataValues.Length; i++)
-                                {
-                                    dataValues[i] = dataValues[i].Trim('\"');
-                                }
-                                dataTable.Rows.Add(dataValues);
-                            }
-                        }
+                        info.AppendLine($"- {Path.GetFileName(file)}");
                     }
                 }
-
-                _dataGridViewGirdi.DataSource = dataTable;
-
-                // Sütun genişliklerini ayarla
-                _dataGridViewGirdi.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-
-                // Başlık renklendirme
-                for (int i = 0; i < _dataGridViewGirdi.Columns.Count; i++)
-                {
-                    _dataGridViewGirdi.Columns[i].HeaderCell.Style.BackColor = System.Drawing.Color.LightBlue;
-                    _dataGridViewGirdi.Columns[i].HeaderCell.Style.ForeColor = System.Drawing.Color.Navy;
-                    _dataGridViewGirdi.Columns[i].HeaderCell.Style.Font = new System.Drawing.Font(_dataGridViewGirdi.Font, System.Drawing.FontStyle.Bold);
-                }
-
-                // Satır sayısı bilgisi
-                MessageBox.Show($"Toplam {dataTable.Rows.Count} adet kayıt yüklendi.", "Veri Yüklendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch (Exception ex)
+
+            // Alt klasörleri kontrol et
+            string[] subDirs = Directory.GetDirectories(outputDir);
+            if (subDirs.Length > 0)
             {
-                MessageBox.Show($"CSV verileri yüklenirken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                info.AppendLine("Alt klasörler:");
+                foreach (var dir in subDirs)
+                {
+                    info.AppendLine($"- {Path.GetFileName(dir)}");
+                }
             }
+
+            return info.ToString();
+        }
+       
         }
     }
-}
