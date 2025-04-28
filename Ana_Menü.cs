@@ -31,7 +31,7 @@ namespace SLF
 
             userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             config_path = Path.Combine(userRootPath,
-                "MRC\\MRC - 1.1.3_T&SI\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\İzmir\\Program Dosyaları\\config.json").Replace("/", "\\");
+                "MRC\\MRC - 1.1.3_T&SI\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\Program Dosyaları\\config.json").Replace("/", "\\");
 
             if (File.Exists(config_path))
             {

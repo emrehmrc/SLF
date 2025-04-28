@@ -31,7 +31,10 @@ namespace SLF.services
                 Console.WriteLine($"Deep Learning model çalıştırılıyor: {selectedCity}/{selectedDistrict}, LastYear: {lastYear}");
 
                 // Python script yolu - artık python_kod klasöründen alınıyor
-                string pythonScriptPath = PathService.GetPythonScriptPath("model_learning.py");
+                string scriptRelativePath = Path.Combine("python_kod", "deep_learning", "kod", "model_learning.py");
+                string pythonScriptPath = PathService.GetPythonScriptPath(scriptRelativePath);
+                //Console.WriteLine("deeplearningpath"+pythonScriptPath.ToString());
+                
 
                 if (!File.Exists(pythonScriptPath))
                 {
@@ -106,6 +109,31 @@ namespace SLF.services
                 Console.WriteLine($"Deep Learning modeli çalıştırılırken hata: {ex.Message}");
                 throw; // Üst seviye metodların hatayı yakalaması için yeniden fırlat
             }
+        }
+        private static string FindExistingPythonScript(string basePath, string scriptRelativePath)
+        {
+            // Try the direct path first
+            string directPath = Path.Combine(basePath, scriptRelativePath);
+            directPath = PathService.ConvertPathToFileSystem(directPath);
+            if (File.Exists(directPath))
+                return directPath;
+
+            // Try alternatives
+            string[] pathVariations = new string[]
+            {
+        directPath,
+        directPath.Replace('\\', '/'),
+        directPath.Replace("python_kod", "python_kodlari"),
+                // Add more variations as needed
+            };
+
+            foreach (string path in pathVariations)
+            {
+                if (File.Exists(path))
+                    return path;
+            }
+
+            return null; // No valid path found
         }
 
         /// <summary>
@@ -223,11 +251,23 @@ namespace SLF.services
                 Console.WriteLine($"İmar Planı modeli çalıştırılıyor: {selectedCity}/{selectedDistrict}");
 
                 // Python script yolu 
-                string pythonScriptPath = PathService.GetPythonScriptPath("main.py");
+                string pythonScriptPath = !string.IsNullOrEmpty(PathService._configImarAnaliziPath)
+                    ? PathService._configImarAnaliziPath
+                    : PathService.GetPythonScriptPath("main.py");
 
                 if (!File.Exists(pythonScriptPath))
                 {
-                    throw new Exception($"Python script bulunamadı: {pythonScriptPath}");
+                    // Alternatif yolları dene
+                    string altPath = Path.Combine(PathService.PythonKodDirectory, "imar_analizi", "main.py");
+                    if (File.Exists(altPath))
+                    {
+                        pythonScriptPath = altPath;
+                        Console.WriteLine($"Alternatif İmar Analizi yolu kullanılıyor: {pythonScriptPath}");
+                    }
+                    else
+                    {
+                        throw new Exception($"İmar Analizi Python script bulunamadı: {pythonScriptPath}");
+                    }
                 }
 
                 // Çıktı klasörü yolları - Ana çalışma klasörü
@@ -390,7 +430,7 @@ namespace SLF.services
                     {
                         if (!string.IsNullOrEmpty(e.Data))
                         {
-                            Console.WriteLine($"PYTHON ERROR: {e.Data}");
+                            Console.WriteLine($"PYTHON: {e.Data}");
                             error += e.Data + Environment.NewLine;
                         }
                     };
@@ -443,6 +483,7 @@ namespace SLF.services
                 throw; // Üst seviye metodların hatayı yakalaması için yeniden fırlat
             }
         }
+
         /// <summary>
         /// Saturation Load Flow (SLF) analizini çalıştırır ve sonuçları döndürür
         /// </summary>
@@ -459,8 +500,8 @@ namespace SLF.services
         /// <param name="saturasyonFilePath">Saturasyon dosyasının yolu (zorunlu)</param>
         /// <returns>Python betiğinin çıktısı</returns>
         /// 
-
-        public static string RunSLFModel(string saturasyonFilePath)
+        //string pythonScriptPath = Path.Combine(PathService.PythonKodDirectory, "slf_analizi", "slf_main.py");
+        public static string RunSLFModel(string saturasyonFilePath, string explicitScriptPath = null)
         {
             try
             {
@@ -475,13 +516,44 @@ namespace SLF.services
 
                 Console.WriteLine($"SLF modeli çalıştırılıyor: {selectedCity}/{selectedDistrict}");
 
-                // Python script yolu 
-                string pythonScriptPath = Path.Combine(PathService.PythonKodDirectory, "slf_analizi", "slf_main.py");
-
-                if (!File.Exists(pythonScriptPath))
+                // Python script yolu için öncelik sırası
+                string[] possibleScriptPaths = new string[]
                 {
-                    throw new Exception($"Python script bulunamadı: {pythonScriptPath}");
+            // Açık olarak sağlanan yol (varsa)
+            explicitScriptPath,
+
+            // Config'den gelen yol
+            !string.IsNullOrEmpty(PathService._configSLFMainPath)
+                ? PathService._configSLFMainPath
+                : null,
+
+            // Config Python Kod Path'i
+            !string.IsNullOrEmpty(PathService._configPythonKodPath)
+                ? Path.Combine(PathService._configPythonKodPath, "SLF_analizi", "slf_main.py")
+                : null,
+
+            // Manuel inşa edilen yol
+            Path.Combine(PathService.BaseDirectory,
+                selectedCity,
+                "Program Dosyaları",
+                "İmar",
+                "python_kod",
+                "SLF_analizi",
+                "slf_main.py"),
+
+            // PythonKodDirectory üzerinden
+            Path.Combine(PathService.PythonKodDirectory, "SLF_analizi", "slf_main.py")
+                };
+
+                // İlk geçerli script yolunu bul
+                string pythonScriptPath = possibleScriptPaths.FirstOrDefault(File.Exists);
+
+                if (string.IsNullOrEmpty(pythonScriptPath))
+                {
+                    throw new FileNotFoundException($"SLF main.py script dosyası bulunamadı. Olası yollar kontrol edildi.");
                 }
+
+                Console.WriteLine($"Kullanılacak Python Script Yolu: {pythonScriptPath}");
 
                 // İmar sonuçları altında özel bir SLF sonuçları klasörü oluştur
                 string imarAnaliziPath = PathService.GetImarAnaliziPathForType("imar_planlari");
@@ -489,15 +561,12 @@ namespace SLF.services
                 Console.WriteLine($"SLF analizi çıktı klasörü: {slfAnaliziPath}");
 
                 // Klasörü oluştur (yoksa)
-                if (!Directory.Exists(slfAnaliziPath))
-                {
-                    Directory.CreateDirectory(slfAnaliziPath);
-                }
+                Directory.CreateDirectory(slfAnaliziPath);
 
                 // Saturasyon dosyası kontrolü
                 if (!File.Exists(saturasyonFilePath))
                 {
-                    throw new Exception($"Saturasyon dosyası bulunamadı: {saturasyonFilePath}");
+                    throw new FileNotFoundException($"Saturasyon dosyası bulunamadı: {saturasyonFilePath}");
                 }
 
                 // ASCII'ye çevrilmiş path'ler ve değişkenler
@@ -506,98 +575,38 @@ namespace SLF.services
 
                 // İmar oranı dosyasını bul
                 string imarOraniFilePath = PathService.GetImarOraniFilePath();
-
-                // İmar oranı dosyası zorunlu, yoksa hata atılacak
                 if (string.IsNullOrEmpty(imarOraniFilePath))
                 {
-                    throw new Exception("İmar oranı dosyası bulunamadı, bu dosya gereklidir.");
+                    throw new FileNotFoundException("İmar oranı dosyası bulunamadı, bu dosya gereklidir.");
                 }
 
                 // Construction stats (imar stats) dosyasını bul
-                string imarStatsFilePath = PathService.GetConstructionStatsFilePath(); // Bu metodu PathService'e eklemeniz gerekiyor
-
-                // İmar stats dosyası zorunlu, yoksa hata atılacak
+                string imarStatsFilePath = PathService.GetConstructionStatsFilePath();
                 if (string.IsNullOrEmpty(imarStatsFilePath))
                 {
-                    throw new Exception("Construction stats dosyası bulunamadı, bu dosya gereklidir.");
+                    throw new FileNotFoundException("Construction stats dosyası bulunamadı, bu dosya gereklidir.");
                 }
 
-                // Python script için komut satırı argümanları
-                string arguments = $"\"{pythonScriptPath}\" \"{saturasyonFilePath}\" \"{asciiCity}\" \"{asciiDistrict}\" \"{slfAnaliziPath}\" --start-year 2024 --end-year 2035";
+                // Komut satırı argümanları
+                string arguments = CreateCommandLineArguments(
+                    pythonScriptPath,
+                    saturasyonFilePath,
+                    asciiCity,
+                    asciiDistrict,
+                    slfAnaliziPath,
+                    imarOraniFilePath,
+                    imarStatsFilePath
+                );
 
-                // İmar oranı dosyasını argümanlara ekle
-                arguments += $" --imar-orani-file \"{imarOraniFilePath}\"";
-                Console.WriteLine($"İmar oranı dosyası: {imarOraniFilePath}");
-
-                // Construction stats dosyasını argümanlara ekle
-                arguments += $" --imar-stats-file \"{imarStatsFilePath}\"";
-                Console.WriteLine($"Construction stats dosyası: {imarStatsFilePath}");
-
-                // Çalıştırılan tam komutu oluştur ve yazdır
-                string fullCommand = $"python {arguments}";
-                Console.WriteLine("RunSLF çalıştırılan komut: " + fullCommand);
-
-                // Python betiğini çalıştır
-                ProcessStartInfo processInfo = new ProcessStartInfo("python")
-                {
-                    Arguments = arguments,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    WorkingDirectory = Path.GetDirectoryName(pythonScriptPath),
-                    // UTF-8 kodlamayı ayarla
-                    StandardOutputEncoding = System.Text.Encoding.UTF8,
-                    StandardErrorEncoding = System.Text.Encoding.UTF8
-                };
-
-                // Çevre değişkenlerini ayarla (Python'un UTF-8 kullanmasını sağlar)
-                processInfo.EnvironmentVariables["PYTHONIOENCODING"] = "utf-8";
+                // Python process ayarları
+                ProcessStartInfo processInfo = ConfigureProcessStartInfo(pythonScriptPath, arguments);
 
                 string output = "";
                 string error = "";
+
                 using (Process process = Process.Start(processInfo))
                 {
-                    // Eş zamanlı çıktı yakalama
-                    process.OutputDataReceived += (sender, e) =>
-                    {
-                        if (!string.IsNullOrEmpty(e.Data))
-                        {
-                            Console.WriteLine($"PYTHON: {e.Data}");
-                            output += e.Data + Environment.NewLine;
-                        }
-                    };
-
-                    process.ErrorDataReceived += (sender, e) =>
-                    {
-                        if (!string.IsNullOrEmpty(e.Data))
-                        {
-                            Console.WriteLine($"PYTHON ERROR: {e.Data}");
-                            error += e.Data + Environment.NewLine;
-                        }
-                    };
-
-                    // Asenkron okumaları başlat
-                    process.BeginOutputReadLine();
-                    process.BeginErrorReadLine();
-
-                    // İşlemin tamamlanmasını bekle - timeout süresini artır (dakika cinsinden)
-                    int timeoutMinutes = 30; // Timeout süresini 30 dakikaya ayarladık, gerekirse değiştirin
-                    bool processExited = process.WaitForExit(timeoutMinutes * 60 * 1000);
-
-                    if (!processExited)
-                    {
-                        // İşlem zaman aşımına uğradıysa, sonlandır
-                        try
-                        {
-                            process.Kill();
-                            throw new Exception($"Python betiği zaman aşımına uğradı ({timeoutMinutes} dakika). İşlem sonlandırıldı.");
-                        }
-                        catch (Exception killEx)
-                        {
-                            throw new Exception($"Python betiği zaman aşımına uğradı ve sonlandırılamadı: {killEx.Message}");
-                        }
-                    }
+                    output = CaptureProcessOutput(process, out error);
 
                     // İşlem tamamlandı, çıkış kodunu kontrol et
                     if (process.ExitCode != 0)
@@ -606,18 +615,95 @@ namespace SLF.services
                     }
                 }
 
-                // Sonuçları gösteren mesaj kutusunu güncelleyin
-                Console.WriteLine("SLF analizi başarıyla çalıştırıldı.");
-                Console.WriteLine($"Sonuçlar '{slfAnaliziPath}' klasörüne kaydedildi.");
-                Console.WriteLine($"Toplam çıktı uzunluğu: {output.Length} karakter");
+                // Sonuç log'ları
+                LogSLFAnalysisResult(slfAnaliziPath, output);
 
                 return output;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"SLF analizi çalıştırılırken hata: {ex.Message}");
-                throw; // Üst seviye metodların hatayı yakalaması için yeniden fırlat
+                throw;
             }
+        }
+
+        // Yardımcı metodlar
+        private static string CreateCommandLineArguments(
+            string pythonScriptPath,
+            string saturasyonFilePath,
+            string asciiCity,
+            string asciiDistrict,
+            string slfAnaliziPath,
+            string imarOraniFilePath,
+            string imarStatsFilePath)
+        {
+            string baseArguments = $"\"{pythonScriptPath}\" \"{saturasyonFilePath}\" \"{asciiCity}\" \"{asciiDistrict}\" \"{slfAnaliziPath}\" --start-year 2024 --end-year 2035";
+            baseArguments += $" --imar-orani-file \"{imarOraniFilePath}\"";
+            baseArguments += $" --imar-stats-file \"{imarStatsFilePath}\"";
+
+            Console.WriteLine("Oluşturulan komut: " + baseArguments);
+            return baseArguments;
+        }
+
+        private static ProcessStartInfo ConfigureProcessStartInfo(string pythonScriptPath, string arguments)
+        {
+            return new ProcessStartInfo("python")
+            {
+                Arguments = arguments,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WorkingDirectory = Path.GetDirectoryName(pythonScriptPath),
+                StandardOutputEncoding = System.Text.Encoding.UTF8,
+                StandardErrorEncoding = System.Text.Encoding.UTF8
+            };
+        }
+
+        private static string CaptureProcessOutput(Process process, out string error)
+        {
+            string output = "";
+            error = "";
+
+            process.OutputDataReceived += (sender, e) =>
+            {
+                if (!string.IsNullOrEmpty(e.Data))
+                {
+                    Console.WriteLine($"PYTHON: {e.Data}");
+                    output += e.Data + Environment.NewLine;
+                }
+            };
+
+            process.ErrorDataReceived += (sender, e) =>
+            {
+                if (!string.IsNullOrEmpty(e.Data))
+                {
+                    Console.WriteLine($"PYTHON: {e.Data}");
+                    //error += e.Data + Environment.NewLine;
+                }
+            };
+
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
+            // Timeout ayarı
+            int timeoutMinutes = 30;
+            bool processExited = process.WaitForExit(timeoutMinutes * 60 * 1000);
+
+            if (!processExited)
+            {
+                process.Kill();
+                throw new Exception($"Python betiği zaman aşımına uğradı ({timeoutMinutes} dakika).");
+            }
+
+            return output;
+        }
+
+        private static void LogSLFAnalysisResult(string slfAnaliziPath, string output)
+        {
+            Console.WriteLine("SLF analizi başarıyla çalıştırıldı.");
+            Console.WriteLine($"Sonuçlar '{slfAnaliziPath}' klasörüne kaydedildi.");
+            Console.WriteLine($"Toplam çıktı uzunluğu: {output.Length} karakter");
         }
 
 

@@ -205,7 +205,7 @@ namespace SLF
                 // YearService'ten değerleri alma
                 this.slfStartYear = yearService.slfStartYear;
                 this.slfEndYear = yearService.slfEndYear;
-            }       
+            }
 
             _excelService = new ExcelService();
             InitializeLogTextBox(); // Initialize logTextBox
@@ -224,6 +224,7 @@ namespace SLF
             if (!string.IsNullOrEmpty(tabToSelect))
             {
                 InitializeTabs(tabToSelect);  // Select the specific tab and hide others
+
             }
             else
             {
@@ -507,7 +508,7 @@ namespace SLF
             if (selectedMethod == "ELF (Ekonometrik)")
             {
                 // Show both the "tab_girdi" and "tab_ekonometrik" tabs and hide others
-                InitializeTabs("tab_girdi", "tab_ekonometrik", "EkonometrikSenaryoTabPage", 
+                InitializeTabs("tab_girdi", "tab_ekonometrik", "EkonometrikSenaryoTabPage",
                     "EkonometrikSonuclarTabPage", "EkonometrikGrafiklerTabPage");
                 Modül_Tabları.SelectedTab = tab_girdi;
             }
@@ -831,7 +832,7 @@ namespace SLF
                 // Optionally, set DataSource to null or an empty DataTable to clear the grid
                 dataGridView_girdi.DataSource = null;
             }
-           
+
             dataGridView_girdi.ScrollBars = ScrollBars.Both;
             dataGridView_girdi.Refresh();
 
@@ -943,7 +944,7 @@ namespace SLF
             OpenModuleButton.Enabled = true;
         }
 
-        private void veri_listesi_seçimi_SelectedIndexChanged(object sender, EventArgs e)
+        public void veri_listesi_seçimi_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (veri_listesi_seçimi.SelectedItem != null)
             {
@@ -1165,18 +1166,63 @@ namespace SLF
 
             if (result == DialogResult.Yes)
             {
-                // Reset the data in each GirdiModülü to make all items red
-                foreach (var module in girdiModülleri.Values)
+                // Yenilikler için projeyi yeniden yükle - imar analizi tamamlandıysa görünsün diye
+                if (PathService.CurrentMode == PathService.WorkingMode.Project)
                 {
-                    module.importedDataTable.Clear(); // Clear the data
+                    try
+                    {
+                        string statePath = Path.Combine(
+                            PathService.BaseDirectory,
+                            PathService.FullPath,
+                            PathService.CurrentWorkingFolder,
+                            "project_state.json");
+
+                        if (File.Exists(statePath))
+                        {
+                            // Proje durumunu yeniden yükle
+                            string json = File.ReadAllText(statePath);
+                            var projectState = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+
+                            // Tamamlanan modülleri işaretle
+                            if (projectState != null && projectState.TryGetValue("CompletedModules", out object modulesObj))
+                            {
+                                List<string> completedModules = new List<string>();
+
+                                var modulesArray = modulesObj as Newtonsoft.Json.Linq.JArray;
+                                if (modulesArray != null)
+                                {
+                                    foreach (var module in modulesArray)
+                                    {
+                                        completedModules.Add(module.ToString());
+                                    }
+                                }
+
+                                // İmar Analizi tamamlandıysa, İmar Verileri'ni de yüklü olarak işaretle
+                                if (completedModules.Contains("İmar Analizi"))
+                                {
+                                    // İmar Verileri'ni yüklü olarak işaretle
+                                    if (!GirdiModülü.dataTablesByType.ContainsKey("İmar Verileri"))
+                                    {
+                                        // Boş bir DataTable bile olsa, yüklü olarak gözükecek
+                                        GirdiModülü.dataTablesByType["İmar Verileri"] = new DataTable();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Proje durumu yüklenirken hata: {ex.Message}");
+                        // Hatayı görmezden gel, kullanıcı arayüzü etkilenmesin
+                    }
                 }
 
-                // Invalidate the ComboBox to trigger redraw of all items
+                // ComboBox'ı yeniden çiz
                 veri_listesi_seçimi.Invalidate();
 
-                // Unsubscribe from the FormClosing event
+                // Ana sayfaya dönüş işlemi
                 this.FormClosing -= ModülFormu_FormClosing;
-                this.Hide(); // Hide the current form (ModülFormu)
+                this.Hide();
             }
         }
 
@@ -1184,7 +1230,7 @@ namespace SLF
         {
             ana_menu_form_objesi.config.ELF.ufuk_yılı = (int)endYearComboBox.SelectedItem - (int)startYearComboBox.SelectedItem;
             methodFormObjesi.SaveConfigToFile();
-            
+
             if (endYearComboBox.SelectedIndex == -1)
             {
                 // if the end year is not chosen, it means we are still in selection process
@@ -1250,7 +1296,7 @@ namespace SLF
             { "İzmir", new List<string> {/* "Aliağa", "Balçova", "Bayındır", "Bayraklı", "Bergama", "Beydağ", "Bornova", "Buca", "Çeşme", */ "Çiğli", /*"Dikili", "Foça", "Gaziemir", "Güzelbahçe", "Karabağlar", "Karaburun", */"Karşıyaka",/* "Kemalpaşa", "Kınık", "Kiraz", "Konak", "Menderes", "Menemen", "Narlıdere", "Ödemiş", "Seferihisar", "Selçuk", "Tire", "Torbalı"*/ } },
             { "Eskişehir", new List<string> { /*"Alpu", "Beylikova", "Çifteler", "Günyüzü", "Han", "İnönü", "Mahmudiye", "Mihalgazi", "Mihalıççık", "Odunpazarı", "Sarıcakaya", "Seyitgazi", "Sivrihisar", */ "Tepebaşı" } }
         };
-                private readonly Dictionary<string, string> districtIdMap = new Dictionary<string, string>
+        private readonly Dictionary<string, string> districtIdMap = new Dictionary<string, string>
         {
             { "Çiğli", "1" },
             { "Karşıyaka", "2" },
@@ -1285,12 +1331,12 @@ namespace SLF
             comboBox_ea_yıl_secimi.DataSource = yearList; // Yıl seçimi için ComboBox1
             comboBox_DEK_Yıl.DataSource = yearList; // DEK yılı seçimi için ComboBox3
                                                     // Şehir isimlerini ComboBox2'ye ekleyin
-/*            comboBox_DEK_il.Items.Clear(); // dek
-            comboBox_ea_il_secimi.Items.Clear();   // ea 
-            comboBox_ea_il_secimi.Items.Add("İzmir");
-            comboBox_ea_il_secimi.Items.Add("Eskişehir");
-            comboBox_DEK_il.Items.Add("İzmir");
-            comboBox_DEK_il.Items.Add("Eskişehir");*/
+            /*            comboBox_DEK_il.Items.Clear(); // dek
+                        comboBox_ea_il_secimi.Items.Clear();   // ea 
+                        comboBox_ea_il_secimi.Items.Add("İzmir");
+                        comboBox_ea_il_secimi.Items.Add("Eskişehir");
+                        comboBox_DEK_il.Items.Add("İzmir");
+                        comboBox_DEK_il.Items.Add("Eskişehir");*/
 
         }
 
@@ -1518,26 +1564,26 @@ namespace SLF
                     veri_listesi_seçimi.SelectedIndex = -1;
                 }
 
-/*                if (comboBox_ea_il_secimi != null)
-                {
-                    comboBox_ea_il_secimi.SelectedIndex = -1;
-                }*/
+                /*                if (comboBox_ea_il_secimi != null)
+                                {
+                                    comboBox_ea_il_secimi.SelectedIndex = -1;
+                                }*/
 
                 if (comboBox_ea_yıl_secimi != null)
                 {
                     comboBox_ea_yıl_secimi.SelectedIndex = -1;
                 }
 
-/*                if (comboBox_DEK_il != null)
-                {
-                    comboBox_DEK_il.SelectedIndex = -1;
-                }
+                /*                if (comboBox_DEK_il != null)
+                                {
+                                    comboBox_DEK_il.SelectedIndex = -1;
+                                }
 
-                if (comboBox_DEK_Yıl != null)
-                {
-                    comboBox_DEK_Yıl.SelectedIndex = -1;
-                }
-*/
+                                if (comboBox_DEK_Yıl != null)
+                                {
+                                    comboBox_DEK_Yıl.SelectedIndex = -1;
+                                }
+                */
                 // DataGridView'ları temizle
                 if (dataGridView_girdi != null)
                 {
@@ -2316,7 +2362,7 @@ namespace SLF
                     legendPanel.Visible = false;
                 }
 
-            } 
+            }
         }
 
         public void ProjeEkleButton_Click(object sender, EventArgs e)
@@ -2910,7 +2956,7 @@ namespace SLF
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
 
-                private async void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
+        private async void gMapControl_Ea_OnMapClick(PointLatLng pointClick, MouseEventArgs e)
         {
 
             if (isAddingChargingStation)
@@ -3071,7 +3117,7 @@ namespace SLF
         {
             if (e.Button == MouseButtons.Left)
             {
-               // ContextMenuStrip_Nokta.Show(Cursor.Position);
+                // ContextMenuStrip_Nokta.Show(Cursor.Position);
             }
         }
 
@@ -5256,10 +5302,11 @@ namespace SLF
 
                     activeMap.Refresh();
                 }
-            } else if (e.Button == MouseButtons.Right)
+            }
+            else if (e.Button == MouseButtons.Right)
             {
                 // If user is placing markers (not polygons)
-                if (isRulerActive) { isRulerActive = false;}
+                if (isRulerActive) { isRulerActive = false; }
                 if (isRulerEnabled) { isRulerEnabled = false; }
 
                 rulerOverlay_imar?.Clear();
@@ -6350,61 +6397,61 @@ namespace SLF
             hoveredPolygon = null;
             polygonToolTip.Hide(gMapControl_yuk);
         }
+        //private void Slf_Button_Click(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        // İşlem sırasında imleç görünümünü değiştir
+        //        Cursor.Current = Cursors.WaitCursor;
 
-        private void Slf_Button_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                // İşlem sırasında imleç görünümünü değiştir
-                Cursor.Current = Cursors.WaitCursor;
+        //        // Gerekli kontroller (İl-ilçe seçilmiş mi)
+        //        if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
+        //        {
+        //            MessageBox.Show("Lütfen önce il ve ilçe seçimini yapın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //            return;
+        //        }
 
-                // Gerekli kontroller (İl-ilçe seçilmiş mi)
-                if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
-                {
-                    MessageBox.Show("Lütfen önce il ve ilçe seçimini yapın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
+        //        // İmar Analizi sonuçlarını kontrol et
+        //        string imarAnaliziPath = PathService.GetImarAnaliziPathForType("imar_planlari");
+        //        if (!Directory.Exists(imarAnaliziPath))
+        //        {
+        //            MessageBox.Show("Lütfen önce İmar Analizi'ni çalıştırın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //            return;
+        //        }
 
-                // İmar Analizi sonuçlarını kontrol et
-                string imarAnaliziPath = PathService.GetImarAnaliziPathForType("imar_planlari");
-                if (!Directory.Exists(imarAnaliziPath))
-                {
-                    MessageBox.Show("Lütfen önce İmar Analizi'ni çalıştırın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
+        //        // PathService üzerinden saturasyon dosyasının yolunu al
+        //        string saturasyonFile = PathService.GetSaturasyonFilePath();
+        //        if (string.IsNullOrEmpty(saturasyonFile))
+        //        {
+        //            MessageBox.Show("Saturasyon dosyası bulunamadı. Lütfen önce İmar Analizi'ni çalıştırın.",
+        //                           "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //            return;
+        //        }
 
-                // PathService üzerinden saturasyon dosyasının yolunu al
-                string saturasyonFile = PathService.GetSaturasyonFilePath();
-                if (string.IsNullOrEmpty(saturasyonFile))
-                {
-                    MessageBox.Show("Saturasyon dosyası bulunamadı. Lütfen önce İmar Analizi'ni çalıştırın.",
-                                   "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
+        //        // SLF modelini çalıştır
+        //        string output = PythonHelper.RunSLFModel(saturasyonFile);
 
-                // SLF modelini çalıştır
-                string output = PythonHelper.RunSLFModel(saturasyonFile);
+        //        // Sonuçların kaydedildiği yer
+        //        string slfAnaliziPath = Path.Combine(imarAnaliziPath, "slf_analizi");
 
-                // Sonuçların kaydedildiği yer
-                string slfAnaliziPath = Path.Combine(imarAnaliziPath, "slf_analizi");
+        //        // İşlem tamamlandığında başarı mesajı göster
+        //        MessageBox.Show("SLF analizi başarıyla tamamlandı.\nSonuçlar 'imar_analizi_sonuclari/imar_planlari/slf_analizi' klasöründe kaydedildi.",
+        //                       "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // İşlem tamamlandığında başarı mesajı göster
-                MessageBox.Show("SLF analizi başarıyla tamamlandı.\nSonuçlar 'imar_analizi_sonuclari/imar_planlari/slf_analizi' klasöründe kaydedildi.",
-                               "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //        // Sonuç klasörünü aç
+        //        System.Diagnostics.Process.Start("explorer.exe", slfAnaliziPath);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show($"SLF analizi sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
+        //    finally
+        //    {
+        //        // İşlem bittiğinde imleci normal duruma getir
+        //        Cursor.Current = Cursors.Default;
+        //    }
+        //}
 
-                // Sonuç klasörünü aç
-                System.Diagnostics.Process.Start("explorer.exe", slfAnaliziPath);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"SLF analizi sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                // İşlem bittiğinde imleci normal duruma getir
-                Cursor.Current = Cursors.Default;
-            }
-        }
         private string RunSLFModelWithASCIIPaths(string saturasyonFilePath, string slfSonuclarPath)
         {
             try
@@ -6466,7 +6513,7 @@ namespace SLF
                     {
                         if (!string.IsNullOrEmpty(e.Data))
                         {
-                            Console.WriteLine($"PYTHON ERROR: {e.Data}");
+                            Console.WriteLine($"PYTHON: {e.Data}");
                             error += e.Data + Environment.NewLine;
                         }
                     };
@@ -7471,7 +7518,7 @@ namespace SLF
 
         private void SenaryoModuleTabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(SenaryoModuleTabControl.SelectedTab == EkonometrikSonuclarTabPage)
+            if (SenaryoModuleTabControl.SelectedTab == EkonometrikSonuclarTabPage)
             {
                 EkonometrikSenaryoElementsPanel.Visible = false;
                 label_graphics.Visible = false;
@@ -7657,11 +7704,12 @@ namespace SLF
                 // Prevent switching to the tab
                 e.Cancel = true;
 
-            } else
-            {
-                SenaryoModuleTabControl.SelectedTab = EkonometrikSenaryoTabPage; 
             }
-                
+            else
+            {
+                SenaryoModuleTabControl.SelectedTab = EkonometrikSenaryoTabPage;
+            }
+
         }
 
         private void ELFMaxSenaryoTable_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
@@ -7801,6 +7849,115 @@ namespace SLF
                 ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar, rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
             }
         }
+
+        //private void slf_button_2_Click(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        // İşlem sırasında imleç görünümünü değiştir
+        //        Cursor.Current = Cursors.WaitCursor;
+
+        //        // Gerekli kontroller (İl-ilçe seçilmiş mi)
+        //        if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
+        //        {
+        //            MessageBox.Show("Lütfen önce il ve ilçe seçimini yapın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //            return;
+        //        }
+
+        //        // İmar Analizi sonuçlarını kontrol et
+        //        string imarAnaliziPath = PathService.GetImarAnaliziPathForType("imar_planlari");
+        //        if (!Directory.Exists(imarAnaliziPath))
+        //        {
+        //            MessageBox.Show("Lütfen önce İmar Analizi'ni çalıştırın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //            return;
+        //        }
+
+        //        // PathService üzerinden saturasyon dosyasının yolunu al
+        //        string saturasyonFile = PathService.GetSaturasyonFilePath();
+        //        if (string.IsNullOrEmpty(saturasyonFile))
+        //        {
+        //            MessageBox.Show("Saturasyon dosyası bulunamadı. Lütfen önce İmar Analizi'ni çalıştırın.",
+        //                           "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //            return;
+        //        }
+
+        //        // Debug bilgileri
+        //        Console.WriteLine($"Seçilen Şehir: {PathService.SelectedCity}");
+        //        Console.WriteLine($"Seçilen İlçe: {PathService.SelectedDistrict}");
+        //        Console.WriteLine($"Saturasyon Dosyası: {saturasyonFile}");
+        //        Console.WriteLine($"İmar Analizi Klasörü: {imarAnaliziPath}");
+
+        //        // SLF için olası script yolları
+        //        string[] slfScriptPaths = new string[]
+        //        {
+        //    // Config'den gelen yol
+        //    PathService._configSLFMainPath,
+            
+        //    // Manuel inşa edilen yollar
+        //    Path.Combine(PathService.BaseDirectory, PathService.SelectedCity,
+        //        "Program Dosyaları", "İmar", "python_kod", "SLF_analizi", "slf_main.py"),
+            
+        //    // Python Kod Dizini üzerinden
+        //    Path.Combine(PathService.PythonKodDirectory, "SLF_analizi", "slf_main.py")
+        //        };
+
+        //        // İlk bulunan geçerli script yolunu seç
+        //        string validSlfScriptPath = slfScriptPaths.FirstOrDefault(File.Exists);
+
+        //        if (string.IsNullOrEmpty(validSlfScriptPath))
+        //        {
+        //            throw new FileNotFoundException("SLF main.py script dosyası bulunamadı. " +
+        //                "Lütfen Python script yollarını kontrol edin.");
+        //        }
+
+        //        Console.WriteLine($"Kullanılacak SLF Script Yolu: {validSlfScriptPath}");
+
+        //        // SLF modelini çalıştır
+        //        string output = PythonHelper.RunSLFModel(saturasyonFile, validSlfScriptPath);
+
+        //        // Sonuçların kaydedildiği yer
+        //        string slfAnaliziPath = Path.Combine(imarAnaliziPath, "slf_analizi");
+
+        //        // Sonuç klasörü var mı kontrol et
+        //        if (!Directory.Exists(slfAnaliziPath))
+        //        {
+        //            Directory.CreateDirectory(slfAnaliziPath);
+        //            Console.WriteLine($"SLF analizi sonuç klasörü oluşturuldu: {slfAnaliziPath}");
+        //        }
+
+        //        // İşlem tamamlandığında başarı mesajı göster
+        //        MessageBox.Show("SLF analizi başarıyla tamamlandı.\nSonuçlar 'imar_analizi_sonuclari/imar_planlari/slf_analizi' klasöründe kaydedildi.",
+        //                       "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        //        // Sonuç klasörünü aç
+        //        if (Directory.Exists(slfAnaliziPath))
+        //        {
+        //            System.Diagnostics.Process.Start("explorer.exe", slfAnaliziPath);
+        //        }
+        //        else
+        //        {
+        //            MessageBox.Show("SLF analizi sonuç klasörü bulunamadı.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Detaylı hata mesajı
+        //        string errorMessage = $"SLF analizi sırasında hata oluştu:\n\n" +
+        //                              $"Hata Mesajı: {ex.Message}\n" +
+        //                              $"Kaynak: {ex.Source}\n" +
+        //                              $"Detay: {ex.StackTrace}";
+
+        //        MessageBox.Show(errorMessage, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+        //        // Konsola da hata bilgisini yazdır
+        //        Console.WriteLine(errorMessage);
+        //    }
+        //    finally
+        //    {
+        //        // İşlem bittiğinde imleci normal duruma getir
+        //        Cursor.Current = Cursors.Default;
+        //    }
+        //}
 
         private void TextBox_KeyPress_NumbersOnly(object sender, KeyPressEventArgs e)
         {

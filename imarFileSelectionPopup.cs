@@ -5,6 +5,9 @@ using System.Windows.Forms;
 using System.Data;
 using SLF.Services;
 using SLF.services;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Text;
 
 namespace SLF
 {
@@ -171,7 +174,7 @@ namespace SLF
             }
         }
 
-        private void RunImarPlanPython(string kmlFilePath, string csvFilePath = null)
+        private bool RunImarPlanPython(string kmlFilePath, string csvFilePath = null)
         {
             try
             {
@@ -185,13 +188,141 @@ namespace SLF
                 // Python betiğini çalıştır
                 string output = PythonHelper.RunImarPlanModel(kmlFilePath, csvFilePath);
 
-                // Başarılı çalıştırma mesajı
-                MessageBox.Show("İmar planı analizi başarıyla tamamlandı.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // Çıktı klasörünü kontrol et
+                string outputDir = PathService.GetImarAnaliziPathForType("imar_planlari");
+                string selectedCity = PathService.SelectedCity;
+                string selectedDistrict = PathService.SelectedDistrict;
+                string outputPrefix = $"İMAR_SONUÇLAR";
+                string outputCsvPath = Path.Combine(outputDir, $"{outputPrefix}.csv");
+
+                bool outputExists = File.Exists(outputCsvPath);
+
+                if (outputExists)
+                {
+                    // Proje durumunu güncelle (project_state.json)
+                    if (PathService.CurrentMode == PathService.WorkingMode.Project &&
+                        !string.IsNullOrEmpty(PathService.CurrentWorkingFolder))
+                    {
+                        try
+                        {
+                            // Proje dosyasının yolu
+                            string statePath = Path.Combine(
+                                PathService.BaseDirectory,
+                                PathService.FullPath,
+                                PathService.CurrentWorkingFolder,
+                                "project_state.json");
+
+                            // JSON dosyası için veri oluştur
+                            Dictionary<string, object> projectState;
+
+                            // Eğer dosya varsa, mevcut içeriği oku
+                            if (File.Exists(statePath))
+                            {
+                                string json = File.ReadAllText(statePath);
+                                projectState = JsonConvert.DeserializeObject<Dictionary<string, object>>(json) ??
+                                               new Dictionary<string, object>();
+                            }
+                            else
+                            {
+                                projectState = new Dictionary<string, object>();
+                            }
+
+                            // Tamamlanan modüller listesini al veya oluştur
+                            List<string> completedModules;
+                            if (projectState.TryGetValue("CompletedModules", out object modulesObj))
+                            {
+                                // Mevcut liste varsa dönüştür
+                                try
+                                {
+                                    completedModules = JsonConvert.DeserializeObject<List<string>>(modulesObj.ToString()) ??
+                                                      new List<string>();
+                                }
+                                catch
+                                {
+                                    completedModules = new List<string>();
+                                }
+                            }
+                            else
+                            {
+                                completedModules = new List<string>();
+                            }
+
+                            // "İmar Analizi" modülünü ekle (eğer zaten yoksa)
+                            if (!completedModules.Contains("İmar Analizi"))
+                            {
+                                completedModules.Add("İmar Analizi");
+                            }
+
+                            // Saturasyon klasörünü kontrol et
+                            string saturasyonPath = Path.Combine(outputDir, "saturasyon");
+                            if (Directory.Exists(saturasyonPath) && !completedModules.Contains("Saturasyon Analizi"))
+                            {
+                                completedModules.Add("Saturasyon Analizi");
+                            }
+
+                            // Güncellenmiş listeyi dictionary'ye ekle
+                            projectState["CompletedModules"] = completedModules;
+
+                            // Diğer bilgileri güncelle
+                            projectState["LastSaved"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                            // Proje adı yoksa ekle
+                            if (!projectState.ContainsKey("ProjectName") &&
+                                PathService.CurrentWorkingFolder.StartsWith("proje_"))
+                            {
+                                projectState["ProjectName"] = PathService.CurrentWorkingFolder.Substring(6);
+                            }
+
+                            // YearService'ten yıl bilgilerini al
+                            var yearService = YearService.GetInstance();
+                            projectState["SLFStartYear"] = yearService.slfStartYear;
+                            projectState["SLFEndYear"] = yearService.slfEndYear;
+
+                            // Güncellenen json'ı dosyaya yaz
+                            string updatedJson = JsonConvert.SerializeObject(projectState, Formatting.Indented);
+                            using (StreamWriter writer = new StreamWriter(statePath, false, new UTF8Encoding(false)))
+                            {
+                                writer.Write(updatedJson);
+                            }
+
+                            
+
+                            Console.WriteLine($"Proje durumu güncellendi: {statePath}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Proje durumu güncellenirken hata: {ex.Message}");
+                            // Hata durumunda işleme devam et
+                        }
+                    }
+
+                    // Başarılı çalıştırma mesajı
+                    MessageBox.Show(
+                        "İmar planı analizi başarıyla tamamlandı." +
+                        (PathService.CurrentMode == PathService.WorkingMode.Project ?
+                            "\nProje durumu güncellendi." : ""),
+                        "Başarılı",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+
+                    return true;
+                }
+                else
+                {
+                    // Çıktı dosyası bulunamadıysa uyarı mesajı göster
+                    MessageBox.Show(
+                        "İmar planı analizi tamamlandı ancak çıktı dosyası bulunamadı.",
+                        "Uyarı",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+
+                    return false;
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"İmar planı analizi çalıştırılırken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                throw;
+                return false;
             }
         }
         private void UploadOutputToGridView()
@@ -263,4 +394,3 @@ namespace SLF
         }
     }
 }
-       

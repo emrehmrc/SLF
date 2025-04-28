@@ -20,13 +20,13 @@ namespace SLF.Services
         /// <summary>
         /// Uygulama genelinde path yönetimi sağlayan servis sınıfı
         /// </summary>
-            private static string _configPythonKodPath;
-            private static string _configImarAnaliziPath;
+            public static string _configPythonKodPath;
+            public static string _configImarAnaliziPath;
         // Proje klasörüne göre relatif il-ilçe kırılımı klasörü yolu
-            private static string _relativeDataPath = "il_ilce_kırılımları"; // Varsayılan değer
-            private static string _configSLFMainPath;
+        private static string _relativeDataPath = "il_ilce_kırılımları"; // Varsayılan değer
+        public static string _configSLFMainPath;
         // Temel dizin - ilk çalıştırmada hesaplanır
-        private static string _baseDirectory;
+        public static string _baseDirectory;
 
             // Seçilen il
             public static string SelectedCity { get; private set; }
@@ -84,6 +84,19 @@ namespace SLF.Services
         {
             try
             {
+                string originalPath = @"C:\Users\batuhan.yetis\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\imar\python_kod\deep_learning\kod\model_learning.py";
+
+                // Dosyanın gerçekten var olup olmadığını kontrol et
+                bool originalExists = File.Exists(originalPath);
+                Console.WriteLine($"Orijinal dosya var mı: {originalExists}");
+
+                // Dönüşüm işlemini uygula
+                string convertedPath = ConvertPathToFileSystem(originalPath);
+                Console.WriteLine($"Dönüştürülmüş yol: {convertedPath}");
+
+                // Dönüştürülmüş yolun var olup olmadığını kontrol et
+                bool convertedExists = File.Exists(convertedPath);
+                Console.WriteLine($"Dönüştürülmüş dosya var mı: {convertedExists}");
                 // Config dosyasını oku
                 if (File.Exists(configPath))
                 {
@@ -109,16 +122,10 @@ namespace SLF.Services
                             string programDosyalariPath = config.program_dosyaları_path?.ToString() ?? "Program Dosyaları";
                             string programDosyalariFullPath = Path.Combine(fullPath, programDosyalariPath);
 
-                            // Eğer yoksa oluştur
-                            if (!Directory.Exists(programDosyalariFullPath))
-                            {
-                                Directory.CreateDirectory(programDosyalariFullPath);
-                            }
-
                             // "Python Kodları" bölümünü oku
                             if (config["Python Kodları"] != null)
                             {
-                                // İmar Analizi yolunu oku
+                                // IMAR_ANALİZİ yolunu oku
                                 if (config["Python Kodları"].IMAR_ANALİZİ != null)
                                 {
                                     string marAnaliziRelativePath = config["Python Kodları"].IMAR_ANALİZİ.ToString();
@@ -129,8 +136,8 @@ namespace SLF.Services
                                         marAnaliziRelativePath = marAnaliziRelativePath.Substring(1);
                                     }
 
-                                    // IMAR_ANALİZİ yolunu ana dizinle birleştir
-                                    string marAnaliziFullPath = Path.Combine(fullPath, marAnaliziRelativePath);
+                                    // ÖNEMLİ DEĞİŞİKLİK: İl değerini path'e dahil etme, doğrudan program dosyaları ile birleştir
+                                    string marAnaliziFullPath = Path.Combine(programDosyalariFullPath, marAnaliziRelativePath);
 
                                     // Dizin kısmını al (dosya adını çıkar)
                                     string marAnaliziDirPath = Path.GetDirectoryName(marAnaliziFullPath);
@@ -145,8 +152,14 @@ namespace SLF.Services
                                     _configImarAnaliziPath = marAnaliziFullPath;
                                     Debug.WriteLine($"Config'den alınan İmar Analizi kod yolu: {_configImarAnaliziPath}");
 
-                                    // Python kodları ana dizinini de ayarla
-                                    string pythonKodDir = Path.GetDirectoryName(marAnaliziDirPath);
+                                    // Python kodları ana dizinini de ayarla - marAnaliziDirPath yerine python_kod klasörünü doğrudan bul
+                                    // Bu şekilde "İmar/python_kod" içindeki imar_analizi klasörü yerine doğrudan "python_kod" dizinine ulaşacağız
+                                    string pythonKodDir = Path.Combine(programDosyalariFullPath, "python_kod");
+                                    if (!Directory.Exists(pythonKodDir))
+                                    {
+                                        // Python kodları dizini bulunamadıysa, dizin yapısından çıkarmaya çalış
+                                        pythonKodDir = Path.GetDirectoryName(Path.GetDirectoryName(marAnaliziDirPath));
+                                    }
                                     _configPythonKodPath = pythonKodDir;
                                     Debug.WriteLine($"Config'den alınan Python kod yolu: {_configPythonKodPath}");
                                 }
@@ -162,8 +175,8 @@ namespace SLF.Services
                                         slfMainRelativePath = slfMainRelativePath.Substring(1);
                                     }
 
-                                    // SLF_Main yolunu ana dizinle birleştir
-                                    string slfMainFullPath = Path.Combine(fullPath, slfMainRelativePath);
+                                    // ÖNEMLİ DEĞİŞİKLİK: İl değerini path'e dahil etme, doğrudan program dosyaları ile birleştir
+                                    string slfMainFullPath = Path.Combine(programDosyalariFullPath, slfMainRelativePath);
 
                                     // Dizin kısmını al (dosya adını çıkar)
                                     string slfMainDirPath = Path.GetDirectoryName(slfMainFullPath);
@@ -331,7 +344,7 @@ namespace SLF.Services
             {    // Eğer config'den ayarlanmışsa, o yolu kullan
                 if (!string.IsNullOrEmpty(_configPythonKodPath) && Directory.Exists(_configPythonKodPath))
                 {
-                    return _configPythonKodPath;
+                    return ConvertPathToFileSystem(_configPythonKodPath);
                 }
                 try
                 {
@@ -491,15 +504,32 @@ namespace SLF.Services
         /// <summary>
         /// Python script dosyasının tam yolunu döndürür
         /// </summary>
-        public static string GetPythonScriptPath(string scriptName)
+        public static string GetPythonScriptPath(string relativePath)
         {
-            // Eğer main.py ise İmar Planları klasöründe ara
-            if (scriptName.ToLower() == "main.py")
+            // 1. İlk olarak orijinal Config yolunu dene
+            if (!string.IsNullOrEmpty(_configPythonKodPath))
             {
-                return Path.Combine(ImarPlansDirectory, scriptName);
+                string configPath = Path.Combine(_configPythonKodPath, relativePath);
+                if (File.Exists(configPath))
+                {
+                    return configPath;
+                }
             }
-            // Diğer durumlarda DeepLearning klasöründe ara
-            return Path.Combine(DeepLearningCodeDirectory, scriptName);
+
+            // 2. Temel dizin üzerinden oluşturulan yolu dene
+            string basePath = Path.Combine(PythonKodDirectory, relativePath);
+            if (File.Exists(basePath))
+            {
+                return basePath;
+            }
+
+            // 3. Hiçbiri çalışmazsa, en azından var olan bir dizin döndürmeye çalış
+            if (!string.IsNullOrEmpty(_configPythonKodPath))
+            {
+                return Path.Combine(_configPythonKodPath, relativePath);
+            }
+
+            return basePath;
         }
 
         /// <summary>
@@ -1257,13 +1287,97 @@ namespace SLF.Services
         /// <param name="scriptPath">Python betik dosyasının yolu</param>
         /// <param name="additionalArgs">Ek komut satırı argümanları</param>
         /// <returns>Python betiğinin çıktısı</returns>
+        /// 
+        // Updated method to convert paths with Turkish characters to ASCII equivalents
+        // and fix the path structure by removing invalid "Izmir" directory inclusion
+        /// <summary>
+        /// Converts a path with Turkish characters to a file system compatible path
+        /// </summary>
+        /// <param name="path">Original path with possible Turkish characters</param>
+        /// <returns>File system compatible path</returns>
+        public static string ConvertPathToFileSystem(string path)
+            {
+                if (string.IsNullOrEmpty(path))
+                    return path;
+
+                // Create a dictionary mapping Turkish characters to their ASCII equivalents
+                Dictionary<char, char> turkishToAscii = new Dictionary<char, char>
+        {
+            {'ı', 'i'}, {'İ', 'I'}, {'ğ', 'g'}, {'Ğ', 'G'},
+            {'ü', 'u'}, {'Ü', 'U'}, {'ş', 's'}, {'Ş', 'S'},
+            {'ç', 'c'}, {'Ç', 'C'}, {'ö', 'o'}, {'Ö', 'O'}
+        };
+
+            // Convert character by character
+            StringBuilder result = new StringBuilder(path.Length);
+            foreach (char c in path)
+            {
+                if (turkishToAscii.TryGetValue(c, out char asciiChar))
+                {
+                    result.Append(asciiChar);
+                }
+                else
+                {
+                    result.Append(c);
+                }
+            }
+
+            // Convert the resulting path
+            string convertedPath = result.ToString();
+
+            // Fix the issue with city names being incorrectly inserted in paths
+            // This uses a more generic regex to identify and correct the pattern
+            convertedPath = System.Text.RegularExpressions.Regex.Replace(
+                convertedPath,
+                @"il_ilce_kirilimlari\\[^\\]+\\Program Dosyalari",
+                "il_ilce_kirilimlari\\Program Dosyalari");
+
+            return convertedPath;
+        }
         public static string RunPythonScript(string scriptPath, string additionalArgs = "")
         {
-            string arguments = $"\"{scriptPath}\" {CommandLinePathArg} {additionalArgs}";
-            string output = string.Empty;
-
             try
             {
+                // Convert the path to file system compatible path
+                string fsScriptPath = ConvertPathToFileSystem(scriptPath);
+
+                // Log both paths for debugging
+                Debug.WriteLine($"Original script path: {scriptPath}");
+                Debug.WriteLine($"Converted script path: {fsScriptPath}");
+
+                // Check if the script exists
+                if (!File.Exists(fsScriptPath))
+                {
+                    // Try some variations if the script is not found
+                    string[] pathVariations = new string[]
+                    {
+                fsScriptPath,
+                fsScriptPath.Replace('\\', '/'),  // Try with forward slashes
+                fsScriptPath.Replace("python_kod", "python_kodlari"), // Try alternate folder name
+                Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(fsScriptPath)), Path.GetFileName(fsScriptPath)) // Try two directories up
+                    };
+
+                    bool scriptFound = false;
+                    foreach (string variation in pathVariations)
+                    {
+                        if (File.Exists(variation))
+                        {
+                            fsScriptPath = variation;
+                            scriptFound = true;
+                            Debug.WriteLine($"Found script at alternate path: {variation}");
+                            break;
+                        }
+                    }
+
+                    if (!scriptFound)
+                    {
+                        throw new Exception($"Python script bulunamadi: {scriptPath}\nDönüştürülmüş yol: {fsScriptPath}");
+                    }
+                }
+
+                string arguments = $"\"{fsScriptPath}\" {CommandLinePathArg} {additionalArgs}";
+                string output = string.Empty;
+
                 Process process = new Process();
                 process.StartInfo.FileName = "python";  // veya "python3" Linux/macOS sistemlerinde
                 process.StartInfo.Arguments = arguments;
@@ -1275,7 +1389,7 @@ namespace SLF.Services
                 output = process.StandardOutput.ReadToEnd();
                 process.WaitForExit();
 
-                Debug.WriteLine($"Python betiği çalıştırıldı: {scriptPath}");
+                Debug.WriteLine($"Python betiği çalıştırıldı: {fsScriptPath}");
                 Debug.WriteLine($"Sonuç: {output}");
 
                 return output;
@@ -1517,6 +1631,15 @@ namespace SLF.Services
                 Console.WriteLine($"İmar oranı dosyası aranırken hata: {ex.Message}");
                 return null; // Return null if an error occurs
             }
+        }
+        public static string GetPythonSafePath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return path;
+
+            // Windows ters eğik çizgilerini (\\) ileri eğik çizgilere (/) çevir
+            // Bu, Python'daki unicode escape sorunlarını önler
+            return path.Replace("\\", "/");
         }
         /// <summary>
         /// Türkçe karakterleri ASCII karşılıklarına dönüştürür
