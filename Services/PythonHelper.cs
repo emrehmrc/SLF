@@ -32,7 +32,7 @@ namespace SLF.services
                 string scriptRelativePath = Path.Combine("python_kod", "deep_learning", "kod", "model_learning.py");
                 string pythonScriptPath = PathService.GetPythonScriptPath(scriptRelativePath);
                 //Console.WriteLine("deeplearningpath"+pythonScriptPath.ToString());
-                
+
 
                 if (!File.Exists(pythonScriptPath))
                 {
