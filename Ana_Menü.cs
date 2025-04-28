@@ -17,7 +17,6 @@ namespace SLF
         public dynamic config;
         public string userRootPath;
         public string config_path;
-        public static string config_path2;
 
         public HomePageForm()
         {

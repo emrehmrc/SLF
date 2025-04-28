@@ -64,7 +64,9 @@ namespace SLF.Optimal_DTR
 
             cbs = new CBS();
 
-            var configPath = HomePageForm.config_path2;
+            HomePageForm anaMenu = new HomePageForm();
+
+            var configPath = anaMenu.config_path;
 
             var config = new ConfigurationBuilder()
                 .AddJsonFile(configPath, optional: false, reloadOnChange: true)
