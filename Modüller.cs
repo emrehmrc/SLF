@@ -439,7 +439,7 @@ namespace SLF
                     if (tabToSelect == "tab_girdi")
                     {
                         veri_listesi_seçimi.Text = "Ekonometrik Yük Tahmini Verileri";
-                        veri_listesi_seçimi.Enabled = false;
+                        veri_listesi_seçimi.Enabled = true;
                     }
                 }
                 else if (SenaryoModuleTabControl.TabPages.ContainsKey(tabToSelect))
