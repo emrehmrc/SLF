@@ -22,6 +22,7 @@ using System.Globalization;
 using Newtonsoft.Json;
 using SLF.Optimal_DTR;
 using SLF.RaporlamaDosyası;
+using SLF.services;
 
 namespace SLF
 {
@@ -6333,56 +6334,43 @@ namespace SLF
 
         private void buton_DL_calıstır_Click(object sender, EventArgs e)
         {
-            // Show the confirmation dialog for navigating to the home page
-            DialogResult result_dialog = MessageBox.Show("Bina tiplerini oluşturan makine öğrenmesi modelini " +
-                "çalıştırmak üzeresiniz. Emin misiniz? Bu kodun çalışması biraz zaman alabilir\n\n" +
-                "Çıktı olarak her binaya ait bina tipleri (örneğin 1-2 katlı mesken, villa, orta ticarethane, vb.)" +
-                " oluşturulacaktır.",
-                "Bina Tiplerini Oluştur",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning
-            );
-
-            if (result_dialog == DialogResult.Yes)
+            try
             {
-                try
+                // İşlem sırasında imleç görünümünü değiştir
+                Cursor.Current = Cursors.WaitCursor;
+
+                // Gerekli kontroller (Abone verisi yüklü mü, il-ilçe seçilmiş mi)
+                if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
                 {
-                    // İşlem sırasında imleç görünümünü değiştir
-                    Cursor.Current = Cursors.WaitCursor;
-
-                    // Gerekli kontroller (Abone verisi yüklü mü, il-ilçe seçilmiş mi)
-                    if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
-                    {
-                        MessageBox.Show("Lütfen önce il ve ilçe seçimini yapın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
-
-                    if (!GirdiModülü.dataTablesByType.ContainsKey("Abone Verileri"))
-                    {
-                        MessageBox.Show("Lütfen önce Abone Verileri'ni yükleyin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
-
-                    // Deep Learning modelini çalıştır
-                    string result = SLF.services.PythonHelper.RunDeepLearningModel();
-
-                    // İşlem tamamlandığında başarı mesajı göster
-                    MessageBox.Show("İmar analizi başarıyla tamamlandı.\nSonuçlar 'imar_analizi_sonuclari/deep_learning_modeli' klasöründe kaydedildi.",
-                                    "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    // İsteğe bağlı olarak sonuç klasörünü aç
-                    string imarAnaliziPath = PathService.GetImarAnaliziPathForType("deep_learning_modeli");
-                    System.Diagnostics.Process.Start("explorer.exe", imarAnaliziPath);
+                    MessageBox.Show("Lütfen önce il ve ilçe seçimini yapın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
-                catch (Exception ex)
+
+                if (!GirdiModülü.dataTablesByType.ContainsKey("Abone Verileri"))
                 {
-                    MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Lütfen önce Abone Verileri'ni yükleyin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
-                finally
-                {
-                    // İşlem bittiğinde imleci normal duruma getir
-                    Cursor.Current = Cursors.Default;
-                }
+
+                // Deep Learning modelini çalıştır
+                string result = PythonHelper.RunDeepLearningModel();
+
+                // İşlem tamamlandığında başarı mesajı göster
+                MessageBox.Show("İmar analizi başarıyla tamamlandı.\nSonuçlar 'imar_analizi_sonuclari/deep_learning_modeli' klasöründe kaydedildi.",
+                                "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // İsteğe bağlı olarak sonuç klasörünü aç
+                string imarAnaliziPath = PathService.GetImarAnaliziPathForType("deep_learning_modeli");
+                System.Diagnostics.Process.Start("explorer.exe", imarAnaliziPath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // İşlem bittiğinde imleci normal duruma getir
+                Cursor.Current = Cursors.Default;
             }
         }
 
