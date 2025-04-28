@@ -6,9 +6,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
-
+using SLF.Services;
 namespace SLF
-{
+{   
     public class InvalidColumnHeadersException : Exception
     {
         public InvalidColumnHeadersException(string message) : base(message)
@@ -18,6 +18,7 @@ namespace SLF
 
     internal class ExcelImporter
     {
+
         Dictionary<string, List<string>> expectedHeadersMap = new Dictionary<string, List<string>>
         {
             {
@@ -193,6 +194,77 @@ namespace SLF
             // Add more data types and their expected headers as needed
         };
 
+        private YearService _yearService = YearService.GetInstance();
+
+        // Abone verileri için yıl kolonlarını ekleme
+        private void AddYearColumnsToAboneVerileri(List<string> headers)
+        {
+            // Son 5 yıl için tüketim ve talep kolonları ekle
+            for (int year = _yearService.PenultimateYear - 3; year <= _yearService.LastYear; year++)
+            {
+                if (year > 0) // Geçerli bir yıl ise
+                {
+                    headers.Add($"YIL_TUKETIM_{year}");
+                }
+            }
+
+            for (int year = _yearService.PenultimateYear - 3; year <= _yearService.LastYear; year++)
+            {
+                if (year > 0) // Geçerli bir yıl ise
+                {
+                    headers.Add($"YIL_DEMANT_{year}");
+                }
+            }
+        }
+
+        // DTR verileri için yıl kolonlarını ekleme
+        private void AddYearColumnsToDTRVerileri(List<string> headers)
+        {
+            // Son 3 yıl için talep ve tüketim kolonları ekle
+            for (int year = _yearService.PenultimateYear - 1; year <= _yearService.LastYear; year++)
+            {
+                if (year > 0) // Geçerli bir yıl ise
+                {
+                    headers.Add($"YIL_DEMANT_{year}");
+                    headers.Add($"YIL_TUKETIM_{year}");
+                }
+            }
+        }
+
+  
+
+
+
+        private void ValidateColumnHeaders(ExcelWorksheet worksheet, string seçilenVeriTipi)
+        {
+            int colCount = worksheet.Dimension.Columns;
+            List<string> expectedHeaders = expectedHeadersMap[seçilenVeriTipi];
+            int expectedCount = expectedHeaders.Count;
+            if (colCount != expectedCount)
+            {
+                throw new InvalidColumnHeadersException(
+                    $"Sütun sayıları uyuşmuyor.\nBeklenen: {expectedCount}\nMevcut: {colCount}"
+                );
+            }
+
+            bool headerMismatch = false;
+            var invalidColumnMessage = new StringBuilder("Sütun adları uyuşmuyor.\n");
+            for (int col = 1; col <= colCount; col++)
+            {
+                string columnHeader = worksheet.Cells[1, col].Text;
+                if (string.IsNullOrEmpty(columnHeader) || !expectedHeaders.Contains(columnHeader))
+                {
+                    headerMismatch = true;
+                    string expectedHeader = expectedHeaders[col - 1];
+                    invalidColumnMessage.AppendLine($"{col}. sütun:\tBeklenen: {expectedHeader}\tMevcut: {columnHeader}");
+                }
+            }
+            if (headerMismatch)
+            {
+                throw new InvalidColumnHeadersException(invalidColumnMessage.ToString());
+            }
+        }
+
         public DataTable ImportExcelFile(string filePath, string seçilenVeriTipi)
         {
             DataTable dataTable = new DataTable();
@@ -274,37 +346,6 @@ namespace SLF
             }
 
             return dataTable;
-        }
-
-
-        private void ValidateColumnHeaders(ExcelWorksheet worksheet, string seçilenVeriTipi)
-        {
-            int colCount = worksheet.Dimension.Columns;
-            List<string> expectedHeaders = expectedHeadersMap[seçilenVeriTipi];
-            int expectedCount = expectedHeaders.Count;
-            if (colCount != expectedCount)
-            {
-                throw new InvalidColumnHeadersException(
-                    $"Sütun sayıları uyuşmuyor.\nBeklenen: {expectedCount}\nMevcut: {colCount}"
-                );
-            }
-
-            bool headerMismatch = false;
-            var invalidColumnMessage = new StringBuilder("Sütun adları uyuşmuyor.\n");
-            for (int col = 1; col <= colCount; col++)
-            {
-                string columnHeader = worksheet.Cells[1, col].Text;
-                if (string.IsNullOrEmpty(columnHeader) || !expectedHeaders.Contains(columnHeader))
-                {
-                    headerMismatch = true;
-                    string expectedHeader = expectedHeaders[col - 1];
-                    invalidColumnMessage.AppendLine($"{col}. sütun:\tBeklenen: {expectedHeader}\tMevcut: {columnHeader}");
-                }
-            }
-            if (headerMismatch)
-            {
-                throw new InvalidColumnHeadersException(invalidColumnMessage.ToString());
-            }
         }
 
     }

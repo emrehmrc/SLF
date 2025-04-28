@@ -73,7 +73,7 @@ namespace SLF.Services
         /// <summary>
         /// Son yıl (başlangıç yılından bir önceki)
         /// </summary>
-        public int LastYear
+        public int lastYear
         {
             get { return slfStartYear - 1; }
         }
