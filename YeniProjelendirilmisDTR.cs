@@ -24,6 +24,7 @@ namespace SLF
         {
             return string.IsNullOrWhiteSpace(value);
         }
+
         private void MevcutDTRKapasiteCheck()
         {
             int invalidNewCapacityCount = 0;
@@ -41,6 +42,15 @@ namespace SLF
             foreach (DataRow row in currentDataTable.Rows)
             {
                 int rowIndex = currentDataTable.Rows.IndexOf(row);
+
+                // Check if PROJELENDIRILMIS_TRAFO_YATIRIM_SINIFI is "0" (yeni), and skip capacity check if true
+                string yatırımSınıfı = row["PROJELENDIRILMIS_TRAFO_YATIRIM_SINIFI"]?.ToString();
+                if (yatırımSınıfı == "0")
+                {
+                    Console.WriteLine($"Row {rowIndex} skipped: PROJELENDIRILMIS_TRAFO_YATIRIM_SINIFI is 0 (yeni).");
+                    continue;
+                }
+
                 bool isOldCapacityValid = float.TryParse(row[oldTrafoCapacity]?.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out float oldCapacity);
 
                 if (!isOldCapacityValid || oldCapacity <= 0)
@@ -72,15 +82,16 @@ namespace SLF
             {
                 infoDataTable.Rows.Add(new object[]
                 {
-                        "", "Projelendirilmiş yeni DTR kapasitesi", $"{invalidNewCapacityPercentage:P1}",
-                        "Projelendirilmiş yeni DTR kapasitesi mevcut DTR kapasitesinden küçük olamaz. Bu şart sağlamayan DTR'lar silinecektir."
+            "", "Projelendirilmiş yeni DTR kapasitesi", $"{invalidNewCapacityPercentage:P1}",
+            "Projelendirilmiş yeni DTR kapasitesi mevcut DTR kapasitesinden küçük olamaz. Bu şart sağlamayan DTR'lar silinecektir."
                 });
             }
         }
-
         private void ImputeFlagInvestmentYear()
         {
-            int horizonYearValue = horizonYear; // Accesses slfStartYear from GirdiModülü
+            Console.WriteLine("Starting ImputeFlagInvestmentYear...");
+            int horizonYearValue = horizonYear;
+            Console.WriteLine($"horizonYearValue: {horizonYearValue}");
 
             if (!currentDataTable.Columns.Contains("PROJELENDIRILMIS_TRAFO_YATIRIM_YILI"))
             {
@@ -90,11 +101,13 @@ namespace SLF
 
             int imputedCount = 0;
             int totalRows = currentDataTable.Rows.Count;
+            Console.WriteLine($"Total rows to process: {totalRows}");
 
             foreach (DataRow row in currentDataTable.Rows)
             {
                 int rowIndex = currentDataTable.Rows.IndexOf(row);
                 var investmentYearValue = row["PROJELENDIRILMIS_TRAFO_YATIRIM_YILI"]?.ToString();
+                Console.WriteLine($"Row {rowIndex}: PROJELENDIRILMIS_TRAFO_YATIRIM_YILI = '{investmentYearValue}'");
 
                 if (IsNullLike(investmentYearValue))
                 {
@@ -122,7 +135,10 @@ namespace SLF
                 });
                 Console.WriteLine($"Added post-imputation message to warningDataTable. Total rows in warningDataTable: {warningDataTable.Rows.Count}");
             }
+
+            Console.WriteLine("Finished ImputeFlagInvestmentYear.");
         }
+
         private void PreprocessMismatchedTrafoKoduByCondition()
         {
             DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
@@ -138,7 +154,7 @@ namespace SLF
                 string yatırımSınıfı = row["PROJELENDIRILMIS_TRAFO_YATIRIM_SINIFI"]?.ToString();
                 if (yatırımSınıfı == "1" || yatırımSınıfı == "2" || yatırımSınıfı == "3")
                 {
-                    string connectedTrafo = row["PROJELENDIRILMIS_TRAFO_PROJE_KODU"].ToString();
+                    string connectedTrafo = row["PROJELENDIRILMIS_TRAFO_ID"].ToString();
                     if (IsNullLike(connectedTrafo))
                     {
                         // Değer null ya da boşsa işlem yapma
@@ -254,7 +270,6 @@ namespace SLF
             { "PROJELENDIRILMIS_TRAFO_KAPASITE", INFO_ONLY},
             { "PROJELENDIRILMIS_TRAFO_YATIRIM_YILI", WARNING_ONLY},
         };
-
         private void ReportNullCounts()
         {
             float nullPercentage = 0.0f;
@@ -370,9 +385,54 @@ namespace SLF
                     continue;
                 }
 
-                // Default null check for other columns (including PROJELENDIRILMIS_TRAFO_ID)
-                List<int> nullRows = new List<int>();
-                int nullCount = 0;
+                // Special handling for PROJELENDIRILMIS_TRAFO_KAPASITE
+                if (column.ColumnName == "PROJELENDIRILMIS_TRAFO_KAPASITE")
+                {
+                    List<int> nullRows = new List<int>();
+                    int nullCount = 0;
+
+                    foreach (DataRow row in currentDataTable.Rows)
+                    {
+                        int rowIndex = currentDataTable.Rows.IndexOf(row);
+                        string yatırımSınıfı = row["PROJELENDIRILMIS_TRAFO_YATIRIM_SINIFI"]?.ToString();
+
+                        // Skip null check if PROJELENDIRILMIS_TRAFO_YATIRIM_SINIFI is "0" (yeni)
+                        if (yatırımSınıfı == "0")
+                        {
+                            Console.WriteLine($"Row {rowIndex} skipped: PROJELENDIRILMIS_TRAFO_YATIRIM_SINIFI is 0 (yeni), ignoring null check for PROJELENDIRILMIS_TRAFO_KAPASITE.");
+                            continue;
+                        }
+
+                        var value = row[column]?.ToString();
+                        if (IsNullLike(value) || value == "#N/A")
+                        {
+                            nullCount++;
+                            nullRows.Add(rowIndex);
+                            Console.WriteLine($"Row {rowIndex} flagged for deletion: {column.ColumnName} is {(IsNullLike(value) ? "null" : "#N/A")}.");
+                        }
+                    }
+
+                    columnNullRowsMap[column.ColumnName] = nullRows;
+                    nullPercentage = (float)nullCount / totalRows;
+
+                    if (nullPercentage > 0)
+                    {
+                        var thresholds = nullFieldsCheckWithLevel[column.ColumnName];
+                        var datatableLevel = GetDataTableBasedOnThreshold(nullPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
+                        datatableLevel.Rows.Add(new object[]
+                        {
+                    column.ColumnName, "Null değer", $"{nullPercentage:P1}"
+                        });
+                        string tableName = string.IsNullOrEmpty(datatableLevel.TableName) ? "UnknownTable" : datatableLevel.TableName;
+                        Console.WriteLine($"Added null message to {tableName} for {column.ColumnName}. Total rows in {tableName}: {datatableLevel.Rows.Count}");
+                    }
+
+                    continue;
+                }
+
+                // Default null check for other columns
+                List<int> nullRowsDefault = new List<int>();
+                int nullCountDefault = 0;
 
                 for (int i = 0; i < totalRows; i++)
                 {
@@ -380,15 +440,14 @@ namespace SLF
                     var value = row[column]?.ToString();
                     if (IsNullLike(value) || value == "#N/A")
                     {
-                        nullCount++;
-                        nullRows.Add(i);
+                        nullCountDefault++;
+                        nullRowsDefault.Add(i);
                         Console.WriteLine($"Row {i} flagged for deletion: {column.ColumnName} is {(IsNullLike(value) ? "null" : "#N/A")}.");
                     }
                 }
 
-                columnNullRowsMap[column.ColumnName] = nullRows;
-
-                nullPercentage = (float)nullCount / totalRows;
+                columnNullRowsMap[column.ColumnName] = nullRowsDefault;
+                nullPercentage = (float)nullCountDefault / totalRows;
 
                 if (nullPercentage > 0)
                 {
@@ -398,7 +457,6 @@ namespace SLF
                     {
                 column.ColumnName, "Null değer", $"{nullPercentage:P1}"
                     });
-                    // Fallback logging in case TableName is empty
                     string tableName = string.IsNullOrEmpty(datatableLevel.TableName) ? "UnknownTable" : datatableLevel.TableName;
                     Console.WriteLine($"Added null message to {tableName} for {column.ColumnName}. Total rows in {tableName}: {datatableLevel.Rows.Count}");
                 }
@@ -409,24 +467,31 @@ namespace SLF
         {
             PreprocessMismatchedTrafoKoduByCondition();
         }
+
         public override void Validate()
         {
+            Console.WriteLine("Starting Validate...");
             Console.WriteLine($"Before Validate: columnNullRowsMap has {columnNullRowsMap.Count} entries.");
-            columnNullRowsMap.Clear(); // Clear previous entries
+            columnNullRowsMap.Clear();
             Console.WriteLine($"After Clear: columnNullRowsMap has {columnNullRowsMap.Count} entries.");
             base.Validate();
             minMaxCheckMap = CalculateCoordinateBounds();
             ReportNullCounts();
             ReportCoordinatesOutOfLimitsByCondition();
             MevcutDTRKapasiteCheck();
+            Console.WriteLine("Finished Validate.");
         }
 
         public override void Impute()
         {
+            Console.WriteLine("Starting Impute...");
             ImputeFlagInvestmentYear();
+            Console.WriteLine("Finished Impute.");
         }
+
         public override void Remove()
         {
+            Console.WriteLine("Starting Remove...");
             List<int> combinedRowsToRemoveList = new List<int>();
 
             if (columnNullRowsMap.ContainsKey("PROJELENDIRILMIS_TRAFO_ID"))
@@ -450,16 +515,15 @@ namespace SLF
                 combinedRowsToRemoveList.AddRange(columnNullRowsMap["YATIRIM_YILI_EARLY"]);
             }
 
-            // Deduplicate the list before logging
             var distinctRowsToRemove = combinedRowsToRemoveList.Distinct().ToList();
-
             Console.WriteLine($"Before Remove: currentDataTable has {currentDataTable.Rows.Count} rows.");
             Console.WriteLine($"Total rows to remove: {distinctRowsToRemove.Count}, including KAPASITE: {(columnNullRowsMap.ContainsKey("KAPASITE") ? columnNullRowsMap["KAPASITE"].Count : 0)}, YATIRIM_YILI_EARLY: {(columnNullRowsMap.ContainsKey("YATIRIM_YILI_EARLY") ? columnNullRowsMap["YATIRIM_YILI_EARLY"].Count : 0)}, PROJELENDIRILMIS_TRAFO_ID: {(columnNullRowsMap.ContainsKey("PROJELENDIRILMIS_TRAFO_ID") ? columnNullRowsMap["PROJELENDIRILMIS_TRAFO_ID"].Count : 0)}");
 
             RemoveCombinedRows(distinctRowsToRemove);
-
             Console.WriteLine($"After Remove: currentDataTable has {currentDataTable.Rows.Count} rows.");
+            Console.WriteLine("Finished Remove.");
         }
+
 
         private void RemoveCombinedRows(List<int> rowsToRemoveList)
         {
