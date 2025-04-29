@@ -1248,6 +1248,8 @@ namespace SLF
             ana_menu_form_objesi.config.DEK.bitis_yılı = (int)endYearComboBox.SelectedItem;
             ana_menu_form_objesi.config.EA.baslangıc_yılı = (int)startYearComboBox.SelectedItem;
             ana_menu_form_objesi.config.EA.bitis_yılı = (int)endYearComboBox.SelectedItem;
+            ana_menu_form_objesi.config.SLF.Başlangıç_Yılı = (int)startYearComboBox.SelectedItem;
+            ana_menu_form_objesi.config.SLF.Bitiş_Yılı = (int)endYearComboBox.SelectedItem;
 
             methodFormObjesi.SaveConfigToFile();
 
