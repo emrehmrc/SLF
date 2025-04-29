@@ -41,6 +41,7 @@ namespace SLF
                 // Config dosyasını kendi sınıfında kullanmak için oku
                 json_file = File.ReadAllText(config_path);
                 config = JsonConvert.DeserializeObject(json_file);
+
             }
             else
             {
