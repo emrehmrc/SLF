@@ -176,12 +176,14 @@ namespace SLF
                 throw new InvalidOperationException("Transformer data ('DTR Verileri') is missing or empty. Cannot compute coordinate bounds.");
             }
 
-            // Extract all valid X and Y coordinates directly as double, then convert to float
+            // Extract all valid X and Y coordinates, filtering out DBNull values
             var xCoords = trafoDataTable.AsEnumerable()
+                .Where(row => row["TRAFO_X_KOORDINAT"] != DBNull.Value) // Filter out DBNull
                 .Select(row => Convert.ToSingle(row.Field<double>("TRAFO_X_KOORDINAT")))
                 .ToList();
 
             var yCoords = trafoDataTable.AsEnumerable()
+                .Where(row => row["TRAFO_Y_KOORDINAT"] != DBNull.Value) // Filter out DBNull
                 .Select(row => Convert.ToSingle(row.Field<double>("TRAFO_Y_KOORDINAT")))
                 .ToList();
 
@@ -200,10 +202,10 @@ namespace SLF
             float yRange = yMax - yMin;
 
             minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
-            {
-                { "EA_X_KOORDINAT", (xMin - xRange * COORDINATE_BUFFER_PERCENTAGE, xMax + xRange * COORDINATE_BUFFER_PERCENTAGE) },
-                { "EA_Y_KOORDINAT", (yMin - yRange * COORDINATE_BUFFER_PERCENTAGE, yMax + yRange * COORDINATE_BUFFER_PERCENTAGE) }
-            };
+    {
+        { "EA_X_KOORDINAT", (xMin - xRange * COORDINATE_BUFFER_PERCENTAGE, xMax + xRange * COORDINATE_BUFFER_PERCENTAGE) },
+        { "EA_Y_KOORDINAT", (yMin - yRange * COORDINATE_BUFFER_PERCENTAGE, yMax + yRange * COORDINATE_BUFFER_PERCENTAGE) }
+    };
         }
         private void ReportCoordinatesOutOfLimits()
         {

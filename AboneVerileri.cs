@@ -315,6 +315,9 @@ namespace SLF
             float percentage = 0.0f;
             int totalRows = currentDataTable.Rows.Count;
 
+            // Flag to track if we've already processed the coordinates
+            bool coordinatesProcessed = false;
+
             foreach (DataColumn column in currentDataTable.Columns)
             {
                 if (!nullFieldsCheckWithLevel.ContainsKey(column.ColumnName))
@@ -491,6 +494,15 @@ namespace SLF
                 // Handle coordinate columns (ABONE_X_KOORDINAT and ABONE_Y_KOORDINAT) together
                 else if (column.ColumnName == "ABONE_X_KOORDINAT" || column.ColumnName == "ABONE_Y_KOORDINAT")
                 {
+                    // Skip if we've already processed the coordinates
+                    if (coordinatesProcessed)
+                    {
+                        continue;
+                    }
+
+                    // Mark as processed to prevent re-processing
+                    coordinatesProcessed = true;
+
                     // Validate coordinates and populate columnNullRowsMap["COORDINATE_LIMITS"]
                     ReportCoordinatesOutOfLimits();
 
@@ -530,9 +542,6 @@ namespace SLF
                         // Impute using DTR coordinates as a fallback
                         ImputeOutOfLimitCoordinates("COORDINATE_LIMITS");
                     }
-
-                    // Skip further processing of the other coordinate column
-                    continue;
                 }
                 else
                 {
