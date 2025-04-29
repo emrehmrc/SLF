@@ -6420,11 +6420,11 @@ namespace SLF
             // Define the columns to display
             string[] columns = new string[]
             {
-                $"Mesken_{currentYear}",
-                $"Sanayi_{currentYear}",
-                $"Ticarethane_{currentYear}",
-                $"Tarımsal Sulama_{currentYear}",
-                $"Aydınlatma_{currentYear}",
+                $"MESKEN_{currentYear}",
+                $"SANAYI_{currentYear}",
+                $"TICARETHANE_{currentYear}",
+                $"TARIMSAL_SULAMA_{currentYear}",
+                $"AYDINLATMA_{currentYear}",
                 $"TOPLAM_YÜK_{currentYear}",
                 $"Hücre İçi Yerleşim Alanı_{currentYear}",
                 $"Yük_Yoğunluğu_{currentYear}"
@@ -6462,188 +6462,7 @@ namespace SLF
             hoveredPolygon = null;
             polygonToolTip.Hide(gMapControl_yuk);
         }
-        //private void Slf_Button_Click(object sender, EventArgs e)
-        //{
-        //    try
-        //    {
-        //        // İşlem sırasında imleç görünümünü değiştir
-        //        Cursor.Current = Cursors.WaitCursor;
 
-        //        // Gerekli kontroller (İl-ilçe seçilmiş mi)
-        //        if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
-        //        {
-        //            MessageBox.Show("Lütfen önce il ve ilçe seçimini yapın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        //            return;
-        //        }
-
-        //        // İmar Analizi sonuçlarını kontrol et
-        //        string imarAnaliziPath = PathService.GetImarAnaliziPathForType("imar_planlari");
-        //        if (!Directory.Exists(imarAnaliziPath))
-        //        {
-        //            MessageBox.Show("Lütfen önce İmar Analizi'ni çalıştırın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        //            return;
-        //        }
-
-        //        // PathService üzerinden saturasyon dosyasının yolunu al
-        //        string saturasyonFile = PathService.GetSaturasyonFilePath();
-        //        if (string.IsNullOrEmpty(saturasyonFile))
-        //        {
-        //            MessageBox.Show("Saturasyon dosyası bulunamadı. Lütfen önce İmar Analizi'ni çalıştırın.",
-        //                           "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        //            return;
-        //        }
-
-        //        // SLF modelini çalıştır
-        //        string output = PythonHelper.RunSLFModel(saturasyonFile);
-
-        //        // Sonuçların kaydedildiği yer
-        //        string slfAnaliziPath = Path.Combine(imarAnaliziPath, "slf_analizi");
-
-        //        // İşlem tamamlandığında başarı mesajı göster
-        //        MessageBox.Show("SLF analizi başarıyla tamamlandı.\nSonuçlar 'imar_analizi_sonuclari/imar_planlari/slf_analizi' klasöründe kaydedildi.",
-        //                       "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-        //        // Sonuç klasörünü aç
-        //        System.Diagnostics.Process.Start("explorer.exe", slfAnaliziPath);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show($"SLF analizi sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //    }
-        //    finally
-        //    {
-        //        // İşlem bittiğinde imleci normal duruma getir
-        //        Cursor.Current = Cursors.Default;
-        //    }
-        //}
-
-        private string RunSLFModelWithASCIIPaths(string saturasyonFilePath, string slfSonuclarPath)
-        {
-            try
-            {
-                // Dosyayı ASCII karakterli hedef klasöre kopyala
-                string fileName = Path.GetFileName(saturasyonFilePath);
-                string destinationFile = Path.Combine(slfSonuclarPath, fileName);
-                File.Copy(saturasyonFilePath, destinationFile, true);
-                Console.WriteLine($"Saturasyon dosyası kopyalandı: {destinationFile}");
-
-                // Python script yolu
-                string pythonScriptPath = Path.Combine(PathService.PythonKodDirectory, "slf_analizi", "slf_main.py");
-                if (!File.Exists(pythonScriptPath))
-                {
-                    throw new Exception($"Python script bulunamadı: {pythonScriptPath}");
-                }
-
-                // Türkçe karakterleri ASCII'ye çevir
-                string asciiCity = RemoveDiacritics(PathService.SelectedCity);
-                string asciiDistrict = RemoveDiacritics(PathService.SelectedDistrict);
-                string asciiDestinationFile = RemoveDiacritics(destinationFile);
-                string asciiSlfPath = RemoveDiacritics(slfSonuclarPath);
-
-                // Python script için komut satırı argümanları
-                string arguments = $"\"{pythonScriptPath}\" \"{asciiDestinationFile}\" \"{asciiCity}\" \"{asciiDistrict}\" \"{asciiSlfPath}\" --start-year 2024 --end-year 2035";
-
-                Console.WriteLine($"Çalıştırılacak komut: python {arguments}");
-
-                // Python betiğini çalıştır
-                ProcessStartInfo processInfo = new ProcessStartInfo("python")
-                {
-                    Arguments = arguments,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    WorkingDirectory = Path.GetDirectoryName(pythonScriptPath),
-                    StandardOutputEncoding = System.Text.Encoding.UTF8,
-                    StandardErrorEncoding = System.Text.Encoding.UTF8
-                };
-
-                processInfo.EnvironmentVariables["PYTHONIOENCODING"] = "utf-8";
-
-                string output = "";
-                string error = "";
-                using (Process process = Process.Start(processInfo))
-                {
-                    // Eş zamanlı çıktı yakalama
-                    process.OutputDataReceived += (sender, e) =>
-                    {
-                        if (!string.IsNullOrEmpty(e.Data))
-                        {
-                            Console.WriteLine($"PYTHON: {e.Data}");
-                            output += e.Data + Environment.NewLine;
-                        }
-                    };
-
-                    process.ErrorDataReceived += (sender, e) =>
-                    {
-                        if (!string.IsNullOrEmpty(e.Data))
-                        {
-                            Console.WriteLine($"PYTHON: {e.Data}");
-                            error += e.Data + Environment.NewLine;
-                        }
-                    };
-
-                    // Asenkron okumaları başlat
-                    process.BeginOutputReadLine();
-                    process.BeginErrorReadLine();
-
-                    // İşlemin tamamlanmasını bekle
-                    process.WaitForExit();
-
-                    // İşlem tamamlandı, çıkış kodunu kontrol et
-                    if (process.ExitCode != 0)
-                    {
-                        throw new Exception($"Python betiği hata ile sonlandı. Çıkış kodu: {process.ExitCode}");
-                    }
-                }
-
-                // İşlem başarılı mesajı
-                Console.WriteLine("SLF analizi başarıyla çalıştırıldı.");
-                return output;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"SLF analizi çalıştırılırken hata: {ex.Message}");
-                throw; // Üst seviye metodların hatayı yakalaması için yeniden fırlat
-            }
-        }
-
-        // Türkçe karakterleri ASCII'ye çeviren yardımcı metod
-        private string RemoveDiacritics(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-                return text;
-
-            string normalizedString = text.Normalize(System.Text.NormalizationForm.FormD);
-            System.Text.StringBuilder stringBuilder = new System.Text.StringBuilder();
-
-            foreach (char c in normalizedString)
-            {
-                System.Globalization.UnicodeCategory unicodeCategory = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c);
-                if (unicodeCategory != System.Globalization.UnicodeCategory.NonSpacingMark)
-                {
-                    // Özel Türkçe karakterler için manuel dönüşüm
-                    switch (c)
-                    {
-                        case 'ı': stringBuilder.Append('i'); break;
-                        case 'İ': stringBuilder.Append('I'); break;
-                        case 'ğ': stringBuilder.Append('g'); break;
-                        case 'Ğ': stringBuilder.Append('G'); break;
-                        case 'ü': stringBuilder.Append('u'); break;
-                        case 'Ü': stringBuilder.Append('U'); break;
-                        case 'ş': stringBuilder.Append('s'); break;
-                        case 'Ş': stringBuilder.Append('S'); break;
-                        case 'ç': stringBuilder.Append('c'); break;
-                        case 'Ç': stringBuilder.Append('C'); break;
-                        case 'ö': stringBuilder.Append('o'); break;
-                        case 'Ö': stringBuilder.Append('O'); break;
-                        default: stringBuilder.Append(c); break;
-                    }
-                }
-            }
-
-            return stringBuilder.ToString().Normalize(System.Text.NormalizationForm.FormC);
-        }
 
 
         // Show just the single row whenever a polygon is clicked on which corresponds to its row
@@ -6878,13 +6697,26 @@ namespace SLF
                 // Set the wait cursor on the UI thread
                 await this.InvokeAsync(() => this.Cursor = Cursors.WaitCursor);
 
-                // Find the heatmap overlay (this is quick, can stay on UI thread)
+                // Find the heatmap overlay and copy necessary data (on UI thread)
                 GMapOverlay heatmapOverlay = gMapControl_yuk.Overlays.FirstOrDefault(o => o.Id == "HeatmapOverlay");
                 if (heatmapOverlay == null || heatmapOverlay.Polygons.Count == 0)
                 {
                     await this.InvokeAsync(() => MessageBox.Show("Herhangi bir yük yoğunluğu haritası bulunamadı."));
                     return;
                 }
+
+                // Copy the heatmapPolygonAttributes to a local dictionary to avoid UI thread access in background thread
+                Dictionary<GMapPolygon, DataRow> polygonAttributesCopy = new Dictionary<GMapPolygon, DataRow>();
+                await this.InvokeAsync(() =>
+                {
+                    foreach (GMapPolygon polygon in heatmapOverlay.Polygons)
+                    {
+                        if (heatmapPolygonAttributes.TryGetValue(polygon, out DataRow attributes))
+                        {
+                            polygonAttributesCopy[polygon] = attributes;
+                        }
+                    }
+                });
 
                 // Show the SaveFileDialog on the UI thread
                 string htmlFilePath = null;
@@ -6922,17 +6754,74 @@ namespace SLF
                     bekleForm.Refresh();
                 });
 
+                // Copy heatmapOverlay.Polygons and their Points to a local structure on the UI thread
+                List<(List<(double Lat, double Lng)> Points, Dictionary<string, string> Data)> polygonDataList = new List<(List<(double, double)>, Dictionary<string, string>)>();
+                await this.InvokeAsync(() =>
+                {
+                    foreach (GMapPolygon polygon in heatmapOverlay.Polygons)
+                    {
+                        // Copy the Points
+                        List<(double Lat, double Lng)> points = polygon.Points.Select(p => (p.Lat, p.Lng)).ToList();
+
+                        // Copy the attributes (already copied to polygonAttributesCopy earlier)
+                        Dictionary<string, string> data = new Dictionary<string, string>();
+                        if (polygonAttributesCopy.TryGetValue(polygon, out DataRow attributes))
+                        {
+                            int minYear = 2025;
+                            int maxYear = 2050;
+                            string[] baseTooltipColumns = new string[]
+                            {
+                        "MESKEN",
+                        "SANAYI",
+                        "TICARETHANE",
+                        "TARIMSAL_SULAMA",
+                        "AYDINLATMA",
+                        "TOPLAM_YÜK",
+                        "Hücre İçi Yerleşim Alanı",
+                        "Yük_Yoğunluğu"
+                            };
+
+                            for (int year = minYear; year <= maxYear; year++)
+                            {
+                                string yukColumn = $"TOPLAM_YÜK_{year}";
+                                string densityColumn = $"Yük_Yoğunluğu_{year}";
+                                double yukValue = 0.0, densityValue = 0.0;
+
+                                if (attributes.Table.Columns.Contains(yukColumn))
+                                {
+                                    double.TryParse(attributes[yukColumn]?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out yukValue);
+                                }
+                                if (attributes.Table.Columns.Contains(densityColumn))
+                                {
+                                    double.TryParse(attributes[densityColumn]?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out densityValue);
+                                }
+
+                                data[yukColumn] = yukValue.ToString(CultureInfo.InvariantCulture);
+                                data[densityColumn] = densityValue.ToString(CultureInfo.InvariantCulture);
+
+                                foreach (string baseColumn in baseTooltipColumns)
+                                {
+                                    string column = $"{baseColumn}_{year}";
+                                    string value = attributes.Table.Columns.Contains(column) ? (attributes[column]?.ToString() ?? "N/A") : "N/A";
+                                    data[column] = value.Replace("\"", "\\\"");
+                                }
+                            }
+                        }
+                        polygonDataList.Add((points, data));
+                    }
+                });
+
                 // Run the heavy work on a background thread
                 await Task.Run(async () =>
                 {
                     // Define the columns to include in the tooltip for the current year
                     string[] tooltipColumns = new string[]
                     {
-                $"Mesken_{currentYear}",
-                $"Sanayi_{currentYear}",
-                $"Ticarethane_{currentYear}",
-                $"Tarımsal Sulama_{currentYear}",
-                $"Aydınlatma_{currentYear}",
+                $"MESKEN_{currentYear}",
+                $"SANAYI_{currentYear}",
+                $"TICARETHANE_{currentYear}",
+                $"TARIMSAL_SULAMA_{currentYear}",
+                $"AYDINLATMA_{currentYear}",
                 $"TOPLAM_YÜK_{currentYear}",
                 $"Hücre İçi Yerleşim Alanı_{currentYear}",
                 $"Yük_Yoğunluğu_{currentYear}"
@@ -6941,11 +6830,11 @@ namespace SLF
                     // Define the base columns (without year suffix) to include in the tooltip for all years
                     string[] baseTooltipColumns = new string[]
                     {
-                "Mesken",
-                "Sanayi",
-                "Ticarethane",
-                "Tarımsal Sulama",
-                "Aydınlatma",
+                "MESKEN",
+                "SANAYI",
+                "TICARETHANE",
+                "TARIMSAL_SULAMA",
+                "AYDINLATMA",
                 "TOPLAM_YÜK",
                 "Hücre İçi Yerleşim Alanı",
                 "Yük_Yoğunluğu"
@@ -6960,52 +6849,27 @@ namespace SLF
                         loadDensityColumns.Add($"Yük_Yoğunluğu_{year}");
                     }
 
-                    // Calculate the total TOPLAM_YÜK for each year (still needed for yearly changes)
+                    // Calculate the total TOPLAM_YÜK for each year
                     Dictionary<int, double> totalYukByYear = new Dictionary<int, double>();
                     for (int year = minYear; year <= maxYear; year++)
                     {
                         totalYukByYear[year] = 0.0;
                     }
 
-                    // First pass: Compute totals while collecting data
-                    Dictionary<GMapPolygon, Dictionary<string, string>> polygonData = new Dictionary<GMapPolygon, Dictionary<string, string>>();
-                    foreach (GMapPolygon polygon in heatmapOverlay.Polygons)
+                    // Compute totals using the copied data
+                    foreach (var (points, data) in polygonDataList)
                     {
-                        Dictionary<string, string> data = new Dictionary<string, string>();
-                        if (heatmapPolygonAttributes.TryGetValue(polygon, out DataRow attributes))
+                        for (int year = minYear; year <= maxYear; year++)
                         {
-                            // Collect Yük_Yoğunluğu and TOPLAM_YÜK for all years
-                            for (int year = minYear; year <= maxYear; year++)
+                            string yukColumn = $"TOPLAM_YÜK_{year}";
+                            if (data.ContainsKey(yukColumn))
                             {
-                                string yukColumn = $"TOPLAM_YÜK_{year}";
-                                string densityColumn = $"Yük_Yoğunluğu_{year}";
-                                double yukValue = 0.0, densityValue = 0.0;
-
-                                if (attributes.Table.Columns.Contains(yukColumn))
+                                if (double.TryParse(data[yukColumn], NumberStyles.Any, CultureInfo.InvariantCulture, out double yukValue))
                                 {
-                                    if (double.TryParse(attributes[yukColumn]?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out yukValue))
-                                    {
-                                        totalYukByYear[year] += yukValue;
-                                    }
-                                }
-                                if (attributes.Table.Columns.Contains(densityColumn))
-                                {
-                                    double.TryParse(attributes[densityColumn]?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out densityValue);
-                                }
-
-                                data[yukColumn] = yukValue.ToString(CultureInfo.InvariantCulture);
-                                data[densityColumn] = densityValue.ToString(CultureInfo.InvariantCulture);
-
-                                // Collect all tooltip columns for all years
-                                foreach (string baseColumn in baseTooltipColumns)
-                                {
-                                    string column = $"{baseColumn}_{year}";
-                                    string value = attributes.Table.Columns.Contains(column) ? (attributes[column]?.ToString() ?? "N/A") : "N/A";
-                                    data[column] = value.Replace("\"", "\\\""); // Escape quotes for JSON
+                                    totalYukByYear[year] += yukValue;
                                 }
                             }
                         }
-                        polygonData[polygon] = data;
                     }
 
                     // Stream the GeoJSON directly to the file
@@ -7016,7 +6880,7 @@ namespace SLF
                         await geoJsonWriter.WriteLineAsync("  \"features\": [");
 
                         bool firstFeature = true;
-                        foreach (GMapPolygon polygon in heatmapOverlay.Polygons)
+                        foreach (var (points, data) in polygonDataList)
                         {
                             if (!firstFeature) await geoJsonWriter.WriteLineAsync(",");
                             firstFeature = false;
@@ -7030,16 +6894,16 @@ namespace SLF
                             // Add the polygon coordinates (correctly formatted linear ring)
                             await geoJsonWriter.WriteAsync("          [");
                             bool firstPoint = true;
-                            foreach (var point in polygon.Points)
+                            foreach (var point in points)
                             {
                                 if (!firstPoint) await geoJsonWriter.WriteAsync(",");
                                 firstPoint = false;
                                 await geoJsonWriter.WriteAsync($"[{point.Lng},{point.Lat}]");
                             }
                             // Close the polygon by repeating the first point (ensure no duplicates)
-                            if (polygon.Points.Count > 0)
+                            if (points.Count > 0)
                             {
-                                await geoJsonWriter.WriteAsync($",[{polygon.Points[0].Lng},{polygon.Points[0].Lat}]");
+                                await geoJsonWriter.WriteAsync($",[{points[0].Lng},{points[0].Lat}]");
                             }
                             await geoJsonWriter.WriteLineAsync("]");
                             await geoJsonWriter.WriteLineAsync("        ]");
@@ -7049,86 +6913,57 @@ namespace SLF
                             await geoJsonWriter.WriteLineAsync("      \"properties\": {");
                             bool firstProperty = true;
 
-                            if (polygonData.TryGetValue(polygon, out Dictionary<string, string> data))
+                            // Add Yük_Yoğunluğu for all years (ensure numeric values)
+                            foreach (string column in loadDensityColumns)
                             {
-                                // Add Yük_Yoğunluğu for all years (ensure numeric values)
-                                foreach (string column in loadDensityColumns)
+                                string loadDensity = "0.0";
+                                if (data.ContainsKey(column))
                                 {
-                                    string loadDensity = "0.0";
-                                    if (data.ContainsKey(column))
+                                    if (double.TryParse(data[column], NumberStyles.Any, CultureInfo.InvariantCulture, out double densityValue))
                                     {
-                                        if (double.TryParse(data[column], NumberStyles.Any, CultureInfo.InvariantCulture, out double densityValue))
-                                        {
-                                            loadDensity = densityValue.ToString(CultureInfo.InvariantCulture);
-                                        }
-                                    }
-                                    if (!firstProperty) await geoJsonWriter.WriteLineAsync(",");
-                                    firstProperty = false;
-                                    await geoJsonWriter.WriteAsync($"        \"{column}\": {loadDensity}");
-                                }
-
-                                // Add all tooltip columns for all years
-                                for (int year = minYear; year <= maxYear; year++)
-                                {
-                                    foreach (string baseColumn in baseTooltipColumns)
-                                    {
-                                        string column = $"{baseColumn}_{year}";
-                                        string value = data.ContainsKey(column) ? data[column] : "N/A";
-                                        await geoJsonWriter.WriteLineAsync(",");
-                                        await geoJsonWriter.WriteAsync($"        \"{column}\": \"{value}\"");
+                                        loadDensity = densityValue.ToString(CultureInfo.InvariantCulture);
                                     }
                                 }
+                                if (!firstProperty) await geoJsonWriter.WriteLineAsync(",");
+                                firstProperty = false;
+                                await geoJsonWriter.WriteAsync($"        \"{column}\": {loadDensity}");
+                            }
 
-                                // Compute and add TOPLAM_YUK_DEĞİŞİMİ_{year}
-                                for (int year = minYear; year <= maxYear; year++)
+                            // Add all tooltip columns for all years
+                            for (int year = minYear; year <= maxYear; year++)
+                            {
+                                foreach (string baseColumn in baseTooltipColumns)
                                 {
-                                    double degisim = 0.0;
-                                    string currentYukColumn = $"TOPLAM_YÜK_{year}";
-                                    string previousYukColumn = $"TOPLAM_YÜK_{year - 1}";
-
-                                    if (year > minYear)
-                                    {
-                                        double currentYuk = 0.0, previousYuk = 0.0;
-                                        if (data.ContainsKey(currentYukColumn))
-                                        {
-                                            double.TryParse(data[currentYukColumn], NumberStyles.Any, CultureInfo.InvariantCulture, out currentYuk);
-                                        }
-                                        if (data.ContainsKey(previousYukColumn))
-                                        {
-                                            double.TryParse(data[previousYukColumn], NumberStyles.Any, CultureInfo.InvariantCulture, out previousYuk);
-                                        }
-                                        degisim = currentYuk - previousYuk;
-                                    }
-
+                                    string column = $"{baseColumn}_{year}";
+                                    string value = data.ContainsKey(column) ? data[column] : "N/A";
                                     await geoJsonWriter.WriteLineAsync(",");
-                                    await geoJsonWriter.WriteAsync($"        \"TOPLAM_YUK_DEĞİŞİMİ_{year}\": {degisim}");
+                                    await geoJsonWriter.WriteAsync($"        \"{column}\": \"{value}\"");
                                 }
                             }
-                            else
+
+                            // Compute and add TOPLAM_YUK_DEĞİŞİMİ_{year}
+                            for (int year = minYear; year <= maxYear; year++)
                             {
-                                // Default values if no data
-                                foreach (string column in loadDensityColumns)
-                                {
-                                    if (!firstProperty) await geoJsonWriter.WriteLineAsync(",");
-                                    firstProperty = false;
-                                    await geoJsonWriter.WriteAsync($"        \"{column}\": 0.0");
-                                }
+                                double degisim = 0.0;
+                                string currentYukColumn = $"TOPLAM_YÜK_{year}";
+                                string previousYukColumn = $"TOPLAM_YÜK_{year - 1}";
 
-                                for (int year = minYear; year <= maxYear; year++)
+                                if (year > minYear)
                                 {
-                                    foreach (string baseColumn in baseTooltipColumns)
+                                    double currentYuk = 0.0, previousYuk = 0.0;
+                                    if (data.ContainsKey(currentYukColumn))
                                     {
-                                        string column = $"{baseColumn}_{year}";
-                                        await geoJsonWriter.WriteLineAsync(",");
-                                        await geoJsonWriter.WriteAsync($"        \"{column}\": \"N/A\"");
+                                        double.TryParse(data[currentYukColumn], NumberStyles.Any, CultureInfo.InvariantCulture, out currentYuk);
                                     }
+                                    if (data.ContainsKey(previousYukColumn))
+                                    {
+                                        double.TryParse(data[previousYukColumn], NumberStyles.Any, CultureInfo.InvariantCulture, out previousYuk);
+                                    }
+                                    degisim = currentYuk - previousYuk;
                                 }
 
-                                for (int year = minYear; year <= maxYear; year++)
-                                {
-                                    await geoJsonWriter.WriteLineAsync(",");
-                                    await geoJsonWriter.WriteAsync($"        \"TOPLAM_YUK_DEĞİŞİMİ_{year}\": 0.0");
-                                }
+                                await geoJsonWriter.WriteLineAsync(",");
+                                await geoJsonWriter.WriteAsync($"        \"TOPLAM_YUK_DEĞİŞİMİ_{year}\": {degisim}");
                             }
 
                             await geoJsonWriter.WriteLineAsync();
@@ -7141,12 +6976,12 @@ namespace SLF
                         await geoJsonWriter.WriteLineAsync("}");
                     }
 
-                    // Calculate the center of the map
+                    // Calculate the center of the map using the copied points
                     double avgLat = 0, avgLng = 0;
                     int pointCount = 0;
-                    foreach (GMapPolygon polygon in heatmapOverlay.Polygons)
+                    foreach (var (points, _) in polygonDataList)
                     {
-                        foreach (var point in polygon.Points)
+                        foreach (var point in points)
                         {
                             avgLat += point.Lat;
                             avgLng += point.Lng;
@@ -7413,9 +7248,10 @@ namespace SLF
             }
             catch (Exception ex)
             {
-                // Handle exceptions on the UI thread
+                // Ensure the error message is shown on the UI thread
                 await this.InvokeAsync(() =>
                 {
+                    bekleForm.Hide(); // Ensure the wait form is closed
                     MessageBox.Show($"Hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 });
             }
