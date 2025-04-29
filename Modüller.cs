@@ -8131,7 +8131,6 @@ namespace SLF
         }
 
 
-
         private void buton_abone_sayısı_tahmini_Click(object sender, EventArgs e)
         {
 
