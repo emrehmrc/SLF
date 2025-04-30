@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using OfficeOpenXml;
+using SLF.Optimal_DTR;
 
 namespace SLF
 {
@@ -18,6 +19,7 @@ namespace SLF
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new HomePageForm());
+            //Application.Run(new DTR_Arayuz());
             //Application.Run(new ModülFormu());
 
         }

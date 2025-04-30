@@ -579,16 +579,27 @@ namespace SLF.RaporlamaDosyası
                 filePath = saveFileDialog.FileName;
 
             }
+
             try
             {
                 // EPPlus kullanarak DataTable'ı Excel dosyasına kaydet
                 //ExportDataTableToExcel(currentDt, filePath);
-                await Task.Run(() =>
+                if(filePath == null)
                 {
-                    ExportExcelFile(filePath, currentDt, KullanilanModul);
-                });
-                   
-                MessageBox.Show("Excel dosyası başarıyla kaydedildi!", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Lütfen bir dosya yolu seçin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                else
+                {
+                    await Task.Run(() =>
+                    {
+                        ExportExcelFile(filePath, currentDt, KullanilanModul);
+                    });
+
+                    MessageBox.Show("Excel dosyası başarıyla kaydedildi!", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                }
 
             }
 

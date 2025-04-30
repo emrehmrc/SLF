@@ -198,8 +198,8 @@ namespace SLF.Optimal_DTR
         private bool CalismaYoluKontrol()
         {
             TuketimDosyaAdi = "SONUCLAR2.xlsx";
-            TrafoDosyaAdi = $"trafo_merkez_hucre_{il}_{ilce}.xlsx";
-            TrafoAlanDosyaAdi = $"trafo_rezerv_alanlar_{il.ToLower()}.xlsx";
+            TrafoDosyaAdi = $"trafo_merkez_hucre_{ilce}.xlsx";
+            TrafoAlanDosyaAdi = $"trafo_rezerv_alanlar_{ilce.ToLower()}.xlsx";
 
             tuketim_path = Path.Combine(YükVeriYolu, TuketimDosyaAdi);
             string trafo_path = Path.Combine(İmarVeriYolu, TrafoDosyaAdi);

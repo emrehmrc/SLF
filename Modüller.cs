@@ -7460,6 +7460,12 @@ namespace SLF
                 (string)ana_menu_form_objesi.config.program_dosyaları_path,
                (string)ana_menu_form_objesi.config.ELF.Rscript_Yolu_Model).Replace('/', '\\');
 
+            if(File.Exists(ana_menu_form_objesi.config_path))
+            {
+                MessageBox.Show("bulunuyor");
+            }
+
+            string RscriptYol = Path.Combine((string)ana_menu_form_objesi.config.ELF.Rscript_Yolu, "Rscript.exe");
             var processInfo = new ProcessStartInfo
             {
                 FileName = "Rscript.exe",
@@ -8345,7 +8351,8 @@ namespace SLF
                             Arguments = $"--vanilla \"{rScriptPath}\" \"{ana_menu_form_objesi.config_path}\" \"{ELFSonuçlarTabControls.SelectedIndex + 1}\"",
                             RedirectStandardOutput = true,
                             RedirectStandardError = true,
-                            UseShellExecute = false,
+                            UseShellExecute = true,
+                            Verb = "runas",
                             CreateNoWindow = true
                         }
                     };
