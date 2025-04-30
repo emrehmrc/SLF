@@ -191,8 +191,6 @@ namespace SLF
                 dataTable.Columns.Add("8 USTU KATLI MESKEN", typeof(string));
                 dataTable.Columns.Add("VILLA MESKEN", typeof(string));
                 dataTable.Columns.Add("AYDINLATMA", typeof(string));
-                dataTable.Columns.Add("BUYUK SANAYI", typeof(string));
-                dataTable.Columns.Add("BUYUK TICARETHANE", typeof(string));
                 dataTable.Columns.Add("KUCUK SANAYI", typeof(string));
                 dataTable.Columns.Add("KUCUK TICARETHANE", typeof(string));
                 dataTable.Columns.Add("ORTA SANAYI", typeof(string));
@@ -228,8 +226,6 @@ namespace SLF
                 PoligonDataGridView.Columns["8 USTU KATLI MESKEN"].ToolTipText = "Poligon içindeki tahmini 8 ve üzeri katlı mesken yapılarının oranı (0-100)";
                 PoligonDataGridView.Columns["VILLA MESKEN"].ToolTipText = "Poligon içindeki tahmini Villa mesken yapılarının oranı (0-100)";
                 PoligonDataGridView.Columns["AYDINLATMA"].ToolTipText = "Poligon içindeki tahmini Aydınlatma amaçlı oluşacak kullanım oranı (0-100)";
-                PoligonDataGridView.Columns["BUYUK SANAYI"].ToolTipText = "Poligon içindeki tahmini Büyük sanayi tesislerinin oranı (0-100)";
-                PoligonDataGridView.Columns["BUYUK TICARETHANE"].ToolTipText = "Poligon içindeki tahmini Büyük ticari işletmelerin oranı (0-100)";
                 PoligonDataGridView.Columns["KUCUK SANAYI"].ToolTipText = "Poligon içindeki tahmini Küçük sanayi tesislerinin oranı (0-100)";
                 PoligonDataGridView.Columns["KUCUK TICARETHANE"].ToolTipText = "Poligon içindeki tahmini Küçük ticari işletmelerin oranı (0-100)";
                 PoligonDataGridView.Columns["ORTA SANAYI"].ToolTipText = "Poligon içindeki tahmini Orta ölçekli sanayi tesislerinin oranı (0-100)";
@@ -252,8 +248,6 @@ namespace SLF
                 dataTable.Columns.Add("8 USTU KATLI MESKEN", typeof(string));
                 dataTable.Columns.Add("VILLA MESKEN", typeof(string));
                 dataTable.Columns.Add("AYDINLATMA", typeof(string));
-                dataTable.Columns.Add("BUYUK SANAYI", typeof(string));
-                dataTable.Columns.Add("BUYUK TICARETHANE", typeof(string));
                 dataTable.Columns.Add("KUCUK SANAYI", typeof(string));
                 dataTable.Columns.Add("KUCUK TICARETHANE", typeof(string));
                 dataTable.Columns.Add("ORTA SANAYI", typeof(string));
@@ -289,8 +283,6 @@ namespace SLF
                 PoligonDataGridView.Columns["8 USTU KATLI MESKEN"].ToolTipText = "Poligon içindeki tahmini 8 ve üzeri katlı mesken yapılarının oranı (0-100)";
                 PoligonDataGridView.Columns["VILLA MESKEN"].ToolTipText = "Poligon içindeki tahmini Villa mesken yapılarının oranı (0-100)";
                 PoligonDataGridView.Columns["AYDINLATMA"].ToolTipText = "Poligon içindeki tahmini Aydınlatma amaçlı oluşacak kullanım oranı (0-100)";
-                PoligonDataGridView.Columns["BUYUK SANAYI"].ToolTipText = "Poligon içindeki tahmini Büyük sanayi tesislerinin oranı (0-100)";
-                PoligonDataGridView.Columns["BUYUK TICARETHANE"].ToolTipText = "Poligon içindeki tahmini Büyük ticari işletmelerin oranı (0-100)";
                 PoligonDataGridView.Columns["KUCUK SANAYI"].ToolTipText = "Poligon içindeki tahmini Küçük sanayi tesislerinin oranı (0-100)";
                 PoligonDataGridView.Columns["KUCUK TICARETHANE"].ToolTipText = "Poligon içindeki tahmini Küçük ticari işletmelerin oranı (0-100)";
                 PoligonDataGridView.Columns["ORTA SANAYI"].ToolTipText = "Poligon içindeki tahmini Orta ölçekli sanayi tesislerinin oranı (0-100)";
