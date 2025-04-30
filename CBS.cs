@@ -15,8 +15,6 @@ using System.Windows.Forms;
 using GMap.NET.WindowsForms.Markers;
 using System.Globalization;
 using System.Xml.Linq;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using System.IO.Ports;
 
 namespace SLF
 {

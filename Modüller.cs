@@ -888,75 +888,116 @@ namespace SLF
             // Check if the selected data type is "Ekonometrik Yük Tahmini Verileri"
             if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
             {
-
-                string filePath = Path.Combine(ana_menu_form_objesi.userRootPath,
-                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                    (string)ana_menu_form_objesi.config.İl,
-                    (string)ana_menu_form_objesi.config.İlçe,
-                    (string)ana_menu_form_objesi.config.ELF.INPUT_FILE);
-
-
-                // Asynchronous task to load the Excel package
-                await Task.Run(() =>
+                try
                 {
-                    using (var package = new ExcelPackage(new FileInfo(filePath)))
+                    string filePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.İl,
+                        (string)ana_menu_form_objesi.config.İlçe,
+                        (string)ana_menu_form_objesi.config.ELF.INPUT_FILE);
+
+                    // Asynchronous task to load the Excel package
+                    await Task.Run(() =>
                     {
-                        Invoke(new Action(() =>
+                        // Check if the file is accessible before opening
+                        try
                         {
-                            // Clear previous data
-                            ELFMinSenaryoTable.DataSource = null;
-                            ELFLowSenaryoTable.DataSource = null;
-                            ELFBaseSenaryoTable.DataSource = null;
-                            ELFHighSenaryoTable.DataSource = null;
-                            ELFMaxSenaryoTable.DataSource = null;
-                        }));
-
-                        // Ensure there are at least 6 worksheets
-                        int totalSheets = package.Workbook.Worksheets.Count;
-                        for (int i = 1; i <= 5; i++)
-                        {
-                            if (i < totalSheets)
+                            using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None))
                             {
-                                var worksheet = package.Workbook.Worksheets[i];
-                                DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
-
-                                Invoke(new Action(() =>
+                                // File is accessible, proceed with ExcelPackage
+                                using (var package = new ExcelPackage(fileStream))
                                 {
-                                    var dataGrids = new[] { ELFMinSenaryoTable, ELFLowSenaryoTable, ELFBaseSenaryoTable, ELFHighSenaryoTable, ELFMaxSenaryoTable };
-                                    dataGrids[i - 1].DataSource = dt;
-                                }));
-                            }
-                            else
-                            {
-                                // If there are fewer than 6 sheets, show a message or handle as needed
-                                MessageBox.Show("Eksik sayfalar bulundu. Lütfen dosyayı kontrol edin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                break;
+                                    Invoke(new Action(() =>
+                                    {
+                                        // Clear previous data
+                                        ELFMinSenaryoTable.DataSource = null;
+                                        ELFLowSenaryoTable.DataSource = null;
+                                        ELFBaseSenaryoTable.DataSource = null;
+                                        ELFHighSenaryoTable.DataSource = null;
+                                        ELFMaxSenaryoTable.DataSource = null;
+                                    }));
+
+                                    // Ensure there are at least 5 worksheets
+                                    int totalSheets = package.Workbook.Worksheets.Count;
+                                    for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= totalSheets)
+                                        {
+                                            var worksheet = package.Workbook.Worksheets[i];
+                                            DataTable dt = _excelService.LoadWorksheetIntoDataTable(worksheet);
+
+                                            Invoke(new Action(() =>
+                                            {
+                                                var dataGrids = new[] { ELFMinSenaryoTable, ELFLowSenaryoTable, ELFBaseSenaryoTable, ELFHighSenaryoTable, ELFMaxSenaryoTable };
+                                                dataGrids[i - 1].DataSource = dt;
+                                            }));
+                                        }
+                                        else
+                                        {
+                                            Invoke(new Action(() =>
+                                            {
+                                                MessageBox.Show("Eksik sayfalar bulundu. Lütfen dosyayı kontrol edin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                            }));
+                                            break;
+                                        }
+                                    }
+                                }
                             }
                         }
+                        catch (IOException ex)
+                        {
+                            // Handle file in use or other IO-related errors
+                            Invoke(new Action(() =>
+                            {
+                                MessageBox.Show(
+                                    "Excel dosyası şu anda başka bir programda açık veya erişilemiyor. Lütfen dosyayı kapatıp tekrar deneyin.",
+                                    "Dosya Erişim Hatası",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Error
+                                );
+                            }));
+                            // No need to throw; just let the method continue
+                        }
+                    });
+
+                    // Update tab_ekonometrik accessibility after import
+                    UpdateTabEkonometrikAccessibility();
+                }
+                catch (Exception ex)
+                {
+                    // General catch for any other errors
+                    Invoke(new Action(() =>
+                    {
+                        MessageBox.Show(
+                            $"Dosya yüklenirken bir hata oluştu: {ex.Message}",
+                            "Hata",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error
+                        );
+                    }));
+                }
+                finally
+                {
+
+                    // Based on the selected data type, switch to the corresponding tab
+                    if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
+                    {
+                        Modül_Tabları.SelectedTab = tab_ekonometrik;
                     }
-                });
+                    else if (seçilenVeriTipi == "EA Şarj Verileri")
+                    {
+                        Modül_Tabları.SelectedTab = tab_ea;
+                    }
+                    else if (seçilenVeriTipi == "DEK Verileri")
+                    {
+                        Modül_Tabları.SelectedTab = tab_dek;
+                    }
 
-                // Update tab_ekonometrik accessibility after import
-                UpdateTabEkonometrikAccessibility();
 
+                    // Always re-enable the button
+                    OpenModuleButton.Enabled = true;
+                }
             }
-
-            // Based on the selected data type, switch to the corresponding tab
-            if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
-            {
-                Modül_Tabları.SelectedTab = tab_ekonometrik;
-            }
-            else if (seçilenVeriTipi == "EA Şarj Verileri")
-            {
-                Modül_Tabları.SelectedTab = tab_ea;
-            }
-            else if (seçilenVeriTipi == "DEK Verileri")
-            {
-                Modül_Tabları.SelectedTab = tab_dek;
-            }
-
-            // After loading the data, enable the button
-            OpenModuleButton.Enabled = true;
         }
 
         public void veri_listesi_seçimi_SelectedIndexChanged(object sender, EventArgs e)
@@ -3301,7 +3342,7 @@ namespace SLF
             {
                 string pythonScriptPath = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.program_dosyaları_path,
                     (string)ana_menu_form_objesi.config.EA.program_dosyası_klasörü,
                     (string)ana_menu_form_objesi.config.EA.ea_python_dosyası);
 
@@ -4616,7 +4657,10 @@ namespace SLF
                 // Clear the selection polygon and refresh the map
                 gMapControl_imar.Overlays.Remove(cbs.bounding_box_overlay);
                 cbs.AddGridToMap(gMapControl_imar);
+                gMapControl_imar.Zoom -= 1;
+                gMapControl_imar.Zoom += 1;
                 gMapControl_imar.Refresh();
+                
             }
         }
 
@@ -7481,12 +7525,13 @@ namespace SLF
         private void SenaryoModuleTabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
 
-            // Config dosyasını kendi sınıfında kullanmak için oku
-            string json_file = File.ReadAllText(ana_menu_form_objesi.config_path);
-            dynamic config = JsonConvert.DeserializeObject(json_file);
-
             if (SenaryoModuleTabControl.SelectedTab == EkonometrikSonuclarTabPage)
             {
+
+                // Config dosyasını kendi sınıfında kullanmak için oku
+                string json_file = File.ReadAllText(ana_menu_form_objesi.config_path);
+                dynamic config = JsonConvert.DeserializeObject(json_file);
+
                 label_graphics.Visible = false;
                 comboBox_ekonometrik.Visible = false;
 
@@ -7505,6 +7550,12 @@ namespace SLF
             }
             else if (SenaryoModuleTabControl.SelectedTab == EkonometrikGrafiklerTabPage)
             {
+
+                // Config dosyasını kendi sınıfında kullanmak için oku
+                string json_file = File.ReadAllText(ana_menu_form_objesi.config_path);
+                dynamic config = JsonConvert.DeserializeObject(json_file);
+
+
                 buton_ELF_tablo_sec.Visible = false;
 
                 EkonometrikSenaryoElementsPanel.Visible = true;
