@@ -66,7 +66,7 @@ namespace SLF
         public override void Postprocess()
         {
             DeferredImputeTrafoTuketimDemand();
-            MessageBox.Show("DTR verilerinde eksik kalan tüketimler, abone verilerinin yüklenmesiyle birlikte dolduruldu.");
+           // MessageBox.Show("DTR verilerinde eksik kalan tüketimler, abone verilerinin yüklenmesiyle birlikte dolduruldu.");
             nullFieldsCheckWithLevel["BAGLANDIGI_TRAFO_KODU"] = WarningErrorBoundary(0.1f);  // Return to the original value as you could reupload the data all over again
         }
         public override void Validate()
