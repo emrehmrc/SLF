@@ -2500,6 +2500,7 @@ namespace SLF
                                     "Veri Kaybı Uyarısı",
                                     MessageBoxButtons.YesNo,
                                     MessageBoxIcon.Warning);
+
                                 if (result != DialogResult.Yes)
                                     return;
                             }
@@ -2521,18 +2522,6 @@ namespace SLF
 
                             MessageBox.Show($"Proje '{projectName}' başarıyla açıldı.",
                                 "Proje Açıldı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                            // Son çalışılan projeyi ayarlar dosyasına kaydet
-                            try
-                            {
-
-                                Console.WriteLine($"Son proje bilgileri kaydedildi: {projectName}");
-                            }
-                            catch (Exception settingsEx)
-                            {
-                                Console.WriteLine($"Ayarlar kaydedilirken hata: {settingsEx.Message}");
-                                // Ayarlar kaydedilemediğinde ana işlevi etkilememesi için hatayı yut
-                            }
                         }
                         catch (Exception ex)
                         {

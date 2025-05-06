@@ -108,7 +108,79 @@ namespace SLF.services
                 throw; // Üst seviye metodların hatayı yakalaması için yeniden fırlat
             }
         }
+        public static string RunKatmanDeneme(string kmlFilePath, string csvFilePath)
+        {
+            try
+            {
+                // Check if the inputs are valid
+                if (string.IsNullOrEmpty(kmlFilePath) || !File.Exists(kmlFilePath))
+                {
+                    throw new Exception("Geçerli bir KML dosyası belirtilmelidir.");
+                }
 
+                if (string.IsNullOrEmpty(csvFilePath) || !File.Exists(csvFilePath))
+                {
+                    throw new Exception("Geçerli bir CSV dosyası belirtilmelidir.");
+                }
+
+                Console.WriteLine($"Katman Deneme Python scripti çalıştırılıyor:");
+                Console.WriteLine($"KML: {kmlFilePath}");
+                Console.WriteLine($"CSV: {csvFilePath}");
+
+                // Get the script path
+                string pythonScriptPath = PathService.KatmanDenemePath;
+
+                if (!File.Exists(pythonScriptPath))
+                {
+                    throw new Exception($"Katman Deneme Python script bulunamadı: {pythonScriptPath}");
+                }
+
+                // Output file path - in the same directory as KML file
+                string outputDirectory = Path.GetDirectoryName(kmlFilePath);
+                string outputFile = Path.Combine(outputDirectory, "katman_analiz_sonuc.csv");
+
+                // Create command arguments
+                string arguments = $"\"{pythonScriptPath}\" \"{csvFilePath}\" \"{kmlFilePath}\" \"{outputFile}\"";
+
+                Console.WriteLine($"Çalıştırılacak komut: python {arguments}");
+
+                // Run the Python script
+                ProcessStartInfo processInfo = new ProcessStartInfo("python")
+                {
+                    Arguments = arguments,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    WorkingDirectory = Path.GetDirectoryName(pythonScriptPath)
+                };
+
+                string output = "";
+                string error = "";
+                using (Process process = Process.Start(processInfo))
+                {
+                    output = process.StandardOutput.ReadToEnd();
+                    error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
+
+                    if (process.ExitCode != 0)
+                    {
+                        throw new Exception($"Python betiği hata ile sonlandı. Çıkış kodu: {process.ExitCode}\nHata: {error}");
+                    }
+                }
+
+                Console.WriteLine("Katman Deneme scripti başarıyla çalıştırıldı.");
+                Console.WriteLine(output);
+
+                // Return the output file path for further processing
+                return outputFile;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Katman Deneme scripti çalıştırılırken hata: {ex.Message}");
+                throw; // Re-throw for upper level methods to catch
+            }
+        }
 
         public static string RunImarPlanModel(string kmlFilePath, string csvFilePath = null)
         {
@@ -119,7 +191,7 @@ namespace SLF.services
                 string hucreFilePath = null;
                 string uyduVeriPath = PathService.UyduVerileriPath;
                 string uyduVeriFilePath = null;
-
+                int year = YearService.GetInstance().slfStartYear;
                 // Seçilen il/ilçe bilgilerini al
                 string selectedCity = PathService.SelectedCity;
                 string selectedDistrict = PathService.SelectedDistrict;
@@ -317,7 +389,7 @@ namespace SLF.services
                 args.Append($" --district \"{selectedDistrict}\"");
                 args.Append($" --output-dir \"{imarAnaliziPath}\"");  // Ana çıktı klasörü
                 args.Append($" --output-prefix \"{outputPrefix}\"");
-
+                args.Append($" --Year \"{year}\"");
                 // Hücre verisi dosyasını ekle
                 if (!string.IsNullOrEmpty(hucreFilePath))
                 {

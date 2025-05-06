@@ -22,11 +22,13 @@ namespace SLF.Services
         /// </summary>
             public static string _configPythonKodPath;
             public static string _configImarAnaliziPath;
-        // Proje klasörüne göre relatif il-ilçe kırılımı klasörü yolu
-        private static string _relativeDataPath = "il_ilce_kırılımları"; // Varsayılan değer
-        public static string _configSLFMainPath;
-        // Temel dizin - ilk çalıştırmada hesaplanır
-        public static string _baseDirectory;
+            public static string _configKatmanEslestirmePath;
+            public static string _configKatmanDenemePath;
+            // Proje klasörüne göre relatif il-ilçe kırılımı klasörü yolu
+            private static string _relativeDataPath = "il_ilce_kırılımları"; // Varsayılan değer
+            public static string _configSLFMainPath;
+            // Temel dizin - ilk çalıştırmada hesaplanır
+            public static string _baseDirectory;
 
             // Seçilen il
             public static string SelectedCity { get; private set; }
@@ -36,7 +38,8 @@ namespace SLF.Services
 
             // Aktif çalışma klasörü (temp veya proje)
             public static string CurrentWorkingFolder { get; private set; }
-
+            
+           
             // Çalışma modu
             public static WorkingMode CurrentMode { get; private set; } = WorkingMode.Temporary;
 
@@ -55,6 +58,34 @@ namespace SLF.Services
         /// Uygulama tarafından kullanılacak temel veri dizini
         /// </summary>
         /// 
+        public static string KatmanEslestirmePath
+        {
+            get
+            {
+                // If set from config, use that path
+                if (!string.IsNullOrEmpty(_configKatmanEslestirmePath) && File.Exists(_configKatmanEslestirmePath))
+                {
+                    return _configKatmanEslestirmePath;
+                }
+
+                // Otherwise, use a default path in the imar_analizi folder
+                return Path.Combine(ImarPlansDirectory, "katman_eslesme.csv");
+            }
+        }
+        public static string KatmanDenemePath
+        {
+            get
+            {
+                // If set from config, use that path
+                if (!string.IsNullOrEmpty(_configKatmanDenemePath) && File.Exists(_configKatmanDenemePath))
+                {
+                    return _configKatmanDenemePath;
+                }
+
+                // Otherwise, use a default path in the imar_analizi folder
+                return Path.Combine(ImarPlansDirectory, "katman_deneme.py");
+            }
+        }
         public static string SLFMainPath
         {
             get
@@ -91,12 +122,12 @@ namespace SLF.Services
                 Console.WriteLine($"Orijinal dosya var mı: {originalExists}");
 
                 // Dönüşüm işlemini uygula
-                string convertedPath = ConvertPathToFileSystem(originalPath);
-                Console.WriteLine($"Dönüştürülmüş yol: {convertedPath}");
+                //string convertedPath = ConvertPathToFileSystem(originalPath);
+                //Console.WriteLine($"Dönüştürülmüş yol: {convertedPath}");
 
                 // Dönüştürülmüş yolun var olup olmadığını kontrol et
-                bool convertedExists = File.Exists(convertedPath);
-                Console.WriteLine($"Dönüştürülmüş dosya var mı: {convertedExists}");
+                //bool convertedExists = File.Exists(convertedPath);
+                //Console.WriteLine($"Dönüştürülmüş dosya var mı: {convertedExists}");
                 // Config dosyasını oku
                 if (File.Exists(configPath))
                 {
@@ -111,6 +142,8 @@ namespace SLF.Services
 
                         // Tam yolu oluştur
                         string fullPath = Path.Combine(userRootPath, anaKlasorYolu);
+
+
 
                         // Eğer bu dizin varsa, _baseDirectory olarak ayarla
                         if (Directory.Exists(fullPath))
@@ -145,7 +178,7 @@ namespace SLF.Services
                                     // Klasörü oluştur (yoksa)
                                     if (!Directory.Exists(marAnaliziDirPath))
                                     {
-                                        Directory.CreateDirectory(marAnaliziDirPath);
+                                        //Directory.CreateDirectory(marAnaliziDirPath);
                                     }
 
                                     // İmar analizi yolunu ayarla (dosya yolu)
@@ -184,7 +217,7 @@ namespace SLF.Services
                                     // Klasörü oluştur (yoksa)
                                     if (!Directory.Exists(slfMainDirPath))
                                     {
-                                        Directory.CreateDirectory(slfMainDirPath);
+                                        //Directory.CreateDirectory(slfMainDirPath);
                                     }
 
                                     // SLF Main yolunu ayarla
@@ -192,27 +225,70 @@ namespace SLF.Services
                                     Debug.WriteLine($"Config'den alınan SLF Main kod yolu: {_configSLFMainPath}");
                                 }
                             }
+                            if (config.katman_eslestirme != null)
+                            {
+                                string katmanEslestirmeRelativePath = config.katman_eslestirme.ToString();
+
+                                // Remove leading slash if present
+                                if (katmanEslestirmeRelativePath.StartsWith("/"))
+                                {
+                                    katmanEslestirmeRelativePath = katmanEslestirmeRelativePath.Substring(1);
+                                }
+
+                                // Combine with program files path
+                                string katmanEslestirmeFullPath = Path.Combine(programDosyalariFullPath, katmanEslestirmeRelativePath);
+
+                                // Get directory
+                                string katmanEslestirmeDirPath = Path.GetDirectoryName(katmanEslestirmeFullPath);
+
+                                // Create directory if it doesn't exist
+                                if (!Directory.Exists(katmanEslestirmeDirPath))
+                                {
+                                    //Directory.CreateDirectory(katmanEslestirmeDirPath);
+                                }
+
+                                // Set the layer mapping path
+                                _configKatmanEslestirmePath = katmanEslestirmeFullPath;
+                                Debug.WriteLine($"Config'den alınan Katman Eşleştirme dosya yolu: {_configKatmanEslestirmePath}");
+                            }
+                            if (config["Python Kodları"] != null && config["Python Kodları"].katman_eslestirme_kod != null)
+                            {
+                                string katmanKodRelativePath = config["Python Kodları"].katman_eslestirme_kod.ToString();
+
+                                if (katmanKodRelativePath.StartsWith("/"))
+                                {
+                                    katmanKodRelativePath = katmanKodRelativePath.Substring(1);
+                                }
+
+                                string katmanKodFullPath = Path.Combine(programDosyalariFullPath, katmanKodRelativePath);
+
+                                // katman_deneme.py dosyasının yolunu oluştur (katman_kod.py ile aynı dizinde)
+                                string katmanDir = Path.GetDirectoryName(katmanKodFullPath);
+                                _configKatmanDenemePath = Path.Combine(katmanDir, "katman_deneme.py");
+
+                                Debug.WriteLine($"Python Kodları.katman_eslestirme_kod'dan türetilen Katman Deneme yolu: {_configKatmanDenemePath}");
+                            }
                             else
                             {
                                 // Python Kodları bölümü yoksa varsayılan yapıya devam et
                                 string pythonKodlariPath = Path.Combine(programDosyalariFullPath, "python_kodlari");
                                 if (!Directory.Exists(pythonKodlariPath))
                                 {
-                                    Directory.CreateDirectory(pythonKodlariPath);
+                                    //Directory.CreateDirectory(pythonKodlariPath);
                                 }
 
                                 // MAR_ANALİZİ dizini
                                 string marAnaliziPath = Path.Combine(pythonKodlariPath, "MAR_ANALİZİ");
                                 if (!Directory.Exists(marAnaliziPath))
                                 {
-                                    Directory.CreateDirectory(marAnaliziPath);
+                                    //Directory.CreateDirectory(marAnaliziPath);
                                 }
 
                                 // SLF_Main dizini
                                 string slfMainPath = Path.Combine(pythonKodlariPath, "SLF_analizi");
                                 if (!Directory.Exists(slfMainPath))
                                 {
-                                    Directory.CreateDirectory(slfMainPath);
+                                    //Directory.CreateDirectory(slfMainPath);
                                 }
 
                                 // Python kodu yolunu ayarla
@@ -344,7 +420,7 @@ namespace SLF.Services
             {    // Eğer config'den ayarlanmışsa, o yolu kullan
                 if (!string.IsNullOrEmpty(_configPythonKodPath) && Directory.Exists(_configPythonKodPath))
                 {
-                    return ConvertPathToFileSystem(_configPythonKodPath);
+                    return  _configPythonKodPath;
                 }
                 try
                 {
@@ -1295,51 +1371,51 @@ namespace SLF.Services
         /// </summary>
         /// <param name="path">Original path with possible Turkish characters</param>
         /// <returns>File system compatible path</returns>
-        public static string ConvertPathToFileSystem(string path)
-            {
-                if (string.IsNullOrEmpty(path))
-                    return path;
+        //public static string ConvertPathToFileSystem(string path)
+        //    {
+        //        if (string.IsNullOrEmpty(path))
+        //            return path;
 
-                // Create a dictionary mapping Turkish characters to their ASCII equivalents
-                Dictionary<char, char> turkishToAscii = new Dictionary<char, char>
-        {
-            {'ı', 'i'}, {'İ', 'I'}, {'ğ', 'g'}, {'Ğ', 'G'},
-            {'ü', 'u'}, {'Ü', 'U'}, {'ş', 's'}, {'Ş', 'S'},
-            {'ç', 'c'}, {'Ç', 'C'}, {'ö', 'o'}, {'Ö', 'O'}
-        };
+        //        // Create a dictionary mapping Turkish characters to their ASCII equivalents
+        //        Dictionary<char, char> turkishToAscii = new Dictionary<char, char>
+        //{
+        //    {'ı', 'i'}, {'İ', 'I'}, {'ğ', 'g'}, {'Ğ', 'G'},
+        //    {'ü', 'u'}, {'Ü', 'U'}, {'ş', 's'}, {'Ş', 'S'},
+        //    {'ç', 'c'}, {'Ç', 'C'}, {'ö', 'o'}, {'Ö', 'O'}
+        //};
 
-            // Convert character by character
-            StringBuilder result = new StringBuilder(path.Length);
-            foreach (char c in path)
-            {
-                if (turkishToAscii.TryGetValue(c, out char asciiChar))
-                {
-                    result.Append(asciiChar);
-                }
-                else
-                {
-                    result.Append(c);
-                }
-            }
+        //    // Convert character by character
+        //    StringBuilder result = new StringBuilder(path.Length);
+        //    foreach (char c in path)
+        //    {
+        //        if (turkishToAscii.TryGetValue(c, out char asciiChar))
+        //        {
+        //            result.Append(asciiChar);
+        //        }
+        //        else
+        //        {
+        //            result.Append(c);
+        //        }
+        //    }
 
-            // Convert the resulting path
-            string convertedPath = result.ToString();
+        //    // Convert the resulting path
+        //    string convertedPath = result.ToString();
 
-            // Fix the issue with city names being incorrectly inserted in paths
-            // This uses a more generic regex to identify and correct the pattern
-            convertedPath = System.Text.RegularExpressions.Regex.Replace(
-                convertedPath,
-                @"il_ilce_kirilimlari\\[^\\]+\\Program Dosyalari",
-                "il_ilce_kirilimlari\\Program Dosyalari");
+        //    // Fix the issue with city names being incorrectly inserted in paths
+        //    // This uses a more generic regex to identify and correct the pattern
+        //    convertedPath = System.Text.RegularExpressions.Regex.Replace(
+        //        convertedPath,
+        //        @"il_ilce_kirilimlari\\[^\\]+\\Program Dosyalari",
+        //        "il_ilce_kirilimlari\\Program Dosyalari");
 
-            return convertedPath;
-        }
+        //    return convertedPath;
+        //}
         public static string RunPythonScript(string scriptPath, string additionalArgs = "")
         {
             try
             {
                 // Convert the path to file system compatible path
-                string fsScriptPath = ConvertPathToFileSystem(scriptPath);
+                string fsScriptPath = scriptPath;
 
                 // Log both paths for debugging
                 Debug.WriteLine($"Original script path: {scriptPath}");
