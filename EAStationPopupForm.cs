@@ -225,6 +225,199 @@ namespace SLF
                 }
             }
         }
+        /*        private void SaveUpdatedInputFile(DataTable updatedData)
+                {
+                    try
+                    {
+                        // Retrieve values from the DataGridView
+                        var row = ChargingStationDataGridView.Rows[0];
+                        string startYear = row.Cells["StartYear"].Value?.ToString();
+                        string cellId = row.Cells["ID"].Value?.ToString();
+                        string stationType = row.Cells["ISTASYON_TIPI"].Value?.ToString();
+                        double enlem = Convert.ToDouble(row.Cells["EA_X_KOORDINAT"].Value);
+                        double boylam = Convert.ToDouble(row.Cells["EA_Y_KOORDINAT"].Value);
+
+                        if (string.IsNullOrEmpty(startYear) || string.IsNullOrEmpty(cellId) || string.IsNullOrEmpty(stationType))
+                        {
+                            MessageBox.Show("Please ensure StartYear, ID, and ISTASYON_TIPI are filled.");
+                            return;
+                        }
+
+                        string countColumnName = GetCountColumnName(stationType);
+                        double loadToAdd = GetLoadValue(stationType);
+                        if (countColumnName == null || loadToAdd == 0)
+                        {
+                            MessageBox.Show("Invalid ISTASYON_TIPI selected.");
+                            return;
+                        }
+
+                        string existingFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                            (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                            (string)ana_menu_form_objesi.config.İl,
+                            (string)ana_menu_form_objesi.config.İlçe,
+                            (string)ana_menu_form_objesi.config.EA.ea_klasörü,
+                            (string)ana_menu_form_objesi.config.EA.cikti_dosyasi).Replace('/', '\\');
+
+                        string utilizationPath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                            (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                            (string)ana_menu_form_objesi.config.İl,
+                            (string)ana_menu_form_objesi.config.İlçe,
+                            (string)ana_menu_form_objesi.config.EA.ea_klasörü,
+                            (string)ana_menu_form_objesi.config.EA.utilization_path);
+
+                        // Load utilization factors from UtilizasyonFaktoru.xlsx
+                        Dictionary<int, double> utilizationFactors = new Dictionary<int, double>();
+                        using (var utilizationPackage = new OfficeOpenXml.ExcelPackage(new FileInfo(utilizationPath)))
+                        {
+                            var utilizationWorksheet = utilizationPackage.Workbook.Worksheets[0]; // Assuming data is in the first sheet
+                            if (utilizationWorksheet == null)
+                            {
+                                MessageBox.Show("Utilization factor file is empty or invalid.");
+                                return;
+                            }
+
+                            int rowCount = utilizationWorksheet.Dimension?.End.Row ?? 0;
+                            for (int i = 2; i <= rowCount; i++) // Start from 2 to skip header
+                            {
+                                int minSocket = Convert.ToInt32(utilizationWorksheet.Cells[i, 1].Text);
+                                int maxSocket = Convert.ToInt32(utilizationWorksheet.Cells[i, 2].Text);
+                                double factor = Convert.ToDouble(utilizationWorksheet.Cells[i, 3].Text);
+                                for (int socket = minSocket; socket <= maxSocket; socket++)
+                                {
+                                    utilizationFactors[socket] = factor;
+                                }
+                            }
+                        }
+
+                        using (var package = new OfficeOpenXml.ExcelPackage(new FileInfo(existingFilePath)))
+                        {
+                            int startYearInt = int.Parse(startYear);
+                            foreach (int year in Enumerable.Range(startYearInt, slfEndYear - startYearInt + 1))
+                            {
+                                var worksheet = package.Workbook.Worksheets[year.ToString()];
+                                if (worksheet == null)
+                                {
+                                    // Create a new sheet if it doesn’t exist
+                                    worksheet = package.Workbook.Worksheets.Add(year.ToString());
+                                    worksheet.Cells[1, 1].Value = "ID";
+                                    worksheet.Cells[1, 12].Value = "EA_X_KOORDINAT";
+                                    worksheet.Cells[1, 11].Value = "EA_Y_KOORDINAT";
+                                    worksheet.Cells[1, 7].Value = "AC (Home)_count";
+                                    worksheet.Cells[1, 8].Value = "AC (Work)_count";
+                                    worksheet.Cells[1, 9].Value = "AC (Public)_count";
+                                    worksheet.Cells[1, 10].Value = "Fast DC_count";
+                                    worksheet.Cells[1, 18].Value = "toplam_kapasite";
+                                    // Add new yuk columns
+                                    worksheet.Cells[1, 14].Value = "AC (Home)_yuk";
+                                    worksheet.Cells[1, 15].Value = "AC (Work)_yuk";
+                                    worksheet.Cells[1, 16].Value = "AC (Public)_yuk";
+                                    worksheet.Cells[1, 17].Value = "Fast DC_yuk";
+                                }
+
+                                int lastRow = worksheet.Dimension?.End.Row ?? 1;
+                                bool rowUpdated = false;
+
+                                // Find the row with the matching CellId
+                                for (int i = 2; i <= lastRow; i++)
+                                {
+                                    string existingId = worksheet.Cells[i, 1].Text;
+                                    if (existingId == cellId)
+                                    {
+                                        // Update coordinates
+                                        worksheet.Cells[i, 12].Value = enlem;
+                                        worksheet.Cells[i, 11].Value = boylam;
+
+                                        // Increment the count for the selected station type
+                                        int columnIndex = worksheet.Cells[1, 1, 1, worksheet.Dimension.End.Column]
+                                            .FirstOrDefault(c => c.Text == countColumnName)?.Start.Column ?? 0;
+                                        if (columnIndex > 0)
+                                        {
+                                            int currentCount = worksheet.Cells[i, columnIndex].Value != null ? Convert.ToInt32(worksheet.Cells[i, columnIndex].Value) : 0;
+                                            worksheet.Cells[i, columnIndex].Value = currentCount + 1;
+                                        }
+
+                                        // Update all yuk values based on new counts and utilization factors
+                                        UpdateYukValues(worksheet, i, utilizationFactors);
+
+                                        rowUpdated = true;
+                                        break;
+                                    }
+                                }
+
+                                // If no matching row found, add a new row
+                                if (!rowUpdated)
+                                {
+                                    int newRowIndex = lastRow + 1;
+                                    worksheet.Cells[newRowIndex, 1].Value = cellId;
+                                    worksheet.Cells[newRowIndex, 12].Value = enlem;
+                                    worksheet.Cells[newRowIndex, 11].Value = boylam;
+
+                                    // Set initial counts (1 for the selected type, 0 for others)
+                                    worksheet.Cells[newRowIndex, 7].Value = stationType == "AC (Home)_count" ? 1 : 0;
+                                    worksheet.Cells[newRowIndex, 8].Value = stationType == "AC (Work)_count" ? 1 : 0;
+                                    worksheet.Cells[newRowIndex, 9].Value = stationType == "AC (Public)_count" ? 1 : 0;
+                                    worksheet.Cells[newRowIndex, 10].Value = stationType == "Fast DC_count" ? 1 : 0;
+
+                                    // Update all yuk values based on initial counts and utilization factors
+                                    UpdateYukValues(worksheet, newRowIndex, utilizationFactors);
+                                }
+                            }
+
+                            package.Save();
+                            MessageBox.Show("Data, counts, toplam_kapasite, and specific yuk columns updated successfully in the Excel file!");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error saving data: {ex.Message}");
+                    }
+                }
+
+                private void UpdateYukValues(OfficeOpenXml.ExcelWorksheet worksheet, int rowIndex, Dictionary<int, double> utilizationFactors)
+                {
+                    // Define station types and their column indices
+                    var stationTypes = new Dictionary<string, int>
+            {
+                { "AC (Home)_count", 7 },
+                { "AC (Work)_count", 8 },
+                { "AC (Public)_count", 9 },
+                { "Fast DC_count", 10 }
+            };
+                    var yukColumns = new Dictionary<string, int>
+            {
+                { "AC (Home)_yuk", 14 },
+                { "AC (Work)_yuk", 15 },
+                { "AC (Public)_yuk", 16 },
+                { "Fast DC_yuk", 17 }
+            };
+                    var loadValues = new Dictionary<string, double>
+            {
+                { "AC (Home)_count", 11 },
+                { "AC (Work)_count", 11 },
+                { "AC (Public)_count", 22 },
+                { "Fast DC_count", 150 }
+            };
+
+                    double totalYuk = 0;
+                    foreach (var stationType in stationTypes)
+                    {
+                        int countColumnIndex = stationType.Value;
+                        string yukColumnName = stationType.Key.Replace("_count", "_yuk");
+                        int yukColumnIndex = yukColumns[yukColumnName];
+                        int currentCount = worksheet.Cells[rowIndex, countColumnIndex].Value != null ? Convert.ToInt32(worksheet.Cells[rowIndex, countColumnIndex].Value) : 0;
+                        double loadValue = loadValues[stationType.Key];
+                        double factor = utilizationFactors.ContainsKey(currentCount) ? utilizationFactors[currentCount] : 1.0; // Default to 1.0 if count is out of range
+                        double newYuk = currentCount * loadValue * factor;
+                        worksheet.Cells[rowIndex, yukColumnIndex].Value = newYuk;
+                        totalYuk += newYuk;
+                    }
+
+                    // Update toplam_yuk
+                    int totalYukColumnIndex = worksheet.Cells[1, 1, 1, worksheet.Dimension.End.Column]
+                        .FirstOrDefault(c => c.Text == "toplam_kapasite")?.Start.Column ?? 18;
+                    worksheet.Cells[rowIndex, totalYukColumnIndex].Value = totalYuk;
+                }
+        */
         private void SaveUpdatedInputFile(DataTable updatedData)
         {
             try
@@ -256,7 +449,7 @@ namespace SLF
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
                     (string)ana_menu_form_objesi.config.EA.ea_klasörü,
-                    (string)ana_menu_form_objesi.config.EA.cikti_dosyasi).Replace('/', '\\');
+                    (string)ana_menu_form_objesi.config.EA.cikti_dosyasi);
 
                 string utilizationPath = Path.Combine(ana_menu_form_objesi.userRootPath,
                     (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
@@ -306,8 +499,9 @@ namespace SLF
                             worksheet.Cells[1, 8].Value = "AC (Work)_count";
                             worksheet.Cells[1, 9].Value = "AC (Public)_count";
                             worksheet.Cells[1, 10].Value = "Fast DC_count";
-                            worksheet.Cells[1, 13].Value = "toplam_yuk";
-                            // Add new yuk columns
+                            worksheet.Cells[1, 18].Value = "toplam_yuk";
+                            worksheet.Cells[1, 13].Value = "toplam_kapasite"; // New column for original calculation
+                                                                         // Add new yuk columns
                             worksheet.Cells[1, 14].Value = "AC (Home)_yuk";
                             worksheet.Cells[1, 15].Value = "AC (Work)_yuk";
                             worksheet.Cells[1, 16].Value = "AC (Public)_yuk";
@@ -364,7 +558,7 @@ namespace SLF
                     }
 
                     package.Save();
-                    MessageBox.Show("Data, counts, toplam_yuk, and specific yuk columns updated successfully in the Excel file!");
+                    MessageBox.Show("Data, counts, toplam_kapasite, toplam_yuk, and specific yuk columns updated successfully in the Excel file!");
                 }
             }
             catch (Exception ex)
@@ -398,7 +592,9 @@ namespace SLF
         { "Fast DC_count", 150 }
     };
 
-            double totalYuk = 0;
+            double totalYuk = 0; // Will be used for toplam_yuk (sum of count * power)
+            double totalKapasite = 0; // Will be used for toplam_kapasite (sum of yuk with factors)
+
             foreach (var stationType in stationTypes)
             {
                 int countColumnIndex = stationType.Value;
@@ -409,15 +605,20 @@ namespace SLF
                 double factor = utilizationFactors.ContainsKey(currentCount) ? utilizationFactors[currentCount] : 1.0; // Default to 1.0 if count is out of range
                 double newYuk = currentCount * loadValue * factor;
                 worksheet.Cells[rowIndex, yukColumnIndex].Value = newYuk;
-                totalYuk += newYuk;
+                totalKapasite += newYuk; // Sum for toplam_kapasite
+                totalYuk += currentCount * loadValue; // Sum for toplam_yuk (without factor)
             }
 
-            // Update toplam_yuk
-            int totalYukColumnIndex = worksheet.Cells[1, 1, 1, worksheet.Dimension.End.Column]
-                .FirstOrDefault(c => c.Text == "toplam_yuk")?.Start.Column ?? 13;
-            worksheet.Cells[rowIndex, totalYukColumnIndex].Value = totalYuk;
-        }
+            // Update toplam_kapasite
+            int toplamKapasiteColumnIndex = worksheet.Cells[1, 1, 1, worksheet.Dimension.End.Column]
+                .FirstOrDefault(c => c.Text == "toplam_yuk")?.Start.Column ?? 18;
+            worksheet.Cells[rowIndex, toplamKapasiteColumnIndex].Value = totalKapasite;
 
+            // Update toplam_yuk
+            int toplamYukColumnIndex = worksheet.Cells[1, 1, 1, worksheet.Dimension.End.Column]
+                .FirstOrDefault(c => c.Text == "toplam_kapasite")?.Start.Column ?? 13;
+            worksheet.Cells[rowIndex, toplamYukColumnIndex].Value = totalYuk;
+        }
         private void EACancelButton_Click(object sender, EventArgs e)
         {
             this.Close();

@@ -3975,19 +3975,21 @@ namespace SLF
                 int acPublicCount = row["AC (Public)_count"] != DBNull.Value ? Convert.ToInt32(row["AC (Public)_count"]) : 0;
                 int fastDcCount = row["Fast DC_count"] != DBNull.Value ? Convert.ToInt32(row["Fast DC_count"]) : 0;
 
-                // Get toplam_yuk, defaulting to 0 if null
+                // Get toplam_yuk and toplam_kapasite, defaulting to 0 if null
                 double toplamYuk = row["toplam_yuk"] != DBNull.Value ? Convert.ToDouble(row["toplam_yuk"]) : 0;
+                double toplamKapasite = row["toplam_kapasite"] != DBNull.Value ? Convert.ToDouble(row["toplam_kapasite"]) : 0;
 
                 // Calculate total count
                 int totalCount = acHomeCount + acWorkCount + acPublicCount + fastDcCount;
 
-                // Build the detailed tooltip text for all cells, including toplam_yuk
+                // Build the detailed tooltip text for all cells, including toplam_yuk and toplam_kapasite
                 string tooltipText = $"Cell: {cellId}\n" +
                                      $"AC (Home): {acHomeCount}\n" +
                                      $"AC (Work): {acWorkCount}\n" +
                                      $"AC (Public): {acPublicCount}\n" +
                                      $"Fast DC: {fastDcCount}\n" +
-                                     $"Toplam Yuk: {toplamYuk:F2}"; // Format to 2 decimal places
+                                     $"Toplam Yuk: {toplamYuk:F2}\n" +
+                                     $"Toplam Kapasite: {toplamKapasite:F2}"; // Format to 2 decimal places
 
                 if (totalCount == 0)
                 {
