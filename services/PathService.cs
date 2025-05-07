@@ -24,6 +24,7 @@ namespace SLF.Services
             public static string _configImarAnaliziPath;
             public static string _configKatmanEslestirmePath;
             public static string _configKatmanDenemePath;
+            public static string _configDeepLearningModelPath;
             // Proje klasörüne göre relatif il-ilçe kırılımı klasörü yolu
             private static string _relativeDataPath = "il_ilce_kırılımları"; // Varsayılan değer
             public static string _configSLFMainPath;
@@ -58,6 +59,20 @@ namespace SLF.Services
         /// Uygulama tarafından kullanılacak temel veri dizini
         /// </summary>
         /// 
+        public static string DeepLearningModelPath
+        {
+            get
+            {
+                // If set from config, use that path
+                if (!string.IsNullOrEmpty(_configDeepLearningModelPath) && File.Exists(_configDeepLearningModelPath))
+                {
+                    return _configDeepLearningModelPath;
+                }
+
+                // Otherwise, use a default path based on DeepLearningCodeDirectory
+                return Path.Combine(DeepLearningCodeDirectory, "model_learning.py");
+            }
+        }
         public static string KatmanEslestirmePath
         {
             get
@@ -115,11 +130,10 @@ namespace SLF.Services
         {
             try
             {
-                string originalPath = @"C:\Users\batuhan.yetis\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\imar\python_kod\deep_learning\kod\model_learning.py";
 
                 // Dosyanın gerçekten var olup olmadığını kontrol et
-                bool originalExists = File.Exists(originalPath);
-                Console.WriteLine($"Orijinal dosya var mı: {originalExists}");
+                
+                
 
                 // Dönüşüm işlemini uygula
                 //string convertedPath = ConvertPathToFileSystem(originalPath);
@@ -267,6 +281,32 @@ namespace SLF.Services
                                 _configKatmanDenemePath = Path.Combine(katmanDir, "katman_deneme.py");
 
                                 Debug.WriteLine($"Python Kodları.katman_eslestirme_kod'dan türetilen Katman Deneme yolu: {_configKatmanDenemePath}");
+                            }
+                            if (config["Python Kodları"] != null && config["Python Kodları"].deep_learning != null)
+                            {
+                                string deepLearningRelativePath = config["Python Kodları"].deep_learning.ToString();
+
+                                // Eğer yol "/" ile başlıyorsa, başındaki "/" karakterini kaldır
+                                if (deepLearningRelativePath.StartsWith("/"))
+                                {
+                                    deepLearningRelativePath = deepLearningRelativePath.Substring(1);
+                                }
+
+                                // ÖNEMLİ DEĞİŞİKLİK: İl değerini path'e dahil etme, doğrudan program dosyaları ile birleştir
+                                string deepLearningFullPath = Path.Combine(programDosyalariFullPath, deepLearningRelativePath);
+
+                                // Dizin kısmını al (dosya adını çıkar)
+                                string deepLearningDirPath = Path.GetDirectoryName(deepLearningFullPath);
+
+                                // Klasörü oluştur (yoksa)
+                                if (!Directory.Exists(deepLearningDirPath))
+                                {
+                                    //Directory.CreateDirectory(deepLearningDirPath);
+                                }
+
+                                // Deep Learning model yolunu ayarla
+                                _configDeepLearningModelPath = deepLearningFullPath;
+                                Debug.WriteLine($"Config'den alınan Deep Learning model yolu: {_configDeepLearningModelPath}");
                             }
                             else
                             {

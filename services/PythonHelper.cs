@@ -24,9 +24,9 @@ namespace SLF.services
 
                 // YearService'ten lastYear bilgisini al
                 var yearService = YearService.GetInstance();
-                string lastYear = yearService.LastYear.ToString();
+                string year = yearService.slfStartYear.ToString();
 
-                Console.WriteLine($"Deep Learning model çalıştırılıyor: {selectedCity}/{selectedDistrict}, LastYear: {lastYear}");
+                Console.WriteLine($"Deep Learning model çalıştırılıyor: {selectedCity}/{selectedDistrict}, LastYear: {year}");
 
                 // Python script yolu - artık python_kod klasöründen alınıyor
                 string scriptRelativePath = Path.Combine("python_kod", "deep_learning", "kod", "model_learning.py");
@@ -70,7 +70,7 @@ namespace SLF.services
                 Console.WriteLine($"Çıktı klasörü: {imarAnaliziPath}");
 
                 // Python argümanlarını oluştur - İlçe parametresi eklendi
-                string arguments = $"\"{pythonScriptPath}\" \"{aboneVeriYolu}\" \"{meskenSonucYolu}\" \"{otherSonucYolu}\" \"{selectedCity}\" \"{selectedDistrict}\" \"{lastYear}\"";
+                string arguments = $"\"{pythonScriptPath}\" \"{aboneVeriYolu}\" \"{meskenSonucYolu}\" \"{otherSonucYolu}\" \"{selectedCity}\" \"{selectedDistrict}\" \"{year}\"";
 
                 // Python betiğini çalıştır
                 ProcessStartInfo processInfo = new ProcessStartInfo("python")
@@ -108,6 +108,7 @@ namespace SLF.services
                 throw; // Üst seviye metodların hatayı yakalaması için yeniden fırlat
             }
         }
+        
         public static string RunKatmanDeneme(string kmlFilePath, string csvFilePath)
         {
             try
@@ -191,7 +192,8 @@ namespace SLF.services
                 string hucreFilePath = null;
                 string uyduVeriPath = PathService.UyduVerileriPath;
                 string uyduVeriFilePath = null;
-                int year = YearService.GetInstance().slfStartYear;
+                var yearService = YearService.GetInstance();
+                string year = yearService.slfStartYear.ToString();
                 // Seçilen il/ilçe bilgilerini al
                 string selectedCity = PathService.SelectedCity;
                 string selectedDistrict = PathService.SelectedDistrict;
