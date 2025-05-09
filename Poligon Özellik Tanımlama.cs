@@ -97,6 +97,7 @@ namespace SLF
                 dataTable.Columns.Add("Çizilen Alan (m2)", typeof(string));
                 dataTable.Columns.Add("Ortalama Kapladığı Alan (m2)", typeof(string));
                 dataTable.Columns.Add("Tüketim Sınıfı", typeof(string));
+                dataTable.Columns.Add("ENERJILENDIRME_YILI", typeof(string));
                 dataTable.Columns.Add("Kurulu Güç (kW)", typeof(string));
                 dataTable.Columns.Add("Pik Yüklenme (%)", typeof(string));
                 dataTable.Columns.Add("Pik Demant (kW)", typeof(string));
@@ -124,6 +125,7 @@ namespace SLF
                 PoligonDataGridView.Columns["Çizilen Alan (m2)"].ToolTipText = "Poligonun hesaplanan alanı (metrekare)";
                 PoligonDataGridView.Columns["Ortalama Kapladığı Alan (m2)"].ToolTipText = "Poligonun ortalama kapladığı alan (metrekare)";
                 PoligonDataGridView.Columns["Tüketim Sınıfı"].ToolTipText = "Poligonun enerji tüketim sınıfı - Ticarethane, Sanayi, vb.";
+                PoligonDataGridView.Columns["ENERJILENDIRME_YILI"].ToolTipText = "Poligonun enerjilendirmeye başladığı yıl";
                 PoligonDataGridView.Columns["Kurulu Güç (kW)"].ToolTipText = "Poligonun kurulu güç kapasitesi (kilowatt)";
                 PoligonDataGridView.Columns["Pik Yüklenme (%)"].ToolTipText = "Poligonun pik yüklenme oranı (yüzde)";
                 PoligonDataGridView.Columns["Pik Demant (kW)"].ToolTipText = "Poligonun pik güç talebi (kilowatt)";
@@ -309,6 +311,7 @@ namespace SLF
                     { "Tipi", new HashSet<string>() },
                     { "Ortalama Kapladığı Alan (m2)", new HashSet<string>() },
                     { "Tüketim Sınıfı", new HashSet<string>() },
+                    { "ENERJILENDIRME_YILI", new HashSet<string>() },
                     { "Kurulu Güç (kW)", new HashSet<string>() },
                     { "Pik Yüklenme (%)", new HashSet<string>() },
                     { "Pik Demant (kW)", new HashSet<string>() }
@@ -651,6 +654,7 @@ namespace SLF
                             // Update the other columns with the corresponding values
                             PoligonDataGridView.Rows[e.RowIndex].Cells["Ortalama Kapladığı Alan (m2)"].Value = matchingRow["Ortalama Kapladığı Alan (m2)"];
                             PoligonDataGridView.Rows[e.RowIndex].Cells["Tüketim Sınıfı"].Value = matchingRow["Tüketim Sınıfı"];
+                            PoligonDataGridView.Rows[e.RowIndex].Cells["ENERJILENDIRME_YILI"].Value = matchingRow["ENERJILENDIRME_YILI"];
                             PoligonDataGridView.Rows[e.RowIndex].Cells["Kurulu Güç (kW)"].Value = matchingRow["Kurulu Güç (kW)"];
                             PoligonDataGridView.Rows[e.RowIndex].Cells["Pik Yüklenme (%)"].Value = matchingRow["Pik Yüklenme (%)"];
                             PoligonDataGridView.Rows[e.RowIndex].Cells["Pik Demant (kW)"].Value = matchingRow["Pik Demant (kW)"];

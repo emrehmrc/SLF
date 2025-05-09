@@ -43,6 +43,7 @@ namespace SLF
                 dataTable.Columns.Add("Tipi", typeof(string));
                 dataTable.Columns.Add("Ortalama Kapladığı Alan (m2)", typeof(string));
                 dataTable.Columns.Add("Tüketim Sınıfı", typeof(string));
+                dataTable.Columns.Add("ENERJILENDIRME_YILI", typeof(string));
                 dataTable.Columns.Add("Kurulu Güç (kW)", typeof(string));
                 dataTable.Columns.Add("Pik Yüklenme (%)", typeof(string));
                 dataTable.Columns.Add("Pik Demant (kW)", typeof(string));
@@ -115,6 +116,7 @@ namespace SLF
                                 newRow["Tipi"] = row["Tipi"]?.ToString() ?? string.Empty;
                                 newRow["Ortalama Kapladığı Alan (m2)"] = row["Ortalama Kapladığı Alan (m2)"]?.ToString() ?? string.Empty;
                                 newRow["Tüketim Sınıfı"] = row["Tüketim Sınıfı"]?.ToString() ?? string.Empty;
+                                newRow["ENERJILENDIRME_YILI"] = row["ENERJILENDIRME_YILI"]?.ToString() ?? string.Empty;
                                 newRow["Kurulu Güç (kW)"] = row["Kurulu Güç (kW)"]?.ToString() ?? string.Empty;
                                 newRow["Pik Yüklenme (%)"] = row["Pik Yüklenme (%)"]?.ToString() ?? string.Empty;
                                 newRow["Pik Demant (kW)"] = row["Pik Demant (kW)"]?.ToString() ?? string.Empty;
@@ -168,6 +170,7 @@ namespace SLF
                 dataTable.Columns.Add("Tipi", typeof(string));
                 dataTable.Columns.Add("Ortalama Kapladığı Alan (m2)", typeof(string));
                 dataTable.Columns.Add("Tüketim Sınıfı", typeof(string));
+                dataTable.Columns.Add("ENERJILENDIRME_YILI", typeof(string));
                 dataTable.Columns.Add("Kurulu Güç (kW)", typeof(string));
                 dataTable.Columns.Add("Pik Yüklenme (%)", typeof(string));
                 dataTable.Columns.Add("Pik Demant (kW)", typeof(string));
@@ -175,29 +178,29 @@ namespace SLF
                 // Default data for YUK
                 var defaultData = new List<string[]>
                 {
-                    new[] { "Anaokulu", "2,800", "Ticarethane", "30", "0.8", "24" },
-                    new[] { "AVM", "10,000", "Ticarethane", "1,000", "0.6", "600" },
-                    new[] { "Banka", "500", "Ticarethane", "100", "0.7", "70" },
-                    new[] { "Akaryakıt İstasyonu", "1,400", "Ticarethane", "50", "0.6", "30" },
-                    new[] { "Cami", "300", "Ticarethane", "50", "0.7", "35" },
-                    new[] { "Fırın", "500", "Ticarethane", "30", "0.7", "21" },
-                    new[] { "Halk Sağlığı Merkezi", "400", "Ticarethane", "150", "0.8", "120" },
-                    new[] { "Hastane", "30,000", "Ticarethane", "1,000", "0.9", "900" },
-                    new[] { "İtfaiye", "1,100", "Ticarethane", "100", "0.6", "60" },
-                    new[] { "Kamu Binası", "1,200", "Ticarethane", "200", "0.6", "120" },
-                    new[] { "Konser Alanı", "2,000", "Ticarethane", "400", "0.7", "280" },
-                    new[] { "Okul", "7,500", "Ticarethane", "300", "0.8", "240" },
-                    new[] { "Oto Tamirci", "700", "Ticarethane", "250", "0.7", "175" },
-                    new[] { "Otogar", "5,800", "Ticarethane", "350", "0.7", "245" },
-                    new[] { "Otopark", "2,500", "Ticarethane", "200", "0.8", "160" },
-                    new[] { "Pazar Alanı", "5,400", "Ticarethane", "200", "0.8", "160" },
-                    new[] { "PTT", "500", "Ticarethane", "50", "0.7", "35" },
-                    new[] { "Restoran", "800", "Ticarethane", "120", "0.6", "72" },
-                    new[] { "Sanat Alanı", "3,000", "Ticarethane", "100", "0.6", "60" },
-                    new[] { "Sosyal Yaşam Merkezi", "1,500", "Ticarethane", "300", "0.7", "210" },
-                    new[] { "Süpermarket", "3,500", "Ticarethane", "250", "0.7", "175" },
-                    new[] { "Tarımsal Alan", "10,000", "Tarımsal Sulama", "20", "0.7", "14" },
-                    new[] { "Üniversite Kampüsü", "200,000", "Ticarethane", "1,000", "0.6", "600" }
+                    new[] { "Anaokulu", "2,800", "Ticarethane","2027", "30", "0.8", "24" },
+                    new[] { "AVM", "10,000", "Ticarethane", "2027", "1,000", "0.6", "600" },
+                    new[] { "Banka", "500", "Ticarethane", "2027", "100", "0.7", "70" },
+                    new[] { "Akaryakıt İstasyonu", "1,400", "Ticarethane", "2027", "50", "0.6", "30" },
+                    new[] { "Cami", "300", "Ticarethane", "2027", "50", "0.7", "35" },
+                    new[] { "Fırın", "500", "Ticarethane", "2027", "30", "0.7", "21" },
+                    new[] { "Halk Sağlığı Merkezi", "400", "Ticarethane", "2027", "150", "0.8", "120" },
+                    new[] { "Hastane", "30,000", "Ticarethane", "2027", "1,000", "0.9", "900" },
+                    new[] { "İtfaiye", "1,100", "Ticarethane", "2027", "100", "0.6", "60" },
+                    new[] { "Kamu Binası", "1,200", "Ticarethane", "2027", "200", "0.6", "120" },
+                    new[] { "Konser Alanı", "2,000", "Ticarethane", "2027", "400", "0.7", "280" },
+                    new[] { "Okul", "7,500", "Ticarethane", "2027", "300", "0.8", "240" },
+                    new[] { "Oto Tamirci", "700", "Ticarethane", "2027", "250", "0.7", "175" },
+                    new[] { "Otogar", "5,800", "Ticarethane", "2027", "350", "0.7", "245" },
+                    new[] { "Otopark", "2,500", "Ticarethane", "2027", "200", "0.8", "160" },
+                    new[] { "Pazar Alanı", "5,400", "Ticarethane", "2027", "200", "0.8", "160" },
+                    new[] { "PTT", "500", "Ticarethane", "2027", "50", "0.7", "35" },
+                    new[] { "Restoran", "800", "Ticarethane", "2027", "120", "0.6", "72" },
+                    new[] { "Sanat Alanı", "3,000", "Ticarethane", "2027", "100", "0.6", "60" },
+                    new[] { "Sosyal Yaşam Merkezi", "1,500", "Ticarethane", "2027", "300", "0.7", "210" },
+                    new[] { "Süpermarket", "3,500", "Ticarethane", "2027", "250", "0.7", "175" },
+                    new[] { "Tarımsal Alan", "10,000", "Tarımsal Sulama", "2027", "20", "0.7", "14" },
+                    new[] { "Üniversite Kampüsü", "200,000", "Ticarethane", "2027", "1,000", "0.6", "600" }
                 };
 
                 foreach (var rowData in defaultData)
@@ -206,6 +209,7 @@ namespace SLF
                     row["Tipi"] = rowData[0];
                     row["Ortalama Kapladığı Alan (m2)"] = rowData[1];
                     row["Tüketim Sınıfı"] = rowData[2];
+                    row["ENERJILENDIRME_YILI"] = rowData[2]; 
                     row["Kurulu Güç (kW)"] = rowData[3];
                     row["Pik Yüklenme (%)"] = rowData[4];
                     row["Pik Demant (kW)"] = rowData[5];
