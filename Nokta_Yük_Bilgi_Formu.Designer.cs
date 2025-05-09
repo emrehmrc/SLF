@@ -43,8 +43,8 @@
             // 
             // NoktaYukDataGridView
             // 
-            this.NoktaYukDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.NoktaYukDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.NoktaYukDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
             this.NoktaYukDataGridView.BackgroundColor = System.Drawing.Color.Snow;
@@ -135,7 +135,7 @@
             this.Controls.Add(this.YGATablePanel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.MaximumSize = new System.Drawing.Size(900, 700);
+            this.MaximumSize = new System.Drawing.Size(1300, 1000);
             this.Name = "Nokta_Yuk_Bilgi_Formu";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Nokta Yük Tipleri";

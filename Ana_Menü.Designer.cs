@@ -38,11 +38,11 @@ namespace SLF
             this.label1 = new System.Windows.Forms.Label();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.buton_hakkında = new System.Windows.Forms.Button();
+            this.buton_yardım = new System.Windows.Forms.Button();
             this.roundButton1 = new System.Windows.Forms.Button();
             this.roundButton2 = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.buton_yardım = new System.Windows.Forms.Button();
-            this.buton_hakkında = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
@@ -150,6 +150,26 @@ namespace SLF
             this.panel1.Size = new System.Drawing.Size(1197, 110);
             this.panel1.TabIndex = 11;
             // 
+            // buton_hakkında
+            // 
+            this.buton_hakkında.Location = new System.Drawing.Point(1099, 30);
+            this.buton_hakkında.Name = "buton_hakkında";
+            this.buton_hakkında.Size = new System.Drawing.Size(86, 50);
+            this.buton_hakkında.TabIndex = 11;
+            this.buton_hakkında.Text = "Hakkında";
+            this.buton_hakkında.UseVisualStyleBackColor = true;
+            this.buton_hakkında.Click += new System.EventHandler(this.buton_hakkında_Click);
+            // 
+            // buton_yardım
+            // 
+            this.buton_yardım.Location = new System.Drawing.Point(995, 30);
+            this.buton_yardım.Name = "buton_yardım";
+            this.buton_yardım.Size = new System.Drawing.Size(75, 50);
+            this.buton_yardım.TabIndex = 10;
+            this.buton_yardım.Text = "Yardım";
+            this.buton_yardım.UseVisualStyleBackColor = true;
+            this.buton_yardım.Click += new System.EventHandler(this.buton_yardım_Click);
+            // 
             // roundButton1
             // 
             this.roundButton1.BackColor = System.Drawing.Color.White;
@@ -186,26 +206,6 @@ namespace SLF
             this.panel2.Size = new System.Drawing.Size(1197, 83);
             this.panel2.TabIndex = 12;
             // 
-            // buton_yardım
-            // 
-            this.buton_yardım.Location = new System.Drawing.Point(995, 30);
-            this.buton_yardım.Name = "buton_yardım";
-            this.buton_yardım.Size = new System.Drawing.Size(75, 50);
-            this.buton_yardım.TabIndex = 10;
-            this.buton_yardım.Text = "Yardım";
-            this.buton_yardım.UseVisualStyleBackColor = true;
-            this.buton_yardım.Click += new System.EventHandler(this.buton_yardım_Click);
-            // 
-            // buton_hakkında
-            // 
-            this.buton_hakkında.Location = new System.Drawing.Point(1099, 30);
-            this.buton_hakkında.Name = "buton_hakkında";
-            this.buton_hakkında.Size = new System.Drawing.Size(86, 50);
-            this.buton_hakkında.TabIndex = 11;
-            this.buton_hakkında.Text = "Hakkında";
-            this.buton_hakkında.UseVisualStyleBackColor = true;
-            this.buton_hakkında.Click += new System.EventHandler(this.buton_hakkında_Click);
-            // 
             // HomePageForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
@@ -236,7 +236,6 @@ namespace SLF
         }
 
         #endregion
-
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.Label label2;

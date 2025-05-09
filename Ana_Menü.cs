@@ -5,6 +5,8 @@ using System.Windows.Forms;
 using System.IO;
 using System.Reflection;
 using SLF.Services;
+using System.Drawing;
+using System.IO;
 
 namespace SLF
 {
@@ -47,6 +49,7 @@ namespace SLF
             {
                 MessageBox.Show("Config dosyası bulunamadı!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
         }
 
         private void HomePageForm_Shown(object sender, EventArgs e)
@@ -85,6 +88,7 @@ namespace SLF
             Hakkında hakkında = new Hakkında();
             hakkında.Show();
         }
+
     }
 
 }

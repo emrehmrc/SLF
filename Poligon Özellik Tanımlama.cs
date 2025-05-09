@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.IO;
 using ExcelDataReader;
 using GMap.NET;
+using System.Globalization;
 
 namespace SLF
 {
@@ -122,7 +123,7 @@ namespace SLF
                 PoligonDataGridView.Columns["Koordinatlar"].ToolTipText = "Poligonun WKT formatındaki koordinatları";
                 PoligonDataGridView.Columns["Çizilen Alan (m2)"].ToolTipText = "Poligonun hesaplanan alanı (metrekare)";
                 PoligonDataGridView.Columns["Ortalama Kapladığı Alan (m2)"].ToolTipText = "Poligonun ortalama kapladığı alan (metrekare)";
-                PoligonDataGridView.Columns["Tüketim Sınıfı"].ToolTipText = "Poligonun enerji tüketim sınıfı - Büyük Ticarethane, Orta Sanayi, vb.";
+                PoligonDataGridView.Columns["Tüketim Sınıfı"].ToolTipText = "Poligonun enerji tüketim sınıfı - Ticarethane, Sanayi, vb.";
                 PoligonDataGridView.Columns["Kurulu Güç (kW)"].ToolTipText = "Poligonun kurulu güç kapasitesi (kilowatt)";
                 PoligonDataGridView.Columns["Pik Yüklenme (%)"].ToolTipText = "Poligonun pik yüklenme oranı (yüzde)";
                 PoligonDataGridView.Columns["Pik Demant (kW)"].ToolTipText = "Poligonun pik güç talebi (kilowatt)";
@@ -164,7 +165,7 @@ namespace SLF
                 // Set tooltips for column headers
                 PoligonDataGridView.Columns["Polygon ID"].ToolTipText = "Poligona ait özgün ID numarası";
                 PoligonDataGridView.Columns["Tipi"].ToolTipText = "Poligonun tipi veya kategorisi - AVM, Restoran vb.";
-                PoligonDataGridView.Columns["ENERJI_MUSAADE_ABONE_GRUBU"].ToolTipText = "Enerji müsaadesi için abone grubu - Büyük Ticarethane, Orta Sanayi, vb.";
+                PoligonDataGridView.Columns["ENERJI_MUSAADE_ABONE_GRUBU"].ToolTipText = "Enerji müsaadesi için abone grubu - Ticarethane, Sanayi, vb.";
                 PoligonDataGridView.Columns["ENERJI_MUSAADE_ENERJILENDIRME_YILI"].ToolTipText = "Enerji müsaadesinin verileceği yıl";
                 PoligonDataGridView.Columns["Kurulu Güç (kW)"].ToolTipText = "Enerji müsaadesi verilecek yapıya ait kurulu güç kapasitesi (kilowatt)";
                 PoligonDataGridView.Columns["Pik Yüklenme (%)"].ToolTipText = "Enerji müsaadesi verilecek yapıya ait tahmini pik yüklenme oranı (yüzde)";
@@ -198,6 +199,7 @@ namespace SLF
                 dataTable.Columns.Add("TARIMSAL SULAMA", typeof(string));
                 dataTable.Columns.Add("Başlangıç Yılı", typeof(string));
                 dataTable.Columns.Add("Satürasyon Hızı", typeof(string));
+                dataTable.Columns.Add("TAKS", typeof(string));
                 dataTable.Columns.Add("Park, Yol, Kaldırım Oranı (%)", typeof(string));
 
                 // Add a single row
@@ -233,6 +235,7 @@ namespace SLF
                 PoligonDataGridView.Columns["TARIMSAL SULAMA"].ToolTipText = "Poligon içindeki tahmini Tarımsal sulama amaçlı kullanım oranı (0-100)";
                 PoligonDataGridView.Columns["Başlangıç Yılı"].ToolTipText = "Poligon için planlanan başlangıç yılı";
                 PoligonDataGridView.Columns["Satürasyon Hızı"].ToolTipText = "Poligonun tahmini doygunluğa ulaşma hızı (1-5)";
+                PoligonDataGridView.Columns["TAKS"].ToolTipText = "Poligona ait yaklaşık TAKS bilgisi";
                 PoligonDataGridView.Columns["Park, Yol, Kaldırım Oranı (%)"].ToolTipText = "Poligon içindeki tahmini Park, yol ve kaldırım alanlarının oranı (0-100)";
 
             }
@@ -515,8 +518,6 @@ namespace SLF
                     "3-4 KATLI MESKEN\n" +
                     "5-7 KATLI MESKEN\n" +
                     "8 USTU KATLI MESKEN\n" +
-                    "BUYUK SANAYI\n" +
-                    "BUYUK TICARETHANE\n" +
                     "KUCUK SANAYI\n" +
                     "KUCUK TICARETHANE\n" +
                     "ORTA SANAYI\n" +
@@ -544,8 +545,6 @@ namespace SLF
                 "8 USTU KATLI MESKEN",
                 "VILLA MESKEN",
                 "AYDINLATMA",
-                "BUYUK SANAYI",
-                "BUYUK TICARETHANE",
                 "KUCUK SANAYI",
                 "KUCUK TICARETHANE",
                 "ORTA SANAYI",
@@ -715,18 +714,74 @@ namespace SLF
             // Ensure the editing control is a TextBox
             if (e.Control is TextBox textBox)
             {
-                // Remove any existing KeyPress event handlers to avoid duplicates
-                textBox.KeyPress -= TextBox_KeyPress_NumbersOnly;
-                textBox.KeyPress += TextBox_KeyPress_NumbersOnly;
+                // Get the current column name
+                string columnName = PoligonDataGridView.Columns[PoligonDataGridView.CurrentCell.ColumnIndex].Name;
+
+                // Log to verify the event is firing
+                Console.WriteLine($"EditingControlShowing: ColumnName={columnName}, isSelecting_YGA={isSelecting_YGA}");
+
+                // Add the KeyPress event handler
+                textBox.KeyPress += (s, ev) => TextBox_KeyPress_NumericWithDecimalForTAKS(s, ev, columnName);
             }
         }
 
-        private void TextBox_KeyPress_NumbersOnly(object sender, KeyPressEventArgs e)
+        private void TextBox_KeyPress_NumericWithDecimalForTAKS(object sender, KeyPressEventArgs e, string columnName)
         {
-            // Allow digits (0-9), backspace, and control characters (e.g., Enter, Tab)
-            if (!char.IsDigit(e.KeyChar) && e.KeyChar != (char)Keys.Back && !char.IsControl(e.KeyChar))
+            // Get the culture-specific decimal separator
+            string decimalSeparator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+            Console.WriteLine($"KeyPress: ColumnName={columnName}, KeyChar={e.KeyChar}, DecimalSeparator={decimalSeparator}, isSelecting_YGA={isSelecting_YGA}");
+
+            // Allow backspace and control characters (e.g., Enter, Tab)
+            if (e.KeyChar == (char)Keys.Back || char.IsControl(e.KeyChar))
             {
-                e.Handled = true; // Block the key press
+                return;
+            }
+
+            // Allow digits (0-9)
+            if (char.IsDigit(e.KeyChar))
+            {
+                return;
+            }
+
+            // Allow both '.' and the culture-specific decimal separator for the "TAKS" column
+            if (columnName == "TAKS" && (e.KeyChar == '.' || e.KeyChar.ToString() == decimalSeparator) && isSelecting_YGA)
+            {
+                // Check if a decimal separator already exists in the TextBox
+                TextBox textBox = sender as TextBox;
+                if (textBox != null && !textBox.Text.Contains(decimalSeparator) && !textBox.Text.Contains("."))
+                {
+                    Console.WriteLine("Decimal separator allowed.");
+                    return; // Allow the decimal separator
+                }
+                else
+                {
+                    Console.WriteLine("Decimal separator blocked: Already exists or textBox is null.");
+                }
+            }
+
+            // Block all other characters (including A-Z and other symbols)
+            e.Handled = true;
+            Console.WriteLine("Key press blocked.");
+        }
+
+        private void PoligonDataGridView_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
+        {
+            if (isSelecting_YGA && e.ColumnIndex == PoligonDataGridView.Columns["TAKS"]?.Index)
+            {
+                string input = e.FormattedValue?.ToString();
+                if (!string.IsNullOrWhiteSpace(input))
+                {
+                    // Replace both '.' and culture-specific decimal separator with '.' for parsing
+                    string decimalSeparator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+                    input = input.Replace(decimalSeparator, ".").Replace(".", ".");
+
+                    // Parse using InvariantCulture
+                    if (!double.TryParse(input, NumberStyles.Any, CultureInfo.InvariantCulture, out double taksValue) || taksValue < 0.1 || taksValue > 1)
+                    {
+                        e.Cancel = true; // Prevent the cell from exiting edit mode
+                        MessageBox.Show("Hata: TAKS değeri 0.1 ile 1 arasında olmalıdır!", "Geçersiz Değer", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
             }
         }
     }

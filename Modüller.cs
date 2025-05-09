@@ -367,10 +367,7 @@ namespace SLF
             InitializeGMap(gMapControl_DEK);
 
             // Sort TabPages Alphabetically
-            SortTabPagesAlphabetically(Modül_Tabları, true);
-
-            // Enable double buffering to reduce flickering
-            // this.DoubleBuffered = true;
+            //SortTabPagesAlphabetically(Modül_Tabları, true);
 
             // Set Default Selected Tab
             Modül_Tabları.SelectedTab = tab_girdi;
@@ -5169,18 +5166,6 @@ namespace SLF
         }
 
 
-        private void Poligon_Sil_Click(object sender, EventArgs e)
-        {
-            if (cbs.GetActiveGMapControl() == gMapControl_imar)
-            {
-                if (polygonOverlay_imar == null || polygonOverlay_imar.Polygons.Count == 0)
-                {
-                    MessageBox.Show("Herhangi bir poligon çizilmemiştir. Lütfen öncelikle bir poligon çiziniz.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                }
-            }
-
-        }
-
         private void Poligon_Kaydet_Click(object sender, EventArgs e)
         {
             if (isSelecting_YUK == true)
@@ -5316,10 +5301,10 @@ namespace SLF
         }
 
         public void PoligonKaydetEventi(
-    object sender,
-    EventArgs e,
-    GMapOverlay polygonOverlay,     // the overlay that user just drew the polygon(s) in
-    List<PointLatLng> polygonPoints)
+            object sender,
+            EventArgs e,
+            GMapOverlay polygonOverlay,     // the overlay that user just drew the polygon(s) in
+            List<PointLatLng> polygonPoints)
         {
             // Make sure there's actually a polygon
             if (polygonOverlay == null || polygonOverlay.Polygons.Count == 0)
@@ -5532,7 +5517,6 @@ namespace SLF
             ResetYearSelectionProcessGirdiModulu();
 
         }
-
 
         public List<CheckBox> GetCheckBoxesByIndex(int index)
         {
@@ -7980,8 +7964,6 @@ namespace SLF
                                 exportedAnyJoinedLayer = true;
                                 break;
                             default:
-                                MessageBox.Show($"Geçersiz etiket: {tag}. Bu katman dışa aktarılmayacak.",
-                                    "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                                 continue;
                         }
                     }
