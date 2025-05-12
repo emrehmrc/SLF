@@ -1096,7 +1096,7 @@ namespace SLF
                     foreach (DataRow row in dataTable.Rows)
                     {
                         if (!IsNullLike(row[column]))
-                        {
+                        { 
                             if (double.TryParse(row[column].ToString(), out double value))
                             {
                                 // Assume values > 1 are percentages (e.g., 3.4 -> 0.034)
