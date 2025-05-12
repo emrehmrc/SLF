@@ -11,21 +11,31 @@ namespace SLF
     public class DTRModulu : GirdiModülü
 
     {
-        private readonly (float warningThreshold, float errorThreshold) TUKETIM_ERROR_THRESHOLD = WarningErrorBoundary(0.7f);
+        private readonly (float warningThreshold, float errorThreshold) TUKETIM_ERROR_THRESHOLD = WarningErrorBoundary(0.2f);
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = ERROR_ONLY;
         private readonly string DATE_FORMAT = "dd.MM.yyyy";
         private static readonly List<int> TRAFO_KAPASITE_LISTESI = new List<int>
         {
             15, 25, 40, 50, 63, 100, 160, 200, 250, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500
         };
-        private static readonly List<int> PRIMER_GERILIM_LISTESI = new List<int>
+
+        private static readonly List<float> PRIMER_GERILIM_LISTESI = new List<float>
+        {
+            6.3f, 10.5f, 15.8f, 31.5f, 33.0f, 34.5f // Values in kV
+        };
+        private static readonly List<float> SEKONDER_GERILIM_LISTESI = new List<float>
+        {
+            0.4f // Value in kV
+        };
+
+/*        private static readonly List<int> PRIMER_GERILIM_LISTESI = new List<int>
         {
             6300, 10500, 15800, 31500, 33000, 34500
         };
         private static readonly List<int> SEKONDER_GERILIM_LISTESI = new List<int>
         {
             400
-        };
+        };*/
 
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> dateFormatCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
@@ -506,12 +516,11 @@ namespace SLF
                 }
             }
         }
-
         private void ReportPrimerGerilim()
         {
             int totalRows = currentDataTable.Rows.Count;
             string column = "PRIMER_GERILIM";
-            const int standardValue = 34500; // Standard imputation value
+            const float standardValue = 34.5f; // Standard imputation value (kV)
 
             List<int> nullRows = new List<int>();
             List<int> nonNumericRows = new List<int>();
@@ -531,7 +540,7 @@ namespace SLF
                     nullRows.Add(i);
                     row[column] = standardValue; // Impute null-like values
                 }
-                else if (!int.TryParse(cellValue, out int value))
+                else if (!float.TryParse(cellValue, out float value))
                 {
                     nonNumericCount++;
                     nonNumericRows.Add(i);
@@ -556,7 +565,7 @@ namespace SLF
             if (invalidPercentage > 0)
             {
                 // Report as warning (no threshold, just warning)
-                string message = "Geçersiz değer (imputed with 34500): ";
+                string message = "Geçersiz değer (imputed with 34.5 kV): ";
                 var issues = new List<string>();
                 if (nullCount > 0) issues.Add($"{(float)nullCount / totalRows:P1} NULL/boş (Satır: {string.Join(", ", nullRows)})");
                 if (nonNumericCount > 0) issues.Add($"{(float)nonNumericCount / totalRows:P1} geçersiz format (Satır: {string.Join(", ", nonNumericRows)})");
@@ -565,26 +574,27 @@ namespace SLF
 
                 warningDataTable.Rows.Add(new object[]
                 {
-            column,
-            "Primer Gerilim Kontrolü",
-            $"{invalidPercentage:P1}",
-            message
+                column,
+                "Primer Gerilim Kontrolü",
+                $"{invalidPercentage:P1}",
+                message
                 });
             }
         }
+
         private void ReportSekonderGerilim()
         {
             int totalRows = currentDataTable.Rows.Count;
             string column = "SEKONDER_GERILIM";
-            const int standardValue = 400; // Standard imputation value
+            const float standardValue = 0.4f; // Standard imputation value (kV)
 
             List<int> nullRows = new List<int>();
             List<int> nonNumericRows = new List<int>();
-            List<int> greaterThan400Rows = new List<int>();
+            List<int> greaterThanThresholdRows = new List<int>();
 
             int nullCount = 0;
             int nonNumericCount = 0;
-            int greaterThan400Count = 0;
+            int greaterThanThresholdCount = 0;
 
             for (int i = 0; i < totalRows; i++)
             {
@@ -594,30 +604,30 @@ namespace SLF
                 {
                     nullCount++;
                     nullRows.Add(i);
-                    row[column] = standardValue; // Impute null-like values with 400
+                    row[column] = standardValue; // Impute null-like values with 0.4 kV
                 }
-                else if (!int.TryParse(cellValue, out int value))
+                else if (!float.TryParse(cellValue, out float value))
                 {
                     nonNumericCount++;
                     nonNumericRows.Add(i);
-                    row[column] = standardValue; // Impute non-numeric values with 400
+                    row[column] = standardValue; // Impute non-numeric values with 0.4 kV
                 }
-                else if (value > 400)
+                else if (value > 0.4f)
                 {
-                    greaterThan400Count++;
-                    greaterThan400Rows.Add(i);
-                    currentDataTable.Rows.RemoveAt(i); // Delete row if value > 400
+                    greaterThanThresholdCount++;
+                    greaterThanThresholdRows.Add(i);
+                    currentDataTable.Rows.RemoveAt(i); // Delete row if value > 0.4 kV
                     i--; // Adjust index after deletion
                     totalRows--; // Update totalRows after deletion
                 }
             }
 
             // Calculate total invalid percentage based on remaining rows
-            int totalInvalidCount = nullCount + nonNumericCount + greaterThan400Count;
+            int totalInvalidCount = nullCount + nonNumericCount + greaterThanThresholdCount;
             float invalidPercentage = (float)totalInvalidCount / currentDataTable.Rows.Count;
 
             // Combine all invalid rows for tracking (adjust indices for deleted rows if needed)
-            var invalidRows = nullRows.Concat(nonNumericRows).Concat(greaterThan400Rows).ToList();
+            var invalidRows = nullRows.Concat(nonNumericRows).Concat(greaterThanThresholdRows).ToList();
             columnNullRowsMap[column] = invalidRows; // Store invalid rows for potential future reference
 
             if (invalidPercentage > 0)
@@ -625,20 +635,152 @@ namespace SLF
                 // Report as warning (no threshold, just warning)
                 string message = "Geçersiz değer: ";
                 var issues = new List<string>();
-                if (nullCount > 0) issues.Add($"{(float)nullCount / currentDataTable.Rows.Count:P1} NULL/boş (imputed with 400) (Satır: {string.Join(", ", nullRows)})");
-                if (nonNumericCount > 0) issues.Add($"{(float)nonNumericCount / currentDataTable.Rows.Count:P1} geçersiz format (imputed with 400) (Satır: {string.Join(", ", nonNumericRows)})");
-                if (greaterThan400Count > 0) issues.Add($"{(float)greaterThan400Count / currentDataTable.Rows.Count:P1} > 400 (silinecek) (Satır: {string.Join(", ", greaterThan400Rows)})");
+                if (nullCount > 0) issues.Add($"{(float)nullCount / currentDataTable.Rows.Count:P1} NULL/boş (imputed with 0.4 kV) (Satır: {string.Join(", ", nullRows)})");
+                if (nonNumericCount > 0) issues.Add($"{(float)nonNumericCount / currentDataTable.Rows.Count:P1} geçersiz format (imputed with 0.4 kV) (Satır: {string.Join(", ", nonNumericRows)})");
+                if (greaterThanThresholdCount > 0) issues.Add($"{(float)greaterThanThresholdCount / currentDataTable.Rows.Count:P1} > 0.4 kV (silinecek) (Satır: {string.Join(", ", greaterThanThresholdRows)})");
                 message += string.Join("; ", issues) + ".";
 
                 warningDataTable.Rows.Add(new object[]
                 {
-            column,
-            "Sekonder Gerilim Kontrolü",
-            $"{invalidPercentage:P1}",
-            message
+                column,
+                "Sekonder Gerilim Kontrolü",
+                $"{invalidPercentage:P1}",
+                message
                 });
             }
         }
+        /*        private void ReportPrimerGerilim()
+                {
+                    int totalRows = currentDataTable.Rows.Count;
+                    string column = "PRIMER_GERILIM";
+                    const int standardValue = 34.5f; // Standard imputation value
+
+                    List<int> nullRows = new List<int>();
+                    List<int> nonNumericRows = new List<int>();
+                    List<int> notInListRows = new List<int>();
+
+                    int nullCount = 0;
+                    int nonNumericCount = 0;
+                    int notInListCount = 0;
+
+                    for (int i = 0; i < totalRows; i++)
+                    {
+                        var row = currentDataTable.Rows[i];
+                        var cellValue = row[column]?.ToString();
+                        if (IsNullLike(cellValue))
+                        {
+                            nullCount++;
+                            nullRows.Add(i);
+                            row[column] = standardValue; // Impute null-like values
+                        }
+                        else if (!int.TryParse(cellValue, out int value))
+                        {
+                            nonNumericCount++;
+                            nonNumericRows.Add(i);
+                            row[column] = standardValue; // Impute non-numeric values
+                        }
+                        else if (!PRIMER_GERILIM_LISTESI.Contains(value))
+                        {
+                            notInListCount++;
+                            notInListRows.Add(i);
+                            row[column] = standardValue; // Impute values not in the list
+                        }
+                    }
+
+                    // Calculate total invalid percentage
+                    int totalInvalidCount = nullCount + nonNumericCount + notInListCount;
+                    float invalidPercentage = (float)totalInvalidCount / totalRows;
+
+                    // Combine all invalid rows for tracking
+                    var invalidRows = nullRows.Concat(nonNumericRows).Concat(notInListRows).ToList();
+                    columnNullRowsMap[column] = invalidRows; // Store invalid rows for potential future reference
+
+                    if (invalidPercentage > 0)
+                    {
+                        // Report as warning (no threshold, just warning)
+                        string message = "Geçersiz değer (imputed with 34500): ";
+                        var issues = new List<string>();
+                        if (nullCount > 0) issues.Add($"{(float)nullCount / totalRows:P1} NULL/boş (Satır: {string.Join(", ", nullRows)})");
+                        if (nonNumericCount > 0) issues.Add($"{(float)nonNumericCount / totalRows:P1} geçersiz format (Satır: {string.Join(", ", nonNumericRows)})");
+                        if (notInListCount > 0) issues.Add($"{(float)notInListCount / totalRows:P1} listeden değil (Satır: {string.Join(", ", notInListRows)})");
+                        message += string.Join("; ", issues) + ".";
+
+                        warningDataTable.Rows.Add(new object[]
+                        {
+                    column,
+                    "Primer Gerilim Kontrolü",
+                    $"{invalidPercentage:P1}",
+                    message
+                        });
+                    }
+                }
+                private void ReportSekonderGerilim()
+                {
+                    int totalRows = currentDataTable.Rows.Count;
+                    string column = "SEKONDER_GERILIM";
+                    const int standardValue = 0.4; // Standard imputation value
+
+                    List<int> nullRows = new List<int>();
+                    List<int> nonNumericRows = new List<int>();
+                    List<int> greaterThan400Rows = new List<int>();
+
+                    int nullCount = 0;
+                    int nonNumericCount = 0;
+                    int greaterThan400Count = 0;
+
+                    for (int i = 0; i < totalRows; i++)
+                    {
+                        var row = currentDataTable.Rows[i];
+                        var cellValue = row[column]?.ToString();
+                        if (IsNullLike(cellValue))
+                        {
+                            nullCount++;
+                            nullRows.Add(i);
+                            row[column] = standardValue; // Impute null-like values with 400
+                        }
+                        else if (!int.TryParse(cellValue, out int value))
+                        {
+                            nonNumericCount++;
+                            nonNumericRows.Add(i);
+                            row[column] = standardValue; // Impute non-numeric values with 400
+                        }
+                        else if (value > 400)
+                        {
+                            greaterThan400Count++;
+                            greaterThan400Rows.Add(i);
+                            currentDataTable.Rows.RemoveAt(i); // Delete row if value > 400
+                            i--; // Adjust index after deletion
+                            totalRows--; // Update totalRows after deletion
+                        }
+                    }
+
+                    // Calculate total invalid percentage based on remaining rows
+                    int totalInvalidCount = nullCount + nonNumericCount + greaterThan400Count;
+                    float invalidPercentage = (float)totalInvalidCount / currentDataTable.Rows.Count;
+
+                    // Combine all invalid rows for tracking (adjust indices for deleted rows if needed)
+                    var invalidRows = nullRows.Concat(nonNumericRows).Concat(greaterThan400Rows).ToList();
+                    columnNullRowsMap[column] = invalidRows; // Store invalid rows for potential future reference
+
+                    if (invalidPercentage > 0)
+                    {
+                        // Report as warning (no threshold, just warning)
+                        string message = "Geçersiz değer: ";
+                        var issues = new List<string>();
+                        if (nullCount > 0) issues.Add($"{(float)nullCount / currentDataTable.Rows.Count:P1} NULL/boş (imputed with 400) (Satır: {string.Join(", ", nullRows)})");
+                        if (nonNumericCount > 0) issues.Add($"{(float)nonNumericCount / currentDataTable.Rows.Count:P1} geçersiz format (imputed with 400) (Satır: {string.Join(", ", nonNumericRows)})");
+                        if (greaterThan400Count > 0) issues.Add($"{(float)greaterThan400Count / currentDataTable.Rows.Count:P1} > 400 (silinecek) (Satır: {string.Join(", ", greaterThan400Rows)})");
+                        message += string.Join("; ", issues) + ".";
+
+                        warningDataTable.Rows.Add(new object[]
+                        {
+                    column,
+                    "Sekonder Gerilim Kontrolü",
+                    $"{invalidPercentage:P1}",
+                    message
+                        });
+                    }
+                }*/
         /// <summary>
         /// Trafo demand değerlerini kontrol eder ve kapasite limitlerini aşan değerleri kapasite değerine eşitler.
         /// </summary>
@@ -794,7 +936,7 @@ namespace SLF
             ImputeTMFiderID();
             ImputeAverageDate();
             ImputeTrafoMulkiyet();
-            //ImputeTrafoKapasitesi();
+           //ImputeTrafoKapasitesi();
             ImputeTuketim();
             ImputeDemand();
 
@@ -1207,6 +1349,7 @@ namespace SLF
             if (columnName.StartsWith("YIL_DEMANT"))
             {
                 combinedPercentage = (float)(nullCount + negativeCount + zeroCount + formatErrorCount) / totalRows; // Include zeros for DEMANT
+                
             }
             else // YIL_TUKETIM
             {

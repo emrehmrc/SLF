@@ -381,8 +381,8 @@ namespace SLF
                 {
                     try
                     {
-                        double baglantiGucuWatt = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
-                        row["ENERJI_MUSAADE_BAGLANTI_GUCU"] = baglantiGucuWatt;
+                        double baglantiGucukWatt = Convert.ToDouble(row["ENERJI_MUSAADE_BAGLANTI_GUCU"]);
+                        row["ENERJI_MUSAADE_BAGLANTI_GUCU"] = baglantiGucukWatt;
                     }
                     catch (FormatException)
                     {

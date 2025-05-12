@@ -890,7 +890,9 @@ namespace SLF
             {
                 infoDataTable.Rows.Add(new object[]
                 {
-                    "", "Abone kapasitesi", "Geçersiz Değer",
+                    "", 
+                    "Abone kapasitesi", 
+                    "Geçersiz Değer",
                     $"Abone kapasitesi geçersiz veya aşırı büyük (>{10.0f:P0}) olduğu için bazı satırlar atlandı. (Satır: {string.Join(", ", invalidKapasiteRows)})"
                 });
             }
@@ -902,7 +904,9 @@ namespace SLF
             {
                 infoDataTable.Rows.Add(new object[]
                 {
-                    "", "Abone kapasitesi", $"{overCapacityPercentage:P1}",
+                    "", 
+                    "Abone kapasitesi", 
+                    $"{overCapacityPercentage:P1}",
                     $"Abone kapasitesi {ABONE_KAPASITE_LIMIT:P1}'den büyük olan abonelerin tüketim verileri silinecek."
                 });
             }

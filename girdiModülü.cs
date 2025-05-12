@@ -132,7 +132,6 @@ namespace SLF
         protected Dictionary<string, (double X, double Y)> binaIdToMostFrequentCoordinates = new Dictionary<string, (double X, double Y)>();
         protected Dictionary<string, string> aboneGrubuMostFrequent = new Dictionary<string, string>();
         protected Dictionary<string, double> annualPeakDemand = new Dictionary<string, double>();
-        //protected Dictionary<string, (double X, double Y)> binaIdToAverageCoordinates = new Dictionary<string, (double X, double Y)>();
 
         protected const int COORDINATE_ROUNDING_PRECISION = 3;
         protected const float MAX_THRESHOLD = float.MaxValue;
@@ -154,6 +153,7 @@ namespace SLF
             { "TICARETHANE", 2.5 },
             { "URETICI", 2.5 },
         };
+
         protected double K_FACTOR = 2.5;
 
         protected int RoundUpTrafoKapasitesi(double yeniTrafoKapasitesi)
@@ -280,12 +280,10 @@ namespace SLF
                     }
 
                     Postprocess();
-                    System.Diagnostics.Debug.WriteLine("Postprocessing completed.");
                     return true;
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("DataTable is null or empty.");
                     MessageBox.Show("Veri tablosu boş veya yüklenemedi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 Onizleme1.Onizleme_DataGrid1.ScrollBars = ScrollBars.Both;
@@ -293,7 +291,6 @@ namespace SLF
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"VEERProcess exception: {ex.Message}\nStack Trace: {ex.StackTrace}");
                 MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}\nStack Trace: {ex.StackTrace}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
