@@ -451,17 +451,17 @@ namespace SLF
             this.panel_girdi_rapor_olustur.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.panel_girdi_rapor_olustur.Controls.Add(this.label_girdi_rapor);
             this.panel_girdi_rapor_olustur.Controls.Add(this.raporGoruntuleButonu);
-            this.panel_girdi_rapor_olustur.Location = new System.Drawing.Point(1388, 4);
+            this.panel_girdi_rapor_olustur.Location = new System.Drawing.Point(1146, 4);
             this.panel_girdi_rapor_olustur.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel_girdi_rapor_olustur.Name = "panel_girdi_rapor_olustur";
-            this.panel_girdi_rapor_olustur.Size = new System.Drawing.Size(192, 65);
+            this.panel_girdi_rapor_olustur.Size = new System.Drawing.Size(127, 65);
             this.panel_girdi_rapor_olustur.TabIndex = 15;
             // 
             // label_girdi_rapor
             // 
             this.label_girdi_rapor.AutoSize = true;
             this.label_girdi_rapor.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label_girdi_rapor.Location = new System.Drawing.Point(3, 5);
+            this.label_girdi_rapor.Location = new System.Drawing.Point(3, 1);
             this.label_girdi_rapor.Name = "label_girdi_rapor";
             this.label_girdi_rapor.Size = new System.Drawing.Size(120, 23);
             this.label_girdi_rapor.TabIndex = 7;
@@ -470,16 +470,16 @@ namespace SLF
             // raporGoruntuleButonu
             // 
             this.raporGoruntuleButonu.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.raporGoruntuleButonu.BackColor = System.Drawing.Color.White;
+            this.raporGoruntuleButonu.BackColor = System.Drawing.Color.Black;
             this.raporGoruntuleButonu.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("raporGoruntuleButonu.BackgroundImage")));
             this.raporGoruntuleButonu.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.raporGoruntuleButonu.ForeColor = System.Drawing.Color.Transparent;
-            this.raporGoruntuleButonu.Location = new System.Drawing.Point(131, 14);
+            this.raporGoruntuleButonu.ForeColor = System.Drawing.Color.Gainsboro;
+            this.raporGoruntuleButonu.Location = new System.Drawing.Point(39, 26);
             this.raporGoruntuleButonu.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.raporGoruntuleButonu.Name = "raporGoruntuleButonu";
-            this.raporGoruntuleButonu.Size = new System.Drawing.Size(43, 36);
-            this.raporGoruntuleButonu.TabIndex = 6;
-            this.raporGoruntuleButonu.UseVisualStyleBackColor = false;
+            this.raporGoruntuleButonu.Size = new System.Drawing.Size(43, 34);
+            this.raporGoruntuleButonu.TabIndex = 1;
+            this.raporGoruntuleButonu.UseVisualStyleBackColor = true;
             this.raporGoruntuleButonu.Click += new System.EventHandler(this.raporGoruntuleButonu_Click);
             // 
             // dataGridView_girdi
@@ -527,10 +527,10 @@ namespace SLF
             this.panel_girdi_dısa_aktar.Controls.Add(this.label_dısa_aktar);
             this.panel_girdi_dısa_aktar.Controls.Add(this.ExcelDownloadButton);
             this.panel_girdi_dısa_aktar.Controls.Add(this.csvExportButton);
-            this.panel_girdi_dısa_aktar.Location = new System.Drawing.Point(1074, 4);
+            this.panel_girdi_dısa_aktar.Location = new System.Drawing.Point(1027, 4);
             this.panel_girdi_dısa_aktar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel_girdi_dısa_aktar.Name = "panel_girdi_dısa_aktar";
-            this.panel_girdi_dısa_aktar.Size = new System.Drawing.Size(211, 65);
+            this.panel_girdi_dısa_aktar.Size = new System.Drawing.Size(113, 65);
             this.panel_girdi_dısa_aktar.TabIndex = 14;
             // 
             // label_dısa_aktar
@@ -550,7 +550,7 @@ namespace SLF
             this.ExcelDownloadButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("ExcelDownloadButton.BackgroundImage")));
             this.ExcelDownloadButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ExcelDownloadButton.ForeColor = System.Drawing.Color.Transparent;
-            this.ExcelDownloadButton.Location = new System.Drawing.Point(105, 14);
+            this.ExcelDownloadButton.Location = new System.Drawing.Point(7, 23);
             this.ExcelDownloadButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ExcelDownloadButton.Name = "ExcelDownloadButton";
             this.ExcelDownloadButton.Size = new System.Drawing.Size(43, 36);
@@ -565,7 +565,7 @@ namespace SLF
             this.csvExportButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("csvExportButton.BackgroundImage")));
             this.csvExportButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.csvExportButton.ForeColor = System.Drawing.Color.Transparent;
-            this.csvExportButton.Location = new System.Drawing.Point(153, 14);
+            this.csvExportButton.Location = new System.Drawing.Point(56, 23);
             this.csvExportButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.csvExportButton.Name = "csvExportButton";
             this.csvExportButton.Size = new System.Drawing.Size(43, 36);
@@ -2315,7 +2315,7 @@ namespace SLF
             this.tabPage_dusuk_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_dusuk_senaryo.Name = "tabPage_dusuk_senaryo";
             this.tabPage_dusuk_senaryo.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_dusuk_senaryo.Size = new System.Drawing.Size(824, 643);
+            this.tabPage_dusuk_senaryo.Size = new System.Drawing.Size(824, 617);
             this.tabPage_dusuk_senaryo.TabIndex = 1;
             this.tabPage_dusuk_senaryo.Text = "Düşük Senaryo";
             this.tabPage_dusuk_senaryo.UseVisualStyleBackColor = true;
@@ -2351,7 +2351,7 @@ namespace SLF
             this.ELFLowSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
             this.ELFLowSenaryoTable.RowHeadersWidth = 18;
             this.ELFLowSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(818, 639);
+            this.ELFLowSenaryoTable.Size = new System.Drawing.Size(818, 613);
             this.ELFLowSenaryoTable.TabIndex = 1;
             this.ELFLowSenaryoTable.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.ELFLowSenaryoTable_EditingControlShowing);
             // 
@@ -2363,7 +2363,7 @@ namespace SLF
             this.tabPage_baz_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_baz_senaryo.Name = "tabPage_baz_senaryo";
             this.tabPage_baz_senaryo.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_baz_senaryo.Size = new System.Drawing.Size(824, 643);
+            this.tabPage_baz_senaryo.Size = new System.Drawing.Size(824, 617);
             this.tabPage_baz_senaryo.TabIndex = 2;
             this.tabPage_baz_senaryo.Text = "Baz Senaryo";
             this.tabPage_baz_senaryo.UseVisualStyleBackColor = true;
@@ -2393,7 +2393,7 @@ namespace SLF
             dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             this.ELFBaseSenaryoTable.RowsDefaultCellStyle = dataGridViewCellStyle12;
             this.ELFBaseSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(818, 639);
+            this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(818, 613);
             this.ELFBaseSenaryoTable.TabIndex = 1;
             this.ELFBaseSenaryoTable.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.ELFBaseSenaryoTable_EditingControlShowing);
             // 
@@ -2405,7 +2405,7 @@ namespace SLF
             this.tabPage_yuksek_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_yuksek_senaryo.Name = "tabPage_yuksek_senaryo";
             this.tabPage_yuksek_senaryo.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_yuksek_senaryo.Size = new System.Drawing.Size(824, 643);
+            this.tabPage_yuksek_senaryo.Size = new System.Drawing.Size(824, 617);
             this.tabPage_yuksek_senaryo.TabIndex = 3;
             this.tabPage_yuksek_senaryo.Text = "Yüksek Senaryo";
             this.tabPage_yuksek_senaryo.UseVisualStyleBackColor = true;
@@ -2435,7 +2435,7 @@ namespace SLF
             dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             this.ELFHighSenaryoTable.RowsDefaultCellStyle = dataGridViewCellStyle15;
             this.ELFHighSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFHighSenaryoTable.Size = new System.Drawing.Size(818, 639);
+            this.ELFHighSenaryoTable.Size = new System.Drawing.Size(818, 613);
             this.ELFHighSenaryoTable.TabIndex = 1;
             this.ELFHighSenaryoTable.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.ELFHighSenaryoTable_EditingControlShowing);
             // 
@@ -2447,7 +2447,7 @@ namespace SLF
             this.tabPage_maks_senaryo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_maks_senaryo.Name = "tabPage_maks_senaryo";
             this.tabPage_maks_senaryo.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_maks_senaryo.Size = new System.Drawing.Size(824, 643);
+            this.tabPage_maks_senaryo.Size = new System.Drawing.Size(824, 617);
             this.tabPage_maks_senaryo.TabIndex = 4;
             this.tabPage_maks_senaryo.Text = "Maksimum Senaryo";
             this.tabPage_maks_senaryo.UseVisualStyleBackColor = true;
@@ -2480,7 +2480,7 @@ namespace SLF
             this.ELFMaxSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle17;
             this.ELFMaxSenaryoTable.RowHeadersWidth = 18;
             this.ELFMaxSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(818, 639);
+            this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(818, 613);
             this.ELFMaxSenaryoTable.TabIndex = 1;
             this.ELFMaxSenaryoTable.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.ELFMaxSenaryoTable_EditingControlShowing);
             // 
@@ -2489,7 +2489,7 @@ namespace SLF
             this.EkonometrikSonuclarTabPage.Controls.Add(this.ELFSonuçlarTabControls);
             this.EkonometrikSonuclarTabPage.Location = new System.Drawing.Point(4, 4);
             this.EkonometrikSonuclarTabPage.Name = "EkonometrikSonuclarTabPage";
-            this.EkonometrikSonuclarTabPage.Size = new System.Drawing.Size(1084, 685);
+            this.EkonometrikSonuclarTabPage.Size = new System.Drawing.Size(1084, 659);
             this.EkonometrikSonuclarTabPage.TabIndex = 1;
             this.EkonometrikSonuclarTabPage.Text = "Sonuçları Görüntüle";
             this.EkonometrikSonuclarTabPage.UseVisualStyleBackColor = true;
@@ -2509,7 +2509,7 @@ namespace SLF
             this.ELFSonuçlarTabControls.Name = "ELFSonuçlarTabControls";
             this.ELFSonuçlarTabControls.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.ELFSonuçlarTabControls.SelectedIndex = 0;
-            this.ELFSonuçlarTabControls.Size = new System.Drawing.Size(829, 553);
+            this.ELFSonuçlarTabControls.Size = new System.Drawing.Size(829, 527);
             this.ELFSonuçlarTabControls.TabIndex = 4;
             // 
             // tabPage_min_sonuclar
@@ -2519,7 +2519,7 @@ namespace SLF
             this.tabPage_min_sonuclar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_min_sonuclar.Name = "tabPage_min_sonuclar";
             this.tabPage_min_sonuclar.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_min_sonuclar.Size = new System.Drawing.Size(821, 519);
+            this.tabPage_min_sonuclar.Size = new System.Drawing.Size(821, 493);
             this.tabPage_min_sonuclar.TabIndex = 0;
             this.tabPage_min_sonuclar.Text = "Minimum Sonuçlar";
             this.tabPage_min_sonuclar.UseVisualStyleBackColor = true;
@@ -2545,7 +2545,7 @@ namespace SLF
             this.ELFMinimumResultsTable.RowHeadersWidth = 51;
             dataGridViewCellStyle19.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             this.ELFMinimumResultsTable.RowsDefaultCellStyle = dataGridViewCellStyle19;
-            this.ELFMinimumResultsTable.Size = new System.Drawing.Size(815, 515);
+            this.ELFMinimumResultsTable.Size = new System.Drawing.Size(815, 489);
             this.ELFMinimumResultsTable.TabIndex = 0;
             this.ELFMinimumResultsTable.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.ELFMinimumResultsTable_EditingControlShowing);
             // 
@@ -2556,7 +2556,7 @@ namespace SLF
             this.tabPage_dusuk_sonuclar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_dusuk_sonuclar.Name = "tabPage_dusuk_sonuclar";
             this.tabPage_dusuk_sonuclar.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_dusuk_sonuclar.Size = new System.Drawing.Size(821, 519);
+            this.tabPage_dusuk_sonuclar.Size = new System.Drawing.Size(821, 493);
             this.tabPage_dusuk_sonuclar.TabIndex = 1;
             this.tabPage_dusuk_sonuclar.Text = "Düşük Sonuçlar";
             this.tabPage_dusuk_sonuclar.UseVisualStyleBackColor = true;
@@ -2588,7 +2588,7 @@ namespace SLF
             dataGridViewCellStyle21.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.ELFDüşükResultsTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle21;
             this.ELFDüşükResultsTable.RowHeadersWidth = 51;
-            this.ELFDüşükResultsTable.Size = new System.Drawing.Size(815, 515);
+            this.ELFDüşükResultsTable.Size = new System.Drawing.Size(815, 489);
             this.ELFDüşükResultsTable.TabIndex = 1;
             this.ELFDüşükResultsTable.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.ELFDüşükResultsTable_EditingControlShowing);
             // 
@@ -2599,7 +2599,7 @@ namespace SLF
             this.tabPage_baz_sonuclar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_baz_sonuclar.Name = "tabPage_baz_sonuclar";
             this.tabPage_baz_sonuclar.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_baz_sonuclar.Size = new System.Drawing.Size(821, 519);
+            this.tabPage_baz_sonuclar.Size = new System.Drawing.Size(821, 493);
             this.tabPage_baz_sonuclar.TabIndex = 2;
             this.tabPage_baz_sonuclar.Text = "Baz Sonuçlar";
             this.tabPage_baz_sonuclar.UseVisualStyleBackColor = true;
@@ -2631,7 +2631,7 @@ namespace SLF
             dataGridViewCellStyle23.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.ELFBazResultsTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle23;
             this.ELFBazResultsTable.RowHeadersWidth = 51;
-            this.ELFBazResultsTable.Size = new System.Drawing.Size(815, 515);
+            this.ELFBazResultsTable.Size = new System.Drawing.Size(815, 489);
             this.ELFBazResultsTable.TabIndex = 1;
             this.ELFBazResultsTable.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.ELFBazResultsTable_EditingControlShowing);
             // 
@@ -2642,7 +2642,7 @@ namespace SLF
             this.tabPage_yuksek_sonuclar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_yuksek_sonuclar.Name = "tabPage_yuksek_sonuclar";
             this.tabPage_yuksek_sonuclar.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_yuksek_sonuclar.Size = new System.Drawing.Size(821, 519);
+            this.tabPage_yuksek_sonuclar.Size = new System.Drawing.Size(821, 493);
             this.tabPage_yuksek_sonuclar.TabIndex = 3;
             this.tabPage_yuksek_sonuclar.Text = "Yüksek Sonuçlar";
             this.tabPage_yuksek_sonuclar.UseVisualStyleBackColor = true;
@@ -2668,7 +2668,7 @@ namespace SLF
             this.ELFYüksekResultsTable.RowHeadersWidth = 51;
             dataGridViewCellStyle25.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             this.ELFYüksekResultsTable.RowsDefaultCellStyle = dataGridViewCellStyle25;
-            this.ELFYüksekResultsTable.Size = new System.Drawing.Size(815, 515);
+            this.ELFYüksekResultsTable.Size = new System.Drawing.Size(815, 489);
             this.ELFYüksekResultsTable.TabIndex = 1;
             this.ELFYüksekResultsTable.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.ELFYüksekResultsTable_EditingControlShowing);
             // 
@@ -2679,7 +2679,7 @@ namespace SLF
             this.tabPage_maks_sonuclar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage_maks_sonuclar.Name = "tabPage_maks_sonuclar";
             this.tabPage_maks_sonuclar.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage_maks_sonuclar.Size = new System.Drawing.Size(821, 519);
+            this.tabPage_maks_sonuclar.Size = new System.Drawing.Size(821, 493);
             this.tabPage_maks_sonuclar.TabIndex = 4;
             this.tabPage_maks_sonuclar.Text = "Maksimum Sonuçlar";
             this.tabPage_maks_sonuclar.UseVisualStyleBackColor = true;
@@ -2712,7 +2712,7 @@ namespace SLF
             dataGridViewCellStyle27.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.ELFMaksimumResultsTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle27;
             this.ELFMaksimumResultsTable.RowHeadersWidth = 51;
-            this.ELFMaksimumResultsTable.Size = new System.Drawing.Size(815, 515);
+            this.ELFMaksimumResultsTable.Size = new System.Drawing.Size(815, 489);
             this.ELFMaksimumResultsTable.TabIndex = 1;
             this.ELFMaksimumResultsTable.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.ELFMaksimumResultsTable_EditingControlShowing);
             // 
@@ -2721,7 +2721,7 @@ namespace SLF
             this.EkonometrikGrafiklerTabPage.Controls.Add(this.pictureBox_ekonometrik);
             this.EkonometrikGrafiklerTabPage.Location = new System.Drawing.Point(4, 4);
             this.EkonometrikGrafiklerTabPage.Name = "EkonometrikGrafiklerTabPage";
-            this.EkonometrikGrafiklerTabPage.Size = new System.Drawing.Size(1084, 685);
+            this.EkonometrikGrafiklerTabPage.Size = new System.Drawing.Size(1084, 659);
             this.EkonometrikGrafiklerTabPage.TabIndex = 2;
             this.EkonometrikGrafiklerTabPage.Text = "Grafikler";
             this.EkonometrikGrafiklerTabPage.UseVisualStyleBackColor = true;
@@ -2733,7 +2733,7 @@ namespace SLF
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox_ekonometrik.Location = new System.Drawing.Point(292, 84);
             this.pictureBox_ekonometrik.Name = "pictureBox_ekonometrik";
-            this.pictureBox_ekonometrik.Size = new System.Drawing.Size(723, 488);
+            this.pictureBox_ekonometrik.Size = new System.Drawing.Size(723, 462);
             this.pictureBox_ekonometrik.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox_ekonometrik.TabIndex = 0;
             this.pictureBox_ekonometrik.TabStop = false;
