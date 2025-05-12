@@ -591,25 +591,25 @@ namespace SLF.Services
                 string imarPlansCodePath = Path.Combine(imarPlansPath, "kod");
                 string imarPlansDataPath = Path.Combine(imarPlansPath, "data");
 
-                // Deep Learning alt klasörlerini oluştur
-                if (!Directory.Exists(deepLearningPath))
-                    Directory.CreateDirectory(deepLearningPath);
+                //// Deep Learning alt klasörlerini oluştur
+                //if (!Directory.Exists(deepLearningPath))
+                //    Directory.CreateDirectory(deepLearningPath);
 
-                if (!Directory.Exists(deepLearningCodePath))
-                    Directory.CreateDirectory(deepLearningCodePath);
+                //if (!Directory.Exists(deepLearningCodePath))
+                //    Directory.CreateDirectory(deepLearningCodePath);
 
-                if (!Directory.Exists(deepLearningTrainPath))
-                    Directory.CreateDirectory(deepLearningTrainPath);
+                //if (!Directory.Exists(deepLearningTrainPath))
+                //    Directory.CreateDirectory(deepLearningTrainPath);
 
-                // İmar planları alt klasörlerini oluştur
-                if (!Directory.Exists(imarPlansPath))
-                    Directory.CreateDirectory(imarPlansPath);
+                //// İmar planları alt klasörlerini oluştur
+                //if (!Directory.Exists(imarPlansPath))
+                //    Directory.CreateDirectory(imarPlansPath);
 
-                if (!Directory.Exists(imarPlansCodePath))
-                    Directory.CreateDirectory(imarPlansCodePath);
+                //if (!Directory.Exists(imarPlansCodePath))
+                //    Directory.CreateDirectory(imarPlansCodePath);
 
-                if (!Directory.Exists(imarPlansDataPath))
-                    Directory.CreateDirectory(imarPlansDataPath);
+                //if (!Directory.Exists(imarPlansDataPath))
+                //    Directory.CreateDirectory(imarPlansDataPath);
             }
             catch (Exception ex)
             {
@@ -671,78 +671,78 @@ namespace SLF.Services
         /// </summary>
         /// <param name="sourcePath">Kaynak dosya yolu</param>
         /// <returns>Kopyalanan dosyanın hedef yolu</returns>
-        public static string CopyKmlToImarPlansData(string sourcePath)
-        {
-            try
-            {
-                // Klasör yoksa oluştur
-                if (!Directory.Exists(ImarPlansDataDirectory))
-                {
-                    Directory.CreateDirectory(ImarPlansDataDirectory);
-                }
+        //public static string CopyKmlToImarPlansData(string sourcePath)
+        //{
+        //    try
+        //    {
+        //        // Klasör yoksa oluştur
+        //        if (!Directory.Exists(ImarPlansDataDirectory))
+        //        {
+        //            Directory.CreateDirectory(ImarPlansDataDirectory);
+        //        }
 
-                string fileName = Path.GetFileName(sourcePath);
-                string destinationPath = Path.Combine(ImarPlansDataDirectory, fileName);
+        //        string fileName = Path.GetFileName(sourcePath);
+        //        string destinationPath = Path.Combine(ImarPlansDataDirectory, fileName);
 
-                // Aynı isimde dosya varsa, benzersiz isim oluştur
-                if (File.Exists(destinationPath))
-                {
-                    string fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
-                    string extension = Path.GetExtension(fileName);
-                    string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                    destinationPath = Path.Combine(ImarPlansDataDirectory, $"{fileNameWithoutExt}_{timestamp}{extension}");
-                }
+        //        // Aynı isimde dosya varsa, benzersiz isim oluştur
+        //        if (File.Exists(destinationPath))
+        //        {
+        //            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
+        //            string extension = Path.GetExtension(fileName);
+        //            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        //            destinationPath = Path.Combine(ImarPlansDataDirectory, $"{fileNameWithoutExt}_{timestamp}{extension}");
+        //        }
 
-                File.Copy(sourcePath, destinationPath, true);
-                Debug.WriteLine($"KML dosyası kopyalandı: {destinationPath}");
+        //        File.Copy(sourcePath, destinationPath, true);
+        //        Debug.WriteLine($"KML dosyası kopyalandı: {destinationPath}");
 
-                return destinationPath;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"KML dosyası kopyalanırken hata: {ex.Message}");
-                throw;
-            }
-        }
+        //        return destinationPath;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine($"KML dosyası kopyalanırken hata: {ex.Message}");
+        //        throw;
+        //    }
+        //}
 
         /// <summary>
         /// CSV dosyasını İmar planları veri klasörüne kopyalar
         /// </summary>
         /// <param name="sourcePath">Kaynak dosya yolu</param>
         /// <returns>Kopyalanan dosyanın hedef yolu</returns>
-        public static string CopyCsvToImarPlansData(string sourcePath)
-        {
-            try
-            {
-                // Klasör yoksa oluştur
-                if (!Directory.Exists(ImarPlansDataDirectory))
-                {
-                    Directory.CreateDirectory(ImarPlansDataDirectory);
-                }
+        //public static string CopyCsvToImarPlansData(string sourcePath)
+        //{
+        //    try
+        //    {
+        //        // Klasör yoksa oluştur
+        //        if (!Directory.Exists(ImarPlansDataDirectory))
+        //        {
+        //            Directory.CreateDirectory(ImarPlansDataDirectory);
+        //        }
 
-                string fileName = Path.GetFileName(sourcePath);
-                string destinationPath = Path.Combine(ImarPlansDataDirectory, fileName);
+        //        string fileName = Path.GetFileName(sourcePath);
+        //        string destinationPath = Path.Combine(ImarPlansDataDirectory, fileName);
 
-                // Aynı isimde dosya varsa, benzersiz isim oluştur
-                if (File.Exists(destinationPath))
-                {
-                    string fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
-                    string extension = Path.GetExtension(fileName);
-                    string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                    destinationPath = Path.Combine(ImarPlansDataDirectory, $"{fileNameWithoutExt}_{timestamp}{extension}");
-                }
+        //        // Aynı isimde dosya varsa, benzersiz isim oluştur
+        //        if (File.Exists(destinationPath))
+        //        {
+        //            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
+        //            string extension = Path.GetExtension(fileName);
+        //            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        //            destinationPath = Path.Combine(ImarPlansDataDirectory, $"{fileNameWithoutExt}_{timestamp}{extension}");
+        //        }
 
-                File.Copy(sourcePath, destinationPath, true);
-                Debug.WriteLine($"CSV dosyası kopyalandı: {destinationPath}");
+        //        File.Copy(sourcePath, destinationPath, true);
+        //        Debug.WriteLine($"CSV dosyası kopyalandı: {destinationPath}");
 
-                return destinationPath;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"CSV dosyası kopyalanırken hata: {ex.Message}");
-                throw;
-            }
-        }
+        //        return destinationPath;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine($"CSV dosyası kopyalanırken hata: {ex.Message}");
+        //        throw;
+        //    }
+        //}
 
         // İl/İlçe formatında tam yol
         public static string FullPath => !string.IsNullOrEmpty(SelectedCity) && !string.IsNullOrEmpty(SelectedDistrict)
