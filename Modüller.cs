@@ -63,6 +63,9 @@ namespace SLF
 
         public Panel imar_legendPanel;
 
+        // eklenecek noktasal yükler ELF ye girsin mi
+        public bool point_load_konsolidasyonu = false;
+
         public bool isImported;
         private System.Windows.Forms.Timer cursorTimer;
 
@@ -5448,6 +5451,7 @@ namespace SLF
             isSelecting_YUK = false;
             isSelecting_Musaade = false;
             isSelecting_Kentsel_Donusum = false;
+            point_load_konsolidasyonu = false;
         }
 
 
@@ -6344,6 +6348,20 @@ namespace SLF
 
         private void Point_Load_Ekle_Click(object sender, EventArgs e)
         {
+
+            // Show the confirmation dialog for navigating to the home page
+            DialogResult result_dialog = MessageBox.Show(
+                "Ekleyeceğiniz noktasal yük, ELF sonuçları ile konsolide edilsin mi?",
+                "Noktasal Yük Konsolidasyonu",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (result_dialog == DialogResult.Yes)
+            {
+                point_load_konsolidasyonu = true;
+            }
+
             isSelecting_polygon = true;
             isSelecting_Kentsel_Donusum = false;
             isSelecting_Musaade = false;

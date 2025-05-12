@@ -415,30 +415,27 @@ namespace SLF
             }
         }
 
+        private List<string> dropdownColumns = new List<string>();
+
         private void SetupDropdownColumns(Dictionary<string, HashSet<string>> columnValues)
         {
-
             if (isSelecting_YUK)
             {
-                // Define the columns that should remain manually defined.
                 manualColumns = new HashSet<string>
-                {
-                    "Polygon ID",
-                    "Koordinatlar",
-                    "Çizilen Alan (m2)"
-                };
-
-            } else if (isSelecting_Musaade)
+        {
+            "Polygon ID",
+            "Koordinatlar",
+            "Çizilen Alan (m2)"
+        };
+            }
+            else if (isSelecting_Musaade)
             {
-                // Define the columns that should remain manually defined.
                 manualColumns = new HashSet<string>
-                {
-                    "Polygon ID"
-                };
+        {
+            "Polygon ID"
+        };
             }
 
-
-            // Store current cell values for dropdown columns (from the first non-new row).
             var currentValues = new Dictionary<string, object>();
             foreach (DataGridViewRow row in PoligonDataGridView.Rows)
             {
@@ -451,11 +448,10 @@ namespace SLF
                             currentValues[column.Name] = row.Cells[column.Name].Value;
                         }
                     }
-                    break; // Only capture values from one row.
+                    break;
                 }
             }
 
-            // Identify columns to be replaced with dropdowns.
             var columnsToReplace = new List<(int Index, string Name)>();
             foreach (DataGridViewColumn column in PoligonDataGridView.Columns)
             {
@@ -465,10 +461,10 @@ namespace SLF
                 }
             }
 
-            // Replace each target column with a DataGridViewComboBoxColumn.
+            dropdownColumns.Clear();
+
             foreach (var (index, name) in columnsToReplace)
             {
-                // Ensure there is a valid set of values for the current column.
                 if (!columnValues.ContainsKey(name))
                     continue;
 
@@ -477,17 +473,18 @@ namespace SLF
                     Name = name,
                     HeaderText = name,
                     DataPropertyName = name,
-                    DataSource = columnValues[name].OrderBy(x => x).ToList(), // Sorted for better UX
+                    DataSource = columnValues[name].OrderBy(x => x).ToList(),
                     ValueType = typeof(string),
                     FlatStyle = FlatStyle.Standard
                 };
 
-                // Remove the existing column and insert the new dropdown column.
                 PoligonDataGridView.Columns.Remove(name);
                 PoligonDataGridView.Columns.Insert(index, comboBoxColumn);
+
+                dropdownColumns.Add(name);
             }
 
-            // Reapply stored values if they are still valid.
+            // Reapply stored values, allowing custom values to persist
             foreach (DataGridViewRow row in PoligonDataGridView.Rows)
             {
                 if (!row.IsNewRow)
@@ -497,11 +494,10 @@ namespace SLF
                         var cell = row.Cells[kvp.Key];
                         if (cell is DataGridViewComboBoxCell comboBoxCell && kvp.Value != null)
                         {
-                            // Allow the original value even if it's not in the dropdown list
-                            cell.Value = kvp.Value; // Restore original value
+                            cell.Value = kvp.Value; // Restore original value, including custom ones
                         }
                     }
-                    break; // Only process the first non-new row.
+                    break;
                 }
             }
         }
@@ -707,25 +703,83 @@ namespace SLF
         {
             if (e.Control is ComboBox comboBox)
             {
-                // Set the ComboBox to allow manual input
                 comboBox.DropDownStyle = ComboBoxStyle.DropDown;
-
-                // Optional: Enable autocomplete for better UX
                 comboBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
                 comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
+
+                comboBox.Leave -= ComboBox_Leave;
+                comboBox.TextChanged -= ComboBox_TextChanged;
+
+                comboBox.Leave += ComboBox_Leave;
+                comboBox.TextChanged += ComboBox_TextChanged;
             }
 
-            // Ensure the editing control is a TextBox
             if (e.Control is TextBox textBox)
             {
-                // Get the current column name
                 string columnName = PoligonDataGridView.Columns[PoligonDataGridView.CurrentCell.ColumnIndex].Name;
-
-                // Log to verify the event is firing
                 Console.WriteLine($"EditingControlShowing: ColumnName={columnName}, isSelecting_YGA={isSelecting_YGA}");
-
-                // Add the KeyPress event handler
                 textBox.KeyPress += (s, ev) => TextBox_KeyPress_NumericWithDecimalForTAKS(s, ev, columnName);
+            }
+        }
+
+        private string currentComboBoxValue = null;
+
+        private void ComboBox_TextChanged(object sender, EventArgs e)
+        {
+            if (sender is ComboBox comboBox)
+            {
+                currentComboBoxValue = comboBox.Text;
+                Console.WriteLine($"ComboBox_TextChanged: Value={currentComboBoxValue}");
+            }
+        }
+
+        private void ComboBox_Leave(object sender, EventArgs e)
+        {
+            if (sender is ComboBox comboBox)
+            {
+                try
+                {
+                    currentComboBoxValue = comboBox.Text;
+                    Console.WriteLine($"ComboBox_Leave: Value={currentComboBoxValue}");
+
+                    var cell = PoligonDataGridView.CurrentCell;
+                    if (cell != null && !string.IsNullOrEmpty(currentComboBoxValue))
+                    {
+                        int rowIndex = PoligonDataGridView.CurrentCell.RowIndex;
+                        string columnName = PoligonDataGridView.Columns[cell.ColumnIndex].Name;
+
+                        // Add the custom value to the column's DataSource to make it valid
+                        if (dropdownColumns.Contains(columnName) && columnValues.ContainsKey(columnName))
+                        {
+                            if (!columnValues[columnName].Contains(currentComboBoxValue))
+                            {
+                                columnValues[columnName].Add(currentComboBoxValue);
+                                Console.WriteLine($"ComboBox_Leave: Added {currentComboBoxValue} to DataSource for {columnName}");
+
+                                // Update the DataGridViewComboBoxColumn's DataSource
+                                if (PoligonDataGridView.Columns[columnName] is DataGridViewComboBoxColumn comboBoxColumn)
+                                {
+                                    comboBoxColumn.DataSource = null; // Temporarily clear to avoid binding issues
+                                    comboBoxColumn.DataSource = columnValues[columnName].OrderBy(x => x).ToList();
+                                    Console.WriteLine($"ComboBox_Leave: Updated DataSource for {columnName}");
+                                }
+                            }
+                        }
+
+                        // Force the cell to accept the value
+                        cell.Value = currentComboBoxValue;
+                        Console.WriteLine($"ComboBox_Leave: Forced cell value to {currentComboBoxValue}");
+
+                        // Update the DataTable
+                        dataTable.Rows[rowIndex][columnName] = currentComboBoxValue;
+                        Console.WriteLine($"ComboBox_Leave: Updated DataTable with {currentComboBoxValue}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"ComboBox_Leave Error: {ex.Message}");
+                    MessageBox.Show($"Hata: {ex.Message}", "Düzenleme Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -770,22 +824,101 @@ namespace SLF
 
         private void PoligonDataGridView_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
         {
-            if (isSelecting_YGA && e.ColumnIndex == PoligonDataGridView.Columns["TAKS"]?.Index)
+            try
             {
-                string input = e.FormattedValue?.ToString();
-                if (!string.IsNullOrWhiteSpace(input))
+                if (isSelecting_YGA && e.ColumnIndex == PoligonDataGridView.Columns["TAKS"]?.Index)
                 {
-                    // Replace both '.' and culture-specific decimal separator with '.' for parsing
-                    string decimalSeparator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
-                    input = input.Replace(decimalSeparator, ".").Replace(".", ".");
-
-                    // Parse using InvariantCulture
-                    if (!double.TryParse(input, NumberStyles.Any, CultureInfo.InvariantCulture, out double taksValue) || taksValue < 0.1 || taksValue > 1)
+                    string input = e.FormattedValue?.ToString();
+                    if (!string.IsNullOrWhiteSpace(input))
                     {
-                        e.Cancel = true; // Prevent the cell from exiting edit mode
-                        MessageBox.Show("Hata: TAKS değeri 0.1 ile 1 arasında olmalıdır!", "Geçersiz Değer", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        string decimalSeparator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+                        input = input.Replace(decimalSeparator, ".").Replace(".", ".");
+
+                        if (!double.TryParse(input, NumberStyles.Any, CultureInfo.InvariantCulture, out double taksValue) || taksValue < 0.1 || taksValue > 1)
+                        {
+                            e.Cancel = true;
+                            MessageBox.Show("Hata: TAKS değeri 0.1 ile 1 arasında olmalıdır!", "Geçersiz Değer", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
                     }
                 }
+
+                string columnName = PoligonDataGridView.Columns[e.ColumnIndex].Name;
+                if (dropdownColumns.Contains(columnName))
+                {
+                    string input = e.FormattedValue?.ToString();
+                    Console.WriteLine($"CellValidating: Column={columnName}, Input={input}");
+                    if (string.IsNullOrWhiteSpace(input))
+                    {
+                        e.Cancel = false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"CellValidating Error: {ex.Message}");
+                e.Cancel = true;
+                MessageBox.Show($"Hata: {ex.Message}", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void PoligonDataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            try
+            {
+                string columnName = PoligonDataGridView.Columns[e.ColumnIndex].Name;
+                var cell = PoligonDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex];
+
+                string editedValue = currentComboBoxValue ?? cell.Value?.ToString();
+
+                if (!string.IsNullOrEmpty(editedValue))
+                {
+                    Console.WriteLine($"CellEndEdit: Column={columnName}, EditedValue={editedValue}, CellValueBefore={cell.Value}");
+
+                    // Save to the DataTable
+                    dataTable.Rows[e.RowIndex][columnName] = editedValue;
+
+                    // Force the DataGridView cell to retain the value
+                    if (dropdownColumns.Contains(columnName))
+                    {
+                        cell.Value = editedValue;
+                        Console.WriteLine($"CellEndEdit: Forced DataGridView value to {editedValue}, CellValueAfter={cell.Value}");
+                    }
+                }
+
+                currentComboBoxValue = null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"CellEndEdit Error: {ex.Message}");
+                MessageBox.Show($"Hata: {ex.Message}", "Düzenleme Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void PoligonDataGridView_CellEnter(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            try
+            {
+                string columnName = PoligonDataGridView.Columns[e.ColumnIndex].Name;
+                var cell = PoligonDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex];
+
+                if (dropdownColumns.Contains(columnName))
+                {
+                    string dataTableValue = dataTable.Rows[e.RowIndex][columnName]?.ToString();
+                    Console.WriteLine($"CellEnter: Column={columnName}, DataTableValue={dataTableValue}, CellValue={cell.Value}");
+                    if (!string.IsNullOrEmpty(dataTableValue))
+                    {
+                        cell.Value = dataTableValue;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"CellEnter Error: {ex.Message}");
+                MessageBox.Show($"Hata: {ex.Message}", "Hücre Giriş Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

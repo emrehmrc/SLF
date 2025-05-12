@@ -96,6 +96,8 @@
             this.PoligonDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.PoligonDataGridView.Size = new System.Drawing.Size(1275, 476);
             this.PoligonDataGridView.TabIndex = 1;
+            this.PoligonDataGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.PoligonDataGridView_CellEndEdit);
+            this.PoligonDataGridView.CellEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.PoligonDataGridView_CellEnter);
             this.PoligonDataGridView.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.PoligonDataGridView_CellValidating);
             this.PoligonDataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.PoligonDataGridView_CellValueChanged_1);
             this.PoligonDataGridView.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.PoligonDataGridView_EditingControlShowing);
