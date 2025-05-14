@@ -1083,7 +1083,7 @@ namespace SLF
 
                 if (percentage > errorThreshold)
                 {
-                    string errorMessage = $"Hata Mesajı: %10’dan fazla oranda Enerji Tablo Kodu (BAGLANDIGI_TRAFO_KODU) olmayan abone mevcut uyarısı verilir. (Satır: {string.Join(", ", invalidRows)})";
+                    string errorMessage = $"Hata Mesajı: %10’dan fazla oranda Enerji Tablo Kodu (BAGLANDIGI_TRAFO_KODU) olmayan abone mevcut. (Satır: {string.Join(", ", invalidRows)})";
                     errorDataTable.Rows.Add(new object[]
                     {
                 "BAGLANDIGI_TRAFO_KODU",

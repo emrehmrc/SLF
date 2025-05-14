@@ -79,7 +79,7 @@ namespace SLF
             {
                 infoDataTable.Rows.Add(new object[]
                 {
-            "", "Projelendirilmiş yeni DTR kapasitesi", $"{invalidNewCapacityPercentage:P1}",
+            "PROJELENDIRILMIS_TRAFO_YENI_KAPASITE", "Projelendirilmiş yeni DTR kapasitesi", $"{invalidNewCapacityPercentage:P1}",
             "Projelendirilmiş yeni DTR kapasitesi mevcut DTR kapasitesinden küçük olamaz. Bu şart sağlamayan DTR'lar silinecektir."
                 });
             }
@@ -128,7 +128,7 @@ namespace SLF
             {
                 warningDataTable.Rows.Add(new object[]
                 {
-            "", "Projelendirilmiş Trafo Yatırım Yılı", $"{imputedPercentage:P1}",
+            "PROJELENDIRILMIS_TRAFO_YATIRIM_YILI", "Projelendirilmiş Trafo Yatırım Yılı", $"{imputedPercentage:P1}",
             $"Yatırım yılı NULL veya geçersiz olan {imputedCount} satır OPTIMIZE olarak güncellendi."
                 });
                 Console.WriteLine($"Added post-imputation message to warningDataTable. Total rows in warningDataTable: {warningDataTable.Rows.Count}");
@@ -305,7 +305,9 @@ namespace SLF
                         columnNullRowsMap["PROJELENDIRILMIS_TRAFO_ID"] = invalidRows;
                         infoDataTable.Rows.Add(new object[]
                         {
-                    "", "Projelendirilmiş Trafo ID", $"{invalidPercentage:P1}",
+                    column.ColumnName, 
+                            "Projelendirilmiş Trafo ID",
+                            $"{invalidPercentage:P1}",
                     $"PROJELENDIRILMIS_TRAFO_ID sütununda {invalidCount} satır NULL veya #N/A değer içeriyor ve silinecek."
                         });
                         Console.WriteLine($"Added deletion message to infoDataTable for PROJELENDIRILMIS_TRAFO_ID. Total rows in infoDataTable: {infoDataTable.Rows.Count}");
@@ -364,7 +366,7 @@ namespace SLF
                         columnNullRowsMap["YATIRIM_YILI_EARLY"] = rowsToDelete;
                         infoDataTable.Rows.Add(new object[]
                         {
-                    "", "Projelendirilmiş Trafo Yatırım Yılı", $"{deletedPercentage:P1}",
+                    column.ColumnName, "Projelendirilmiş Trafo Yatırım Yılı", $"{deletedPercentage:P1}",
                     $"{horizonYearValue} horizon periyodundan önceki {rowsToDeleteCount} satır silinecek."
                         });
                         Console.WriteLine($"Added deletion message to infoDataTable. Total rows in infoDataTable: {infoDataTable.Rows.Count}");
@@ -374,7 +376,7 @@ namespace SLF
                     {
                         warningDataTable.Rows.Add(new object[]
                         {
-                    "", "Projelendirilmiş Trafo Yatırım Yılı", $"{nullOrInvalidPercentage:P1}",
+                    column.ColumnName, "Projelendirilmiş Trafo Yatırım Yılı", $"{nullOrInvalidPercentage:P1}",
                     $"Yatırım yılı NULL veya geçersiz olan {nullOrInvalidCount} satır OPTIMIZE olarak belirlenecek."
                         });
                         Console.WriteLine($"Added imputation message to warningDataTable. Total rows in warningDataTable: {warningDataTable.Rows.Count}");

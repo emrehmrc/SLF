@@ -1,13 +1,14 @@
-﻿using OfficeOpenXml; 
+﻿using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using SLF.Services;
 namespace SLF
-{   
+{
     public class InvalidColumnHeadersException : Exception
     {
         public InvalidColumnHeadersException(string message) : base(message)
@@ -159,17 +160,18 @@ namespace SLF
                 "Enerji Müsaadeleri Verileri", new List<string> {
                     "ENERJI_MUSAADE_NO",
                     "ENERJI_MUSAADE_ABONE_GRUBU",
-                    "ENERJI_MUSAADE_ABONE_FAALIYET_KATEGORI",
-                    "ENERJI_MUSAADE_TALEP_DURUMU",
+                    "Tipi",
+                   // "ENERJI_MUSAADE_ABONE_FAALIYET_KATEGORI",
+                    //"ENERJI_MUSAADE_TALEP_DURUMU",
                     "ENERJI_MUSAADE_GERILIM_SEVIYESI",
                     "ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL",
                     "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID",
                     "ENERJI_MUSAADE_BAGLANTI_GUCU",
-                    "ENERJI_MUSAADE_IL",
-                    "ENERJI_MUSAADE_ILCE",
-                    "ENERJI_MUSAADE_MAHALLE",
+                    //"ENERJI_MUSAADE_IL",
+                    //"ENERJI_MUSAADE_ILCE",
+                    //"ENERJI_MUSAADE_MAHALLE",
                     "ENERJI_MUSAADE_ENERJILENDIRME_YILI",
-                    "ENERJI_MUSAADE_BASVURU_TARIHI",
+                    //"ENERJI_MUSAADE_BASVURU_TARIHI",
                     "ENERJI_MUSAADE_X_KOORDINAT",
                     "ENERJI_MUSAADE_Y_KOORDINAT",
             }
@@ -196,6 +198,41 @@ namespace SLF
         private YearService _yearService = YearService.GetInstance();
 
         // Abone verileri için yıl kolonlarını ekleme
+        private void AddYearColumnsToAboneVerileri(List<string> headers)
+        {
+            // Son 5 yıl için tüketim ve talep kolonları ekle
+            for (int year = _yearService.PenultimateYear - 3; year <= _yearService.LastYear; year++)
+            {
+                if (year > 0) // Geçerli bir yıl ise
+                {
+                    headers.Add($"YIL_TUKETIM_{year}");
+                }
+            }
+
+            for (int year = _yearService.PenultimateYear - 3; year <= _yearService.LastYear; year++)
+            {
+                if (year > 0) // Geçerli bir yıl ise
+                {
+                    headers.Add($"YIL_DEMANT_{year}");
+                }
+            }
+        }
+
+        // DTR verileri için yıl kolonlarını ekleme
+        private void AddYearColumnsToDTRVerileri(List<string> headers)
+        {
+            // Son 3 yıl için talep ve tüketim kolonları ekle
+            for (int year = _yearService.PenultimateYear - 1; year <= _yearService.LastYear; year++)
+            {
+                if (year > 0) // Geçerli bir yıl ise
+                {
+                    headers.Add($"YIL_DEMANT_{year}");
+                    headers.Add($"YIL_TUKETIM_{year}");
+                }
+            }
+        }
+
+
 
 
 
@@ -256,10 +293,15 @@ namespace SLF
                     for (int col = 1; col <= colCount; col++)
                     {
                         string columnName = worksheet.Cells[1, col].Text?.Trim() ?? $"Column{col}";
+                        Type columnType = typeof(string); // Default to string
+                        if (columnName == "ABONE_X_KOORDINAT" || columnName == "ABONE_Y_KOORDINAT")
+                        {
+                            columnType = typeof(double); // Enforce double for coordinate columns
+                        }
                         dataTable.Columns.Add(new DataColumn
                         {
                             ColumnName = columnName,
-                            DataType = typeof(string), // Store as string initially
+                            DataType = columnType,
                             AllowDBNull = true
                         });
                     }
@@ -275,10 +317,23 @@ namespace SLF
                         {
                             var cell = worksheet.Cells[row, col];
                             string valueAsString = cell.Value?.ToString()?.Trim();
+                            string columnName = dataTable.Columns[col - 1].ColumnName;
 
                             if (string.IsNullOrEmpty(valueAsString) || valueAsString == "#N/A")
                             {
                                 dataRow[col - 1] = DBNull.Value;
+                            }
+                            else if (columnName == "ABONE_X_KOORDINAT" || columnName == "ABONE_Y_KOORDINAT")
+                            {
+                                if (double.TryParse(valueAsString, out double value))
+                                {
+                                    dataRow[col - 1] = value;
+                                    rowHasData = true;
+                                }
+                                else
+                                {
+                                    dataRow[col - 1] = DBNull.Value;
+                                }
                             }
                             else
                             {
