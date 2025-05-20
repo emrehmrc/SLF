@@ -556,7 +556,7 @@ namespace SLF
                 }
 
                 // Validation for isSelecting_YUK and isSelecting_Musaade
-                if (isSelecting_YUK && isSelecting_Musaade)
+                if (isSelecting_YUK || isSelecting_Musaade)
                 {
                     string[] columnsToValidate = { "Kurulu Güç (kW)", "Pik Yüklenme (%)", "Pik Demant (kW)" };
 
@@ -597,6 +597,7 @@ namespace SLF
 
                                 // Use a small tolerance to account for floating-point precision
                                 const double tolerance = 0.0001;
+
                                 if (Math.Abs(expectedPeakDemand - peakDemandValue) > tolerance)
                                 {
                                     MessageBox.Show(
@@ -914,59 +915,6 @@ namespace SLF
                     }
                 }
 
-                // Validation for Kurulu Güç (kW) * Pik Yüklenme (%) / 100 = Pik Demant (kW)
-                if (isSelecting_YUK || isSelecting_Musaade)
-                {
-                    string[] columnsToValidate = { "Kurulu Güç (kW)", "Pik Yüklenme (%)", "Pik Demant (kW)" };
-                    string currentColumn = PoligonDataGridView.Columns[e.ColumnIndex].Name;
-
-                    // Check if the edited column is one of the columns to validate
-                    if (columnsToValidate.Contains(currentColumn))
-                    {
-                        DataGridViewRow row = PoligonDataGridView.Rows[e.RowIndex];
-
-                        // Get values from DataTable or cell, prioritizing the new input
-                        string powerValueStr = GetCellValue(row, "Kurulu Güç (kW)", currentColumn == "Kurulu Güç (kW)" ? e.FormattedValue?.ToString() : null);
-                        string peakLoadValueStr = GetCellValue(row, "Pik Yüklenme (%)", currentColumn == "Pik Yüklenme (%)" ? e.FormattedValue?.ToString() : null);
-                        string peakDemandValueStr = GetCellValue(row, "Pik Demant (kW)", currentColumn == "Pik Demant (kW)" ? e.FormattedValue?.ToString() : null);
-
-                        // Only validate if all three values are present and non-empty
-                        if (!string.IsNullOrWhiteSpace(powerValueStr) &&
-                            !string.IsNullOrWhiteSpace(peakLoadValueStr) &&
-                            !string.IsNullOrWhiteSpace(peakDemandValueStr))
-                        {
-                            // Parse values
-                            bool isPowerValid = double.TryParse(powerValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double powerValue);
-                            bool isPeakLoadValid = double.TryParse(peakLoadValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double peakLoadValue);
-                            bool isPeakDemandValid = double.TryParse(peakDemandValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double peakDemandValue);
-
-                           if (isPowerValid && isPeakLoadValid && isPeakDemandValid)
-                            {
-                                // Calculate expected peak demand
-                                double expectedPeakDemand = powerValue * (peakLoadValue);
-
-                                // Use a small tolerance to account for floating-point precision
-                                const double tolerance = 1;
-                                if (Math.Abs(expectedPeakDemand - peakDemandValue) > tolerance)
-                                {
-                                    e.Cancel = true;
-                                    MessageBox.Show(
-                                        $"Satır {e.RowIndex + 1}: '{columnsToValidate[0]}' * '{columnsToValidate[1]}'  = '{columnsToValidate[2]}' eşitliği sağlanmıyor.\n" +
-                                        $"Hesaplanan: {expectedPeakDemand:F2} kW, Girilen: {peakDemandValue:F2} kW",
-                                        "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                }
-                            }
-                            else
-                            {
-                                e.Cancel = true;
-                                MessageBox.Show(
-                                    $"Satır {e.RowIndex + 1}: '{columnsToValidate[0]}', '{columnsToValidate[1]}' veya '{columnsToValidate[2]}' sütununda geçersiz bir değer var.",
-                                    "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            }
-                        }
-                    }
-                }
-
                 // Existing dropdown column validation
                 string columnName = PoligonDataGridView.Columns[e.ColumnIndex].Name;
                 if (dropdownColumns.Contains(columnName))
@@ -985,42 +933,6 @@ namespace SLF
                 e.Cancel = true;
                 MessageBox.Show($"Hata: {ex.Message}", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-
-
-        // Helper method to get cell value, prioritizing new input, then DataTable, then cell value
-        private string GetCellValue(DataGridViewRow row, string columnName, string newInput)
-        {
-            // Use new input if provided (from e.FormattedValue)
-            if (!string.IsNullOrWhiteSpace(newInput))
-            {
-                Console.WriteLine($"GetCellValue: {columnName} using new input: {newInput}");
-                return newInput;
-            }
-
-            // Try DataTable first
-            int rowIndex = row.Index;
-            if (dataTable != null && rowIndex < dataTable.Rows.Count && dataTable.Columns.Contains(columnName))
-            {
-                string dataTableValue = dataTable.Rows[rowIndex][columnName]?.ToString();
-                if (!string.IsNullOrWhiteSpace(dataTableValue))
-                {
-                    Console.WriteLine($"GetCellValue: {columnName} using DataTable: {dataTableValue}");
-                    return dataTableValue;
-                }
-            }
-
-            // Fallback to cell value
-            int columnIndex = PoligonDataGridView.Columns[columnName]?.Index ?? -1;
-            if (columnIndex >= 0)
-            {
-                string cellValue = row.Cells[columnIndex].Value?.ToString();
-                Console.WriteLine($"GetCellValue: {columnName} using cell value: {cellValue}");
-                return cellValue;
-            }
-
-            Console.WriteLine($"GetCellValue: {columnName} no value found");
-            return null;
         }
 
 
