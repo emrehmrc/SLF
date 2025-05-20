@@ -31,9 +31,9 @@ namespace SLF
             this.Shown += HomePageForm_Shown;
 
             userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            config_path = Path.Combine(userRootPath,
-                "MRC\\MRC - 1.1.3_T&SI\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\Program Dosyaları\\config.json").Replace("/", "\\");
 
+            config_path = Path.Combine(userRootPath, "Desktop", "config.json");
+            Console.WriteLine("config_path"+config_path);
             if (File.Exists(config_path))
             {
                 // Config dosyasından PathService'e yolu ilet
