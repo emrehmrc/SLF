@@ -134,10 +134,10 @@ namespace SLF
                     }
 
                     // Dosyayı imar_plans/data klasörüne kopyala
-                    string kmlDestinationPath = PathService.CopyKmlToImarPlansData(KmlFilePath);
+                    //string kmlDestinationPath = PathService.CopyKmlToImarPlansData(KmlFilePath);
 
                     // PythonHelper.RunImarPlanModel'i çağır
-                    RunImarPlanPython(kmlDestinationPath);
+                    RunImarPlanPython(KmlFilePath);
                 }
                 else if (imarMethodSelectionComboBox.SelectedIndex == 1)
                 {
@@ -148,12 +148,12 @@ namespace SLF
                         return;
                     }
 
-                    // Dosyaları imar_plans/data klasörüne kopyala
-                    string kmlDestinationPath = PathService.CopyKmlToImarPlansData(KmlFilePath);
-                    string csvDestinationPath = PathService.CopyCsvToImarPlansData(CsvFilePath);
+                    //// Dosyaları imar_plans/data klasörüne kopyala
+                    //string kmlDestinationPath = PathService.CopyKmlToImarPlansData(KmlFilePath);
+                    //string csvDestinationPath = PathService.CopyCsvToImarPlansData(CsvFilePath);
 
                     // PythonHelper.RunImarPlanModel'i çağır
-                    RunImarPlanPython(kmlDestinationPath, csvDestinationPath);
+                    RunImarPlanPython(KmlFilePath, CsvFilePath);
                 }
                 else
                 {
