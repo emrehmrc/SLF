@@ -502,42 +502,16 @@ namespace SLF
             }
         }
 
-        private void buton_poligon_ozellik_Click(object sender, EventArgs e)
-        {
-            if (ValidatePolygonData())
-            {
-                isKaydetClicked = true;
-                this.Close();
-            }
-            else
-            {
-                MessageBox.Show("Hata: İmar tiplerinin toplamı 100(%) olmalıdır!\n\n" +
-                    "İlgili imar tipleri şunlardır:\n\n" +
-                    "1-2 KATLI MESKEN\n" +
-                    "3-4 KATLI MESKEN\n" +
-                    "5-7 KATLI MESKEN\n" +
-                    "8 USTU KATLI MESKEN\n" +
-                    "KUCUK SANAYI\n" +
-                    "KUCUK TICARETHANE\n" +
-                    "ORTA SANAYI\n" +
-                    "ORTA TICARETHANE\n" +
-                    "VILLA MESKEN\n" +
-                    "TARIMSAL SULAMA\n" +
-                    "Park, Yol, Kaldırım Oranı (%)", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
         private bool ValidatePolygonData()
         {
-            // Validation only applies to isSelecting_YGA or isSelecting_KentselDonusum
-            if (!isSelecting_YGA && !isSelecting_KentselDonusum)
+            try
             {
-                return true; // No validation needed for other conditions
-            }
-
-            // Columns to validate
-            string[] columnsToValidate = new string[]
-            {
+                // Validation for isSelecting_YGA or isSelecting_KentselDonusum
+                if (isSelecting_YGA || isSelecting_KentselDonusum)
+                {
+                    // Columns to validate for percentage sum
+                    string[] columnsToValidate = new string[]
+                    {
                 "1-2 KATLI MESKEN",
                 "3-4 KATLI MESKEN",
                 "5-7 KATLI MESKEN",
@@ -550,41 +524,138 @@ namespace SLF
                 "ORTA TICARETHANE",
                 "TARIMSAL SULAMA",
                 "Park, Yol, Kaldırım Oranı (%)"
-            };
+                    };
 
-            try
-            {
-                double total = 0;
-                foreach (DataRow row in dataTable.Rows)
+                    double total = 0;
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        foreach (string column in columnsToValidate)
+                        {
+                            // Check if the column exists and the value is not null or empty
+                            if (dataTable.Columns.Contains(column) && !string.IsNullOrEmpty(row[column]?.ToString()))
+                            {
+                                // Try to parse the value as a double
+                                if (double.TryParse(row[column].ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+                                {
+                                    total += value;
+                                }
+                                else
+                                {
+                                    MessageBox.Show($"Hata: '{column}' sütununda geçersiz bir değer var.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+
+                    // Check if total is approximately 100 (allowing for small floating-point errors)
+                    if (Math.Abs(total - 100) >= 0.1)
+                    {
+                        return false; // Error message handled in button click
+                    }
+                }
+
+                // Validation for isSelecting_YUK and isSelecting_Musaade
+                if (isSelecting_YUK && isSelecting_Musaade)
                 {
+                    string[] columnsToValidate = { "Kurulu Güç (kW)", "Pik Yüklenme (%)", "Pik Demant (kW)" };
+
+                    // Check if all required columns exist
                     foreach (string column in columnsToValidate)
                     {
-                        // Check if the column exists and the value is not null or empty
-                        if (dataTable.Columns.Contains(column) && !string.IsNullOrEmpty(row[column]?.ToString()))
+                        if (!dataTable.Columns.Contains(column))
                         {
-                            // Try to parse the value as a double
-                            if (double.TryParse(row[column].ToString(), out double value))
+                            MessageBox.Show($"Hata: '{column}' sütunu bulunamadı.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+                    }
+
+                    // Iterate over each row in the DataTable
+                    for (int rowIndex = 0; rowIndex < dataTable.Rows.Count; rowIndex++)
+                    {
+                        DataRow row = dataTable.Rows[rowIndex];
+
+                        // Get values for the three columns
+                        string powerValueStr = row["Kurulu Güç (kW)"]?.ToString();
+                        string peakLoadValueStr = row["Pik Yüklenme (%)"]?.ToString();
+                        string peakDemandValueStr = row["Pik Demant (kW)"]?.ToString();
+
+                        // Only validate if all three values are present and non-empty
+                        if (!string.IsNullOrWhiteSpace(powerValueStr) &&
+                            !string.IsNullOrWhiteSpace(peakLoadValueStr) &&
+                            !string.IsNullOrWhiteSpace(peakDemandValueStr))
+                        {
+                            // Parse values
+                            bool isPowerValid = double.TryParse(powerValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double powerValue);
+                            bool isPeakLoadValid = double.TryParse(peakLoadValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double peakLoadValue);
+                            bool isPeakDemandValid = double.TryParse(peakDemandValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double peakDemandValue);
+
+                            if (isPowerValid && isPeakLoadValid && isPeakDemandValid)
                             {
-                                total += value;
+                                // Calculate expected peak demand
+                                double expectedPeakDemand = powerValue * (peakLoadValue);
+
+                                // Use a small tolerance to account for floating-point precision
+                                const double tolerance = 0.0001;
+                                if (Math.Abs(expectedPeakDemand - peakDemandValue) > tolerance)
+                                {
+                                    MessageBox.Show(
+                                        $"Satır {rowIndex + 1}: '{columnsToValidate[0]}' * '{columnsToValidate[1]}' = '{columnsToValidate[2]}' eşitliği sağlanmıyor.\n" +
+                                        $"Hesaplanan: {expectedPeakDemand:F2} kW, Girilen: {peakDemandValue:F2} kW",
+                                        "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return false;
+                                }
                             }
                             else
                             {
-                                // If parsing fails, show error and return false
-                                MessageBox.Show($"Hata: '{column}' sütununda geçersiz bir değer var.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBox.Show(
+                                    $"Satır {rowIndex + 1}: '{columnsToValidate[0]}', '{columnsToValidate[1]}' veya '{columnsToValidate[2]}' sütununda geçersiz bir değer var.",
+                                    "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 return false;
                             }
                         }
                     }
                 }
 
-                // Check if total is approximately 1 (allowing for small floating-point errors)
-                return Math.Abs(total - 100) < 0.1;
+                // All validations passed
+                return true;
             }
             catch (Exception ex)
             {
+                MessageBox.Show($"Doğrulama sırasında bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
+
+            private void buton_poligon_ozellik_Click(object sender, EventArgs e)
+            {
+
+                if (ValidatePolygonData())
+                {
+                    isKaydetClicked = true;
+                    this.Close();
+                }
+                else
+                {
+                    if (isSelecting_YGA || isSelecting_KentselDonusum)
+                    {
+                        MessageBox.Show("Hata: İmar tiplerinin toplamı 100(%) olmalıdır!\n\n" +
+                            "İlgili imar tipleri şunlardır:\n\n" +
+                            "1-2 KATLI MESKEN\n" +
+                            "3-4 KATLI MESKEN\n" +
+                            "5-7 KATLI MESKEN\n" +
+                            "8 USTU KATLI MESKEN\n" +
+                            "VILLA MESKEN\n" +
+                            "AYDINLATMA\n" +
+                            "KUCUK SANAYI\n" +
+                            "KUCUK TICARETHANE\n" +
+                            "ORTA SANAYI\n" +
+                            "ORTA TICARETHANE\n" +
+                            "TARIMSAL SULAMA\n" +
+                            "Park, Yol, Kaldırım Oranı (%)", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
 
 
         private void buton_yük_tipleri_Click(object sender, EventArgs e)
@@ -826,13 +897,14 @@ namespace SLF
         {
             try
             {
+                // Existing TAKS validation
                 if (isSelecting_YGA && e.ColumnIndex == PoligonDataGridView.Columns["TAKS"]?.Index)
                 {
                     string input = e.FormattedValue?.ToString();
                     if (!string.IsNullOrWhiteSpace(input))
                     {
                         string decimalSeparator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
-                        input = input.Replace(decimalSeparator, ".").Replace(".", ".");
+                        input = input.Replace(decimalSeparator, ".");
 
                         if (!double.TryParse(input, NumberStyles.Any, CultureInfo.InvariantCulture, out double taksValue) || taksValue < 0.1 || taksValue > 1)
                         {
@@ -842,6 +914,60 @@ namespace SLF
                     }
                 }
 
+                // Validation for Kurulu Güç (kW) * Pik Yüklenme (%) / 100 = Pik Demant (kW)
+                if (isSelecting_YUK || isSelecting_Musaade)
+                {
+                    string[] columnsToValidate = { "Kurulu Güç (kW)", "Pik Yüklenme (%)", "Pik Demant (kW)" };
+                    string currentColumn = PoligonDataGridView.Columns[e.ColumnIndex].Name;
+
+                    // Check if the edited column is one of the columns to validate
+                    if (columnsToValidate.Contains(currentColumn))
+                    {
+                        DataGridViewRow row = PoligonDataGridView.Rows[e.RowIndex];
+
+                        // Get values from DataTable or cell, prioritizing the new input
+                        string powerValueStr = GetCellValue(row, "Kurulu Güç (kW)", currentColumn == "Kurulu Güç (kW)" ? e.FormattedValue?.ToString() : null);
+                        string peakLoadValueStr = GetCellValue(row, "Pik Yüklenme (%)", currentColumn == "Pik Yüklenme (%)" ? e.FormattedValue?.ToString() : null);
+                        string peakDemandValueStr = GetCellValue(row, "Pik Demant (kW)", currentColumn == "Pik Demant (kW)" ? e.FormattedValue?.ToString() : null);
+
+                        // Only validate if all three values are present and non-empty
+                        if (!string.IsNullOrWhiteSpace(powerValueStr) &&
+                            !string.IsNullOrWhiteSpace(peakLoadValueStr) &&
+                            !string.IsNullOrWhiteSpace(peakDemandValueStr))
+                        {
+                            // Parse values
+                            bool isPowerValid = double.TryParse(powerValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double powerValue);
+                            bool isPeakLoadValid = double.TryParse(peakLoadValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double peakLoadValue);
+                            bool isPeakDemandValid = double.TryParse(peakDemandValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double peakDemandValue);
+
+                           if (isPowerValid && isPeakLoadValid && isPeakDemandValid)
+                            {
+                                // Calculate expected peak demand
+                                double expectedPeakDemand = powerValue * (peakLoadValue);
+
+                                // Use a small tolerance to account for floating-point precision
+                                const double tolerance = 1;
+                                if (Math.Abs(expectedPeakDemand - peakDemandValue) > tolerance)
+                                {
+                                    e.Cancel = true;
+                                    MessageBox.Show(
+                                        $"Satır {e.RowIndex + 1}: '{columnsToValidate[0]}' * '{columnsToValidate[1]}'  = '{columnsToValidate[2]}' eşitliği sağlanmıyor.\n" +
+                                        $"Hesaplanan: {expectedPeakDemand:F2} kW, Girilen: {peakDemandValue:F2} kW",
+                                        "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                }
+                            }
+                            else
+                            {
+                                e.Cancel = true;
+                                MessageBox.Show(
+                                    $"Satır {e.RowIndex + 1}: '{columnsToValidate[0]}', '{columnsToValidate[1]}' veya '{columnsToValidate[2]}' sütununda geçersiz bir değer var.",
+                                    "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                        }
+                    }
+                }
+
+                // Existing dropdown column validation
                 string columnName = PoligonDataGridView.Columns[e.ColumnIndex].Name;
                 if (dropdownColumns.Contains(columnName))
                 {
@@ -860,6 +986,43 @@ namespace SLF
                 MessageBox.Show($"Hata: {ex.Message}", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+
+        // Helper method to get cell value, prioritizing new input, then DataTable, then cell value
+        private string GetCellValue(DataGridViewRow row, string columnName, string newInput)
+        {
+            // Use new input if provided (from e.FormattedValue)
+            if (!string.IsNullOrWhiteSpace(newInput))
+            {
+                Console.WriteLine($"GetCellValue: {columnName} using new input: {newInput}");
+                return newInput;
+            }
+
+            // Try DataTable first
+            int rowIndex = row.Index;
+            if (dataTable != null && rowIndex < dataTable.Rows.Count && dataTable.Columns.Contains(columnName))
+            {
+                string dataTableValue = dataTable.Rows[rowIndex][columnName]?.ToString();
+                if (!string.IsNullOrWhiteSpace(dataTableValue))
+                {
+                    Console.WriteLine($"GetCellValue: {columnName} using DataTable: {dataTableValue}");
+                    return dataTableValue;
+                }
+            }
+
+            // Fallback to cell value
+            int columnIndex = PoligonDataGridView.Columns[columnName]?.Index ?? -1;
+            if (columnIndex >= 0)
+            {
+                string cellValue = row.Cells[columnIndex].Value?.ToString();
+                Console.WriteLine($"GetCellValue: {columnName} using cell value: {cellValue}");
+                return cellValue;
+            }
+
+            Console.WriteLine($"GetCellValue: {columnName} no value found");
+            return null;
+        }
+
 
         private void PoligonDataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {

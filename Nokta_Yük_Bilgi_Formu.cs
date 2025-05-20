@@ -6,6 +6,7 @@ using System.IO;
 using ExcelDataReader;
 using ClosedXML.Excel;
 using System.Globalization;
+using System.Linq;
 
 namespace SLF
 {
@@ -291,20 +292,35 @@ namespace SLF
 
         private bool ValidatePolygonData()
         {
-            // Column to validate
-            string columnToValidate = "Kurulu Güç (kW)";
+            // Columns to validate
+            string powerColumn = "Kurulu Güç (kW)";
+            string peakLoadColumn = "Pik Yüklenme (%)";
+            string peakDemandColumn = "Pik Demant (kW)";
 
             try
             {
-                // Check if the column exists in the DataGridView
-                if (!NoktaYukDataGridView.Columns.Contains(columnToValidate))
+                Console.WriteLine("ValidatePolygonData: Method started.");
+
+                // Check if all required columns exist in the DataGridView
+                if (!NoktaYukDataGridView.Columns.Contains(powerColumn) ||
+                    !NoktaYukDataGridView.Columns.Contains(peakLoadColumn) ||
+                    !NoktaYukDataGridView.Columns.Contains(peakDemandColumn))
                 {
-                    MessageBox.Show($"Hata: '{columnToValidate}' sütunu bulunamadı.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    string missingColumns = string.Join(", ", new[] { powerColumn, peakLoadColumn, peakDemandColumn }
+                        .Where(col => !NoktaYukDataGridView.Columns.Contains(col)));
+                    MessageBox.Show($"Hata: Şu sütun(lar) bulunamadı: {missingColumns}.",
+                        "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Console.WriteLine($"ValidatePolygonData: Missing columns: {missingColumns}");
                     return false;
                 }
 
-                // Get the column index for "Kurulu Güç (kW)"
-                int columnIndex = NoktaYukDataGridView.Columns[columnToValidate].Index;
+                // Get column indices
+                int powerColumnIndex = NoktaYukDataGridView.Columns[powerColumn].Index;
+                int peakLoadColumnIndex = NoktaYukDataGridView.Columns[peakLoadColumn].Index;
+                int peakDemandColumnIndex = NoktaYukDataGridView.Columns[peakDemandColumn].Index;
+
+                Console.WriteLine($"ValidatePolygonData: Columns found. PowerIndex={powerColumnIndex}, PeakLoadIndex={peakLoadColumnIndex}, PeakDemandIndex={peakDemandColumnIndex}");
+                Console.WriteLine($"ValidatePolygonData: Total rows={NoktaYukDataGridView.Rows.Count}");
 
                 // Iterate over each row in the DataGridView
                 for (int rowIndex = 0; rowIndex < NoktaYukDataGridView.Rows.Count; rowIndex++)
@@ -312,45 +328,90 @@ namespace SLF
                     var row = NoktaYukDataGridView.Rows[rowIndex];
 
                     // Skip the new row placeholder if it exists
-                    if (row.IsNewRow) continue;
-
-                    // Get the cell value for "Kurulu Güç (kW)"
-                    var cellValue = row.Cells[columnIndex].Value;
-
-                    // Check if the value is not null or empty
-                    if (cellValue != null && !string.IsNullOrEmpty(cellValue.ToString()))
+                    if (row.IsNewRow)
                     {
-                        // Try to parse the value as a double
-                        if (double.TryParse(cellValue.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+                        Console.WriteLine($"ValidatePolygonData: Row {rowIndex + 1} skipped (new row placeholder).");
+                        continue;
+                    }
+
+                    // Get the cell values
+                    string powerCellValue = row.Cells[powerColumnIndex].Value?.ToString();
+                    string peakLoadCellValue = row.Cells[peakLoadColumnIndex].Value?.ToString();
+                    string peakDemandCellValue = row.Cells[peakDemandColumnIndex].Value?.ToString();
+
+                    Console.WriteLine($"ValidatePolygonData: Row {rowIndex + 1} - Power='{powerCellValue}', PeakLoad='{peakLoadCellValue}', PeakDemand='{peakDemandCellValue}'");
+
+                    // Validate "Kurulu Güç (kW)" if present
+                    if (!string.IsNullOrWhiteSpace(powerCellValue))
+                    {
+                        if (!double.TryParse(powerCellValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double powerValue))
                         {
-                            // Check if the value exceeds 10,000
-                            if (value > 10000)
+                            MessageBox.Show($"Satır {rowIndex + 1}: '{powerColumn}' sütununda geçersiz bir değer: {powerCellValue}",
+                                "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            Console.WriteLine($"ValidatePolygonData: Row {rowIndex + 1} - Invalid power value: {powerCellValue}");
+                            return false;
+                        }
+
+                        // Check if the value exceeds 10,000
+                        if (powerValue > 10000)
+                        {
+                            MessageBox.Show($"Satır {rowIndex + 1}: '{powerColumn}' değeri 10,000'i aşamaz. Değer: {powerValue}",
+                                "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            Console.WriteLine($"ValidatePolygonData: Row {rowIndex + 1} - Power value {powerValue} exceeds 10,000.");
+                            return false;
+                        }
+                    }
+
+                    // Validate equality only if all three values are present
+                    if (!string.IsNullOrWhiteSpace(powerCellValue) &&
+                        !string.IsNullOrWhiteSpace(peakLoadCellValue) &&
+                        !string.IsNullOrWhiteSpace(peakDemandCellValue))
+                    {
+                        if (double.TryParse(powerCellValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double powerValue) &&
+                            double.TryParse(peakLoadCellValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double peakLoadValue) &&
+                            double.TryParse(peakDemandCellValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double peakDemandValue))
+                        {
+                            // Calculate expected peak demand
+                            double expectedPeakDemand = powerValue * (peakLoadValue / 100); // Percentage correction
+                            Console.WriteLine($"ValidatePolygonData: Row {rowIndex + 1} - Power={powerValue}, PeakLoad={peakLoadValue}, ExpectedPeakDemand={expectedPeakDemand}, ActualPeakDemand={peakDemandValue}");
+
+                            // Use a small tolerance for floating-point precision
+                            const double tolerance = 0.001; // Increased slightly for robustness
+                            if (Math.Abs(expectedPeakDemand - peakDemandValue) > tolerance)
                             {
-                                MessageBox.Show($"Satır {rowIndex + 1}: '{columnToValidate}' değeri 10,000'i aşamaz. Değer: {value}",
+                                MessageBox.Show(
+                                    $"Satır {rowIndex + 1}: '{powerColumn}' * '{peakLoadColumn}' / 100 = '{peakDemandColumn}' eşitliği sağlanmıyor.\n" +
+                                    $"Hesaplanan: {expectedPeakDemand:F2} kW, Girilen: {peakDemandValue:F2} kW",
                                     "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                Console.WriteLine($"ValidatePolygonData: Row {rowIndex + 1} - Equality failed. Expected: {expectedPeakDemand:F2}, Actual: {peakDemandValue:F2}");
                                 return false;
                             }
                         }
                         else
                         {
-                            // If parsing fails, show error and return false
-                            MessageBox.Show($"Satır {rowIndex + 1}: '{columnToValidate}' sütununda geçersiz bir değer var: {cellValue}",
+                            MessageBox.Show($"Satır {rowIndex + 1}: '{powerColumn}', '{peakLoadColumn}' veya '{peakDemandColumn}' sütununda geçersiz bir değer var.\n" +
+                                $"Değerler: Power='{powerCellValue}', PeakLoad='{peakLoadCellValue}', PeakDemand='{peakDemandCellValue}'",
                                 "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            Console.WriteLine($"ValidatePolygonData: Row {rowIndex + 1} - Invalid values: Power='{powerCellValue}', PeakLoad='{peakLoadCellValue}', PeakDemand='{peakDemandCellValue}'");
                             return false;
                         }
                     }
+                    else
+                    {
+                        Console.WriteLine($"ValidatePolygonData: Row {rowIndex + 1} - Skipped equality validation (missing values).");
+                    }
                 }
 
-                // If all values are valid, return true
+                Console.WriteLine("ValidatePolygonData: Validation passed for all rows.");
                 return true;
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Doğrulama sırasında bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine($"ValidatePolygonData: Exception occurred: {ex.Message}\nStackTrace: {ex.StackTrace}");
                 return false;
             }
         }
-
 
 
         private void NoktaYukTableSaveButton_Click(object sender, EventArgs e)
