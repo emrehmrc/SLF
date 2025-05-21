@@ -31,21 +31,13 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.buttonDtrVerisiOlustur = new System.Windows.Forms.Button();
+            
             this.buttonAboneVerisiOlustur = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonDtrVerisiOlustur
             // 
-            this.buttonDtrVerisiOlustur.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
-            this.buttonDtrVerisiOlustur.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.buttonDtrVerisiOlustur.Location = new System.Drawing.Point(150, 74);
-            this.buttonDtrVerisiOlustur.Name = "buttonDtrVerisiOlustur";
-            this.buttonDtrVerisiOlustur.Size = new System.Drawing.Size(200, 76);
-            this.buttonDtrVerisiOlustur.TabIndex = 0;
-            this.buttonDtrVerisiOlustur.Text = "DTR Verisi Oluştur";
-            this.buttonDtrVerisiOlustur.UseVisualStyleBackColor = false;
-            this.buttonDtrVerisiOlustur.Click += new System.EventHandler(this.buttonDtrVerisiOlustur_Click);
+         
             // 
             // buttonAboneVerisiOlustur
             // 
