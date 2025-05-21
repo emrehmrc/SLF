@@ -148,8 +148,8 @@ namespace SLF
                 // Add columns
                 dataTable.Columns.Add("Polygon ID", typeof(string));
                 dataTable.Columns.Add("Tipi", typeof(string));
-                dataTable.Columns.Add("ENERJI_MUSAADE_ABONE_GRUBU", typeof(string));
-                dataTable.Columns.Add("ENERJI_MUSAADE_ENERJILENDIRME_YILI", typeof(string));
+                dataTable.Columns.Add("ABONE_GRUBU", typeof(string));
+                dataTable.Columns.Add("ENERJILENDIRME_YILI", typeof(string));
                 dataTable.Columns.Add("Kurulu Güç (kW)", typeof(string));
                 dataTable.Columns.Add("Pik Yüklenme (%)", typeof(string));
                 dataTable.Columns.Add("Pik Demant (kW)", typeof(string));
@@ -171,8 +171,8 @@ namespace SLF
                 // Set tooltips for column headers
                 PoligonDataGridView.Columns["Polygon ID"].ToolTipText = "Poligona ait özgün ID numarası";
                 PoligonDataGridView.Columns["Tipi"].ToolTipText = "Poligonun tipi veya kategorisi - AVM, Restoran vb.";
-                PoligonDataGridView.Columns["ENERJI_MUSAADE_ABONE_GRUBU"].ToolTipText = "Enerji müsaadesi için abone grubu - Ticarethane, Sanayi, vb.";
-                PoligonDataGridView.Columns["ENERJI_MUSAADE_ENERJILENDIRME_YILI"].ToolTipText = "Enerji müsaadesinin verileceği yıl";
+                PoligonDataGridView.Columns["ABONE_GRUBU"].ToolTipText = "Enerji müsaadesi için abone grubu - Ticarethane, Sanayi, vb.";
+                PoligonDataGridView.Columns["ENERJILENDIRME_YILI"].ToolTipText = "Enerji müsaadesinin verileceği yıl";
                 PoligonDataGridView.Columns["Kurulu Güç (kW)"].ToolTipText = "Enerji müsaadesi verilecek yapıya ait kurulu güç kapasitesi (kilowatt)";
                 PoligonDataGridView.Columns["Pik Yüklenme (%)"].ToolTipText = "Enerji müsaadesi verilecek yapıya ait tahmini pik yüklenme oranı (yüzde)";
                 PoligonDataGridView.Columns["Pik Demant (kW)"].ToolTipText = "Enerji müsaadesi verilecek yapıya ait tahmini pik güç talebi (kilowatt)";
@@ -326,8 +326,8 @@ namespace SLF
                 columnValues = new Dictionary<string, HashSet<string>>
                 {
                     { "Tipi", new HashSet<string>() },
-                    { "ENERJI_MUSAADE_ABONE_GRUBU", new HashSet<string>() },
-                    { "ENERJI_MUSAADE_ENERJILENDIRME_YILI", new HashSet<string>() },
+                    { "ABONE_GRUBU", new HashSet<string>() },
+                    { "ENERJILENDIRME_YILI", new HashSet<string>() },
                     { "Kurulu Güç (kW)", new HashSet<string>() },
                     { "Pik Yüklenme (%)", new HashSet<string>() },
                     { "Pik Demant (kW)", new HashSet<string>() }
@@ -516,18 +516,18 @@ namespace SLF
                     // Columns to validate for percentage sum
                     string[] percentageColumns = new string[]
                     {
-                "1-2 KATLI MESKEN",
-                "3-4 KATLI MESKEN",
-                "5-7 KATLI MESKEN",
-                "8 USTU KATLI MESKEN",
-                "VILLA MESKEN",
-                "AYDINLATMA",
-                "KUCUK SANAYI",
-                "KUCUK TICARETHANE",
-                "ORTA SANAYI",
-                "ORTA TICARETHANE",
-                "TARIMSAL SULAMA",
-                "Park, Yol, Kaldırım Oranı (%)"
+                        "1-2 KATLI MESKEN",
+                        "3-4 KATLI MESKEN",
+                        "5-7 KATLI MESKEN",
+                        "8 USTU KATLI MESKEN",
+                        "VILLA MESKEN",
+                        "AYDINLATMA",
+                        "KUCUK SANAYI",
+                        "KUCUK TICARETHANE",
+                        "ORTA SANAYI",
+                        "ORTA TICARETHANE",
+                        "TARIMSAL SULAMA",
+                        "Park, Yol, Kaldırım Oranı (%)"
                     };
 
                     // Additional columns to validate
@@ -797,8 +797,8 @@ namespace SLF
                         var matchingRow = excelDataRows.FirstOrDefault(row => row["Tipi"] == selectedTipi);
                         if (matchingRow != null)
                         {
-                            PoligonDataGridView.Rows[e.RowIndex].Cells["ENERJI_MUSAADE_ABONE_GRUBU"].Value = matchingRow["ENERJI_MUSAADE_ABONE_GRUBU"];
-                            PoligonDataGridView.Rows[e.RowIndex].Cells["ENERJI_MUSAADE_ENERJILENDIRME_YILI"].Value = matchingRow["ENERJI_MUSAADE_ENERJILENDIRME_YILI"];
+                            PoligonDataGridView.Rows[e.RowIndex].Cells["ABONE_GRUBU"].Value = matchingRow["ABONE_GRUBU"];
+                            PoligonDataGridView.Rows[e.RowIndex].Cells["ENERJILENDIRME_YILI"].Value = matchingRow["ENERJILENDIRME_YILI"];
                             PoligonDataGridView.Rows[e.RowIndex].Cells["Kurulu Güç (kW)"].Value = matchingRow["Kurulu Güç (kW)"];
                             PoligonDataGridView.Rows[e.RowIndex].Cells["Pik Yüklenme (%)"].Value = matchingRow["Pik Yüklenme (%)"];
                             PoligonDataGridView.Rows[e.RowIndex].Cells["Pik Demant (kW)"].Value = matchingRow["Pik Demant (kW)"];

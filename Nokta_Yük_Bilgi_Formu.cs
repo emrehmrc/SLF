@@ -53,8 +53,8 @@ namespace SLF
             {
                 // Columns for the second sheet (Musaade)
                 dataTable.Columns.Add("Tipi", typeof(string));
-                dataTable.Columns.Add("ENERJI_MUSAADE_ABONE_GRUBU", typeof(string));
-                dataTable.Columns.Add("ENERJI_MUSAADE_ENERJILENDIRME_YILI", typeof(string));
+                dataTable.Columns.Add("ABONE_GRUBU", typeof(string));
+                dataTable.Columns.Add("ENERJILENDIRME_YILI", typeof(string));
                 dataTable.Columns.Add("Kurulu Güç (kW)", typeof(string));
                 dataTable.Columns.Add("Pik Yüklenme (%)", typeof(string));
                 dataTable.Columns.Add("Pik Demant (kW)", typeof(string));
@@ -125,8 +125,8 @@ namespace SLF
                             else if (musaade_select)
                             {
                                 newRow["Tipi"] = row["Tipi"]?.ToString() ?? string.Empty;
-                                newRow["ENERJI_MUSAADE_ABONE_GRUBU"] = row["ENERJI_MUSAADE_ABONE_GRUBU"]?.ToString() ?? string.Empty;
-                                newRow["ENERJI_MUSAADE_ENERJILENDIRME_YILI"] = row["ENERJI_MUSAADE_ENERJILENDIRME_YILI"]?.ToString() ?? string.Empty;
+                                newRow["ABONE_GRUBU"] = row["ABONE_GRUBU"]?.ToString() ?? string.Empty;
+                                newRow["ENERJILENDIRME_YILI"] = row["ENERJILENDIRME_YILI"]?.ToString() ?? string.Empty;
                                 newRow["Kurulu Güç (kW)"] = row["Kurulu Güç (kW)"]?.ToString() ?? string.Empty;
                                 newRow["Pik Yüklenme (%)"] = row["Pik Yüklenme (%)"]?.ToString() ?? string.Empty;
                                 newRow["Pik Demant (kW)"] = row["Pik Demant (kW)"]?.ToString() ?? string.Empty;
@@ -179,29 +179,29 @@ namespace SLF
                 // Default data for YUK
                 var defaultData = new List<string[]>
                 {
-                    new[] { "Anaokulu", "2,800", "Ticarethane","2027", "30", "0.8", "24" },
-                    new[] { "AVM", "10,000", "Ticarethane", "2027", "1,000", "0.6", "600" },
-                    new[] { "Banka", "500", "Ticarethane", "2027", "100", "0.7", "70" },
-                    new[] { "Akaryakıt İstasyonu", "1,400", "Ticarethane", "2027", "50", "0.6", "30" },
-                    new[] { "Cami", "300", "Ticarethane", "2027", "50", "0.7", "35" },
-                    new[] { "Fırın", "500", "Ticarethane", "2027", "30", "0.7", "21" },
-                    new[] { "Halk Sağlığı Merkezi", "400", "Ticarethane", "2027", "150", "0.8", "120" },
-                    new[] { "Hastane", "30,000", "Ticarethane", "2027", "1,000", "0.9", "900" },
-                    new[] { "İtfaiye", "1,100", "Ticarethane", "2027", "100", "0.6", "60" },
-                    new[] { "Kamu Binası", "1,200", "Ticarethane", "2027", "200", "0.6", "120" },
-                    new[] { "Konser Alanı", "2,000", "Ticarethane", "2027", "400", "0.7", "280" },
-                    new[] { "Okul", "7,500", "Ticarethane", "2027", "300", "0.8", "240" },
-                    new[] { "Oto Tamirci", "700", "Ticarethane", "2027", "250", "0.7", "175" },
-                    new[] { "Otogar", "5,800", "Ticarethane", "2027", "350", "0.7", "245" },
-                    new[] { "Otopark", "2,500", "Ticarethane", "2027", "200", "0.8", "160" },
-                    new[] { "Pazar Alanı", "5,400", "Ticarethane", "2027", "200", "0.8", "160" },
-                    new[] { "PTT", "500", "Ticarethane", "2027", "50", "0.7", "35" },
-                    new[] { "Restoran", "800", "Ticarethane", "2027", "120", "0.6", "72" },
-                    new[] { "Sanat Alanı", "3,000", "Ticarethane", "2027", "100", "0.6", "60" },
-                    new[] { "Sosyal Yaşam Merkezi", "1,500", "Ticarethane", "2027", "300", "0.7", "210" },
-                    new[] { "Süpermarket", "3,500", "Ticarethane", "2027", "250", "0.7", "175" },
-                    new[] { "Tarımsal Alan", "10,000", "Tarımsal Sulama", "2027", "20", "0.7", "14" },
-                    new[] { "Üniversite Kampüsü", "200,000", "Ticarethane", "2027", "1,000", "0.6", "600" }
+                    new[] { "Anaokulu", "2,800", "TİCARETHANE","2027", "30", "0.8", "24" },
+                    new[] { "AVM", "10,000", "TİCARETHANE", "2027", "1,000", "0.6", "600" },
+                    new[] { "Banka", "500", "TİCARETHANE", "2027", "100", "0.7", "70" },
+                    new[] { "Akaryakıt İstasyonu", "1,400", "TİCARETHANE", "2027", "50", "0.6", "30" },
+                    new[] { "Cami", "300", "TİCARETHANE", "2027", "50", "0.7", "35" },
+                    new[] { "Fırın", "500", "TİCARETHANE", "2027", "30", "0.7", "21" },
+                    new[] { "Halk Sağlığı Merkezi", "400", "TİCARETHANE", "2027", "150", "0.8", "120" },
+                    new[] { "Hastane", "30,000", "TİCARETHANE", "2027", "1,000", "0.9", "900" },
+                    new[] { "İtfaiye", "1,100", "TİCARETHANE", "2027", "100", "0.6", "60" },
+                    new[] { "Kamu Binası", "1,200", "TİCARETHANE", "2027", "200", "0.6", "120" },
+                    new[] { "Konser Alanı", "2,000", "TİCARETHANE", "2027", "400", "0.7", "280" },
+                    new[] { "Okul", "7,500", "TİCARETHANE", "2027", "300", "0.8", "240" },
+                    new[] { "Oto Tamirci", "700", "TİCARETHANE", "2027", "250", "0.7", "175" },
+                    new[] { "Otogar", "5,800", "TİCARETHANE", "2027", "350", "0.7", "245" },
+                    new[] { "Otopark", "2,500", "TİCARETHANE", "2027", "200", "0.8", "160" },
+                    new[] { "Pazar Alanı", "5,400", "TİCARETHANE", "2027", "200", "0.8", "160" },
+                    new[] { "PTT", "500", "TİCARETHANE", "2027", "50", "0.7", "35" },
+                    new[] { "Restoran", "800", "TİCARETHANE", "2027", "120", "0.6", "72" },
+                    new[] { "Sanat Alanı", "3,000", "TİCARETHANE", "2027", "100", "0.6", "60" },
+                    new[] { "Sosyal Yaşam Merkezi", "1,500", "TİCARETHANE", "2027", "300", "0.7", "210" },
+                    new[] { "Süpermarket", "3,500", "TİCARETHANE", "2027", "250", "0.7", "175" },
+                    new[] { "Tarımsal Alan", "10,000", "TARIMSAL SULAMA", "2027", "20", "0.7", "14" },
+                    new[] { "Üniversite Kampüsü", "200,000", "TİCARETHANE", "2027", "1,000", "0.6", "600" }
                 };
 
                 foreach (var rowData in defaultData)
@@ -221,8 +221,8 @@ namespace SLF
             {
                 // Define columns for the second sheet (Musaade)
                 dataTable.Columns.Add("Tipi", typeof(string));
-                dataTable.Columns.Add("ENERJI_MUSAADE_ABONE_GRUBU", typeof(string));
-                dataTable.Columns.Add("ENERJI_MUSAADE_ENERJILENDIRME_YILI", typeof(string));
+                dataTable.Columns.Add("ABONE_GRUBU", typeof(string));
+                dataTable.Columns.Add("ENERJILENDIRME_YILI", typeof(string));
                 dataTable.Columns.Add("Kurulu Güç (kW)", typeof(string));
                 dataTable.Columns.Add("Pik Yüklenme (%)", typeof(string));
                 dataTable.Columns.Add("Pik Demant (kW)", typeof(string));
@@ -230,49 +230,49 @@ namespace SLF
                 // Default data for Musaade (based on the provided sample)
                 var defaultData = new List<string[]>
                 {
-                    new[] { "ACİL SERVİS", "Ticarethane", "2026", "167", "0.6", "100" },
-                    new[] { "ANAOKULU", "Ticarethane", "2026", "86", "0.7", "60" },
-                    new[] { "ATM", "Ticarethane", "2026", "10", "0.3", "3" },
-                    new[] { "AVM", "Ticarethane", "2026", "1800", "0.5", "900" },
-                    new[] { "BAZ İSTASYONU", "Ticarethane", "2026", "1800", "0.5", "900" },
-                    new[] { "BİNA", "Mesken", "2026", "36", "0.7", "25" },
-                    new[] { "BÜFE", "Ticarethane", "2026", "7", "0.7", "5" },
-                    new[] { "DERNEK", "Ticarethane", "2026", "17", "0.7", "12" },
-                    new[] { "GÜÇ ARTIRIMI - ATM", "Ticarethane", "2026", "4", "1", "4" },
-                    new[] { "GÜÇ ARTIRIMI - İŞYERİ", "Ticarethane", "2026", "25", "1", "25" },
-                    new[] { "GÜÇ ARTIRIMI - TİCARETHANE", "Ticarethane", "2026", "30", "1", "30" },
-                    new[] { "GÜÇ ARTIRIMI - TARIMSAL SULAMA", "Tarımsal Sulama", "2026", "20", "1", "20" },
-                    new[] { "GEÇİCİ - DEPO", "Ticarethane", "2026", "50", "0.4", "20" },
-                    new[] { "GEÇİCİ - HOBİ BAHÇESİ", "Mesken", "2026", "8", "0.4", "3" },
-                    new[] { "GEÇİCİ - PARK AYDINLATMASI", "Ticarethane", "2026", "83", "0.6", "50" },
-                    new[] { "GEÇİCİ - BÜFE", "Ticarethane", "2026", "17", "0.3", "5" },
-                    new[] { "İBADETHANE", "Ticarethane", "2026", "42", "0.6", "25" },
-                    new[] { "İÇME SUYU", "Ticarethane", "2026", "67", "0.6", "40" },
-                    new[] { "İSTASYON", "Ticarethane", "2026", "67", "0.6", "40" },
-                    new[] { "MESKEN", "Mesken", "2026", "9", "0.7", "6" },
-                    new[] { "MOBESE KAMERASI", "Ticarethane", "2026", "8", "0.6", "5" },
-                    new[] { "OKUL", "Ticarethane", "2026", "150", "0.6", "90" },
-                    new[] { "OTOPARK", "Ticarethane", "2026", "80", "0.5", "40" },
-                    new[] { "ÖĞRENCİ YURDU", "Ticarethane", "2026", "167", "0.6", "100" },
-                    new[] { "RESMİ KURUM", "Ticarethane", "2026", "133", "0.6", "80" },
-                    new[] { "SANAYİ", "Ticarethane", "2026", "500", "0.5", "250" },
-                    new[] { "SİNYALİZASYON", "Ticarethane", "2026", "17", "0.6", "10" },
-                    new[] { "SONDAJ KUYUSU", "Tarımsal Sulama", "2026", "60", "0.5", "30" },
-                    new[] { "SPOR KOMPLEKSİ", "Ticarethane", "2026", "200", "0.6", "120" },
-                    new[] { "ŞARJ İSTASYONU", "Ticarethane", "2026", "167", "0.6", "100" },
-                    new[] { "ŞANTİYE", "Ticarethane", "2026", "250", "0.6", "150" },
-                    new[] { "TARIMSAL SULAMA", "Tarımsal Sulama", "2026", "133", "0.6", "80" },
-                    new[] { "TERFİ İSTASYONU", "Ticarethane", "2026", "91", "0.7", "64" },
-                    new[] { "TİCARETHANE", "Ticarethane", "2026", "100", "0.7", "70" },
-                    new[] { "YURT", "Ticarethane", "2026", "150", "0.7", "105" }
+                    new[] { "ACİL SERVİS", "TİCARETHANE", "2026", "167", "0.6", "100" },
+                    new[] { "ANAOKULU", "TİCARETHANE", "2026", "86", "0.7", "60" },
+                    new[] { "ATM", "TİCARETHANE", "2026", "10", "0.3", "3" },
+                    new[] { "AVM", "TİCARETHANE", "2026", "1800", "0.5", "900" },
+                    new[] { "BAZ İSTASYONU", "TİCARETHANE", "2026", "1800", "0.5", "900" },
+                    new[] { "BİNA", "MESKEN", "2026", "36", "0.7", "25" },
+                    new[] { "BÜFE", "TİCARETHANE", "2026", "7", "0.7", "5" },
+                    new[] { "DERNEK", "TİCARETHANE", "2026", "17", "0.7", "12" },
+                    new[] { "GÜÇ ARTIRIMI - ATM", "TİCARETHANE", "2026", "4", "1", "4" },
+                    new[] { "GÜÇ ARTIRIMI - İŞYERİ", "TİCARETHANE", "2026", "25", "1", "25" },
+                    new[] { "GÜÇ ARTIRIMI - TİCARETHANE", "TİCARETHANE", "2026", "30", "1", "30" },
+                    new[] { "GÜÇ ARTIRIMI - TARIMSAL SULAMA", "TARIMSAL SULAMA", "2026", "20", "1", "20" },
+                    new[] { "GEÇİCİ - DEPO", "TİCARETHANE", "2026", "50", "0.4", "20" },
+                    new[] { "GEÇİCİ - HOBİ BAHÇESİ", "MESKEN", "2026", "8", "0.4", "3" },
+                    new[] { "GEÇİCİ - PARK AYDINLATMASI", "TİCARETHANE", "2026", "83", "0.6", "50" },
+                    new[] { "GEÇİCİ - BÜFE", "TİCARETHANE", "2026", "17", "0.3", "5" },
+                    new[] { "İBADETHANE", "TİCARETHANE", "2026", "42", "0.6", "25" },
+                    new[] { "İÇME SUYU", "TİCARETHANE", "2026", "67", "0.6", "40" },
+                    new[] { "İSTASYON", "TİCARETHANE", "2026", "67", "0.6", "40" },
+                    new[] { "MESKEN", "MESKEN", "2026", "9", "0.7", "6" },
+                    new[] { "MOBESE KAMERASI", "TİCARETHANE", "2026", "8", "0.6", "5" },
+                    new[] { "OKUL", "TİCARETHANE", "2026", "150", "0.6", "90" },
+                    new[] { "OTOPARK", "TİCARETHANE", "2026", "80", "0.5", "40" },
+                    new[] { "ÖĞRENCİ YURDU", "TİCARETHANE", "2026", "167", "0.6", "100" },
+                    new[] { "RESMİ KURUM", "TİCARETHANE", "2026", "133", "0.6", "80" },
+                    new[] { "SANAYİ", "SANAYİ", "2026", "500", "0.5", "250" },
+                    new[] { "SİNYALİZASYON", "TİCARETHANE", "2026", "17", "0.6", "10" },
+                    new[] { "SONDAJ KUYUSU", "TARIMSAL SULAMA", "2026", "60", "0.5", "30" },
+                    new[] { "SPOR KOMPLEKSİ", "TİCARETHANE", "2026", "200", "0.6", "120" },
+                    new[] { "ŞARJ İSTASYONU", "TİCARETHANE", "2026", "167", "0.6", "100" },
+                    new[] { "ŞANTİYE", "TİCARETHANE", "2026", "250", "0.6", "150" },
+                    new[] { "TARIMSAL SULAMA", "TARIMSAL SULAMA", "2026", "133", "0.6", "80" },
+                    new[] { "TERFİ İSTASYONU", "TİCARETHANE", "2026", "91", "0.7", "64" },
+                    new[] { "TİCARETHANE", "TİCARETHANE", "2026", "100", "0.7", "70" },
+                    new[] { "YURT", "TİCARETHANE", "2026", "150", "0.7", "105" }
                 };
 
                 foreach (var rowData in defaultData)
                 {
                     var row = dataTable.NewRow();
                     row["Tipi"] = rowData[0];
-                    row["ENERJI_MUSAADE_ABONE_GRUBU"] = rowData[1];
-                    row["ENERJI_MUSAADE_ENERJILENDIRME_YILI"] = rowData[2];
+                    row["ABONE_GRUBU"] = rowData[1];
+                    row["ENERJILENDIRME_YILI"] = rowData[2];
                     row["Kurulu Güç (kW)"] = rowData[3];
                     row["Pik Yüklenme (%)"] = rowData[4];
                     row["Pik Demant (kW)"] = rowData[5];
@@ -299,7 +299,6 @@ namespace SLF
 
             try
             {
-                Console.WriteLine("ValidatePolygonData: Method started.");
 
                 // Check if all required columns exist in the DataGridView
                 if (!NoktaYukDataGridView.Columns.Contains(powerColumn) ||
@@ -310,7 +309,6 @@ namespace SLF
                         .Where(col => !NoktaYukDataGridView.Columns.Contains(col)));
                     MessageBox.Show($"Hata: Şu sütun(lar) bulunamadı: {missingColumns}.",
                         "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    Console.WriteLine($"ValidatePolygonData: Missing columns: {missingColumns}");
                     return false;
                 }
 
@@ -318,9 +316,6 @@ namespace SLF
                 int powerColumnIndex = NoktaYukDataGridView.Columns[powerColumn].Index;
                 int peakLoadColumnIndex = NoktaYukDataGridView.Columns[peakLoadColumn].Index;
                 int peakDemandColumnIndex = NoktaYukDataGridView.Columns[peakDemandColumn].Index;
-
-                Console.WriteLine($"ValidatePolygonData: Columns found. PowerIndex={powerColumnIndex}, PeakLoadIndex={peakLoadColumnIndex}, PeakDemandIndex={peakDemandColumnIndex}");
-                Console.WriteLine($"ValidatePolygonData: Total rows={NoktaYukDataGridView.Rows.Count}");
 
                 // Iterate over each row in the DataGridView
                 for (int rowIndex = 0; rowIndex < NoktaYukDataGridView.Rows.Count; rowIndex++)
@@ -330,7 +325,6 @@ namespace SLF
                     // Skip the new row placeholder if it exists
                     if (row.IsNewRow)
                     {
-                        Console.WriteLine($"ValidatePolygonData: Row {rowIndex + 1} skipped (new row placeholder).");
                         continue;
                     }
 
@@ -339,8 +333,6 @@ namespace SLF
                     string peakLoadCellValue = row.Cells[peakLoadColumnIndex].Value?.ToString();
                     string peakDemandCellValue = row.Cells[peakDemandColumnIndex].Value?.ToString();
 
-                    Console.WriteLine($"ValidatePolygonData: Row {rowIndex + 1} - Power='{powerCellValue}', PeakLoad='{peakLoadCellValue}', PeakDemand='{peakDemandCellValue}'");
-
                     // Validate "Kurulu Güç (kW)" if present
                     if (!string.IsNullOrWhiteSpace(powerCellValue))
                     {
@@ -348,7 +340,6 @@ namespace SLF
                         {
                             MessageBox.Show($"Satır {rowIndex + 1}: '{powerColumn}' sütununda geçersiz bir değer: {powerCellValue}",
                                 "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            Console.WriteLine($"ValidatePolygonData: Row {rowIndex + 1} - Invalid power value: {powerCellValue}");
                             return false;
                         }
 
@@ -357,7 +348,6 @@ namespace SLF
                         {
                             MessageBox.Show($"Satır {rowIndex + 1}: '{powerColumn}' değeri 10,000'i aşamaz. Değer: {powerValue}",
                                 "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            Console.WriteLine($"ValidatePolygonData: Row {rowIndex + 1} - Power value {powerValue} exceeds 10,000.");
                             return false;
                         }
                     }
@@ -373,7 +363,6 @@ namespace SLF
                         {
                             // Calculate expected peak demand
                             double expectedPeakDemand = powerValue * (peakLoadValue / 100); // Percentage correction
-                            Console.WriteLine($"ValidatePolygonData: Row {rowIndex + 1} - Power={powerValue}, PeakLoad={peakLoadValue}, ExpectedPeakDemand={expectedPeakDemand}, ActualPeakDemand={peakDemandValue}");
 
                             // Use a small tolerance for floating-point precision
                             const double tolerance = 0.001; // Increased slightly for robustness
@@ -383,7 +372,6 @@ namespace SLF
                                     $"Satır {rowIndex + 1}: '{powerColumn}' * '{peakLoadColumn}' / 100 = '{peakDemandColumn}' eşitliği sağlanmıyor.\n" +
                                     $"Hesaplanan: {expectedPeakDemand:F2} kW, Girilen: {peakDemandValue:F2} kW",
                                     "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                Console.WriteLine($"ValidatePolygonData: Row {rowIndex + 1} - Equality failed. Expected: {expectedPeakDemand:F2}, Actual: {peakDemandValue:F2}");
                                 return false;
                             }
                         }
@@ -392,7 +380,6 @@ namespace SLF
                             MessageBox.Show($"Satır {rowIndex + 1}: '{powerColumn}', '{peakLoadColumn}' veya '{peakDemandColumn}' sütununda geçersiz bir değer var.\n" +
                                 $"Değerler: Power='{powerCellValue}', PeakLoad='{peakLoadCellValue}', PeakDemand='{peakDemandCellValue}'",
                                 "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            Console.WriteLine($"ValidatePolygonData: Row {rowIndex + 1} - Invalid values: Power='{powerCellValue}', PeakLoad='{peakLoadCellValue}', PeakDemand='{peakDemandCellValue}'");
                             return false;
                         }
                     }
@@ -408,7 +395,6 @@ namespace SLF
             catch (Exception ex)
             {
                 MessageBox.Show($"Doğrulama sırasında bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Console.WriteLine($"ValidatePolygonData: Exception occurred: {ex.Message}\nStackTrace: {ex.StackTrace}");
                 return false;
             }
         }
