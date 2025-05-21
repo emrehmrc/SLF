@@ -7,6 +7,7 @@ using System.IO;
 using ExcelDataReader;
 using GMap.NET;
 using System.Globalization;
+using OfficeOpenXml;
 
 namespace SLF
 {
@@ -506,6 +507,10 @@ namespace SLF
             }
         }
 
+        // Dictionary to store adjusted horizontal values (Year -> (Category -> Adjusted Value))
+        // e.g., { 2027: { "TİCARETHANE": 3597070.999 - difference, "SANAYİ": ... } }
+        private static readonly Dictionary<int, Dictionary<string, double>> AdjustedHorizontalValues = new Dictionary<int, Dictionary<string, double>>();
+
         private bool ValidatePolygonData()
         {
             try
@@ -516,18 +521,18 @@ namespace SLF
                     // Columns to validate for percentage sum
                     string[] percentageColumns = new string[]
                     {
-                        "1-2 KATLI MESKEN",
-                        "3-4 KATLI MESKEN",
-                        "5-7 KATLI MESKEN",
-                        "8 USTU KATLI MESKEN",
-                        "VILLA MESKEN",
-                        "AYDINLATMA",
-                        "KUCUK SANAYI",
-                        "KUCUK TICARETHANE",
-                        "ORTA SANAYI",
-                        "ORTA TICARETHANE",
-                        "TARIMSAL SULAMA",
-                        "Park, Yol, Kaldırım Oranı (%)"
+                "1-2 KATLI MESKEN",
+                "3-4 KATLI MESKEN",
+                "5-7 KATLI MESKEN",
+                "8 USTU KATLI MESKEN",
+                "VILLA MESKEN",
+                "AYDINLATMA",
+                "KUCUK SANAYI",
+                "KUCUK TICARETHANE",
+                "ORTA SANAYI",
+                "ORTA TICARETHANE",
+                "TARIMSAL SULAMA",
+                "Park, Yol, Kaldırım Oranı (%)"
                     };
 
                     // Additional columns to validate
@@ -615,7 +620,10 @@ namespace SLF
                 // Validation for isSelecting_YUK or isSelecting_Musaade
                 if (isSelecting_YUK || isSelecting_Musaade)
                 {
-                    string[] columnsToValidate = { "Kurulu Güç (kW)", "Pik Yüklenme (%)", "Pik Demant (kW)" };
+                    // Required columns for both YUK and Musaade
+                    string[] columnsToValidate = { "Kurulu Güç (kW)", "Pik Yüklenme (%)", "Pik Demant (kW)", "ENERJILENDIRME_YILI" };
+                    string categoryColumn = isSelecting_YUK ? "Tüketim Sınıfı" : "ABONE_GRUBU";
+                    columnsToValidate = columnsToValidate.Concat(new[] { categoryColumn }).ToArray();
 
                     // Check if all required columns exist
                     foreach (string column in columnsToValidate)
@@ -632,44 +640,200 @@ namespace SLF
                     {
                         DataRow row = dataTable.Rows[rowIndex];
 
-                        // Get values for the three columns
+                        // Get values for the required columns
                         string powerValueStr = row["Kurulu Güç (kW)"]?.ToString();
                         string peakLoadValueStr = row["Pik Yüklenme (%)"]?.ToString();
                         string peakDemandValueStr = row["Pik Demant (kW)"]?.ToString();
+                        string energizationYearStr = row["ENERJILENDIRME_YILI"]?.ToString();
+                        string categoryValue = row[categoryColumn]?.ToString();
 
-                        // Only validate if all three values are present and non-empty
-                        if (!string.IsNullOrWhiteSpace(powerValueStr) &&
-                            !string.IsNullOrWhiteSpace(peakLoadValueStr) &&
-                            !string.IsNullOrWhiteSpace(peakDemandValueStr))
+                        // Validate required fields
+                        if (string.IsNullOrWhiteSpace(powerValueStr) ||
+                            string.IsNullOrWhiteSpace(peakLoadValueStr) ||
+                            string.IsNullOrWhiteSpace(peakDemandValueStr) ||
+                            string.IsNullOrWhiteSpace(energizationYearStr) ||
+                            string.IsNullOrWhiteSpace(categoryValue))
                         {
-                            // Parse values
-                            bool isPowerValid = double.TryParse(powerValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double powerValue);
-                            bool isPeakLoadValid = double.TryParse(peakLoadValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double peakLoadValue);
-                            bool isPeakDemandValid = double.TryParse(peakDemandValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double peakDemandValue);
+                            MessageBox.Show(
+                                $"Satır {rowIndex + 1}: Tüm alanlar doldurulmalıdır: " +
+                                $"Kurulu Güç='{powerValueStr}', Pik Yüklenme='{peakLoadValueStr}', Pik Demant='{peakDemandValueStr}', " +
+                                $"ENERJILENDIRME_YILI='{energizationYearStr}', {categoryColumn}='{categoryValue}'",
+                                "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
 
-                            if (isPowerValid && isPeakLoadValid && isPeakDemandValid)
+                        // Parse values
+                        if (!double.TryParse(powerValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double powerValue) ||
+                            !double.TryParse(peakLoadValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double peakLoadValue) ||
+                            !double.TryParse(peakDemandValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double peakDemandValue) ||
+                            !int.TryParse(energizationYearStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int energizationYear))
+                        {
+                            MessageBox.Show(
+                                $"Satır {rowIndex + 1}: Geçersiz değerler: " +
+                                $"Kurulu Güç='{powerValueStr}', Pik Yüklenme='{peakLoadValueStr}', Pik Demant='{peakDemandValueStr}', " +
+                                $"ENERJILENDIRME_YILI='{energizationYearStr}'",
+                                "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+
+                        // Validate the power equation
+                        double expectedPeakDemand = powerValue * peakLoadValue;
+                        const double tolerance = 0.001;
+                        if (Math.Abs(expectedPeakDemand - peakDemandValue) > tolerance)
+                        {
+                            MessageBox.Show(
+                                $"Satır {rowIndex + 1}: 'Kurulu Güç (kW)' * 'Pik Yüklenme (%)' = 'Pik Demant (kW)' eşitliği sağlanmıyor.\n" +
+                                $"Hesaplanan: {expectedPeakDemand:F2} kW, Girilen: {peakDemandValue:F2} kW",
+                                "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+
+                        // Determine the category column in Excel
+                        string excelColumn;
+                        string categoryUpper = categoryValue.ToUpper();
+                        if (categoryUpper == "TİCARETHANE")
+                        {
+                            excelColumn = "TICARETHANE_HORIZONTAL";
+                        }
+                        else if (categoryUpper == "SANAYİ")
+                        {
+                            excelColumn = "SANAYI_HORIZONTAL";
+                        }
+                        else
+                        {
+                            MessageBox.Show(
+                                $"Satır {rowIndex + 1}: {categoryColumn} yalnızca 'TİCARETHANE' veya 'SANAYİ' olabilir. Girilen: {categoryValue}",
+                                "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+
+                        // Construct the path to the Excel file
+                        string hor_ver_path = Path.Combine(modül_formu.ana_menu_form_objesi.userRootPath,
+                            (string)modül_formu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                            (string)modül_formu.ana_menu_form_objesi.config.İl,
+                            (string)modül_formu.ana_menu_form_objesi.config.İlçe,
+                            (string)modül_formu.ana_menu_form_objesi.config.proje_ismi,
+                            (string)modül_formu.ana_menu_form_objesi.config.ELF.hor_ver_dosyası).Replace('/', '\\');
+
+                        if (!File.Exists(hor_ver_path))
+                        {
+                            MessageBox.Show($"Hata: Excel dosyası bulunamadı: {hor_ver_path}", "Dosya Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+
+
+                        // Read the Excel file
+                        using (var package = new ExcelPackage(new FileInfo(hor_ver_path)))
+                        {
+                            var worksheet = package.Workbook.Worksheets[0]; // First worksheet
+                            int rowCount = worksheet.Dimension.Rows;
+                            int yearCol = 2; // "YIL" is the second column
+                            int horizontalCol = -1;
+
+                            // Find the column index for TICARETHANE_HORIZONTAL or SANAYI_HORIZONTAL
+                            for (int col = 1; col <= worksheet.Dimension.Columns; col++)
                             {
-                                // Calculate expected peak demand
-                                double expectedPeakDemand = powerValue * (peakLoadValue / 100); // Fixed: Added /100 for percentage
+                                if (worksheet.Cells[1, col].Text == excelColumn)
+                                {
+                                    horizontalCol = col;
+                                    break;
+                                }
+                            }
 
-                                // Use a small tolerance for floating-point precision
-                                const double tolerance = 0.001;
-                                if (Math.Abs(expectedPeakDemand - peakDemandValue) > tolerance)
+                            if (horizontalCol == -1)
+                            {
+                                MessageBox.Show($"Hata: '{excelColumn}' sütunu Excel dosyasında bulunamadı.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return false;
+                            }
+
+                            // Validate for years t0, t+1, and t+2
+                            for (int yearOffset = 0; yearOffset <= 2; yearOffset++)
+                            {
+                                int targetYear = energizationYear + yearOffset;
+                                double multiplier = (yearOffset == 0) ? 0.5 : 0.25;
+                                double calculatedValue = peakDemandValue / 2.5 * 8760 * multiplier;
+                                double thresholdMultiplier = 0.9; // 90%
+
+                                // Find the row for the target year
+                                double horizontalValue = 0;
+                                bool yearFound = false;
+                                for (int excelRow = 2; excelRow <= rowCount; excelRow++) // Renamed 'row' to 'excelRow'
+                                {
+                                    string yearStr = worksheet.Cells[excelRow, yearCol].Text?.Replace(",", "");
+                                    if (int.TryParse(yearStr, out int excelYear) && excelYear == targetYear)
+                                    {
+                                        string horizontalStr = worksheet.Cells[excelRow, horizontalCol].Text?.Replace(",", "");
+                                        if (double.TryParse(horizontalStr, NumberStyles.Any, CultureInfo.InvariantCulture, out horizontalValue))
+                                        {
+                                            yearFound = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (!yearFound)
+                                {
+                                    MessageBox.Show($"Hata: {targetYear} yılı Excel dosyasında bulunamadı.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return false;
+                                }
+
+                                // Adjust horizontal value if previous polygons have modified it
+                                double adjustedHorizontalValue = horizontalValue;
+                                if (AdjustedHorizontalValues.ContainsKey(targetYear) && AdjustedHorizontalValues[targetYear].ContainsKey(categoryUpper))
+                                {
+                                    adjustedHorizontalValue = AdjustedHorizontalValues[targetYear][categoryUpper];
+                                }
+
+                                double threshold = adjustedHorizontalValue * thresholdMultiplier;
+                                if (calculatedValue > threshold)
                                 {
                                     MessageBox.Show(
-                                        $"Satır {rowIndex + 1}: '{columnsToValidate[0]}' * '{columnsToValidate[1]}' / 100 = '{columnsToValidate[2]}' eşitliği sağlanmıyor.\n" +
-                                        $"Hesaplanan: {expectedPeakDemand:F2} kW, Girilen: {peakDemandValue:F2} kW",
+                                        $"Satır {rowIndex + 1}: {targetYear} yılı için {excelColumn} ELF tahmininden gelen " +
+                                        $"kWh tüketim sınırını aşıyor.\n" +
+                                        $"Hesaplanan Değer: {calculatedValue:F0} kWh," +
+                                        $" İzin Verilen Maksimum ({targetYear} verisinin ({adjustedHorizontalValue:F0})" +
+                                        $" %90'ı) = {threshold:F0} kWh",
                                         "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return false;
                                 }
                             }
-                            else
+
+                            // If all validations pass, calculate and store the differences
+                            for (int yearOffset = 0; yearOffset <= 2; yearOffset++)
                             {
-                                MessageBox.Show(
-                                    $"Satır {rowIndex + 1}: '{columnsToValidate[0]}', '{columnsToValidate[1]}' veya '{columnsToValidate[2]}' sütununda geçersiz bir değer var.\n" +
-                                    $"Değerler: Power='{powerValueStr}', PeakLoad='{peakLoadValueStr}', PeakDemand='{peakDemandValueStr}'",
-                                    "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return false;
+                                int targetYear = energizationYear + yearOffset;
+                                double multiplier = (yearOffset == 0) ? 0.5 : 0.25;
+                                double calculatedValue = peakDemandValue / 2.5 * 8760 * multiplier;
+
+                                // Find the original horizontal value again for difference calculation
+                                double horizontalValue = 0;
+                                for (int excelRow = 2; excelRow <= rowCount; excelRow++) // Renamed 'row' to 'excelRow'
+                                {
+                                    string yearStr = worksheet.Cells[excelRow, yearCol].Text?.Replace(",", "");
+                                    if (int.TryParse(yearStr, out int excelYear) && excelYear == targetYear)
+                                    {
+                                        string horizontalStr = worksheet.Cells[excelRow, horizontalCol].Text?.Replace(",", "");
+                                        if (double.TryParse(horizontalStr, NumberStyles.Any, CultureInfo.InvariantCulture, out horizontalValue))
+                                        {
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                // Adjust the value (subtract the calculated value)
+                                double adjustedValue = horizontalValue;
+                                if (AdjustedHorizontalValues.ContainsKey(targetYear) && AdjustedHorizontalValues[targetYear].ContainsKey(categoryUpper))
+                                {
+                                    adjustedValue = AdjustedHorizontalValues[targetYear][categoryUpper];
+                                }
+                                adjustedValue -= calculatedValue;
+
+                                // Store the adjusted value in the dictionary
+                                if (!AdjustedHorizontalValues.ContainsKey(targetYear))
+                                {
+                                    AdjustedHorizontalValues[targetYear] = new Dictionary<string, double>();
+                                }
+                                AdjustedHorizontalValues[targetYear][categoryUpper] = adjustedValue;
                             }
                         }
                     }
