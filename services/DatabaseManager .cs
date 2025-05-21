@@ -1,6 +1,6 @@
-﻿using Npgsql;
-using System;
+﻿using System;
 using System.Data;
+using Oracle.ManagedDataAccess.Client;
 
 namespace SLF.Services
 {
@@ -8,7 +8,7 @@ namespace SLF.Services
     {
         private static DatabaseManager _instance;
         private static readonly object _lock = new object();
-        private NpgsqlConnection _connection;
+        private OracleConnection _connection;
         private string _connectionString;
 
         private DatabaseManager()
@@ -36,7 +36,7 @@ namespace SLF.Services
             return _instance;
         }
 
-        public NpgsqlConnection GetConnection()
+        public OracleConnection GetConnection()
         {
             try
             {
@@ -52,7 +52,7 @@ namespace SLF.Services
                         _connection.Dispose();
                     }
 
-                    _connection = new NpgsqlConnection(_connectionString);
+                    _connection = new OracleConnection(_connectionString);
                     _connection.Open();
                 }
 

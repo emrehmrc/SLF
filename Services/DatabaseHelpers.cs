@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Npgsql;
 using System.Data;
+using Oracle.ManagedDataAccess.Client;
+
 namespace SLF.Services
 {
     public static class DatabaseHelper
@@ -14,18 +15,18 @@ namespace SLF.Services
             try
             {
                 var connection = DatabaseManager.GetInstance().GetConnection();
-                using (var cmd = new NpgsqlCommand(query, connection))
+                using (var cmd = new OracleCommand(query, connection))
                 {
                     // Parametreleri ekle
                     if (parameters != null)
                     {
                         foreach (var param in parameters)
                         {
-                            cmd.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
+                            cmd.Parameters.Add(new OracleParameter(param.Key, param.Value ?? DBNull.Value));
                         }
                     }
 
-                    using (var adapter = new NpgsqlDataAdapter(cmd))
+                    using (var adapter = new OracleDataAdapter(cmd))
                     {
                         DataTable result = new DataTable();
                         adapter.Fill(result);
@@ -47,14 +48,14 @@ namespace SLF.Services
             try
             {
                 var connection = DatabaseManager.GetInstance().GetConnection();
-                using (var cmd = new NpgsqlCommand(query, connection))
+                using (var cmd = new OracleCommand(query, connection))
                 {
                     // Parametreleri ekle
                     if (parameters != null)
                     {
                         foreach (var param in parameters)
                         {
-                            cmd.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
+                            cmd.Parameters.Add(new OracleParameter(param.Key, param.Value ?? DBNull.Value));
                         }
                     }
 
@@ -75,19 +76,16 @@ namespace SLF.Services
             try
             {
                 string query = @"
-                    SELECT EXISTS (
-                        SELECT FROM information_schema.tables 
-                        WHERE table_schema = 'public' 
-                        AND table_name = @tableName
-                    )";
+                    SELECT COUNT(*) FROM ALL_TABLES 
+                    WHERE TABLE_NAME = :tableName";
 
                 var parameters = new Dictionary<string, object>
                 {
-                    { "@tableName", tableName.ToLower() }
+                    { ":tableName", tableName.ToUpper() }
                 };
 
                 var result = ExecuteQuery(query, parameters);
-                return Convert.ToBoolean(result.Rows[0][0]);
+                return Convert.ToInt32(result.Rows[0][0]) > 0;
             }
             catch (Exception ex)
             {
@@ -113,11 +111,11 @@ namespace SLF.Services
                 string query = $"SELECT * FROM \"{tableName}\"";
                 Console.WriteLine($"Çalıştırılacak sorgu: {query}");
 
-                using (var cmd = new NpgsqlCommand(query, connection))
+                using (var cmd = new OracleCommand(query, connection))
                 {
-                    Console.WriteLine("NpgsqlCommand oluşturuldu");
+                    Console.WriteLine("OracleCommand oluşturuldu");
 
-                    using (var adapter = new NpgsqlDataAdapter(cmd))
+                    using (var adapter = new OracleDataAdapter(cmd))
                     {
                         Console.WriteLine("DataAdapter oluşturuldu");
 
@@ -148,4 +146,3 @@ namespace SLF.Services
         }
     }
 }
-

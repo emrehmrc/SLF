@@ -182,7 +182,110 @@ namespace SLF.services
                 throw; // Re-throw for upper level methods to catch
             }
         }
+        public static string RunPythonScriptForAboneVerisi(string configPath)
+        {
+            try
+            {
+                Console.WriteLine("---------- Abone Verisi Python Script Çalıştırma Başladı ----------");
+                Console.WriteLine($"Config dosya yolu: {configPath}");
 
+                // Python yürütme ortamı
+                string pythonExecutable = "python"; // veya "python3" gerekirse
+
+                // Python kod dosyasının yolunu PathService'ten al
+                string pythonScript = PathService._configveritabanikod;
+                Console.WriteLine($"Config'den alınan Python kod yolu: {pythonScript}");
+
+                // Tüm dosya yolunu düzgün formata getir
+                if (!string.IsNullOrEmpty(pythonScript))
+                {
+                    // Hem / hem de \ karakterlerini önce / yapalım, sonra hepsini \ yapalım
+                    pythonScript = pythonScript.Replace('\\', '/').Replace('/', '\\');
+                    Console.WriteLine($"Düzenlenen Python kodu yolu: {pythonScript}");
+                }
+
+                // Dosyanın var olup olmadığını kontrol et
+                if (string.IsNullOrEmpty(pythonScript) || !File.Exists(pythonScript))
+                {
+                    throw new FileNotFoundException($"Python kod dosyası bulunamadı! Aranan konum: {pythonScript}");
+                }
+
+                Console.WriteLine($"Python kodu çalıştırılıyor: {pythonScript}");
+                Console.WriteLine($"Config dosyası: {configPath}");
+
+                // Python sürecini başlat ve config yolunu argüman olarak geç
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = pythonExecutable,
+                    Arguments = $"\"{pythonScript}\" \"{configPath}\"", // Doğrudan config yolunu argüman olarak geç
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = false, // Hata ayıklama için görünür konsol penceresi
+                    WorkingDirectory = Path.GetDirectoryName(pythonScript) // Çalışma dizinini script konumuna ayarla
+                };
+
+                StringBuilder output = new StringBuilder();
+                StringBuilder error = new StringBuilder();
+
+                using (Process process = new Process())
+                {
+                    process.StartInfo = startInfo;
+                    process.Start();
+
+                    // Çıktıları asenkron olarak oku
+                    process.OutputDataReceived += (sender, e) => {
+                        if (e.Data != null)
+                        {
+                            output.AppendLine(e.Data);
+                            Console.WriteLine(e.Data); // Gerçek zamanlı çıktı görüntüleme
+                        }
+                    };
+
+                    process.ErrorDataReceived += (sender, e) => {
+                        if (e.Data != null)
+                        {
+                            error.AppendLine(e.Data);
+                            Console.WriteLine($"ERR: {e.Data}"); // Hata çıktısı görüntüleme
+                        }
+                    };
+
+                    // Asenkron okumayı başlat
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
+
+                    // İşlemin tamamlanmasını bekle
+                    process.WaitForExit();
+
+                    // Çıktıları alalım
+                    string outputStr = output.ToString();
+                    string errorStr = error.ToString();
+
+                    // Hata durumunda
+                    if (process.ExitCode != 0)
+                    {
+                        throw new Exception($"Python kodu çalıştırılırken hata oluştu (Çıkış kodu: {process.ExitCode}).\nHata: {errorStr}");
+                    }
+
+                    // İşlemin başarılı olduğunu kontrol et
+                    if (outputStr.Contains("Sonuçlar başarıyla Excel formatında kaydedildi"))
+                    {
+                        Console.WriteLine("Abone verileri başarıyla işlendi.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Abone verileri işlemi tamamlandı, ancak başarı mesajı alınamadı.");
+                    }
+
+                    return outputStr;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Python kodunu çalıştırırken hata: {ex.Message}");
+                throw new Exception($"Python kodunu çalıştırırken hata: {ex.Message}", ex);
+            }
+        }
         public static string RunImarPlanModel(string kmlFilePath, string csvFilePath = null)
         {
             try
