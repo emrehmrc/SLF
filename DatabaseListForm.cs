@@ -14,34 +14,96 @@ namespace SLF
 {
     public partial class DatabaseListForm : Form
     {
-        private readonly Dictionary<string, List<string>> requiredColumns = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
-        {
-            { "DTR Verileri", new List<string> {
-                "TRAFO_ID",
-                "TRAFO_KODU",
-                "TRAFO_ILCE_ADI",
-                "TRAFO_KAPASITESI",
-                "TRAFO_X_KOORDINAT",
-                "TRAFO_Y_KOORDINAT"
-            }},
-            { "Abone Verileri", new List<string> {
-                "TESISAT_NO",
-                "ABONE_X_KOORDINAT",
-                "ABONE_Y_KOORDINAT",
-                "BAGLANDIGI_TRAFO_KODU",
-                "BAGLANTI_GUCU",
-                "ABONE_GRUBU"
-            }}
-        };
+        
 
         public DatabaseListForm()
         {
             InitializeComponent();
+
+            // Load event'ini manuel olarak bağla
+            this.Load += DatabaseListForm_Load;
+
+            // Constructor'da direkt çağır (kesin çalışır)
+            try
+            {
+                // Form tamamen yüklendikten sonra çağırmak için Timer kullan
+                var timer = new Timer();
+                timer.Interval = 100; // 100ms bekle
+                timer.Tick += (s, e) =>
+                {
+                    timer.Stop();
+                    timer.Dispose();
+                    CheckDataValidation();
+                };
+                timer.Start();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Başlangıç kontrolü sırasında hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
-       
+        private void DatabaseListForm_Load(object sender, EventArgs e)
+        {
+            // Form yüklendiğinde veri doğrulaması yap
+            CheckDataValidation();
+        }
 
-        
+        /// <summary>
+        /// Veritabanı verilerinin güncelliğini kontrol eder
+        /// </summary>
+        private void CheckDataValidation()
+        {
+            try
+            {
+                // Veritabanı bağlantısı var mı kontrol et
+                var dbManager = DatabaseManager.GetInstance();
+                if (!dbManager.HasConnectionString() || !dbManager.IsConnected())
+                {
+                    MessageBox.Show("Veritabanı bağlantısı bulunamadı. Lütfen önce veritabanına bağlanın.",
+                                  "Bağlantı Hatası",
+                                  MessageBoxButtons.OK,
+                                  MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Config dosyası yolunu al
+                string configPath = PathService._configKonum;
+
+                if (string.IsNullOrEmpty(configPath) || !File.Exists(configPath))
+                {
+                    MessageBox.Show("Config dosyası bulunamadı.",
+                                  "Config Hatası",
+                                  MessageBoxButtons.OK,
+                                  MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Veri doğrulaması yap
+                var validationResult = DataValidationService.ValidateAboneData(configPath);
+
+                // Sonucu kullanıcıya göster
+                MessageBoxIcon icon = validationResult.IsValid ? MessageBoxIcon.Information : MessageBoxIcon.Warning;
+                string title = validationResult.IsValid ? "Veri Durumu - Güncel" : "Veri Durumu - Güncelleme Gerekli";
+
+                MessageBox.Show(validationResult.Message, title, MessageBoxButtons.OK, icon);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Veri doğrulaması sırasında hata oluştu: {ex.Message}",
+                              "Hata",
+                              MessageBoxButtons.OK,
+                              MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Manuel veri doğrulaması butonu için
+        /// </summary>
+        private void buttonVerileriKontrolEt_Click(object sender, EventArgs e)
+        {
+            CheckDataValidation();
+        }
 
         private void buttonAboneVerisiOlustur_Click(object sender, EventArgs e)
         {
@@ -51,22 +113,19 @@ namespace SLF
                 string configPath = PathService._configKonum;
 
                 // Python script yolunu al
-
-
                 PythonHelper.RunPythonScriptForAboneVerisi(configPath);
-
-                // Formu göster
-
 
                 // İşlem başarılı olduysa dialog'u kapat
                 MessageBox.Show("Abone verisi başarıyla oluşturuldu.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Abone verisi oluşturulduktan sonra tekrar kontrol et
+                CheckDataValidation();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-       
 
         // Tablo seçim formu
         public class SelectTableForm : Form
@@ -159,4 +218,5 @@ namespace SLF
                 }
             }
         }
-    }}
+    }
+}

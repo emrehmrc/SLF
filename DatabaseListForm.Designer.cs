@@ -40,7 +40,7 @@
             this.buttonAboneVerisiOlustur.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
             this.buttonAboneVerisiOlustur.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.buttonAboneVerisiOlustur.ForeColor = System.Drawing.Color.DarkOrange;
-            this.buttonAboneVerisiOlustur.Location = new System.Drawing.Point(268, 133);
+            this.buttonAboneVerisiOlustur.Location = new System.Drawing.Point(275, 150);
             this.buttonAboneVerisiOlustur.Name = "buttonAboneVerisiOlustur";
             this.buttonAboneVerisiOlustur.Size = new System.Drawing.Size(200, 76);
             this.buttonAboneVerisiOlustur.TabIndex = 1;
