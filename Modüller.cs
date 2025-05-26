@@ -8236,6 +8236,29 @@ namespace SLF
             {
                 try
                 {
+
+                    switch (ELFSonuçlarTabControls.SelectedIndex + 1)
+                    {
+                        case 1:
+                            ana_menu_form_objesi.config.SLF.secilen_senaryo = "minimum";
+                            break;
+                        case 2:
+                            ana_menu_form_objesi.config.SLF.secilen_senaryo = "düşük";
+                            break;
+                        case 3:
+                            ana_menu_form_objesi.config.SLF.secilen_senaryo = "baz";
+                            break;
+                        case 4:
+                            ana_menu_form_objesi.config.SLF.secilen_senaryo = "yüksek";
+                            break;
+                        case 5:
+                            ana_menu_form_objesi.config.SLF.secilen_senaryo = "maksimum";
+                            break;
+                    }
+
+                    methodFormObjesi.SaveConfigToFile();
+
+
                     this.Cursor = Cursors.WaitCursor;
 
                     // Construct the path to the R script
