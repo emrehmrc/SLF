@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Oracle.ManagedDataAccess.Client; // PostgreSQL yerine Oracle kütüphanesi
+using Npgsql;
 using System.Data;
+using Oracle.ManagedDataAccess.Client;
+
 namespace SLF.Services
 {
     public static class DatabaseHelper
@@ -14,23 +16,18 @@ namespace SLF.Services
             try
             {
                 var connection = DatabaseManager.GetInstance().GetConnection();
-                using (var cmd = new OracleCommand(query, connection)) // NpgsqlCommand -> OracleCommand
+                using (var cmd = new OracleCommand(query, connection))
                 {
                     // Parametreleri ekle - Oracle'da parametre formatı farklıdır
                     if (parameters != null)
                     {
                         foreach (var param in parameters)
                         {
-                            // Oracle'da parametre işareti @ yerine : kullanılır
-                            string paramName = param.Key;
-                            if (paramName.StartsWith("@"))
-                                paramName = ":" + paramName.Substring(1);
-
-                            cmd.Parameters.Add(new OracleParameter(paramName, param.Value ?? DBNull.Value));
+                            cmd.Parameters.Add(new OracleParameter(param.Key, param.Value ?? DBNull.Value));
                         }
                     }
 
-                    using (var adapter = new OracleDataAdapter(cmd)) // NpgsqlDataAdapter -> OracleDataAdapter
+                    using (var adapter = new OracleDataAdapter(cmd))
                     {
                         DataTable result = new DataTable();
                         adapter.Fill(result);
@@ -52,19 +49,14 @@ namespace SLF.Services
             try
             {
                 var connection = DatabaseManager.GetInstance().GetConnection();
-                using (var cmd = new OracleCommand(query, connection)) // NpgsqlCommand -> OracleCommand
+                using (var cmd = new OracleCommand(query, connection))
                 {
                     // Parametreleri ekle
                     if (parameters != null)
                     {
                         foreach (var param in parameters)
                         {
-                            // Oracle'da parametre işareti @ yerine : kullanılır
-                            string paramName = param.Key;
-                            if (paramName.StartsWith("@"))
-                                paramName = ":" + paramName.Substring(1);
-
-                            cmd.Parameters.Add(new OracleParameter(paramName, param.Value ?? DBNull.Value));
+                            cmd.Parameters.Add(new OracleParameter(param.Key, param.Value ?? DBNull.Value));
                         }
                     }
 
@@ -86,14 +78,12 @@ namespace SLF.Services
             {
                 // Oracle için tablo var mı kontrolü sorgusu
                 string query = @"
-                    SELECT COUNT(*) 
-                    FROM ALL_TABLES 
-                    WHERE OWNER = USER 
-                    AND TABLE_NAME = :tableName";
+                    SELECT COUNT(*) FROM ALL_TABLES 
+                    WHERE TABLE_NAME = :tableName";
 
                 var parameters = new Dictionary<string, object>
                 {
-                    { ":tableName", tableName.ToUpper() } // Oracle genellikle büyük harf kullanır
+                    { ":tableName", tableName.ToUpper() }
                 };
 
                 var result = ExecuteQuery(query, parameters);
@@ -123,11 +113,11 @@ namespace SLF.Services
                 string query = $"SELECT * FROM {tableName}";
                 Console.WriteLine($"Çalıştırılacak sorgu: {query}");
 
-                using (var cmd = new OracleCommand(query, connection)) // NpgsqlCommand -> OracleCommand
+                using (var cmd = new OracleCommand(query, connection))
                 {
                     Console.WriteLine("OracleCommand oluşturuldu");
 
-                    using (var adapter = new OracleDataAdapter(cmd)) // NpgsqlDataAdapter -> OracleDataAdapter
+                    using (var adapter = new OracleDataAdapter(cmd))
                     {
                         Console.WriteLine("DataAdapter oluşturuldu");
 

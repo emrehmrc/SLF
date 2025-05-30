@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Data;
-using Oracle.ManagedDataAccess.Client; // PostgreSQL yerine Oracle kütüphanesi
+using Oracle.ManagedDataAccess.Client;
 
 namespace SLF.Services
 {
@@ -8,7 +8,7 @@ namespace SLF.Services
     {
         private static DatabaseManager _instance;
         private static readonly object _lock = new object();
-        private OracleConnection _connection; // NpgsqlConnection yerine OracleConnection
+        private OracleConnection _connection;
         private string _connectionString;
 
         private DatabaseManager()
@@ -34,7 +34,7 @@ namespace SLF.Services
             return _instance;
         }
 
-        public OracleConnection GetConnection() // Dönüş tipi değişti
+        public OracleConnection GetConnection()
         {
             try
             {
@@ -48,7 +48,8 @@ namespace SLF.Services
                     {
                         _connection.Dispose();
                     }
-                    _connection = new OracleConnection(_connectionString); // OracleConnection oluştur
+
+                    _connection = new OracleConnection(_connectionString);
                     _connection.Open();
                 }
                 return _connection;

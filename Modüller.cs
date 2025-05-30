@@ -6333,7 +6333,7 @@ namespace SLF
         }
 
         private void buton_tablo_olustur_Click(object sender, EventArgs e)
-        {
+        {         
             Tablo_olustur tablo_olustur_formu = new Tablo_olustur();
             tablo_olustur_formu.Show();
         }

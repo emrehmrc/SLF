@@ -25,10 +25,14 @@ namespace SLF.Services
             public static string _configKatmanEslestirmePath;
             public static string _configKatmanDenemePath;
             public static string _configDeepLearningModelPath;
-            // Proje klasörüne göre relatif il-ilçe kırılımı klasörü yolu
+            public static string _configCbs;
+            public static string _configveritabanikod;
+            public static string _configKonum;
+        // Proje klasörüne göre relatif il-ilçe kırılımı klasörü yolu
             private static string _relativeDataPath = "il_ilce_kırılımları"; // Varsayılan değer
             public static string _configSLFMainPath;
-            // Temel dizin - ilk çalıştırmada hesaplanır
+            public static string _configDepo; // Yeni eklenen depo path'i
+                                              // Temel dizin - ilk çalıştırmada hesaplanır
             public static string _baseDirectory;
 
             // Seçilen il
@@ -130,22 +134,13 @@ namespace SLF.Services
         {
             try
             {
-
                 // Dosyanın gerçekten var olup olmadığını kontrol et
-                
-                
 
-                // Dönüşüm işlemini uygula
-                //string convertedPath = ConvertPathToFileSystem(originalPath);
-                //Console.WriteLine($"Dönüştürülmüş yol: {convertedPath}");
-
-                // Dönüştürülmüş yolun var olup olmadığını kontrol et
-                //bool convertedExists = File.Exists(convertedPath);
-                //Console.WriteLine($"Dönüştürülmüş dosya var mı: {convertedExists}");
                 // Config dosyasını oku
                 if (File.Exists(configPath))
                 {
                     string jsonFile = File.ReadAllText(configPath);
+                     _configKonum = configPath;
                     dynamic config = JsonConvert.DeserializeObject(jsonFile);
 
                     // Ana_Klasör_Yolu değerini al
@@ -157,13 +152,78 @@ namespace SLF.Services
                         // Tam yolu oluştur
                         string fullPath = Path.Combine(userRootPath, anaKlasorYolu);
 
-
-
                         // Eğer bu dizin varsa, _baseDirectory olarak ayarla
                         if (Directory.Exists(fullPath))
                         {
                             _baseDirectory = fullPath;
                             Debug.WriteLine($"Config'den alınan veri klasörü yolu: {_baseDirectory}");
+
+                            // CBS yolunu ayarla (yeni eklenen kısım)
+                            if (config.CBS != null)
+                            {
+                                string cbsPath = config.CBS.ToString();
+
+                                // Eğer yol "/" ile başlıyorsa, başındaki "/" karakterini kaldır
+                                if (cbsPath.StartsWith("/"))
+                                {
+                                    cbsPath = cbsPath.Substring(1);
+                                }
+
+                                // İl ve ilçe değerlerini al
+                                string il = config.İl?.ToString();
+                                string ilce = config.İlçe?.ToString();
+
+                                if (!string.IsNullOrEmpty(il) && !string.IsNullOrEmpty(ilce))
+                                {
+                                    // CBS yolunu oluştur: Ana_Klasör_Yolu/İl/İlçe/CBS
+                                    string cbsFullPath = Path.Combine(fullPath, il, ilce, cbsPath);
+
+                                    // Dosya yolunu düzgün şekilde ayıklama
+                                    string cbsDirectory = Path.GetDirectoryName(cbsFullPath);
+                                    string cbsFileName = Path.GetFileName(cbsFullPath);
+
+                                    // CBS klasörünün varlığını kontrol et
+                                    if (Directory.Exists(cbsDirectory))
+                                    {
+                                        Console.WriteLine($"CBS klasörü bulundu: {cbsDirectory}");
+
+                                        // Eğer klasörde belirtilen dosya varsa
+                                        if (File.Exists(cbsFullPath))
+                                        {
+                                            _configCbs = cbsFullPath;
+                                            Console.WriteLine($"CBS TAB dosyası bulundu: {_configCbs}");
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine($"CBS TAB dosyası bulunamadı: {cbsFullPath}");
+
+                                            // Klasördeki TAB dosyalarını ara
+                                            string[] tabFiles = Directory.GetFiles(cbsDirectory, "*.TAB");
+                                            if (tabFiles.Length > 0)
+                                            {
+                                                _configCbs = tabFiles[0]; // İlk TAB dosyasını al
+                                                Console.WriteLine($"Alternatif CBS TAB dosyası kullanılıyor: {_configCbs}");
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine($"CBS klasöründe hiç TAB dosyası bulunamadı: {cbsDirectory}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine($"CBS klasörü bulunamadı: {cbsDirectory}");
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("İl veya ilçe bilgisi eksik, CBS yolu ayarlanamadı.");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Config dosyasında CBS yolu belirtilmemiş.");
+                            }
 
                             // Program dosyaları klasörü (temel yapı için gerekli)
                             string programDosyalariPath = config.program_dosyaları_path?.ToString() ?? "Program Dosyaları";
@@ -308,6 +368,41 @@ namespace SLF.Services
                                 _configDeepLearningModelPath = deepLearningFullPath;
                                 Debug.WriteLine($"Config'den alınan Deep Learning model yolu: {_configDeepLearningModelPath}");
                             }
+                            if (config["Python Kodları"] != null && config["Python Kodları"].veritabani_kod != null)
+                            {
+                                string veritabaniKodRelativePath = config["Python Kodları"].veritabani_kod.ToString();
+
+                                // "/" başındaki karakteri kaldır
+                                if (veritabaniKodRelativePath.StartsWith("/"))
+                                {
+                                    veritabaniKodRelativePath = veritabaniKodRelativePath.Substring(1);
+                                }
+
+                                // Program dosyaları ile birleştir
+                                string veritabaniKodFullPath = Path.Combine(programDosyalariFullPath, veritabaniKodRelativePath);
+
+                                _configveritabanikod = veritabaniKodFullPath;
+                            }
+                            if (config.konum != null)
+                            {
+                                // Konum değerini direkt olarak al
+                                string konumValue = config.konum.ToString();
+
+                                // Konum değeri bir dosya yolu mu yoksa sadece dosya adı mı kontrol et
+                                if (Path.IsPathRooted(konumValue))
+                                {
+                                    // Tam yol verilmiş
+                                    _configKonum = konumValue;
+                                }
+                                else
+                                {
+                                    // Göreceli yol verilmiş, ana klasör ile birleştir
+                                    _configKonum = Path.Combine(fullPath, konumValue.TrimStart('/'));
+                                }
+
+                                Console.WriteLine($"Konum değeri ayarlandı: {_configKonum}");
+                            }
+                            
                             else
                             {
                                 // Python Kodları bölümü yoksa varsayılan yapıya devam et

@@ -182,7 +182,254 @@ namespace SLF.services
                 throw; // Re-throw for upper level methods to catch
             }
         }
+        /// <summary>
+        /// Abone verisi oluşturma işlemi - Akıllı mod
+        /// Veri durumuna göre CSV'den veya veritabanından çalışır
+        /// </summary>
+        public static string RunPythonScriptForAboneVerisi(string configPath)
+        {
+            try
+            {
+                Console.WriteLine("---------- Abone Verisi Python Script Çalıştırma Başladı ----------");
+                Console.WriteLine($"Config dosya yolu: {configPath}");
 
+                // Önce veri doğrulaması yap
+                var validationResult = DataValidationService.ValidateAboneData(configPath);
+
+                if (validationResult.IsValid && validationResult.HasDepoCsvFiles && validationResult.IsDataUpToDate)
+                {
+                    // Veriler güncel ve CSV'ler mevcut - CSV'lerle işlem yap
+                    Console.WriteLine("Veriler güncel ve CSV dosyaları mevcut. CSV'lerden abone verisi oluşturuluyor...");
+                    return ProcessAboneDataFromCsv(configPath, validationResult.DepoPath);
+                }
+                else
+                {
+                    // Veriler güncel değil veya CSV'ler yok - Veritabanından çek
+                    // Veriler güncel değil veya CSV'ler yok - Veritabanından çek
+                    Console.WriteLine("Veriler güncel değil veya CSV dosyaları yok. Veritabanından yeni veri çekiliyor...");
+                    return ProcessAboneDataFromDatabase(configPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Abone verisi işlemi sırasında hata: {ex.Message}");
+                throw new Exception($"Abone verisi işlemi başarısız: {ex.Message}", ex);
+            }
+        }
+        /// <summary>
+        /// Mevcut CSV dosyalarından abone verisi oluşturur
+        /// </summary>
+        private static string ProcessAboneDataFromCsv(string configPath, string depoPath)
+        {
+            try
+            {
+                Console.WriteLine($"CSV dosyalarından abone verisi oluşturuluyor...");
+                Console.WriteLine($"Depo klasörü: {depoPath}");
+
+                // CSV dosya yolları
+                string aboneCsvPath = Path.Combine(depoPath, "DWH_MRC_SLFPROJE_ABN_BLG.csv");
+                string tuketimCsvPath = Path.Combine(depoPath, "DWH_TUKETIM_DENEME.csv");
+
+                // Dosyaların varlığını kontrol et
+                if (!File.Exists(aboneCsvPath))
+                {
+                    throw new FileNotFoundException($"Abone bilgi CSV dosyası bulunamadı: {aboneCsvPath}");
+                }
+
+                if (!File.Exists(tuketimCsvPath))
+                {
+                    throw new FileNotFoundException($"Tüketim CSV dosyası bulunamadı: {tuketimCsvPath}");
+                }
+
+                Console.WriteLine($"CSV dosyaları bulundu:");
+                Console.WriteLine($"  Abone Bilgi: {aboneCsvPath}");
+                Console.WriteLine($"  Tüketim: {tuketimCsvPath}");
+
+                // Python script'ini CSV modunda çalıştır
+                string pythonExecutable = "python";
+                string pythonScript = PathService._configveritabanikod;
+
+                if (string.IsNullOrEmpty(pythonScript) || !File.Exists(pythonScript))
+                {
+                    throw new FileNotFoundException($"Python kod dosyası bulunamadı: {pythonScript}");
+                }
+
+                // Python sürecini CSV modunda başlat
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = pythonExecutable,
+                    Arguments = $"\"{pythonScript}\" \"{configPath}\" --mode CSV --abone-csv \"{aboneCsvPath}\" --tuketim-csv \"{tuketimCsvPath}\"",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = false,
+                    WorkingDirectory = Path.GetDirectoryName(pythonScript)
+                };
+
+                StringBuilder output = new StringBuilder();
+                StringBuilder error = new StringBuilder();
+
+                using (Process process = new Process())
+                {
+                    process.StartInfo = startInfo;
+                    process.Start();
+
+                    // Çıktıları asenkron olarak oku
+                    process.OutputDataReceived += (sender, e) => {
+                        if (e.Data != null)
+                        {
+                            output.AppendLine(e.Data);
+                            Console.WriteLine(e.Data);
+                        }
+                    };
+
+                    process.ErrorDataReceived += (sender, e) => {
+                        if (e.Data != null)
+                        {
+                            error.AppendLine(e.Data);
+                            Console.WriteLine($"ERR: {e.Data}");
+                        }
+                    };
+
+                    // Asenkron okumayı başlat
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
+
+                    // İşlemin tamamlanmasını bekle
+                    process.WaitForExit();
+
+                    string outputStr = output.ToString();
+                    string errorStr = error.ToString();
+
+                    // Hata durumunda
+                    if (process.ExitCode != 0)
+                    {
+                        throw new Exception($"CSV işleme sırasında hata oluştu (Çıkış kodu: {process.ExitCode}).\nHata: {errorStr}");
+                    }
+
+                    // İşlemin başarılı olduğunu kontrol et
+                    if (outputStr.Contains("Sonuçlar başarıyla Excel formatında kaydedildi"))
+                    {
+                        Console.WriteLine("Abone verileri CSV dosyalarından başarıyla işlendi.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("CSV işleme tamamlandı, ancak başarı mesajı alınamadı.");
+                    }
+
+                    return outputStr;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"CSV işleme hatası: {ex.Message}");
+                throw;
+            }
+        }
+        /// <summary>
+        /// Veritabanından yeni veri çeker, CSV'leri günceller ve sonucu oluşturur
+        /// </summary>
+        private static string ProcessAboneDataFromDatabase(string configPath)
+        {
+            try
+            {
+                Console.WriteLine("Veritabanından veri çekme ve CSV güncelleme işlemi başlatılıyor...");
+
+                // Python yürütme ortamı
+                string pythonExecutable = "python";
+
+                // Python kod dosyasının yolunu PathService'ten al
+                string pythonScript = PathService._configveritabanikod;
+                Console.WriteLine($"Config'den alınan Python kod yolu: {pythonScript}");
+
+                // Dosya yolunu düzgün formata getir
+                if (!string.IsNullOrEmpty(pythonScript))
+                {
+                    pythonScript = pythonScript.Replace('\\', '/').Replace('/', '\\');
+                    Console.WriteLine($"Düzenlenen Python kodu yolu: {pythonScript}");
+                }
+
+                // Dosyanın var olup olmadığını kontrol et
+                if (string.IsNullOrEmpty(pythonScript) || !File.Exists(pythonScript))
+                {
+                    throw new FileNotFoundException($"Python kod dosyası bulunamadı! Aranan konum: {pythonScript}");
+                }
+
+                Console.WriteLine($"Python kodu çalıştırılıyor: {pythonScript}");
+                Console.WriteLine($"Config dosyası: {configPath}");
+
+                // Python sürecini başlat - "DATABASE" modunda çalışacak
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = pythonExecutable,
+                    Arguments = $"\"{pythonScript}\" \"{configPath}\" --mode DATABASE", // DATABASE modu eklendi
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = false,
+                    WorkingDirectory = Path.GetDirectoryName(pythonScript)
+                };
+
+                StringBuilder output = new StringBuilder();
+                StringBuilder error = new StringBuilder();
+
+                using (Process process = new Process())
+                {
+                    process.StartInfo = startInfo;
+                    process.Start();
+
+                    // Çıktıları asenkron olarak oku
+                    process.OutputDataReceived += (sender, e) => {
+                        if (e.Data != null)
+                        {
+                            output.AppendLine(e.Data);
+                            Console.WriteLine(e.Data);
+                        }
+                    };
+
+                    process.ErrorDataReceived += (sender, e) => {
+                        if (e.Data != null)
+                        {
+                            error.AppendLine(e.Data);
+                            Console.WriteLine($"ERR: {e.Data}");
+                        }
+                    };
+
+                    // Asenkron okumayı başlat
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
+
+                    // İşlemin tamamlanmasını bekle
+                    process.WaitForExit();
+
+                    string outputStr = output.ToString();
+                    string errorStr = error.ToString();
+
+                    // Hata durumunda
+                    if (process.ExitCode != 0)
+                    {
+                        throw new Exception($"Python kodu çalıştırılırken hata oluştu (Çıkış kodu: {process.ExitCode}).\nHata: {errorStr}");
+                    }
+
+                    // İşlemin başarılı olduğunu kontrol et
+                    if (outputStr.Contains("Sonuçlar başarıyla Excel formatında kaydedildi"))
+                    {
+                        Console.WriteLine("Abone verileri veritabanından başarıyla işlendi ve CSV dosyaları güncellendi.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Abone verileri işlemi tamamlandı, ancak başarı mesajı alınamadı.");
+                    }
+
+                    return outputStr;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Veritabanından veri çekme işlemi hatası: {ex.Message}");
+                throw;
+            }
+        }
         public static string RunImarPlanModel(string kmlFilePath, string csvFilePath = null)
         {
             try
