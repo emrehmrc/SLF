@@ -39,12 +39,12 @@ namespace SLF
             this.imarMethodSelectionComboBox = new System.Windows.Forms.ComboBox();
             this.imarCitySelectionPanel = new System.Windows.Forms.Panel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.katman_tablosu = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.TestCalıstır = new System.Windows.Forms.Button();
             this.KmlTestButton = new System.Windows.Forms.Button();
-            this.katman_tablosu = new System.Windows.Forms.Button();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
             this.imarFileSelectionPanel.SuspendLayout();
             this.imarCitySelectionPanel.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -56,7 +56,7 @@ namespace SLF
             this.imarFileSelectionPanel.Controls.Add(this.label2);
             this.imarFileSelectionPanel.Controls.Add(this.OkButton);
             this.imarFileSelectionPanel.Controls.Add(this.SelectKmlButton);
-            this.imarFileSelectionPanel.Location = new System.Drawing.Point(197, 492);
+            this.imarFileSelectionPanel.Location = new System.Drawing.Point(35, 441);
             this.imarFileSelectionPanel.Margin = new System.Windows.Forms.Padding(4);
             this.imarFileSelectionPanel.Name = "imarFileSelectionPanel";
             this.imarFileSelectionPanel.Size = new System.Drawing.Size(395, 159);
@@ -132,7 +132,7 @@ namespace SLF
             this.imarMethodSelectionComboBox.Items.AddRange(new object[] {
             "Verileri Güncelle",
             "Varolan Verileri Kullan"});
-            this.imarMethodSelectionComboBox.Location = new System.Drawing.Point(246, 46);
+            this.imarMethodSelectionComboBox.Location = new System.Drawing.Point(66, 13);
             this.imarMethodSelectionComboBox.Margin = new System.Windows.Forms.Padding(4);
             this.imarMethodSelectionComboBox.Name = "imarMethodSelectionComboBox";
             this.imarMethodSelectionComboBox.Size = new System.Drawing.Size(295, 29);
@@ -143,7 +143,7 @@ namespace SLF
             // 
             this.imarCitySelectionPanel.Controls.Add(this.label1);
             this.imarCitySelectionPanel.Controls.Add(this.SelectCsvButton);
-            this.imarCitySelectionPanel.Location = new System.Drawing.Point(197, 316);
+            this.imarCitySelectionPanel.Location = new System.Drawing.Point(35, 265);
             this.imarCitySelectionPanel.Margin = new System.Windows.Forms.Padding(4);
             this.imarCitySelectionPanel.Name = "imarCitySelectionPanel";
             this.imarCitySelectionPanel.Size = new System.Drawing.Size(395, 123);
@@ -158,11 +158,47 @@ namespace SLF
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.TestCalıstır);
             this.panel1.Controls.Add(this.KmlTestButton);
-            this.panel1.Location = new System.Drawing.Point(197, 113);
+            this.panel1.Location = new System.Drawing.Point(35, 62);
             this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(395, 170);
             this.panel1.TabIndex = 6;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.label5.ForeColor = System.Drawing.Color.DarkOrange;
+            this.label5.Location = new System.Drawing.Point(94, 13);
+            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(200, 23);
+            this.label5.TabIndex = 6;
+            this.label5.Text = "İmar Verileri Test Bölümü";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.label4.ForeColor = System.Drawing.Color.DarkOrange;
+            this.label4.Location = new System.Drawing.Point(6, 54);
+            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(201, 23);
+            this.label4.TabIndex = 3;
+            this.label4.Text = "Katman Listesi Görüntüle";
+            // 
+            // katman_tablosu
+            // 
+            this.katman_tablosu.BackgroundImage = global::SLF.Properties.Resources.CSV21;
+            this.katman_tablosu.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.katman_tablosu.Location = new System.Drawing.Point(37, 90);
+            this.katman_tablosu.Margin = new System.Windows.Forms.Padding(4);
+            this.katman_tablosu.Name = "katman_tablosu";
+            this.katman_tablosu.Size = new System.Drawing.Size(44, 47);
+            this.katman_tablosu.TabIndex = 3;
+            this.katman_tablosu.UseVisualStyleBackColor = true;
+            this.katman_tablosu.Click += new System.EventHandler(this.katman_tablosu_Click);
             // 
             // label3
             // 
@@ -201,48 +237,12 @@ namespace SLF
             this.KmlTestButton.UseVisualStyleBackColor = true;
             this.KmlTestButton.Click += new System.EventHandler(this.KmlTestButton_Click);
             // 
-            // katman_tablosu
-            // 
-            this.katman_tablosu.BackgroundImage = global::SLF.Properties.Resources.CSV21;
-            this.katman_tablosu.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.katman_tablosu.Location = new System.Drawing.Point(37, 90);
-            this.katman_tablosu.Margin = new System.Windows.Forms.Padding(4);
-            this.katman_tablosu.Name = "katman_tablosu";
-            this.katman_tablosu.Size = new System.Drawing.Size(44, 47);
-            this.katman_tablosu.TabIndex = 3;
-            this.katman_tablosu.UseVisualStyleBackColor = true;
-            this.katman_tablosu.Click += new System.EventHandler(this.katman_tablosu_Click);
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label4.ForeColor = System.Drawing.Color.DarkOrange;
-            this.label4.Location = new System.Drawing.Point(6, 54);
-            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(201, 23);
-            this.label4.TabIndex = 3;
-            this.label4.Text = "Katman Listesi Görüntüle";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label5.ForeColor = System.Drawing.Color.DarkOrange;
-            this.label5.Location = new System.Drawing.Point(94, 13);
-            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(200, 23);
-            this.label5.TabIndex = 6;
-            this.label5.Text = "İmar Verileri Test Bölümü";
-            // 
             // imarFileSelectionPopup
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.NavajoWhite;
-            this.ClientSize = new System.Drawing.Size(617, 656);
+            this.ClientSize = new System.Drawing.Size(509, 622);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.imarCitySelectionPanel);
             this.Controls.Add(this.imarMethodSelectionComboBox);

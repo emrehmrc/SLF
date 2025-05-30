@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace SLF
 {
@@ -108,7 +111,6 @@ namespace SLF
             {
                 int rowIndex = currentDataTable.Rows.IndexOf(row);
                 var investmentYearValue = row["PROJELENDIRILMIS_TRAFO_YATIRIM_YILI"]?.ToString();
-                Console.WriteLine($"Row {rowIndex}: PROJELENDIRILMIS_TRAFO_YATIRIM_YILI = '{investmentYearValue}'");
 
                 if (IsNullLike(investmentYearValue))
                 {
@@ -417,49 +419,6 @@ namespace SLF
                 List<int> nullRowsDefault = new List<int>();
                 int nullCountDefault = 0;
 
-                    foreach (DataRow row in currentDataTable.Rows)
-                    {
-                        int rowIndex = currentDataTable.Rows.IndexOf(row);
-                        string yatırımSınıfı = row["PROJELENDIRILMIS_TRAFO_YATIRIM_SINIFI"]?.ToString();
-
-                        // Skip null check if PROJELENDIRILMIS_TRAFO_YATIRIM_SINIFI is "0" (yeni)
-                        if (yatırımSınıfı == "0")
-                        {
-                            Console.WriteLine($"Row {rowIndex} skipped: PROJELENDIRILMIS_TRAFO_YATIRIM_SINIFI is 0 (yeni), ignoring null check for PROJELENDIRILMIS_TRAFO_KAPASITE.");
-                            continue;
-                        }
-
-                        var value = row[column]?.ToString();
-                        if (IsNullLike(value) || value == "#N/A")
-                        {
-                            nullCount++;
-                            nullRows.Add(rowIndex);
-                            Console.WriteLine($"Row {rowIndex} flagged for deletion: {column.ColumnName} is {(IsNullLike(value) ? "null" : "#N/A")}.");
-                        }
-                    }
-
-                    columnNullRowsMap[column.ColumnName] = nullRows;
-                    nullPercentage = (float)nullCount / totalRows;
-
-                    if (nullPercentage > 0)
-                    {
-                        var thresholds = nullFieldsCheckWithLevel[column.ColumnName];
-                        var datatableLevel = GetDataTableBasedOnThreshold(nullPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
-                        datatableLevel.Rows.Add(new object[]
-                        {
-                    column.ColumnName, "Null değer", $"{nullPercentage:P1}"
-                        });
-                        string tableName = string.IsNullOrEmpty(datatableLevel.TableName) ? "UnknownTable" : datatableLevel.TableName;
-                        Console.WriteLine($"Added null message to {tableName} for {column.ColumnName}. Total rows in {tableName}: {datatableLevel.Rows.Count}");
-                    }
-
-                    continue;
-                }
-
-                // Default null check for other columns
-                List<int> nullRowsDefault = new List<int>();
-                int nullCountDefault = 0;
-
                 for (int i = 0; i < totalRows; i++)
                 {
                     var row = currentDataTable.Rows[i];
@@ -570,3 +529,4 @@ namespace SLF
         }
     }
 }
+
