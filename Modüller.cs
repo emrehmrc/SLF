@@ -2161,7 +2161,7 @@ namespace SLF
                         FileName = "cmd.exe",
                         Arguments = $"/C rd /S /Q \"{path}\"",
                         WindowStyle = ProcessWindowStyle.Hidden,
-                        CreateNoWindow = true,
+                        CreateNoWindow = false,
                         UseShellExecute = false
                     }
                 };
@@ -3351,10 +3351,10 @@ namespace SLF
                 {
                     FileName = "python",
                     Arguments = $"\"{pythonScriptPath}\" \"{config_path}\"",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
                     UseShellExecute = false,
-                    CreateNoWindow = true
+                    CreateNoWindow = false
                 };
 
                 using (Process process = new Process { StartInfo = startInfo })
@@ -6643,10 +6643,10 @@ namespace SLF
                     FileName = "python",
                     // Use verbatim string with concatenation
                     Arguments = @"""" + pythonScriptPath + @""" """ + config_path,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
                     UseShellExecute = false,
-                    CreateNoWindow = true
+                    CreateNoWindow = false
                 };
 
                 using (Process process = new Process { StartInfo = startInfo })
@@ -7322,10 +7322,10 @@ namespace SLF
             {
                 FileName = "Rscript.exe",
                 Arguments = $"--vanilla \"{ELFrScriptModelPath}\" \"{ana_menu_form_objesi.config_path}\"",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
+                RedirectStandardOutput = false,
+                RedirectStandardError = false,
                 UseShellExecute = false,
-                CreateNoWindow = true
+                CreateNoWindow = false
             };
 
             using (var process = new Process())
@@ -7334,20 +7334,12 @@ namespace SLF
 
                 // Variables to capture output and error
                 string outputData = null;
-                string errorData = null;
 
                 process.Start();
-
-                // Read output and error synchronously on background threads
-                Task<string> outputTask = Task.Run(() => process.StandardOutput.ReadToEnd());
-                Task<string> errorTask = Task.Run(() => process.StandardError.ReadToEnd());
 
                 // Wait for the process to exit asynchronously
                 await Task.Run(() => process.WaitForExit());
 
-                // Get the output and error
-                outputData = await outputTask;
-                errorData = await errorTask;
 
                 // Process the output to get the file path
                 if (!string.IsNullOrEmpty(outputData))
@@ -8007,10 +7999,10 @@ namespace SLF
                         {
                             FileName = "python",
                             Arguments = $"\"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
-                            RedirectStandardOutput = true,
-                            RedirectStandardError = true,
+                            RedirectStandardOutput = false,
+                            RedirectStandardError = false,
                             UseShellExecute = false,
-                            CreateNoWindow = true
+                            CreateNoWindow = false
                         }
                     };
 
@@ -8072,23 +8064,21 @@ namespace SLF
                         {
                             FileName = "python",
                             Arguments = $"\"{abone_sayısı_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
-                            RedirectStandardOutput = true,
-                            RedirectStandardError = true,
+                            RedirectStandardOutput = false,
+                            RedirectStandardError = false,
                             UseShellExecute = false,
-                            CreateNoWindow = true
+                            CreateNoWindow = false
                         }
                     };
 
                     process.Start();
-                    string output = process.StandardOutput.ReadToEnd();
-                    string error = process.StandardError.ReadToEnd();
                     process.WaitForExit();
 
                     this.Cursor = Cursors.Default;
 
                     // Show result
                     if (process.ExitCode != 0)
-                        MessageBox.Show($"Bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
+                        MessageBox.Show($"Bir hata meydana geldi.",
                             "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                     else
                         MessageBox.Show($"Ufuk yılları için abone sayısı tahminleri oluşturuldu!",
@@ -8131,23 +8121,21 @@ namespace SLF
                         {
                             FileName = "python",
                             Arguments = $"\"{slf_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
-                            RedirectStandardOutput = true,
-                            RedirectStandardError = true,
+                            RedirectStandardOutput = false,
+                            RedirectStandardError = false,
                             UseShellExecute = false,
-                            CreateNoWindow = true
+                            CreateNoWindow = false
                         }
                     };
 
                     process.Start();
-                    string output = process.StandardOutput.ReadToEnd();
-                    string error = process.StandardError.ReadToEnd();
                     process.WaitForExit();
                       
 
                     // Show result
                     if (process.ExitCode != 0)
 
-                        MessageBox.Show($"Bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
+                        MessageBox.Show($"Bir hata meydana geldi.",
                             "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
 
                     else
@@ -8282,15 +8270,13 @@ namespace SLF
                     };
 
                     process.Start();
-                    string output = process.StandardOutput.ReadToEnd();
-                    string error = process.StandardError.ReadToEnd();
                     process.WaitForExit();
 
                     this.Cursor = Cursors.Default;
 
                     // Show result
                     if (process.ExitCode != 0)
-                        MessageBox.Show($"R script çalışmasında bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
+                        MessageBox.Show($"R script çalışmasında bir hata meydana geldi.",
                             "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                     else
                         MessageBox.Show($"Yatay ve dikey büyüme rakamları başarıyla oluşturuldu. SLF ile konsolidasyon" +
