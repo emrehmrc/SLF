@@ -2,11 +2,7 @@
 using System;
 using System.IO;
 using System.Windows.Forms;
-using System.IO;
-using System.Reflection;
 using SLF.Services;
-using System.Drawing;
-using System.IO;
 
 namespace SLF
 {
