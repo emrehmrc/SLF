@@ -93,7 +93,7 @@ namespace SLF
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     CsvFilePath = openFileDialog.FileName;
-                    csvFilePathLabel.Text = Path.GetFileName(CsvFilePath);
+                 
                 }
             }
         }
@@ -106,7 +106,7 @@ namespace SLF
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     KmlFilePath = openFileDialog.FileName;
-                    kmlFilePathLabel.Text = Path.GetFileName(KmlFilePath);
+                    //kmlFilePathLabel.Text = Path.GetFileName(KmlFilePath);
                 }
             }
         }
@@ -134,10 +134,10 @@ namespace SLF
                     }
 
                     // Dosyayı imar_plans/data klasörüne kopyala
-                    string kmlDestinationPath = PathService.CopyKmlToImarPlansData(KmlFilePath);
+                    //string kmlDestinationPath = PathService.CopyKmlToImarPlansData(KmlFilePath);
 
                     // PythonHelper.RunImarPlanModel'i çağır
-                    RunImarPlanPython(kmlDestinationPath);
+                    RunImarPlanPython(KmlFilePath);
                 }
                 else if (imarMethodSelectionComboBox.SelectedIndex == 1)
                 {
@@ -149,11 +149,11 @@ namespace SLF
                     }
 
                     // Dosyaları imar_plans/data klasörüne kopyala
-                    string kmlDestinationPath = PathService.CopyKmlToImarPlansData(KmlFilePath);
-                    string csvDestinationPath = PathService.CopyCsvToImarPlansData(CsvFilePath);
+                    //string kmlDestinationPath = PathService.CopyKmlToImarPlansData(KmlFilePath);
+                    //string csvDestinationPath = PathService.CopyCsvToImarPlansData(CsvFilePath);
 
                     // PythonHelper.RunImarPlanModel'i çağır
-                    RunImarPlanPython(kmlDestinationPath, csvDestinationPath);
+                    RunImarPlanPython(KmlFilePath, CsvFilePath);
                 }
                 else
                 {

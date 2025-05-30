@@ -1,6 +1,6 @@
-﻿using Npgsql;
-using System;
+﻿using System;
 using System.Data;
+using Oracle.ManagedDataAccess.Client; // PostgreSQL yerine Oracle kütüphanesi
 
 namespace SLF.Services
 {
@@ -8,7 +8,7 @@ namespace SLF.Services
     {
         private static DatabaseManager _instance;
         private static readonly object _lock = new object();
-        private NpgsqlConnection _connection;
+        private OracleConnection _connection; // NpgsqlConnection yerine OracleConnection
         private string _connectionString;
 
         private DatabaseManager()
@@ -27,16 +27,14 @@ namespace SLF.Services
                     }
                 }
             }
-
             if (!string.IsNullOrEmpty(connString))
             {
                 _instance._connectionString = connString;
             }
-
             return _instance;
         }
 
-        public NpgsqlConnection GetConnection()
+        public OracleConnection GetConnection() // Dönüş tipi değişti
         {
             try
             {
@@ -46,16 +44,13 @@ namespace SLF.Services
                     {
                         throw new Exception("Veritabanı bağlantı bilgileri bulunamadı. Lütfen tekrar giriş yapın.");
                     }
-
                     if (_connection != null)
                     {
                         _connection.Dispose();
                     }
-
-                    _connection = new NpgsqlConnection(_connectionString);
+                    _connection = new OracleConnection(_connectionString); // OracleConnection oluştur
                     _connection.Open();
                 }
-
                 return _connection;
             }
             catch (Exception ex)
