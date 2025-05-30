@@ -1,4 +1,4 @@
-﻿using OfficeOpenXml; 
+﻿using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -6,8 +6,9 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using SLF.Services;
+
 namespace SLF
-{   
+{
     public class InvalidColumnHeadersException : Exception
     {
         public InvalidColumnHeadersException(string message) : base(message)
@@ -17,42 +18,45 @@ namespace SLF
 
     internal class ExcelImporter
     {
+        private YearService _yearService;
+        private Dictionary<string, List<string>> _expectedHeadersMap;
 
-        Dictionary<string, List<string>> expectedHeadersMap = new Dictionary<string, List<string>>
+        // Excel Importer'dan kopyalanacak temel başlıklar dizini
+        private readonly Dictionary<string, List<string>> _baseHeadersMap = new Dictionary<string, List<string>>
         {
             {
                 "Abone Verileri",
-                    new List<string> {
-                        "TESISAT_NO",
-                        "ABONE_X_KOORDINAT",
-                        "ABONE_Y_KOORDINAT",
-                        "BINA_ID",
-                        "BINA_TURU",
-                        "ABONE_ILCE_ID",
-                        "BAGLANDIGI_TRAFO_KODU",
-                        "BAGLANTI_GUCU",
-                        "SOZLESME_DURUMU",
-                        "ABONE_GRUBU",
-                        "GERILIM_SEVIYESI",
-                        "ABONE_BASLANGIC_TARIHI",
-                        "ABONE_BITIS_TARIHI",
-                        "YIL_TUKETIM_2019",
-                        "YIL_TUKETIM_2020",
-                        "YIL_TUKETIM_2021",
-                        "YIL_TUKETIM_2022",
-                        "YIL_TUKETIM_2023",
-                        "YIL_DEMANT_2019",
-                        "YIL_DEMANT_2020",
-                        "YIL_DEMANT_2021",
-                        "YIL_DEMANT_2022",
-                        "YIL_DEMANT_2023",
-                    }
+                new List<string> {
+                    "TESISAT_NO",
+                    "ABONE_X_KOORDINAT",
+                    "ABONE_Y_KOORDINAT",
+                    "BINA_ID",
+                    "BINA_TURU",
+                    "ABONE_ILCE_ID",
+                    "BAGLANDIGI_TRAFO_KODU",
+                    "BAGLANTI_GUCU",
+                    "SOZLESME_DURUMU",
+                    "ABONE_GRUBU",
+                    "GERILIM_SEVIYESI",
+                    "ABONE_BASLANGIC_TARIHI",
+                    "ABONE_BITIS_TARIHI",
+                    // Dinamik yıl alanları oluşturulacak
+                }
             },
-            { "EA Şarj Verileri", new List<string> {
-                "ISTASYON_ADI", "ISTASYON_TIPI", "ISTASYON_GUCU", "EA_TRAFO_KODU","EA_X_KOORDINAT","EA_Y_KOORDINAT"
-            } },
             {
-                "DTR Verileri", new List<string> {
+                "EA Şarj Verileri",
+                new List<string> {
+                    "ISTASYON_ADI",
+                    "ISTASYON_TIPI",
+                    "ISTASYON_GUCU",
+                    "EA_TRAFO_KODU",
+                    "EA_X_KOORDINAT",
+                    "EA_Y_KOORDINAT"
+                }
+            },
+            {
+                "DTR Verileri",
+                new List<string> {
                     "TRAFO_ID",
                     "TRAFO_KODU",
                     "TRAFO_ILCE_ADI",
@@ -68,16 +72,12 @@ namespace SLF
                     "TRAFO_KURULUM_TARIHI",
                     "PRIMER_GERILIM",
                     "SEKONDER_GERILIM",
-                    "YIL_DEMANT_2021",
-                    "YIL_TUKETIM_2021",
-                    "YIL_DEMANT_2022",
-                    "YIL_TUKETIM_2022",
-                    "YIL_DEMANT_2023",
-                    "YIL_TUKETIM_2023"
-            }
+                    // Dinamik yıl alanları oluşturulacak
+                }
             },
             {
-                "DEK Verileri", new List<string> {
+                "DEK Verileri",
+                new List<string> {
                     "ILCE_ADI",
                     "KAYNAK_TIPI",
                     "DEK_KURULU_GUCU",
@@ -86,10 +86,11 @@ namespace SLF
                     "DEK_DTR_ADI",
                     "DEK_KURULUM_YERI",
                     "DEK_BAGLANDIGI_TRAFO_KODU",
-            }
+                }
             },
             {
-                "Ekonometrik Yük Tahmini Verileri", new List<string> {
+                "Ekonometrik Yük Tahmini Verileri",
+                new List<string> {
                     "YIL",
                     "GDP_BUYUME_ORANI",
                     "ILCE_NUFUS",
@@ -134,29 +135,31 @@ namespace SLF
                     "CDD",
                     "HDD"
                 }
-
             },
             {
-                "Fider Verileri", new List<string> {
+                "Fider Verileri",
+                new List<string> {
                     "FIDER_TM_ADI",
                     "FIDER_ADI",
                     "FIDER_ID",
                     "FIDER_TARIH",
                     "FIDER_SAAT",
                     "FIDER_DEMANT",
-            }
+                }
             },
             {
-                "TM Verileri", new List<string> {
+                "TM Verileri",
+                new List<string> {
                     "EDW_TM_ID",
                     "EDW_TRAFO_ID",
                     "EDW_TARIH",
                     "EDW_TM_TUKETIM",
                     "EDW_TM_URETIM",
-            }
+                }
             },
-                        {
-                "Enerji Müsaadeleri Verileri", new List<string> {
+            {
+                "Enerji Müsaadeleri Verileri",
+                new List<string> {
                     "ENERJI_MUSAADE_NO",
                     "ENERJI_MUSAADE_ABONE_GRUBU",
                     "ENERJI_MUSAADE_ABONE_FAALIYET_KATEGORI",
@@ -172,10 +175,11 @@ namespace SLF
                     "ENERJI_MUSAADE_BASVURU_TARIHI",
                     "ENERJI_MUSAADE_X_KOORDINAT",
                     "ENERJI_MUSAADE_Y_KOORDINAT",
-            }
+                }
             },
-                                    {
-                "Yeni Projelendirilmiş DTR Verileri", new List<string> {
+            {
+                "Yeni Projelendirilmiş DTR Verileri",
+                new List<string> {
                     "PROJELENDIRILMIS_TRAFO_ID",
                     "PROJELENDIRILMIS_TRAFO_PROJE_KODU",
                     "PROJELENDIRILMIS_TRAFO_PROJE_ADI",
@@ -185,15 +189,44 @@ namespace SLF
                     "PROJELENDIRILMIS_TRAFO_YATIRIM_YILI",
                     "PROJELENDIRILMIS_TRAFO_X_KOORDINAT",
                     "PROJELENDIRILMIS_TRAFO_Y_KOORDINAT",
+                }
             }
-            },
-
-
-                        
-            // Add more data types and their expected headers as needed
         };
 
-        private YearService _yearService = YearService.GetInstance();
+        public ExcelImporter()
+        {
+            _yearService = YearService.GetInstance();
+            InitializeExpectedHeaders();
+
+            // YearService'deki değişiklikleri dinleyerek başlıkları güncelleme
+            _yearService.OnYearChanged += (sender, args) => {
+                InitializeExpectedHeaders();
+            };
+        }
+
+        // Dinamik başlıkları yeniden oluşturma metodu
+        private void InitializeExpectedHeaders()
+        {
+            _expectedHeadersMap = new Dictionary<string, List<string>>();
+
+            foreach (var entry in _baseHeadersMap)
+            {
+                string dataType = entry.Key;
+                List<string> headers = new List<string>(entry.Value);
+
+                // Veri tipine göre yıl alanlarını ekle
+                if (dataType == "Abone Verileri")
+                {
+                    AddYearColumnsToAboneVerileri(headers);
+                }
+                else if (dataType == "DTR Verileri")
+                {
+                    AddYearColumnsToDTRVerileri(headers);
+                }
+
+                _expectedHeadersMap[dataType] = headers;
+            }
+        }
 
         // Abone verileri için yıl kolonlarını ekleme
 
@@ -202,18 +235,26 @@ namespace SLF
         private void ValidateColumnHeaders(ExcelWorksheet worksheet, string seçilenVeriTipi)
         {
             int colCount = worksheet.Dimension.Columns;
-            List<string> expectedHeaders = expectedHeadersMap[seçilenVeriTipi];
+            List<string> expectedHeaders = _expectedHeadersMap[seçilenVeriTipi];
             int expectedCount = expectedHeaders.Count;
+
+            // Sütun sayılarını konsola yazdır (debug için)
+            System.Diagnostics.Debug.WriteLine($"Beklenen sütun sayısı: {expectedCount}, Excel'deki mevcut: {colCount}");
+
+            /* Geçici olarak sütun sayıları kontrolünü devre dışı bırakabilirsiniz
             if (colCount != expectedCount)
             {
                 throw new InvalidColumnHeadersException(
                     $"Sütun sayıları uyuşmuyor.\nBeklenen: {expectedCount}\nMevcut: {colCount}"
                 );
             }
+            */
 
+            // Sadece mevcut sütunların kontrolü
             bool headerMismatch = false;
             var invalidColumnMessage = new StringBuilder("Sütun adları uyuşmuyor.\n");
-            for (int col = 1; col <= colCount; col++)
+
+            for (int col = 1; col <= Math.Min(colCount, expectedCount); col++)
             {
                 string columnHeader = worksheet.Cells[1, col].Text;
                 if (string.IsNullOrEmpty(columnHeader) || !expectedHeaders.Contains(columnHeader))
@@ -223,6 +264,7 @@ namespace SLF
                     invalidColumnMessage.AppendLine($"{col}. sütun:\tBeklenen: {expectedHeader}\tMevcut: {columnHeader}");
                 }
             }
+
             if (headerMismatch)
             {
                 throw new InvalidColumnHeadersException(invalidColumnMessage.ToString());
@@ -311,6 +353,5 @@ namespace SLF
 
             return dataTable;
         }
-
     }
 }

@@ -1040,8 +1040,14 @@ namespace SLF
             // Default color is red
             Color textColor = Color.Red;
 
-            // Check if the module exists and has data
-            if (girdiModülleri.ContainsKey(text) && girdiModülleri[text].importedDataTable.Rows.Count > 0)
+            // Check if module is completed according to project_state.json
+            List<string> completedModules = GetCompletedModulesFromJson();
+            if (completedModules != null && completedModules.Contains(text))
+            {
+                textColor = Color.Green;
+            }
+            // Fallback to old method if JSON check fails
+            else if (girdiModülleri.ContainsKey(text) && girdiModülleri[text].importedDataTable.Rows.Count > 0)
             {
                 textColor = Color.Green;
             }
@@ -1058,7 +1064,35 @@ namespace SLF
             // Draw the focus rectangle if the item is selected
             e.DrawFocusRectangle();
         }
+        private List<string> GetCompletedModulesFromJson()
+        {
+            try
+            {
+                // Proje dosyasının yolu
+                string statePath = Path.Combine(
+                    PathService.BaseDirectory,
+                    PathService.FullPath,
+                    PathService.CurrentWorkingFolder,
+                    "project_state.json");
 
+                if (File.Exists(statePath))
+                {
+                    string json = File.ReadAllText(statePath);
+                    Dictionary<string, object> projectState = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+
+                    if (projectState != null && projectState.TryGetValue("CompletedModules", out object modulesObj))
+                    {
+                        return JsonConvert.DeserializeObject<List<string>>(modulesObj.ToString());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"JSON dosyası okunurken hata: {ex.Message}");
+            }
+
+            return null;
+        }
         private void raporGoruntuleButonu_Click(object sender, EventArgs e)
         {
             // Girdi modülündeki dosya yükleme butonuna tıklandığında çalışacak kodlar
@@ -1565,6 +1599,25 @@ namespace SLF
                         }
                     }
                 }
+            }
+
+            // Form kapatılmadan önce veri_listesi_seçimi'ndeki yeşil öğeleri kırmızıya çevir
+            if (!e.Cancel)
+            {
+                // Veri seçimi listesindeki modüller için durum bilgisini sıfırla
+                // Bu, sonraki açılışta tüm öğelerin kırmızı görünmesini sağlar
+                modulescheck.Clear();
+
+                // GirdiModülü.dataTablesByType sözlüğünü temizle
+                // Bu, içeri aktarılmış verilerin kaydını temizler
+                foreach (var girdiModül in girdiModülleri.Values)
+                {
+                    girdiModül.importedDataTable = new DataTable();
+                }
+                GirdiModülü.dataTablesByType.Clear();
+
+                // Veri listesini yeniden çiz, böylece tüm öğeler kırmızı renkte gösterilecek
+                veri_listesi_seçimi.Invalidate();
             }
 
             // Çıkış işlemine devam et
@@ -2489,6 +2542,7 @@ namespace SLF
                                     "Veri Kaybı Uyarısı",
                                     MessageBoxButtons.YesNo,
                                     MessageBoxIcon.Warning);
+
                                 if (result != DialogResult.Yes)
                                     return;
                             }
@@ -2510,18 +2564,6 @@ namespace SLF
 
                             MessageBox.Show($"Proje '{projectName}' başarıyla açıldı.",
                                 "Proje Açıldı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                            // Son çalışılan projeyi ayarlar dosyasına kaydet
-                            try
-                            {
-
-                                Console.WriteLine($"Son proje bilgileri kaydedildi: {projectName}");
-                            }
-                            catch (Exception settingsEx)
-                            {
-                                Console.WriteLine($"Ayarlar kaydedilirken hata: {settingsEx.Message}");
-                                // Ayarlar kaydedilemediğinde ana işlevi etkilememesi için hatayı yut
-                            }
                         }
                         catch (Exception ex)
                         {
@@ -6324,7 +6366,7 @@ namespace SLF
         }
 
         private void buton_tablo_olustur_Click(object sender, EventArgs e)
-        {
+        {         
             Tablo_olustur tablo_olustur_formu = new Tablo_olustur();
             tablo_olustur_formu.Show();
         }

@@ -8,7 +8,8 @@ using SLF.services;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text;
-
+using System.Linq;
+using System.Drawing;
 namespace SLF
 {
     public partial class imarFileSelectionPopup : Form
@@ -27,11 +28,11 @@ namespace SLF
             _dataGridViewGirdi = dataGridViewGirdi;
 
             // Radio butonları gizleyelim veya kaldıralım çünkü artık kullanılmayacak
-            if (imarizmirRadioButton != null) imarizmirRadioButton.Visible = false;
-            if (imarEskisehirRadioButton != null) imarEskisehirRadioButton.Visible = false;
+            //if (imarizmirRadioButton != null) imarizmirRadioButton.Visible = false;
+            //if (imarEskisehirRadioButton != null) imarEskisehirRadioButton.Visible = false;
 
             // Dosya yolu etiketlerini oluştur
-            CreateFilePathLabels();
+            //CreateFilePathLabels();
 
             // Seçili il/ilçe bilgilerini gösterelim
             UpdateCityDistrictLabel();
@@ -61,24 +62,24 @@ namespace SLF
                 cityInfoLabel.ForeColor = System.Drawing.Color.Black;
             }
         }
-        private void CreateFilePathLabels()
-        {
-            // CSV dosya adı etiketi
-            csvFilePathLabel = new Label();
-            csvFilePathLabel.AutoSize = true;
-            csvFilePathLabel.Location = new System.Drawing.Point(12, 60); // SelectCsvButton'un altına
-            csvFilePathLabel.Name = "csvFilePathLabel";
-            csvFilePathLabel.Text = "CSV dosyası seçilmedi";
-            this.Controls.Add(csvFilePathLabel);
+        //private void CreateFilePathLabels()
+        //{
+        //    // CSV dosya adı etiketi
+        //    csvFilePathLabel = new Label();
+        //    csvFilePathLabel.AutoSize = true;
+        //    csvFilePathLabel.Location = new System.Drawing.Point(12, 60); // SelectCsvButton'un altına
+        //    csvFilePathLabel.Name = "csvFilePathLabel";
+        //    csvFilePathLabel.Text = "CSV dosyası seçilmedi";
+        //    this.Controls.Add(csvFilePathLabel);
 
-            // KML dosya adı etiketi
-            kmlFilePathLabel = new Label();
-            kmlFilePathLabel.AutoSize = true;
-            kmlFilePathLabel.Location = new System.Drawing.Point(12, 100); // SelectKmlButton'un altına
-            kmlFilePathLabel.Name = "kmlFilePathLabel";
-            kmlFilePathLabel.Text = "KML dosyası seçilmedi";
-            this.Controls.Add(kmlFilePathLabel);
-        }
+        //    // KML dosya adı etiketi
+        //    kmlFilePathLabel = new Label();
+        //    kmlFilePathLabel.AutoSize = true;
+        //    kmlFilePathLabel.Location = new System.Drawing.Point(12, 100); // SelectKmlButton'un altına
+        //    kmlFilePathLabel.Name = "kmlFilePathLabel";
+        //    kmlFilePathLabel.Text = "KML dosyası seçilmedi";
+        //    this.Controls.Add(kmlFilePathLabel);
+        //}
         private void imarFileSelectionPanel_Paint(object sender, PaintEventArgs e)
         {
             this.DoubleBuffered = true;
@@ -92,7 +93,7 @@ namespace SLF
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     CsvFilePath = openFileDialog.FileName;
-                    csvFilePathLabel.Text = Path.GetFileName(CsvFilePath);
+                 
                 }
             }
         }
@@ -105,7 +106,7 @@ namespace SLF
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     KmlFilePath = openFileDialog.FileName;
-                    kmlFilePathLabel.Text = Path.GetFileName(KmlFilePath);
+                    //kmlFilePathLabel.Text = Path.GetFileName(KmlFilePath);
                 }
             }
         }
@@ -133,10 +134,10 @@ namespace SLF
                     }
 
                     // Dosyayı imar_plans/data klasörüne kopyala
-                    string kmlDestinationPath = PathService.CopyKmlToImarPlansData(KmlFilePath);
+                    //string kmlDestinationPath = PathService.CopyKmlToImarPlansData(KmlFilePath);
 
                     // PythonHelper.RunImarPlanModel'i çağır
-                    RunImarPlanPython(kmlDestinationPath);
+                    RunImarPlanPython(KmlFilePath);
                 }
                 else if (imarMethodSelectionComboBox.SelectedIndex == 1)
                 {
@@ -148,11 +149,11 @@ namespace SLF
                     }
 
                     // Dosyaları imar_plans/data klasörüne kopyala
-                    string kmlDestinationPath = PathService.CopyKmlToImarPlansData(KmlFilePath);
-                    string csvDestinationPath = PathService.CopyCsvToImarPlansData(CsvFilePath);
+                    //string kmlDestinationPath = PathService.CopyKmlToImarPlansData(KmlFilePath);
+                    //string csvDestinationPath = PathService.CopyCsvToImarPlansData(CsvFilePath);
 
                     // PythonHelper.RunImarPlanModel'i çağır
-                    RunImarPlanPython(kmlDestinationPath, csvDestinationPath);
+                    RunImarPlanPython(KmlFilePath, CsvFilePath);
                 }
                 else
                 {
@@ -161,7 +162,7 @@ namespace SLF
                 }
 
                 // Populate the DataGridView after successful script execution
-                UploadOutputToGridView();
+                //UploadOutputToGridView();
                 this.Close();
             }
             catch (Exception ex)
@@ -190,12 +191,16 @@ namespace SLF
 
                 // Çıktı klasörünü kontrol et
                 string outputDir = PathService.GetImarAnaliziPathForType("imar_planlari");
+                string csvOutputDir = Path.Combine(outputDir, "csv");
                 string selectedCity = PathService.SelectedCity;
                 string selectedDistrict = PathService.SelectedDistrict;
-                string outputPrefix = $"İMAR_SONUÇLAR";
-                string outputCsvPath = Path.Combine(outputDir, $"{outputPrefix}.csv");
 
-                bool outputExists = File.Exists(outputCsvPath);
+                // Herhangi bir çıktı dosyasını kontrol et
+                bool outputExists = Directory.Exists(outputDir) &&
+                   (Directory.Exists(csvOutputDir) && Directory.GetFiles(csvOutputDir, "*.csv").Length > 0 ||
+                    Directory.GetFiles(outputDir, "*.csv").Length > 0 ||
+                    Directory.GetFiles(outputDir, "*.kml").Length > 0 ||
+                    Directory.GetDirectories(outputDir).Length > 0);
 
                 if (outputExists)
                 {
@@ -285,8 +290,6 @@ namespace SLF
                                 writer.Write(updatedJson);
                             }
 
-                            
-
                             Console.WriteLine($"Proje durumu güncellendi: {statePath}");
                         }
                         catch (Exception ex)
@@ -322,75 +325,482 @@ namespace SLF
             catch (Exception ex)
             {
                 MessageBox.Show($"İmar planı analizi çalıştırılırken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
+                return false;  // Hata durumunda false döndür
             }
         }
-        private void UploadOutputToGridView()
+        private string GetOutputFileInfo(string outputDir)
+        {
+            StringBuilder info = new StringBuilder();
+            info.AppendLine("Çıktı klasörü içeriği:");
+
+            // Ana klasördeki CSV'leri kontrol et
+            string[] csvFiles = Directory.GetFiles(outputDir, "*.csv", SearchOption.TopDirectoryOnly);
+            if (csvFiles.Length > 0)
+            {
+                info.AppendLine("Ana klasördeki CSV dosyaları:");
+                foreach (var file in csvFiles)
+                {
+                    info.AppendLine($"- {Path.GetFileName(file)}");
+                }
+            }
+
+            // csv alt klasörünü kontrol et
+            string csvOutputDir = Path.Combine(outputDir, "csv");
+            if (Directory.Exists(csvOutputDir))
+            {
+                string[] csvSubFiles = Directory.GetFiles(csvOutputDir, "*.csv", SearchOption.TopDirectoryOnly);
+                if (csvSubFiles.Length > 0)
+                {
+                    info.AppendLine("CSV alt klasöründeki dosyalar:");
+                    foreach (var file in csvSubFiles)
+                    {
+                        info.AppendLine($"- {Path.GetFileName(file)}");
+                    }
+                }
+            }
+
+            // Alt klasörleri kontrol et
+            string[] subDirs = Directory.GetDirectories(outputDir);
+            if (subDirs.Length > 0)
+            {
+                info.AppendLine("Alt klasörler:");
+                foreach (var dir in subDirs)
+                {
+                    info.AppendLine($"- {Path.GetFileName(dir)}");
+                }
+            }
+
+            return info.ToString();
+        }
+
+        private void TestCalıstır_Click(object sender, EventArgs e)
         {
             try
             {
-                // Çıktı klasörünü belirle
-                string outputDir = PathService.GetImarAnaliziPathForType("imar_planlari");
-                string selectedCity = PathService.SelectedCity;
-                string selectedDistrict = PathService.SelectedDistrict;
-                string outputPrefix = $"imar_plan_{selectedCity}_{selectedDistrict}";
-                string outputCsvPath = Path.Combine(outputDir, $"{outputPrefix}.csv");
+                Cursor.Current = Cursors.WaitCursor;
 
-                if (!File.Exists(outputCsvPath))
+                // Check if KML file is selected
+                if (string.IsNullOrEmpty(KmlFilePath))
                 {
-                    MessageBox.Show("Çıktı CSV dosyası bulunamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Lütfen bir KML dosyası seçin.", "Eksik Dosya", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                // CSV dosyasını DataTable'a yükle
-                var dataTable = new DataTable();
-                using (var reader = new StreamReader(outputCsvPath))
+                // For CSV, use the katman_eslesme.csv
+                string csvFilePath = PathService.KatmanEslestirmePath;
+                if (!File.Exists(csvFilePath))
                 {
-                    string headerLine = reader.ReadLine();
-                    if (headerLine != null)
+                    MessageBox.Show("Katman eşleştirme CSV dosyası bulunamadı.", "Eksik Dosya", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Run the Katman Deneme script
+                string outputFile = PythonHelper.RunKatmanDeneme(KmlFilePath, csvFilePath);
+
+                // Display success message
+                MessageBox.Show("Katman analizi başarıyla tamamlandı.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Display the results in a new form
+                if (File.Exists(outputFile))
+                {
+                    ShowAnalysisResults(outputFile);
+                }
+                else
+                {
+                    MessageBox.Show("Analiz sonuç dosyası bulunamadı.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Katman analizi çalıştırılırken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                Cursor.Current = Cursors.Default;
+            }
+        }
+        private void ShowAnalysisResults(string csvFilePath)
+        {
+            try
+            {
+                // Load the CSV into a DataTable
+                DataTable dt = LoadCsvToDataTable(csvFilePath);
+                if (dt == null || dt.Columns.Count == 0)
+                {
+                    MessageBox.Show("Analiz sonuçları okunamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Ana sonuçlar formu
+                Form resultsForm = new Form();
+                resultsForm.Text = "Katman Analizi Sonuçları";
+                resultsForm.Size = new System.Drawing.Size(800, 600);
+                resultsForm.StartPosition = FormStartPosition.Manual;
+                // Ana formu sol tarafa yerleştir
+                resultsForm.Location = new Point(20, 20);
+
+                // DataGridView oluştur
+                DataGridView dataGridView = new DataGridView();
+                dataGridView.Dock = DockStyle.Fill;
+                dataGridView.AllowUserToAddRows = false;
+                dataGridView.AllowUserToDeleteRows = false;
+                dataGridView.ReadOnly = true;
+                dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                dataGridView.DataSource = dt;
+
+                // Kontrolleri forma ekle
+                resultsForm.Controls.Add(dataGridView);
+
+                // Katman eşleştirme tablonuzu yükleyin
+                string layerMappingPath = PathService.KatmanEslestirmePath;
+                if (!string.IsNullOrEmpty(layerMappingPath) && File.Exists(layerMappingPath))
+                {
+                    // Katman eşleştirme dosyasını yükle
+                    DataTable mappingDt = LoadCsvToDataTable(layerMappingPath);
+
+                    if (mappingDt != null && mappingDt.Columns.Count > 0)
                     {
-                        string[] headers = headerLine.Split(',');
-                        foreach (string header in headers)
+                        // Katman eşleştirme formu
+                        Form mappingForm = new Form();
+                        mappingForm.Text = "Katman Eşleştirme Tablosu";
+                        mappingForm.Size = new System.Drawing.Size(700, 500);
+                        mappingForm.StartPosition = FormStartPosition.Manual;
+                        // Katman formunu sağ tarafa yerleştir
+                        mappingForm.Location = new Point(Screen.PrimaryScreen.WorkingArea.Width - 720, 20);
+
+                        // Panel oluştur (düğmeler için)
+                        Panel buttonPanel = new Panel();
+                        buttonPanel.Dock = DockStyle.Bottom;
+                        buttonPanel.Height = 50;
+
+                        // Kaydet butonu
+                        Button saveButton = new Button();
+                        saveButton.Text = "Kaydet";
+                        saveButton.Size = new System.Drawing.Size(100, 30);
+                        saveButton.Location = new Point(buttonPanel.Width - 120, 10);
+                        saveButton.Anchor = AnchorStyles.Right | AnchorStyles.Top;
+                        saveButton.Click += (s, args) => {
+                            try
+                            {
+                                // Değişiklikleri CSV dosyasına kaydet
+                                SaveDataTableToCsv(mappingDt, layerMappingPath);
+                                MessageBox.Show("Katman eşleştirme tablosu başarıyla kaydedildi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Katman eşleştirme tablosu kaydedilirken hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                        };
+
+                        // Yeni Satır Ekle butonu
+                        Button addButton = new Button();
+                        addButton.Text = "Yeni Satır Ekle";
+                        addButton.Size = new System.Drawing.Size(120, 30);
+                        addButton.Location = new Point(10, 10);
+                        addButton.Click += (s, args) => {
+                            // Yeni satır ekle
+                            DataRow newRow = mappingDt.NewRow();
+                            // Varsayılan değerler ata (sütunlara göre)
+                            if (mappingDt.Columns.Contains("Imar Tipi"))
+                                newRow["Imar Tipi"] = "Yeni Tip";
+                            if (mappingDt.Columns.Contains("Katman Adlandirma"))
+                                newRow["Katman Adlandirma"] = "Yeni Katman";
+                            if (mappingDt.Columns.Contains("Poligon Tip"))
+                                newRow["Poligon Tip"] = "PL";
+                            if (mappingDt.Columns.Contains("Anahtar Kelimeler"))
+                                newRow["Anahtar Kelimeler"] = "anahtar1,anahtar2";
+
+                            // Satırı tabloya ekle
+                            mappingDt.Rows.Add(newRow);
+                        };
+
+                        // Butonları panele ekle
+                        buttonPanel.Controls.Add(saveButton);
+                        buttonPanel.Controls.Add(addButton);
+
+                        // Katman eşleştirme DataGridView'i
+                        DataGridView mappingGridView = new DataGridView();
+                        mappingGridView.Dock = DockStyle.Fill;
+                        mappingGridView.AllowUserToAddRows = true;
+                        mappingGridView.AllowUserToDeleteRows = true;
+                        mappingGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                        mappingGridView.DataSource = mappingDt;
+
+                        // Formları oluştur
+                        mappingForm.Controls.Add(mappingGridView);
+                        mappingForm.Controls.Add(buttonPanel);
+
+                        // Ana formun kapanışını takip et ve diğer formu da kapat
+                        resultsForm.FormClosed += (s, args) => {
+                            if (!mappingForm.IsDisposed && mappingForm.Visible)
+                                mappingForm.Close();
+                        };
+
+                        // Katman eşleştirme formunu göster (modalsız olarak)
+                        mappingForm.Show();
+                    }
+                }
+
+                // Ana formu göster (modalsız olarak)
+                resultsForm.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Analiz sonuçları gösterilirken hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private void katman_tablosu_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Config'den katman_eslesme.csv yolunu al
+                string layerMappingPath = PathService.KatmanEslestirmePath;
+                Debug.WriteLine($"Config'den alınan yol: {layerMappingPath}");
+
+                // Tüm slash karakterlerini normalize et (önce hepsini \ yap)
+                layerMappingPath = layerMappingPath.Replace('/', '\\');
+
+                // Windows tam yoluna dönüştür
+                layerMappingPath = Path.GetFullPath(layerMappingPath);
+                Debug.WriteLine($"Normalize edilmiş yol: {layerMappingPath}");
+
+                // Dosya yolu doğru mu kontrol et
+                if (string.IsNullOrEmpty(layerMappingPath))
+                {
+                    MessageBox.Show("Katman eşleştirme dosyası yolu bulunamadı.",
+                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Dosyanın var olup olmadığını kontrol et
+                if (!File.Exists(layerMappingPath))
+                {
+                    // Dosya yoksa hata ver ve geri dön
+                    MessageBox.Show($"Katman eşleştirme dosyası bulunamadı: {layerMappingPath}",
+                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Dosyayı DataTable'a yükle
+                DataTable dt = LoadCsvToDataTable(layerMappingPath);
+
+                // DataTable kontrol et
+                if (dt == null || dt.Columns.Count == 0)
+                {
+                    MessageBox.Show("Katman eşleştirme verileri okunamadı.",
+                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Katman listesi formunu oluştur
+                Form layerMappingForm = new Form();
+                layerMappingForm.Text = "Katman Listesi";
+                layerMappingForm.Size = new System.Drawing.Size(800, 500);
+                layerMappingForm.StartPosition = FormStartPosition.CenterParent;
+
+                // DataGridView oluştur
+                DataGridView dataGridView = new DataGridView();
+                dataGridView.Dock = DockStyle.Fill;
+                dataGridView.AllowUserToAddRows = true;
+                dataGridView.AllowUserToDeleteRows = true;
+                dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                dataGridView.DataSource = dt;
+
+                // Kaydet butonu
+                Button saveButton = new Button();
+                saveButton.Text = "Kaydet";
+                saveButton.Size = new System.Drawing.Size(100, 30);
+                saveButton.Dock = DockStyle.Bottom;
+                saveButton.Click += (s, args) =>
+                {
+                    try
+                    {
+                        SaveDataTableToCsv((DataTable)dataGridView.DataSource, layerMappingPath);
+                        MessageBox.Show("Katman listesi başarıyla kaydedildi.",
+                            "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        layerMappingForm.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Kaydetme hatası: {ex.Message}",
+                            "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                };
+
+                // Panel ekle
+                Panel buttonPanel = new Panel();
+                buttonPanel.Height = 40;
+                buttonPanel.Dock = DockStyle.Bottom;
+                buttonPanel.Controls.Add(saveButton);
+
+                // Kontrolleri forma ekle
+                layerMappingForm.Controls.Add(dataGridView);
+                layerMappingForm.Controls.Add(buttonPanel);
+
+                // Formu göster
+                layerMappingForm.ShowDialog(this);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Katman listesi hatası: {ex.Message}, {ex.StackTrace}");
+                MessageBox.Show($"Katman listesi açılırken hata: {ex.Message}",
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+
+        private DataTable LoadCsvToDataTable(string csvPath)
+        {
+            DataTable dt = new DataTable();
+
+            try
+            {
+                Debug.WriteLine($"Dosya yolu: {csvPath}");
+
+                // Dosya var mı kontrol et
+                if (!File.Exists(csvPath))
+                {
+                    Debug.WriteLine($"HATA: Dosya bulunamadı: {csvPath}");
+                    MessageBox.Show($"CSV dosyası bulunamadı: {csvPath}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return dt;
+                }
+
+                // Dosyayı oku - UTF8 ile dene
+                string[] lines;
+                try
+                {
+                    lines = File.ReadAllLines(csvPath, Encoding.UTF8);
+                    Debug.WriteLine($"Dosya UTF8 ile okundu. Satır sayısı: {lines.Length}");
+                }
+                catch
+                {
+                    // UTF8 başarısız olursa varsayılan kodlama ile dene
+                    lines = File.ReadAllLines(csvPath, Encoding.Default);
+                    Debug.WriteLine($"Dosya varsayılan kodlama ile okundu. Satır sayısı: {lines.Length}");
+                }
+
+                // Dosya boş mu kontrol et
+                if (lines.Length == 0)
+                {
+                    Debug.WriteLine("Dosya boş.");
+                    return dt;
+                }
+
+                // Başlık satırını işle
+                string headerLine = lines[0];
+                string[] headers = headerLine.Split(',');
+
+                // DataTable'a sütunları ekle
+                foreach (string header in headers)
+                {
+                    dt.Columns.Add(header.Trim());
+                }
+
+                // Veri satırlarını ekle
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    if (!string.IsNullOrEmpty(lines[i]))
+                    {
+                        string[] values = lines[i].Split(',');
+                        DataRow row = dt.NewRow();
+
+                        for (int j = 0; j < values.Length && j < dt.Columns.Count; j++)
                         {
-                            dataTable.Columns.Add(header.Trim('\"'));
+                            row[j] = values[j].Trim();
                         }
 
-                        while (!reader.EndOfStream)
+                        dt.Rows.Add(row);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"CSV okuma hatası: {ex.Message}, {ex.StackTrace}");
+                MessageBox.Show($"CSV okuma hatası: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            return dt;
+        }
+
+        private void AddDefaultRows(DataTable dt)
+        {
+            dt.Rows.Add("Konut", "Konut", "PL_KONUT", "KONUT|KNT");
+            dt.Rows.Add("Ticaret", "Ticaret", "PL_TICARET", "TIC|TICARET");
+            dt.Rows.Add("Sanayi", "Sanayi", "PL_SANAYI", "SAN|SANAYI");
+            dt.Rows.Add("Park", "Park", "PL_PARK", "PARK");
+            Debug.WriteLine("Varsayılan satırlar eklendi");
+        }
+
+        private void SaveDataTableToCsv(DataTable dt, string csvPath)
+        {
+            try
+            {
+                Debug.WriteLine($"CSV kaydediliyor: {csvPath}");
+
+                // Klasör yolunun varlığını kontrol et
+                string directory = Path.GetDirectoryName(csvPath);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                // CSV dosyasını kaydet
+                using (StreamWriter sw = new StreamWriter(csvPath, false, Encoding.UTF8))
+                {
+                    // Başlıkları yaz
+                    List<string> headers = new List<string>();
+                    foreach (DataColumn column in dt.Columns)
+                    {
+                        headers.Add(column.ColumnName);
+                    }
+                    sw.WriteLine(string.Join(",", headers));
+
+                    // Satırları yaz
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        if (row.RowState != DataRowState.Deleted)
                         {
-                            string dataLine = reader.ReadLine();
-                            if (dataLine != null)
+                            List<string> fields = new List<string>();
+                            foreach (var item in row.ItemArray)
                             {
-                                string[] dataValues = dataLine.Split(',');
-                                for (int i = 0; i < dataValues.Length; i++)
+                                string field = item?.ToString() ?? "";
+
+                                // Virgül, tırnak veya yeni satır içeren alanları tırnak içine al
+                                if (field.Contains(",") || field.Contains("\"") || field.Contains("\n"))
                                 {
-                                    dataValues[i] = dataValues[i].Trim('\"');
+                                    field = $"\"{field.Replace("\"", "\"\"")}\"";
                                 }
-                                dataTable.Rows.Add(dataValues);
+
+                                fields.Add(field);
                             }
+
+                            sw.WriteLine(string.Join(",", fields));
                         }
                     }
                 }
 
-                _dataGridViewGirdi.DataSource = dataTable;
-
-                // Sütun genişliklerini ayarla
-                _dataGridViewGirdi.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-
-                // Başlık renklendirme
-                for (int i = 0; i < _dataGridViewGirdi.Columns.Count; i++)
-                {
-                    _dataGridViewGirdi.Columns[i].HeaderCell.Style.BackColor = System.Drawing.Color.LightBlue;
-                    _dataGridViewGirdi.Columns[i].HeaderCell.Style.ForeColor = System.Drawing.Color.Navy;
-                    _dataGridViewGirdi.Columns[i].HeaderCell.Style.Font = new System.Drawing.Font(_dataGridViewGirdi.Font, System.Drawing.FontStyle.Bold);
-                }
-
-                // Satır sayısı bilgisi
-                MessageBox.Show($"Toplam {dataTable.Rows.Count} adet kayıt yüklendi.", "Veri Yüklendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Debug.WriteLine($"CSV başarıyla kaydedildi: {csvPath}");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"CSV verileri yüklenirken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Debug.WriteLine($"CSV kaydetme hatası: {ex.Message}, {ex.StackTrace}");
+                throw; // Hatayı yukarıya fırlat
+            }
+        }
+
+        private void KmlTestButton_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "KML Files (*.kml)|*.kml";
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    KmlFilePath = openFileDialog.FileName;
+                    //kmlFilePathLabel.Text = Path.GetFileName(KmlFilePath);
+                }
             }
         }
     }
-}
+    }
+    
