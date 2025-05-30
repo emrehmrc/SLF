@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Npgsql;
 using System.Data;
 using Oracle.ManagedDataAccess.Client;
 
