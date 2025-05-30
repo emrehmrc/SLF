@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using Newtonsoft.Json.Linq;
 using SLF.services;
 using SLF.Services;
-
+using System.Threading.Tasks;
 namespace SLF
 {
     public partial class DatabaseListForm : Form
@@ -112,14 +112,120 @@ namespace SLF
                 // Config yolunu al
                 string configPath = PathService._configKonum;
 
-                // Python script yolunu al
-                PythonHelper.RunPythonScriptForAboneVerisi(configPath);
+                if (string.IsNullOrEmpty(configPath) || !File.Exists(configPath))
+                {
+                    MessageBox.Show("Config dosyası bulunamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
-                // İşlem başarılı olduysa dialog'u kapat
-                MessageBox.Show("Abone verisi başarıyla oluşturuldu.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // Önce veri durumunu kontrol et
+                var validationResult = DataValidationService.ValidateAboneData(configPath);
 
-                // Abone verisi oluşturulduktan sonra tekrar kontrol et
-                CheckDataValidation();
+                // Kullanıcıya durumu göster ve onay al
+                string confirmMessage;
+
+                if (validationResult.IsValid && validationResult.HasDepoCsvFiles && validationResult.IsDataUpToDate)
+                {
+                    confirmMessage = $"✅ Veriler güncel ve CSV dosyaları mevcut.\n\n" +
+                                   $"İşlem türü: Hızlı işleme (CSV'lerden)\n" +
+                                   $"Abone Bilgi: {validationResult.AboneBilgiConfigCount:N0} kayıt\n" +
+                                   $"Tüketim: {validationResult.AboneTuketimConfigCount:N0} kayıt\n\n" +
+                                   $"CSV dosyalarından abone verisi oluşturulsun mu?";
+                }
+                else if (!validationResult.DatabaseAccessible && validationResult.HasDepoCsvFiles)
+                {
+                    confirmMessage = $"⚠ Veritabanına erişim yok, CSV dosyaları kullanılacak.\n\n" +
+                                   $"İşlem türü: CSV'lerden işleme\n" +
+                                   $"Depo yolu: {validationResult.DepoPath}\n\n" +
+                                   $"Mevcut CSV dosyalarından abone verisi oluşturulsun mu?";
+                }
+                else
+                {
+                    confirmMessage = $"🔄 Veri güncelleme gerekli.\n\n" +
+                                   $"İşlem türü: Tam güncelleme (Veritabanı + CSV)\n" +
+                                   $"Abone Bilgi: {validationResult.AboneBilgiCurrentCount:N0} → {validationResult.AboneBilgiConfigCount:N0}\n" +
+                                   $"Tüketim: {validationResult.AboneTuketimCurrentCount:N0} → {validationResult.AboneTuketimConfigCount:N0}\n\n" +
+                                   $"Bu işlem zaman alabilir. Devam edilsin mi?";
+                }
+
+                var dialogResult = MessageBox.Show(confirmMessage, "Abone Verisi Oluşturma", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (dialogResult != DialogResult.Yes)
+                {
+                    return;
+                }
+
+                // İşlem tipini belirle ve kullanıcıya bilgi ver
+                string processingMode;
+                if (validationResult.IsValid && validationResult.HasDepoCsvFiles && validationResult.IsDataUpToDate)
+                {
+                    processingMode = "CSV";
+                }
+                else
+                {
+                    processingMode = "DATABASE";
+                }
+
+                // İlerleme formu göster (opsiyonel)
+                var progressForm = new Form()
+                {
+                    Text = "Abone Verisi Oluşturuluyor...",
+                    Size = new Size(400, 100),
+                    StartPosition = FormStartPosition.CenterParent,
+                    FormBorderStyle = FormBorderStyle.FixedDialog,
+                    MaximizeBox = false,
+                    MinimizeBox = false
+                };
+
+                var progressLabel = new Label()
+                {
+                    Text = processingMode == "CSV" ? "CSV dosyalarından veri işleniyor..." : "Veritabanından veri çekiliyor ve güncelleniyor...",
+                    Dock = DockStyle.Fill,
+                    TextAlign = ContentAlignment.MiddleCenter
+                };
+                progressForm.Controls.Add(progressLabel);
+
+                // Async olarak Python script'ini çalıştır
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        // Python script'ini akıllı modda çalıştır
+                        PythonHelper.RunPythonScriptForAboneVerisi(configPath);
+
+                        // UI thread'de sonucu göster
+                        this.BeginInvoke(new Action(() =>
+                        {
+                            progressForm.Close();
+                            MessageBox.Show(
+                                $"✅ Abone verisi başarıyla oluşturuldu!\n\nİşlem türü: {(processingMode == "CSV" ? "Hızlı (CSV)" : "Tam güncelleme")}",
+                                "Başarılı",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information
+                            );
+
+                            // Abone verisi oluşturulduktan sonra tekrar kontrol et
+                            CheckDataValidation();
+                        }));
+                    }
+                    catch (Exception ex)
+                    {
+                        // UI thread'de hatayı göster
+                        this.BeginInvoke(new Action(() =>
+                        {
+                            progressForm.Close();
+                            MessageBox.Show(
+                                $"❌ Abone verisi oluşturulurken hata oluştu:\n\n{ex.Message}",
+                                "Hata",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error
+                            );
+                        }));
+                    }
+                });
+
+                // İlerleme formunu göster
+                progressForm.ShowDialog(this);
             }
             catch (Exception ex)
             {

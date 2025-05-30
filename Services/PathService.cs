@@ -31,7 +31,8 @@ namespace SLF.Services
         // Proje klasörüne göre relatif il-ilçe kırılımı klasörü yolu
             private static string _relativeDataPath = "il_ilce_kırılımları"; // Varsayılan değer
             public static string _configSLFMainPath;
-            // Temel dizin - ilk çalıştırmada hesaplanır
+            public static string _configDepo; // Yeni eklenen depo path'i
+                                              // Temel dizin - ilk çalıştırmada hesaplanır
             public static string _baseDirectory;
 
             // Seçilen il
@@ -371,27 +372,16 @@ namespace SLF.Services
                             {
                                 string veritabaniKodRelativePath = config["Python Kodları"].veritabani_kod.ToString();
 
-                                // Eğer yol "/" ile başlıyorsa, başındaki "/" karakterini kaldır
+                                // "/" başındaki karakteri kaldır
                                 if (veritabaniKodRelativePath.StartsWith("/"))
                                 {
                                     veritabaniKodRelativePath = veritabaniKodRelativePath.Substring(1);
                                 }
 
-                                // ÖNEMLİ DEĞİŞİKLİK: İl değerini path'e dahil etme, doğrudan program dosyaları ile birleştir
+                                // Program dosyaları ile birleştir
                                 string veritabaniKodFullPath = Path.Combine(programDosyalariFullPath, veritabaniKodRelativePath);
 
-                                // Dizin kısmını al (dosya adını çıkar)
-                                string veritabaniKodDirPath = Path.GetDirectoryName(veritabaniKodFullPath);
-
-                                // Klasörü oluştur (yoksa)
-                                if (!Directory.Exists(veritabaniKodDirPath))
-                                {
-                                    //Directory.CreateDirectory(veritabaniKodDirPath);
-                                }
-
-                                // Veritabani kod yolunu ayarla
                                 _configveritabanikod = veritabaniKodFullPath;
-                                Debug.WriteLine($"Config'den alınan Veritabanı kod yolu: {_configveritabanikod}");
                             }
                             if (config.konum != null)
                             {

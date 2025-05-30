@@ -9,7 +9,7 @@ namespace SLF.Services
     public static class DataValidationService
     {
         /// <summary>
-        /// Veritabanındaki tablo verilerini kontrol eder ve config ile karşılaştırır
+        /// Veritabanındaki tablo verilerini kontrol eder, config ile karşılaştırır ve CSV durumunu kontrol eder
         /// </summary>
         public static DataValidationResult ValidateAboneData(string configPath)
         {
@@ -27,7 +27,9 @@ namespace SLF.Services
                         AboneBilgiCurrentCount = 0,
                         AboneTuketimCurrentCount = 0,
                         AboneBilgiConfigCount = 0,
-                        AboneTuketimConfigCount = 0
+                        AboneTuketimConfigCount = 0,
+                        HasDepoCsvFiles = false,
+                        DepoPath = ""
                     };
                 }
 
@@ -36,9 +38,13 @@ namespace SLF.Services
                 System.Diagnostics.Debug.WriteLine($"Abone Bilgi: {aboneBilgiTable}");
                 System.Diagnostics.Debug.WriteLine($"Abone Tüketim: {aboneTuketimTable}");
 
+                // Depo klasörü ve CSV dosyalarının varlığını kontrol et
+                var (hasDepoCsv, depoPath, csvStatus) = CheckDepoCsvFiles(configPath);
+
                 // Veritabanından güncel satır sayılarını al
                 int currentAboneBilgiCount = 0;
                 int currentAboneTuketimCount = 0;
+                bool databaseAccessible = true;
 
                 try
                 {
@@ -48,7 +54,7 @@ namespace SLF.Services
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine($"Abone Bilgi Count Hatası: {ex.Message}");
-                    throw new Exception($"Abone bilgi tablosu erişim hatası: {ex.Message}");
+                    databaseAccessible = false;
                 }
 
                 try
@@ -59,7 +65,7 @@ namespace SLF.Services
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine($"Abone Tüketim Count Hatası: {ex.Message}");
-                    throw new Exception($"Abone tüketim tablosu erişim hatası: {ex.Message}");
+                    databaseAccessible = false;
                 }
 
                 // Config'den kayıtlı satır sayılarını al
@@ -69,41 +75,20 @@ namespace SLF.Services
                 System.Diagnostics.Debug.WriteLine($"Config Abone Bilgi: {configAboneBilgiCount}");
                 System.Diagnostics.Debug.WriteLine($"Config Abone Tüketim: {configAboneTuketimCount}");
 
-                // Karşılaştırma yap
-                bool isUpToDate = (currentAboneBilgiCount == configAboneBilgiCount) &&
-                                 (currentAboneTuketimCount == configAboneTuketimCount);
-
-                string message;
-                if (isUpToDate)
-                {
-                    message = "Verileriniz güncel.";
-                }
-                else
-                {
-                    message = $"Verileriniz güncel değil.\n\n" +
-                             $"Abone Bilgi Tablosu ({aboneBilgiTable}):\n" +
-                             $"  Güncel: {currentAboneBilgiCount:N0} satır\n" +
-                             $"  Config: {configAboneBilgiCount:N0} satır\n\n" +
-                             $"Abone Tüketim Tablosu ({aboneTuketimTable}):\n" +
-                             $"  Güncel: {currentAboneTuketimCount:N0} satır\n" +
-                             $"  Config: {configAboneTuketimCount:N0} satır";
-                }
-
-                // Config'i güncelle
-                if (!isUpToDate)
-                {
-                    ConfigService.UpdateAboneRowCounts(configPath, currentAboneBilgiCount, currentAboneTuketimCount);
-                }
-
-                return new DataValidationResult
-                {
-                    IsValid = isUpToDate,
-                    Message = message,
-                    AboneBilgiCurrentCount = currentAboneBilgiCount,
-                    AboneTuketimCurrentCount = currentAboneTuketimCount,
-                    AboneBilgiConfigCount = configAboneBilgiCount,
-                    AboneTuketimConfigCount = configAboneTuketimCount
-                };
+                // Veri durumunu analiz et
+                return AnalyzeDataStatus(
+                    databaseAccessible,
+                    currentAboneBilgiCount,
+                    currentAboneTuketimCount,
+                    configAboneBilgiCount,
+                    configAboneTuketimCount,
+                    hasDepoCsv,
+                    depoPath,
+                    csvStatus,
+                    aboneBilgiTable,
+                    aboneTuketimTable,
+                    configPath
+                );
             }
             catch (Exception ex)
             {
@@ -114,9 +99,165 @@ namespace SLF.Services
                     AboneBilgiCurrentCount = 0,
                     AboneTuketimCurrentCount = 0,
                     AboneBilgiConfigCount = 0,
-                    AboneTuketimConfigCount = 0
+                    AboneTuketimConfigCount = 0,
+                    HasDepoCsvFiles = false,
+                    DepoPath = ""
                 };
             }
+        }
+
+        /// <summary>
+        /// Depo klasöründeki CSV dosyalarının varlığını kontrol eder
+        /// </summary>
+        private static (bool hasDepoCsv, string depoPath, string csvStatus) CheckDepoCsvFiles(string configPath)
+        {
+            try
+            {
+                // Config'den depo yolunu oluştur
+                string jsonContent = File.ReadAllText(configPath);
+                JObject config = JObject.Parse(jsonContent);
+
+                string anaKlasor = config["Ana_Klasör_Yolu"]?.ToString() ?? "";
+                string il = config["İl"]?.ToString() ?? "";
+                string depoRelPath = config["depo"]?.ToString() ?? "depo";
+
+                // Slash'leri temizle
+                if (depoRelPath.StartsWith("/")) depoRelPath = depoRelPath.Substring(1);
+                if (depoRelPath.EndsWith("/")) depoRelPath = depoRelPath.Substring(0, depoRelPath.Length - 1);
+
+                string depoPath = Path.Combine(anaKlasor, il, depoRelPath);
+
+                // CSV dosya yolları
+                string aboneCsvPath = Path.Combine(depoPath, "DWH_MRC_SLFPROJE_ABN_BLG.csv");
+                string tuketimCsvPath = Path.Combine(depoPath, "DWH_TUKETIM_DENEME.csv");
+
+                bool aboneExists = File.Exists(aboneCsvPath);
+                bool tuketimExists = File.Exists(tuketimCsvPath);
+
+                string csvStatus = "";
+                if (aboneExists && tuketimExists)
+                {
+                    csvStatus = "✓ Tüm CSV dosyaları mevcut";
+                }
+                else if (aboneExists || tuketimExists)
+                {
+                    csvStatus = $"⚠ Kısmi CSV dosyaları mevcut (Abone: {(aboneExists ? "✓" : "✗")}, Tüketim: {(tuketimExists ? "✓" : "✗")})";
+                }
+                else
+                {
+                    csvStatus = "✗ CSV dosyaları bulunamadı";
+                }
+
+                return (aboneExists && tuketimExists, depoPath, csvStatus);
+            }
+            catch (Exception ex)
+            {
+                return (false, "", $"CSV kontrolü hatası: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Veri durumunu analiz eder ve uygun mesajı oluşturur
+        /// </summary>
+        private static DataValidationResult AnalyzeDataStatus(
+            bool databaseAccessible,
+            int currentAboneBilgiCount,
+            int currentAboneTuketimCount,
+            int configAboneBilgiCount,
+            int configAboneTuketimCount,
+            bool hasDepoCsv,
+            string depoPath,
+            string csvStatus,
+            string aboneBilgiTable,
+            string aboneTuketimTable,
+            string configPath)
+        {
+            bool isDataUpToDate = false;
+            string message = "";
+            bool canProceed = false;
+
+            if (!databaseAccessible)
+            {
+                // Veritabanına erişim yok
+                if (hasDepoCsv)
+                {
+                    canProceed = true;
+                    message = $"⚠ Veritabanına erişim yok, ancak depo CSV dosyaları kullanılabilir.\n\n" +
+                             $"{csvStatus}\n" +
+                             $"Depo yolu: {depoPath}\n\n" +
+                             $"CSV dosyalarından abone verisi oluşturulacak.";
+                }
+                else
+                {
+                    canProceed = false;
+                    message = $"❌ Veritabanına erişim yok ve depo CSV dosyaları bulunamadı.\n\n" +
+                             $"{csvStatus}\n" +
+                             $"Depo yolu: {depoPath}\n\n" +
+                             $"Lütfen önce veritabanı bağlantısını kurun ve 'Abone Verisi Oluştur' butonuna tıklayın.";
+                }
+            }
+            else
+            {
+                // Veritabanına erişim var - karşılaştırma yap
+                isDataUpToDate = (currentAboneBilgiCount == configAboneBilgiCount) &&
+                               (currentAboneTuketimCount == configAboneTuketimCount);
+
+                if (isDataUpToDate)
+                {
+                    // Veriler güncel
+                    if (hasDepoCsv)
+                    {
+                        canProceed = true;
+                        message = $"✅ Veriler güncel! Depo CSV dosyaları kullanılacak.\n\n" +
+                                 $"Abone Bilgi ({aboneBilgiTable}): {configAboneBilgiCount:N0} satır\n" +
+                                 $"Abone Tüketim ({aboneTuketimTable}): {configAboneTuketimCount:N0} satır\n\n" +
+                                 $"{csvStatus}\n" +
+                                 $"Depo yolu: {depoPath}";
+                    }
+                    else
+                    {
+                        canProceed = false;
+                        message = $"✅ Veriler güncel ancak depo CSV dosyaları bulunamadı.\n\n" +
+                                 $"Abone Bilgi ({aboneBilgiTable}): {configAboneBilgiCount:N0} satır\n" +
+                                 $"Abone Tüketim ({aboneTuketimTable}): {configAboneTuketimCount:N0} satır\n\n" +
+                                 $"{csvStatus}\n" +
+                                 $"Depo yolu: {depoPath}\n\n" +
+                                 $"CSV dosyalarını oluşturmak için 'Abone Verisi Oluştur' butonuna tıklayın.";
+                    }
+                }
+                else
+                {
+                    // Veriler güncel değil
+                    canProceed = false;
+                    message = $"⚠ Veriler güncel değil! Güncelleme gerekli.\n\n" +
+                             $"Abone Bilgi ({aboneBilgiTable}):\n" +
+                             $"  Güncel: {currentAboneBilgiCount:N0} satır\n" +
+                             $"  Config: {configAboneBilgiCount:N0} satır\n\n" +
+                             $"Abone Tüketim ({aboneTuketimTable}):\n" +
+                             $"  Güncel: {currentAboneTuketimCount:N0} satır\n" +
+                             $"  Config: {configAboneTuketimCount:N0} satır\n\n" +
+                             $"{csvStatus}\n" +
+                             $"Depo yolu: {depoPath}\n\n" +
+                             $"Lütfen 'Abone Verisi Oluştur' butonuna tıklayarak verileri güncelleyin.";
+
+                    // Config'i güncelle
+                    ConfigService.UpdateAboneRowCounts(configPath, currentAboneBilgiCount, currentAboneTuketimCount);
+                }
+            }
+
+            return new DataValidationResult
+            {
+                IsValid = canProceed,
+                Message = message,
+                AboneBilgiCurrentCount = currentAboneBilgiCount,
+                AboneTuketimCurrentCount = currentAboneTuketimCount,
+                AboneBilgiConfigCount = configAboneBilgiCount,
+                AboneTuketimConfigCount = configAboneTuketimCount,
+                HasDepoCsvFiles = hasDepoCsv,
+                DepoPath = depoPath,
+                IsDataUpToDate = isDataUpToDate,
+                DatabaseAccessible = databaseAccessible
+            };
         }
 
         /// <summary>
@@ -215,7 +356,7 @@ namespace SLF.Services
     }
 
     /// <summary>
-    /// Veri doğrulama sonuç sınıfı
+    /// Veri doğrulama sonuç sınıfı - Güncellenmiş
     /// </summary>
     public class DataValidationResult
     {
@@ -225,5 +366,11 @@ namespace SLF.Services
         public int AboneTuketimCurrentCount { get; set; }
         public int AboneBilgiConfigCount { get; set; }
         public int AboneTuketimConfigCount { get; set; }
+
+        // Yeni özellikler
+        public bool HasDepoCsvFiles { get; set; }
+        public string DepoPath { get; set; }
+        public bool IsDataUpToDate { get; set; }
+        public bool DatabaseAccessible { get; set; }
     }
 }
