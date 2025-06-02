@@ -37,10 +37,10 @@
             // 
             this.dtrVeriTabloOlustur.Font = new System.Drawing.Font("Comic Sans MS", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dtrVeriTabloOlustur.ForeColor = System.Drawing.Color.DarkOrange;
-            this.dtrVeriTabloOlustur.Location = new System.Drawing.Point(436, 145);
-            this.dtrVeriTabloOlustur.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.dtrVeriTabloOlustur.Location = new System.Drawing.Point(69, 115);
+            this.dtrVeriTabloOlustur.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dtrVeriTabloOlustur.Name = "dtrVeriTabloOlustur";
-            this.dtrVeriTabloOlustur.Size = new System.Drawing.Size(183, 66);
+            this.dtrVeriTabloOlustur.Size = new System.Drawing.Size(163, 53);
             this.dtrVeriTabloOlustur.TabIndex = 13;
             this.dtrVeriTabloOlustur.Text = "DTR Veri Tablosu Oluştur";
             this.dtrVeriTabloOlustur.UseVisualStyleBackColor = true;
@@ -50,10 +50,10 @@
             // 
             this.aboneVeriOlustur.Font = new System.Drawing.Font("Comic Sans MS", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.aboneVeriOlustur.ForeColor = System.Drawing.Color.DarkOrange;
-            this.aboneVeriOlustur.Location = new System.Drawing.Point(436, 276);
-            this.aboneVeriOlustur.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.aboneVeriOlustur.Location = new System.Drawing.Point(69, 220);
+            this.aboneVeriOlustur.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.aboneVeriOlustur.Name = "aboneVeriOlustur";
-            this.aboneVeriOlustur.Size = new System.Drawing.Size(183, 66);
+            this.aboneVeriOlustur.Size = new System.Drawing.Size(163, 53);
             this.aboneVeriOlustur.TabIndex = 16;
             this.aboneVeriOlustur.Text = "Abone Veri Tablosu Oluştur";
             this.aboneVeriOlustur.UseVisualStyleBackColor = true;
@@ -64,22 +64,22 @@
             this.tablo_label.AutoSize = true;
             this.tablo_label.Font = new System.Drawing.Font("Comic Sans MS", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tablo_label.ForeColor = System.Drawing.Color.DarkOrange;
-            this.tablo_label.Location = new System.Drawing.Point(368, 28);
+            this.tablo_label.Location = new System.Drawing.Point(29, 23);
             this.tablo_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.tablo_label.Name = "tablo_label";
-            this.tablo_label.Size = new System.Drawing.Size(297, 58);
+            this.tablo_label.Size = new System.Drawing.Size(246, 48);
             this.tablo_label.TabIndex = 21;
             this.tablo_label.Text = "Tablo Oluştur";
             // 
             // Tablo_olustur
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1169, 692);
+            this.ClientSize = new System.Drawing.Size(311, 305);
             this.Controls.Add(this.tablo_label);
             this.Controls.Add(this.aboneVeriOlustur);
             this.Controls.Add(this.dtrVeriTabloOlustur);
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "Tablo_olustur";
             this.Text = "Tablo_olustur";
             this.ResumeLayout(false);

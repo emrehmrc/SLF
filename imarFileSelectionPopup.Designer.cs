@@ -42,9 +42,9 @@ namespace SLF
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.katman_tablosu = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
             this.TestCalıstır = new System.Windows.Forms.Button();
             this.KmlTestButton = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
             this.imarFileSelectionPanel.SuspendLayout();
             this.imarCitySelectionPanel.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -200,18 +200,6 @@ namespace SLF
             this.katman_tablosu.UseVisualStyleBackColor = true;
             this.katman_tablosu.Click += new System.EventHandler(this.katman_tablosu_Click);
             // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label3.ForeColor = System.Drawing.Color.DarkOrange;
-            this.label3.Location = new System.Drawing.Point(251, 54);
-            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(140, 23);
-            this.label3.TabIndex = 3;
-            this.label3.Text = "KML Veri Seçimi ;";
-            // 
             // TestCalıstır
             // 
             this.TestCalıstır.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
@@ -236,6 +224,18 @@ namespace SLF
             this.KmlTestButton.TabIndex = 1;
             this.KmlTestButton.UseVisualStyleBackColor = true;
             this.KmlTestButton.Click += new System.EventHandler(this.KmlTestButton_Click);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.label3.ForeColor = System.Drawing.Color.DarkOrange;
+            this.label3.Location = new System.Drawing.Point(251, 54);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(140, 23);
+            this.label3.TabIndex = 3;
+            this.label3.Text = "KML Veri Seçimi ;";
             // 
             // imarFileSelectionPopup
             // 
@@ -274,11 +274,11 @@ namespace SLF
         private System.Windows.Forms.Panel imarCitySelectionPanel;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button TestCalıstır;
-        private System.Windows.Forms.Button KmlTestButton;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button katman_tablosu;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button KmlTestButton;
     }
 }
