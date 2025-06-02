@@ -86,14 +86,14 @@ namespace SLF.Optimal_DTR
             il = config["İl"];
             ilce = config["İlçe"];
             İlkYıl = config["DEK:baslangıc_yılı"];
-            SonYıl = config["DEK:bitis_yılı"];          
+            SonYıl = config["DEK:bitis_yılı"];
 
             Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
                 {
                     { "İzmir", new PointLatLng(38.4192, 27.1287) }, // Example coordinates for İzmir
                     { "Eskişehir", new PointLatLng(39.7768, 30.5206) } // Example coordinates for Eskişehir
                     // Add more cities and their coordinates as needed
-                };                 
+                };
 
         }
 
@@ -167,7 +167,7 @@ namespace SLF.Optimal_DTR
                     return;
                 }
                 // Unique X ve Y koordinatları (DataTable'dan alınıyor)
-                
+
 
                 // Eğer unique koordinatlar varsa, onları kullan
                 PointLatLng konum = new PointLatLng(unique_y, unique_x);  // Unique X ve Y'yi buraya ekliyoruz
@@ -198,8 +198,8 @@ namespace SLF.Optimal_DTR
         private bool CalismaYoluKontrol()
         {
             TuketimDosyaAdi = "SONUCLAR2.xlsx";
-            TrafoDosyaAdi = $"trafo_merkez_hucre_{il}_{ilce}.xlsx";
-            TrafoAlanDosyaAdi = $"trafo_rezerv_alanlar_{il.ToLower()}.xlsx";
+            TrafoDosyaAdi = $"trafo_merkez_hucre_{ilce}.xlsx";
+            TrafoAlanDosyaAdi = $"trafo_rezerv_alanlar_{ilce.ToLower()}.xlsx";
 
             tuketim_path = Path.Combine(YükVeriYolu, TuketimDosyaAdi);
             string trafo_path = Path.Combine(İmarVeriYolu, TrafoDosyaAdi);
@@ -317,8 +317,8 @@ namespace SLF.Optimal_DTR
 
             // Form'a ProgressBar'ı ve Label'ı ekliyoruz
             form.Controls.Add(progressBar1);
-            
-            form.Controls.Add(label);                
+
+            form.Controls.Add(label);
 
             try
             {
@@ -717,7 +717,7 @@ namespace SLF.Optimal_DTR
                 MessageBox.Show("Veri yüklenmedi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
-           
+
         }
 
         private void Arazi_Click(object sender, EventArgs e)

@@ -305,7 +305,7 @@ namespace SLF
                         columnNullRowsMap["PROJELENDIRILMIS_TRAFO_ID"] = invalidRows;
                         infoDataTable.Rows.Add(new object[]
                         {
-                    column.ColumnName, 
+                    column.ColumnName,
                             "Projelendirilmiş Trafo ID",
                             $"{invalidPercentage:P1}",
                     $"PROJELENDIRILMIS_TRAFO_ID sütununda {invalidCount} satır NULL veya #N/A değer içeriyor ve silinecek."

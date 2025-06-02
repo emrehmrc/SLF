@@ -7,6 +7,7 @@ using System.IO;
 using ExcelDataReader;
 using GMap.NET;
 using System.Globalization;
+using OfficeOpenXml;
 
 namespace SLF
 {
@@ -34,9 +35,13 @@ namespace SLF
         // Add a public property to access the DataTable
         public DataTable PolygonDataTable => dataTable;
 
+        // Field to store the current KeyPress lambda delegate
+        private KeyPressEventHandler _currentKeyPressHandler;
+
         public Poligon_Özellik_Tanımlama(bool isSelectingYUK, bool isSelectingYGA, bool isSelectingMusaade, bool isSelectingKentselDonusum,
             List<PointLatLng> polygonPoints)
         {
+
             InitializeComponent();
             modül_formu = new ModülFormu();
             cbsFormu = new CBS(modül_formu);
@@ -144,8 +149,8 @@ namespace SLF
                 // Add columns
                 dataTable.Columns.Add("Polygon ID", typeof(string));
                 dataTable.Columns.Add("Tipi", typeof(string));
-                dataTable.Columns.Add("ENERJI_MUSAADE_ABONE_GRUBU", typeof(string));
-                dataTable.Columns.Add("ENERJI_MUSAADE_ENERJILENDIRME_YILI", typeof(string));
+                dataTable.Columns.Add("ABONE_GRUBU", typeof(string));
+                dataTable.Columns.Add("ENERJILENDIRME_YILI", typeof(string));
                 dataTable.Columns.Add("Kurulu Güç (kW)", typeof(string));
                 dataTable.Columns.Add("Pik Yüklenme (%)", typeof(string));
                 dataTable.Columns.Add("Pik Demant (kW)", typeof(string));
@@ -167,8 +172,8 @@ namespace SLF
                 // Set tooltips for column headers
                 PoligonDataGridView.Columns["Polygon ID"].ToolTipText = "Poligona ait özgün ID numarası";
                 PoligonDataGridView.Columns["Tipi"].ToolTipText = "Poligonun tipi veya kategorisi - AVM, Restoran vb.";
-                PoligonDataGridView.Columns["ENERJI_MUSAADE_ABONE_GRUBU"].ToolTipText = "Enerji müsaadesi için abone grubu - Ticarethane, Sanayi, vb.";
-                PoligonDataGridView.Columns["ENERJI_MUSAADE_ENERJILENDIRME_YILI"].ToolTipText = "Enerji müsaadesinin verileceği yıl";
+                PoligonDataGridView.Columns["ABONE_GRUBU"].ToolTipText = "Enerji müsaadesi için abone grubu - Ticarethane, Sanayi, vb.";
+                PoligonDataGridView.Columns["ENERJILENDIRME_YILI"].ToolTipText = "Enerji müsaadesinin verileceği yıl";
                 PoligonDataGridView.Columns["Kurulu Güç (kW)"].ToolTipText = "Enerji müsaadesi verilecek yapıya ait kurulu güç kapasitesi (kilowatt)";
                 PoligonDataGridView.Columns["Pik Yüklenme (%)"].ToolTipText = "Enerji müsaadesi verilecek yapıya ait tahmini pik yüklenme oranı (yüzde)";
                 PoligonDataGridView.Columns["Pik Demant (kW)"].ToolTipText = "Enerji müsaadesi verilecek yapıya ait tahmini pik güç talebi (kilowatt)";
@@ -322,8 +327,8 @@ namespace SLF
                 columnValues = new Dictionary<string, HashSet<string>>
                 {
                     { "Tipi", new HashSet<string>() },
-                    { "ENERJI_MUSAADE_ABONE_GRUBU", new HashSet<string>() },
-                    { "ENERJI_MUSAADE_ENERJILENDIRME_YILI", new HashSet<string>() },
+                    { "ABONE_GRUBU", new HashSet<string>() },
+                    { "ENERJILENDIRME_YILI", new HashSet<string>() },
                     { "Kurulu Güç (kW)", new HashSet<string>() },
                     { "Pik Yüklenme (%)", new HashSet<string>() },
                     { "Pik Demant (kW)", new HashSet<string>() }
@@ -502,42 +507,20 @@ namespace SLF
             }
         }
 
-        private void buton_poligon_ozellik_Click(object sender, EventArgs e)
-        {
-            if (ValidatePolygonData())
-            {
-                isKaydetClicked = true;
-                this.Close();
-            }
-            else
-            {
-                MessageBox.Show("Hata: İmar tiplerinin toplamı 100(%) olmalıdır!\n\n" +
-                    "İlgili imar tipleri şunlardır:\n\n" +
-                    "1-2 KATLI MESKEN\n" +
-                    "3-4 KATLI MESKEN\n" +
-                    "5-7 KATLI MESKEN\n" +
-                    "8 USTU KATLI MESKEN\n" +
-                    "KUCUK SANAYI\n" +
-                    "KUCUK TICARETHANE\n" +
-                    "ORTA SANAYI\n" +
-                    "ORTA TICARETHANE\n" +
-                    "VILLA MESKEN\n" +
-                    "TARIMSAL SULAMA\n" +
-                    "Park, Yol, Kaldırım Oranı (%)", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
+        // Dictionary to store adjusted horizontal values (Year -> (Category -> Adjusted Value))
+        // e.g., { 2027: { "TİCARETHANE": 3597070.999 - difference, "SANAYİ": ... } }
+        private static readonly Dictionary<int, Dictionary<string, double>> AdjustedHorizontalValues = new Dictionary<int, Dictionary<string, double>>();
 
         private bool ValidatePolygonData()
         {
-            // Validation only applies to isSelecting_YGA or isSelecting_KentselDonusum
-            if (!isSelecting_YGA && !isSelecting_KentselDonusum)
+            try
             {
-                return true; // No validation needed for other conditions
-            }
-
-            // Columns to validate
-            string[] columnsToValidate = new string[]
-            {
+                // Validation for isSelecting_YGA or isSelecting_KentselDonusum
+                if (isSelecting_YGA || isSelecting_KentselDonusum)
+                {
+                    // Columns to validate for percentage sum
+                    string[] percentageColumns = new string[]
+                    {
                 "1-2 KATLI MESKEN",
                 "3-4 KATLI MESKEN",
                 "5-7 KATLI MESKEN",
@@ -550,42 +533,350 @@ namespace SLF
                 "ORTA TICARETHANE",
                 "TARIMSAL SULAMA",
                 "Park, Yol, Kaldırım Oranı (%)"
-            };
+                    };
 
-            try
-            {
-                double total = 0;
-                foreach (DataRow row in dataTable.Rows)
+                    // Additional columns to validate
+                    string[] additionalColumns = { "Başlangıç Yılı", "Satürasyon Hızı" };
+                    if (isSelecting_YGA)
+                    {
+                        additionalColumns = additionalColumns.Concat(new[] { "TAKS" }).ToArray();
+                    }
+
+                    // Check if all required columns exist
+                    foreach (string column in percentageColumns.Concat(additionalColumns))
+                    {
+                        if (dataTable.Columns.Contains(column)) continue;
+                        MessageBox.Show($"Hata: '{column}' sütunu bulunamadı.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return false;
+                    }
+
+                    double total = 0;
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        // Validate percentage sum
+                        foreach (string column in percentageColumns)
+                        {
+                            // Check if the column exists and the value is not null or empty
+                            if (!string.IsNullOrEmpty(row[column]?.ToString()))
+                            {
+                                // Try to parse the value as a double
+                                if (double.TryParse(row[column].ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+                                {
+                                    total += value;
+                                }
+                                else
+                                {
+                                    MessageBox.Show($"Hata: '{column}' sütununda geçersiz bir değer var.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return false;
+                                }
+                            }
+                        }
+
+                        // Validate Başlangıç Yılı
+                        string startYearStr = row["Başlangıç Yılı"]?.ToString();
+                        if (string.IsNullOrWhiteSpace(startYearStr))
+                        {
+                            MessageBox.Show("Hata: 'Başlangıç Yılı' sütunu boş olamaz.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+                        if (!int.TryParse(startYearStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int startYear) || startYear < 2025 || startYear > 2075)
+                        {
+                            MessageBox.Show($"Hata: 'Başlangıç Yılı' 2025 ile 2075 arasında olmalıdır. Girilen: {startYearStr}", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+
+                        // Validate Satürasyon Hızı
+                        string saturationSpeedStr = row["Satürasyon Hızı"]?.ToString();
+                        if (string.IsNullOrWhiteSpace(saturationSpeedStr))
+                        {
+                            MessageBox.Show("Hata: 'Satürasyon Hızı' sütunu boş olamaz.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+                        if (!double.TryParse(saturationSpeedStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double saturationSpeed) || saturationSpeed < 1 || saturationSpeed > 5)
+                        {
+                            MessageBox.Show($"Hata: 'Satürasyon Hızı' 1 ile 5 arasında olmalıdır. Girilen: {saturationSpeedStr}", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+
+                        // Validate TAKS when isSelecting_YGA is true
+                        if (isSelecting_YGA)
+                        {
+                            string taksStr = row["TAKS"]?.ToString();
+                            if (string.IsNullOrWhiteSpace(taksStr))
+                            {
+                                MessageBox.Show("Hata: 'TAKS' sütunu boş olamaz.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return false;
+                            }
+                        }
+                    }
+
+                    // Check if total is approximately 100 (allowing for small floating-point errors)
+                    if (Math.Abs(total - 100) >= 0.1)
+                    {
+                        return false; // Error message handled in button click
+                    }
+                }
+
+                // Validation for isSelecting_YUK or isSelecting_Musaade
+                if (isSelecting_YUK || isSelecting_Musaade)
                 {
+                    // Required columns for both YUK and Musaade
+                    string[] columnsToValidate = { "Kurulu Güç (kW)", "Pik Yüklenme (%)", "Pik Demant (kW)", "ENERJILENDIRME_YILI" };
+                    string categoryColumn = isSelecting_YUK ? "Tüketim Sınıfı" : "ABONE_GRUBU";
+                    columnsToValidate = columnsToValidate.Concat(new[] { categoryColumn }).ToArray();
+
+                    // Check if all required columns exist
                     foreach (string column in columnsToValidate)
                     {
-                        // Check if the column exists and the value is not null or empty
-                        if (dataTable.Columns.Contains(column) && !string.IsNullOrEmpty(row[column]?.ToString()))
+                        if (!dataTable.Columns.Contains(column))
                         {
-                            // Try to parse the value as a double
-                            if (double.TryParse(row[column].ToString(), out double value))
+                            MessageBox.Show($"Hata: '{column}' sütunu bulunamadı.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+                    }
+
+                    // Iterate over each row in the DataTable
+                    for (int rowIndex = 0; rowIndex < dataTable.Rows.Count; rowIndex++)
+                    {
+                        DataRow row = dataTable.Rows[rowIndex];
+
+                        // Get values for the required columns
+                        string powerValueStr = row["Kurulu Güç (kW)"]?.ToString();
+                        string peakLoadValueStr = row["Pik Yüklenme (%)"]?.ToString();
+                        string peakDemandValueStr = row["Pik Demant (kW)"]?.ToString();
+                        string energizationYearStr = row["ENERJILENDIRME_YILI"]?.ToString();
+                        string categoryValue = row[categoryColumn]?.ToString();
+
+                        // Validate required fields
+                        if (string.IsNullOrWhiteSpace(powerValueStr) ||
+                            string.IsNullOrWhiteSpace(peakLoadValueStr) ||
+                            string.IsNullOrWhiteSpace(peakDemandValueStr) ||
+                            string.IsNullOrWhiteSpace(energizationYearStr) ||
+                            string.IsNullOrWhiteSpace(categoryValue))
+                        {
+                            MessageBox.Show(
+                                $"Satır {rowIndex + 1}: Tüm alanlar doldurulmalıdır: " +
+                                $"Kurulu Güç='{powerValueStr}', Pik Yüklenme='{peakLoadValueStr}', Pik Demant='{peakDemandValueStr}', " +
+                                $"ENERJILENDIRME_YILI='{energizationYearStr}', {categoryColumn}='{categoryValue}'",
+                                "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+
+                        // Parse values
+                        if (!double.TryParse(powerValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double powerValue) ||
+                            !double.TryParse(peakLoadValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double peakLoadValue) ||
+                            !double.TryParse(peakDemandValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double peakDemandValue) ||
+                            !int.TryParse(energizationYearStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int energizationYear))
+                        {
+                            MessageBox.Show(
+                                $"Satır {rowIndex + 1}: Geçersiz değerler: " +
+                                $"Kurulu Güç='{powerValueStr}', Pik Yüklenme='{peakLoadValueStr}', Pik Demant='{peakDemandValueStr}', " +
+                                $"ENERJILENDIRME_YILI='{energizationYearStr}'",
+                                "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+
+                        // Validate the power equation
+                        double expectedPeakDemand = powerValue * peakLoadValue;
+                        const double tolerance = 0.001;
+                        if (Math.Abs(expectedPeakDemand - peakDemandValue) > tolerance)
+                        {
+                            MessageBox.Show(
+                                $"Satır {rowIndex + 1}: 'Kurulu Güç (kW)' * 'Pik Yüklenme (%)' = 'Pik Demant (kW)' eşitliği sağlanmıyor.\n" +
+                                $"Hesaplanan: {expectedPeakDemand:F2} kW, Girilen: {peakDemandValue:F2} kW",
+                                "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+
+                        // Determine the category column in Excel
+                        string excelColumn;
+                        string categoryUpper = categoryValue.ToUpper();
+                        if (categoryUpper == "TİCARETHANE")
+                        {
+                            excelColumn = "TICARETHANE_HORIZONTAL";
+                        }
+                        else if (categoryUpper == "SANAYİ")
+                        {
+                            excelColumn = "SANAYI_HORIZONTAL";
+                        }
+                        else
+                        {
+                            MessageBox.Show(
+                                $"Satır {rowIndex + 1}: {categoryColumn} yalnızca 'TİCARETHANE' veya 'SANAYİ' olabilir. Girilen: {categoryValue}",
+                                "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+
+                        // Construct the path to the Excel file
+                        string hor_ver_path = Path.Combine(modül_formu.ana_menu_form_objesi.userRootPath,
+                            (string)modül_formu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                            (string)modül_formu.ana_menu_form_objesi.config.İl,
+                            (string)modül_formu.ana_menu_form_objesi.config.İlçe,
+                            (string)modül_formu.ana_menu_form_objesi.config.proje_ismi,
+                            (string)modül_formu.ana_menu_form_objesi.config.ELF.hor_ver_dosyası).Replace('/', '\\');
+
+                        if (!File.Exists(hor_ver_path))
+                        {
+                            MessageBox.Show($"Hata: Excel dosyası bulunamadı: {hor_ver_path}", "Dosya Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+
+
+                        // Read the Excel file
+                        using (var package = new ExcelPackage(new FileInfo(hor_ver_path)))
+                        {
+                            var worksheet = package.Workbook.Worksheets[0]; // First worksheet
+                            int rowCount = worksheet.Dimension.Rows;
+                            int yearCol = 2; // "YIL" is the second column
+                            int horizontalCol = -1;
+
+                            // Find the column index for TICARETHANE_HORIZONTAL or SANAYI_HORIZONTAL
+                            for (int col = 1; col <= worksheet.Dimension.Columns; col++)
                             {
-                                total += value;
+                                if (worksheet.Cells[1, col].Text == excelColumn)
+                                {
+                                    horizontalCol = col;
+                                    break;
+                                }
                             }
-                            else
+
+                            if (horizontalCol == -1)
                             {
-                                // If parsing fails, show error and return false
-                                MessageBox.Show($"Hata: '{column}' sütununda geçersiz bir değer var.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBox.Show($"Hata: '{excelColumn}' sütunu Excel dosyasında bulunamadı.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 return false;
+                            }
+
+                            // Validate for years t0, t+1, and t+2
+                            for (int yearOffset = 0; yearOffset <= 2; yearOffset++)
+                            {
+                                int targetYear = energizationYear + yearOffset;
+                                double multiplier = (yearOffset == 0) ? 0.5 : 0.25;
+                                double calculatedValue = peakDemandValue / 2.5 * 8760 * multiplier;
+                                double thresholdMultiplier = 0.9; // 90%
+
+                                // Find the row for the target year
+                                double horizontalValue = 0;
+                                bool yearFound = false;
+                                for (int excelRow = 2; excelRow <= rowCount; excelRow++) // Renamed 'row' to 'excelRow'
+                                {
+                                    string yearStr = worksheet.Cells[excelRow, yearCol].Text?.Replace(",", "");
+                                    if (int.TryParse(yearStr, out int excelYear) && excelYear == targetYear)
+                                    {
+                                        string horizontalStr = worksheet.Cells[excelRow, horizontalCol].Text?.Replace(",", "");
+                                        if (double.TryParse(horizontalStr, NumberStyles.Any, CultureInfo.InvariantCulture, out horizontalValue))
+                                        {
+                                            yearFound = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (!yearFound)
+                                {
+                                    MessageBox.Show($"Hata: {targetYear} yılı Excel dosyasında bulunamadı.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return false;
+                                }
+
+                                // Adjust horizontal value if previous polygons have modified it
+                                double adjustedHorizontalValue = horizontalValue;
+                                if (AdjustedHorizontalValues.ContainsKey(targetYear) && AdjustedHorizontalValues[targetYear].ContainsKey(categoryUpper))
+                                {
+                                    adjustedHorizontalValue = AdjustedHorizontalValues[targetYear][categoryUpper];
+                                }
+
+                                double threshold = adjustedHorizontalValue * thresholdMultiplier;
+                                if (calculatedValue > threshold)
+                                {
+                                    MessageBox.Show(
+                                        $"Satır {rowIndex + 1}: {targetYear} yılı için {excelColumn} ELF tahmininden gelen " +
+                                        $"kWh tüketim sınırını aşıyor.\n" +
+                                        $"Hesaplanan Değer: {calculatedValue:F0} kWh," +
+                                        $" İzin Verilen Maksimum ({targetYear} verisinin ({adjustedHorizontalValue:F0})" +
+                                        $" %90'ı) = {threshold:F0} kWh",
+                                        "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return false;
+                                }
+                            }
+
+                            // If all validations pass, calculate and store the differences
+                            for (int yearOffset = 0; yearOffset <= 2; yearOffset++)
+                            {
+                                int targetYear = energizationYear + yearOffset;
+                                double multiplier = (yearOffset == 0) ? 0.5 : 0.25;
+                                double calculatedValue = peakDemandValue / 2.5 * 8760 * multiplier;
+
+                                // Find the original horizontal value again for difference calculation
+                                double horizontalValue = 0;
+                                for (int excelRow = 2; excelRow <= rowCount; excelRow++) // Renamed 'row' to 'excelRow'
+                                {
+                                    string yearStr = worksheet.Cells[excelRow, yearCol].Text?.Replace(",", "");
+                                    if (int.TryParse(yearStr, out int excelYear) && excelYear == targetYear)
+                                    {
+                                        string horizontalStr = worksheet.Cells[excelRow, horizontalCol].Text?.Replace(",", "");
+                                        if (double.TryParse(horizontalStr, NumberStyles.Any, CultureInfo.InvariantCulture, out horizontalValue))
+                                        {
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                // Adjust the value (subtract the calculated value)
+                                double adjustedValue = horizontalValue;
+                                if (AdjustedHorizontalValues.ContainsKey(targetYear) && AdjustedHorizontalValues[targetYear].ContainsKey(categoryUpper))
+                                {
+                                    adjustedValue = AdjustedHorizontalValues[targetYear][categoryUpper];
+                                }
+                                adjustedValue -= calculatedValue;
+
+                                // Store the adjusted value in the dictionary
+                                if (!AdjustedHorizontalValues.ContainsKey(targetYear))
+                                {
+                                    AdjustedHorizontalValues[targetYear] = new Dictionary<string, double>();
+                                }
+                                AdjustedHorizontalValues[targetYear][categoryUpper] = adjustedValue;
                             }
                         }
                     }
                 }
 
-                // Check if total is approximately 1 (allowing for small floating-point errors)
-                return Math.Abs(total - 100) < 0.1;
+                return true;
             }
             catch (Exception ex)
             {
+                MessageBox.Show($"Doğrulama sırasında bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }
 
+        private void buton_poligon_ozellik_Click(object sender, EventArgs e)
+        {
+
+            if (ValidatePolygonData())
+            {
+                isKaydetClicked = true;
+                this.Close();
+            }
+            else
+            {
+                if (isSelecting_YGA || isSelecting_KentselDonusum)
+                {
+                    MessageBox.Show("Hata: İmar tiplerinin toplamı 100(%) olmalıdır!\n\n" +
+                        "İlgili imar tipleri şunlardır:\n\n" +
+                        "1-2 KATLI MESKEN\n" +
+                        "3-4 KATLI MESKEN\n" +
+                        "5-7 KATLI MESKEN\n" +
+                        "8 USTU KATLI MESKEN\n" +
+                        "VILLA MESKEN\n" +
+                        "AYDINLATMA\n" +
+                        "KUCUK SANAYI\n" +
+                        "KUCUK TICARETHANE\n" +
+                        "ORTA SANAYI\n" +
+                        "ORTA TICARETHANE\n" +
+                        "TARIMSAL SULAMA\n" +
+                        "Park, Yol, Kaldırım Oranı (%)", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
 
         private void buton_yük_tipleri_Click(object sender, EventArgs e)
         {
@@ -670,8 +961,8 @@ namespace SLF
                         var matchingRow = excelDataRows.FirstOrDefault(row => row["Tipi"] == selectedTipi);
                         if (matchingRow != null)
                         {
-                            PoligonDataGridView.Rows[e.RowIndex].Cells["ENERJI_MUSAADE_ABONE_GRUBU"].Value = matchingRow["ENERJI_MUSAADE_ABONE_GRUBU"];
-                            PoligonDataGridView.Rows[e.RowIndex].Cells["ENERJI_MUSAADE_ENERJILENDIRME_YILI"].Value = matchingRow["ENERJI_MUSAADE_ENERJILENDIRME_YILI"];
+                            PoligonDataGridView.Rows[e.RowIndex].Cells["ABONE_GRUBU"].Value = matchingRow["ABONE_GRUBU"];
+                            PoligonDataGridView.Rows[e.RowIndex].Cells["ENERJILENDIRME_YILI"].Value = matchingRow["ENERJILENDIRME_YILI"];
                             PoligonDataGridView.Rows[e.RowIndex].Cells["Kurulu Güç (kW)"].Value = matchingRow["Kurulu Güç (kW)"];
                             PoligonDataGridView.Rows[e.RowIndex].Cells["Pik Yüklenme (%)"].Value = matchingRow["Pik Yüklenme (%)"];
                             PoligonDataGridView.Rows[e.RowIndex].Cells["Pik Demant (kW)"].Value = matchingRow["Pik Demant (kW)"];
@@ -718,7 +1009,18 @@ namespace SLF
             {
                 string columnName = PoligonDataGridView.Columns[PoligonDataGridView.CurrentCell.ColumnIndex].Name;
                 Console.WriteLine($"EditingControlShowing: ColumnName={columnName}, isSelecting_YGA={isSelecting_YGA}");
-                textBox.KeyPress += (s, ev) => TextBox_KeyPress_NumericWithDecimalForTAKS(s, ev, columnName);
+
+                // Remove the previous KeyPress handler if it exists
+                if (_currentKeyPressHandler != null)
+                {
+                    textBox.KeyPress -= _currentKeyPressHandler;
+                }
+
+                // Create a new lambda delegate with the current columnName
+                _currentKeyPressHandler = (s, ev) => TextBox_KeyPress_NumericWithDecimalForTAKS(s, ev, columnName);
+
+                // Add the new KeyPress handler
+                textBox.KeyPress += _currentKeyPressHandler;
             }
         }
 
@@ -792,56 +1094,95 @@ namespace SLF
             // Allow backspace and control characters (e.g., Enter, Tab)
             if (e.KeyChar == (char)Keys.Back || char.IsControl(e.KeyChar))
             {
+                Console.WriteLine("KeyPress: Allowed backspace or control character.");
                 return;
             }
 
             // Allow digits (0-9)
             if (char.IsDigit(e.KeyChar))
             {
+                Console.WriteLine("KeyPress: Allowed digit.");
                 return;
             }
 
             // Allow both '.' and the culture-specific decimal separator for the "TAKS" column
-            if (columnName == "TAKS" && (e.KeyChar == '.' || e.KeyChar.ToString() == decimalSeparator) && isSelecting_YGA)
+            if (columnName == "TAKS" && isSelecting_YGA && (e.KeyChar == '.' || e.KeyChar.ToString() == decimalSeparator))
             {
                 // Check if a decimal separator already exists in the TextBox
                 TextBox textBox = sender as TextBox;
                 if (textBox != null && !textBox.Text.Contains(decimalSeparator) && !textBox.Text.Contains("."))
                 {
-                    Console.WriteLine("Decimal separator allowed.");
+                    Console.WriteLine("KeyPress: Decimal separator allowed.");
                     return; // Allow the decimal separator
                 }
                 else
                 {
-                    Console.WriteLine("Decimal separator blocked: Already exists or textBox is null.");
+                    Console.WriteLine("KeyPress: Decimal separator blocked: Already exists or TextBox is null.");
                 }
             }
 
             // Block all other characters (including A-Z and other symbols)
             e.Handled = true;
-            Console.WriteLine("Key press blocked.");
+            Console.WriteLine("KeyPress: Character blocked.");
         }
 
         private void PoligonDataGridView_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
         {
             try
             {
-                if (isSelecting_YGA && e.ColumnIndex == PoligonDataGridView.Columns["TAKS"]?.Index)
+                // Existing TAKS validation and Başlangıç Yılı validation
+                if (isSelecting_YGA || isSelecting_KentselDonusum)
                 {
-                    string input = e.FormattedValue?.ToString();
-                    if (!string.IsNullOrWhiteSpace(input))
+                    // TAKS validation
+                    if (e.ColumnIndex == PoligonDataGridView.Columns["TAKS"]?.Index)
                     {
-                        string decimalSeparator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
-                        input = input.Replace(decimalSeparator, ".").Replace(".", ".");
-
-                        if (!double.TryParse(input, NumberStyles.Any, CultureInfo.InvariantCulture, out double taksValue) || taksValue < 0.1 || taksValue > 1)
+                        string input = e.FormattedValue?.ToString();
+                        if (!string.IsNullOrWhiteSpace(input))
                         {
-                            e.Cancel = true;
-                            MessageBox.Show("Hata: TAKS değeri 0.1 ile 1 arasında olmalıdır!", "Geçersiz Değer", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            string decimalSeparator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+                            input = input.Replace(decimalSeparator, ".");
+
+                            if (!double.TryParse(input, NumberStyles.Any, CultureInfo.InvariantCulture, out double taksValue) || taksValue < 0.1 || taksValue > 1)
+                            {
+                                e.Cancel = true;
+                                MessageBox.Show("Hata: TAKS değeri 0.1 ile 1 arasında olmalıdır!", "Geçersiz Değer", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                        }
+                    }
+
+                    // Satürasyon Hızı validation
+                    if (e.ColumnIndex == PoligonDataGridView.Columns["Satürasyon Hızı"]?.Index)
+                    {
+                        string input = e.FormattedValue?.ToString();
+                        if (!string.IsNullOrWhiteSpace(input))
+                        {
+                            string decimalSeparator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+                            input = input.Replace(decimalSeparator, ".");
+
+                            if (!double.TryParse(input, NumberStyles.Any, CultureInfo.InvariantCulture, out double saturationSpeed) || saturationSpeed < 1 || saturationSpeed > 5)
+                            {
+                                e.Cancel = true;
+                                MessageBox.Show("Hata: Satürasyon Hızı 1 ile 5 arasında olmalıdır!", "Geçersiz Değer", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                        }
+                    }
+
+                    // Başlangıç Yılı validation
+                    if (e.ColumnIndex == PoligonDataGridView.Columns["Başlangıç Yılı"]?.Index)
+                    {
+                        string input = e.FormattedValue?.ToString();
+                        if (!string.IsNullOrWhiteSpace(input))
+                        {
+                            if (!int.TryParse(input, NumberStyles.Integer, CultureInfo.InvariantCulture, out int yearValue) || yearValue < 2025 || yearValue > 2075)
+                            {
+                                e.Cancel = true;
+                                MessageBox.Show("Hata: Başlangıç Yılı 2025 ile 2075 arasında olmalıdır!", "Geçersiz Değer", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
                         }
                     }
                 }
 
+                // Existing dropdown column validation
                 string columnName = PoligonDataGridView.Columns[e.ColumnIndex].Name;
                 if (dropdownColumns.Contains(columnName))
                 {
@@ -860,6 +1201,7 @@ namespace SLF
                 MessageBox.Show($"Hata: {ex.Message}", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         private void PoligonDataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {

@@ -49,7 +49,7 @@ namespace SLF.RaporlamaDosyası
         public DataTable DataTableDTR { get; set; } = new DataTable();
         public DataTable DataTableEA { get; set; } = new DataTable();
         public DataTable DataTableYuk { get; set; } = new DataTable();
-        public DataTable DataTableDEK { get; set; } = new DataTable(); 
+        public DataTable DataTableDEK { get; set; } = new DataTable();
 
         public DataTable currentDt { get; set; }
 
@@ -63,7 +63,7 @@ namespace SLF.RaporlamaDosyası
 
         string ELFSonucYolu;
 
-        
+
         string İlYol;
 
         string YükVeriYolu;
@@ -106,8 +106,9 @@ namespace SLF.RaporlamaDosyası
             YükVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Yük_klasör"]);
 
             İmarVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Trafo_klasör"]);
-            
-            PythonPath = GetPythonPath();
+
+            //PythonPath = GetPythonPath();
+            PythonPath = "python.exe";
 
             if (PythonPath == null)
             {
@@ -140,20 +141,20 @@ namespace SLF.RaporlamaDosyası
         }*/
 
 
-        
 
-        
+
+
 
         public bool DosyaMevcutMu(string yol, string dosya)
         {
-    
+
             if (!Directory.Exists(yol))
             {
                 MessageBox.Show("Klasör Yok");
                 return false;
             }
 
-            if((!File.Exists(dosya)) | (dosya == null))
+            if ((!File.Exists(dosya)) | (dosya == null))
             {
                 MessageBox.Show("Dosya Yok");
                 return false;
@@ -194,14 +195,14 @@ namespace SLF.RaporlamaDosyası
 
 
             var sonuc = from row in dt.AsEnumerable()
-                       where row.Field<string>("Durum") == "Mevcut"
-                       select row;
+                        where row.Field<string>("Durum") == "Mevcut"
+                        select row;
 
             DataTable filteredTable = sonuc.CopyToDataTable();
 
-            
 
-            
+
+
         }
 
         public void VeriYazdir2(DataTable dt)
@@ -216,7 +217,7 @@ namespace SLF.RaporlamaDosyası
 
 
             this.panel5.Controls.Add(tablo_Formu.vektörel_attribute_table);
-            
+
 
         }
 
@@ -317,11 +318,11 @@ namespace SLF.RaporlamaDosyası
             {
                 MessageBox.Show(ex.Message);
             }
-            
+
 
             try
             {
-                
+
 
                 /*if (DosyaMevcutMu(ProjeYolu, ODTRSonucYolu))
                 {
@@ -338,7 +339,7 @@ namespace SLF.RaporlamaDosyası
                     currentDt = DataTableDTR.Copy();
 
                     // Şimdi, DataTableYuk'un satırlarını currentDt'ye ekliyoruz
-                    
+
 
                     if (dTR == null)
                     {
@@ -368,10 +369,10 @@ namespace SLF.RaporlamaDosyası
         private void Form_FiltrelemeYapildi(object sender, FiltreEventArgs e)
         {
             // Parametreli fonksiyon çağır
-            
-            
+
+
             UygulaFiltre(e.dt);
-            
+
 
         }
 
@@ -392,16 +393,16 @@ namespace SLF.RaporlamaDosyası
 
             else if (KullanilanModul == "DEK")
             {
-                
+
             }
 
             else
             {
-                
+
             }
         }
 
-        
+
 
         private void button2_Click(object sender, EventArgs e)
         {
@@ -529,26 +530,26 @@ namespace SLF.RaporlamaDosyası
 
 
         public async Task<DataTable> GetDataTableFromSQLite(string dbPath, string sqlQuery)
+        {
+            DataTable dt = new DataTable();
+
+            string connectionString = $"Data Source={dbPath};Version=3;";
+
+            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
             {
-                DataTable dt = new DataTable();
-
-                string connectionString = $"Data Source={dbPath};Version=3;";
-
-                using (SQLiteConnection conn = new SQLiteConnection(connectionString))
+                conn.Open();
+                using (SQLiteCommand cmd = new SQLiteCommand(sqlQuery, conn))
                 {
-                    conn.Open();
-                    using (SQLiteCommand cmd = new SQLiteCommand(sqlQuery, conn))
+                    using (SQLiteDataAdapter adapter = new SQLiteDataAdapter(cmd))
                     {
-                        using (SQLiteDataAdapter adapter = new SQLiteDataAdapter(cmd))
-                        {
-                            adapter.Fill(dt);
-                        }
+                        adapter.Fill(dt);
                     }
-                    conn.Close();
                 }
-
-                return dt;
+                conn.Close();
             }
+
+            return dt;
+        }
 
         private void ExcelDownloadButton_Click(object sender, EventArgs e)
         {
@@ -579,20 +580,31 @@ namespace SLF.RaporlamaDosyası
                 filePath = saveFileDialog.FileName;
 
             }
+
             try
             {
                 // EPPlus kullanarak DataTable'ı Excel dosyasına kaydet
                 //ExportDataTableToExcel(currentDt, filePath);
-                await Task.Run(() =>
+                if (filePath == null)
                 {
-                    ExportExcelFile(filePath, currentDt, KullanilanModul);
-                });
-                   
-                MessageBox.Show("Excel dosyası başarıyla kaydedildi!", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Lütfen bir dosya yolu seçin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                else
+                {
+                    await Task.Run(() =>
+                    {
+                        ExportExcelFile(filePath, currentDt, KullanilanModul);
+                    });
+
+                    MessageBox.Show("Excel dosyası başarıyla kaydedildi!", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                }
 
             }
 
-            catch 
+            catch
             {
                 MessageBox.Show(e.ToString());
             }
@@ -606,10 +618,10 @@ namespace SLF.RaporlamaDosyası
 
 
 
-            }
+        }
 
-            
-        
+
+
 
         private void ExportDataTableToExcel(DataTable dt, string filePath)
         {
@@ -630,7 +642,7 @@ namespace SLF.RaporlamaDosyası
             MessageBox.Show("Excel dosyası başarıyla kaydedildi!", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        public void ExportExcelFile(string filePath, DataTable dt, string seçilenVeriTipi="excel")
+        public void ExportExcelFile(string filePath, DataTable dt, string seçilenVeriTipi = "excel")
         {
             // Create a new Excel package
             using (ExcelPackage package = new ExcelPackage())
@@ -667,7 +679,7 @@ namespace SLF.RaporlamaDosyası
                     FileInfo file = new FileInfo(filePath);
                     package.Workbook.CalcMode = ExcelCalcMode.Automatic;
                     package.SaveAs(file);
-                    
+
                     //MessageBox.Show("Dosya başarıyla kaydedildi.", "Dosya Kaydedildi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (InvalidOperationException)
@@ -684,59 +696,59 @@ namespace SLF.RaporlamaDosyası
         }
 
         public void ExportDataTableToKML(DataTable dt, string filePath)
-        {                     
-                // KML belgesi oluşturma
-                XmlDocument xmlDoc = new XmlDocument();
+        {
+            // KML belgesi oluşturma
+            XmlDocument xmlDoc = new XmlDocument();
 
-                // KML kök elemanını oluştur
-                XmlElement kmlElement = xmlDoc.CreateElement("kml");
-                kmlElement.SetAttribute("xmlns", "http://www.opengis.net/kml/2.2");
-                xmlDoc.AppendChild(kmlElement);
+            // KML kök elemanını oluştur
+            XmlElement kmlElement = xmlDoc.CreateElement("kml");
+            kmlElement.SetAttribute("xmlns", "http://www.opengis.net/kml/2.2");
+            xmlDoc.AppendChild(kmlElement);
 
-                // KML Document elemanı ekleyelim
-                XmlElement documentElement = xmlDoc.CreateElement("Document");
-                kmlElement.AppendChild(documentElement);
+            // KML Document elemanı ekleyelim
+            XmlElement documentElement = xmlDoc.CreateElement("Document");
+            kmlElement.AppendChild(documentElement);
 
-                try
+            try
+            {
+                foreach (DataRow row in dt.Rows)
                 {
-                    foreach (DataRow row in dt.Rows)
-                    {
-                        // Placemark elemanı
-                        XmlElement placemarkElement = xmlDoc.CreateElement("Placemark");
-                        documentElement.AppendChild(placemarkElement);
+                    // Placemark elemanı
+                    XmlElement placemarkElement = xmlDoc.CreateElement("Placemark");
+                    documentElement.AppendChild(placemarkElement);
 
-                        // Name elemanı
-                        XmlElement nameElement = xmlDoc.CreateElement("name");
-                        nameElement.InnerText = row["trafo_id"].ToString();  // "trafo_id" kolonunu kullan
-                        placemarkElement.AppendChild(nameElement);
+                    // Name elemanı
+                    XmlElement nameElement = xmlDoc.CreateElement("name");
+                    nameElement.InnerText = row["trafo_id"].ToString();  // "trafo_id" kolonunu kullan
+                    placemarkElement.AppendChild(nameElement);
 
-                        // Description elemanı
-                        XmlElement descriptionElement = xmlDoc.CreateElement("description");
-                        descriptionElement.InnerText = $"Trafo Yaşı: {row["trafo_yasi"]}, Kapasite: {row["kapasite"]}, Aksiyon: {row["Trafo Aksiyon"]}";
-                        placemarkElement.AppendChild(descriptionElement);
+                    // Description elemanı
+                    XmlElement descriptionElement = xmlDoc.CreateElement("description");
+                    descriptionElement.InnerText = $"Trafo Yaşı: {row["trafo_yasi"]}, Kapasite: {row["kapasite"]}, Aksiyon: {row["Trafo Aksiyon"]}";
+                    placemarkElement.AppendChild(descriptionElement);
 
-                        // Point elemanı (koordinatlar)
-                        XmlElement pointElement = xmlDoc.CreateElement("Point");
-                        placemarkElement.AppendChild(pointElement);
+                    // Point elemanı (koordinatlar)
+                    XmlElement pointElement = xmlDoc.CreateElement("Point");
+                    placemarkElement.AppendChild(pointElement);
 
-                        // Koordinatlar elemanı (Koord_x ve Koord_y'yi kullanıyoruz)
-                        XmlElement coordinatesElement = xmlDoc.CreateElement("coordinates");
-                        string x = row["Koord_x"].ToString(); // "Koord_x" kolonunu kullan
-                        string y = row["Koord_y"].ToString();  // "Koord_y" kolonunu kullan
-                        coordinatesElement.InnerText = $"{x},{y},0"; // X, Y, 0 (yükseklik)
-                        pointElement.AppendChild(coordinatesElement);
-                    }
-                    xmlDoc.Save(filePath);
-
-                    MessageBox.Show("KML dosyası başarıyla kaydedildi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // Koordinatlar elemanı (Koord_x ve Koord_y'yi kullanıyoruz)
+                    XmlElement coordinatesElement = xmlDoc.CreateElement("coordinates");
+                    string x = row["Koord_x"].ToString(); // "Koord_x" kolonunu kullan
+                    string y = row["Koord_y"].ToString();  // "Koord_y" kolonunu kullan
+                    coordinatesElement.InnerText = $"{x},{y},0"; // X, Y, 0 (yükseklik)
+                    pointElement.AppendChild(coordinatesElement);
                 }
+                xmlDoc.Save(filePath);
 
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"KML dosyası kaydedilirken hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-
+                MessageBox.Show("KML dosyası başarıyla kaydedildi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show($"KML dosyası kaydedilirken hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+        }
 
         private async void button5_Click(object sender, EventArgs e)
         {
@@ -762,7 +774,7 @@ namespace SLF.RaporlamaDosyası
                 filePath = saveFileDialog.FileName; // Seçilen dosya yolu
             }
 
-                await Task.Run(() =>
+            await Task.Run(() =>
             {
                 ExportDataTableToKML(currentDt, filePath);
             });
@@ -831,19 +843,19 @@ namespace SLF.RaporlamaDosyası
             await Task.Run(() =>
             {
                 ExportExcelFile(filePath, currentDt, KullanilanModul);
-            });       
+            });
 
             string python_path = Path.Combine(PythonFilePath, "PydeckRun.py");
 
-            MessageBox.Show("Python dosyası çalıştırılıyor...");         
+            MessageBox.Show("Python dosyası çalıştırılıyor...");
 
             try
             {
-                
+
                 await PythonScriptCalistir(python_path, filePath);
 
                 MessageBox.Show("İşlem başarıyla tamamlandı.");
-                
+
             }
 
 
@@ -917,7 +929,7 @@ namespace SLF.RaporlamaDosyası
             {
                 var startInfo = new ProcessStartInfo
                 {
-                    FileName = $"{PythonPath}", // Python'ın yüklü olduğu path
+                    FileName = $"python.exe", // Python'ın yüklü olduğu path
                     //Arguments = $"{PythonFilePath} \"{inputpath}\"",
                     Arguments = $"\"{python_path}\" \"{inputpath}\"  \"{SonucYolu}\"",
                     UseShellExecute = false,
@@ -987,7 +999,7 @@ namespace SLF.RaporlamaDosyası
             form.Close();
 
             MessageBox.Show("İşlem tamamlandı", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-             
+
         }
 
         public async Task PythonScriptCalistir2(string pythonPath, string inputPath)
@@ -1096,7 +1108,7 @@ namespace SLF.RaporlamaDosyası
         public string GetPythonPath()
         {
             string systemPathVariable = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
-            
+
 
             // Sistem genelindeki PATH çevresel değişkenini alıyoruz
             // Eğer çevresel değişken mevcutsa
@@ -1186,7 +1198,7 @@ namespace SLF.RaporlamaDosyası
 public class FiltreEventArgs : EventArgs
 {
     public DataTable dt { get; set; }
-    
+
 }
 
 public interface IDrawable

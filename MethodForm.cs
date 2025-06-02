@@ -25,7 +25,7 @@ namespace SLF
             // Önce ComboBox'ları temizle
             IlComboBox.Items.Clear();
             IlceComboBox.Items.Clear();
-            
+
             // "Lütfen seçin" varsayılan maddelerini ekle
             IlComboBox.Items.Add("Lütfen il seçin");
             IlceComboBox.Items.Add("Lütfen ilçe seçin");
@@ -33,6 +33,7 @@ namespace SLF
             // Şehirleri ekle
             IlComboBox.Items.Add("İzmir");
             IlComboBox.Items.Add("Eskişehir");
+            IlComboBox.Items.Add("Manisa"); // Yeni il eklendi
 
             // Varsayılan olarak "Lütfen seçin" seçeneklerini seç
             IlComboBox.SelectedIndex = 0;
@@ -65,7 +66,7 @@ namespace SLF
             homePageForm.config.İlçe = IlceComboBox.SelectedItem.ToString();
 
             SaveConfigToFile();
-            
+
             if (MethodComboBox.SelectedItem == null)
             {
                 MessageBox.Show("İlerlemek için bir metot seçiniz");
@@ -74,7 +75,7 @@ namespace SLF
 
             selectedMethod = MethodComboBox.SelectedItem.ToString();
 
-            
+
             // "Lütfen seçin" seçeneklerinin seçili olup olmadığını kontrol et
             if (IlComboBox.SelectedIndex == 0 || IlceComboBox.SelectedIndex == 0)
             {
@@ -96,7 +97,7 @@ namespace SLF
 
             if (!pathUpdated)
             {
-                MessageBox.Show("İl/ilçe yolu oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.", 
+                MessageBox.Show("İl/ilçe yolu oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.",
                     "Yol Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
@@ -115,7 +116,7 @@ namespace SLF
 
                 // Write the updated JSON back to the file
                 File.WriteAllText(homePageForm.config_path, updatedJson);
-      
+
             }
             catch (Exception ex)
             {
@@ -130,14 +131,14 @@ namespace SLF
             {
                 // İl/ilçe yolunu oluştur
                 string districtPath = Path.Combine(PathService.BaseDirectory, city, district);
-                
+
                 // Klasör yoksa işlem yapma
                 if (!Directory.Exists(districtPath))
                     return;
-                
+
                 // "temp_" ile başlayan tüm klasörleri bul
                 string[] tempFolders = Directory.GetDirectories(districtPath, "temp_*");
-                
+
                 foreach (string folder in tempFolders)
                 {
                     try
@@ -167,13 +168,13 @@ namespace SLF
             {
                 // PathService'teki değerleri sıfırla
                 PathService.ResetWorkingEnvironment();
-                
+
                 // GirdiModülü veri tablolarını temizle
                 if (GirdiModülü.dataTablesByType != null)
                 {
                     GirdiModülü.dataTablesByType.Clear();
                 }
-                
+
 
             }
             catch (Exception ex)
@@ -228,7 +229,7 @@ namespace SLF
                 tempSelectedCity = null; // Reset the temporary city
                 return;
             }
-            
+
             // Şehir seçimini geçici olarak sakla
             tempSelectedCity = IlComboBox.SelectedItem.ToString();
 
@@ -285,6 +286,29 @@ namespace SLF
                 IlceComboBox.Items.Add("Seyitgazi");
                 IlceComboBox.Items.Add("Sivrihisar");
                 IlceComboBox.Items.Add("Tepebaşı");
+            }
+            else if (tempSelectedCity == "Manisa")
+            {
+                // Add Manisa districts in alphabetical order
+                IlceComboBox.Items.Add("Lütfen ilçe seçin");
+                IlceComboBox.Items.Add("Ahmetli");
+                IlceComboBox.Items.Add("Akhisar");
+                IlceComboBox.Items.Add("Alaşehir");
+                IlceComboBox.Items.Add("Demirci");
+                IlceComboBox.Items.Add("Gölmarmara");
+                IlceComboBox.Items.Add("Gördes");
+                IlceComboBox.Items.Add("Kula");
+                IlceComboBox.Items.Add("Köprübaşı");
+                IlceComboBox.Items.Add("Kırkağaç");
+                IlceComboBox.Items.Add("Salihli");
+                IlceComboBox.Items.Add("Saruhanlı");
+                IlceComboBox.Items.Add("Sarıgöl");
+                IlceComboBox.Items.Add("Selendi");
+                IlceComboBox.Items.Add("Soma");
+                IlceComboBox.Items.Add("Turgutlu");
+                IlceComboBox.Items.Add("Yunusemre");
+                IlceComboBox.Items.Add("Şaphane");
+                IlceComboBox.Items.Add("Şehzadeler");
             }
 
             // Pre-select the first item

@@ -24,6 +24,7 @@ using SLF.Optimal_DTR;
 using SLF.RaporlamaDosyası;
 using SLF.services;
 
+
 namespace SLF
 {
     public partial class ModülFormu : Form
@@ -1039,8 +1040,14 @@ namespace SLF
             // Default color is red
             Color textColor = Color.Red;
 
-            // Check if the module exists and has data
-            if (girdiModülleri.ContainsKey(text) && girdiModülleri[text].importedDataTable.Rows.Count > 0)
+            // Check if module is completed according to project_state.json
+            List<string> completedModules = GetCompletedModulesFromJson();
+            if (completedModules != null && completedModules.Contains(text))
+            {
+                textColor = Color.Green;
+            }
+            // Fallback to old method if JSON check fails
+            else if (girdiModülleri.ContainsKey(text) && girdiModülleri[text].importedDataTable.Rows.Count > 0)
             {
                 textColor = Color.Green;
             }
@@ -1057,7 +1064,35 @@ namespace SLF
             // Draw the focus rectangle if the item is selected
             e.DrawFocusRectangle();
         }
+        private List<string> GetCompletedModulesFromJson()
+        {
+            try
+            {
+                // Proje dosyasının yolu
+                string statePath = Path.Combine(
+                    PathService.BaseDirectory,
+                    PathService.FullPath,
+                    PathService.CurrentWorkingFolder,
+                    "project_state.json");
 
+                if (File.Exists(statePath))
+                {
+                    string json = File.ReadAllText(statePath);
+                    Dictionary<string, object> projectState = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+
+                    if (projectState != null && projectState.TryGetValue("CompletedModules", out object modulesObj))
+                    {
+                        return JsonConvert.DeserializeObject<List<string>>(modulesObj.ToString());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"JSON dosyası okunurken hata: {ex.Message}");
+            }
+
+            return null;
+        }
         private void raporGoruntuleButonu_Click(object sender, EventArgs e)
         {
             // Girdi modülündeki dosya yükleme butonuna tıklandığında çalışacak kodlar
@@ -1564,6 +1599,25 @@ namespace SLF
                         }
                     }
                 }
+            }
+
+            // Form kapatılmadan önce veri_listesi_seçimi'ndeki yeşil öğeleri kırmızıya çevir
+            if (!e.Cancel)
+            {
+                // Veri seçimi listesindeki modüller için durum bilgisini sıfırla
+                // Bu, sonraki açılışta tüm öğelerin kırmızı görünmesini sağlar
+                modulescheck.Clear();
+
+                // GirdiModülü.dataTablesByType sözlüğünü temizle
+                // Bu, içeri aktarılmış verilerin kaydını temizler
+                foreach (var girdiModül in girdiModülleri.Values)
+                {
+                    girdiModül.importedDataTable = new DataTable();
+                }
+                GirdiModülü.dataTablesByType.Clear();
+
+                // Veri listesini yeniden çiz, böylece tüm öğeler kırmızı renkte gösterilecek
+                veri_listesi_seçimi.Invalidate();
             }
 
             // Çıkış işlemine devam et
@@ -2161,7 +2215,7 @@ namespace SLF
                         FileName = "cmd.exe",
                         Arguments = $"/C rd /S /Q \"{path}\"",
                         WindowStyle = ProcessWindowStyle.Hidden,
-                        CreateNoWindow = true,
+                        CreateNoWindow = false,
                         UseShellExecute = false
                     }
                 };
@@ -2488,6 +2542,7 @@ namespace SLF
                                     "Veri Kaybı Uyarısı",
                                     MessageBoxButtons.YesNo,
                                     MessageBoxIcon.Warning);
+
                                 if (result != DialogResult.Yes)
                                     return;
                             }
@@ -2509,18 +2564,6 @@ namespace SLF
 
                             MessageBox.Show($"Proje '{projectName}' başarıyla açıldı.",
                                 "Proje Açıldı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                            // Son çalışılan projeyi ayarlar dosyasına kaydet
-                            try
-                            {
-
-                                Console.WriteLine($"Son proje bilgileri kaydedildi: {projectName}");
-                            }
-                            catch (Exception settingsEx)
-                            {
-                                Console.WriteLine($"Ayarlar kaydedilirken hata: {settingsEx.Message}");
-                                // Ayarlar kaydedilemediğinde ana işlevi etkilememesi için hatayı yut
-                            }
                         }
                         catch (Exception ex)
                         {
@@ -3436,10 +3479,10 @@ namespace SLF
                 {
                     FileName = "python",
                     Arguments = $"\"{pythonScriptPath}\" \"{config_path}\"",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
                     UseShellExecute = false,
-                    CreateNoWindow = true
+                    CreateNoWindow = false
                 };
 
                 using (Process process = new Process { StartInfo = startInfo })
@@ -6420,7 +6463,7 @@ namespace SLF
         }
 
         private void buton_tablo_olustur_Click(object sender, EventArgs e)
-        {
+        {         
             Tablo_olustur tablo_olustur_formu = new Tablo_olustur();
             tablo_olustur_formu.Show();
         }
@@ -6739,10 +6782,10 @@ namespace SLF
                     FileName = "python",
                     // Use verbatim string with concatenation
                     Arguments = @"""" + pythonScriptPath + @""" """ + config_path,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
                     UseShellExecute = false,
-                    CreateNoWindow = true
+                    CreateNoWindow = false
                 };
 
                 using (Process process = new Process { StartInfo = startInfo })
@@ -7420,10 +7463,10 @@ namespace SLF
             {
                 FileName = "Rscript.exe",
                 Arguments = $"--vanilla \"{ELFrScriptModelPath}\" \"{ana_menu_form_objesi.config_path}\"",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
+                RedirectStandardOutput = false,
+                RedirectStandardError = false,
                 UseShellExecute = false,
-                CreateNoWindow = true
+                CreateNoWindow = false
             };
 
             using (var process = new Process())
@@ -7432,20 +7475,12 @@ namespace SLF
 
                 // Variables to capture output and error
                 string outputData = null;
-                string errorData = null;
 
                 process.Start();
-
-                // Read output and error synchronously on background threads
-                Task<string> outputTask = Task.Run(() => process.StandardOutput.ReadToEnd());
-                Task<string> errorTask = Task.Run(() => process.StandardError.ReadToEnd());
 
                 // Wait for the process to exit asynchronously
                 await Task.Run(() => process.WaitForExit());
 
-                // Get the output and error
-                outputData = await outputTask;
-                errorData = await errorTask;
 
                 // Process the output to get the file path
                 if (!string.IsNullOrEmpty(outputData))
@@ -8105,10 +8140,10 @@ namespace SLF
                         {
                             FileName = "python",
                             Arguments = $"\"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
-                            RedirectStandardOutput = true,
-                            RedirectStandardError = true,
+                            RedirectStandardOutput = false,
+                            RedirectStandardError = false,
                             UseShellExecute = false,
-                            CreateNoWindow = true
+                            CreateNoWindow = false
                         }
                     };
 
@@ -8170,23 +8205,21 @@ namespace SLF
                         {
                             FileName = "python",
                             Arguments = $"\"{abone_sayısı_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
-                            RedirectStandardOutput = true,
-                            RedirectStandardError = true,
+                            RedirectStandardOutput = false,
+                            RedirectStandardError = false,
                             UseShellExecute = false,
-                            CreateNoWindow = true
+                            CreateNoWindow = false
                         }
                     };
 
                     process.Start();
-                    string output = process.StandardOutput.ReadToEnd();
-                    string error = process.StandardError.ReadToEnd();
                     process.WaitForExit();
 
                     this.Cursor = Cursors.Default;
 
                     // Show result
                     if (process.ExitCode != 0)
-                        MessageBox.Show($"Bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
+                        MessageBox.Show($"Bir hata meydana geldi.",
                             "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                     else
                         MessageBox.Show($"Ufuk yılları için abone sayısı tahminleri oluşturuldu!",
@@ -8229,23 +8262,21 @@ namespace SLF
                         {
                             FileName = "python",
                             Arguments = $"\"{slf_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
-                            RedirectStandardOutput = true,
-                            RedirectStandardError = true,
+                            RedirectStandardOutput = false,
+                            RedirectStandardError = false,
                             UseShellExecute = false,
-                            CreateNoWindow = true
+                            CreateNoWindow = false
                         }
                     };
 
                     process.Start();
-                    string output = process.StandardOutput.ReadToEnd();
-                    string error = process.StandardError.ReadToEnd();
                     process.WaitForExit();
                       
 
                     // Show result
                     if (process.ExitCode != 0)
 
-                        MessageBox.Show($"Bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
+                        MessageBox.Show($"Bir hata meydana geldi.",
                             "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
 
                     else
@@ -8334,6 +8365,29 @@ namespace SLF
             {
                 try
                 {
+
+                    switch (ELFSonuçlarTabControls.SelectedIndex + 1)
+                    {
+                        case 1:
+                            ana_menu_form_objesi.config.SLF.secilen_senaryo = "minimum";
+                            break;
+                        case 2:
+                            ana_menu_form_objesi.config.SLF.secilen_senaryo = "düşük";
+                            break;
+                        case 3:
+                            ana_menu_form_objesi.config.SLF.secilen_senaryo = "baz";
+                            break;
+                        case 4:
+                            ana_menu_form_objesi.config.SLF.secilen_senaryo = "yüksek";
+                            break;
+                        case 5:
+                            ana_menu_form_objesi.config.SLF.secilen_senaryo = "maksimum";
+                            break;
+                    }
+
+                    methodFormObjesi.SaveConfigToFile();
+
+
                     this.Cursor = Cursors.WaitCursor;
 
                     // Construct the path to the R script
@@ -8357,15 +8411,13 @@ namespace SLF
                     };
 
                     process.Start();
-                    string output = process.StandardOutput.ReadToEnd();
-                    string error = process.StandardError.ReadToEnd();
                     process.WaitForExit();
 
                     this.Cursor = Cursors.Default;
 
                     // Show result
                     if (process.ExitCode != 0)
-                        MessageBox.Show($"R script çalışmasında bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
+                        MessageBox.Show($"R script çalışmasında bir hata meydana geldi.",
                             "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                     else
                         MessageBox.Show($"Yatay ve dikey büyüme rakamları başarıyla oluşturuldu. SLF ile konsolidasyon" +
