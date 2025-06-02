@@ -3638,7 +3638,7 @@ namespace SLF
             catch (Exception ex)
             {
                 // Handle any unexpected exceptions
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -3811,8 +3811,7 @@ namespace SLF
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[year];
                     if (worksheet == null)
                     {
-                        MessageBox.Show($"Worksheet for year {year} not found in output file.",
-                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"Çıktı dosyasındaki {year} yılına ait çalışma sayfası bulunamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
 
@@ -4309,8 +4308,7 @@ namespace SLF
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[year];
                     if (worksheet == null)
                     {
-                        MessageBox.Show($"Worksheet for year {year} not found in output file.",
-                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"Çıktı dosyasındaki {year} yılına ait çalışma sayfası bulunamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
 
@@ -4511,7 +4509,7 @@ namespace SLF
                 }
                 else
                 {
-                    Invoke(new Action(() => MessageBox.Show("Lütfen Dek noktalarını görebilmek için verilerinizi yükleyiniz.")));
+                    Invoke(new Action(() => MessageBox.Show("Lütfen DEK Merkezlerini görebilmek için verilerinizi yükleyiniz.")));
                 }
             }
             catch (Exception ex)
@@ -5164,7 +5162,7 @@ namespace SLF
             }
             else
             {
-                MessageBox.Show($"Image not found: {imagePath}", "Image Load Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show($"Görsel bulunamadı: {imagePath}", "Görsel Yükleme Hatası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -5789,7 +5787,7 @@ namespace SLF
 
             if (imarPolygon == null && yukPolygon == null)
             {
-                string debugInfo = $"Row_No: {targetRowNo}, imarOverlay Polygons: {(imarOverlay?.Polygons.Count ?? 0)}, yukOverlay Polygons: {(yukOverlay?.Polygons.Count ?? 0)}";
+                string debugInfo = $"Satır_No: {targetRowNo}, imarOverlay Polygons: {(imarOverlay?.Polygons.Count ?? 0)}, yukOverlay Polygons: {(yukOverlay?.Polygons.Count ?? 0)}";
                 MessageBox.Show($"Seçilen satıra karşılık gelen poligon bulunamadı.\n{debugInfo}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -6069,7 +6067,7 @@ namespace SLF
                 }
                 else
                 {
-                    MessageBox.Show("Checkbox veya Tag null.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Onay Kutusu veya Tag tanımsız.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -7820,8 +7818,7 @@ namespace SLF
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Dropdown konumu ayarlanırken bir hata oluştu: {ex.Message}",
-                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Açılır Menü konumu ayarlanırken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

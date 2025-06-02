@@ -17,7 +17,7 @@ namespace SLF
         {
             if (dataTables == null || sheetNames == null || dataTables.Count != sheetNames.Count)
             {
-                throw new ArgumentException("The number of DataTables must match the number of sheet names.");
+                throw new ArgumentException("Veri Tablolarının sayısı, sayfa adlarının sayısıyla eşleşmelidir.");
             }
 
             // Create a new Excel package

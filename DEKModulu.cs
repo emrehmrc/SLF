@@ -240,7 +240,7 @@ namespace SLF
             "DEK_X_KOORDINAT & DEK_Y_KOORDINAT",
             "Koordinat Sınırları",
             $"{outOfThresholdPercentage:P1}",
-            $"DEK_X_KOORDINAT ve/veya DEK_Y_KOORDINAT parametresi ilgili trafo koordinat aralığında değil. (X: {minXValue:F2} to {maxXValue:F2}, Y: {minYValue:F2} to {maxYValue:F2}) for {countOutOfThresholdCoordinates}. Hata oranı %10'dan fazla değilse bu değerler imputasyon aşamasında düzeltilecektir."
+            $"DEK_X_KOORDINAT ve/veya DEK_Y_KOORDINAT parametresi ilgili trafo koordinat aralığında değil. (X: {minXValue:F2} to {maxXValue:F2}, Y: {minYValue:F2} to {maxYValue:F2}) for {countOutOfThresholdCoordinates}. Hata oranı %10'dan fazla değilse bu değerler veri doldurma aşamasında düzeltilecektir."
         });
             }
         }
@@ -299,7 +299,7 @@ namespace SLF
             "DEK_X_KOORDINAT & DEK_Y_KOORDINAT",
             "Koordinat Düzeltme",
             $"{correctedPercentage:P1}",
-            $"{correctedCount} out-of-bound coordinates corrected using transformer data."
+            $"{correctedCount} sınır dışı koordinat, trafo verileri kullanılarak düzeltildi."
         });
             }
         }

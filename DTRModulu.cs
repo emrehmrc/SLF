@@ -454,26 +454,26 @@ namespace SLF
                     {
                         if (nullPercentage <= thresholds.warningThreshold)
                         {
-                            message = $"Uyarı: {nullPercentage:P1} oranında {column.ColumnName} değerleri eksik (Satır: {string.Join(", ", nullRows)}). Tarihler 'dd.MM.yyyy' biçiminde olmalıdır. Bu değerler ortalama tarihle otomatik imputation ile doldurulacaktır.";
+                            message = $"Uyarı: {nullPercentage:P1} oranında {column.ColumnName} değerleri eksik (Satır: {string.Join(", ", nullRows)}). Tarihler 'dd.MM.yyyy' biçiminde olmalıdır. Bu değerler ortalama tarihle otomatik veri doldurma ile doldurulacaktır.";
                         }
                         else if (nullPercentage <= thresholds.errorThreshold)
                         {
-                            message = $"Dikkat: {nullPercentage:P1} oranında {column.ColumnName} değerleri eksik (Satır: {string.Join(", ", nullRows)}). Tarihler 'dd.MM.yyyy' biçiminde olmalıdır. Lütfen ortalama tarihle otomatik imputation onaylayın veya verileri kontrol edin.";
+                            message = $"Dikkat: {nullPercentage:P1} oranında {column.ColumnName} değerleri eksik (Satır: {string.Join(", ", nullRows)}). Tarihler 'dd.MM.yyyy' biçiminde olmalıdır. Lütfen ortalama tarihle otomatik veri doldurma onaylayın veya verileri kontrol edin.";
                         }
                         else
                         {
-                            message = $"Hata: {nullPercentage:P1} oranında {column.ColumnName} değerleri eksik (Satır: {string.Join(", ", nullRows)}). Tarihler 'dd.MM.yyyy' biçiminde olmalıdır. Ortalama tarihle imputation uygulanacak; bu oran analizleri etkileyebilir, lütfen kontrol edin.";
+                            message = $"Hata: {nullPercentage:P1} oranında {column.ColumnName} değerleri eksik (Satır: {string.Join(", ", nullRows)}). Tarihler 'dd.MM.yyyy' biçiminde olmalıdır. Ortalama tarihle veri doldurma uygulanacak; bu oran analizleri etkileyebilir, lütfen kontrol edin.";
                         }
                     }
                     else if (column.ColumnName == "TM_FIDER_ID")
                     {
                         if (nullPercentage <= thresholds.warningThreshold)
                         {
-                            message = $"Uyarı: {nullPercentage:P1} oranında TM_FIDER_ID değerleri eksik. Bu değerler, koordinat bazlı yakınlık ile otomatik imputation ile doldurulacaktır.";
+                            message = $"Uyarı: {nullPercentage:P1} oranında TM_FIDER_ID değerleri eksik. Bu değerler, koordinat bazlı yakınlık ile otomatik veri doldurma ile doldurulacaktır.";
                         }
                         else if (nullPercentage <= thresholds.errorThreshold)
                         {
-                            message = $"Dikkat: {nullPercentage:P1} oranında TM_FIDER_ID değerleri eksik. Lütfen koordinat bazlı otomatik imputation onaylayın veya verileri kontrol edin.";
+                            message = $"Dikkat: {nullPercentage:P1} oranında TM_FIDER_ID değerleri eksik. Lütfen koordinat bazlı otomatik veri doldurma onaylayın veya verileri kontrol edin.";
                         }
                         else
                         {
@@ -484,15 +484,15 @@ namespace SLF
                     {
                         if (nullPercentage <= thresholds.warningThreshold)
                         {
-                            message = $"Uyarı: {nullPercentage:P1} oranında {column.ColumnName} değerleri eksik (Satır: {string.Join(", ", nullRows)}). Bu değerler, uygun bir imputation yöntemiyle doldurulabilir.";
+                            message = $"Uyarı: {nullPercentage:P1} oranında {column.ColumnName} değerleri eksik (Satır: {string.Join(", ", nullRows)}). Bu değerler, uygun bir veri doldurma yöntemiyle doldurulabilir.";
                         }
                         else if (nullPercentage <= thresholds.errorThreshold)
                         {
-                            message = $"Dikkat: {nullPercentage:P1} oranında {column.ColumnName} değerleri eksik (Satır: {string.Join(", ", nullRows)}). Lütfen uygun imputation yöntemini onaylayın veya verileri kontrol edin.";
+                            message = $"Dikkat: {nullPercentage:P1} oranında {column.ColumnName} değerleri eksik (Satır: {string.Join(", ", nullRows)}). Lütfen uygun veri doldurma yöntemini onaylayın veya verileri kontrol edin.";
                         }
                         else
                         {
-                            message = $"Hata: {nullPercentage:P1} oranında {column.ColumnName} değerleri eksik (Satır: {string.Join(", ", nullRows)}). Bu, analizleri etkileyebilir. Imputation uygulanacak; ek doğrulama gerekebilir.";
+                            message = $"Hata: {nullPercentage:P1} oranında {column.ColumnName} değerleri eksik (Satır: {string.Join(", ", nullRows)}). Bu, analizleri etkileyebilir. Veri doldurma uygulanacak; ek doğrulama gerekebilir.";
                         }
                     }
 
@@ -625,8 +625,8 @@ namespace SLF
                 // Report as warning (no threshold, just warning)
                 string message = "Geçersiz değer: ";
                 var issues = new List<string>();
-                if (nullCount > 0) issues.Add($"{(float)nullCount / currentDataTable.Rows.Count:P1} NULL/boş (imputed with 0.4 kV) (Satır: {string.Join(", ", nullRows)})");
-                if (nonNumericCount > 0) issues.Add($"{(float)nonNumericCount / currentDataTable.Rows.Count:P1} geçersiz format (imputed with 0.4 kV) (Satır: {string.Join(", ", nonNumericRows)})");
+                if (nullCount > 0) issues.Add($"{(float)nullCount / currentDataTable.Rows.Count:P1} NULL/boş (0.4 kV ile dolduruldu) (Satır: {string.Join(", ", nullRows)})");
+                if (nonNumericCount > 0) issues.Add($"{(float)nonNumericCount / currentDataTable.Rows.Count:P1} geçersiz format (0.4 kV ile dolduruldu) (Satır: {string.Join(", ", nonNumericRows)})");
                 if (greaterThanThresholdCount > 0) issues.Add($"{(float)greaterThanThresholdCount / currentDataTable.Rows.Count:P1} > 0.4 kV (silinecek) (Satır: {string.Join(", ", greaterThanThresholdRows)})");
                 message += string.Join("; ", issues) + ".";
 
@@ -743,12 +743,12 @@ namespace SLF
                 {
                     string message = "Geçersiz veya aşırı yük değerleri: ";
                     var issues = new List<string>();
-                    if (nullDemandCount > 0) issues.Add($"{(float)nullDemandCount / currentDataTable.Rows.Count:P1} NULL/boş demand (imputed with 0) (Satır: {string.Join(", ", issueRows[year]["nullDemand"])})");
-                    if (nonNumericDemandCount > 0) issues.Add($"{(float)nonNumericDemandCount / currentDataTable.Rows.Count:P1} geçersiz format demand (imputed with 0) (Satır: {string.Join(", ", issueRows[year]["nonNumericDemand"])})");
-                    if (zeroNegativeDemandCount > 0) issues.Add($"{(float)zeroNegativeDemandCount / currentDataTable.Rows.Count:P1} sıfır/negatif demand (imputed with 0) (Satır: {string.Join(", ", issueRows[year]["zeroNegativeDemand"])})");
-                    if (nullKapasiteCount > 0) issues.Add($"{(float)nullKapasiteCount / currentDataTable.Rows.Count:P1} NULL/boş kapasite (imputed with 0) (Satır: {string.Join(", ", issueRows[year]["nullKapasite"])})");
-                    if (nonNumericKapasiteCount > 0) issues.Add($"{(float)nonNumericKapasiteCount / currentDataTable.Rows.Count:P1} geçersiz format kapasite (imputed with 0) (Satır: {string.Join(", ", issueRows[year]["nonNumericKapasite"])})");
-                    if (zeroNegativeKapasiteCount > 0) issues.Add($"{(float)zeroNegativeKapasiteCount / currentDataTable.Rows.Count:P1} sıfır/negatif kapasite (imputed with 0) (Satır: {string.Join(", ", issueRows[year]["zeroNegativeKapasite"])})");
+                    if (nullDemandCount > 0) issues.Add($"{(float)nullDemandCount / currentDataTable.Rows.Count:P1} NULL/boş demand (0 ile dolduruldu) (Satır: {string.Join(", ", issueRows[year]["nullDemand"])})");
+                    if (nonNumericDemandCount > 0) issues.Add($"{(float)nonNumericDemandCount / currentDataTable.Rows.Count:P1} geçersiz format demand (0 ile dolduruldu) (Satır: {string.Join(", ", issueRows[year]["nonNumericDemand"])})");
+                    if (zeroNegativeDemandCount > 0) issues.Add($"{(float)zeroNegativeDemandCount / currentDataTable.Rows.Count:P1} sıfır/negatif demand (0 ile dolduruldu) (Satır: {string.Join(", ", issueRows[year]["zeroNegativeDemand"])})");
+                    if (nullKapasiteCount > 0) issues.Add($"{(float)nullKapasiteCount / currentDataTable.Rows.Count:P1} NULL/boş kapasite (0 ile dolduruldu) (Satır: {string.Join(", ", issueRows[year]["nullKapasite"])})");
+                    if (nonNumericKapasiteCount > 0) issues.Add($"{(float)nonNumericKapasiteCount / currentDataTable.Rows.Count:P1} geçersiz format kapasite (0 ile dolduruldu) (Satır: {string.Join(", ", issueRows[year]["nonNumericKapasite"])})");
+                    if (zeroNegativeKapasiteCount > 0) issues.Add($"{(float)zeroNegativeKapasiteCount / currentDataTable.Rows.Count:P1} sıfır/negatif kapasite (0 ile dolduruldu) (Satır: {string.Join(", ", issueRows[year]["zeroNegativeKapasite"])})");
                     if (overloadedCount > 0) issues.Add($"{(float)overloadedCount / currentDataTable.Rows.Count:P1} aşırı yük (demand kapasiteye eşitlendi) (Satır: {string.Join(", ", issueRows[year]["overloaded"])})");
                     message += string.Join("; ", issues) + ".";
 
@@ -880,7 +880,7 @@ namespace SLF
             {
                 message = $"Hata: {invalidPercentage:P1} oranında {column} değerleri eksik veya geçersiz " +
                           $"(NULL: {string.Join(", ", nullRows)}; Geçersiz format: {string.Join(", ", invalidFormatRows)}). " +
-                          "%20 eşiği aşıldı; imputation uygulanamaz, lütfen verileri manuel olarak düzeltin.";
+                          "%20 eşiği aşıldı; veri doldurma uygulanamaz, lütfen verileri manuel olarak düzeltin.";
                 warningDataTable.Rows.Add(new object[]
                 {
             column,
@@ -909,7 +909,7 @@ namespace SLF
                 column,
                 "Geçersiz İndeks",
                 "0%",
-                $"İndeks {missingIndex} geçerli aralıkta değil; {column} için imputation uygulanamadı."
+                $"İndeks {missingIndex} geçerli aralıkta değil; {column} için veri doldurma uygulanamadı."
                     });
                 }
             }
@@ -918,19 +918,19 @@ namespace SLF
             message = ""; // Reset message for reporting
             if (ozelRows.Count > 0)
             {
-                message += $"Converted ÖZEL to 1 (Satır: {string.Join(", ", ozelRows)}); ";
+                message += $"ÖZEL, 1 olarak dönüştürüldü (Satır: {string.Join(", ", ozelRows)}); ";
             }
             if (kurumRows.Count > 0)
             {
-                message += $"Converted KURUM to 0 (Satır: {string.Join(", ", kurumRows)}); ";
+                message += $"KURUM, 0 olarak dönüştürüldü (Satır: {string.Join(", ", kurumRows)}); ";
             }
             if (imputableRows.Count > 0)
             {
-                message += $"Geçersiz değer (imputed with {defaultValue}): " +
+                message += $"Geçersiz değer (veri doldurma: {defaultValue}): " +
                            $"{(float)nullRows.Count / originalTotalRows:P1} NULL/boş " +
-                           $"(imputed with {defaultValue}) (Satır: {string.Join(", ", nullRows)}) " +
+                           $"(Veri doldurma: {defaultValue}) (Satır: {string.Join(", ", nullRows)}) " +
                            $"{(float)invalidFormatRows.Count / originalTotalRows:P1} geçersiz format " +
-                           $"(imputed with {defaultValue}) (Satır: {string.Join(", ", invalidFormatRows)}).";
+                           $"(Veri doldurma: {defaultValue}) (Satır: {string.Join(", ", invalidFormatRows)}).";
             }
 
             if (!string.IsNullOrEmpty(message))
@@ -1001,7 +1001,7 @@ namespace SLF
                         errorDataTable.Rows.Add(new object[]
                         {
                     demandColumn,
-                    "Imputation Uyarısı",
+                    "Veri Doldurma Uyarısı",
                     "0%",
                     $"Satır {missingIndex} için {tuketimColumn} {errorDetail}; {demandColumn} sıfıra ayarlandı."
                         });
@@ -1015,7 +1015,7 @@ namespace SLF
                             errorDataTable.Rows.Add(new object[]
                             {
                         demandColumn,
-                        "Imputation Uyarısı",
+                        "Veri Doldurma Uyarısı",
                         "0%",
                         $"Satır {missingIndex} için hesaplanan {demandColumn} değeri negatif ({imputedValue}); sıfıra ayarlandı."
                             });
@@ -1030,7 +1030,7 @@ namespace SLF
                 demandColumn,
                 "Geçersiz İndeks",
                 "0%",
-                $"İndeks {missingIndex} geçerli aralıkta değil; {demandColumn} için imputation uygulanamadı."
+                $"İndeks {missingIndex} geçerli aralıkta değil; {demandColumn} için veri doldurma uygulanamadı."
                     });
                 }
             }
@@ -1060,7 +1060,7 @@ namespace SLF
                         errorDataTable.Rows.Add(new object[]
                         {
                             tuketimColumn,
-                            "Imputation Uyarısı",
+                            "Veri Doldurma Uyarısı",
                             "0%",
                             $"Satır {missingIndex} için {demandColumn} {errorDetail}; {tuketimColumn} sıfıra ayarlandı."
                         });
@@ -1074,7 +1074,7 @@ namespace SLF
                             errorDataTable.Rows.Add(new object[]
                             {
                                 tuketimColumn,
-                                "Imputation Uyarısı",
+                                "Veri Doldurma Uyarısı",
                                 "0%",
                                 $"Satır {missingIndex} için hesaplanan {tuketimColumn} değeri negatif ({imputedValue}); sıfıra ayarlandı."
                             });
@@ -1089,7 +1089,7 @@ namespace SLF
                         tuketimColumn,
                         "Geçersiz İndeks",
                         "0%",
-                        $"İndeks {missingIndex} geçerli aralıkta değil; {tuketimColumn} için imputation uygulanamadı."
+                        $"İndeks {missingIndex} geçerli aralıkta değil; {tuketimColumn} için veri doldurma uygulanamadı."
                     });
                 }
             }
@@ -1111,8 +1111,8 @@ namespace SLF
                                                                          // Log the failure to errorDataTable for user visibility
                     errorDataTable.Rows.Add(new object[]
                     {
-                "TM_FIDER_ID", "Imputasyon başarısız", "Geçersiz koordinat",
-                $"Satır {missingIndex}: TM_FIDER_ID imputasyonu başarısız: Geçersiz koordinatlar (TRAFO_X_KOORDINAT veya TRAFO_Y_KOORDINAT). Lütfen koordinat verilerini kontrol edin ve düzeltin."
+                "TM_FIDER_ID", "Veri doldurma başarısız", "Geçersiz koordinat",
+                $"Satır {missingIndex}: TM_FIDER_ID veri doldurması başarısız: Geçersiz koordinatlar (TRAFO_X_KOORDINAT veya TRAFO_Y_KOORDINAT). Lütfen koordinat verilerini kontrol edin ve düzeltin."
                     });
                     continue;
                 }
@@ -1151,8 +1151,8 @@ namespace SLF
                                                                    // Log the failure to errorDataTable for user visibility
                     errorDataTable.Rows.Add(new object[]
                     {
-                "TM_FIDER_ID", "Imputasyon başarısız", "Uygun fider bulunamadı",
-                $"Satır {missingIndex}: TM_FIDER_ID imputasyonu başarısız: 1 km içinde uygun bir fider bulunamadı. Lütfen koordinatları doğrulayın veya TM_FIDER_ID değerini manuel olarak atayın."
+                "TM_FIDER_ID", "Veri doldurma başarısız", "Uygun fider bulunamadı",
+                $"Satır {missingIndex}: TM_FIDER_ID veri doldurması başarısız: 1 km içinde uygun bir fider bulunamadı. Lütfen koordinatları doğrulayın veya TM_FIDER_ID değerini manuel olarak atayın."
                     });
                 }
             }
@@ -1252,7 +1252,7 @@ namespace SLF
                 {
                     columnNullRowsMap[column.ColumnName] = nullRows.Concat(negativeRows).Concat(zeroRows).Concat(formatErrorRows).ToList();
                     imputableRowsMap[column.ColumnName] = new List<int>(); // Clear for no imputation
-                    message += ". %20 eşiği aşıldı; imputation uygulanamaz, lütfen verileri manuel olarak düzeltin.";
+                    message += ". %20 eşiği aşıldı; veri doldurma uygulanamaz, lütfen verileri manuel olarak düzeltin.";
                 }
 
                 message += " (%20 eşiği aşılırsa ek doğrulama gerekebilir.)";
@@ -1317,13 +1317,13 @@ namespace SLF
                     dateColumn,
                     "Geçersiz Tarih Formatı",
                     "0%",
-                    $"Imputation sırasında {invalidDates.Count} geçersiz tarih bulundu (Satır ve Değer: {string.Join(", ", invalidDates.Select(x => $"[{x.rowIndex}]: {x.date}"))}). Tarihler 'dd.MM.yyyy' biçiminde olmalıdır."
+                    $"Veri doldurma sırasında {invalidDates.Count} geçersiz tarih bulundu (Satır ve Değer: {string.Join(", ", invalidDates.Select(x => $"[{x.rowIndex}]: {x.date}"))}). Tarihler 'dd.MM.yyyy' biçiminde olmalıdır."
                 });
             }
 
             if (dateTimes.Count == 0)
             {
-                throw new ArgumentException("No valid dates found in the column.");
+                throw new ArgumentException("Sütunda geçerli tarih bulunamadı.");
             }
 
             BigInteger totalTicks = dateTimes.Aggregate(BigInteger.Zero, (sum, date) => sum + date.Ticks);
@@ -1340,7 +1340,7 @@ namespace SLF
                 }
                 else
                 {
-                    throw new ArgumentOutOfRangeException($"Index {index} is out of the valid range.");
+                    throw new ArgumentOutOfRangeException($"Dizin {index} geçerli aralığın dışında.");
                 }
             }
         }
