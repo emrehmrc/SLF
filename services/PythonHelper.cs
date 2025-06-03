@@ -31,8 +31,6 @@ namespace SLF.services
                 // Python script yolu - artık python_kod klasöründen alınıyor
                 string scriptRelativePath = Path.Combine("python_kod", "deep_learning", "kod", "model_learning.py");
                 string pythonScriptPath = PathService.GetPythonScriptPath(scriptRelativePath);
-                //Console.WriteLine("deeplearningpath"+pythonScriptPath.ToString());
-
 
                 if (!File.Exists(pythonScriptPath))
                 {
@@ -76,31 +74,27 @@ namespace SLF.services
                 ProcessStartInfo processInfo = new ProcessStartInfo("python")
                 {
                     Arguments = arguments,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
+                    RedirectStandardOutput = false, // Output will be displayed in the console
+                    RedirectStandardError = false,  // Errors will be displayed in the console
                     UseShellExecute = false,
-                    CreateNoWindow = true
+                    CreateNoWindow = false
                 };
 
-                string output = "";
-                string error = "";
                 using (Process process = Process.Start(processInfo))
                 {
-                    output = process.StandardOutput.ReadToEnd();
-                    error = process.StandardError.ReadToEnd();
                     process.WaitForExit();
 
                     if (process.ExitCode != 0)
                     {
-                        throw new Exception($"Python betiği hata ile sonlandı. Çıktı: {output}, Hata: {error}");
+                        throw new Exception("Python betiği hata ile sonlandı. Hata mesajları konsolda görüntülendi.");
                     }
                 }
 
                 // İşlem başarılı mesajı
                 Console.WriteLine("Deep Learning modeli başarıyla çalıştırıldı.");
-                Console.WriteLine(output);
 
-                return output;
+                // Since output is displayed in the console, return an empty string or a success message
+                return "Deep Learning modeli başarıyla çalıştırıldı.";
             }
             catch (Exception ex)
             {
@@ -108,7 +102,7 @@ namespace SLF.services
                 throw; // Üst seviye metodların hatayı yakalaması için yeniden fırlat
             }
         }
-        
+
         public static string RunKatmanDeneme(string kmlFilePath, string csvFilePath)
         {
             try
