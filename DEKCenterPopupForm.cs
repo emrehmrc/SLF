@@ -147,37 +147,37 @@ namespace SLF
         {
             if (DEKCenterDataGridView == null || DEKCenterDataGridView.Rows.Count == 0)
             {
-                MessageBox.Show("DataGridView is empty or not initialized.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("DEK Bilgileri Tablosu boş veya başlatılmadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            var row = DEKCenterDataGridView.Rows[0];
+            var row = DEKCenterDataGridView.Rows[0];    
             string[] requiredColumns = { "KAYNAK_TIPI", "DEK_KURULU_GUCU", "DEK_X_KOORDINAT", "DEK_Y_KOORDINAT", "DEK_DTR_ADI", "DEK_KURULUM_YERI" };
             foreach (string col in requiredColumns)
             {
                 if (!DEKCenterDataGridView.Columns.Contains(col) || row.Cells[col].Value == null ||
                     string.IsNullOrWhiteSpace(row.Cells[col].Value.ToString()))
                 {
-                    MessageBox.Show($"Please ensure all fields are filled, including '{col}'.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Lütfen tüm alanların doldurulduğundan emin olun, '{col}' dahil.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
             }
 
             if (!double.TryParse(row.Cells["DEK_KURULU_GUCU"].Value.ToString(), out double dekKuruluGucu))
             {
-                MessageBox.Show("DEK_KURULU_GUCU must be a valid number.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("DEK Bilgileri Tablosu'nda DEK Kurulum Gücü (DEK_KURULU_GUCU) geçerli bir sayı olmalıdır.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             if (!double.TryParse(row.Cells["DEK_X_KOORDINAT"].Value.ToString(), out double dekXKoordinat))
             {
-                MessageBox.Show("DEK_X_KOORDINAT must be a valid number.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("DEK Bilgileri Tablosu'nda DEK X Koordinatı(DEK_X_KOORDINAT) geçerli bir sayı olmalıdır.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             if (!double.TryParse(row.Cells["DEK_Y_KOORDINAT"].Value.ToString(), out double dekYKoordinat))
             {
-                MessageBox.Show("DEK_Y_KOORDINAT must be a valid number.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("DEK Bilgileri Tablosu'nda DEK Y Koordinatı(DEK_Y_KOORDINAT) geçerli bir sayı olmalıdır.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -207,7 +207,7 @@ namespace SLF
             {
                 if (DEKCenterDataGridView == null || DEKCenterDataGridView.Rows.Count == 0)
                 {
-                    MessageBox.Show("DataGridView is empty or not initialized.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("DEK Bilgileri Tablosu boş veya başlatılmadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -216,7 +216,7 @@ namespace SLF
                 {
                     if (!DEKCenterDataGridView.Columns.Contains(col))
                     {
-                        MessageBox.Show($"Required column '{col}' is missing in DataGridView.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"DEK Bilgileri Tablosu'nda gerekli sütun '{col}' eksik.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
                 }
@@ -233,37 +233,37 @@ namespace SLF
 
                 if (string.IsNullOrEmpty(startYearStr) || string.IsNullOrEmpty(cellId) || string.IsNullOrEmpty(dekValueStr))
                 {
-                    MessageBox.Show("Please ensure StartYear, ID, and DEK_KURULU_GUCU are filled.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Lütfen Başlangıç Yılı(BASLANGIC_YILI), ID ve DEK Kurulum Gücü(DEK_KURULU_GUCU) alanlarının doldurulduğundan emin olun.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
                 if (!int.TryParse(startYearStr, out int startYearInt))
                 {
-                    MessageBox.Show("StartYear must be a valid integer.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Başlangıç Yılı geçerli bir sayı olmalıdır.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
                 if (!double.TryParse(dekValueStr, out double dekValue))
                 {
-                    MessageBox.Show("DEK_KURULU_GUCU must be a valid number.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("DEK Bilgileri Tablosu'nda DEK Kurulum Gücü(DEK_KURULU_GUCU) geçerli bir sayı olmalıdır.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
                 if (enlemValue == null || !double.TryParse(enlemValue.ToString(), out double enlem))
                 {
-                    MessageBox.Show("DEK_X_KOORDINAT must be a valid number.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("DEK Bilgileri Tablosu'nda DEK X Koordinatı(DEK_X_KOORDINAT) geçerli bir sayı olmalıdır.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
                 if (boylamValue == null || !double.TryParse(boylamValue.ToString(), out double boylam))
                 {
-                    MessageBox.Show("DEK_Y_KOORDINAT must be a valid number.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("DEK Bilgileri Tablosu'nda DEK Y Koordinatı(DEK_Y_KOORDINAT) geçerli bir sayı olmalıdır.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
                 if (startYearInt > slfEndYear)
                 {
-                    MessageBox.Show($"StartYear must be less than or equal to {slfEndYear}.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Başlangıç Yılı(BASLANGIC_YILI), {slfEndYear} veya daha küçük olmalıdır.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -275,8 +275,7 @@ namespace SLF
                     ana_menu_form_objesi.config.DEK?.dek_klasörü == null ||
                     ana_menu_form_objesi.config.DEK?.cikti_dosyasi == null)
                 {
-                    MessageBox.Show("Configuration is incomplete. Please ensure all configuration settings are provided.",
-                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Yapılandırma eksik. Lütfen tüm yapılandırma ayarlarının sağlandığından emin olun.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -289,7 +288,7 @@ namespace SLF
 
                 if (!File.Exists(existingFilePath))
                 {
-                    MessageBox.Show($"Output Excel file not found at: {existingFilePath}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Çıktı Excel dosyası şu adreste bulunamadı: {existingFilePath}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -339,13 +338,12 @@ namespace SLF
                     }
 
                     workbook.Save();
-                    MessageBox.Show("Data and DEK_distributed values updated successfully in the Excel file!",
-                        "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Veriler ve DEK Dağıtım Değerleri(DEK_distributed) Excel dosyasında başarıyla güncellendi!", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error saving data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Veri kaydedilirken hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

@@ -383,7 +383,7 @@ namespace SLF
                         }
                         else
                         {
-                            string warningMessage = $"Düzeltilecekler Mesajı: Kullanıcıya Abone Bağlantı Gücü NULL veya geçersiz olan verilere imputasyon uygulanacaktır. (Satır: {string.Join(", ", invalidRows)})";
+                            string warningMessage = $"Düzeltilecekler Mesajı: Kullanıcıya Abone Bağlantı Gücü NULL veya geçersiz olan verilere veri doldurma uygulanacaktır. (Satır: {string.Join(", ", invalidRows)})";
                             warningDataTable.Rows.Add(new object[]
                             {
                         column.ColumnName,
@@ -840,7 +840,7 @@ namespace SLF
                 var datatableLevel = GetDataTableBasedOnThreshold(nonPositivePercentage, thresholds.warningThreshold, thresholds.errorThreshold);
 
                 datatableLevel.Rows.Add(new object[] {
-            column.ColumnName, "Son yıl tüketim verisi", $"{nonPositivePercentage:P1} abonenin tüketim ve imputasyon verisi yok",
+            column.ColumnName, "Son yıl tüketim verisi", $"{nonPositivePercentage:P1} abonenin tüketim ve veri doldurma için verisi yok",
             "Bu abonelerin tüketim verileri silinecek."
         });
             }
@@ -1158,7 +1158,7 @@ namespace SLF
 
                 if (percentage > errorThreshold)
                 {
-                    string errorMessage = $"Hata Mesajı: %10’dan fazla oranda Enerji Tablo Kodu (BAGLANDIGI_TRAFO_KODU) olmayan abone mevcut uyarısı verilir. (Satır: {string.Join(", ", invalidRows)})";
+                    string errorMessage = $"Hata Mesajı: %10’dan fazla oranda Enerji Tablo Kodu (BAGLANDIGI_TRAFO_KODU) olmayan abone mevcut. (Satır: {string.Join(", ", invalidRows)})";
                     errorDataTable.Rows.Add(new object[]
                     {
                 "BAGLANDIGI_TRAFO_KODU",

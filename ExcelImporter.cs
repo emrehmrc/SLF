@@ -162,17 +162,18 @@ namespace SLF
                 new List<string> {
                     "ENERJI_MUSAADE_NO",
                     "ENERJI_MUSAADE_ABONE_GRUBU",
-                    "ENERJI_MUSAADE_ABONE_FAALIYET_KATEGORI",
-                    "ENERJI_MUSAADE_TALEP_DURUMU",
+                    "Tipi",
+                   // "ENERJI_MUSAADE_ABONE_FAALIYET_KATEGORI",
+                    //"ENERJI_MUSAADE_TALEP_DURUMU",
                     "ENERJI_MUSAADE_GERILIM_SEVIYESI",
                     "ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL",
                     "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID",
                     "ENERJI_MUSAADE_BAGLANTI_GUCU",
-                    "ENERJI_MUSAADE_IL",
-                    "ENERJI_MUSAADE_ILCE",
-                    "ENERJI_MUSAADE_MAHALLE",
+                    //"ENERJI_MUSAADE_IL",
+                    //"ENERJI_MUSAADE_ILCE",
+                    //"ENERJI_MUSAADE_MAHALLE",
                     "ENERJI_MUSAADE_ENERJILENDIRME_YILI",
-                    "ENERJI_MUSAADE_BASVURU_TARIHI",
+                    //"ENERJI_MUSAADE_BASVURU_TARIHI",
                     "ENERJI_MUSAADE_X_KOORDINAT",
                     "ENERJI_MUSAADE_Y_KOORDINAT",
                 }
@@ -232,7 +233,7 @@ namespace SLF
         private void AddYearColumnsToAboneVerileri(List<string> headers)
         {
             // Son 2 yıl için tüketim kolonları ekle
-            for (int year = _yearService.slfStartYear - 2; year <= _yearService.slfStartYear; year++)
+            for (int year = _yearService.slfStartYear - 5; year <= _yearService.slfStartYear; year++)
             {
                 if (year > 0) // Geçerli bir yıl ise
                 {
@@ -241,7 +242,7 @@ namespace SLF
             }
 
             // Son 2 yıl için talep kolonları ekle
-            for (int year = _yearService.slfStartYear - 2; year <= _yearService.slfStartYear; year++)
+            for (int year = _yearService.slfStartYear - 5; year <= _yearService.slfStartYear; year++)
             {
                 if (year > 0) // Geçerli bir yıl ise
                 {
@@ -254,7 +255,7 @@ namespace SLF
         private void AddYearColumnsToDTRVerileri(List<string> headers)
         {
             // Son 2 yıl için talep ve tüketim kolonları ekle
-            for (int year = _yearService.slfStartYear - 1; year <= _yearService.slfStartYear; year++)
+            for (int year = _yearService.slfStartYear - 3; year <= _yearService.slfStartYear; year++)
             {
                 if (year > 0) // Geçerli bir yıl ise
                 {
@@ -263,6 +264,10 @@ namespace SLF
                 }
             }
         }
+
+
+
+
 
         private void ValidateColumnHeaders(ExcelWorksheet worksheet, string seçilenVeriTipi)
         {
@@ -330,10 +335,15 @@ namespace SLF
                     for (int col = 1; col <= colCount; col++)
                     {
                         string columnName = worksheet.Cells[1, col].Text?.Trim() ?? $"Column{col}";
+                        Type columnType = typeof(string); // Default to string
+                        if (columnName == "ABONE_X_KOORDINAT" || columnName == "ABONE_Y_KOORDINAT")
+                        {
+                            columnType = typeof(double); // Enforce double for coordinate columns
+                        }
                         dataTable.Columns.Add(new DataColumn
                         {
                             ColumnName = columnName,
-                            DataType = typeof(string), // Store as string initially
+                            DataType = columnType,
                             AllowDBNull = true
                         });
                     }
@@ -349,10 +359,23 @@ namespace SLF
                         {
                             var cell = worksheet.Cells[row, col];
                             string valueAsString = cell.Value?.ToString()?.Trim();
+                            string columnName = dataTable.Columns[col - 1].ColumnName;
 
                             if (string.IsNullOrEmpty(valueAsString) || valueAsString == "#N/A")
                             {
                                 dataRow[col - 1] = DBNull.Value;
+                            }
+                            else if (columnName == "ABONE_X_KOORDINAT" || columnName == "ABONE_Y_KOORDINAT")
+                            {
+                                if (double.TryParse(valueAsString, out double value))
+                                {
+                                    dataRow[col - 1] = value;
+                                    rowHasData = true;
+                                }
+                                else
+                                {
+                                    dataRow[col - 1] = DBNull.Value;
+                                }
                             }
                             else
                             {
