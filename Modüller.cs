@@ -127,7 +127,6 @@ namespace SLF
 
         public bool isSelecting_YGA = false;
         public bool isSelecting_YUK = false;
-        public bool isSelecting_Musaade = false;
         public bool isSelecting_Kentsel_Donusum = false;
 
         // X and Y coordinates of the center location of the gMapControl object to be used to create a sample
@@ -5216,21 +5215,17 @@ namespace SLF
         {
             if (isSelecting_YUK == true)
             {
-                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(true, false, false, false, polygonPoints_imar);
+                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(true, false, false, polygonPoints_imar);
 
             }
             else if (isSelecting_YGA == true)
             {
-                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, true, false, false, polygonPoints_imar);
+                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, true, false, polygonPoints_imar);
                 poligonOzellikFormu.buton_yük_tipleri.Visible = false;
-            }
-            else if (isSelecting_Musaade == true)
-            {
-                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, false, true, false, polygonPoints_imar);
             }
             else if (isSelecting_Kentsel_Donusum == true)
             {
-                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, false, false, true, polygonPoints_imar);
+                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, false, true, polygonPoints_imar);
                 poligonOzellikFormu.buton_yük_tipleri.Visible = false;
             }
 
@@ -5365,8 +5360,6 @@ namespace SLF
                 overlayTag = "YGA";
             else if (isSelecting_YUK)
                 overlayTag = "YUK";
-            else if (isSelecting_Musaade)
-                overlayTag = "MUSAADE";
             else if (isSelecting_Kentsel_Donusum)
                 overlayTag = "KENTSEL_DONUSUM";
             else
@@ -5492,7 +5485,6 @@ namespace SLF
 
             isSelecting_YGA = false;
             isSelecting_YUK = false;
-            isSelecting_Musaade = false;
             isSelecting_Kentsel_Donusum = false;
             point_load_konsolidasyonu = false;
         }
@@ -6375,7 +6367,6 @@ namespace SLF
         {
             isSelecting_polygon = true;
             isSelecting_Kentsel_Donusum = false;
-            isSelecting_Musaade = false;
             isSelecting_YGA = true;
             isSelecting_YUK = false;
 
@@ -6407,7 +6398,6 @@ namespace SLF
 
             isSelecting_polygon = true;
             isSelecting_Kentsel_Donusum = false;
-            isSelecting_Musaade = false;
             isSelecting_YGA = false;
             isSelecting_YUK = true;
 
@@ -7902,7 +7892,6 @@ namespace SLF
         {
             isSelecting_polygon = true;
             isSelecting_Kentsel_Donusum = false;
-            isSelecting_Musaade = true;
             isSelecting_YGA = false;
             isSelecting_YUK = false;
 
@@ -7934,7 +7923,7 @@ namespace SLF
                 {
                     // Check if any of the required tags exist in cbs.tüm_katmanlar_array_polygon_tags
                     bool hasRequiredTag = false;
-                    string[] requiredTags = { "KENTSEL_DONUSUM_JOINED", "YGA_JOINED", "YUK_JOINED", "MUSAADE_JOINED" };
+                    string[] requiredTags = { "KENTSEL_DONUSUM_JOINED", "YGA_JOINED", "YUK_JOINED" };
                     foreach (string tag in cbs.tüm_katmanlar_array_polygon_tags)
                     {
                         if (requiredTags.Contains(tag))
@@ -7947,41 +7936,132 @@ namespace SLF
                     // If no required tags are found, show message and return early
                     if (!hasRequiredTag)
                     {
+                        MessageBox.Show("Gerekli katmanlar bulunamadı.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        this.Cursor = Cursors.Default;
                         return;
                     }
 
-                    // Export DataTables for tagged overlays
-                    string exportFolderPath_kentsel = Path.Combine(
+                    // Create the specified YGA directory
+                    string ygaDirectoryPath = Path.Combine(
                         ana_menu_form_objesi.userRootPath,
                         (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                         (string)ana_menu_form_objesi.config.İl,
                         (string)ana_menu_form_objesi.config.İlçe,
                         (string)ana_menu_form_objesi.config.proje_ismi,
-                        (string)ana_menu_form_objesi.config.SLF.kentsel_donusum_poligonu).Replace('/', '\\');
+                        "sonuclar/SLF Sonuçları/YGA/girdi").Replace('/', '\\');
 
-                    string exportFolderPath_YGA = Path.Combine(
-                        ana_menu_form_objesi.userRootPath,
-                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                        (string)ana_menu_form_objesi.config.İl,
-                        (string)ana_menu_form_objesi.config.İlçe,
-                        (string)ana_menu_form_objesi.config.proje_ismi,
-                        (string)ana_menu_form_objesi.config.SLF.YGA_poligonu).Replace('/', '\\');
+                    try
+                    {
+                        if (!Directory.Exists(ygaDirectoryPath))
+                        {
+                            Directory.CreateDirectory(ygaDirectoryPath);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"YGA dizini oluşturulurken hata oluştu: {ex.Message}\nPath: {ygaDirectoryPath}",
+                            "Dizin Oluşturma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        this.Cursor = Cursors.Default;
+                        return;
+                    }
 
-                    string exportFolderPath_YUK = Path.Combine(
+                    // Create the specified Kentsel Dönüşüm directory
+                    string kentselDonusumDirectoryPath = Path.Combine(
                         ana_menu_form_objesi.userRootPath,
                         (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                         (string)ana_menu_form_objesi.config.İl,
                         (string)ana_menu_form_objesi.config.İlçe,
                         (string)ana_menu_form_objesi.config.proje_ismi,
-                        (string)ana_menu_form_objesi.config.SLF.YUK_poligonu).Replace('/', '\\');
+                        "sonuclar/SLF Sonuçları/Kentsel Dönüşüm/girdi").Replace('/', '\\');
 
-                    string exportFolderPath_Musaade = Path.Combine(
+                    try
+                    {
+                        if (!Directory.Exists(kentselDonusumDirectoryPath))
+                        {
+                            Directory.CreateDirectory(kentselDonusumDirectoryPath);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Kentsel Dönüşüm dizini oluşturulurken hata oluştu: {ex.Message}\nPath: {kentselDonusumDirectoryPath}",
+                            "Dizin Oluşturma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        this.Cursor = Cursors.Default;
+                        return;
+                    }
+
+                    // Create the specified YUK directory (corrected to Point Load)
+                    string yukDirectoryPath = Path.Combine(
                         ana_menu_form_objesi.userRootPath,
                         (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                         (string)ana_menu_form_objesi.config.İl,
                         (string)ana_menu_form_objesi.config.İlçe,
                         (string)ana_menu_form_objesi.config.proje_ismi,
-                        (string)ana_menu_form_objesi.config.SLF.musaade_poligonu).Replace('/', '\\');
+                        "sonuclar/SLF Sonuçları/Point Load/girdi").Replace('/', '\\');
+
+                    try
+                    {
+                        if (!Directory.Exists(yukDirectoryPath))
+                        {
+                            Directory.CreateDirectory(yukDirectoryPath);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"YUK dizini oluşturulurken hata oluştu: {ex.Message}\nPath: {yukDirectoryPath}",
+                            "Dizin Oluşturma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        this.Cursor = Cursors.Default;
+                        return;
+                    }
+
+                    // Export DataTables for tagged overlays - Use directories and append file names
+                    string exportDirPath_kentsel = Path.GetDirectoryName(Path.Combine(
+                        ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.İl,
+                        (string)ana_menu_form_objesi.config.İlçe,
+                        (string)ana_menu_form_objesi.config.proje_ismi,
+                        (string)ana_menu_form_objesi.config.SLF.kentsel_donusum_poligonu).Replace('/', '\\'));
+
+                    string exportDirPath_YGA = Path.GetDirectoryName(Path.Combine(
+                        ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.İl,
+                        (string)ana_menu_form_objesi.config.İlçe,
+                        (string)ana_menu_form_objesi.config.proje_ismi,
+                        (string)ana_menu_form_objesi.config.SLF.YGA_poligonu).Replace('/', '\\'));
+
+                    string exportDirPath_YUK = Path.GetDirectoryName(Path.Combine(
+                        ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.İl,
+                        (string)ana_menu_form_objesi.config.İlçe,
+                        (string)ana_menu_form_objesi.config.proje_ismi,
+                        (string)ana_menu_form_objesi.config.SLF.YUK_poligonu).Replace('/', '\\'));
+
+
+                    // Ensure directories for export paths exist
+                    try
+                    {
+                        if (!Directory.Exists(exportDirPath_kentsel))
+                        {
+                            Directory.CreateDirectory(exportDirPath_kentsel);
+                        }
+                        if (!Directory.Exists(exportDirPath_YGA))
+                        {
+                            Directory.CreateDirectory(exportDirPath_YGA);
+                        }
+                        if (!Directory.Exists(exportDirPath_YUK))
+                        {
+                            Directory.CreateDirectory(exportDirPath_YUK);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Export dizinleri oluşturulurken hata oluştu: {ex.Message}",
+                            "Dizin Oluşturma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        this.Cursor = Cursors.Default;
+                        return;
+                    }
 
                     this.Cursor = Cursors.WaitCursor;
 
@@ -8001,19 +8081,18 @@ namespace SLF
                         switch (tag)
                         {
                             case "KENTSEL_DONUSUM_JOINED":
-                                excelExporter.ExportExcelFile(exportFolderPath_kentsel, dt, $"Kentsel_Donusum_Joined_{i + 1}", true);
+                                excelExporter.ExportExcelFile(Path.Combine(exportDirPath_kentsel, "kentsel_donusum_poligonlar.xlsx").Replace('/', '\\'), 
+                                    dt, "kentsel_donusum_poligonlar", true);
                                 exportedAnyJoinedLayer = true;
                                 break;
                             case "YGA_JOINED":
-                                excelExporter.ExportExcelFile(exportFolderPath_YGA, dt, $"YGA_Joined_{i + 1}", true);
+                                excelExporter.ExportExcelFile(Path.Combine(exportDirPath_YGA, "yga_poligonlar.xlsx").Replace('/', '\\'), dt, 
+                                    "yga_poligonlar", true);
                                 exportedAnyJoinedLayer = true;
                                 break;
                             case "YUK_JOINED":
-                                excelExporter.ExportExcelFile(exportFolderPath_YUK, dt, $"YUK_Joined_{i + 1}", true);
-                                exportedAnyJoinedLayer = true;
-                                break;
-                            case "MUSAADE_JOINED":
-                                excelExporter.ExportExcelFile(exportFolderPath_Musaade, dt, $"MUSAADE_Joined_{i + 1}", true);
+                                excelExporter.ExportExcelFile(Path.Combine(exportDirPath_YUK, "point_load_poligonlar.xlsx").Replace('/', '\\'), 
+                                    dt, "point_load_poligonlar", true);
                                 exportedAnyJoinedLayer = true;
                                 break;
                             default:
@@ -8024,6 +8103,8 @@ namespace SLF
                     // Check if any joined layers were exported
                     if (!exportedAnyJoinedLayer)
                     {
+                        MessageBox.Show("Hiçbir katman dışa aktarılmadı.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        this.Cursor = Cursors.Default;
                         return;
                     }
 
@@ -8035,7 +8116,7 @@ namespace SLF
                         (string)ana_menu_form_objesi.config.program_dosyaları_path,
                         (string)ana_menu_form_objesi.config.SLF.imar_oranı_tahmini_kodu).Replace('/', '\\');
 
-                    // Run Rscript.exe directly with quoted paths
+                    // Run the Python script with output and error capturing
                     var process = new Process
                     {
                         StartInfo = new ProcessStartInfo
@@ -8050,15 +8131,13 @@ namespace SLF
                     };
 
                     process.Start();
-                    string output = process.StandardOutput.ReadToEnd();
-                    string error = process.StandardError.ReadToEnd();
+
                     process.WaitForExit();
 
                     this.Cursor = Cursors.Default;
 
-                    // Show result
                     if (process.ExitCode != 0)
-                        MessageBox.Show($"Bir hata meydana geldi.\nHata: {error}\nÇıktı: {output}",
+                        MessageBox.Show($"Bir hata meydana geldi.",
                             "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                     else
                         MessageBox.Show($"Ufuk yılları için imar tahminleri oluşturuldu!",
@@ -8068,10 +8147,10 @@ namespace SLF
                 {
                     MessageBox.Show($"Bir hata meydana geldi: {ex.Message}\nStack Trace: {ex.StackTrace}",
                         "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    this.Cursor = Cursors.Default;
                 }
             }
         }
-
 
 
         private void buton_abone_sayısı_tahmini_Click(object sender, EventArgs e)
@@ -8337,7 +8416,6 @@ namespace SLF
         {
             isSelecting_polygon = true;
             isSelecting_Kentsel_Donusum = true;
-            isSelecting_Musaade = false;
             isSelecting_YGA = false;
             isSelecting_YUK = false;
 

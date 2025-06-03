@@ -16,18 +16,15 @@ namespace SLF
         private string excelFilePath;
         public ModülFormu modül_formu;
         public bool is_yukler_changed = false;
-        public bool is_musaade_changed = false;
 
         public bool yuk_select;
-        public bool musaade_select;
 
-        public Nokta_Yuk_Bilgi_Formu(string filePath, bool yukSelect, bool musaadeSelect)
+        public Nokta_Yuk_Bilgi_Formu(string filePath, bool yukSelect)
         {
             InitializeComponent();
 
             excelFilePath = filePath;
             yuk_select = yukSelect;
-            musaade_select = musaadeSelect;
 
             LoadDataFromExcel();
             modül_formu = new ModülFormu();
@@ -48,20 +45,9 @@ namespace SLF
                 dataTable.Columns.Add("Kurulu Güç (kW)", typeof(string));
                 dataTable.Columns.Add("Pik Yüklenme (%)", typeof(string));
                 dataTable.Columns.Add("Pik Demant (kW)", typeof(string));
-            }
-            else if (musaade_select)
+            } else
             {
-                // Columns for the second sheet (Musaade)
-                dataTable.Columns.Add("Tipi", typeof(string));
-                dataTable.Columns.Add("ABONE_GRUBU", typeof(string));
-                dataTable.Columns.Add("ENERJILENDIRME_YILI", typeof(string));
-                dataTable.Columns.Add("Kurulu Güç (kW)", typeof(string));
-                dataTable.Columns.Add("Pik Yüklenme (%)", typeof(string));
-                dataTable.Columns.Add("Pik Demant (kW)", typeof(string));
-            }
-            else
-            {
-                // Handle invalid case (neither YUK nor Musaade selected)
+                // Handle invalid case 
                 MessageBox.Show("Geçersiz seçim", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 PopulateDefaultData();
                 return;
@@ -93,17 +79,7 @@ namespace SLF
                                 throw new Exception("Excel dosyasında 'YUK' için gerekli olan ilk sayfa bulunamadı.");
                             }
                             excelTable = result.Tables[0];
-                        }
-                        else if (musaade_select)
-                        {
-                            // Read the second sheet (index 1)
-                            if (result.Tables.Count < 2)
-                            {
-                                throw new Exception("Excel dosyasında 'Musaade' için gerekli olan ikinci sayfa bulunamadı.");
-                            }
-                            excelTable = result.Tables[1];
-                        }
-                        else
+                        } else
                         {
                             throw new Exception("Geçersiz seçim");
                         }
@@ -122,15 +98,7 @@ namespace SLF
                                 newRow["Pik Yüklenme (%)"] = row["Pik Yüklenme (%)"]?.ToString() ?? string.Empty;
                                 newRow["Pik Demant (kW)"] = row["Pik Demant (kW)"]?.ToString() ?? string.Empty;
                             }
-                            else if (musaade_select)
-                            {
-                                newRow["Tipi"] = row["Tipi"]?.ToString() ?? string.Empty;
-                                newRow["ABONE_GRUBU"] = row["ABONE_GRUBU"]?.ToString() ?? string.Empty;
-                                newRow["ENERJILENDIRME_YILI"] = row["ENERJILENDIRME_YILI"]?.ToString() ?? string.Empty;
-                                newRow["Kurulu Güç (kW)"] = row["Kurulu Güç (kW)"]?.ToString() ?? string.Empty;
-                                newRow["Pik Yüklenme (%)"] = row["Pik Yüklenme (%)"]?.ToString() ?? string.Empty;
-                                newRow["Pik Demant (kW)"] = row["Pik Demant (kW)"]?.ToString() ?? string.Empty;
-                            }
+
                             dataTable.Rows.Add(newRow);
                         }
                     }
@@ -179,29 +147,29 @@ namespace SLF
                 // Default data for YUK
                 var defaultData = new List<string[]>
                 {
-                    new[] { "Anaokulu", "2,800", "TİCARETHANE","2027", "30", "0.8", "24" },
-                    new[] { "AVM", "10,000", "TİCARETHANE", "2027", "1,000", "0.6", "600" },
-                    new[] { "Banka", "500", "TİCARETHANE", "2027", "100", "0.7", "70" },
-                    new[] { "Akaryakıt İstasyonu", "1,400", "TİCARETHANE", "2027", "50", "0.6", "30" },
-                    new[] { "Cami", "300", "TİCARETHANE", "2027", "50", "0.7", "35" },
-                    new[] { "Fırın", "500", "TİCARETHANE", "2027", "30", "0.7", "21" },
-                    new[] { "Halk Sağlığı Merkezi", "400", "TİCARETHANE", "2027", "150", "0.8", "120" },
-                    new[] { "Hastane", "30,000", "TİCARETHANE", "2027", "1,000", "0.9", "900" },
-                    new[] { "İtfaiye", "1,100", "TİCARETHANE", "2027", "100", "0.6", "60" },
-                    new[] { "Kamu Binası", "1,200", "TİCARETHANE", "2027", "200", "0.6", "120" },
-                    new[] { "Konser Alanı", "2,000", "TİCARETHANE", "2027", "400", "0.7", "280" },
-                    new[] { "Okul", "7,500", "TİCARETHANE", "2027", "300", "0.8", "240" },
-                    new[] { "Oto Tamirci", "700", "TİCARETHANE", "2027", "250", "0.7", "175" },
-                    new[] { "Otogar", "5,800", "TİCARETHANE", "2027", "350", "0.7", "245" },
-                    new[] { "Otopark", "2,500", "TİCARETHANE", "2027", "200", "0.8", "160" },
-                    new[] { "Pazar Alanı", "5,400", "TİCARETHANE", "2027", "200", "0.8", "160" },
-                    new[] { "PTT", "500", "TİCARETHANE", "2027", "50", "0.7", "35" },
-                    new[] { "Restoran", "800", "TİCARETHANE", "2027", "120", "0.6", "72" },
-                    new[] { "Sanat Alanı", "3,000", "TİCARETHANE", "2027", "100", "0.6", "60" },
-                    new[] { "Sosyal Yaşam Merkezi", "1,500", "TİCARETHANE", "2027", "300", "0.7", "210" },
-                    new[] { "Süpermarket", "3,500", "TİCARETHANE", "2027", "250", "0.7", "175" },
-                    new[] { "Tarımsal Alan", "10,000", "TARIMSAL SULAMA", "2027", "20", "0.7", "14" },
-                    new[] { "Üniversite Kampüsü", "200,000", "TİCARETHANE", "2027", "1,000", "0.6", "600" }
+                    new[] { "Anaokulu", "2,800", "TICARETHANE","2027", "30", "0.8", "24" },
+                    new[] { "AVM", "10,000", "TICARETHANE", "2027", "1,000", "0.6", "600" },
+                    new[] { "Banka", "500", "TICARETHANE", "2027", "100", "0.7", "70" },
+                    new[] { "Akaryakıt İstasyonu", "1,400", "TICARETHANE", "2027", "50", "0.6", "30" },
+                    new[] { "Cami", "300", "TICARETHANE", "2027", "50", "0.7", "35" },
+                    new[] { "Fırın", "500", "TICARETHANE", "2027", "30", "0.7", "21" },
+                    new[] { "Halk Sağlığı Merkezi", "400", "TICARETHANE", "2027", "150", "0.8", "120" },
+                    new[] { "Hastane", "30,000", "TICARETHANE", "2027", "1,000", "0.9", "900" },
+                    new[] { "İtfaiye", "1,100", "TICARETHANE", "2027", "100", "0.6", "60" },
+                    new[] { "Kamu Binası", "1,200", "TICARETHANE", "2027", "200", "0.6", "120" },
+                    new[] { "Konser Alanı", "2,000", "TICARETHANE", "2027", "400", "0.7", "280" },
+                    new[] { "Okul", "7,500", "TICARETHANE", "2027", "300", "0.8", "240" },
+                    new[] { "Oto Tamirci", "700", "TICARETHANE", "2027", "250", "0.7", "175" },
+                    new[] { "Otogar", "5,800", "TICARETHANE", "2027", "350", "0.7", "245" },
+                    new[] { "Otopark", "2,500", "TICARETHANE", "2027", "200", "0.8", "160" },
+                    new[] { "Pazar Alanı", "5,400", "TICARETHANE", "2027", "200", "0.8", "160" },
+                    new[] { "PTT", "500", "TICARETHANE", "2027", "50", "0.7", "35" },
+                    new[] { "Restoran", "800", "TICARETHANE", "2027", "120", "0.6", "72" },
+                    new[] { "Sanat Alanı", "3,000", "TICARETHANE", "2027", "100", "0.6", "60" },
+                    new[] { "Sosyal Yaşam Merkezi", "1,500", "TICARETHANE", "2027", "300", "0.7", "210" },
+                    new[] { "Süpermarket", "3,500", "TICARETHANE", "2027", "250", "0.7", "175" },
+                    new[] { "Tarımsal Alan", "10,000", "TARIMSAL_SULAMA", "2027", "20", "0.7", "14" },
+                    new[] { "Üniversite Kampüsü", "200,000", "TICARETHANE", "2027", "1,000", "0.6", "600" }
                 };
 
                 foreach (var rowData in defaultData)
@@ -216,72 +184,9 @@ namespace SLF
                     row["Pik Demant (kW)"] = rowData[5];
                     dataTable.Rows.Add(row);
                 }
-            }
-            else if (musaade_select)
+            } else
             {
-                // Define columns for the second sheet (Musaade)
-                dataTable.Columns.Add("Tipi", typeof(string));
-                dataTable.Columns.Add("ABONE_GRUBU", typeof(string));
-                dataTable.Columns.Add("ENERJILENDIRME_YILI", typeof(string));
-                dataTable.Columns.Add("Kurulu Güç (kW)", typeof(string));
-                dataTable.Columns.Add("Pik Yüklenme (%)", typeof(string));
-                dataTable.Columns.Add("Pik Demant (kW)", typeof(string));
-
-                // Default data for Musaade (based on the provided sample)
-                var defaultData = new List<string[]>
-                {
-                    new[] { "ACİL SERVİS", "TİCARETHANE", "2026", "167", "0.6", "100" },
-                    new[] { "ANAOKULU", "TİCARETHANE", "2026", "86", "0.7", "60" },
-                    new[] { "ATM", "TİCARETHANE", "2026", "10", "0.3", "3" },
-                    new[] { "AVM", "TİCARETHANE", "2026", "1800", "0.5", "900" },
-                    new[] { "BAZ İSTASYONU", "TİCARETHANE", "2026", "1800", "0.5", "900" },
-                    new[] { "BİNA", "MESKEN", "2026", "36", "0.7", "25" },
-                    new[] { "BÜFE", "TİCARETHANE", "2026", "7", "0.7", "5" },
-                    new[] { "DERNEK", "TİCARETHANE", "2026", "17", "0.7", "12" },
-                    new[] { "GÜÇ ARTIRIMI - ATM", "TİCARETHANE", "2026", "4", "1", "4" },
-                    new[] { "GÜÇ ARTIRIMI - İŞYERİ", "TİCARETHANE", "2026", "25", "1", "25" },
-                    new[] { "GÜÇ ARTIRIMI - TİCARETHANE", "TİCARETHANE", "2026", "30", "1", "30" },
-                    new[] { "GÜÇ ARTIRIMI - TARIMSAL SULAMA", "TARIMSAL SULAMA", "2026", "20", "1", "20" },
-                    new[] { "GEÇİCİ - DEPO", "TİCARETHANE", "2026", "50", "0.4", "20" },
-                    new[] { "GEÇİCİ - HOBİ BAHÇESİ", "MESKEN", "2026", "8", "0.4", "3" },
-                    new[] { "GEÇİCİ - PARK AYDINLATMASI", "TİCARETHANE", "2026", "83", "0.6", "50" },
-                    new[] { "GEÇİCİ - BÜFE", "TİCARETHANE", "2026", "17", "0.3", "5" },
-                    new[] { "İBADETHANE", "TİCARETHANE", "2026", "42", "0.6", "25" },
-                    new[] { "İÇME SUYU", "TİCARETHANE", "2026", "67", "0.6", "40" },
-                    new[] { "İSTASYON", "TİCARETHANE", "2026", "67", "0.6", "40" },
-                    new[] { "MESKEN", "MESKEN", "2026", "9", "0.7", "6" },
-                    new[] { "MOBESE KAMERASI", "TİCARETHANE", "2026", "8", "0.6", "5" },
-                    new[] { "OKUL", "TİCARETHANE", "2026", "150", "0.6", "90" },
-                    new[] { "OTOPARK", "TİCARETHANE", "2026", "80", "0.5", "40" },
-                    new[] { "ÖĞRENCİ YURDU", "TİCARETHANE", "2026", "167", "0.6", "100" },
-                    new[] { "RESMİ KURUM", "TİCARETHANE", "2026", "133", "0.6", "80" },
-                    new[] { "SANAYİ", "SANAYİ", "2026", "500", "0.5", "250" },
-                    new[] { "SİNYALİZASYON", "TİCARETHANE", "2026", "17", "0.6", "10" },
-                    new[] { "SONDAJ KUYUSU", "TARIMSAL SULAMA", "2026", "60", "0.5", "30" },
-                    new[] { "SPOR KOMPLEKSİ", "TİCARETHANE", "2026", "200", "0.6", "120" },
-                    new[] { "ŞARJ İSTASYONU", "TİCARETHANE", "2026", "167", "0.6", "100" },
-                    new[] { "ŞANTİYE", "TİCARETHANE", "2026", "250", "0.6", "150" },
-                    new[] { "TARIMSAL SULAMA", "TARIMSAL SULAMA", "2026", "133", "0.6", "80" },
-                    new[] { "TERFİ İSTASYONU", "TİCARETHANE", "2026", "91", "0.7", "64" },
-                    new[] { "TİCARETHANE", "TİCARETHANE", "2026", "100", "0.7", "70" },
-                    new[] { "YURT", "TİCARETHANE", "2026", "150", "0.7", "105" }
-                };
-
-                foreach (var rowData in defaultData)
-                {
-                    var row = dataTable.NewRow();
-                    row["Tipi"] = rowData[0];
-                    row["ABONE_GRUBU"] = rowData[1];
-                    row["ENERJILENDIRME_YILI"] = rowData[2];
-                    row["Kurulu Güç (kW)"] = rowData[3];
-                    row["Pik Yüklenme (%)"] = rowData[4];
-                    row["Pik Demant (kW)"] = rowData[5];
-                    dataTable.Rows.Add(row);
-                }
-            }
-            else
-            {
-                // Handle invalid case (neither YUK nor Musaade selected)
+                // Handle invalid case 
                 dataTable.Columns.Add("Tipi", typeof(string)); // Minimal column to avoid empty table
                 var row = dataTable.NewRow();
                 row["Tipi"] = "Hata: Geçersiz seçim";
@@ -424,15 +329,9 @@ namespace SLF
                     {
                         sheetName = workbook.Worksheets.Count > 0 ? workbook.Worksheet(1).Name : "YUK";
                         sheetIndex = 1; // First sheet (index 1 in ClosedXML)
-                    }
-                    else if (musaade_select)
+                    } else
                     {
-                        sheetName = workbook.Worksheets.Count > 1 ? workbook.Worksheet(2).Name : "Musaade";
-                        sheetIndex = 2; // Second sheet (index 2 in ClosedXML)
-                    }
-                    else
-                    {
-                        throw new Exception("Geçersiz seçim: Yuk veya Musaade seçilmelidir.");
+                        throw new Exception("Geçersiz seçim: Yuk seçilmelidir.");
                     }
 
                     // Delete the existing sheet and recreate it to ensure clean data
@@ -467,8 +366,6 @@ namespace SLF
 
                 if (yuk_select)
                     is_yukler_changed = true;
-                else if (musaade_select)
-                    is_musaade_changed = true;
             }
             catch (Exception ex)
             {
