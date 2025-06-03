@@ -602,7 +602,7 @@ namespace SLF
                     nonNumericRows.Add(i);
                     row[column] = standardValue; // Impute non-numeric values with 0.4 kV
                 }
-                else if (value > 0.4f)
+                else if (value > 400f)
                 {
                     greaterThanThresholdCount++;
                     greaterThanThresholdRows.Add(i);
