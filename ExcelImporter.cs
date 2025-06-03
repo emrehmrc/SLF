@@ -378,8 +378,7 @@ namespace SLF
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"ImportExcelFile exception: {ex.Message}\nStack Trace: {ex.StackTrace}");
-                MessageBox.Show($"Excel dosyasını okurken hata oluştu: {ex.Message}\nStack Trace: {ex.StackTrace}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Excel dosyasını okurken hata oluştu!!\n\n{ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return new DataTable();
             }
 

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Configuration;
 using System.IO;
 using System.Windows.Forms;
-using System.Security.Cryptography;
-using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SLF.Services;

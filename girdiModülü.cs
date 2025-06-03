@@ -291,7 +291,7 @@ namespace SLF
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}\nStack Trace: {ex.StackTrace}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"İşlem sırasında hata oluştu!!\n\n{ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             return false;
