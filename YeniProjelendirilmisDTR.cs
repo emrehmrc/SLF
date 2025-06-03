@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace SLF
 {
@@ -82,17 +79,17 @@ namespace SLF
             {
                 infoDataTable.Rows.Add(new object[]
                 {
-            "", "Projelendirilmiş yeni DTR kapasitesi", $"{invalidNewCapacityPercentage:P1}",
+            "PROJELENDIRILMIS_TRAFO_YENI_KAPASITE", "Projelendirilmiş yeni DTR kapasitesi", $"{invalidNewCapacityPercentage:P1}",
             "Projelendirilmiş yeni DTR kapasitesi mevcut DTR kapasitesinden küçük olamaz. Bu şart sağlamayan DTR'lar silinecektir."
                 });
             }
         }
+
         private void ImputeFlagInvestmentYear()
         {
             Console.WriteLine("Starting ImputeFlagInvestmentYear...");
-
-            // DÜZELTME: Bu fonksiyon artık sadece log için kullanılacak
-            // Gerçek işlem ReportNullCounts()'ta yapılacak - NULL değerler silinecek
+            int horizonYearValue = horizonYear;
+            Console.WriteLine($"horizonYearValue: {horizonYearValue}");
 
             if (!currentDataTable.Columns.Contains("PROJELENDIRILMIS_TRAFO_YATIRIM_YILI"))
             {
@@ -100,37 +97,43 @@ namespace SLF
                 return;
             }
 
+            int imputedCount = 0;
             int totalRows = currentDataTable.Rows.Count;
-            int validCount = 0;
-            int nullCount = 0;
-            int invalidCount = 0;
-
-            Console.WriteLine($"Total rows to analyze: {totalRows}");
+            Console.WriteLine($"Total rows to process: {totalRows}");
 
             foreach (DataRow row in currentDataTable.Rows)
             {
                 int rowIndex = currentDataTable.Rows.IndexOf(row);
                 var investmentYearValue = row["PROJELENDIRILMIS_TRAFO_YATIRIM_YILI"]?.ToString();
+                Console.WriteLine($"Row {rowIndex}: PROJELENDIRILMIS_TRAFO_YATIRIM_YILI = '{investmentYearValue}'");
 
                 if (IsNullLike(investmentYearValue))
                 {
-                    nullCount++;
-                    Console.WriteLine($"Row {rowIndex}: Investment year is NULL - will be deleted");
+                    row["PROJELENDIRILMIS_TRAFO_YATIRIM_YILI"] = "OPTIMIZE";
+                    imputedCount++;
+                    Console.WriteLine($"Row {rowIndex} imputed: Investment year was null-like.");
                 }
-                else if (!int.TryParse(investmentYearValue, out int parsedYear))
+                else if (!int.TryParse(investmentYearValue, out _))
                 {
-                    invalidCount++;
-                    Console.WriteLine($"Row {rowIndex}: Investment year '{investmentYearValue}' is invalid - will be deleted");
-                }
-                else
-                {
-                    validCount++;
-                    Console.WriteLine($"Row {rowIndex}: Investment year {investmentYearValue} is valid - kept");
+                    row["PROJELENDIRILMIS_TRAFO_YATIRIM_YILI"] = "OPTIMIZE";
+                    imputedCount++;
+                    Console.WriteLine($"Row {rowIndex} imputed: Investment year {investmentYearValue} is not a valid integer.");
                 }
             }
 
-            Console.WriteLine($"ImputeFlagInvestmentYear Analysis: Valid: {validCount}, NULL: {nullCount}, Invalid: {invalidCount}");
-            Console.WriteLine("NULL and invalid investment years will be deleted in Remove() phase.");
+            float imputedPercentage = totalRows > 0 ? (float)imputedCount / totalRows : 0;
+            Console.WriteLine($"ImputeFlagInvestmentYear: Imputed {imputedCount} rows out of {totalRows} ({imputedPercentage:P1}).");
+
+            if (imputedPercentage > 0)
+            {
+                warningDataTable.Rows.Add(new object[]
+                {
+            "PROJELENDIRILMIS_TRAFO_YATIRIM_YILI", "Projelendirilmiş Trafo Yatırım Yılı", $"{imputedPercentage:P1}",
+            $"Yatırım yılı NULL veya geçersiz olan {imputedCount} satır OPTIMIZE olarak güncellendi."
+                });
+                Console.WriteLine($"Added post-imputation message to warningDataTable. Total rows in warningDataTable: {warningDataTable.Rows.Count}");
+            }
+
             Console.WriteLine("Finished ImputeFlagInvestmentYear.");
         }
 
@@ -302,7 +305,9 @@ namespace SLF
                         columnNullRowsMap["PROJELENDIRILMIS_TRAFO_ID"] = invalidRows;
                         infoDataTable.Rows.Add(new object[]
                         {
-                    "", "Projelendirilmiş Trafo ID", $"{invalidPercentage:P1}",
+                    column.ColumnName,
+                            "Projelendirilmiş Trafo ID",
+                            $"{invalidPercentage:P1}",
                     $"PROJELENDIRILMIS_TRAFO_ID sütununda {invalidCount} satır NULL veya #N/A değer içeriyor ve silinecek."
                         });
                         Console.WriteLine($"Added deletion message to infoDataTable for PROJELENDIRILMIS_TRAFO_ID. Total rows in infoDataTable: {infoDataTable.Rows.Count}");
@@ -312,10 +317,9 @@ namespace SLF
                 }
 
                 // Special handling for PROJELENDIRILMIS_TRAFO_YATIRIM_YILI
-                // Special handling for PROJELENDIRILMIS_TRAFO_YATIRIM_YILI
                 if (column.ColumnName == "PROJELENDIRILMIS_TRAFO_YATIRIM_YILI")
                 {
-                    int horizonYearValue = horizonYear;
+                    int horizonYearValue = horizonYear; // Accesses slfStartYear from GirdiModülü
 
                     int nullOrInvalidCount = 0;
                     int rowsToDeleteCount = 0;
@@ -326,45 +330,56 @@ namespace SLF
                         int rowIndex = currentDataTable.Rows.IndexOf(row);
                         var investmentYearValue = row["PROJELENDIRILMIS_TRAFO_YATIRIM_YILI"]?.ToString();
 
+                        // Skip rows that have already been imputed to "OPTIMIZE"
+                        if (investmentYearValue == "OPTIMIZE")
+                        {
+                            continue;
+                        }
+
                         if (IsNullLike(investmentYearValue))
                         {
-                            // NULL değerler silinecek
                             nullOrInvalidCount++;
-                            rowsToDelete.Add(rowIndex);
-                            Console.WriteLine($"Row {rowIndex} flagged for deletion: Investment year is NULL.");
+                            Console.WriteLine($"Row {rowIndex} has null investment year.");
                         }
-                        else if (!int.TryParse(investmentYearValue, out int investmentYear))
+                        else if (int.TryParse(investmentYearValue, out int investmentYear))
                         {
-                            // Geçersiz değerler silinecek
+                            if (investmentYear < horizonYearValue)
+                            {
+                                rowsToDeleteCount++;
+                                rowsToDelete.Add(rowIndex);
+                                Console.WriteLine($"Row {rowIndex} flagged for deletion: Investment year {investmentYear} is less than horizon year {horizonYearValue}.");
+                            }
+                        }
+                        else
+                        {
                             nullOrInvalidCount++;
-                            rowsToDelete.Add(rowIndex);
-                            Console.WriteLine($"Row {rowIndex} flagged for deletion: Investment year '{investmentYearValue}' is invalid.");
+                            Console.WriteLine($"Row {rowIndex} has invalid investment year: {investmentYearValue}.");
                         }
-                        else if (investmentYear < horizonYearValue)
-                        {
-                            // Horizon yılından önceki değerler silinecek
-                            rowsToDeleteCount++;
-                            rowsToDelete.Add(rowIndex);
-                            Console.WriteLine($"Row {rowIndex} flagged for deletion: Investment year {investmentYear} is less than horizon year {horizonYearValue}.");
-                        }
-                        // Geçerli ve horizon yılından sonraki değerler korunacak
                     }
 
-                    // Toplam silme sayısı
-                    int totalToDelete = rowsToDelete.Count;
-                    float deletedPercentage = totalRows > 0 ? (float)totalToDelete / totalRows : 0;
+                    float nullOrInvalidPercentage = totalRows > 0 ? (float)nullOrInvalidCount / totalRows : 0;
+                    float deletedPercentage = totalRows > 0 ? (float)rowsToDeleteCount / totalRows : 0;
+                    Console.WriteLine($"ReportNullCounts (PROJELENDIRILMIS_TRAFO_YATIRIM_YILI): Found {nullOrInvalidCount} null/invalid rows, flagged {rowsToDeleteCount} rows for deletion out of {totalRows} (Null/Invalid: {nullOrInvalidPercentage:P1}, Deleted: {deletedPercentage:P1}).");
 
-                    Console.WriteLine($"ReportNullCounts (PROJELENDIRILMIS_TRAFO_YATIRIM_YILI): Flagged {totalToDelete} rows for deletion out of {totalRows} (NULL/Invalid: {nullOrInvalidCount}, Early: {rowsToDeleteCount}, Total Deleted: {deletedPercentage:P1}).");
-
-                    if (totalToDelete > 0)
+                    if (rowsToDeleteCount > 0)
                     {
-                        columnNullRowsMap["PROJELENDIRILMIS_TRAFO_YATIRIM_YILI"] = rowsToDelete;
+                        columnNullRowsMap["YATIRIM_YILI_EARLY"] = rowsToDelete;
                         infoDataTable.Rows.Add(new object[]
                         {
-            "", "Projelendirilmiş Trafo Yatırım Yılı", $"{deletedPercentage:P1}",
-            $"Yatırım yılı NULL, geçersiz veya {horizonYearValue} horizon periyodundan önceki {totalToDelete} satır silinecek."
+                    column.ColumnName, "Projelendirilmiş Trafo Yatırım Yılı", $"{deletedPercentage:P1}",
+                    $"{horizonYearValue} horizon periyodundan önceki {rowsToDeleteCount} satır silinecek."
                         });
                         Console.WriteLine($"Added deletion message to infoDataTable. Total rows in infoDataTable: {infoDataTable.Rows.Count}");
+                    }
+
+                    if (nullOrInvalidPercentage > 0)
+                    {
+                        warningDataTable.Rows.Add(new object[]
+                        {
+                    column.ColumnName, "Projelendirilmiş Trafo Yatırım Yılı", $"{nullOrInvalidPercentage:P1}",
+                    $"Yatırım yılı NULL veya geçersiz olan {nullOrInvalidCount} satır OPTIMIZE olarak belirlenecek."
+                        });
+                        Console.WriteLine($"Added imputation message to warningDataTable. Total rows in warningDataTable: {warningDataTable.Rows.Count}");
                     }
 
                     continue;
@@ -495,12 +510,6 @@ namespace SLF
             {
                 combinedRowsToRemoveList.AddRange(columnNullRowsMap["COORDINATES_OUT_OF_BOUNDS"]);
             }
-            // DÜZELTME: Yatırım yılı silme işlemini ekle
-            if (columnNullRowsMap.ContainsKey("PROJELENDIRILMIS_TRAFO_YATIRIM_YILI"))
-            {
-                combinedRowsToRemoveList.AddRange(columnNullRowsMap["PROJELENDIRILMIS_TRAFO_YATIRIM_YILI"]);
-            }
-            // ESKI: YATIRIM_YILI_EARLY kontrolünü kaldır - artık tek kontrol var
             if (columnNullRowsMap.ContainsKey("YATIRIM_YILI_EARLY"))
             {
                 combinedRowsToRemoveList.AddRange(columnNullRowsMap["YATIRIM_YILI_EARLY"]);
@@ -508,13 +517,12 @@ namespace SLF
 
             var distinctRowsToRemove = combinedRowsToRemoveList.Distinct().ToList();
             Console.WriteLine($"Before Remove: currentDataTable has {currentDataTable.Rows.Count} rows.");
-            Console.WriteLine($"Total rows to remove: {distinctRowsToRemove.Count}, including KAPASITE: {(columnNullRowsMap.ContainsKey("KAPASITE") ? columnNullRowsMap["KAPASITE"].Count : 0)}, YATIRIM_YILI: {(columnNullRowsMap.ContainsKey("PROJELENDIRILMIS_TRAFO_YATIRIM_YILI") ? columnNullRowsMap["PROJELENDIRILMIS_TRAFO_YATIRIM_YILI"].Count : 0)}, PROJELENDIRILMIS_TRAFO_ID: {(columnNullRowsMap.ContainsKey("PROJELENDIRILMIS_TRAFO_ID") ? columnNullRowsMap["PROJELENDIRILMIS_TRAFO_ID"].Count : 0)}");
+            Console.WriteLine($"Total rows to remove: {distinctRowsToRemove.Count}, including KAPASITE: {(columnNullRowsMap.ContainsKey("KAPASITE") ? columnNullRowsMap["KAPASITE"].Count : 0)}, YATIRIM_YILI_EARLY: {(columnNullRowsMap.ContainsKey("YATIRIM_YILI_EARLY") ? columnNullRowsMap["YATIRIM_YILI_EARLY"].Count : 0)}, PROJELENDIRILMIS_TRAFO_ID: {(columnNullRowsMap.ContainsKey("PROJELENDIRILMIS_TRAFO_ID") ? columnNullRowsMap["PROJELENDIRILMIS_TRAFO_ID"].Count : 0)}");
 
             RemoveCombinedRows(distinctRowsToRemove);
             Console.WriteLine($"After Remove: currentDataTable has {currentDataTable.Rows.Count} rows.");
             Console.WriteLine("Finished Remove.");
         }
-
 
         private void RemoveCombinedRows(List<int> rowsToRemoveList)
         {
@@ -529,4 +537,3 @@ namespace SLF
         }
     }
 }
-

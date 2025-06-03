@@ -120,7 +120,7 @@ namespace SLF
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error saving config: {ex.Message}");
+                MessageBox.Show($"Yapılandırma kaydedilirken hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
