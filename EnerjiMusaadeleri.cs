@@ -415,9 +415,9 @@ namespace SLF
                     row["ENERJI_MUSAADE_TALEP_DURUMU"] = 0;
                     infoDataTable.Rows.Add(
                         enerjiMusaadeNo,
-                        //   "Impute Onay",
-                        "Request status was null.",
-                        "Defaulted to 0."
+                        // "Impute Onay", // Commenting out as it seems like a placeholder
+                        "Talep durumu boş.",
+                        "Varsayılan olarak 0 ayarlandı."
                     );
                 }
             }
@@ -459,33 +459,33 @@ namespace SLF
         {
             int totalRows = currentDataTable.Rows.Count;
             // Step 1: Check for NULL coordinates (special case for X and Y together)
-            /*            List<int> missingCoordinateRows = new List<int>();
-                        if (currentDataTable.Columns.Contains("ENERJI_MUSAADE_X_KOORDINAT") &&
-                            currentDataTable.Columns.Contains("ENERJI_MUSAADE_Y_KOORDINAT"))
-                        {
-                            for (int i = 0; i < totalRows; i++)
-                            {
-                                DataRow row = currentDataTable.Rows[i];
-                                if (IsNullLike(row["ENERJI_MUSAADE_X_KOORDINAT"]) ||
-                                    IsNullLike(row["ENERJI_MUSAADE_Y_KOORDINAT"]))
-                                {
-                                    missingCoordinateRows.Add(i);
-                                }
-                            }
+            List<int> missingCoordinateRows = new List<int>();
+            if (currentDataTable.Columns.Contains("ENERJI_MUSAADE_X_KOORDINAT") &&
+                currentDataTable.Columns.Contains("ENERJI_MUSAADE_Y_KOORDINAT"))
+            {
+                for (int i = 0; i < totalRows; i++)
+                {
+                    DataRow row = currentDataTable.Rows[i];
+                    if (IsNullLike(row["ENERJI_MUSAADE_X_KOORDINAT"]) ||
+                        IsNullLike(row["ENERJI_MUSAADE_Y_KOORDINAT"]))
+                    {
+                        missingCoordinateRows.Add(i);
+                    }
+                }
 
-                            // Log error for missing coordinates
-                            if (missingCoordinateRows.Count > 0)
-                            {
-                                float missingPercentage = (float)missingCoordinateRows.Count / totalRows;
-                                string errorMessage = $"Hata: ENERJI_MUSAADE_X_KOORDINAT veya ENERJI_MUSAADE_Y_KOORDINAT NULL olduğu için {missingCoordinateRows.Count} satır geçersiz. Bu satırlar silinecektir. Toplam: {missingCoordinateRows.Count} satır, Percentage: {missingPercentage:P1}. (Satır: {string.Join(", ", missingCoordinateRows)})";
-                                errorDataTable.Rows.Add(
-                                    "ENERJI_MUSAADE_X_KOORDINAT,ENERJI_MUSAADE_Y_KOORDINAT",
-                                    "Koordinat Eksik Validasyonu",
-                                    $"Toplam: {missingCoordinateRows.Count} satır",
-                                    errorMessage
-                                );
-                            }
-                        }*/
+                // Log error for missing coordinates
+                if (missingCoordinateRows.Count > 0)
+                {
+                    float missingPercentage = (float)missingCoordinateRows.Count / totalRows;
+                    string errorMessage = $"Hata: ENERJI_MUSAADE_X_KOORDINAT veya ENERJI_MUSAADE_Y_KOORDINAT NULL olduğu için {missingCoordinateRows.Count} satır geçersiz. Bu satırlar silinecektir. Toplam: {missingCoordinateRows.Count} satır, Percentage: {missingPercentage:P1}. (Satır: {string.Join(", ", missingCoordinateRows)})";
+                    errorDataTable.Rows.Add(
+                        "ENERJI_MUSAADE_X_KOORDINAT,ENERJI_MUSAADE_Y_KOORDINAT",
+                        "Koordinat Eksik Validasyonu",
+                        $"Toplam: {missingCoordinateRows.Count} satır",
+                        errorMessage
+                    );
+                }
+            }
             foreach (DataColumn column in currentDataTable.Columns)
             {
                 // Only process monitored columns.
