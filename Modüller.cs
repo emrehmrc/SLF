@@ -622,14 +622,16 @@ namespace SLF
         {
 
             checkBoxes_imar = new System.Windows.Forms.CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4,
-        checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9,
-        checkBox_imar_10, checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15 };
+                checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9,checkBox_imar_10, checkBox_imar_11, 
+                checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15 , checkBox_imar_16,
+                checkBox_imar_17, checkBox_imar_18, checkBox_imar_19, checkBox_imar_20};
 
             checkBoxes_yuk = new System.Windows.Forms.CheckBox[] { checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4,
-        checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9,
-        checkBox_yuk_10, checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15 };
+                checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9,checkBox_yuk_10, checkBox_yuk_11, 
+                checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15 , checkBox_yuk_16, checkBox_yuk_17, checkBox_yuk_18
+            , checkBox_yuk_19, checkBox_yuk_20};
 
-            int[] tagValuesForCheckboxes = Enumerable.Range(1, 15).ToArray();
+            int[] tagValuesForCheckboxes = Enumerable.Range(1, 20).ToArray();
 
             void initializeCheckBoxes(System.Windows.Forms.CheckBox[] checkBoxes, int[] tagValues)
             {
@@ -706,10 +708,12 @@ namespace SLF
                 checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4, checkBox_imar_5,
                 checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
                 checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15,
+                checkBox_imar_16,checkBox_imar_17,checkBox_imar_18,checkBox_imar_19,checkBox_imar_20,
 
                 checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4, checkBox_yuk_5,
                 checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9, checkBox_yuk_10,
                 checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15,
+                checkBox_yuk_16, checkBox_yuk_17, checkBox_yuk_18, checkBox_yuk_19, checkBox_yuk_20
             };
 
             var categoryCheckboxes = new Dictionary<string, CheckBox[]>
@@ -1661,26 +1665,13 @@ namespace SLF
                     veri_listesi_seçimi.SelectedIndex = -1;
                 }
 
-                /*                if (comboBox_ea_il_secimi != null)
-                                {
-                                    comboBox_ea_il_secimi.SelectedIndex = -1;
-                                }*/
 
                 if (comboBox_ea_yıl_secimi != null)
                 {
                     comboBox_ea_yıl_secimi.SelectedIndex = -1;
                 }
 
-                /*                if (comboBox_DEK_il != null)
-                                {
-                                    comboBox_DEK_il.SelectedIndex = -1;
-                                }
 
-                                if (comboBox_DEK_Yıl != null)
-                                {
-                                    comboBox_DEK_Yıl.SelectedIndex = -1;
-                                }
-                */
                 // DataGridView'ları temizle
                 if (dataGridView_girdi != null)
                 {
@@ -1751,12 +1742,14 @@ namespace SLF
             try
             {
                 checkBoxes_imar = new System.Windows.Forms.CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4,
-                    checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9,
-                    checkBox_imar_10, checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15 };
+                    checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9,checkBox_imar_10, checkBox_imar_11, 
+                    checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15, checkBox_imar_16, checkBox_imar_17, checkBox_imar_18
+                , checkBox_imar_19, checkBox_imar_20};
 
                 checkBoxes_yuk = new System.Windows.Forms.CheckBox[] { checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4,
-                    checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9,
-                    checkBox_yuk_10, checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15 };
+                    checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9,checkBox_yuk_10, checkBox_yuk_11, 
+                    checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15 , checkBox_yuk_16, checkBox_yuk_17, checkBox_yuk_18
+                , checkBox_yuk_19, checkBox_yuk_20};
 
 
                 // EA modülü checkboxlarını sıfırla
@@ -3848,7 +3841,7 @@ namespace SLF
                     int baseYear = slfStartYear; // e.g., 2024
                     string year = (SelectedYear != -1 && SelectedYear < (slfEndYear - slfStartYear + 1))
                         ? (baseYear + SelectedYear).ToString()
-                        : "2025";
+                        : DateTime.Now.Year.ToString();
 
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[year];
                     if (worksheet == null)
@@ -4345,7 +4338,7 @@ namespace SLF
                     int baseYear = slfStartYear; // e.g., 2024
                     string year = (SelectedYear != -1 && SelectedYear < (slfEndYear - slfStartYear + 1))
                         ? (baseYear + SelectedYear).ToString()
-                        : "2025";
+                        : DateTime.Now.Year.ToString();
 
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[year];
                     if (worksheet == null)
@@ -5380,7 +5373,7 @@ namespace SLF
                     int layerIndex = FindFirstFreeLayerIndex();
                     if (layerIndex == -1)
                     {
-                        MessageBox.Show("En fazla 15 adet katman!");
+                        MessageBox.Show("En fazla 20 adet katman!");
                         return;
                     }
 
@@ -5659,14 +5652,16 @@ namespace SLF
 
             var imarCheckBoxes = new CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4,
                 checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
-                checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15 };
+                checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15
+            , checkBox_imar_16, checkBox_imar_17, checkBox_imar_18, checkBox_imar_19, checkBox_imar_20};
 
             var yukCheckBoxes = new CheckBox[] { checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4,
                 checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9, checkBox_yuk_10,
-                checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15 };
+                checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15
+            , checkBox_yuk_16, checkBox_yuk_17, checkBox_yuk_18, checkBox_yuk_19, checkBox_yuk_20};
 
             // Ensure the index is valid before accessing arrays
-            if (index >= 0 && index < 15)
+            if (index >= 0 && index < 20)
             {
                 // Return the checkboxes for the given index
                 return new List<CheckBox> { imarCheckBoxes[index], yukCheckBoxes[index] };
@@ -5718,7 +5713,7 @@ namespace SLF
                 return;
             }
 
-            // Adjust the index since the tags are from 1 to 15 but the checkbox_indexes in the arrays are 0 to 14
+            // Adjust the index since the tags are from 1 to 20 but the checkbox_indexes in the arrays are 0 to 24
             checkbox_index -= 1;
             lastSelectedCheckboxIndex = checkbox_index; // Store the index
 
@@ -6257,7 +6252,7 @@ namespace SLF
         public int FindLayerIndexFromOverlay(GMapOverlay overlay)
         {
             // Check each array for a match
-            for (int i = 0; i < 15; i++)
+            for (int i = 0; i < 20; i++)
             {
                 if (cbs.tüm_katmanlar_array_imar[i] == overlay) return i;
                 if (cbs.tüm_katmanlar_array_yuk[i] == overlay) return i;
@@ -6535,9 +6530,6 @@ namespace SLF
                 MessageBox.Show("İmar analizi başarıyla tamamlandı.\nSonuçlar 'imar_analizi_sonuclari/deep_learning_modeli' klasöründe kaydedildi.",
                                 "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // İsteğe bağlı olarak sonuç klasörünü aç
-                string imarAnaliziPath = PathService.GetImarAnaliziPathForType("deep_learning_modeli");
-                System.Diagnostics.Process.Start("explorer.exe", imarAnaliziPath);
             }
             catch (Exception ex)
             {
@@ -6948,14 +6940,14 @@ namespace SLF
                             int maxYear = 2050;
                             string[] baseTooltipColumns = new string[]
                             {
-                        "MESKEN",
-                        "SANAYI",
-                        "TICARETHANE",
-                        "TARIMSAL_SULAMA",
-                        "AYDINLATMA",
-                        "TOPLAM_YÜK",
-                        "Hücre İçi Yerleşim Alanı",
-                        "Yük_Yoğunluğu"
+                                "MESKEN",
+                                "SANAYI",
+                                "TICARETHANE",
+                                "TARIMSAL_SULAMA",
+                                "AYDINLATMA",
+                                "TOPLAM_YÜK",
+                                "Hücre İçi Yerleşim Alanı",
+                                "Yük_Yoğunluğu"
                             };
 
                             for (int year = minYear; year <= maxYear; year++)
@@ -8019,194 +8011,6 @@ namespace SLF
 
                 try
                 {
-                    // Check if any of the required tags exist in cbs.tüm_katmanlar_array_polygon_tags
-                    bool hasRequiredTag = false;
-                    string[] requiredTags = { "KENTSEL_DONUSUM_JOINED", "YGA_JOINED", "YUK_JOINED" };
-                    foreach (string tag in cbs.tüm_katmanlar_array_polygon_tags)
-                    {
-                        if (requiredTags.Contains(tag))
-                        {
-                            hasRequiredTag = true;
-                            break;
-                        }
-                    }
-
-                    // If no required tags are found, show message and return early
-                    if (!hasRequiredTag)
-                    {
-                        MessageBox.Show("Gerekli katmanlar bulunamadı.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        this.Cursor = Cursors.Default;
-                        return;
-                    }
-
-                    // Create the specified YGA directory
-                    string ygaDirectoryPath = Path.Combine(
-                        ana_menu_form_objesi.userRootPath,
-                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                        (string)ana_menu_form_objesi.config.İl,
-                        (string)ana_menu_form_objesi.config.İlçe,
-                        (string)ana_menu_form_objesi.config.proje_ismi,
-                        "sonuclar/SLF Sonuçları/YGA/girdi").Replace('/', '\\');
-
-                    try
-                    {
-                        if (!Directory.Exists(ygaDirectoryPath))
-                        {
-                            Directory.CreateDirectory(ygaDirectoryPath);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"YGA dizini oluşturulurken hata oluştu: {ex.Message}\nPath: {ygaDirectoryPath}",
-                            "Dizin Oluşturma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        this.Cursor = Cursors.Default;
-                        return;
-                    }
-
-                    // Create the specified Kentsel Dönüşüm directory
-                    string kentselDonusumDirectoryPath = Path.Combine(
-                        ana_menu_form_objesi.userRootPath,
-                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                        (string)ana_menu_form_objesi.config.İl,
-                        (string)ana_menu_form_objesi.config.İlçe,
-                        (string)ana_menu_form_objesi.config.proje_ismi,
-                        "sonuclar/SLF Sonuçları/Kentsel Dönüşüm/girdi").Replace('/', '\\');
-
-                    try
-                    {
-                        if (!Directory.Exists(kentselDonusumDirectoryPath))
-                        {
-                            Directory.CreateDirectory(kentselDonusumDirectoryPath);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Kentsel Dönüşüm dizini oluşturulurken hata oluştu: {ex.Message}\nPath: {kentselDonusumDirectoryPath}",
-                            "Dizin Oluşturma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        this.Cursor = Cursors.Default;
-                        return;
-                    }
-
-                    // Create the specified YUK directory (corrected to Point Load)
-                    string yukDirectoryPath = Path.Combine(
-                        ana_menu_form_objesi.userRootPath,
-                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                        (string)ana_menu_form_objesi.config.İl,
-                        (string)ana_menu_form_objesi.config.İlçe,
-                        (string)ana_menu_form_objesi.config.proje_ismi,
-                        "sonuclar/SLF Sonuçları/Point Load/girdi").Replace('/', '\\');
-
-                    try
-                    {
-                        if (!Directory.Exists(yukDirectoryPath))
-                        {
-                            Directory.CreateDirectory(yukDirectoryPath);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"YUK dizini oluşturulurken hata oluştu: {ex.Message}\nPath: {yukDirectoryPath}",
-                            "Dizin Oluşturma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        this.Cursor = Cursors.Default;
-                        return;
-                    }
-
-                    // Export DataTables for tagged overlays - Use directories and append file names
-                    string exportDirPath_kentsel = Path.GetDirectoryName(Path.Combine(
-                        ana_menu_form_objesi.userRootPath,
-                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                        (string)ana_menu_form_objesi.config.İl,
-                        (string)ana_menu_form_objesi.config.İlçe,
-                        (string)ana_menu_form_objesi.config.proje_ismi,
-                        (string)ana_menu_form_objesi.config.SLF.kentsel_donusum_poligonu).Replace('/', '\\'));
-
-                    string exportDirPath_YGA = Path.GetDirectoryName(Path.Combine(
-                        ana_menu_form_objesi.userRootPath,
-                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                        (string)ana_menu_form_objesi.config.İl,
-                        (string)ana_menu_form_objesi.config.İlçe,
-                        (string)ana_menu_form_objesi.config.proje_ismi,
-                        (string)ana_menu_form_objesi.config.SLF.YGA_poligonu).Replace('/', '\\'));
-
-                    string exportDirPath_YUK = Path.GetDirectoryName(Path.Combine(
-                        ana_menu_form_objesi.userRootPath,
-                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                        (string)ana_menu_form_objesi.config.İl,
-                        (string)ana_menu_form_objesi.config.İlçe,
-                        (string)ana_menu_form_objesi.config.proje_ismi,
-                        (string)ana_menu_form_objesi.config.SLF.YUK_poligonu).Replace('/', '\\'));
-
-
-                    // Ensure directories for export paths exist
-                    try
-                    {
-                        if (!Directory.Exists(exportDirPath_kentsel))
-                        {
-                            Directory.CreateDirectory(exportDirPath_kentsel);
-                        }
-                        if (!Directory.Exists(exportDirPath_YGA))
-                        {
-                            Directory.CreateDirectory(exportDirPath_YGA);
-                        }
-                        if (!Directory.Exists(exportDirPath_YUK))
-                        {
-                            Directory.CreateDirectory(exportDirPath_YUK);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Export dizinleri oluşturulurken hata oluştu: {ex.Message}",
-                            "Dizin Oluşturma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        this.Cursor = Cursors.Default;
-                        return;
-                    }
-
-                    this.Cursor = Cursors.WaitCursor;
-
-                    // Initialize the Excel exporter
-                    var excelExporter = new ExcelExporter();
-
-                    // Flag to track if any joined layers were exported
-                    bool exportedAnyJoinedLayer = false;
-
-                    // Check cbs.tüm_katmanlar_array_imar for overlays
-                    for (int i = 0; i < cbs.tüm_katmanlar_array_imar.Length; i++)
-                    {
-                        GMapOverlay overlay = cbs.tüm_katmanlar_array_imar[i];
-                        string tag = cbs.tüm_katmanlar_array_polygon_tags[i];
-                        DataTable dt = cbs.tüm_katmanlar_datatable[i];
-
-                        switch (tag)
-                        {
-                            case "KENTSEL_DONUSUM_JOINED":
-                                excelExporter.ExportExcelFile(Path.Combine(exportDirPath_kentsel, "kentsel_donusum_poligonlar.xlsx").Replace('/', '\\'), 
-                                    dt, "kentsel_donusum_poligonlar", true);
-                                exportedAnyJoinedLayer = true;
-                                break;
-                            case "YGA_JOINED":
-                                excelExporter.ExportExcelFile(Path.Combine(exportDirPath_YGA, "yga_poligonlar.xlsx").Replace('/', '\\'), dt, 
-                                    "yga_poligonlar", true);
-                                exportedAnyJoinedLayer = true;
-                                break;
-                            case "YUK_JOINED":
-                                excelExporter.ExportExcelFile(Path.Combine(exportDirPath_YUK, "point_load_poligonlar.xlsx").Replace('/', '\\'), 
-                                    dt, "point_load_poligonlar", true);
-                                exportedAnyJoinedLayer = true;
-                                break;
-                            default:
-                                continue;
-                        }
-                    }
-
-                    // Check if any joined layers were exported
-                    if (!exportedAnyJoinedLayer)
-                    {
-                        MessageBox.Show("Hiçbir katman dışa aktarılmadı.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        this.Cursor = Cursors.Default;
-                        return;
-                    }
-
-                    this.Cursor = Cursors.WaitCursor;
 
                     // Construct the path to the python script
                     string imar_tahmini_path = Path.Combine(ana_menu_form_objesi.userRootPath,
@@ -8270,6 +8074,189 @@ namespace SLF
 
                 try
                 {
+
+                    // Check if any of the required tags exist in cbs.tüm_katmanlar_array_polygon_tags
+                    bool hasRequiredTag = false;
+                    string[] requiredTags = { "KENTSEL_DONUSUM_JOINED", "YGA_JOINED", "YUK_JOINED" };
+                    foreach (string tag in cbs.tüm_katmanlar_array_polygon_tags)
+                    {
+                        if (requiredTags.Contains(tag))
+                        {
+                            hasRequiredTag = true;
+                            break;
+                        }
+                    }
+
+                    // If no required tags are found, show message and return early
+                    if (!hasRequiredTag)
+                    {
+                        MessageBox.Show("Kentsel dönüşüm, yeni genişleme alanı veyahut noktasal yük poligonları bulunamadı." +
+                            " Abone sayıları tahminleri yapılırken bu katmanlar dikkate alınmayacaktır.",
+                            "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        this.Cursor = Cursors.Default;
+                        //return;
+                    }
+
+                    // Create the specified YGA directory
+                    string ygaDirectoryPath = Path.Combine(
+                        ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.İl,
+                        (string)ana_menu_form_objesi.config.İlçe,
+                        (string)ana_menu_form_objesi.config.proje_ismi,
+                        "sonuclar/SLF Sonuçları/YGA/girdi").Replace('/', '\\');
+
+                    try
+                    {
+                        if (!Directory.Exists(ygaDirectoryPath))
+                        {
+                            Directory.CreateDirectory(ygaDirectoryPath);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"YGA dizini oluşturulurken hata oluştu: {ex.Message}\nPath: {ygaDirectoryPath}",
+                            "Dizin Oluşturma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        this.Cursor = Cursors.Default;
+                        //return;
+                    }
+
+                    // Create the specified Kentsel Dönüşüm directory
+                    string kentselDonusumDirectoryPath = Path.Combine(
+                        ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.İl,
+                        (string)ana_menu_form_objesi.config.İlçe,
+                        (string)ana_menu_form_objesi.config.proje_ismi,
+                        "sonuclar/SLF Sonuçları/Kentsel Dönüşüm/girdi").Replace('/', '\\');
+
+                    try
+                    {
+                        if (!Directory.Exists(kentselDonusumDirectoryPath))
+                        {
+                            Directory.CreateDirectory(kentselDonusumDirectoryPath);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Kentsel Dönüşüm dizini oluşturulurken hata oluştu: {ex.Message}\nPath: {kentselDonusumDirectoryPath}",
+                            "Dizin Oluşturma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        this.Cursor = Cursors.Default;
+                        //return;
+                    }
+
+                    // Create the specified YUK directory (corrected to Point Load)
+                    string yukDirectoryPath = Path.Combine(
+                        ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.İl,
+                        (string)ana_menu_form_objesi.config.İlçe,
+                        (string)ana_menu_form_objesi.config.proje_ismi,
+                        "sonuclar/SLF Sonuçları/Point Load/girdi").Replace('/', '\\');
+
+                    try
+                    {
+                        if (!Directory.Exists(yukDirectoryPath))
+                        {
+                            Directory.CreateDirectory(yukDirectoryPath);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"YUK dizini oluşturulurken hata oluştu: {ex.Message}\nPath: {yukDirectoryPath}",
+                            "Dizin Oluşturma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        this.Cursor = Cursors.Default;
+                        //return;
+                    }
+
+                    // Export DataTables for tagged overlays - Use directories and append file names
+                    string exportDirPath_kentsel = Path.GetDirectoryName(Path.Combine(
+                        ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.İl,
+                        (string)ana_menu_form_objesi.config.İlçe,
+                        (string)ana_menu_form_objesi.config.proje_ismi,
+                        (string)ana_menu_form_objesi.config.SLF.kentsel_donusum_poligonu).Replace('/', '\\'));
+
+                    string exportDirPath_YGA = Path.GetDirectoryName(Path.Combine(
+                        ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.İl,
+                        (string)ana_menu_form_objesi.config.İlçe,
+                        (string)ana_menu_form_objesi.config.proje_ismi,
+                        (string)ana_menu_form_objesi.config.SLF.YGA_poligonu).Replace('/', '\\'));
+
+                    string exportDirPath_YUK = Path.GetDirectoryName(Path.Combine(
+                        ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.İl,
+                        (string)ana_menu_form_objesi.config.İlçe,
+                        (string)ana_menu_form_objesi.config.proje_ismi,
+                        (string)ana_menu_form_objesi.config.SLF.YUK_poligonu).Replace('/', '\\'));
+
+
+                    // Ensure directories for export paths exist
+                    try
+                    {
+                        if (!Directory.Exists(exportDirPath_kentsel))
+                        {
+                            Directory.CreateDirectory(exportDirPath_kentsel);
+                        }
+                        if (!Directory.Exists(exportDirPath_YGA))
+                        {
+                            Directory.CreateDirectory(exportDirPath_YGA);
+                        }
+                        if (!Directory.Exists(exportDirPath_YUK))
+                        {
+                            Directory.CreateDirectory(exportDirPath_YUK);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Export dizinleri oluşturulurken hata oluştu: {ex.Message}",
+                            "Dizin Oluşturma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        this.Cursor = Cursors.Default;
+                        //return;
+                    }
+
+                    this.Cursor = Cursors.WaitCursor;
+
+                    // Initialize the Excel exporter
+                    var excelExporter = new ExcelExporter();
+
+                    // Flag to track if any joined layers were exported
+                    bool exportedAnyJoinedLayer = false;
+
+                    // Check cbs.tüm_katmanlar_array_imar for overlays
+                    for (int i = 0; i < cbs.tüm_katmanlar_array_imar.Length; i++)
+                    {
+                        GMapOverlay overlay = cbs.tüm_katmanlar_array_imar[i];
+                        string tag = cbs.tüm_katmanlar_array_polygon_tags[i];
+                        DataTable dt = cbs.tüm_katmanlar_datatable[i];
+
+                        switch (tag)
+                        {
+                            case "KENTSEL_DONUSUM_JOINED":
+                                excelExporter.ExportExcelFile(Path.Combine(exportDirPath_kentsel, "kentsel_donusum_poligonlar.xlsx").Replace('/', '\\'),
+                                    dt, "kentsel_donusum_poligonlar", true);
+                                exportedAnyJoinedLayer = true;
+                                break;
+                            case "YGA_JOINED":
+                                excelExporter.ExportExcelFile(Path.Combine(exportDirPath_YGA, "yga_poligonlar.xlsx").Replace('/', '\\'), dt,
+                                    "yga_poligonlar", true);
+                                exportedAnyJoinedLayer = true;
+                                break;
+                            case "YUK_JOINED":
+                                excelExporter.ExportExcelFile(Path.Combine(exportDirPath_YUK, "point_load_poligonlar.xlsx").Replace('/', '\\'),
+                                    dt, "point_load_poligonlar", true);
+                                exportedAnyJoinedLayer = true;
+                                break;
+                            default:
+                                continue;
+                        }
+                    }
+
+
                     // Construct the path to the python script
                     string abone_sayısı_tahmini_path = Path.Combine(ana_menu_form_objesi.userRootPath,
                         (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
@@ -8364,7 +8351,7 @@ namespace SLF
 
                         if (layer_index == -1)
                         {
-                            MessageBox.Show("En fazla 15 adet katman seçilebilmektedir.");
+                            MessageBox.Show("En fazla 20 adet katman seçilebilmektedir.");
                             return;
                         }
 

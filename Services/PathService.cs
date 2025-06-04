@@ -406,37 +406,16 @@ namespace SLF.Services
                             else
                             {
                                 // Python Kodları bölümü yoksa varsayılan yapıya devam et
-                                string pythonKodlariPath = Path.Combine(programDosyalariFullPath, "python_kodlari");
+                                string pythonKodlariPath = Path.Combine(programDosyalariFullPath, "imar");
                                 if (!Directory.Exists(pythonKodlariPath))
                                 {
                                     //Directory.CreateDirectory(pythonKodlariPath);
-                                }
-
-                                // MAR_ANALİZİ dizini
-                                string marAnaliziPath = Path.Combine(pythonKodlariPath, "MAR_ANALİZİ");
-                                if (!Directory.Exists(marAnaliziPath))
-                                {
-                                    //Directory.CreateDirectory(marAnaliziPath);
-                                }
-
-                                // SLF_Main dizini
-                                string slfMainPath = Path.Combine(pythonKodlariPath, "SLF_analizi");
-                                if (!Directory.Exists(slfMainPath))
-                                {
-                                    //Directory.CreateDirectory(slfMainPath);
                                 }
 
                                 // Python kodu yolunu ayarla
                                 _configPythonKodPath = pythonKodlariPath;
                                 Debug.WriteLine($"Config'den alınan Python kod yolu: {_configPythonKodPath}");
 
-                                // İmar analizi yolunu ayarla (MAR_ANALİZİ)
-                                _configImarAnaliziPath = marAnaliziPath;
-                                Debug.WriteLine($"Config'den alınan İmar Analizi kod yolu: {_configImarAnaliziPath}");
-
-                                // SLF Main yolunu ayarla
-                                _configSLFMainPath = Path.Combine(slfMainPath, "slf_main.py");
-                                Debug.WriteLine($"Config'den alınan SLF Main kod yolu: {_configSLFMainPath}");
                             }
                         }
                     }

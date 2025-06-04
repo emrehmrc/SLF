@@ -26,14 +26,14 @@ namespace SLF
         private Dictionary<string, System.Drawing.Color> currentImarTipiColorMap; // Stores the color mapping for the current KML file
 
         // GMapOverlay arrays, one per map:
-        public GMapOverlay[] tüm_katmanlar_array_imar = new GMapOverlay[15];
-        public GMapOverlay[] tüm_katmanlar_array_yuk = new GMapOverlay[15];
-        public string[] tüm_katmanlar_array_polygon_tags = new string[15];
+        public GMapOverlay[] tüm_katmanlar_array_imar = new GMapOverlay[20];
+        public GMapOverlay[] tüm_katmanlar_array_yuk = new GMapOverlay[20];
+        public string[] tüm_katmanlar_array_polygon_tags = new string[20];
 
-        public string[] tüm_katmanlar_array_names = new string[15];
-        public System.Data.DataTable[] tüm_katmanlar_datatable = new DataTable[15];
+        public string[] tüm_katmanlar_array_names = new string[20];
+        public System.Data.DataTable[] tüm_katmanlar_datatable = new DataTable[20];
 
-        public MapWinGIS.Shapefile[] shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[15];
+        public MapWinGIS.Shapefile[] shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[20];
 
 
         // see the attributes of a polygon when clicked on it on the map 
@@ -163,7 +163,7 @@ namespace SLF
 
         private int FindFirstFreeLayerIndex()
         {
-            for (int i = 0; i < 15; i++)
+            for (int i = 0; i < 20; i++)
             {
                 // If all four overlays at index i are null, that means it’s free
                 if (tüm_katmanlar_array_imar[i] == null && tüm_katmanlar_array_yuk[i] == null)
@@ -181,7 +181,7 @@ namespace SLF
 
             if (layer_index == -1)
             {
-                MessageBox.Show("En fazla 15 adet katman seçilebilmektedir.");
+                MessageBox.Show("En fazla 20 adet katman seçilebilmektedir.");
                 return;
             }
 
@@ -385,7 +385,12 @@ namespace SLF
             (System.Drawing.Color.Black, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Black)),
             (System.Drawing.Color.Violet, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Violet)),
             (System.Drawing.Color.Violet, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Ivory)),
-            (System.Drawing.Color.Violet, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Navy))
+            (System.Drawing.Color.Violet, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Navy)),
+            (System.Drawing.Color.Red, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.AliceBlue)),
+            (System.Drawing.Color.Blue, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.BurlyWood)),
+            (System.Drawing.Color.Green, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.MintCream)),
+            (System.Drawing.Color.DarkGoldenrod, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Beige)),
+            (System.Drawing.Color.Purple, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Chartreuse))
         };
 
         private System.Data.DataTable LoadAttributeTable(DataRow row, DataGridView dataGridView,
@@ -1181,7 +1186,7 @@ namespace SLF
             layer_index = Array.FindIndex(tüm_katmanlar_array_imar, s => s == null);
             if (layer_index == -1)
             {
-                MessageBox.Show("En fazla 15 adet katman seçilebilmektedir.");
+                MessageBox.Show("En fazla 20 adet katman seçilebilmektedir.");
                 return;
             }
 
