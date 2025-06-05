@@ -217,7 +217,7 @@ namespace SLF.services
 
                 // CSV dosya yolları
                 string aboneCsvPath = Path.Combine(depoPath, "DWH_MRC_SLFPROJE_ABN_BLG.csv");
-                string tuketimCsvPath = Path.Combine(depoPath, "DWH_TUKETIM_DENEME.csv");
+                string tuketimCsvPath = Path.Combine(depoPath, "DWH_MRC_SLFPROJE_TUKETIM.csv");
 
                 // Dosyaların varlığını kontrol et
                 if (!File.Exists(aboneCsvPath))
