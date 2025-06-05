@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SLF.Services;
 
@@ -26,6 +27,9 @@ namespace SLF
 
             // Config dosyasını yükle
             LoadConfigFile();
+
+            // Kaydedilmiş kullanıcı adı ve şifreyi yükle
+            LoadSavedCredentials();
         }
 
         private void LoadConfigFile()
@@ -47,6 +51,73 @@ namespace SLF
             {
                 MessageBox.Show("Config dosyası yüklenirken hata oluştu: " + ex.Message, "Hata",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void LoadSavedCredentials()
+        {
+            try
+            {
+                if (configJson != null)
+                {
+                    // Config'den kullanıcı adını yükle
+                    if (configJson["Veritabanı"] != null && configJson["Veritabanı"]["Username"] != null)
+                    {
+                        textBoxUsername.Text = configJson["Veritabanı"]["Username"].ToString();
+                    }
+
+                    // Beni hatırla durumunu ve şifreyi yükle
+                    if (configJson["Veritabanı"] != null && configJson["Veritabanı"]["RememberMe"] != null
+                        && configJson["Veritabanı"]["RememberMe"].ToString().ToLower() == "true")
+                    {
+                        checkBoxRememberMe.Checked = true;
+
+                        // Kaydedilmiş şifreyi yükle
+                        if (configJson["Veritabanı"]["Password"] != null)
+                        {
+                            textBoxPassword.Text = configJson["Veritabanı"]["Password"].ToString();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Sadece loglama yap, kullanıcıya mesaj gösterme
+                Console.WriteLine("Kullanıcı bilgileri yüklenirken hata: " + ex.Message);
+            }
+        }
+
+        private void SaveCredentials()
+        {
+            try
+            {
+                if (configJson != null)
+                {
+                    // Kullanıcı adını her zaman kaydet
+                    configJson["Veritabanı"]["Username"] = textBoxUsername.Text;
+
+                    // RememberMe durumunu kaydet
+                    configJson["Veritabanı"]["RememberMe"] = checkBoxRememberMe.Checked.ToString().ToLower();
+
+                    // Eğer "Beni Hatırla" seçili ise şifreyi de kaydet
+                    if (checkBoxRememberMe.Checked)
+                    {
+                        configJson["Veritabanı"]["Password"] = textBoxPassword.Text;
+                    }
+                    else
+                    {
+                        // Şifre kaydını temizle (ama diğer ayarları koru)
+                        configJson["Veritabanı"]["Password"] = "";
+                    }
+
+                    // Değişiklikleri kaydet
+                    File.WriteAllText(configPath, configJson.ToString(Formatting.Indented));
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Kullanıcı bilgileri kaydedilirken hata: " + ex.Message, "Hata",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -82,6 +153,8 @@ namespace SLF
 
                 // DatabaseManager'ı başlat
                 DatabaseManager.GetInstance(connString).GetConnection();
+
+                SaveCredentials();
 
                 MessageBox.Show("Bağlantı başarılı!", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
 

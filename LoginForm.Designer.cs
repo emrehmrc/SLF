@@ -109,7 +109,6 @@
             this.checkBoxRememberMe.TabIndex = 13;
             this.checkBoxRememberMe.Text = "Beni Hatırla";
             this.checkBoxRememberMe.UseVisualStyleBackColor = true;
-            this.checkBoxRememberMe.Visible = false;
             // 
             // LoginForm
             // 

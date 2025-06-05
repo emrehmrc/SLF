@@ -93,13 +93,6 @@ namespace SLF
             }
         }
 
-        /// <summary>
-        /// Manuel veri doğrulaması butonu için
-        /// </summary>
-        private void buttonVerileriKontrolEt_Click(object sender, EventArgs e)
-        {
-            CheckDataValidation();
-        }
 
         private void buttonAboneVerisiOlustur_Click(object sender, EventArgs e)
         {
@@ -116,40 +109,6 @@ namespace SLF
 
                 // Önce veri durumunu kontrol et
                 var validationResult = DataValidationService.ValidateAboneData(configPath);
-
-                // Kullanıcıya durumu göster ve onay al
-                string confirmMessage;
-
-                if (validationResult.IsValid && validationResult.HasDepoCsvFiles && validationResult.IsDataUpToDate)
-                {
-                    confirmMessage = $"✅ Veriler güncel ve CSV dosyaları mevcut.\n\n" +
-                                   $"İşlem türü: Hızlı işleme (CSV'lerden)\n" +
-                                   $"Abone Bilgi: {validationResult.AboneBilgiConfigCount:N0} kayıt\n" +
-                                   $"Tüketim: {validationResult.AboneTuketimConfigCount:N0} kayıt\n\n" +
-                                   $"CSV dosyalarından abone verisi oluşturulsun mu?";
-                }
-                else if (!validationResult.DatabaseAccessible && validationResult.HasDepoCsvFiles)
-                {
-                    confirmMessage = $"⚠ Veritabanına erişim yok, CSV dosyaları kullanılacak.\n\n" +
-                                   $"İşlem türü: CSV'lerden işleme\n" +
-                                   $"Depo yolu: {validationResult.DepoPath}\n\n" +
-                                   $"Mevcut CSV dosyalarından abone verisi oluşturulsun mu?";
-                }
-                else
-                {
-                    confirmMessage = $"🔄 Veri güncelleme gerekli.\n\n" +
-                                   $"İşlem türü: Tam güncelleme (Veritabanı + CSV)\n" +
-                                   $"Abone Bilgi: {validationResult.AboneBilgiCurrentCount:N0} → {validationResult.AboneBilgiConfigCount:N0}\n" +
-                                   $"Tüketim: {validationResult.AboneTuketimCurrentCount:N0} → {validationResult.AboneTuketimConfigCount:N0}\n\n" +
-                                   $"Bu işlem zaman alabilir. Devam edilsin mi?";
-                }
-
-                var dialogResult = MessageBox.Show(confirmMessage, "Abone Verisi Oluşturma", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-                if (dialogResult != DialogResult.Yes)
-                {
-                    return;
-                }
 
                 // İşlem tipini belirle ve kullanıcıya bilgi ver
                 string processingMode;
