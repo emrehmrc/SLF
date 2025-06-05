@@ -38,7 +38,7 @@
             this.dtrVeriTabloOlustur.Font = new System.Drawing.Font("Comic Sans MS", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dtrVeriTabloOlustur.ForeColor = System.Drawing.Color.DarkOrange;
             this.dtrVeriTabloOlustur.Location = new System.Drawing.Point(69, 115);
-            this.dtrVeriTabloOlustur.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dtrVeriTabloOlustur.Margin = new System.Windows.Forms.Padding(4);
             this.dtrVeriTabloOlustur.Name = "dtrVeriTabloOlustur";
             this.dtrVeriTabloOlustur.Size = new System.Drawing.Size(163, 53);
             this.dtrVeriTabloOlustur.TabIndex = 13;
@@ -51,7 +51,7 @@
             this.aboneVeriOlustur.Font = new System.Drawing.Font("Comic Sans MS", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.aboneVeriOlustur.ForeColor = System.Drawing.Color.DarkOrange;
             this.aboneVeriOlustur.Location = new System.Drawing.Point(69, 220);
-            this.aboneVeriOlustur.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.aboneVeriOlustur.Margin = new System.Windows.Forms.Padding(4);
             this.aboneVeriOlustur.Name = "aboneVeriOlustur";
             this.aboneVeriOlustur.Size = new System.Drawing.Size(163, 53);
             this.aboneVeriOlustur.TabIndex = 16;
@@ -75,11 +75,11 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(311, 305);
+            this.ClientSize = new System.Drawing.Size(300, 293);
             this.Controls.Add(this.tablo_label);
             this.Controls.Add(this.aboneVeriOlustur);
             this.Controls.Add(this.dtrVeriTabloOlustur);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Tablo_olustur";
             this.Text = "Tablo_olustur";
             this.ResumeLayout(false);

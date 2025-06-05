@@ -6378,11 +6378,6 @@ namespace SLF
                 var yearService = YearService.GetInstance();
                 yearService.SetYears(slfStartYear, slfEndYear);
 
-                Console.WriteLine($"YearService başarıyla güncellendi - Başlangıç: {yearService.slfStartYear}, Bitiş: {yearService.slfEndYear}");
-                Console.WriteLine($"LastYear: {yearService.LastYear}");
-                Console.WriteLine($"PenultimateYear: {yearService.PenultimateYear}");
-                Console.WriteLine($"HorizonYear: {yearService.HorizonYear}");
-
                 // Veri tipi kontrolü
                 if (veri_listesi_seçimi.SelectedItem == null)
                 {

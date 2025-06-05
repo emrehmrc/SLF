@@ -8,8 +8,9 @@ using SLF.services;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text;
-using System.Linq;
 using System.Drawing;
+
+
 namespace SLF
 {
     public partial class imarFileSelectionPopup : Form
@@ -25,61 +26,12 @@ namespace SLF
         public imarFileSelectionPopup(DataGridView dataGridViewGirdi)
         {
             InitializeComponent();
+
             _dataGridViewGirdi = dataGridViewGirdi;
 
-            // Radio butonları gizleyelim veya kaldıralım çünkü artık kullanılmayacak
-            //if (imarizmirRadioButton != null) imarizmirRadioButton.Visible = false;
-            //if (imarEskisehirRadioButton != null) imarEskisehirRadioButton.Visible = false;
-
-            // Dosya yolu etiketlerini oluştur
-            //CreateFilePathLabels();
-
-            // Seçili il/ilçe bilgilerini gösterelim
-            UpdateCityDistrictLabel();
         }
 
-        private void UpdateCityDistrictLabel()
-        {
-            // Bilgi için bir label ekleyelim ve seçili il/ilçeyi gösterelim
-            if (cityInfoLabel == null)
-            {
-                cityInfoLabel = new Label();
-                cityInfoLabel.AutoSize = true;
-                cityInfoLabel.Location = new System.Drawing.Point(12, 20);
-                cityInfoLabel.Name = "cityInfoLabel";
-                this.Controls.Add(cityInfoLabel);
-            }
 
-            // Eğer il/ilçe seçilmemişse uyarı göster
-            if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
-            {
-                cityInfoLabel.Text = "Lütfen önce il/ilçe seçin!";
-                cityInfoLabel.ForeColor = System.Drawing.Color.Red;
-            }
-            else
-            {
-                cityInfoLabel.Text = $"Seçili Bölge: {PathService.SelectedCity} / {PathService.SelectedDistrict}";
-                cityInfoLabel.ForeColor = System.Drawing.Color.Black;
-            }
-        }
-        //private void CreateFilePathLabels()
-        //{
-        //    // CSV dosya adı etiketi
-        //    csvFilePathLabel = new Label();
-        //    csvFilePathLabel.AutoSize = true;
-        //    csvFilePathLabel.Location = new System.Drawing.Point(12, 60); // SelectCsvButton'un altına
-        //    csvFilePathLabel.Name = "csvFilePathLabel";
-        //    csvFilePathLabel.Text = "CSV dosyası seçilmedi";
-        //    this.Controls.Add(csvFilePathLabel);
-
-        //    // KML dosya adı etiketi
-        //    kmlFilePathLabel = new Label();
-        //    kmlFilePathLabel.AutoSize = true;
-        //    kmlFilePathLabel.Location = new System.Drawing.Point(12, 100); // SelectKmlButton'un altına
-        //    kmlFilePathLabel.Name = "kmlFilePathLabel";
-        //    kmlFilePathLabel.Text = "KML dosyası seçilmedi";
-        //    this.Controls.Add(kmlFilePathLabel);
-        //}
         private void imarFileSelectionPanel_Paint(object sender, PaintEventArgs e)
         {
             this.DoubleBuffered = true;
@@ -328,50 +280,6 @@ namespace SLF
                 return false;  // Hata durumunda false döndür
             }
         }
-        private string GetOutputFileInfo(string outputDir)
-        {
-            StringBuilder info = new StringBuilder();
-            info.AppendLine("Çıktı klasörü içeriği:");
-
-            // Ana klasördeki CSV'leri kontrol et
-            string[] csvFiles = Directory.GetFiles(outputDir, "*.csv", SearchOption.TopDirectoryOnly);
-            if (csvFiles.Length > 0)
-            {
-                info.AppendLine("Ana klasördeki CSV dosyaları:");
-                foreach (var file in csvFiles)
-                {
-                    info.AppendLine($"- {Path.GetFileName(file)}");
-                }
-            }
-
-            // csv alt klasörünü kontrol et
-            string csvOutputDir = Path.Combine(outputDir, "csv");
-            if (Directory.Exists(csvOutputDir))
-            {
-                string[] csvSubFiles = Directory.GetFiles(csvOutputDir, "*.csv", SearchOption.TopDirectoryOnly);
-                if (csvSubFiles.Length > 0)
-                {
-                    info.AppendLine("CSV alt klasöründeki dosyalar:");
-                    foreach (var file in csvSubFiles)
-                    {
-                        info.AppendLine($"- {Path.GetFileName(file)}");
-                    }
-                }
-            }
-
-            // Alt klasörleri kontrol et
-            string[] subDirs = Directory.GetDirectories(outputDir);
-            if (subDirs.Length > 0)
-            {
-                info.AppendLine("Alt klasörler:");
-                foreach (var dir in subDirs)
-                {
-                    info.AppendLine($"- {Path.GetFileName(dir)}");
-                }
-            }
-
-            return info.ToString();
-        }
 
         private void TestCalıstır_Click(object sender, EventArgs e)
         {
@@ -419,6 +327,7 @@ namespace SLF
                 Cursor.Current = Cursors.Default;
             }
         }
+
         private void ShowAnalysisResults(string csvFilePath)
         {
             try
@@ -549,6 +458,7 @@ namespace SLF
                 MessageBox.Show($"Analiz sonuçları gösterilirken hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         private void katman_tablosu_Click(object sender, EventArgs e)
         {
             try
@@ -648,8 +558,6 @@ namespace SLF
             }
         }
 
-
-
         private DataTable LoadCsvToDataTable(string csvPath)
         {
             DataTable dt = new DataTable();
@@ -723,15 +631,6 @@ namespace SLF
             return dt;
         }
 
-        private void AddDefaultRows(DataTable dt)
-        {
-            dt.Rows.Add("Konut", "Konut", "PL_KONUT", "KONUT|KNT");
-            dt.Rows.Add("Ticaret", "Ticaret", "PL_TICARET", "TIC|TICARET");
-            dt.Rows.Add("Sanayi", "Sanayi", "PL_SANAYI", "SAN|SANAYI");
-            dt.Rows.Add("Park", "Park", "PL_PARK", "PARK");
-            Debug.WriteLine("Varsayılan satırlar eklendi");
-        }
-
         private void SaveDataTableToCsv(DataTable dt, string csvPath)
         {
             try
@@ -802,5 +701,5 @@ namespace SLF
             }
         }
     }
-    }
+}
     

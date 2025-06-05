@@ -614,12 +614,6 @@
     <Compile Include="Ana_Menü.Designer.cs">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
     </Compile>
-    <Compile Include="ChargingStationPopupForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ChargingStationPopupForm.Designer.cs">
-      <DependentUpon>ChargingStationPopupForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="DatabaseListForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -716,7 +710,7 @@
     <Compile Include="Services\ConfigService.cs" />
     <Compile Include="Services\ControlExtensions.cs" />
     <Compile Include="Services\DatabaseHelpers.cs" />
-    <Compile Include="Services\DatabaseManager .cs" />
+    <Compile Include="Services\DatabaseManager.cs" />
     <Compile Include="Services\DataValidationService.cs" />
     <Compile Include="Services\PathService.cs" />
     <Compile Include="Services\PythonHelper.cs" />
@@ -769,19 +763,12 @@
     <Compile Include="DEKModulu.cs" />
     <Compile Include="DTRModulu.cs" />
     <Compile Include="EASarjModulu.cs" />
-    <Compile Include="FormOznitelik.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormOznitelik.Designer.cs">
-      <DependentUpon>FormOznitelik.cs</DependentUpon>
-    </Compile>
     <Compile Include="Attribute_Table.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Attribute_Table.Designer.cs">
       <DependentUpon>Attribute_Table.cs</DependentUpon>
     </Compile>
-    <Compile Include="GdalConfiguration.cs" />
     <Compile Include="Google_Earth.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -833,9 +820,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Ana_Menü.resx">
       <DependentUpon>Ana_Menü.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ChargingStationPopupForm.resx">
-      <DependentUpon>ChargingStationPopupForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DatabaseListForm.resx">
       <DependentUpon>DatabaseListForm.cs</DependentUpon>
@@ -902,9 +886,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Hakkında.resx">
       <DependentUpon>Hakkında.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormOznitelik.resx">
-      <DependentUpon>FormOznitelik.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="imarFileSelectionPopup.resx">
       <DependentUpon>imarFileSelectionPopup.cs</DependentUpon>

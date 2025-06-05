@@ -117,19 +117,20 @@ namespace SLF.Services
                 string jsonContent = File.ReadAllText(configPath);
                 JObject config = JObject.Parse(jsonContent);
 
+                string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
                 string anaKlasor = config["Ana_Klasör_Yolu"]?.ToString() ?? "";
-                string il = config["İl"]?.ToString() ?? "";
                 string depoRelPath = config["depo"]?.ToString() ?? "depo";
 
                 // Slash'leri temizle
                 if (depoRelPath.StartsWith("/")) depoRelPath = depoRelPath.Substring(1);
                 if (depoRelPath.EndsWith("/")) depoRelPath = depoRelPath.Substring(0, depoRelPath.Length - 1);
 
-                string depoPath = Path.Combine(anaKlasor, il, depoRelPath);
+                string depoPath = Path.Combine(userRootPath, anaKlasor, depoRelPath).Replace('/', '\\');
 
                 // CSV dosya yolları
                 string aboneCsvPath = Path.Combine(depoPath, "DWH_MRC_SLFPROJE_ABN_BLG.csv");
-                string tuketimCsvPath = Path.Combine(depoPath, "DWH_TUKETIM_DENEME.csv");
+                string tuketimCsvPath = Path.Combine(depoPath, "DWH_MRC_SLFPROJE_TUKETIM.csv");
 
                 bool aboneExists = File.Exists(aboneCsvPath);
                 bool tuketimExists = File.Exists(tuketimCsvPath);
