@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using System.Windows.Forms;
 
 namespace SLF.Services
 {
@@ -774,7 +773,6 @@ namespace SLF.Services
         /// <summary>
         /// Yeni bir geçici çalışma klasörü oluşturur
         /// </summary>
-        /// 
         public static bool CreateNewTempFolder()
         {
             // İl ve ilçe seçilip seçilmediğini kontrol et
@@ -784,12 +782,11 @@ namespace SLF.Services
                 return false;
             }
 
-
             // Eğer zaten geçici bir klasör varsa ve aynı il/ilçe için çalışıyorsak
             if (CurrentMode == WorkingMode.Temporary && !string.IsNullOrEmpty(CurrentWorkingFolder))
             {
                 // Şu anki geçici klasör yolu
-                string currentTempPath  = Path.Combine(BaseDirectory, FullPath, CurrentWorkingFolder);
+                string currentTempPath = Path.Combine(BaseDirectory, FullPath, CurrentWorkingFolder);
 
                 // Eğer klasör hala varsa, yeni oluşturmaya gerek yok
                 if (Directory.Exists(currentTempPath))
@@ -803,51 +800,66 @@ namespace SLF.Services
             CurrentWorkingFolder = $"proje_temp_{timestamp}";
             CurrentMode = WorkingMode.Temporary;
 
-
-            string current_temp_file_path = Path.Combine(BaseDirectory, FullPath, CurrentWorkingFolder);
-
             // Klasör yapısını oluştur
             CreateFolderStructure();
-            SaveProjectState(current_temp_file_path);
 
             Debug.WriteLine($"Yeni geçici klasör oluşturuldu: {CurrentWorkingFolder}");
             return true;
         }
 
 
+        /// <summary>
+        /// Bir dizinin içerik barındırıp barındırmadığını kontrol eder
+        /// </summary>
+        /// <param name="path">Kontrol edilecek dizin yolu</param>
+        /// <returns>İçerik varsa true, yoksa false</returns>
+        private static bool DirectoryHasContent(string path)
+        {
+            if (!Directory.Exists(path))
+                return false;
+
+            // Alt klasörlerdeki dosya sayısı (girdiler, imar_analizi_sonuclari, sonuclar)
+            int fileCount = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories).Length;
+
+            // Sadece alt klasörler varsa içerik sayılmasın
+            if (fileCount == 0)
+            {
+                // Alt klasörler dışında başka dosya yoksa
+                return false;
+            }
+
+            return true;
+        }
+
 
         /// <summary>
         /// Proje durumunu kaydeder
         /// </summary>
-        public static void SaveProjectState(string projectPath)
+        private static void SaveProjectState(string projectPath)
         {
             try
             {
-                var yearService = YearService.GetInstance();
+                // Tamamlanan modülleri GirdiModülü.dataTablesByType'dan al
+                var completedModules = GirdiModülü.dataTablesByType.Keys.ToList();
 
-                // Proje durumunu hazırla (yeni geçici proje için CompletedModules boş)
                 var projectState = new Dictionary<string, object>
                 {
-                    ["CompletedModules"] = new List<string>(), // Explicitly empty for new projects
-                    ["SLFStartYear"] = yearService.slfStartYear,
-                    ["SLFEndYear"] = yearService.slfEndYear,
+                    ["CompletedModules"] = completedModules,
                     ["LastSaved"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     ["CreatedBy"] = Environment.UserName
                 };
 
-                // JSON olarak kaydet
                 string json = System.Text.Json.JsonSerializer.Serialize(projectState,
                     new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
 
                 string statePath = Path.Combine(projectPath, "project_state.json");
-                Directory.CreateDirectory(projectPath); // Ensure the directory exists
                 File.WriteAllText(statePath, json);
-                Console.WriteLine($"Created empty project_state.json at: {statePath}");
+
+                Debug.WriteLine($"Proje durumu kaydedildi: {statePath}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Proje durumu kaydedilirken hata: {ex.Message}");
-                throw;
+                Debug.WriteLine($"Proje durumu kaydedilirken hata: {ex.Message}");
             }
         }
 
