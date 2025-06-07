@@ -718,12 +718,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Services\YearServices.cs" />
-    <Compile Include="Tablo_olustur.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Tablo_olustur.Designer.cs">
-      <DependentUpon>Tablo_olustur.cs</DependentUpon>
-    </Compile>
     <Compile Include="CBS.cs" />
     <Compile Include="EAStationPopupForm.cs">
       <SubType>Form</SubType>
@@ -865,9 +859,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ReportTableForm.resx">
       <DependentUpon>ReportTableForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tablo_olustur.resx">
-      <DependentUpon>Tablo_olustur.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Attribute_Table.resx">
       <DependentUpon>Attribute_Table.cs</DependentUpon>

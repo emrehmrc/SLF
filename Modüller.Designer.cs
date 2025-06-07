@@ -278,7 +278,6 @@ namespace SLF
             this.miniToolStrip = new System.Windows.Forms.ToolStrip();
             this.buton_ea_harita_katmanlar = new System.Windows.Forms.Button();
             this.ELFMinSenaryoGraphPicBox = new System.Windows.Forms.PictureBox();
-            this.buton_tablo_olustur = new System.Windows.Forms.Button();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
             this.panel_proje_ekle.SuspendLayout();
@@ -3531,7 +3530,6 @@ namespace SLF
             // HeaderPanel
             // 
             this.HeaderPanel.BackColor = System.Drawing.Color.NavajoWhite;
-            this.HeaderPanel.Controls.Add(this.buton_tablo_olustur);
             this.HeaderPanel.Controls.Add(this.buton_database_giris);
             this.HeaderPanel.Controls.Add(this.HomePageButton);
             this.HeaderPanel.Dock = System.Windows.Forms.DockStyle.Top;
@@ -3629,17 +3627,6 @@ namespace SLF
             this.ELFMinSenaryoGraphPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.ELFMinSenaryoGraphPicBox.TabIndex = 22;
             this.ELFMinSenaryoGraphPicBox.TabStop = false;
-            // 
-            // buton_tablo_olustur
-            // 
-            this.buton_tablo_olustur.Location = new System.Drawing.Point(177, 4);
-            this.buton_tablo_olustur.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.buton_tablo_olustur.Name = "buton_tablo_olustur";
-            this.buton_tablo_olustur.Size = new System.Drawing.Size(153, 28);
-            this.buton_tablo_olustur.TabIndex = 7;
-            this.buton_tablo_olustur.Text = "Tablo Oluştur";
-            this.buton_tablo_olustur.UseVisualStyleBackColor = true;
-            this.buton_tablo_olustur.Click += new System.EventHandler(this.buton_tablo_olustur_Click);
             // 
             // ModülFormu
             // 
@@ -3982,6 +3969,5 @@ namespace SLF
         private CheckBox checkBox_yuk_17;
         private CheckBox checkBox_yuk_18;
         private CheckBox checkBox_yuk_16;
-        private Button buton_tablo_olustur;
     }
 }

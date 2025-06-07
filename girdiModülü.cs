@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.IO;
 using SLF.Services;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace SLF
 {
@@ -453,11 +454,9 @@ namespace SLF
 
                 SaveModuleDataToCSV();
 
-                if (PathService.CurrentMode == PathService.WorkingMode.Temporary)
-                {
-                    string tempPath = Path.Combine(PathService.BaseDirectory, PathService.FullPath, PathService.CurrentWorkingFolder);
-                    SaveTempProjectState(tempPath);
-                }
+                // Update project state for both temporary and imported projects
+                string projectPath = Path.Combine(PathService.BaseDirectory, PathService.FullPath, PathService.CurrentWorkingFolder);
+                UpdateProjectState(projectPath);
 
                 if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
                 {
@@ -559,22 +558,41 @@ namespace SLF
             }
         }
 
-        private void SaveTempProjectState(string tempPath)
+        private void UpdateProjectState(string projectPath)
         {
-            // Tamamlanan modül listesini doğrudan dataTablesByType'dan al
-            var completedModules = dataTablesByType.Keys.ToList();
-
-            var projectState = new Dictionary<string, object>
+            try
             {
-                ["CompletedModules"] = completedModules,
-                ["LastUpdated"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-            };
+                var yearService = YearService.GetInstance();
+                string statePath = Path.Combine(projectPath, "project_state.json");
 
-            string json = System.Text.Json.JsonSerializer.Serialize(projectState,
-                new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+                Dictionary<string, object> projectState = new Dictionary<string, object>();
+                if (File.Exists(statePath))
+                {
+                    // Read existing project_state.json
+                    string existingJson = File.ReadAllText(statePath);
+                    projectState = JsonConvert.DeserializeObject<Dictionary<string, object>>(existingJson) ?? new Dictionary<string, object>();
+                }
 
-            string statePath = Path.Combine(tempPath, "temp_state.json");
-            File.WriteAllText(statePath, json);
+                // Update CompletedModules with current dataTablesByType keys
+                var completedModules = dataTablesByType.Keys.ToList();
+                projectState["CompletedModules"] = completedModules;
+
+                // Preserve or add other fields
+                projectState["SLFStartYear"] = projectState.ContainsKey("SLFStartYear") ? projectState["SLFStartYear"] : yearService.slfStartYear;
+                projectState["SLFEndYear"] = projectState.ContainsKey("SLFEndYear") ? projectState["SLFEndYear"] : yearService.slfEndYear;
+                projectState["LastSaved"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                projectState["CreatedBy"] = projectState.ContainsKey("CreatedBy") ? projectState["CreatedBy"] : Environment.UserName;
+
+                // Serialize and save the updated state
+                string updatedJson = JsonConvert.SerializeObject(projectState, Newtonsoft.Json.Formatting.Indented);
+                Directory.CreateDirectory(projectPath); // Ensure directory exists
+                File.WriteAllText(statePath, updatedJson);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Hata oluştu proje durumu güncellenirken: {ex.Message}");
+                throw;
+            }
         }
 
         private DataTable ConvertColumnNamesToUpperCase(DataTable dataTable)

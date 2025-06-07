@@ -335,6 +335,7 @@ namespace SLF.Services
                                 // Program dosyaları ile birleştir
                                 string veritabaniKodFullPath = Path.Combine(programDosyalariFullPath, veritabaniKodRelativePath);
 
+
                                 _configveritabanikod = veritabaniKodFullPath;
                             }
                             if (config.konum != null)
@@ -796,7 +797,7 @@ namespace SLF.Services
             }
 
             string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            CurrentWorkingFolder = $"temp_{timestamp}";
+            CurrentWorkingFolder = $"proje_temp_{timestamp}";
             CurrentMode = WorkingMode.Temporary;
 
             // Klasör yapısını oluştur

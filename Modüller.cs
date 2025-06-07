@@ -1043,30 +1043,45 @@ namespace SLF
             // Default color is red
             Color textColor = Color.Red;
 
-            // Check if module is completed according to project_state.json
+            // Check if module is completed according to the current project_state.json
             List<string> completedModules = GetCompletedModulesFromJson();
             if (completedModules != null && completedModules.Contains(text))
             {
-                textColor = Color.Green;
-            }
-            // Fallback to old method if JSON check fails
-            else if (girdiModülleri.ContainsKey(text) && girdiModülleri[text].importedDataTable.Rows.Count > 0)
-            {
-                textColor = Color.Green;
+                textColor = Color.FromArgb(7, 235, 136); // Green for completed modules
             }
 
-            // Draw the background
-            e.DrawBackground();
+            // Determine background color based on state
+            Color backColor = veri_listesi_seçimi.BackColor; // Default background (usually white)
+            if ((e.State & DrawItemState.HotLight) == DrawItemState.HotLight) // Hover state
+            {
+                backColor = Color.LightSkyBlue; // Light blue hue for hover
+            }
+            else if ((e.State & DrawItemState.Selected) == DrawItemState.Selected) // Selected state
+            {
+                backColor = SystemColors.Highlight; // Keep default selection color (optional)
+            }
+
+            // Draw custom background
+            using (Brush backBrush = new SolidBrush(backColor))
+            {
+                e.Graphics.FillRectangle(backBrush, e.Bounds);
+            }
 
             // Draw the text with the determined color
-            using (Brush brush = new SolidBrush(textColor))
+            using (Brush textBrush = new SolidBrush(textColor))
             {
-                e.Graphics.DrawString(text, e.Font, brush, e.Bounds);
+                e.Graphics.DrawString(text, e.Font, textBrush, e.Bounds);
             }
 
             // Draw the focus rectangle if the item is selected
-            e.DrawFocusRectangle();
+            if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+            {
+                e.DrawFocusRectangle();
+            }
         }
+
+
+
         private List<string> GetCompletedModulesFromJson()
         {
             try
@@ -1096,6 +1111,8 @@ namespace SLF
 
             return null;
         }
+
+
         private void raporGoruntuleButonu_Click(object sender, EventArgs e)
         {
             // Girdi modülündeki dosya yükleme butonuna tıklandığında çalışacak kodlar
@@ -1926,17 +1943,6 @@ namespace SLF
                     if (result == DialogResult.No)
                         return false;
 
-                    // Var olan klasörü tamamen silmek yerine, project_state.json'ı güncelle
-                    try
-                    {
-                        // project_state.json dışındaki dosyaları güncelle
-                        // Eğer aynı isimde bir dosya varsa, üzerine yazacak
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Var olan proje dosyası güncellenirken hata: {ex.Message}");
-                        // Devam et
-                    }
                 }
                 else
                 {
@@ -6450,11 +6456,6 @@ namespace SLF
             }
         }
 
-        private void buton_tablo_olustur_Click(object sender, EventArgs e)
-        {         
-            Tablo_olustur tablo_olustur_formu = new Tablo_olustur();
-            tablo_olustur_formu.Show();
-        }
 
         private void YGA_Ekle_Click(object sender, EventArgs e)
         {
