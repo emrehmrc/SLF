@@ -1584,6 +1584,11 @@ namespace SLF
                                 return;
                             }
                         }
+
+                        ana_menu_form_objesi.config.proje_ismi = "proje_" + projectName;
+
+                        methodFormObjesi.SaveConfigToFile();
+
                     }
 
                     if (!saveSuccess)
@@ -2084,8 +2089,6 @@ namespace SLF
                 throw;
             }
         }
-        // Modül verilerini CSV olarak kaydet
-
 
         // Mevcut projeyi güncelleme metodu
         private bool UpdateExistingProject()
@@ -2133,7 +2136,7 @@ namespace SLF
                 Console.WriteLine($"Geçici klasörler aranıyor: {districtPath}");
 
                 // "temp_" ile başlayan tüm klasörleri bul
-                string[] tempFolders = Directory.GetDirectories(districtPath, "temp_*");
+                string[] tempFolders = Directory.GetDirectories(districtPath, "proje_temp_*");
                 Console.WriteLine($"Bulunan geçici klasör sayısı: {tempFolders.Length}");
 
                 foreach (string folder in tempFolders)
@@ -2526,6 +2529,9 @@ namespace SLF
                             string selectedPath = folderBrowser.SelectedPath;
                             string projectName = folderBrowser.SelectedProjectName;
 
+                            ana_menu_form_objesi.config.proje_ismi = "proje_" + projectName;
+                            methodFormObjesi.SaveConfigToFile();
+
                             // Geçici klasörden yüklü veri kontrolü
                             if (PathService.CurrentMode == PathService.WorkingMode.Temporary && GirdiModülü.dataTablesByType.Count > 0)
                             {
@@ -2583,7 +2589,7 @@ namespace SLF
                 if (Directory.Exists(districtPath))
                 {
                     // "temp_" ile başlayan tüm klasörleri bul
-                    string[] tempFolders = Directory.GetDirectories(districtPath, "temp_*");
+                    string[] tempFolders = Directory.GetDirectories(districtPath, "proje_temp_*");
 
                     foreach (string folder in tempFolders)
                     {
@@ -8018,8 +8024,8 @@ namespace SLF
                     {
                         StartInfo = new ProcessStartInfo
                         {
-                            FileName = "python",
-                            Arguments = $"\"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
+                            FileName = "cmd.exe",
+                            Arguments = $"/C python \"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
                             RedirectStandardOutput = false,
                             RedirectStandardError = false,
                             UseShellExecute = false,
@@ -8219,15 +8225,15 @@ namespace SLF
                     // Initialize the Excel exporter
                     var excelExporter = new ExcelExporter();
 
-                    // Flag to track if any joined layers were exported
-                    bool exportedAnyJoinedLayer = false;
-
                     // Check cbs.tüm_katmanlar_array_imar for overlays
                     for (int i = 0; i < cbs.tüm_katmanlar_array_imar.Length; i++)
                     {
                         GMapOverlay overlay = cbs.tüm_katmanlar_array_imar[i];
                         string tag = cbs.tüm_katmanlar_array_polygon_tags[i];
                         DataTable dt = cbs.tüm_katmanlar_datatable[i];
+
+                        // Flag to track if any joined layers were exported
+                        bool exportedAnyJoinedLayer = false;
 
                         switch (tag)
                         {
@@ -8259,13 +8265,13 @@ namespace SLF
                         (string)ana_menu_form_objesi.config.SLF.abone_sayısı_tahmini_kodu).Replace('/', '\\');
 
 
-                    // Run Rscript.exe directly with quoted paths
+                    // Run cmd.exe with /k to keep the window open
                     var process = new Process
                     {
                         StartInfo = new ProcessStartInfo
                         {
-                            FileName = "python",
-                            Arguments = $"\"{abone_sayısı_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
+                            FileName = "cmd.exe",
+                            Arguments = $"/C python \"{abone_sayısı_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
                             RedirectStandardOutput = false,
                             RedirectStandardError = false,
                             UseShellExecute = false,
@@ -8309,6 +8315,26 @@ namespace SLF
 
                 try
                 {
+
+                    // Construct the path to the ELF input file
+                    string elfFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.İl,
+                        (string)ana_menu_form_objesi.config.İlçe,
+                        (string)ana_menu_form_objesi.config.proje_ismi,
+                        (string)ana_menu_form_objesi.config.ELF.hor_ver_dosyası).Replace('/', '\\');
+
+                    // Check if the ELF input file exists
+                    if (!File.Exists(elfFilePath))
+                    {
+                        this.Cursor = Cursors.Default;
+                        MessageBox.Show("Ekonometrik Talep Tahminleri güncel proje klasöründe bulunamadı.!!\n\n" +
+                            "Lütfen önce ELF modülünü kullanarak ekonometrik tahminleri oluşturunuz.",
+                            "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                        return; // Exit the method if the file does not exist
+                    }
+
+
                     // Construct the path to the python script
                     string slf_tahmini_path = Path.Combine(ana_menu_form_objesi.userRootPath,
                         (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
@@ -8321,8 +8347,8 @@ namespace SLF
                     {
                         StartInfo = new ProcessStartInfo
                         {
-                            FileName = "python",
-                            Arguments = $"\"{slf_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
+                            FileName = "cmd.exe",
+                            Arguments = $"/C python \"{slf_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\" \"{point_load_konsolidasyonu}\"",
                             RedirectStandardOutput = false,
                             RedirectStandardError = false,
                             UseShellExecute = false,
@@ -8350,12 +8376,13 @@ namespace SLF
                             return;
                         }
 
+
                         string filepath = Path.Combine(ana_menu_form_objesi.userRootPath,
-                            (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                            (string)ana_menu_form_objesi.config.İl,
-                            (string)ana_menu_form_objesi.config.İlçe,
-                            (string)ana_menu_form_objesi.config.proje_ismi,
-                            (string)ana_menu_form_objesi.config.Yük_Yoğunluğu.sonuclar_kml).Replace('/', '\\');
+                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                        (string)ana_menu_form_objesi.config.İl,
+                        (string)ana_menu_form_objesi.config.İlçe,
+                        (string)ana_menu_form_objesi.config.proje_ismi,
+                        (string)ana_menu_form_objesi.config.Yük_Yoğunluğu.sonuclar_kml).Replace('/', '\\');
 
                         string imported_filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
 

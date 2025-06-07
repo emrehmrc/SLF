@@ -18,25 +18,6 @@ namespace SLF
 
             // Load event'ini manuel olarak bağla
             this.Load += DatabaseListForm_Load;
-
-            // Constructor'da direkt çağır (kesin çalışır)
-            try
-            {
-                // Form tamamen yüklendikten sonra çağırmak için Timer kullan
-                var timer = new Timer();
-                timer.Interval = 100; // 100ms bekle
-                timer.Tick += (s, e) =>
-                {
-                    timer.Stop();
-                    timer.Dispose();
-                    CheckDataValidation();
-                };
-                timer.Start();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Başlangıç kontrolü sırasında hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
         }
 
         private void DatabaseListForm_Load(object sender, EventArgs e)
@@ -98,6 +79,7 @@ namespace SLF
         {
             try
             {
+
                 // Config yolunu al
                 string configPath = PathService._configKonum;
 
@@ -138,6 +120,8 @@ namespace SLF
                     Dock = DockStyle.Fill,
                     TextAlign = ContentAlignment.MiddleCenter
                 };
+              
+
                 progressForm.Controls.Add(progressLabel);
 
                 // Async olarak Python script'ini çalıştır
@@ -145,6 +129,13 @@ namespace SLF
                 {
                     try
                     {
+                        buttonAboneVerisiOlustur.ForeColor = Color.Silver;
+                        
+                        System.Threading.Thread.Sleep(500);
+
+                        buttonAboneVerisiOlustur.ForeColor = Color.White;
+
+
                         // Python script'ini akıllı modda çalıştır
                         PythonHelper.RunPythonScriptForAboneVerisi(configPath);
 
@@ -159,8 +150,6 @@ namespace SLF
                                 MessageBoxIcon.Information
                             );
 
-                            // Abone verisi oluşturulduktan sonra tekrar kontrol et
-                            CheckDataValidation();
                         }));
                     }
                     catch (Exception ex)
@@ -180,7 +169,7 @@ namespace SLF
                 });
 
                 // İlerleme formunu göster
-                progressForm.ShowDialog(this);
+                progressForm.Close();
             }
             catch (Exception ex)
             {

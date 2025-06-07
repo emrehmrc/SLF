@@ -139,7 +139,7 @@ namespace SLF
                 MessageBox.Show(message, "İşlem Başlıyor", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 // Python betiğini çalıştır
-                string output = PythonHelper.RunImarPlanModel(kmlFilePath, csvFilePath);
+                PythonHelper.RunImarPlanModel(kmlFilePath, csvFilePath);
 
                 // Çıktı klasörünü kontrol et
                 string outputDir = PathService.GetImarAnaliziPathForType("imar_planlari");

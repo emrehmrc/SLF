@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json.Linq;
-using SLF.services;
 
 namespace SLF.Services
 {
@@ -11,8 +10,10 @@ namespace SLF.Services
         /// <summary>
         /// Veritabanındaki tablo verilerini kontrol eder, config ile karşılaştırır ve CSV durumunu kontrol eder
         /// </summary>
+        
         public static DataValidationResult ValidateAboneData(string configPath)
         {
+            
             try
             {
                 // Config'den tablo isimlerini al
@@ -176,6 +177,8 @@ namespace SLF.Services
             bool isDataUpToDate = false;
             string message = "";
             bool canProceed = false;
+            
+            
 
             if (!databaseAccessible)
             {

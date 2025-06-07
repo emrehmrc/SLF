@@ -270,7 +270,6 @@ namespace SLF
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
             this.HeaderPanel = new System.Windows.Forms.Panel();
-            this.buton_tablo_olustur = new System.Windows.Forms.Button();
             this.buton_database_giris = new System.Windows.Forms.Button();
             this.HomePageButton = new System.Windows.Forms.Button();
             this.buton_proje_sec = new System.Windows.Forms.Button();
@@ -279,6 +278,7 @@ namespace SLF
             this.miniToolStrip = new System.Windows.Forms.ToolStrip();
             this.buton_ea_harita_katmanlar = new System.Windows.Forms.Button();
             this.ELFMinSenaryoGraphPicBox = new System.Windows.Forms.PictureBox();
+            this.buton_tablo_olustur = new System.Windows.Forms.Button();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
             this.panel_proje_ekle.SuspendLayout();
@@ -2198,7 +2198,7 @@ namespace SLF
             // buton_ELF_tablo_sec
             // 
             this.buton_ELF_tablo_sec.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.buton_ELF_tablo_sec.Location = new System.Drawing.Point(52, 488);
+            this.buton_ELF_tablo_sec.Location = new System.Drawing.Point(52, 710);
             this.buton_ELF_tablo_sec.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buton_ELF_tablo_sec.Name = "buton_ELF_tablo_sec";
             this.buton_ELF_tablo_sec.Size = new System.Drawing.Size(125, 33);
@@ -3541,17 +3541,6 @@ namespace SLF
             this.HeaderPanel.Size = new System.Drawing.Size(1323, 38);
             this.HeaderPanel.TabIndex = 6;
             // 
-            // buton_tablo_olustur
-            // 
-            this.buton_tablo_olustur.Location = new System.Drawing.Point(177, 4);
-            this.buton_tablo_olustur.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.buton_tablo_olustur.Name = "buton_tablo_olustur";
-            this.buton_tablo_olustur.Size = new System.Drawing.Size(153, 28);
-            this.buton_tablo_olustur.TabIndex = 7;
-            this.buton_tablo_olustur.Text = "Tablo Oluştur";
-            this.buton_tablo_olustur.UseVisualStyleBackColor = true;
-            this.buton_tablo_olustur.Click += new System.EventHandler(this.buton_tablo_olustur_Click);
-            // 
             // buton_database_giris
             // 
             this.buton_database_giris.Location = new System.Drawing.Point(3, 4);
@@ -3640,6 +3629,17 @@ namespace SLF
             this.ELFMinSenaryoGraphPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.ELFMinSenaryoGraphPicBox.TabIndex = 22;
             this.ELFMinSenaryoGraphPicBox.TabStop = false;
+            // 
+            // buton_tablo_olustur
+            // 
+            this.buton_tablo_olustur.Location = new System.Drawing.Point(177, 4);
+            this.buton_tablo_olustur.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.buton_tablo_olustur.Name = "buton_tablo_olustur";
+            this.buton_tablo_olustur.Size = new System.Drawing.Size(153, 28);
+            this.buton_tablo_olustur.TabIndex = 7;
+            this.buton_tablo_olustur.Text = "Tablo Oluştur";
+            this.buton_tablo_olustur.UseVisualStyleBackColor = true;
+            this.buton_tablo_olustur.Click += new System.EventHandler(this.buton_tablo_olustur_Click);
             // 
             // ModülFormu
             // 
@@ -3902,7 +3902,6 @@ namespace SLF
 
         private ToolStripMenuItem YGA_Çiz;
         private Button buton_database_giris;
-        private Button buton_tablo_olustur;
         private ToolStripMenuItem YGA_Ekle;
         private ToolStripMenuItem Point_Load_Ekle;
         private Button buton_DL_calıstır;
@@ -3983,5 +3982,6 @@ namespace SLF
         private CheckBox checkBox_yuk_17;
         private CheckBox checkBox_yuk_18;
         private CheckBox checkBox_yuk_16;
+        private Button buton_tablo_olustur;
     }
 }

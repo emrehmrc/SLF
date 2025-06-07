@@ -156,7 +156,10 @@ namespace SLF
 
                 SaveCredentials();
 
-                MessageBox.Show("Bağlantı başarılı!", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Bağlantı başarılı!\n\n Lütfen bu pencereyi kapattıktan sonra bekleyiniz," +
+                    " veritabanında ilgili SAP Abone tüketimleri tablosu (DWH_MRC_SLFPROJE_TUKETIM) ve " +
+                    "Abone bilgi tablosunun olup olmadığı (DWH_MRC_SLFPROJE_ABN_BLG) kontrol edilecek.", 
+                    "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 // Giriş başarılı, formu kapat ve ana uygulamayı devam ettir
                 this.DialogResult = DialogResult.OK;

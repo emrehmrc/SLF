@@ -65,8 +65,6 @@ namespace SLF
             homePageForm.config.İl = IlComboBox.SelectedItem.ToString();
             homePageForm.config.İlçe = IlceComboBox.SelectedItem.ToString();
 
-            SaveConfigToFile();
-
             if (MethodComboBox.SelectedItem == null)
             {
                 MessageBox.Show("İlerlemek için bir metot seçiniz");
@@ -91,7 +89,7 @@ namespace SLF
 
             // Var olan oturum veya proje verilerini temizle
             CleanupExistingSessionData();
-
+            
             // Sadece burada, kullanıcı onayladığında PathService'i güncelle ve klasör oluştur
             bool pathUpdated = PathService.UpdatePath(selectedCity, selectedDistrict);
 
@@ -101,6 +99,9 @@ namespace SLF
                     "Yol Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
+            homePageForm.config.proje_ismi = PathService.CurrentWorkingFolder;
+            SaveConfigToFile();
 
             // Seçilen metoda göre modül formunu aç
             OpenModülFormuBasedOnSelection(selectedMethod);

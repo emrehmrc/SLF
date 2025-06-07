@@ -114,7 +114,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(567, 222);
+            this.ClientSize = new System.Drawing.Size(567, 223);
             this.Controls.Add(this.checkBoxRememberMe);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.button1);
@@ -124,7 +124,12 @@
             this.Controls.Add(this.txtKullaniciAdi);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(585, 270);
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(585, 270);
             this.Name = "LoginForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Veritabanı Bağlantısı";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
