@@ -206,7 +206,6 @@ namespace SLF.services
                 else
                 {
                     // Veriler güncel değil veya CSV'ler yok - Veritabanından çek
-                    // Veriler güncel değil veya CSV'ler yok - Veritabanından çek
                     Console.WriteLine("Veriler güncel değil veya CSV dosyaları yok. Veritabanından yeni veri çekiliyor...");
                     ProcessAboneDataFromDatabase(configPath);
                 }
@@ -574,6 +573,7 @@ namespace SLF.services
                 args.Append($" --output-dir \"{imarAnaliziPath}\"");  // Ana çıktı klasörü
                 args.Append($" --output-prefix \"{outputPrefix}\"");
                 args.Append($" --Year \"{year}\"");
+
                 // Hücre verisi dosyasını ekle
                 if (!string.IsNullOrEmpty(hucreFilePath))
                 {

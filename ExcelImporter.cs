@@ -255,14 +255,6 @@ namespace SLF
             // Sütun sayılarını konsola yazdır (debug için)
             System.Diagnostics.Debug.WriteLine($"Beklenen sütun sayısı: {expectedCount}, Excel'deki mevcut: {colCount}");
 
-            /* Geçici olarak sütun sayıları kontrolünü devre dışı bırakabilirsiniz
-            if (colCount != expectedCount)
-            {
-                throw new InvalidColumnHeadersException(
-                    $"Sütun sayıları uyuşmuyor.\nBeklenen: {expectedCount}\nMevcut: {colCount}"
-                );
-            }
-            */
 
             // Sadece mevcut sütunların kontrolü
             bool headerMismatch = false;

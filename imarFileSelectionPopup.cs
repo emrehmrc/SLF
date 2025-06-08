@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
+using System.Threading.Tasks;
 
 
 namespace SLF
@@ -32,11 +33,6 @@ namespace SLF
         }
 
 
-        private void imarFileSelectionPanel_Paint(object sender, PaintEventArgs e)
-        {
-            this.DoubleBuffered = true;
-        }
-
         private void SelectCsvButton_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
@@ -45,6 +41,11 @@ namespace SLF
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     CsvFilePath = openFileDialog.FileName;
+                    string filename = CsvFilePath.Substring(CsvFilePath.LastIndexOf("\\") + 1);
+
+
+                    label_overpass_path.Text = filename;
+                    label_overpass_path.Visible = true;
                  
                 }
             }
@@ -58,7 +59,10 @@ namespace SLF
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     KmlFilePath = openFileDialog.FileName;
-                    //kmlFilePathLabel.Text = Path.GetFileName(KmlFilePath);
+                    string filename = KmlFilePath.Substring(KmlFilePath.LastIndexOf("\\") + 1);
+
+                    label_imar_path.Text = filename;
+                    label_imar_path.Visible= true;
                 }
             }
         }
@@ -454,101 +458,7 @@ namespace SLF
 
         private void katman_tablosu_Click(object sender, EventArgs e)
         {
-            try
-            {
-                // Config'den katman_eslesme.csv yolunu al
-                string layerMappingPath = PathService.KatmanEslestirmePath;
-                Debug.WriteLine($"Config'den alınan yol: {layerMappingPath}");
 
-                // Tüm slash karakterlerini normalize et (önce hepsini \ yap)
-                layerMappingPath = layerMappingPath.Replace('/', '\\');
-
-                // Windows tam yoluna dönüştür
-                layerMappingPath = Path.GetFullPath(layerMappingPath);
-                Debug.WriteLine($"Normalize edilmiş yol: {layerMappingPath}");
-
-                // Dosya yolu doğru mu kontrol et
-                if (string.IsNullOrEmpty(layerMappingPath))
-                {
-                    MessageBox.Show("Katman eşleştirme dosyası yolu bulunamadı.",
-                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                // Dosyanın var olup olmadığını kontrol et
-                if (!File.Exists(layerMappingPath))
-                {
-                    // Dosya yoksa hata ver ve geri dön
-                    MessageBox.Show($"Katman eşleştirme dosyası bulunamadı: {layerMappingPath}",
-                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                // Dosyayı DataTable'a yükle
-                DataTable dt = LoadCsvToDataTable(layerMappingPath);
-
-                // DataTable kontrol et
-                if (dt == null || dt.Columns.Count == 0)
-                {
-                    MessageBox.Show("Katman eşleştirme verileri okunamadı.",
-                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                // Katman listesi formunu oluştur
-                Form layerMappingForm = new Form();
-                layerMappingForm.Text = "Katman Listesi";
-                layerMappingForm.Size = new System.Drawing.Size(800, 500);
-                layerMappingForm.StartPosition = FormStartPosition.CenterParent;
-
-                // DataGridView oluştur
-                DataGridView dataGridView = new DataGridView();
-                dataGridView.Dock = DockStyle.Fill;
-                dataGridView.AllowUserToAddRows = true;
-                dataGridView.AllowUserToDeleteRows = true;
-                dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-                dataGridView.DataSource = dt;
-
-                // Kaydet butonu
-                Button saveButton = new Button();
-                saveButton.Text = "Kaydet";
-                saveButton.Size = new System.Drawing.Size(100, 30);
-                saveButton.Dock = DockStyle.Bottom;
-                saveButton.Click += (s, args) =>
-                {
-                    try
-                    {
-                        SaveDataTableToCsv((DataTable)dataGridView.DataSource, layerMappingPath);
-                        MessageBox.Show("Katman listesi başarıyla kaydedildi.",
-                            "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        layerMappingForm.Close();
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Kaydetme hatası: {ex.Message}",
-                            "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                };
-
-                // Panel ekle
-                Panel buttonPanel = new Panel();
-                buttonPanel.Height = 40;
-                buttonPanel.Dock = DockStyle.Bottom;
-                buttonPanel.Controls.Add(saveButton);
-
-                // Kontrolleri forma ekle
-                layerMappingForm.Controls.Add(dataGridView);
-                layerMappingForm.Controls.Add(buttonPanel);
-
-                // Formu göster
-                layerMappingForm.ShowDialog(this);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Katman listesi hatası: {ex.Message}, {ex.StackTrace}");
-                MessageBox.Show($"Katman listesi açılırken hata: {ex.Message}",
-                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
         }
 
         private DataTable LoadCsvToDataTable(string csvPath)
@@ -691,6 +601,112 @@ namespace SLF
                     KmlFilePath = openFileDialog.FileName;
                     //kmlFilePathLabel.Text = Path.GetFileName(KmlFilePath);
                 }
+            }
+        }
+
+        private async void label_imar_katman_listeleri_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Change text color to WhiteSmoke
+                label_imar_katman_listeleri.ForeColor = Color.LimeGreen;
+                label_imar_katman_listeleri.Refresh(); // Force UI update
+                await Task.Delay(1000); // Non-blocking delay for 1 second
+                label_imar_katman_listeleri.ForeColor = Color.Green;
+                label_imar_katman_listeleri.Refresh(); // Force UI update
+
+                // Config'den katman_eslesme.csv yolunu al
+                string layerMappingPath = PathService.KatmanEslestirmePath;
+                Debug.WriteLine($"Config'den alınan yol: {layerMappingPath}");
+
+                // Tüm slash karakterlerini normalize et (önce hepsini \ yap)
+                layerMappingPath = layerMappingPath.Replace('/', '\\');
+
+                // Windows tam yoluna dönüştür
+                layerMappingPath = Path.GetFullPath(layerMappingPath);
+                Debug.WriteLine($"Normalize edilmiş yol: {layerMappingPath}");
+
+                // Dosya yolu doğru mu kontrol et
+                if (string.IsNullOrEmpty(layerMappingPath))
+                {
+                    MessageBox.Show("Katman eşleştirme dosyası yolu bulunamadı.",
+                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Dosyanın var olup olmadığını kontrol et
+                if (!File.Exists(layerMappingPath))
+                {
+                    // Dosya yoksa hata ver ve geri dön
+                    MessageBox.Show($"Katman eşleştirme dosyası bulunamadı: {layerMappingPath}",
+                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Dosyayı DataTable'a yükle
+                DataTable dt = LoadCsvToDataTable(layerMappingPath);
+
+                // DataTable kontrol et
+                if (dt == null || dt.Columns.Count == 0)
+                {
+                    MessageBox.Show("Katman eşleştirme verileri okunamadı.",
+                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Katman listesi formunu oluştur
+                Form layerMappingForm = new Form();
+                layerMappingForm.Text = "Katman Listesi";
+                layerMappingForm.Size = new System.Drawing.Size(800, 500);
+                layerMappingForm.StartPosition = FormStartPosition.CenterParent;
+
+                // DataGridView oluştur
+                DataGridView dataGridView = new DataGridView();
+                dataGridView.Dock = DockStyle.Fill;
+                dataGridView.AllowUserToAddRows = true;
+                dataGridView.AllowUserToDeleteRows = true;
+                dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                dataGridView.DataSource = dt;
+
+                // Kaydet butonu
+                Button saveButton = new Button();
+                saveButton.Text = "Kaydet";
+                saveButton.Size = new System.Drawing.Size(100, 30);
+                saveButton.Dock = DockStyle.Bottom;
+                saveButton.Click += (s, args) =>
+                {
+                    try
+                    {
+                        SaveDataTableToCsv((DataTable)dataGridView.DataSource, layerMappingPath);
+                        MessageBox.Show("Katman listesi başarıyla kaydedildi.",
+                            "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        layerMappingForm.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Kaydetme hatası: {ex.Message}",
+                            "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                };
+
+                // Panel ekle
+                Panel buttonPanel = new Panel();
+                buttonPanel.Height = 40;
+                buttonPanel.Dock = DockStyle.Bottom;
+                buttonPanel.Controls.Add(saveButton);
+
+                // Kontrolleri forma ekle
+                layerMappingForm.Controls.Add(dataGridView);
+                layerMappingForm.Controls.Add(buttonPanel);
+
+                // Formu göster
+                layerMappingForm.ShowDialog(this);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Katman listesi hatası: {ex.Message}, {ex.StackTrace}");
+                MessageBox.Show($"Katman listesi açılırken hata: {ex.Message}",
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
