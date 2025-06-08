@@ -46,6 +46,7 @@ namespace SLF
             this.KmlTestButton = new System.Windows.Forms.Button();
             this.label_imar_path = new System.Windows.Forms.Label();
             this.label_overpass_path = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             this.imarCitySelectionPanel.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -94,7 +95,7 @@ namespace SLF
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
             this.label1.ForeColor = System.Drawing.Color.MidnightBlue;
-            this.label1.Location = new System.Drawing.Point(22, 53);
+            this.label1.Location = new System.Drawing.Point(22, 85);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.MaximumSize = new System.Drawing.Size(150, 100);
             this.label1.Name = "label1";
@@ -106,7 +107,7 @@ namespace SLF
             // 
             this.SelectCsvButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("SelectCsvButton.BackgroundImage")));
             this.SelectCsvButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.SelectCsvButton.Location = new System.Drawing.Point(180, 58);
+            this.SelectCsvButton.Location = new System.Drawing.Point(180, 94);
             this.SelectCsvButton.Margin = new System.Windows.Forms.Padding(4);
             this.SelectCsvButton.Name = "SelectCsvButton";
             this.SelectCsvButton.Size = new System.Drawing.Size(44, 47);
@@ -132,6 +133,7 @@ namespace SLF
             // imarCitySelectionPanel
             // 
             this.imarCitySelectionPanel.BackColor = System.Drawing.Color.White;
+            this.imarCitySelectionPanel.Controls.Add(this.label4);
             this.imarCitySelectionPanel.Controls.Add(this.label_overpass_path);
             this.imarCitySelectionPanel.Controls.Add(this.label_imar_path);
             this.imarCitySelectionPanel.Controls.Add(this.OkButton);
@@ -164,12 +166,12 @@ namespace SLF
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Bahnschrift SemiBold", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.label5.ForeColor = System.Drawing.Color.MidnightBlue;
-            this.label5.Location = new System.Drawing.Point(125, 15);
+            this.label5.Location = new System.Drawing.Point(122, 11);
             this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(276, 28);
+            this.label5.Size = new System.Drawing.Size(316, 28);
             this.label5.TabIndex = 6;
-            this.label5.Text = "İmar Verileri Test Bölümü";
+            this.label5.Text = "İmar Katmanları Test Bölümü";
             // 
             // label_imar_katman_listeleri
             // 
@@ -239,13 +241,25 @@ namespace SLF
             // 
             this.label_overpass_path.AutoSize = true;
             this.label_overpass_path.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label_overpass_path.Location = new System.Drawing.Point(231, 68);
+            this.label_overpass_path.Location = new System.Drawing.Point(231, 106);
             this.label_overpass_path.MaximumSize = new System.Drawing.Size(200, 100);
             this.label_overpass_path.Name = "label_overpass_path";
             this.label_overpass_path.Size = new System.Drawing.Size(50, 20);
             this.label_overpass_path.TabIndex = 7;
             this.label_overpass_path.Text = "label4";
             this.label_overpass_path.Visible = false;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Bahnschrift SemiBold", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.label4.ForeColor = System.Drawing.Color.MidnightBlue;
+            this.label4.Location = new System.Drawing.Point(143, 15);
+            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(246, 28);
+            this.label4.TabIndex = 8;
+            this.label4.Text = "İmar Verileri Analizleri";
             // 
             // imarFileSelectionPopup
             // 
@@ -292,5 +306,6 @@ namespace SLF
         private System.Windows.Forms.Button KmlTestButton;
         private System.Windows.Forms.Label label_overpass_path;
         private System.Windows.Forms.Label label_imar_path;
+        private System.Windows.Forms.Label label4;
     }
 }

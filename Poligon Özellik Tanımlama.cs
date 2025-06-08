@@ -8,6 +8,7 @@ using ExcelDataReader;
 using GMap.NET;
 using System.Globalization;
 using OfficeOpenXml;
+using DocumentFormat.OpenXml.Vml;
 
 namespace SLF
 {
@@ -50,7 +51,7 @@ namespace SLF
             isSelecting_YGA = isSelectingYGA;
             isSelecting_KentselDonusum = isSelectingKentselDonusum;
 
-            excelFilePath = Path.Combine(modül_formu.ana_menu_form_objesi.userRootPath,
+            excelFilePath = System.IO.Path.Combine(modül_formu.ana_menu_form_objesi.userRootPath,
                 (string)modül_formu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                 (string)modül_formu.ana_menu_form_objesi.config.İl,
                 (string)modül_formu.ana_menu_form_objesi.config.İlçe,
@@ -561,6 +562,37 @@ namespace SLF
                         }
                     }
 
+
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        // Validate Başlangıç Yılı
+                        string startYearStr = row["ENERJILENDIRME_YILI"]?.ToString();
+
+                        if (string.IsNullOrWhiteSpace(startYearStr))
+                        {
+                            MessageBox.Show("Hata: 'ENERJILENDIRME_YILI' sütunu boş olamaz.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+                        if (!int.TryParse(startYearStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int startYear) || startYear < 2025 || startYear > 2075)
+                        {
+                            MessageBox.Show($"Hata: 'ENERJILENDIRME_YILI' 2025 ile 2075 arasında olmalıdır. Girilen: {startYearStr}", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+
+                        string kuruluGucStr = row["Kurulu Güç (kW)"]?.ToString();
+
+
+                        if (!int.TryParse(kuruluGucStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int kuruluGuc) || kuruluGuc > 10000)
+                        {
+                            MessageBox.Show($"Hata: 'Kurulu Güç (kW)' değeri en fazla 10,000 kW olabilir. Girilen: {kuruluGucStr}", 
+                                "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+
+
+                    }
+
+
                     // Iterate over each row in the DataTable
                     for (int rowIndex = 0; rowIndex < dataTable.Rows.Count; rowIndex++)
                     {
@@ -634,7 +666,7 @@ namespace SLF
                         }
 
                         // Construct the path to the Excel file
-                        string hor_ver_path = Path.Combine(modül_formu.ana_menu_form_objesi.userRootPath,
+                        string hor_ver_path = System.IO.Path.Combine(modül_formu.ana_menu_form_objesi.userRootPath,
                             (string)modül_formu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                             (string)modül_formu.ana_menu_form_objesi.config.İl,
                             (string)modül_formu.ana_menu_form_objesi.config.İlçe,
@@ -898,7 +930,7 @@ namespace SLF
                 comboBox.TextChanged += ComboBox_TextChanged;
             }
 
-            if (e.Control is TextBox textBox)
+            if (e.Control is System.Windows.Forms.TextBox textBox)
             {
                 string columnName = PoligonDataGridView.Columns[PoligonDataGridView.CurrentCell.ColumnIndex].Name;
                 Console.WriteLine($"EditingControlShowing: ColumnName={columnName}, isSelecting_YGA={isSelecting_YGA}");
@@ -1002,7 +1034,7 @@ namespace SLF
             if (columnName == "TAKS" && isSelecting_YGA && (e.KeyChar == '.' || e.KeyChar.ToString() == decimalSeparator))
             {
                 // Check if a decimal separator already exists in the TextBox
-                TextBox textBox = sender as TextBox;
+                System.Windows.Forms.TextBox textBox = sender as System.Windows.Forms.TextBox;
                 if (textBox != null && !textBox.Text.Contains(decimalSeparator) && !textBox.Text.Contains("."))
                 {
                     Console.WriteLine("KeyPress: Decimal separator allowed.");

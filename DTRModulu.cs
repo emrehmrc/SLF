@@ -382,7 +382,6 @@ namespace SLF
             { "TRAFO_KODU", ERROR_ONLY},
             { "TRAFO_X_KOORDINAT", ERROR_ONLY},
             { "TRAFO_Y_KOORDINAT", ERROR_ONLY},
-            { "TM_FIDER_ID", WarningErrorBoundary(0.1f)},
             { "TRAFO_KURULUM_TARIHI", WarningErrorBoundary(0.2f) },
             { "TRAFO_KAPASITESI", ERROR_ONLY }, // WarningErrorBoundary(0.2f) },
             { "TRAFO_MULKIYET", WarningErrorBoundary(0.2f) },
@@ -456,21 +455,6 @@ namespace SLF
                         else
                         {
                             message = $"Hata: {nullPercentage:P1} oranında {column.ColumnName} değerleri eksik (Satır: {string.Join(", ", nullRows)}). Tarihler 'dd.MM.yyyy' biçiminde olmalıdır. Ortalama tarihle veri doldurma uygulanacak; bu oran analizleri etkileyebilir, lütfen kontrol edin.";
-                        }
-                    }
-                    else if (column.ColumnName == "TM_FIDER_ID")
-                    {
-                        if (nullPercentage <= thresholds.warningThreshold)
-                        {
-                            message = $"Uyarı: {nullPercentage:P1} oranında TM_FIDER_ID değerleri eksik. Bu değerler, koordinat bazlı yakınlık ile otomatik veri doldurma ile doldurulacaktır.";
-                        }
-                        else if (nullPercentage <= thresholds.errorThreshold)
-                        {
-                            message = $"Dikkat: {nullPercentage:P1} oranında TM_FIDER_ID değerleri eksik. Lütfen koordinat bazlı otomatik veri doldurma onaylayın veya verileri kontrol edin.";
-                        }
-                        else
-                        {
-                            message = $"Hata: {nullPercentage:P1} oranında TM_FIDER_ID değerleri eksik. Bu, analizleri etkileyebilir. Verilerin kontrol edilmesi önerilir.";
                         }
                     }
                     else
@@ -782,7 +766,6 @@ namespace SLF
 
         public override void Impute()
         {
-            ImputeTMFiderID();
             ImputeAverageDate();
             ImputeTrafoMulkiyet();
             //ImputeTrafoKapasitesi();
@@ -1048,72 +1031,6 @@ namespace SLF
                         "Geçersiz İndeks",
                         "0%",
                         $"İndeks {missingIndex} geçerli aralıkta değil; {tuketimColumn} için veri doldurma uygulanamadı."
-                    });
-                }
-            }
-        }
-
-
-
-        private void ImputeTMFiderID()
-        {
-            // 0.01 is the 2d distance of the delta of x and y coordinates, approximately 1 km (assuming degree-based coordinates).
-            const double maxDistance = 0.01;
-
-            foreach (int missingIndex in columnNullRowsMap["TM_FIDER_ID"])
-            {
-                var missingRow = currentDataTable.Rows[missingIndex];
-
-                // Validate and convert coordinates for the missing row
-                if (!double.TryParse(missingRow["TRAFO_X_KOORDINAT"]?.ToString(), out double missingX) ||
-                    !double.TryParse(missingRow["TRAFO_Y_KOORDINAT"]?.ToString(), out double missingY))
-                {
-                    missingRow["TM_FIDER_ID"] = "Geçersiz koordinatlar"; // Placeholder value for failed imputation
-                                                                         // Log the failure to errorDataTable for user visibility
-                    errorDataTable.Rows.Add(new object[]
-                    {
-                "TM_FIDER_ID", "Veri doldurma başarısız", "Geçersiz koordinat",
-                $"Satır {missingIndex}: TM_FIDER_ID veri doldurması başarısız: Geçersiz koordinatlar (TRAFO_X_KOORDINAT veya TRAFO_Y_KOORDINAT). Lütfen koordinat verilerini kontrol edin ve düzeltin."
-                    });
-                    continue;
-                }
-
-                double closestDistance = double.MaxValue;
-                DataRow closestRow = null;
-
-                foreach (DataRow row in currentDataTable.Rows)
-                {
-                    if (row == missingRow || IsNullLike(row["TM_FIDER_ID"], true))
-                        continue;
-
-                    // Validate and convert coordinates for the candidate row
-                    if (!double.TryParse(row["TRAFO_X_KOORDINAT"]?.ToString(), out double x) ||
-                        !double.TryParse(row["TRAFO_Y_KOORDINAT"]?.ToString(), out double y))
-                        continue;
-
-                    double distance = Math.Sqrt(Math.Pow(missingX - x, 2) + Math.Pow(missingY - y, 2));
-                    if (distance < closestDistance && distance < maxDistance)
-                    {
-                        closestDistance = distance;
-                        closestRow = row;
-                    }
-                }
-
-                if (closestRow != null)
-                {
-                    missingRow["TM_FIDER_ID"] = closestRow["TM_FIDER_ID"];
-                    // Only impute FIDER_ADI if it exists and is not NULL
-                    if (!IsNullLike(closestRow["FIDER_ADI"], true))
-                        missingRow["FIDER_ADI"] = closestRow["FIDER_ADI"];
-                }
-                else
-                {
-                    missingRow["TM_FIDER_ID"] = "Uygun fider yok"; // Placeholder value for failed imputation
-                                                                   // Log the failure to errorDataTable for user visibility
-                    errorDataTable.Rows.Add(new object[]
-                    {
-                "TM_FIDER_ID", "Veri doldurma başarısız", "Uygun fider bulunamadı",
-                $"Satır {missingIndex}: TM_FIDER_ID veri doldurması başarısız: 1 km içinde uygun bir fider bulunamadı. Lütfen koordinatları doğrulayın veya TM_FIDER_ID değerini manuel olarak atayın."
                     });
                 }
             }

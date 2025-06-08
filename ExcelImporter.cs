@@ -59,10 +59,7 @@ namespace SLF
                 new List<string> {
                     "TRAFO_KODU",
                     "TRAFO_MULKIYET",
-                    "FIDER_ADI",
                     "TRAFO_KAPASITESI",
-                    "TM_ID",
-                    "TM_FIDER_ID",
                     "TRAFO_X_KOORDINAT",
                     "TRAFO_Y_KOORDINAT",
                     "TRAFO_KURULUM_TARIHI",
@@ -130,32 +127,6 @@ namespace SLF
                     "GDP_INSAAT_URETIM_%",
                     "CDD",
                     "HDD"
-                }
-            },
-            {
-                "Fider Verileri",
-                new List<string> {
-                    "FIDER_TM_ADI",
-                    "FIDER_ADI",
-                    "FIDER_ID",
-                    "FIDER_TARIH",
-                    "FIDER_SAAT",
-                    "FIDER_DEMANT",
-                }
-            },
-            {
-                "Enerji Müsaadeleri Verileri",
-                new List<string> {
-                    "ENERJI_MUSAADE_NO",
-                    "ENERJI_MUSAADE_ABONE_GRUBU",
-                    "Tipi",
-                    "ENERJI_MUSAADE_GERILIM_SEVIYESI",
-                    "ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL",
-                    "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID",
-                    "ENERJI_MUSAADE_BAGLANTI_GUCU",
-                    "ENERJI_MUSAADE_ENERJILENDIRME_YILI",
-                    "ENERJI_MUSAADE_X_KOORDINAT",
-                    "ENERJI_MUSAADE_Y_KOORDINAT",
                 }
             },
             {

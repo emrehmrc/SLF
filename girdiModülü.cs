@@ -9,7 +9,6 @@ using System.IO;
 using SLF.Services;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using DocumentFormat.OpenXml.Presentation;
 
 namespace SLF
 {
@@ -38,12 +37,9 @@ namespace SLF
         protected readonly List<string> veri_listesi_requires_xlsx = new List<string> {
             "Ekonometrik Yük Tahmini Verileri",
             "EA Şarj Verileri",
-            "Fider Verileri",
-            "TM Verileri",
             "DTR Verileri",
             "DEK Verileri",
             "Abone Verileri",
-            "Enerji Müsaadeleri Verileri",
             "Yeni Projelendirilmiş DTR Verileri"
         };
 
@@ -58,7 +54,6 @@ namespace SLF
             { "EA_Sarj_verileri", "EA Şarj Verileri" },
             { "dek_verileri", "DEK Verileri" },
             { "projelendirilmis_trafolar", "Yeni Projelendirilmiş DTR Verileri" },
-            { "enerji_musaade_verileri", "Enerji Müsaadeleri Verileri" },
             { "dtr_verileri", "DTR Verileri" },
             {"abone_final_tablosu","Abone Verileri" }
         };
@@ -974,7 +969,7 @@ namespace SLF
                 if (columnName.Contains("id") || columnName.Contains("adi") || columnName.Contains("kod") ||
                     columnName.Contains("mulkiyet") || columnName.Contains("mahalle") || columnName.Contains("ilce"))
                 {
-                    continue; // Treat as string (e.g., TRAFO_ID, FIDER_ADI, TRAFO_ADI)
+                    continue; // Treat as string (e.g., TRAFO_ID, TRAFO_ADI)
                 }
 
                 int validDateCount = 0;
