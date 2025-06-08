@@ -14,23 +14,18 @@ namespace SLF
         private readonly (float warningThreshold, float errorThreshold) TUKETIM_ERROR_THRESHOLD = WarningErrorBoundary(0.1f);
         private readonly (float warningThreshold, float errorThreshold) COORDINATE_ERROR_THRESHOLD = ERROR_ONLY;
         private readonly string DATE_FORMAT = "dd.MM.yyyy";
-        private static readonly List<int> TRAFO_KAPASITE_LISTESI = new List<int>
-        {
-            15, 25, 40, 50, 63, 100, 160, 200, 250, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500
-        };
+
         private static readonly List<float> PRIMER_GERILIM_LISTESI = new List<float>
         {
             6.3f, 10.5f, 15.8f, 31.5f, 33.0f, 34.5f // Values in kV
         };
-        private static readonly List<float> SEKONDER_GERILIM_LISTESI = new List<float>
-        {
-            0.4f // Value in kV
-        };
+
 
         private readonly Dictionary<string, (float warningThreshold, float errorThreshold)> dateFormatCheckWithLevel = new Dictionary<string, (float warningThreshold, float errorThreshold)>
         {
             { "TRAFO_KURULUM_TARIHI", WarningErrorBoundary(0.2f) },
         };
+
         private void ReportDateFormatErrors()
         {
             float invalidPercentage = 0.0f;
@@ -112,6 +107,7 @@ namespace SLF
                 }
             }
         }
+
         private void ReportTrafoLoad()
         {
             double loadThreshold = 1.0;
@@ -234,9 +230,9 @@ namespace SLF
             }
         }
         private readonly List<string> duplicateFieldsGivingError = new List<string>
-{
-    "TRAFO_KODU"
-};
+        {
+            "TRAFO_KODU"
+        };
 
         private void ReportCompositeDuplicateCounts()
         {
@@ -390,10 +386,7 @@ namespace SLF
             { "TRAFO_KURULUM_TARIHI", WarningErrorBoundary(0.2f) },
             { "TRAFO_KAPASITESI", ERROR_ONLY }, // WarningErrorBoundary(0.2f) },
             { "TRAFO_MULKIYET", WarningErrorBoundary(0.2f) },
-            //{ "YIL_TUKETIM_2023", WarningErrorBoundary(0.2f) },
-            //{ "YIL_DEMANT_2023", WarningErrorBoundary(0.2f) },
             { "PRIMER_GERILIM", WARNING_ONLY },
-            //{ "SEKONDER_GERILIM", WARNING_ONLY },
         };
 
         private void ReportNullCounts()
@@ -572,6 +565,7 @@ namespace SLF
                 });
             }
         }
+
         private void ReportSekonderGerilim()
         {
             int totalRows = currentDataTable.Rows.Count;
@@ -639,10 +633,7 @@ namespace SLF
                 });
             }
         }
-        /// <summary>
-        /// Trafo demand değerlerini kontrol eder ve kapasite limitlerini aşan değerleri kapasite değerine eşitler.
-        /// </summary>
-        /// 
+
         private void CheckDemandLimits()
         {
             Console.WriteLine("\n[INFO] Demand limitleri kontrol ediliyor...");
@@ -659,15 +650,15 @@ namespace SLF
                 if (!currentDataTable.Columns.Contains(demandCol)) continue; // Skip if column doesn't exist
 
                 issueRows[year] = new Dictionary<string, List<int>>
-        {
-            { "nullDemand", new List<int>() },
-            { "nonNumericDemand", new List<int>() },
-            { "zeroNegativeDemand", new List<int>() },
-            { "nullKapasite", new List<int>() },
-            { "nonNumericKapasite", new List<int>() },
-            { "zeroNegativeKapasite", new List<int>() },
-            { "overloaded", new List<int>() }
-        };
+                {
+                    { "nullDemand", new List<int>() },
+                    { "nonNumericDemand", new List<int>() },
+                    { "zeroNegativeDemand", new List<int>() },
+                    { "nullKapasite", new List<int>() },
+                    { "nonNumericKapasite", new List<int>() },
+                    { "zeroNegativeKapasite", new List<int>() },
+                    { "overloaded", new List<int>() }
+                };
 
                 int nullDemandCount = 0;
                 int nonNumericDemandCount = 0;
@@ -948,37 +939,6 @@ namespace SLF
             columnNullRowsMap[column] = new List<int>(); // Clear after successful imputation
         }
 
-        private void ImputeTrafoKapasitesi()
-        {
-            var column = "TRAFO_KAPASITESI";
-            var refColumn = $"YIL_DEMANT_{lastYear}";
-            double demandFactor = 2.5;
-            double tentativeKapasite;
-            foreach (int missingIndex in columnNullRowsMap[column])
-            {
-                var missingRow = currentDataTable.Rows[missingIndex];
-
-                var refValue = missingRow[refColumn];
-
-                if (!IsNullLike(refValue))
-                {
-                    if (double.TryParse(refValue?.ToString(), out double demand))
-                    {
-                        // Calculate the tentative kapasite
-                        tentativeKapasite = demand * demandFactor;
-
-                        // Find the closest kapasite value in the list
-                        double kapasite = TRAFO_KAPASITE_LISTESI.OrderBy(x => Math.Abs(x - tentativeKapasite)).First();
-                        // Assign the calculated kapasite to the missing row
-                        missingRow[column] = kapasite;
-                    }
-                    else
-                    {
-                        throw new ArgumentException($"'{refColumn}' column has invalid data format at row index {missingIndex}.");
-                    }
-                }
-            }
-        }
         private void ImputeDemand()
         {
             var demandColumn = $"YIL_DEMANT_{lastYear}";
@@ -1038,9 +998,7 @@ namespace SLF
 
         private void ImputeTuketim()
         {
-            const double maxDistance = 0.005;
             var demandColumn = $"YIL_DEMANT_{lastYear}";
-            var kapasiteColumn = "TRAFO_KAPASITESI";
             var tuketimColumn = $"YIL_TUKETIM_{lastYear}";
             foreach (int missingIndex in imputableRowsMap[tuketimColumn])
             {
@@ -1094,6 +1052,7 @@ namespace SLF
                 }
             }
         }
+
         private void ImputeTMFiderID()
         {
             // 0.01 is the 2d distance of the delta of x and y coordinates, approximately 1 km (assuming degree-based coordinates).
@@ -1157,6 +1116,7 @@ namespace SLF
                 }
             }
         }
+
         private void ReportErrorLessThanZero(string columnName)
         {
             float nullPercentage, negativePercentage, zeroPercentage, formatPercentage;

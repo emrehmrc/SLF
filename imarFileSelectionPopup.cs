@@ -85,8 +85,6 @@ namespace SLF
                         return;
                     }
 
-                    // Dosyayı imar_plans/data klasörüne kopyala
-                    //string kmlDestinationPath = PathService.CopyKmlToImarPlansData(KmlFilePath);
 
                     // PythonHelper.RunImarPlanModel'i çağır
                     RunImarPlanPython(KmlFilePath);
@@ -100,9 +98,6 @@ namespace SLF
                         return;
                     }
 
-                    // Dosyaları imar_plans/data klasörüne kopyala
-                    //string kmlDestinationPath = PathService.CopyKmlToImarPlansData(KmlFilePath);
-                    //string csvDestinationPath = PathService.CopyCsvToImarPlansData(CsvFilePath);
 
                     // PythonHelper.RunImarPlanModel'i çağır
                     RunImarPlanPython(KmlFilePath, CsvFilePath);
@@ -113,8 +108,6 @@ namespace SLF
                     return;
                 }
 
-                // Populate the DataGridView after successful script execution
-                //UploadOutputToGridView();
                 this.Close();
             }
             catch (Exception ex)

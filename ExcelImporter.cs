@@ -57,10 +57,7 @@ namespace SLF
             {
                 "DTR Verileri",
                 new List<string> {
-                    "TRAFO_ID",
                     "TRAFO_KODU",
-                    "TRAFO_ILCE_ADI",
-                    "TRAFO_MAHALLE_ADI",
                     "TRAFO_MULKIYET",
                     "FIDER_ADI",
                     "TRAFO_KAPASITESI",
@@ -68,7 +65,6 @@ namespace SLF
                     "TM_FIDER_ID",
                     "TRAFO_X_KOORDINAT",
                     "TRAFO_Y_KOORDINAT",
-                    "TRAFO_ADI",
                     "TRAFO_KURULUM_TARIHI",
                     "PRIMER_GERILIM",
                     "SEKONDER_GERILIM",
@@ -148,32 +144,16 @@ namespace SLF
                 }
             },
             {
-                "TM Verileri",
-                new List<string> {
-                    "EDW_TM_ID",
-                    "EDW_TRAFO_ID",
-                    "EDW_TARIH",
-                    "EDW_TM_TUKETIM",
-                    "EDW_TM_URETIM",
-                }
-            },
-            {
                 "Enerji Müsaadeleri Verileri",
                 new List<string> {
                     "ENERJI_MUSAADE_NO",
                     "ENERJI_MUSAADE_ABONE_GRUBU",
                     "Tipi",
-                   // "ENERJI_MUSAADE_ABONE_FAALIYET_KATEGORI",
-                    //"ENERJI_MUSAADE_TALEP_DURUMU",
                     "ENERJI_MUSAADE_GERILIM_SEVIYESI",
                     "ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL",
                     "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID",
                     "ENERJI_MUSAADE_BAGLANTI_GUCU",
-                    //"ENERJI_MUSAADE_IL",
-                    //"ENERJI_MUSAADE_ILCE",
-                    //"ENERJI_MUSAADE_MAHALLE",
                     "ENERJI_MUSAADE_ENERJILENDIRME_YILI",
-                    //"ENERJI_MUSAADE_BASVURU_TARIHI",
                     "ENERJI_MUSAADE_X_KOORDINAT",
                     "ENERJI_MUSAADE_Y_KOORDINAT",
                 }
@@ -264,9 +244,6 @@ namespace SLF
                 }
             }
         }
-
-
-
 
 
         private void ValidateColumnHeaders(ExcelWorksheet worksheet, string seçilenVeriTipi)

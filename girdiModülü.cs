@@ -9,6 +9,7 @@ using System.IO;
 using SLF.Services;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+using DocumentFormat.OpenXml.Presentation;
 
 namespace SLF
 {
@@ -285,7 +286,11 @@ namespace SLF
                 }
                 else
                 {
-                    MessageBox.Show("Veri tablosu boş veya yüklenemedi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    if(seçilenVeriTipi != "İmar Verileri")
+                    {
+                        MessageBox.Show("Veri tablosu boş veya yüklenemedi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+
                 }
                 Onizleme1.Onizleme_DataGrid1.ScrollBars = ScrollBars.Both;
 
@@ -676,6 +681,12 @@ namespace SLF
 
                 using (var fileDialog1 = new OpenFileDialog { Title = FileDialogTitle })
                 {
+
+                    if(seçilenVeriTipi == "İmar Verileri")
+                    {
+                        return;
+                    }
+
                     string filter = GetFileFilter(seçilenVeriTipi);
                     if (string.IsNullOrEmpty(filter))
                     {
