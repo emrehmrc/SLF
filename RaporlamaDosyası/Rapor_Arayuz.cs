@@ -55,6 +55,8 @@ namespace SLF.RaporlamaDosyası
 
         string KullanilanModul = string.Empty;
 
+        string EskiKullanilanModul = string.Empty;
+
         string İlİlceYol;
 
         string ProjeYolu;
@@ -74,7 +76,15 @@ namespace SLF.RaporlamaDosyası
 
         string PythonFilePath;
 
-        string ArsivVeriYolu;
+        public string ArsivVeriYolu;
+
+        public string veriTabaniAdi;
+
+        public string AlansalYukTabloAdi;
+
+        public string Dosyalar;
+
+        string html;
 
         string PythonPath;
         string userRootPath;
@@ -83,32 +93,60 @@ namespace SLF.RaporlamaDosyası
         {
             InitializeComponent();
 
-            HomePageForm anaMenu = new HomePageForm();
-            var configPath = anaMenu.config_path;
+            this.button2.Image = Properties.Resources.html;
 
-            var config = new ConfigurationBuilder()
+            this.button5.Image = Properties.Resources.KML2;
+
+            HomePageForm anaMenu = new HomePageForm();
+
+            var configPath = anaMenu.config_path;
+            
+            /*var configPath = Path.Combine("C:\\Users\\vural.bayrakli\\",
+                @"OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\Arşiv\Optimal DTR\configVural.json");
+            */
+
+            try
+            {
+                var config = new ConfigurationBuilder()
                 .AddJsonFile(configPath, optional: false, reloadOnChange: true)
                 .Build();
 
-            userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
-            string Ana_Klasör_Yolu = Path.Combine(userRootPath, config["Ana_Klasör_Yolu"]);
+                string Ana_Klasör_Yolu = Path.Combine(userRootPath, config["Ana_Klasör_Yolu"]);
+
+                İlYol = Path.Combine(Ana_Klasör_Yolu, config["İl"]);
+
+                İlİlceYol = Path.Combine(Ana_Klasör_Yolu, config["İl"], config["İlçe"]);
+
+                SonucYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:Sonuçlar_klasör"]);
+
+                PythonFilePath = Path.Combine(Ana_Klasör_Yolu, config["program_dosyaları_path"], config["ODTR:PYTHON_klasör"]);
+
+                YükVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Yük_klasör"]);
+
+                İmarVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Trafo_klasör"]);
+
+                PythonPath = GetPythonPath();
+
+                Dosyalar = Path.Combine(PythonFilePath, config["ODTR:Dosyalar"]);
+
+                veriTabaniAdi = Path.Combine(Dosyalar, config["ODTR:veriTabaniAdi"]);
 
 
-            İlYol = Path.Combine(Ana_Klasör_Yolu, config["İl"]);
 
-            İlİlceYol = Path.Combine(Ana_Klasör_Yolu, config["İl"], config["İlçe"]);
+                AlansalYukTabloAdi = config["ODTR:AlansalYukTabloAdi"];
 
-            SonucYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:Sonuçlar_klasör"]);
+                html = Path.Combine(SonucYolu, config["ODTR:HTML"]);
 
-            PythonFilePath = Path.Combine(Ana_Klasör_Yolu, config["program_dosyaları_path"], config["ODTR:PYTHON_klasör"]);
+            }
 
-            YükVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Yük_klasör"]);
+            catch (Exception ex)
+            {
+                MessageBox.Show("Konfigürasyon dosyası okunamadı: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
-            İmarVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Trafo_klasör"]);
-
-            //PythonPath = GetPythonPath();
-            PythonPath = "python.exe";
 
             if (PythonPath == null)
             {
@@ -122,28 +160,9 @@ namespace SLF.RaporlamaDosyası
                 Directory.CreateDirectory(ArsivVeriYolu);
             }
 
+            this.button4_Click(this.button4, EventArgs.Empty); // Yükleme butonuna tıklanmış gibi davranarak yükleme işlemini başlatıyoruz
+            this.button4.Focus(); // Yükleme butonuna odaklanıyoruz
         }
-
-        /*private void InitializeMap()
-        {
-
-            overlay = new GMapOverlay("map");
-
-            gMapControl1.Dock = DockStyle.Fill;
-            gMapControl1.CanDragMap = true;
-            gMapControl1.MapProvider = GMapProviders.GoogleMap;
-            gMapControl1.MinZoom = 5;
-            gMapControl1.MaxZoom = 18;
-            gMapControl1.Zoom = 12;
-            gMapControl1.Position = new PointLatLng(38.5, 27.0); // Başlangıç konumu
-            gMapControl1.DragButton = MouseButtons.Left;
-
-        }*/
-
-
-
-
-
 
         public bool DosyaMevcutMu(string yol, string dosya)
         {
@@ -178,11 +197,11 @@ namespace SLF.RaporlamaDosyası
 
         }
 
-        public void VeriYazdir(string yol)
+        public async void VeriYazdir(string yol)
         {
             this.panel4.Controls.Clear();
 
-            DataTable dt = ImportExcelFile(yol);
+            DataTable dt = await ImportExcelFile(yol);
 
             /*tablo_Formu.vektörel_attribute_table.DataSource = dt;
             tablo_Formu.FormBorderStyle = FormBorderStyle.None;
@@ -208,6 +227,8 @@ namespace SLF.RaporlamaDosyası
         public void VeriYazdir2(DataTable dt)
         {
             this.panel5.Controls.Clear();
+            this.panel5.ContextMenuStrip = null; // Önceki context menu'yu temizle
+            tablo_Formu.vektörel_attribute_table.ContextMenuStrip = null; // Önceki context menu'yu temizle
 
             tablo_Formu.vektörel_attribute_table.DataSource = dt;
             tablo_Formu.FormBorderStyle = FormBorderStyle.None;
@@ -215,15 +236,16 @@ namespace SLF.RaporlamaDosyası
             tablo_Formu.TopLevel = false;
             tablo_Formu.Show();
 
-
             this.panel5.Controls.Add(tablo_Formu.vektörel_attribute_table);
+
+            ContextMenuStrip menu = new ContextMenuStrip();
+            ToolStripMenuItem item = new ToolStripMenuItem("Excel İle Aç");
+            item.Click += (s, e) => this.button33_Click(this.button3, EventArgs.Empty);
+            menu.Items.Add(item);
+            this.panel5.ContextMenuStrip = menu;
 
 
         }
-
-
-
-
 
         public string DosyaSeciciGoster(string klasorYolu)
         {
@@ -264,7 +286,11 @@ namespace SLF.RaporlamaDosyası
                 string[] dosyaYollari = Directory.GetFiles(klasorYolu);
                 foreach (var yol in dosyaYollari)
                 {
-                    listBox.Items.Add(Path.GetFileName(yol)); // sadece dosya adı
+                    if (yol.Contains("Optimal Trafo Yıllık"))
+                    {
+                        listBox.Items.Add(Path.GetFileName(yol)); // sadece dosya adı
+                    }
+
                 }
             }
             else
@@ -293,48 +319,67 @@ namespace SLF.RaporlamaDosyası
             return secilenDosya;
         }
 
-
-
-
-
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
             label1.Visible = true;
             button2.Visible = true;
             label7.Visible = true;
             button5.Visible = true;
+            this.button1.Enabled = false; // DTR butonunu devre dışı bırakıyoruz
+            this.button4.Enabled = false; // DEK butonunu devre dışı bırakıyoruz
+
 
             KullanilanModul = "DTR";
 
-            this.panel3.Controls.Clear();
+            if (EskiKullanilanModul == null)
+            {
+                EskiKullanilanModul = "DTR";
+            }
+
+            else
+            {
+                if (EskiKullanilanModul != KullanilanModul)
+                {
+                    this.panel3.Controls.Clear();
+                }
+            }
+
+            EskiKullanilanModul = "DTR";
+
+            this.panel5.Controls.Clear();
 
             string dtyol = DosyaSeciciGoster(SonucYolu);
 
+            // LOADING GIF EKLE
+            PictureBox loadingGif = new PictureBox();
+            loadingGif.SizeMode = PictureBoxSizeMode.Zoom;
+            loadingGif.Image = Properties.Resources.l1; // Burada gif yerine bir resim kullanıyoruz
+            loadingGif.Location = new Point(
+                (panel5.Width - loadingGif.Width) / 2,
+                (panel5.Height - loadingGif.Height) / 2
+            );
+            panel5.Controls.Add(loadingGif);
+            panel5.Refresh();
+
+            // ✨ UI thread'e nefes ver
+            await Task.Delay(1);
+
+            Application.DoEvents();
             try
             {
-                dtyol = Path.Combine(SonucYolu, dtyol);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-
-
-            try
-            {
-
-
-                /*if (DosyaMevcutMu(ProjeYolu, ODTRSonucYolu))
+                if (dtyol == null)
                 {
-                    DataTableDTR = excelImporter.ImportExcelFile(ODTRSonucYolu, null, false);
+                    MessageBox.Show("Lütfen bir dosya seçin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
-                    VeriYazdir2(DataTableDTR);
-
-                }*/
-
-                if (DosyaMevcutMu(SonucYolu, dtyol))
+                else
                 {
-                    DataTableDTR = ImportExcelFile(dtyol);
+                    // dtyol, kullanıcı tarafından seçilen dosya adını içerir
+                    // SonucYolu ile birleştirerek tam yolu oluşturuyoruz
+                    dtyol = Path.Combine(SonucYolu, dtyol);
+
+                    DataTableDTR = await Task.Run(() => ImportExcelFile(dtyol));
 
                     currentDt = DataTableDTR.Copy();
 
@@ -357,12 +402,18 @@ namespace SLF.RaporlamaDosyası
 
                     VeriYazdir2(DataTableDTR);
                 }
-            }
 
+            }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
+
+
+            this.button1.Enabled = true;
+            this.button4.Enabled = true;
+
+
 
         }
 
@@ -404,7 +455,7 @@ namespace SLF.RaporlamaDosyası
 
 
 
-        private void button2_Click(object sender, EventArgs e)
+        private async void button2_Click(object sender, EventArgs e)
         {
             KullanilanModul = "EA";
 
@@ -418,7 +469,7 @@ namespace SLF.RaporlamaDosyası
 
             if (!DosyaMevcutMu(yolDir, dosya))
             {
-                DataTableEA = ImportExcelFile(dosya);
+                DataTableEA = await ImportExcelFile(dosya);
 
                 if (eA == null)
                 {
@@ -432,7 +483,7 @@ namespace SLF.RaporlamaDosyası
 
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private async void button3_Click(object sender, EventArgs e)
         {
             string isim = "DEK";
 
@@ -444,7 +495,7 @@ namespace SLF.RaporlamaDosyası
 
             if (!DosyaMevcutMu(yolDir, dosya))
             {
-                DataTableDEK = ImportExcelFile(dosya);
+                DataTableDEK = await ImportExcelFile(dosya);
 
                 if (dek == null)
                 {
@@ -458,26 +509,40 @@ namespace SLF.RaporlamaDosyası
 
         private async void button4_Click(object sender, EventArgs e)
         {
+
             label1.Visible = false;
             button2.Visible = false;
             label7.Visible = false;
             button5.Visible = false;
+            this.button1.Enabled = false; // DTR butonunu devre dışı bırakıyoruz
+            this.button4.Enabled = false; // DEK butonunu devre dışı bırakıyoruz
 
             KullanilanModul = "YUK";
 
+            if (EskiKullanilanModul == null)
+            {
+                EskiKullanilanModul = "YUK";
+            }
 
-            this.panel3.Controls.Clear();
+            else
+            {
+                if (EskiKullanilanModul != KullanilanModul)
+                {
+                    this.panel3.Controls.Clear();
+                }
+            }
+
+            EskiKullanilanModul = "YUK";
+
+
+
             this.panel5.Controls.Clear();
-
-
-
-            string veritabaniYolu = Path.Combine(PythonFilePath, "veriler.db");
 
             // LOADING GIF EKLE
             PictureBox loadingGif = new PictureBox();
-            loadingGif.SizeMode = PictureBoxSizeMode.AutoSize;
-            string gifPath = Path.Combine(PythonFilePath, "l1.gif");
-            loadingGif.Image = Image.FromFile(gifPath);
+            loadingGif.SizeMode = PictureBoxSizeMode.Zoom;
+            //string gifPath = Path.Combine(PythonFilePath, "l1.gif");
+            loadingGif.Image = Properties.Resources.l1; // Burada gif yerine bir resim kullanıyoruz
             loadingGif.Location = new Point(
                 (panel5.Width - loadingGif.Width) / 2,
                 (panel5.Height - loadingGif.Height) / 2
@@ -489,17 +554,16 @@ namespace SLF.RaporlamaDosyası
             await Task.Delay(1);
             Application.DoEvents();
 
-
             try
             {
-                if (DosyaMevcutMu(SonucYolu, veritabaniYolu))
+                if (DosyaMevcutMu(SonucYolu, veriTabaniAdi))
                 {
-                    string sqlQuery = "SELECT * FROM dfYukButun";
+                    string sqlQuery = $"SELECT * FROM {AlansalYukTabloAdi}";
                     //DataTableYuk = await GetDataTableFromSQLite(veritabaniYolu, sqlQuery).ConfigureAwait(false);
 
                     DataTableYuk = await Task.Run(() =>
                     {
-                        return GetDataTableFromSQLite(veritabaniYolu, sqlQuery).Result;
+                        return GetDataTableFromSQLite(FormManager.Form2Instance.VeriTabanıYolu, sqlQuery).Result;
                     });
 
                     currentDt = DataTableYuk.Copy();
@@ -523,11 +587,10 @@ namespace SLF.RaporlamaDosyası
                 // ✅ LOADING ANİMASYONUNU KALDIR
                 panel5.Controls.Remove(loadingGif);
                 loadingGif.Dispose();
+                this.button1.Enabled = true;
+                this.button4.Enabled = true;
             }
         }
-
-
-
 
         public async Task<DataTable> GetDataTableFromSQLite(string dbPath, string sqlQuery)
         {
@@ -558,12 +621,12 @@ namespace SLF.RaporlamaDosyası
 
         private async void ExcelDownloadButton_Click_1(object sender, EventArgs e)
         {
-            // Örnek DataTable oluşturma
-            string gifPath = Path.Combine(PythonFilePath, "l1.gif");
+            ExcelDownloadButton.Enabled = false; // Butonu devre dışı bırakıyoruz
 
+            // Örnek DataTable oluşturma
             string filePath = null;
 
-            PictureBox aktifGif = ShowLoadingGifNextToButton(ExcelDownloadButton, panel7, gifPath);
+            PictureBox aktifGif = ShowLoadingGifNextToButton(ExcelDownloadButton, panel7);
 
             await Task.Delay(1);         // animasyonun başlama şansı olsun
             Application.DoEvents();      // UI thread'e nefes ver       
@@ -614,18 +677,16 @@ namespace SLF.RaporlamaDosyası
                 // ✅ LOADING ANİMASYONUNU KALDIR
                 panel7.Controls.Remove(aktifGif);
                 aktifGif.Dispose();
+                ExcelDownloadButton.Enabled = true; // Butonu devre dışı bırakıyoruz
+
             }
-
-
 
         }
 
-
-
-
         private void ExportDataTableToExcel(DataTable dt, string filePath)
         {
-            MessageBox.Show(dt.Rows.Count.ToString());
+
+
             using (ExcelPackage package = new ExcelPackage())
             {
                 // Yeni bir çalışma sayfası oluştur
@@ -639,7 +700,6 @@ namespace SLF.RaporlamaDosyası
                 package.SaveAs(file);
             }
 
-            MessageBox.Show("Excel dosyası başarıyla kaydedildi!", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         public void ExportExcelFile(string filePath, DataTable dt, string seçilenVeriTipi = "excel")
@@ -740,7 +800,7 @@ namespace SLF.RaporlamaDosyası
                 }
                 xmlDoc.Save(filePath);
 
-                MessageBox.Show("KML dosyası başarıyla kaydedildi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                //MessageBox.Show("KML dosyası başarıyla kaydedildi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
             catch (Exception ex)
@@ -752,11 +812,9 @@ namespace SLF.RaporlamaDosyası
 
         private async void button5_Click(object sender, EventArgs e)
         {
+            button5.Enabled = false; // Butonu devre dışı bırakıyoruz
 
-            // Örnek DataTable oluşturma
-            string gifPath = Path.Combine(PythonFilePath, "l1.gif");
-
-            PictureBox aktifGif = ShowLoadingGifNextToButton(button5, panel7, gifPath);
+            PictureBox aktifGif = ShowLoadingGifNextToButton(button5, panel7);
 
             await Task.Delay(1);         // animasyonun başlama şansı olsun
             Application.DoEvents();
@@ -774,19 +832,34 @@ namespace SLF.RaporlamaDosyası
                 filePath = saveFileDialog.FileName; // Seçilen dosya yolu
             }
 
-            await Task.Run(() =>
+            try
             {
-                ExportDataTableToKML(currentDt, filePath);
-            });
+                await Task.Run(() =>
+                {
+                    ExportDataTableToKML(currentDt, filePath);
+
+
+                });
+
+                MessageBox.Show("Kml dosyası başarılı şekilde kaydedildi.");
+            }
+
+            catch
+            {
+                MessageBox.Show("Hata oluştu.");
+
+            }
+
 
             // ✅ LOADING ANİMASYONUNU KALDIR
             panel7.Controls.Remove(aktifGif);
             aktifGif.Dispose();
+            button5.Enabled = true; // Butonu devre dışı bırakıyoruz
 
 
         }
 
-        public DataTable ImportExcelFile(string filePath)
+        public async Task<DataTable> ImportExcelFile(string filePath)
         {
             DataTable dataTable = new DataTable();
 
@@ -830,9 +903,9 @@ namespace SLF.RaporlamaDosyası
 
         private async void button2_Click_1(object sender, EventArgs e)
         {
-            string gifPath = Path.Combine(PythonFilePath, "l1.gif");
+            button2.Enabled = false; // Butonu devre dışı bırakıyoruz
 
-            PictureBox aktifGif = ShowLoadingGifNextToButton(button2, panel7, gifPath);
+            PictureBox aktifGif = ShowLoadingGifNextToButton(button2, panel7);
 
 
             await Task.Delay(1);         // animasyonun başlama şansı olsun
@@ -847,7 +920,6 @@ namespace SLF.RaporlamaDosyası
 
             string python_path = Path.Combine(PythonFilePath, "PydeckRun.py");
 
-            MessageBox.Show("Python dosyası çalıştırılıyor...");
 
             try
             {
@@ -868,7 +940,28 @@ namespace SLF.RaporlamaDosyası
                 // ✅ LOADING ANİMASYONUNU KALDIR
                 panel7.Controls.Remove(aktifGif);
                 aktifGif.Dispose();
+
+
+                DialogResult result = MessageBox.Show(
+                    "HTML dosyasını açmak istiyor musunuz?",
+                    "Onay",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
+
+            if (result == DialogResult.Yes)
+            {
+                    
+
+                    System.Diagnostics.Process.Start(new ProcessStartInfo()
+                    {
+                        FileName = html,
+                        UseShellExecute = true
+                    });
+                }
             }
+
+            button2.Enabled = true; // Butonu devre dışı bırakıyoruz
 
 
         }
@@ -929,7 +1022,7 @@ namespace SLF.RaporlamaDosyası
             {
                 var startInfo = new ProcessStartInfo
                 {
-                    FileName = $"python.exe", // Python'ın yüklü olduğu path
+                    FileName = $"{PythonPath}", // Python'ın yüklü olduğu path
                     //Arguments = $"{PythonFilePath} \"{inputpath}\"",
                     Arguments = $"\"{python_path}\" \"{inputpath}\"  \"{SonucYolu}\"",
                     UseShellExecute = false,
@@ -996,9 +1089,7 @@ namespace SLF.RaporlamaDosyası
 
             //progressBar1.Visible = false;
 
-            form.Close();
-
-            MessageBox.Show("İşlem tamamlandı", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            form.Close();           
 
         }
 
@@ -1136,7 +1227,7 @@ namespace SLF.RaporlamaDosyası
             return null;
         }
 
-        public PictureBox ShowLoadingGifNextToButton(Button button, Panel targetPanel, string gifPath)
+        public PictureBox ShowLoadingGifNextToButton(Button button, Panel targetPanel)
         {
             PictureBox loadingGif = new PictureBox();
 
@@ -1146,7 +1237,7 @@ namespace SLF.RaporlamaDosyası
             loadingGif.Size = new Size(targetWidth, targetHeight);
             loadingGif.SizeMode = PictureBoxSizeMode.Zoom;
 
-            loadingGif.Image = Image.FromFile(gifPath);
+            loadingGif.Image = Properties.Resources.l1;
 
             loadingGif.Location = new Point(
                 button.Right + 5,
@@ -1192,16 +1283,113 @@ namespace SLF.RaporlamaDosyası
         {
 
         }
+
+        private async void button33_Click(object sender, EventArgs e)
+        {
+            DataTable dt = currentDt.Copy();
+            string tempPath = Path.Combine(Path.GetTempPath(), "veriler.xlsx");
+            bool success = false;
+            string errorMessage = "";
+
+            // 1. PictureBox tanımı
+            PictureBox loadingGif = new PictureBox();
+            loadingGif.Size = new Size(64, 64); // Boyutu belirle, örnek: 64x64
+            loadingGif.SizeMode = PictureBoxSizeMode.Zoom;
+            loadingGif.Image = Properties.Resources.l1;
+            loadingGif.Location = new Point(
+                (panel5.Width - loadingGif.Width) / 2,
+                (panel5.Height - loadingGif.Height) / 2 - 10 // hafif yukarıda dursun ki altta yazı için yer açılsın
+            );
+
+            // 2. Label tanımı
+            Label loadingLabel = new Label();
+            loadingLabel.Text = "Lütfen bekleyin...";
+            loadingLabel.AutoSize = true;
+            loadingLabel.TextAlign = ContentAlignment.MiddleCenter;
+            loadingLabel.Font = new Font("Segoe UI", 10, FontStyle.Regular);
+
+            // Label'ı gif’in altına ortalanmış şekilde yerleştir
+            loadingLabel.Location = new Point(
+                loadingGif.Left + (loadingGif.Width - loadingLabel.PreferredWidth) / 2,
+                loadingGif.Bottom + 5
+            );
+
+            panel5.Controls.Clear();
+
+            // 3. Panel’e ekle
+            panel5.Controls.Add(loadingGif);
+            panel5.Controls.Add(loadingLabel);
+
+            panel5.Refresh();
+
+
+            // Dosya kullanımda değilse sil (aksi halde IOException fırlatır)
+
+            try
+            {
+                if (File.Exists(tempPath))
+                {
+                    File.Delete(tempPath);
+                }
+
+                await Task.Run(() =>
+
+                {
+                    try
+                    {
+                        ExportDataTableToExcel(currentDt.Copy(), tempPath);
+                        success = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        errorMessage = ex.Message;
+                        // ✅ LOADING ANİMASYONUNU KALDIR
+                        
+                        return;
+                    }
+                });
+
+                // UI thread: MessageBox burada gösterilir
+                if (success)
+                {
+                    MessageBox.Show("Excel dosyası başarıyla kaydedildi! Şimdi Dosya Açılacak.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Process.Start("excel.exe", "\"" + tempPath + "\"");
+                }
+                else
+                {
+                    MessageBox.Show("Hata oluştu:\n" + errorMessage, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+                // ✅ LOADING ANİMASYONUNU KALDIR               
+                VeriYazdir2(dt); // Veriyi yazdırma işlemi
+
+
+            }
+            catch (IOException)
+            {
+                // Dosya kullanımda, silme işlemi başarısız oldu
+                MessageBox.Show("Geçici dosya kullanımda. Lütfen dosyayı kapatıp tekrar deneyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);                              
+
+            }
+
+            panel5.Controls.Remove(loadingGif);
+            panel5.Controls.Remove(loadingLabel);
+
+            loadingGif.Dispose();
+
+            VeriYazdir2(dt);
+        }
     }
-}
 
-public class FiltreEventArgs : EventArgs
-{
-    public DataTable dt { get; set; }
+    public class FiltreEventArgs : EventArgs
+    {
+        public DataTable dt { get; set; }
 
-}
+    }
 
-public interface IDrawable
-{
-    void DrawMap(); // veya Task DrawAsync(); da olabilir
+    public interface IDrawable
+    {
+        void DrawMap(); // veya Task DrawAsync(); da olabilir
+    }
+
 }

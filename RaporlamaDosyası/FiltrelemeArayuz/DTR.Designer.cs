@@ -49,6 +49,8 @@
             // 
             // panel3
             // 
+            this.panel3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.panel3.AutoScroll = true;
             this.panel3.Controls.Add(this.panel7);
             this.panel3.Controls.Add(this.button1);
@@ -56,7 +58,7 @@
             this.panel3.Controls.Add(this.panel2);
             this.panel3.Location = new System.Drawing.Point(12, 21);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(272, 801);
+            this.panel3.Size = new System.Drawing.Size(348, 867);
             this.panel3.TabIndex = 9;
             // 
             // panel7
@@ -65,15 +67,20 @@
             this.panel7.Controls.Add(this.label3);
             this.panel7.Location = new System.Drawing.Point(10, 491);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(223, 200);
+            this.panel7.Size = new System.Drawing.Size(335, 277);
             this.panel7.TabIndex = 13;
             // 
             // checkedListBox2
             // 
             this.checkedListBox2.FormattingEnabled = true;
+            this.checkedListBox2.HorizontalScrollbar = true;
             this.checkedListBox2.Items.AddRange(new object[] {
             "Hepsi",
             "Mevcut",
+            "Gerilim Donüşümü",
+            "Deplase",
+            "Güç Artırımı",
+            "Projelendirilmiş Yeni Trafo",
             "Trafo Yenileme-Yaştan",
             "Trafo Yükseltme-Kapasiteden",
             "Trafo Yükseltme-Yükten",
@@ -81,7 +88,7 @@
             this.checkedListBox2.Location = new System.Drawing.Point(18, 51);
             this.checkedListBox2.Name = "checkedListBox2";
             this.checkedListBox2.ScrollAlwaysVisible = true;
-            this.checkedListBox2.Size = new System.Drawing.Size(189, 119);
+            this.checkedListBox2.Size = new System.Drawing.Size(296, 211);
             this.checkedListBox2.TabIndex = 2;
             this.checkedListBox2.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.checkedListBox2_ItemCheck);
             // 
@@ -98,7 +105,7 @@
             // 
             this.button1.BackColor = System.Drawing.Color.ForestGreen;
             this.button1.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.button1.Location = new System.Drawing.Point(12, 727);
+            this.button1.Location = new System.Drawing.Point(10, 791);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(223, 57);
             this.button1.TabIndex = 9;
@@ -112,7 +119,7 @@
             this.panel4.Controls.Add(this.checkedListBox1);
             this.panel4.Location = new System.Drawing.Point(10, 225);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(223, 260);
+            this.panel4.Size = new System.Drawing.Size(335, 260);
             this.panel4.TabIndex = 8;
             // 
             // label5
@@ -143,7 +150,7 @@
             this.checkedListBox1.Location = new System.Drawing.Point(18, 36);
             this.checkedListBox1.Name = "checkedListBox1";
             this.checkedListBox1.ScrollAlwaysVisible = true;
-            this.checkedListBox1.Size = new System.Drawing.Size(189, 211);
+            this.checkedListBox1.Size = new System.Drawing.Size(296, 211);
             this.checkedListBox1.TabIndex = 1;
             this.checkedListBox1.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.checkedListBox1_ItemCheck);
             // 
@@ -155,7 +162,7 @@
             this.panel2.Controls.Add(this.label1);
             this.panel2.Location = new System.Drawing.Point(10, 36);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(223, 163);
+            this.panel2.Size = new System.Drawing.Size(314, 163);
             this.panel2.TabIndex = 2;
             // 
             // radioButton4
@@ -204,7 +211,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(292, 853);
+            this.ClientSize = new System.Drawing.Size(365, 900);
             this.Controls.Add(this.panel3);
             this.Name = "DTR";
             this.Text = "Form1";

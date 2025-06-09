@@ -18,7 +18,16 @@ using Font = System.Drawing.Font;
 using Microsoft.Extensions.Configuration;
 using Task = System.Threading.Tasks.Task;
 using OfficeOpenXml;
-
+using Microsoft.Web.WebView2.WinForms;
+using SLF.RaporlamaDosyası;
+using DocumentFormat.OpenXml.Wordprocessing;
+using SLF.Properties;
+using Irony;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using Size = System.Drawing.Size;
+using Formatting = Newtonsoft.Json.Formatting;
+using DataTable = System.Data.DataTable;
+using System.Threading;
 
 namespace SLF.Optimal_DTR
 {
@@ -46,6 +55,7 @@ namespace SLF.Optimal_DTR
         string İlYol;
         string YükVeriYolu;
         string İmarVeriYolu;
+        string Arsiv;
         string ODTRJson;
 
         DataTable trafodt;
@@ -53,48 +63,143 @@ namespace SLF.Optimal_DTR
 
         string il;
         string ilce;
-        string İlkYıl;
-        string SonYıl;
+        public string İlkYıl;
+        public string SonYıl;
+
+        public Panel panelWebview;
+        private WebView2 webView;
+        public Rapor_Arayuz Rapor_Arayuz;
+
+        string Dosyalar;
+        string Katsayilar;
+
+        string YukTabloAdi;
+        string AlansalYukTabloAdi;
+        string HTML;
+        public string VeriTabanıYolu;
+
+        bool veriSeçildi_mi = false;
+
+        IConfigurationRoot config;
+
+        Dictionary<string, PointLatLng> cityCoordinates;
+
+        public bool ODTR_çalıştı_mı = false;
 
         public DTR_Arayuz()
         {
             InitializeComponent();
-            InitializeMap();
-            ToolTipKismi();
-
-            cbs = new CBS();
+            
+            ToolTipKismi();                     
 
             HomePageForm anaMenu = new HomePageForm();
 
             var configPath = anaMenu.config_path;
 
-            var config = new ConfigurationBuilder()
+            /*var configPath = Path.Combine("C:\\Users\\vural.bayrakli\\",
+                @"OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\configVural.json");
+            */
+            config = new ConfigurationBuilder()
                 .AddJsonFile(configPath, optional: false, reloadOnChange: true)
                 .Build();
 
             userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
-            string Ana_Klasör_Yolu = Path.Combine(userRootPath, config["Ana_Klasör_Yolu"]);
+            //string Ana_Klasör_Yolu = Path.Combine(userRootPath, config["Ana_Klasör_Yolu"]);
+            string Ana_Klasör_Yolu = Path.Combine(config["Ana_Klasör_Yolu"]);
 
 
-            İlYol = Path.Combine(Ana_Klasör_Yolu, config["İl"]);
-            İlİlceYol = Path.Combine(İlYol, config["İlçe"]);
-            SonucYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:Sonuçlar_klasör"]);
-            PythonFilePath = Path.Combine(Ana_Klasör_Yolu, config["program_dosyaları_path"], config["ODTR:PYTHON_klasör"]);
-            YükVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Yük_klasör"]);
-            İmarVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Trafo_klasör"]);
-            il = config["İl"];
-            ilce = config["İlçe"];
-            İlkYıl = config["DEK:baslangıc_yılı"];
-            SonYıl = config["DEK:bitis_yılı"];
+            try
+            {
+                İlYol = Path.Combine(Ana_Klasör_Yolu, config["İl"]);
+                İlİlceYol = Path.Combine(İlYol, config["İlçe"]);
+                SonucYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:Sonuçlar_klasör"]);
+                PythonFilePath = Path.Combine(Ana_Klasör_Yolu, config["program_dosyaları_path"], config["ODTR:PYTHON_klasör"]);
+                YükVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Yük_klasör"]);
+                İmarVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Trafo_klasör"]);
+                Arsiv = Path.Combine(SonucYolu, config["ODTR:Arşiv"]);
+                Dosyalar = Path.Combine(PythonFilePath, config["ODTR:Dosyalar"]);
+                Katsayilar = Path.Combine(Dosyalar, config["ODTR:Katsayilar"]);
+                YukTabloAdi = config["ODTR:YukTabloAdi"];
+                AlansalYukTabloAdi = config["ODTR:AlansalYukTabloAdi"];
+                HTML = config["ODTR:HTML"];
+                VeriTabanıYolu = Path.Combine(Dosyalar, config["ODTR:veriTabaniAdi"]);
 
-            Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
+                il = config["İl"];
+                ilce = config["İlçe"];
+                İlkYıl = config["DEK:baslangıc_yılı"];
+                SonYıl = config["DEK:bitis_yılı"];
+            }
+                
+
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Konfigürasyon dosyası okunamadı: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            cityCoordinates = new Dictionary<string, PointLatLng>
                 {
-                    { "İzmir", new PointLatLng(38.4192, 27.1287) }, // Example coordinates for İzmir
-                    { "Eskişehir", new PointLatLng(39.7768, 30.5206) } // Example coordinates for Eskişehir
+                    { "İzmir", new PointLatLng(38.5, 27.0) }, // Example coordinates for İzmir
+                    { "Eskişehir", new PointLatLng(39.7768, 30.5206) },// Example coordinates for Eskişehir
+                    { "Manisa", new PointLatLng(38.6191, 27.4289) }
+
                     // Add more cities and their coordinates as needed
                 };
 
+            InitializeMap();
+            YillariYerlestir();
+        }
+
+
+        private async void InitBrowser(string path)
+        {
+            this.gMapControl1.Visible = false; // GMapControl'ü gizle
+
+            if(panelWebview != null)
+            {
+                panelWebview.Dispose();
+            }
+
+
+            panelWebview = new Panel
+            {
+                Dock = DockStyle.None,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right,
+                Location = this.gMapControl1.Location,
+                Size = this.gMapControl1.Size,
+            };
+
+            this.Controls.Add(panelWebview);
+
+            webView = new WebView2
+            {
+                Dock = DockStyle.Fill,
+                
+            };
+
+            PictureBox loadingGif = new PictureBox();
+            loadingGif.SizeMode = PictureBoxSizeMode.Zoom;
+            loadingGif.Image = Properties.Resources.l1;
+            //string gifPath = Path.Combine(PythonFilePath, "l1.gif");
+            //loadingGif.Image = Image.FromFile(gifPath);
+            loadingGif.Location = new Point(
+                (panelWebview.Width - loadingGif.Width) / 2,
+                (panelWebview.Height - loadingGif.Height) / 2
+            );
+
+            panelWebview.Controls.Add(loadingGif);
+            panelWebview.Refresh();
+
+            await Task.Delay(1);
+            Application.DoEvents();
+
+            panelWebview.Controls.Add(webView);
+            await webView.EnsureCoreWebView2Async();
+            webView.Source = new Uri(path);  // ✅ Yerel dosya da olabilir
+
+            panelWebview.Controls.Remove(loadingGif);
+            loadingGif.Dispose();// Örnek: webView.Source = new Uri(Path.Combine(Application.StartupPath, "sayfa.html"));
         }
 
         public GMapControl GetActiveGMapControl()
@@ -176,9 +281,10 @@ namespace SLF.Optimal_DTR
                 GMarkerGoogleType markerType = owner == "Özel" ? GMarkerGoogleType.red_dot : GMarkerGoogleType.blue_dot;
 
                 string tooltip = $"TrafoID: {trafo["trafo_id"]}\n" +
-                                    $"Owner: {trafo["Trafo Mülkiyeti"]}\n" +
-                                    $"Year: {trafo["year"]}\n" +
-                                    $"Trafo Durumu: {trafo["Trafo Aksiyon"]}";
+                                    $"Mülkiyet: {trafo["Trafo Mülkiyeti"]}\n" +
+                                    $"İşlem Tarihi: {trafo["İşlem Tarihi"]}\n" +
+                                    $"Trafo Aksiyon: {trafo["Trafo Aksiyon"]}\n" +
+                                    $"Trafo Kapasite: {trafo["kapasite"]}";
 
                 var marker = new GMarkerGoogle(konum, markerType)
                 {
@@ -197,7 +303,7 @@ namespace SLF.Optimal_DTR
 
         private bool CalismaYoluKontrol()
         {
-            TuketimDosyaAdi = "SONUCLAR2.xlsx";
+            TuketimDosyaAdi = $"SONUCLAR_{ilce}.xlsx";
             TrafoDosyaAdi = $"trafo_merkez_hucre_{ilce}.xlsx";
             TrafoAlanDosyaAdi = $"trafo_rezerv_alanlar_{ilce.ToLower()}.xlsx";
 
@@ -239,7 +345,6 @@ namespace SLF.Optimal_DTR
         public string GetPythonPath()
         {
             string systemPathVariable = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
-            string python_location = null;
 
             // Sistem genelindeki PATH çevresel değişkenini alıyoruz
             // Eğer çevresel değişken mevcutsa
@@ -285,6 +390,7 @@ namespace SLF.Optimal_DTR
 
             };
 
+            
             form.Show();
 
             // Yeni bir ProgressBar oluşturuluyor
@@ -324,8 +430,9 @@ namespace SLF.Optimal_DTR
             {
                 var startInfo = new ProcessStartInfo
                 {
-                    FileName = $"{PythonPath}", // Python'ın yüklü olduğu path
+                    //FileName = $"{PythonPath}", // Python'ın yüklü olduğu path
                     //Arguments = $"{PythonFilePath} \"{inputpath}\"",
+                    FileName = $"python", // Python'ın yüklü olduğu path
                     Arguments = $"\"{python_path}\" \"{inputpath}\"",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
@@ -335,45 +442,71 @@ namespace SLF.Optimal_DTR
 
                 };
 
+                CancellationTokenSource cts = new CancellationTokenSource();
+                CancellationToken token = cts.Token;
+
+                form.FormClosed += (s, e) =>
+                {
+
+
+                    if (!cts.IsCancellationRequested)
+                        cts.Cancel();
+
+                    this.button2.Enabled = true; // Butonu devre dışı bırakıyoruz
+                };
+
                 using (var process = new Process { StartInfo = startInfo })
                 {
                     process.Start();
 
-                    Console.WriteLine("Python script çalıştırıldı");
                     // Python script'inin çıktısını UTF-8 ile yakalıyoruz ve gerçek zamanlı olarak okuyoruz
 
                     var outputTask = Task.Run(() =>
                     {
                         using (StreamReader reader = new StreamReader(process.StandardOutput.BaseStream, Encoding.UTF8))
                         {
-                            while (!reader.EndOfStream)
+                            while (!reader.EndOfStream && !token.IsCancellationRequested)
                             {
                                 string output = reader.ReadLine();
-                                Invoke(new Action(() =>
+
+                                if (!form.IsDisposed && label.IsHandleCreated)
                                 {
-                                    label.Text += output + "\n\n";
-                                    Console.WriteLine(output);  // Konsola yazdırma
-                                                                // Burada isterseniz progress bar'ı veya başka bir UI elementini güncelleyebilirsiniz
-                                }));
+                                    form.Invoke(new Action(() =>
+                                    {
+                                        if (!label.IsDisposed && label.IsHandleCreated)
+                                        {
+                                            label.Text += output + "\n\n";
+                                        }
+                                    }));
+                                }
                             }
                         }
-                    });
+                    }, token);
 
                     // Hata çıktılarını asenkron olarak okuyalım
                     var errorTask = Task.Run(() =>
                     {
                         using (StreamReader reader = new StreamReader(process.StandardError.BaseStream, Encoding.UTF8))
                         {
-                            while (!reader.EndOfStream)
+                            while (!reader.EndOfStream && !form.IsDisposed)
                             {
                                 string error = reader.ReadLine();
-                                Invoke(new Action(() =>
+
+                                // Form kapanmışsa hiçbir şey yapma
+                                if (!form.IsDisposed && form.IsHandleCreated)
                                 {
-                                    Console.WriteLine($"Hata: {error}");
-                                }));
+                                    form.Invoke(new Action(() =>
+                                    {
+                                        if (!form.IsDisposed) // Label vs. yoksa bile en azından form sağlam mı bakalım
+                                        {
+                                            Console.WriteLine($"Hata: {error}");
+                                        }
+                                    }));
+                                }
                             }
                         }
                     });
+
 
                     // Python script'inin tamamlanmasını bekleyelim
                     await Task.WhenAll(outputTask, errorTask);  // Her iki görevi de bekliyoruz
@@ -404,7 +537,21 @@ namespace SLF.Optimal_DTR
             gMapControl1.MinZoom = 5;
             gMapControl1.MaxZoom = 18;
             gMapControl1.Zoom = 12;
-            gMapControl1.Position = new PointLatLng(38.5, 27.0); // Başlangıç konumu
+            //gMapControl1.Position = new PointLatLng(38.5, 27.0); // Başlangıç konumu
+            
+            try
+            {
+                gMapControl1.Position = cityCoordinates[il];
+            }
+
+            catch (KeyNotFoundException)
+            {
+                MessageBox.Show($"Şehir koordinatları bulunamadı: {il}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                gMapControl1.Position = new PointLatLng(38.5, 27.0); // Varsayılan konum
+            }
+
+
+
             gMapControl1.DragButton = MouseButtons.Left;
 
         }
@@ -440,6 +587,10 @@ namespace SLF.Optimal_DTR
                 { "Yeni Trafo Tesis", "yeni trafo tesis" }, // "Eklenen" -> "yeni trafo tesis"
                 { "Trafo Yenileme-Yaştan", "trafo yenileme-yaştan" },
                 { "Trafo Yenileme-Kapasiteden", "trafo yükseltme-kapasiteden" },
+                { "Gerilim Donüşümü", "gerilim dönüşümü"},
+                { "Deplase", "deplase" },
+                { "Güç Artırımı", "güç artırımı" },
+                { "Projelendirilmiş Yeni Trafo", "projelendirilmiş yeni trafo" },
 
             };
 
@@ -461,7 +612,17 @@ namespace SLF.Optimal_DTR
             // Filtreleme işlemi
             var radiobuttonvalue = GetSelectedRadioButton(panel2) ?? "Hepsi";  // Default to "Hepsi" if null
 
-            var filtrelenmisData = trafodt.AsEnumerable()
+            var filtrelenmisData = new List<DataRow>();
+
+            if (veriSeçildi_mi == false)
+            {
+                MessageBox.Show("Lütfen önce verileri yükleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            try
+            {
+                filtrelenmisData = trafodt.AsEnumerable()
                 .Where(row =>
                     (secilenYillar.Count == 0 ||
                     (int.TryParse(row.Field<string>("year"), out int year) && secilenYillar.Contains(year))) && // Yıla göre filtreleme
@@ -469,11 +630,57 @@ namespace SLF.Optimal_DTR
                     (eslesenAksiyonlar.Count == 0 || eslesenAksiyonlar.Contains(row.Field<string>("Trafo Aksiyon"))) // Trafo Aksiyonları filtreleme
                 )
                 .ToList();
+            }
+
+            catch
+            {
+                MessageBox.Show("Filtreleme işlemi sırasında hata oluştu.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            
 
             DataTable filtrelenmis = filtrelenmisData.Any() ? filtrelenmisData.CopyToDataTable() : trafodt.Clone();
 
             // Filtrelenmiş verileri haritada göster
             DrawMap3(filtrelenmis);
+            //Filtrele(filtrelenmis);
+
+        }
+
+        private async void Filtrele(DataTable currentDt)
+        {
+            string filePath = Path.Combine(Rapor_Arayuz.ArsivVeriYolu, "Sonuç.xlsx");
+
+            await Task.Run(() =>
+            {
+                FormManager.RaporInstance.ExportExcelFile(filePath, currentDt, "excel");
+            });
+
+            string python_path = Path.Combine(PythonFilePath, "PydeckRun.py");
+
+            if(File.Exists(filePath))
+            {
+                MessageBox.Show("Excel dosyası başarıyla oluşturuldu.");
+            }
+           
+            try
+            {
+
+                await Rapor_Arayuz.PythonScriptCalistir(python_path, filePath);
+
+                MessageBox.Show("İşlem başarıyla tamamlandı.");
+
+            }
+
+
+            catch (Exception ex)
+            {
+                MessageBox.Show("Hata: " + ex.Message);
+            }
+
+            string path = Path.Combine(SonucYolu, "hucre_trafo_pydeck.html");
+            InitBrowser(path);
+
         }
 
         private string GetSelectedRadioButton(Panel panel)
@@ -503,9 +710,13 @@ namespace SLF.Optimal_DTR
 
                     PythonFilePath = PythonFilePath,
 
+                    VeriTabanıYolu = VeriTabanıYolu,
+
                     YükVeriYolu = YükVeriYolu,
 
                     İmarVeriYolu = İmarVeriYolu,
+
+                    Arsiv = Arsiv,
 
                 },
 
@@ -518,6 +729,12 @@ namespace SLF.Optimal_DTR
                     TuketimDosyaAdi = TuketimDosyaAdi,
                     TrafoDosyaAdi = TrafoDosyaAdi,
                     TrafoAlanDosyaAdi = TrafoAlanDosyaAdi,
+                    veriTabaniAdi = config["ODTR:veriTabaniAdi"],
+                    YukTabloAdi = YukTabloAdi,
+                    AlansalYukTabloAdi = AlansalYukTabloAdi,
+                    HTML = HTML
+
+
 
                 }
             };
@@ -527,11 +744,12 @@ namespace SLF.Optimal_DTR
             string json = JsonConvert.SerializeObject(configODTR, Formatting.Indented);
 
             // JSON dosyasını yazma
-            File.WriteAllText(ODTRJson, json);
+            //File.WriteAllText(ODTRJson, json);
         }
 
         public async void button2_Click(object sender, EventArgs e)
         {
+            this.button2.Enabled = false; // Butonu devre dışı bırakıyoruz
 
             string pythonPath = GetPythonPath();
 
@@ -551,18 +769,33 @@ namespace SLF.Optimal_DTR
             {
                 if (islemeDevam)
                 {
-                    await Task.Run(() => ODTRconfig());
+                    try
+                    {
+                        ODTR_çalıştı_mı = true; // örneğin bir bool flag set etmek
 
-                    //await PythonScriptCalistir(tuketim_path);
-                    await PythonScriptCalistir(python_path, ODTRJson);
+                        await Task.Run(() => ODTRconfig());
+
+                        //await PythonScriptCalistir(tuketim_path);
+                        await PythonScriptCalistir(python_path, ODTRJson);
+
+                        
+                    }
+
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Hata: " + ex.Message);
+                    }
+
                 }
             }
 
+            this.button2.Enabled = true; // İşlem tamamlandığında butonu tekrar etkinleştiriyoruz
         }
 
         private void checkedListBox_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             CheckedListBox checkedListBox = sender as CheckedListBox;
+            
             if (checkedListBox == null)
                 return;
 
@@ -622,7 +855,11 @@ namespace SLF.Optimal_DTR
                 string[] dosyaYollari = Directory.GetFiles(klasorYolu);
                 foreach (var yol in dosyaYollari)
                 {
-                    listBox.Items.Add(Path.GetFileName(yol)); // sadece dosya adı
+                    if(yol.Contains("Optimal Trafo Yıllık"))
+                    {
+                        listBox.Items.Add(Path.GetFileName(yol)); // sadece dosya adı
+                    }
+                    
                 }
             }
             else
@@ -694,28 +931,49 @@ namespace SLF.Optimal_DTR
         private void button3_Click_1(object sender, EventArgs e)
         {
             string trafo_path = DosyaSeciciGoster(SonucYolu);
+            //trafo_path = Path.Combine(SonucYolu, trafo_path);
+            //InitBrowser(trafo_path);
+            
             try
             {
                 trafo_path = Path.Combine(SonucYolu, trafo_path);
                 trafodt = ImportExcelFile(trafo_path);
+                veriSeçildi_mi = true; // Veri seçildi mi kontrolü için flag
 
             }
 
             catch (Exception ex)
             {
-                MessageBox.Show("Dosya Seçilmedi.");
+                MessageBox.Show("Dosya Seçilmedi. " + $"{ex.ToString()}");
                 return;
             }
 
-            if (DialogResult.Yes == MessageBox.Show("Veri sisteme yüklensin mi?", "Bilgi", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
+            
+            // Verileri sisteme yükle
+            var filtrelenmisData = new List<DataRow>();
+            try
             {
-                // Verileri sisteme yükle
-                DrawMap3(trafodt);
+                filtrelenmisData = trafodt.AsEnumerable()
+                .Where(row =>                       
+                    (int.TryParse(row.Field<string>("year"), out int year) && year == int.Parse(İlkYıl))                    
+                )
+                .ToList();
             }
-            else
+
+            catch
             {
-                MessageBox.Show("Veri yüklenmedi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Filtreleme işlemi sırasında hata oluştu.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
+
+
+            DataTable filtrelenmis = filtrelenmisData.Any() ? filtrelenmisData.CopyToDataTable() : trafodt.Clone();
+            DrawMap3(trafodt);
+            //string path = Path.Combine(SonucYolu, "hucre_trafo_pydeck.html");
+            //InitBrowser(path);
+                
+            
+            MessageBox.Show("Trafo verileri başarıyla yüklendi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
 
         }
@@ -764,55 +1022,390 @@ namespace SLF.Optimal_DTR
             GetActiveGMapControl().Visible = true;
             GetActiveGMapControl().MapProvider = GMapProviders.GoogleSatelliteMap;
         }
+
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "Excel Files|*.xlsx";
+
+
+            /*if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                string path = ofd.FileName;
+                ExcelPackage package = new ExcelPackage(new FileInfo(path));
+                ExcelWorksheet ws = package.Workbook.Worksheets[0];
+
+                DataTable dt = new DataTable();
+                foreach (var cell in ws.Cells[1, 1, 1, ws.Dimension.End.Column])
+                    dt.Columns.Add(cell.Text);
+
+                for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                {
+                    DataRow dr = dt.NewRow();
+                    for (int col = 1; col <= dt.Columns.Count; col++)
+                        dr[col - 1] = ws.Cells[row, col].Text;
+                    dt.Rows.Add(dr);
+                }
+
+                Console.WriteLine(string.Join(" ", dt.Columns.Cast<DataColumn>().Select(col => col.ColumnName)));
+                Form2 parametreFormu = new Form2(path, dt)
+                {
+                    StartPosition = FormStartPosition.CenterParent,
+                    TopMost = true
+                };
+                parametreFormu.ShowDialog(this);  // <-- Modal ve merkezde
+
+
+            }*/
+
+            DataTable dt = ImportExcelFile(Katsayilar);
+
+            Form2 parametreFormu = new Form2(Katsayilar, dt)
+            {
+                StartPosition = FormStartPosition.CenterParent,
+                TopMost = true
+            };
+            parametreFormu.ShowDialog(this);  // <-- Modal ve merkezde
+
+
+
+
+        }
+
+        private void YillariYerlestir()
+        {
+            this.checkedListBox1.Items.Clear();
+
+            this.checkedListBox1.Items.Add("Hepsi");
+
+            int ilkYilInt = int.Parse(İlkYıl);
+            int sonYilInt = int.Parse(SonYıl);
+
+            for (int year = ilkYilInt - 1; year <= sonYilInt; year++)
+            {
+                this.checkedListBox1.Items.Add(year.ToString());
+            }
+
+
+
+        }
     }
 
-
-    public class Trafo
+    public class Form2 : Form
     {
-        public string TrafoID { get; set; }
+        private string _excelPath;
+        private DataTable _dt;
+        private TableLayoutPanel _layout;
+        private Button _btnKaydet;
+        private List<TextBox> _textBoxes = new List<TextBox>();
 
-        public int HucreID { get; set; }
-
-        public double BosKapasite { get; set; }
-
-        public string Owner { get; set; }
-
-        public int Year { get; set; }
-
-        public string Durumu { get; set; }
-
-
-
-        public Trafo(string trafoID, int hucreID, string owner, int year, string durum)
+        public Form2(string excelPath, DataTable dt)
         {
-            TrafoID = trafoID;
-            HucreID = hucreID;
-            Owner = owner;
-            Year = year;
-            Durumu = durum;
+            _excelPath = excelPath;
+            _dt = dt;
+
+            try
+            {
+                InitializeUI();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void InitializeUI()
+        {
+            this.Text = "Parametre Düzenleyici";
+            this.Size = new Size(800, 600);
+            this.AutoScroll = true;
+
+            // Ana panel: tüm içeriği taşır
+            Panel mainPanel = new Panel
+            {
+                Dock = DockStyle.Fill,
+                AutoScroll = true
+            };
+
+            _layout = new TableLayoutPanel
+            {
+                ColumnCount = 6,
+                AutoSize = true,
+                Padding = new Padding(20),
+            };
+
+            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25));
+            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15));
+            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
+            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
+            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
+            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
+
+            // Başlıklar
+            _layout.Controls.Add(CreateHeaderLabel("Parametre"), 0, 0);
+            _layout.Controls.Add(CreateHeaderLabel("Birim"), 1, 0);
+            _layout.Controls.Add(CreateHeaderLabel("Açıklama"), 2, 0);
+            _layout.Controls.Add(CreateHeaderLabel("Değer"), 3, 0);
+            _layout.Controls.Add(CreateHeaderLabel("Min. DEĞER"), 4, 0);
+            _layout.Controls.Add(CreateHeaderLabel("Maks. DEĞER"), 5, 0);
+
+            int rowCount = _dt.Rows.Count;
+
+            for (int i = 0; i < rowCount; i++)
+            {
+
+                int rowIndex = i + 1;
+
+                string parametre = _dt.Rows[i]["parametre"]?.ToString() ?? "";
+                string birim = _dt.Rows[i]["birim"]?.ToString() ?? "";
+                string aciklama = _dt.Rows[i]["açıklama"]?.ToString() ?? "";
+                string deger = _dt.Rows[i]["değer"]?.ToString() ?? "";
+                string minDeger = _dt.Rows[i]["Min. DEĞER"]?.ToString() ?? "";
+                string maxDeger = _dt.Rows[i]["Maks. DEĞER"]?.ToString() ?? "";
+
+                _layout.Controls.Add(CreateContentLabel(parametre), 0, rowIndex);
+                _layout.Controls.Add(CreateContentLabel(birim), 1, rowIndex);
+                _layout.Controls.Add(CreateContentLabel(aciklama), 2, rowIndex);
+                _layout.Controls.Add(CreateContentLabel(minDeger), 4, rowIndex);
+                _layout.Controls.Add(CreateContentLabel(maxDeger), 5, rowIndex);
+
+                TextBox txt = new TextBox
+                {
+                    Text = deger,
+                    Width = 150,
+                    Anchor = AnchorStyles.Left,
+                    Margin = new Padding(5)
+                };
+
+                txt.Tag = i;  // Satırın indeksini tag ile saklıyoruz
+
+                txt.KeyDown += Txt_KeyDown;
+
+                if ((double.TryParse(deger, out double p2Value)))
+                {
+                    if((i == 1) | i == 0)
+                        txt.Text = p2Value.ToString("P1", System.Globalization.CultureInfo.InvariantCulture); // Yüzdelik format
+                }
+
+
+                if (i == 1)
+                {                    
+
+                    txt.ReadOnly = true;
+                    txt.BackColor = SystemColors.Control;
+                }
+
+                if (i == 0)
+                {
+                    //txt.TextChanged += Txt_TextChanged; // Döngüyü önlemek için geçici çıkar
+                    txt.Leave += Txt_Leave;
+
+                }
+
+                _textBoxes.Add(txt);
+                _layout.Controls.Add(txt, 3, rowIndex);
+            }
+
+
+
+            mainPanel.Controls.Add(_layout);
+
+            _btnKaydet = new Button
+            {
+                Text = "Kaydet",
+                Dock = DockStyle.Fill,
+                Height = 40,
+                Margin = new Padding(10)
+            };
+            _btnKaydet.Click += BtnKaydet_Click;
+
+            Panel bottomPanel = new Panel
+            {
+                Dock = DockStyle.Bottom,
+                Height = 60
+            };
+            bottomPanel.Controls.Add(_btnKaydet);
+
+            this.Controls.Add(mainPanel);
+            this.Controls.Add(bottomPanel);
         }
 
 
-
-        public class Hucre
+        private Label CreateHeaderLabel(string text) => new Label
         {
-            public int HucreId { get; set; }
-            public double Left { get; set; }
-            public double Top { get; set; }
-            public double Right { get; set; }
-            public double Bottom { get; set; }
+            Text = text,
+            Font = new Font("Segoe UI", 10, FontStyle.Bold),
+            AutoSize = true,
+            Anchor = AnchorStyles.Left,
+            Margin = new Padding(5)
+        };
 
-            public Hucre(int id, double left, double top, double right, double bottom)
+        private Label CreateContentLabel(string text) => new Label
+        {
+            Text = text,
+            AutoSize = true,
+            Anchor = AnchorStyles.Left,
+            Margin = new Padding(5)
+        };
+
+        private void Txt_Leave(object sender, EventArgs e)
+        {
+            TextBox txtBox = sender as TextBox;
+            if (txtBox == null) return;
+
+            int rowIndex = (int)txtBox.Tag;
+
+            if (rowIndex == 0) // P1
             {
-                HucreId = id;
-                Left = left;
-                Top = top;
-                Right = right;
-                Bottom = bottom;
+                string input = txtBox.Text.Replace("%", "").Replace(",", ".");
+                if (double.TryParse(input, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double p1Value))
+                {
+                    if (p1Value > 1) p1Value /= 100.0;
+                    double p2Value = (1.0 - p1Value) / 4.0;
+
+                    TextBox txtBoxP2 = _textBoxes[1];
+                   
+                    txtBoxP2.Text = p2Value.ToString("P1", System.Globalization.CultureInfo.InvariantCulture);         
+                    
+                    txtBox.Text = p1Value.ToString("P1", System.Globalization.CultureInfo.InvariantCulture);
+          
+                }
+            }
+        }
+
+        private void Txt_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                Txt_Leave(sender, EventArgs.Empty); // Enter'a basınca Leave olayını tetikle
+                e.SuppressKeyPress = true; // Ding sesi çıkmasın diye
+            }
+        }
+
+        private void Txt_TextChanged(object sender, EventArgs e)
+        {
+            TextBox txtBox = sender as TextBox;
+            if (txtBox == null) return;
+
+            int rowIndex = (int)txtBox.Tag;
+
+            if (rowIndex == 0)
+            {
+                if (double.TryParse(txtBox.Text.Replace("%", "").Replace(",", "."), out double p1Value))
+                {
+
+                    // Yüzdelik değer girildiyse %50 -> 0.5'e dönüştür
+                    if (p1Value > 1) p1Value = p1Value / 100.0;
+                    // Formül: P1 + 4*P2 = 1 => P2 = (1 - P1) / 4
+                    double p2Value = (1.0 - p1Value) / 4.0;
+
+                    // P2 kutusunu güncelle
+                    
+                    TextBox txtBoxP2 = _textBoxes[1];
+                    txtBoxP2.TextChanged -= Txt_TextChanged; // Döngüyü önlemek için geçici çıkar
+                    txtBoxP2.Text = p2Value.ToString("P1", System.Globalization.CultureInfo.InvariantCulture); // Yüzdelik format
+                    txtBoxP2.TextChanged += Txt_TextChanged;
+
+                    TextBox txtBoxP1 = _textBoxes[0];
+                    txtBoxP1.TextChanged -= Txt_TextChanged; // Döngüyü önlemek için geçici çıkar
+                    txtBoxP1.Text = p1Value.ToString("P1", System.Globalization.CultureInfo.InvariantCulture); // Yüzdelik format
+                    txtBoxP1.TextChanged += Txt_TextChanged;
+
+
+                    // Eğer isterseniz burada txtBoxP2.Enabled = false; diyerek tamamen kilitleyebilirsiniz
+                }
+            }
+        }
+
+
+        private void BtnKaydet_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < _dt.Rows.Count; i++)
+            {
+                _dt.Rows[i]["değer"] = _textBoxes[i].Text;  // ✅ SADECE "değer" kolonu güncelleniyor
+            }
+
+            var package = new ExcelPackage();
+            var ws = package.Workbook.Worksheets.Add("Sheet2");
+
+            for (int col = 0; col < _dt.Columns.Count; col++)
+                ws.Cells[1, col + 1].Value = _dt.Columns[col].ColumnName;
+
+            for (int row = 0; row < _dt.Rows.Count; row++)
+                for (int col = 0; col < _dt.Columns.Count; col++)
+                    ws.Cells[row + 2, col + 1].Value = _dt.Rows[row][col];
+
+            package.SaveAs(new FileInfo(_excelPath));
+            MessageBox.Show("Excel dosyası başarıyla kaydedildi ✔️");
+            Close();
+        }
+    }
+
+    public static class FormManager
+    {
+        public static DTR_Arayuz Form2Instance { get; set; }
+        public static Rapor_Arayuz RaporInstance { get; set; }
+
+
+        public static void InitializeForms()
+        {
+            Form2Instance = new DTR_Arayuz();
+        }
+
+        public static void InitializeRapor()
+        {
+            RaporInstance = new Rapor_Arayuz();
+        }
+    }
+
+    public class Trafo
+        {
+            public string TrafoID { get; set; }
+
+            public int HucreID { get; set; }
+
+            public double BosKapasite { get; set; }
+
+            public string Owner { get; set; }
+
+            public int Year { get; set; }
+
+            public string Durumu { get; set; }
+
+
+
+            public Trafo(string trafoID, int hucreID, string owner, int year, string durum)
+            {
+                TrafoID = trafoID;
+                HucreID = hucreID;
+                Owner = owner;
+                Year = year;
+                Durumu = durum;
+            }
+
+
+
+            public class Hucre
+            {
+                public int HucreId { get; set; }
+                public double Left { get; set; }
+                public double Top { get; set; }
+                public double Right { get; set; }
+                public double Bottom { get; set; }
+
+                public Hucre(int id, double left, double top, double right, double bottom)
+                {
+                    HucreId = id;
+                    Left = left;
+                    Top = top;
+                    Right = right;
+                    Bottom = bottom;
+                }
+
             }
 
         }
 
     }
 
-}

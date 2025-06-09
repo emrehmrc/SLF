@@ -208,6 +208,8 @@ namespace SLF
             InitializeComponent();
             SetupLayout();
 
+            this.FormClosed += Form_Closed;
+
             ana_menu_form_objesi = new HomePageForm();
             methodFormObjesi = new MethodForm(ana_menu_form_objesi);
             bekleForm = new BekleForm();
@@ -2455,59 +2457,106 @@ namespace SLF
 
             else if (selectedTabText == "Optimal DTR Konumlandırma")
             {
-                // Sekme geçişini tamamen iptal et
+                // Önce mevcut paneli bul ya da oluştur
+                Panel panel = tab_optDTR.Controls.Find("optDtrPanel", false).FirstOrDefault() as Panel;
 
-                Panel panel = new Panel();
-                panel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-                panel.Location = new System.Drawing.Point(0, 0);
-                // Form'un boyutunu kullanarak panel'in genişliğini 50 piksel eksik yapma
-                panel.Size = new Size(this.ClientSize.Width - 25, this.ClientSize.Height - 85);
-                this.tab_optDTR.Controls.Add(panel);
-
-                if (dtr == null)
+                if (panel == null)
                 {
-                    dtr = new DTR_Arayuz();
-                    dtr.TopLevel = false;
-                    dtr.FormBorderStyle = FormBorderStyle.None;
-                    dtr.Dock = DockStyle.Fill;
-                    dtr.Show();
+                    panel = new Panel
+                    {
+                        Name = "optDtrPanel",
+                        Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
+                        Location = new System.Drawing.Point(0, 0),
+                        Size = new Size(this.ClientSize.Width - 25, this.ClientSize.Height - 85)
+                    };
 
-                    panel.Controls.Add(dtr);
-                    //dtr.Parent = this.tab_optDTR;
+                    tab_optDTR.Controls.Add(panel);
+                }
 
+                // Form instance yoksa oluştur
+                if (FormManager.Form2Instance == null)
+                {
+                    FormManager.InitializeForms();
+                    FormManager.Form2Instance.TopLevel = false;
+                    FormManager.Form2Instance.FormBorderStyle = FormBorderStyle.None;
+                    FormManager.Form2Instance.Dock = DockStyle.Fill;
 
+                    panel.Controls.Clear(); // Temizlik
+                    panel.Controls.Add(FormManager.Form2Instance);
+                    FormManager.Form2Instance.Show();
+                }
+                else
+                {
+                    // Eğer form zaten varsa ama panelde değilse tekrar ekle
+                    if (!panel.Controls.Contains(FormManager.Form2Instance))
+                    {
+                        panel.Controls.Clear();
+                        panel.Controls.Add(FormManager.Form2Instance);
+                        FormManager.Form2Instance.Show();
+                    }
                 }
 
                 return;
             }
 
+
             else if (selectedTabText == "Raporlama")
             {
-                Panel panel2 = new Panel();
-                panel2.Dock = DockStyle.Fill;
-                panel2.Padding = new Padding(0, 0, 0, 70); // Bottom margin gibi davranır
+                // Eğer panel daha önce eklenmişse tekrar oluşturma
+                Panel panel2 = tab_rapor.Controls.Find("raporlamaPanel", false).FirstOrDefault() as Panel;
 
-                // Form'un boyutunu kullanarak panel'in genişliğini 50 piksel eksik yapma
-                //panel2.Size = new Size(this.ClientSize.Width - 25, this.ClientSize.Height - 85);
-
-                tab_rapor.Controls.Add(panel2); 
-
-                if (Rapor_Arayuz == null)
+                if (panel2 == null)
                 {
-                    Rapor_Arayuz = new Rapor_Arayuz();
+                    panel2 = new Panel
+                    {
+                        Name = "raporlamaPanel",
+                        Dock = DockStyle.Fill,
+                        Padding = new Padding(0, 0, 0, 70)
+                    };
 
-                    Rapor_Arayuz.TopLevel = false;
-                    Rapor_Arayuz.FormBorderStyle = FormBorderStyle.None;
-                    Rapor_Arayuz.Dock = DockStyle.Fill;
-                    Rapor_Arayuz.Show();
+                    tab_rapor.Controls.Add(panel2);
+                }
 
-                    panel2.Controls.Add(Rapor_Arayuz);
-                    //Rapor_Arayuz.Parent = this.panel2;
+                bool odtrNesne = FormManager.Form2Instance != null;
 
+                if (odtrNesne && FormManager.Form2Instance.ODTR_çalıştı_mı)
+                {
+                    if (FormManager.RaporInstance == null)
+                    {
+                        FormManager.InitializeRapor();
 
+                        FormManager.RaporInstance.TopLevel = false;
+                        FormManager.RaporInstance.FormBorderStyle = FormBorderStyle.None;
+                        FormManager.RaporInstance.Dock = DockStyle.Fill;
+
+                        panel2.Controls.Clear(); // Aynı formu tekrar koymamak için temizle
+                        panel2.Controls.Add(FormManager.RaporInstance);
+
+                        FormManager.RaporInstance.Show();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Lütfen önce Optimal DTR Konumlandırma modülünü çalıştırın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    selectedTabText = "Optimal DTR Konumlandırma";
+                    Modül_Tabları.SelectedTab = tab_optDTR;
                 }
 
                 return;
+            }
+
+        }
+
+        public void Form_Closed(object sender, FormClosedEventArgs e)
+        {
+            FormManager.Form2Instance.Dispose();
+            FormManager.Form2Instance = null; // Clear the instance to allow re-initialization
+
+            if (FormManager.RaporInstance != null)
+            {
+                FormManager.RaporInstance.Dispose();
+                FormManager.RaporInstance = null; // Clear the instance to allow re-initialization
+
             }
 
         }
