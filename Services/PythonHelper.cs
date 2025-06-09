@@ -568,7 +568,7 @@ namespace SLF.services
 
                 // Argümanları oluştur
                 StringBuilder args = new StringBuilder();
-                args.Append($"\"{pythonScriptPath}\" process \"{selectedCity}\" \"{kmlFilePath}\"");
+                args.Append($"/C python \"{pythonScriptPath}\" process \"{selectedCity}\" \"{kmlFilePath}\"");
                 args.Append($" --district \"{selectedDistrict}\"");
                 args.Append($" --output-dir \"{imarAnaliziPath}\"");  // Ana çıktı klasörü
                 args.Append($" --output-prefix \"{outputPrefix}\"");
@@ -619,6 +619,7 @@ namespace SLF.services
                 // Python betiğini çalıştır
                 ProcessStartInfo processInfo = new ProcessStartInfo("python")
                 {
+                    FileName = "cmd.exe",
                     Arguments = args.ToString(),
                     RedirectStandardOutput = false,
                     RedirectStandardError = false,

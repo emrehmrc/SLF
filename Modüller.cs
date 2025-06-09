@@ -771,9 +771,7 @@ namespace SLF
             {"DTR Verileri", new DTRModulu()},
             {"EA Şarj Verileri", new EASarjModulu()},
             {"Ekonometrik Yük Tahmini Verileri", new EkonometrikYukTahminiModulu()},
-            {"Fider Verileri", new FiderVerileri()},
             {"İmar Verileri", new GirdiModülü()},
-            {"Enerji Müsaadeleri Verileri", new EnerjiMusaadeleri()},
             {"Yeni Projelendirilmiş DTR Verileri", new YeniProjelendirilmisDTR()},
         };
 
@@ -849,12 +847,17 @@ namespace SLF
                 if (dataGridView_girdi.DataSource != null)
                 {
                     girdiModülü.ApplyDataGridViewFormatting(GirdiModülü.dataTablesByType[seçilenVeriTipi], dataGridView_girdi);
+
+                    // Update label_data_count with the row 
+                    label_data_count.Text = $"(Satır Sayısı: {GirdiModülü.dataTablesByType[seçilenVeriTipi].Rows.Count})";
+                    label_data_count.Visible = true;
                 }
             }
             else
             {
                 // Optionally, set DataSource to null or an empty DataTable to clear the grid
                 dataGridView_girdi.DataSource = null;
+                label_data_count.Visible = false;
             }
 
             dataGridView_girdi.ScrollBars = ScrollBars.Both;
@@ -1052,8 +1055,29 @@ namespace SLF
             List<string> completedModules = GetCompletedModulesFromJson();
             if (completedModules != null && completedModules.Contains(text))
             {
-                textColor = Color.FromArgb(7, 235, 136); // Green for completed modules
+                textColor = Color.FromArgb(8, 255, 82); // Green for completed modules
             }
+
+            string abone_as_is_sonuc_path = Path.Combine(ana_menu_form_objesi.userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.İlçe,
+                    (string)ana_menu_form_objesi.config.proje_ismi,
+                    "imar_analizi_sonuclari\\imar_planlari\\hucre_abone_analizi\\as_is_abone_sayılari.xlsx");
+
+            string imar_saturasyon_sonuc_path = Path.Combine(ana_menu_form_objesi.userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.İlçe,
+                    (string)ana_menu_form_objesi.config.proje_ismi,
+                    "imar_analizi_sonuclari\\imar_planlari\\saturasyon\\saturasyon_sonuc\\saturasyon.csv");
+
+
+            if (text == "İmar Verileri" && File.Exists(abone_as_is_sonuc_path) && File.Exists(imar_saturasyon_sonuc_path))
+            {
+                textColor = Color.FromArgb(8, 255, 82); // Green for completed modules
+            }
+
 
             // Determine background color based on state
             Color backColor = veri_listesi_seçimi.BackColor; // Default background (usually white)
@@ -2361,7 +2385,7 @@ namespace SLF
             // Modüllerin yüklü olup olmadığını kontrol et
             if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
-                /*if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Haritası Modülü") && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
+                if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Haritası Modülü") && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
                 {
                     //  -- add this later!!!
                     // Sekme geçişini tamamen iptal et
@@ -2391,7 +2415,7 @@ namespace SLF
                     Modül_Tabları.SelectedTab = tab_girdi;
                     Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
                     return;
-                }*/
+                }
             }
 
             // EA Şarj Modülü tabına tıklanmışsa
@@ -5413,27 +5437,22 @@ namespace SLF
         }
 
         public void OnMapClickEventi(
-            PointLatLng pointClick,
-            MouseEventArgs e,
-            GMapOverlay markerOverlay,
-            ref List<PointLatLng> polygonPoints,
-            ref GMapOverlay polygonOverlay,
-            System.Windows.Forms.Label mesafe,
-            System.Windows.Forms.Label mesafe_metre)
+    PointLatLng pointClick,
+    MouseEventArgs e,
+    GMapOverlay markerOverlay,
+    ref List<PointLatLng> polygonPoints,
+    ref GMapOverlay polygonOverlay,
+    System.Windows.Forms.Label mesafe,
+    System.Windows.Forms.Label mesafe_metre)
         {
             if (e.Button == MouseButtons.Left)
             {
-                // If user is drawing polygons
                 if (isSelecting_polygon)
                 {
-                    // Add the newly clicked point
                     polygonPoints.Add(pointClick);
-
-                    // Add a small marker on each click so the user sees the polygon corners
                     GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue_small);
                     markerOverlay.Markers.Add(marker);
 
-                    // find first free layer index
                     int layerIndex = FindFirstFreeLayerIndex();
                     if (layerIndex == -1)
                     {
@@ -5441,48 +5460,40 @@ namespace SLF
                         return;
                     }
 
-                    // decide which map array to use, based on which gMapControl is currently active
                     GMapControl activeMap = cbs.GetActiveGMapControl();
-                    GMapOverlay[] arrayForActiveMap = null;
-
-                    if (activeMap == gMapControl_imar)
-                        arrayForActiveMap = cbs.tüm_katmanlar_array_imar;
-                    else if (activeMap == gMapControl_yuk)
-                        arrayForActiveMap = cbs.tüm_katmanlar_array_yuk;
-                    else
+                    GMapOverlay[] arrayForActiveMap = activeMap == gMapControl_imar ? cbs.tüm_katmanlar_array_imar : cbs.tüm_katmanlar_array_yuk;
+                    if (activeMap != gMapControl_imar && activeMap != gMapControl_yuk)
                     {
                         MessageBox.Show("Geçersiz harita kontrolü!");
                         return;
                     }
 
-                    // 3) If we haven't created an overlay for this layerIndex yet, create & store it
                     if (arrayForActiveMap[layerIndex] == null)
                     {
-                        // define the Id of the polygon "PolygonLayer_{layerIndex+1}"
                         string overlayName = $"PolygonLayer_{layerIndex + 1}";
-
                         GMapOverlay newOverlay = new GMapOverlay(overlayName);
                         activeMap.Overlays.Add(newOverlay);
                         arrayForActiveMap[layerIndex] = newOverlay;
                     }
 
-                    // now set polygonOverlay = that array entry
                     polygonOverlay = arrayForActiveMap[layerIndex];
 
-                    // if there are at least 3 points, let's draw or re-draw the polygon
                     if (polygonPoints.Count >= 3)
                     {
-                        cbs.Draw_Polygon(polygonPoints, polygonOverlay, activeMap);
-
-                        // Calculate and store the center point
-                        double avgLat = polygonPoints.Average(p => p.Lat);
-                        double avgLng = polygonPoints.Average(p => p.Lng);
-                        cbs.polygonCenterPoints[layerIndex] = (avgLat, avgLng);
-
-                        double area = cbs.CalculatePolygonArea(polygonPoints);
-                        mesafe_metre.Visible = false;
-                        mesafe.Visible = true;
-                        mesafe.Text = "Seçili Alan: " + Math.Round(area, 0) + " m²";
+                        string wkt = $"POLYGON (({string.Join(", ", polygonPoints.Select(p => $"{p.Lat} {p.Lng}"))}))";
+                        var centroid = cbs.ParseWktCentroid(wkt);
+                        if (centroid.HasValue)
+                        {
+                            cbs.Draw_Polygon(polygonPoints, polygonOverlay, activeMap);
+                            double area = cbs.CalculatePolygonArea(polygonPoints);
+                            mesafe_metre.Visible = false;
+                            mesafe.Visible = true;
+                            mesafe.Text = "Seçili Alan: " + Math.Round(area, 0) + " m²";
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Failed to calculate centroid for WKT: {wkt}");
+                        }
                     }
 
                     activeMap.Refresh();
@@ -5490,13 +5501,10 @@ namespace SLF
             }
             else if (e.Button == MouseButtons.Right)
             {
-                // If user is placing markers (not polygons)
-                if (isRulerActive) { isRulerActive = false; }
-                if (isRulerEnabled) { isRulerEnabled = false; }
-
+                if (isRulerActive) isRulerActive = false;
+                if (isRulerEnabled) isRulerEnabled = false;
                 rulerOverlay_imar?.Clear();
                 rulerRoute_imar?.Clear();
-
             }
         }
 
@@ -8041,22 +8049,6 @@ namespace SLF
             }
         }
 
-        private void Enerji_Müsaadesi_Ekle_Click(object sender, EventArgs e)
-        {
-            isSelecting_polygon = true;
-            isSelecting_Kentsel_Donusum = false;
-            isSelecting_YGA = false;
-            isSelecting_YUK = false;
-
-            isRulerEnabled = false;
-            isRulerActive = false;
-
-            // Determine the active map control and reset accordingly
-            if (cbs.GetActiveGMapControl() == gMapControl_imar)
-            {
-                ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar, rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
-            }
-        }
 
         private void buton_imar_tahmini_Click(object sender, EventArgs e)
         {
@@ -8664,6 +8656,21 @@ namespace SLF
             {
                 ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar, 
                     rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
+            }
+        }
+
+        private void dataGridView_girdi_DataSourceChanged(object sender, EventArgs e)
+        {
+            // Check if the DataSource is a DataTable and update the label
+            if (dataGridView_girdi.DataSource is DataTable dataTable)
+            {
+                label_data_count.Text = $"(Satır Sayısı: {dataTable.Rows.Count:N0})";
+                label_data_count.Visible = true;
+            }
+            else
+            {
+                // Clear the label if no valid DataSource is set
+                label_data_count.Visible = false ;
             }
         }
 

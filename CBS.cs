@@ -15,6 +15,7 @@ using System.Windows.Forms;
 using GMap.NET.WindowsForms.Markers;
 using System.Globalization;
 using System.Xml.Linq;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
 
 
 namespace SLF
@@ -75,6 +76,74 @@ namespace SLF
         // Get the user's profile path
         public string userProfilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         public string targetDirectory;
+
+        // Haversine formula to calculate distance between two points (in meters) - POINT LOAD yük dagıtma mantıgında kullanılacak
+        public double CalculateHaversineDistance(double lat1, double lon1, double lat2, double lon2)
+        {
+            const double R = 6371000; // Earth's radius in meters
+            double dLat = ToRadians(lat2 - lat1);
+            double dLon = ToRadians(lon2 - lon1);
+            double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                       Math.Cos(ToRadians(lat1)) * Math.Cos(ToRadians(lat2)) *
+                       Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return R * c;
+        }
+
+        private double ToRadians(double angle)
+        {
+            return angle * Math.PI / 180.0;
+        }
+
+        public (double Latitude, double Longitude)? ParseWktCentroid(string wkt)
+        {
+            if (string.IsNullOrEmpty(wkt))
+                return null;
+
+            wkt = wkt.Trim().ToUpper(); // Normalize case
+            try
+            {
+                if (wkt.StartsWith("POLYGON"))
+                {
+                    var pointStrings = wkt.Replace("POLYGON ((", "").Replace("))", "").Split(',');
+                    if (pointStrings.Length >= 3)
+                    {
+                        double minLat = double.MaxValue, maxLat = double.MinValue;
+                        double minLon = double.MaxValue, maxLon = double.MinValue;
+
+                        foreach (var point in pointStrings)
+                        {
+                            var coords = point.Trim().Split(' ');
+                            if (coords.Length == 2 && double.TryParse(coords[0], out double lat) && double.TryParse(coords[1], out double lon))
+                            {
+                                minLat = Math.Min(minLat, lat); // Latitude (Y)
+                                maxLat = Math.Max(maxLat, lat);
+                                minLon = Math.Min(minLon, lon); // Longitude (X)
+                                maxLon = Math.Max(maxLon, lon);
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Invalid coordinate pair in WKT: {point}");
+                            }
+                        }
+                        if (minLat != double.MaxValue && maxLat != double.MinValue && minLon != double.MaxValue && maxLon != double.MinValue)
+                        {
+                            var centroid = ((minLat + maxLat) / 2, (minLon + maxLon) / 2);
+                            return centroid;
+                        }
+                    }
+                }
+                Console.WriteLine($"Failed to parse WKT: {wkt}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ParseWktCentroid error: {ex.Message} for WKT: {wkt}");
+                return null;
+            }
+        }
+
+
 
         public CBS (ModülFormu mainform)
         {
@@ -1689,8 +1758,6 @@ namespace SLF
 
         public void Draw_Polygon(List<PointLatLng> polygonPoints, GMapOverlay polygonOverlay, GMapControl gmap)
         {
-            // bu noktalar arasında poligon çiz, mavi ile işaretle, ve de 
-            // polygonOverlay katmanına ekle.
             string poligonIsim = $"Poligon_{polygonOverlay.Polygons.Count + 1}";
             GMapPolygon polygon = new GMapPolygon(polygonPoints, poligonIsim)
             {
@@ -1700,6 +1767,28 @@ namespace SLF
             polygonOverlay.Polygons.Clear();
             polygonOverlay.Polygons.Add(polygon);
             gmap.Refresh();
+
+            if (polygonPoints != null && polygonPoints.Count > 0)
+            {
+                double minLat = double.MaxValue, maxLat = double.MinValue;
+                double minLon = double.MaxValue, maxLon = double.MinValue;
+
+                foreach (var point in polygonPoints)
+                {
+                    minLat = Math.Min(minLat, point.Lat);
+                    maxLat = Math.Max(maxLat, point.Lat);
+                    minLon = Math.Min(minLon, point.Lng);
+                    maxLon = Math.Max(maxLon, point.Lng);
+                }
+                var center = ((minLat + maxLat) / 2, (minLon + maxLon) / 2); // (lat, lon) order
+                int layerIndex = Array.FindIndex(tüm_katmanlar_array_imar, overlay => overlay == polygonOverlay) >= 0
+                    ? Array.FindIndex(tüm_katmanlar_array_imar, overlay => overlay == polygonOverlay)
+                    : Array.FindIndex(tüm_katmanlar_array_yuk, overlay => overlay == polygonOverlay);
+                if (layerIndex >= 0 && layerIndex < polygonCenterPoints.Length)
+                {
+                    polygonCenterPoints[layerIndex] = center;
+                }
+            }
         }
 
         public double CalculatePolygonArea(List<PointLatLng> points)
@@ -2176,7 +2265,6 @@ namespace SLF
         }
 
 
-
         // after performing spatial join, create the resulting GMapOverlay object and add the resulting
         // polygon and attributes to the specified objects
         private GMapOverlay CreateResultingOverlay(
@@ -2254,100 +2342,140 @@ namespace SLF
         }
 
 
-        // join the two layers by their indexes within the tüm_katmanlar_array GMapOverlay array
         public async Task JoinAttributesByLocation(GMapControl gMapControl)
         {
-            // Assume selectedColumns is populated from the ComboBox selections
             List<string> selectedColumns = modülFormu.fonksiyonFormu.agrege_olacak_sutunlar;
 
-            // Find the indices of the layers that are selected in the "jabl" functionality/interface
             modülFormu.firstLayerToJoin = Array.FindIndex(tüm_katmanlar_array_names,
                 name => name == modülFormu.firstLayerName);
             modülFormu.secondLayerToJoin = Array.FindIndex(tüm_katmanlar_array_names,
                 name => name == modülFormu.secondLayerName);
 
-            // Validate layer indices
             if (modülFormu.firstLayerToJoin == -1 || modülFormu.secondLayerToJoin == -1)
             {
                 MessageBox.Show("Seçilen katmanlar bulunamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            // Extract the first and second overlay layers according to their specified indices
-            GMapOverlay firstOverlay = tüm_katmanlar_array_imar[modülFormu.firstLayerToJoin];
-            GMapOverlay secondOverlay = tüm_katmanlar_array_imar[modülFormu.secondLayerToJoin];
+            GMapOverlay firstLayer = tüm_katmanlar_array_imar[modülFormu.firstLayerToJoin];
+            GMapOverlay secondLayer = tüm_katmanlar_array_imar[modülFormu.secondLayerToJoin];
 
-            // Extract the data of the first layer from the "tüm_katmanlar_datatable" array
             List<(GMapPolygon Polygon, DataRow Attributes)> firstLayerData =
-                ExtractPolygonsAndAttributes(firstOverlay, tüm_katmanlar_datatable[modülFormu.firstLayerToJoin]);
-
-            // Extract the data of the second layer from the "tüm_katmanlar_datatable" array
+                ExtractPolygonsAndAttributes(firstLayer, tüm_katmanlar_datatable[modülFormu.firstLayerToJoin]);
             List<(GMapPolygon Polygon, DataRow Attributes)> secondLayerData =
-                ExtractPolygonsAndAttributes(secondOverlay, tüm_katmanlar_datatable[modülFormu.secondLayerToJoin]);
+                ExtractPolygonsAndAttributes(secondLayer, tüm_katmanlar_datatable[modülFormu.secondLayerToJoin]);
 
-            // Spatially join the two layers and store the results in the "joinedData" List object
             List<(GMapPolygon ResultingPolygon, DataRow ResultingAttributes)> joinedData = PerformSpatialJoin(firstLayerData, secondLayerData);
 
-            // Create the resulting overlay with respect to the "joinedData" object
+            string firstLayerTag = tüm_katmanlar_array_polygon_tags[modülFormu.firstLayerToJoin];
+            string secondLayerTag = tüm_katmanlar_array_polygon_tags[modülFormu.secondLayerToJoin];
+            bool isYukJoin = firstLayerTag == "YUK" || secondLayerTag == "YUK";
+            int yukLayerIndex = firstLayerTag == "YUK" ? modülFormu.firstLayerToJoin : modülFormu.secondLayerToJoin;
+            List<(GMapPolygon Polygon, DataRow Attributes)> yukLayerData = firstLayerTag == "YUK" ? firstLayerData : secondLayerData;
+
+            if (isYukJoin && joinedData.Count > 0)
+            {
+                var centerPoint = polygonCenterPoints[yukLayerIndex];
+                if (centerPoint.Latitude == 0.0 && centerPoint.Longitude == 0.0)
+                {
+                    MessageBox.Show("YUK katmanının merkez noktası bulunamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                double minDistance = double.MaxValue;
+                int closestRowIndex = -1;
+
+                Console.WriteLine($"YUK Center Point: {centerPoint.Latitude}, {centerPoint.Longitude}");
+
+                for (int i = 0; i < joinedData.Count; i++)
+                {
+                    var row = joinedData[i].ResultingAttributes;
+                    if (row.Table.Columns.Contains("left") && row.Table.Columns.Contains("top") &&
+                        row.Table.Columns.Contains("right") && row.Table.Columns.Contains("bottom"))
+                    {
+                        if (double.TryParse(row["left"].ToString(), out double left) &&
+                            double.TryParse(row["top"].ToString(), out double top) &&
+                            double.TryParse(row["right"].ToString(), out double right) &&
+                            double.TryParse(row["bottom"].ToString(), out double bottom))
+                        {
+                            double centroidLat = (top + bottom) / 2; // Latitude (Y)
+                            double centroidLon = (left + right) / 2; // Longitude (X)
+                            double distance = CalculateHaversineDistance(
+                                centerPoint.Latitude, centerPoint.Longitude,
+                                centroidLat, centroidLon);
+                            Console.WriteLine($"Row {i}: Centroid ({centroidLat}, {centroidLon}), Distance = {distance} m, Row_No = {row["Row_No"]}");
+                            if (distance < minDistance || closestRowIndex == -1)
+                            {
+                                minDistance = distance;
+                                closestRowIndex = i;
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Row {i}: Failed to parse left, top, right, bottom: {row["left"]}, {row["top"]}, {row["right"]}, {row["bottom"]}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Row {i}: Missing left, top, right, or bottom columns");
+                    }
+                }
+
+                Console.WriteLine($"Closest Row Index: {closestRowIndex}, Min Distance: {minDistance} m, Row_No of Closest = {joinedData[closestRowIndex].ResultingAttributes["Row_No"]}");
+
+                if (closestRowIndex >= 0 && joinedData[0].ResultingAttributes.Table.Columns.Contains("Pik Demant (kW)"))
+                {
+                    var pikDemantValue = yukLayerData[0].Attributes["Pik Demant (kW)"];
+                    for (int i = 0; i < joinedData.Count; i++)
+                    {
+                        var row = joinedData[i].ResultingAttributes;
+                        row["Pik Demant (kW)"] = i == closestRowIndex ? pikDemantValue : 0.0;
+                    }
+                    Console.WriteLine($"Assigned Pik Demant (kW) = {pikDemantValue} to Row {closestRowIndex} (Row_No = {joinedData[closestRowIndex].ResultingAttributes["Row_No"]})");
+                }
+            }
+
             GMapOverlay resultingOverlay = CreateResultingOverlay(joinedData);
+            resultingOverlay.Id = $"PolygonLayer_{layer_index + 1}";
 
-            // Set the Id to ensure it contains "polygon"
-            resultingOverlay.Id = $"PolygonLayer_{layer_index + 1}"; // Match the pattern used in PoligonKaydetEventi
-
-            // Find the first available slot in the array that holds shapefile overlay layers
             layer_index = Array.FindIndex(tüm_katmanlar_array_imar, i => i == null);
-
             if (layer_index == -1)
             {
                 MessageBox.Show("En fazla 13 adet katman seçilebilmektedir.");
                 return;
             }
 
-            // Determine the tag for the resulting overlay based on input layers' tags
-            string overlayTag = "JOINED"; // Default tag
-            string firstLayerTag = tüm_katmanlar_array_polygon_tags[modülFormu.firstLayerToJoin];
-            string secondLayerTag = tüm_katmanlar_array_polygon_tags[modülFormu.secondLayerToJoin];
-
-            // List of valid base tags
+            string overlayTag = "JOINED";
             string[] validBaseTags = { "YGA", "YUK", "KENTSEL_DONUSUM" };
 
-            // Check if either layer has a valid base tag
             if (validBaseTags.Contains(firstLayerTag))
             {
-                overlayTag = $"{firstLayerTag}_JOINED"; // e.g., "KENTSEL_DONUSUM_JOINED"
+                overlayTag = $"{firstLayerTag}_JOINED";
             }
             else if (validBaseTags.Contains(secondLayerTag))
             {
-                overlayTag = $"{secondLayerTag}_JOINED"; // e.g., "YGA_JOINED"
+                overlayTag = $"{secondLayerTag}_JOINED";
             }
             else
             {
-                // If neither layer has a valid tag, set a default _JOINED tag
                 overlayTag = "DEFAULT_JOINED";
             }
 
-            // Store the tag
             tüm_katmanlar_array_polygon_tags[layer_index] = overlayTag;
-            modülFormu.overlayTags[resultingOverlay] = overlayTag; // Keep for compatibility
+            modülFormu.overlayTags[resultingOverlay] = overlayTag;
 
-            // Add the resulting layer and its name to the specified arrays
             tüm_katmanlar_array_imar[layer_index] = resultingOverlay;
             tüm_katmanlar_array_names[layer_index] = "Birleştirilmiş_Katman_" + (layer_index + 1).ToString();
 
-            // Create a data table object and fill it with the information from the joinedData object
             System.Data.DataTable joined_data_table = new System.Data.DataTable();
-
             if (joinedData.Count > 0)
             {
-                // Use the first DataRow to define the columns of the DataTable
                 DataRow firstRow = joinedData[0].ResultingAttributes;
-
                 foreach (DataColumn column in firstRow.Table.Columns)
                 {
                     joined_data_table.Columns.Add(column.ColumnName, column.DataType);
                 }
 
-                // Add each DataRow within the resulting "joinedData" object to the "joined_data_table" object
                 foreach (var (_, dataRow) in joinedData)
                 {
                     DataRow newRow = joined_data_table.NewRow();
@@ -2363,21 +2491,17 @@ namespace SLF
                 Console.WriteLine("JoinAttributesByLocation - Warning: No resulting polygons after spatial join.");
             }
 
-            // Add the datatable to the array so that it can be summoned later
             tüm_katmanlar_datatable[layer_index] = joined_data_table;
 
-            // Get the list of associated checkboxes for the given layer_index
             List<System.Windows.Forms.CheckBox> associatedCheckBoxes = modülFormu.GetCheckBoxesByIndex(layer_index);
-
             if (associatedCheckBoxes != null)
             {
-                // Loop through each checkbox in the list and apply the required settings
                 foreach (var checkBox in associatedCheckBoxes)
                 {
                     checkBox.Checked = true;
                     checkBox.Visible = true;
                     checkBox.Text = tüm_katmanlar_array_names[layer_index];
-                    checkBox.Tag = (layer_index + 1).ToString(); // Set Tag to 1-based layer index
+                    checkBox.Tag = (layer_index + 1).ToString();
                 }
             }
 

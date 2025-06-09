@@ -22,7 +22,7 @@ namespace SLF.Services
             public static string _configKatmanEslestirmePath;
             public static string _configKatmanDenemePath;
             public static string _configDeepLearningModelPath;
-            public static string _configCbs;
+            public static string _configCbs_abone;
             public static string _configveritabanikod;
             public static string _configKonum;
         // Proje klasörüne göre relatif il-ilçe kırılımı klasörü yolu
@@ -136,9 +136,9 @@ namespace SLF.Services
                             Debug.WriteLine($"Config'den alınan veri klasörü yolu: {_baseDirectory}");
 
                             // CBS yolunu ayarla (yeni eklenen kısım)
-                            if (config.CBS != null)
+                            if (config.CBS_abone != null)
                             {
-                                string cbsPath = config.CBS.ToString();
+                                string cbsPath = config.CBS_abone.ToString();
 
                                 // Eğer yol "/" ile başlıyorsa, başındaki "/" karakterini kaldır
                                 if (cbsPath.StartsWith("/"))
@@ -167,24 +167,12 @@ namespace SLF.Services
                                         // Eğer klasörde belirtilen dosya varsa
                                         if (File.Exists(cbsFullPath))
                                         {
-                                            _configCbs = cbsFullPath;
-                                            Console.WriteLine($"CBS TAB dosyası bulundu: {_configCbs}");
+                                            _configCbs_abone = cbsFullPath;
+                                            Console.WriteLine($"CBS ABONE.TAB dosyası bulundu: {_configCbs_abone}");
                                         }
                                         else
                                         {
-                                            Console.WriteLine($"CBS TAB dosyası bulunamadı: {cbsFullPath}");
-
-                                            // Klasördeki TAB dosyalarını ara
-                                            string[] tabFiles = Directory.GetFiles(cbsDirectory, "*.TAB");
-                                            if (tabFiles.Length > 0)
-                                            {
-                                                _configCbs = tabFiles[0]; // İlk TAB dosyasını al
-                                                Console.WriteLine($"Alternatif CBS TAB dosyası kullanılıyor: {_configCbs}");
-                                            }
-                                            else
-                                            {
-                                                Console.WriteLine($"CBS klasöründe hiç TAB dosyası bulunamadı: {cbsDirectory}");
-                                            }
+                                            Console.WriteLine($"CBS ABONE.TAB dosyası bulunamadı: {cbsFullPath}");
                                         }
                                     }
                                     else

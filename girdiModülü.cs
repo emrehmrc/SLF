@@ -167,6 +167,7 @@ namespace SLF
 
             return roundedKapasite;
         }
+
         public bool IsNullLike(object value, bool isZero = false) // 0 VE negatif kontrolu 
         {
             if (value == null || value == DBNull.Value)
