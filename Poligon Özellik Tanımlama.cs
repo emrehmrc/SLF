@@ -8,7 +8,6 @@ using ExcelDataReader;
 using GMap.NET;
 using System.Globalization;
 using OfficeOpenXml;
-using DocumentFormat.OpenXml.Vml;
 
 namespace SLF
 {
@@ -38,13 +37,15 @@ namespace SLF
         // Field to store the current KeyPress lambda delegate
         private KeyPressEventHandler _currentKeyPressHandler;
 
+
         public Poligon_Özellik_Tanımlama(bool isSelectingYUK, bool isSelectingYGA, bool isSelectingKentselDonusum,
-            List<PointLatLng> polygonPoints)
+            List<PointLatLng> polygonPoints, ModülFormu mainform)
         {
 
             InitializeComponent();
             modül_formu = new ModülFormu();
             cbsFormu = new CBS(modül_formu);
+            this.modül_formu = mainform;
 
             // Set the flags before calling SetupDataGridView
             isSelecting_YUK = isSelectingYUK;
@@ -57,8 +58,10 @@ namespace SLF
                 (string)modül_formu.ana_menu_form_objesi.config.İlçe,
                 (string)modül_formu.ana_menu_form_objesi.config.Point_Load_Musaade).Replace('/', '\\');
 
-            // Determine layer index
-            layerIndex = FindFirstFreeLayerIndex();
+
+            // Determine layer index (already the polygon is added on to the overlay, so this will return 1)
+            layerIndex = Array.FindIndex(modül_formu.cbs.tüm_katmanlar_array_imar, s => s == null);
+
             if (layerIndex < 0)
             {
                 MessageBox.Show("Çizilen poligon geçersiz bir katmana ait!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -70,18 +73,6 @@ namespace SLF
 
         }
 
-        private int FindFirstFreeLayerIndex()
-        {
-            for (int i = 0; i < 15; i++)
-            {
-                // If all four overlays at index i are null, that means it’s free
-                if (cbsFormu.tüm_katmanlar_array_imar[i] == null && cbsFormu.tüm_katmanlar_array_yuk[i] == null)
-                {
-                    return i;
-                }
-            }
-            return -1; // none free
-        }
 
         private void SetupDataGridView(List<PointLatLng> polygonPoints)
         {
@@ -90,6 +81,7 @@ namespace SLF
             // Create a string representation of the coordinates in WKT format
             string coordinates = $"Polygon (({string.Join(", ", polygonPoints.Select(p => $"{p.Lat} {p.Lng}"))}))";
             string area = Math.Round(cbsFormu.CalculatePolygonArea(polygonPoints), 1).ToString() + " m2";
+
 
             // construct the parameters of the point load addition 
             if (isSelecting_YUK == true)
@@ -110,7 +102,7 @@ namespace SLF
                 dataTable.Rows.Add(dataTable.NewRow());
 
                 // Set "Polygon ID" value
-                dataTable.Rows[0]["Polygon ID"] = "Polygon_" + layerIndex;
+                dataTable.Rows[0]["Polygon ID"] = "Polygon_" + (layerIndex).ToString();
                 dataTable.Rows[0]["Koordinatlar"] = coordinates;
                 dataTable.Rows[0]["Çizilen Alan (m2)"] = area;
 
@@ -168,7 +160,7 @@ namespace SLF
                 dataTable.Rows.Add(dataTable.NewRow());
 
                 // Set "Polygon ID" value
-                dataTable.Rows[0]["Polygon ID"] = "Polygon_" + layerIndex;
+                dataTable.Rows[0]["Polygon ID"] = "Polygon_" + (layerIndex).ToString();
                 dataTable.Rows[0]["Koordinatlar"] = coordinates;
                 dataTable.Rows[0]["Çizilen Alan (m2)"] = area;
 
@@ -225,7 +217,7 @@ namespace SLF
                 dataTable.Rows.Add(dataTable.NewRow());
 
                 // Set "Polygon ID" value
-                dataTable.Rows[0]["Polygon ID"] = "Polygon_" + layerIndex;
+                dataTable.Rows[0]["Polygon ID"] = "Polygon_" + (layerIndex).ToString();
                 dataTable.Rows[0]["Koordinatlar"] = coordinates;
                 dataTable.Rows[0]["Çizilen Alan (m2)"] = area;
 

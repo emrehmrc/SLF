@@ -234,6 +234,8 @@ namespace SLF
 
             // initialize the instance of a CBS form
             cbs = new CBS(this);
+
+
             this.DoubleBuffered = true;
 
             this.selectedMethod = selectedMethod;  // Store the method
@@ -5317,17 +5319,17 @@ namespace SLF
         {
             if (isSelecting_YUK == true)
             {
-                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(true, false, false, polygonPoints_imar);
+                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(true, false, false, polygonPoints_imar, this);
 
             }
             else if (isSelecting_YGA == true)
             {
-                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, true, false, polygonPoints_imar);
+                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, true, false, polygonPoints_imar, this);
                 poligonOzellikFormu.buton_yük_tipleri.Visible = false;
             }
             else if (isSelecting_Kentsel_Donusum == true)
             {
-                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, false, true, polygonPoints_imar);
+                poligonOzellikFormu = new Poligon_Özellik_Tanımlama(false, false, true, polygonPoints_imar, this);
                 poligonOzellikFormu.buton_yük_tipleri.Visible = false;
             }
 
@@ -8026,7 +8028,7 @@ namespace SLF
                         StartInfo = new ProcessStartInfo
                         {
                             FileName = "cmd.exe",
-                            Arguments = $"/C python \"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
+                            Arguments = $"/k python \"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
                             RedirectStandardOutput = false,
                             RedirectStandardError = false,
                             UseShellExecute = false,
@@ -8239,17 +8241,17 @@ namespace SLF
                         switch (tag)
                         {
                             case "KENTSEL_DONUSUM_JOINED":
-                                excelExporter.ExportExcelFile(Path.Combine(exportDirPath_kentsel, "kentsel_donusum_poligonlar.xlsx").Replace('/', '\\'),
+                                excelExporter.ExportExcelFile_poligons(Path.Combine(exportDirPath_kentsel, "kentsel_donusum_poligonlar.xlsx").Replace('/', '\\'),
                                     dt, "kentsel_donusum_poligonlar", true);
                                 exportedAnyJoinedLayer = true;
                                 break;
                             case "YGA_JOINED":
-                                excelExporter.ExportExcelFile(Path.Combine(exportDirPath_YGA, "yga_poligonlar.xlsx").Replace('/', '\\'), dt,
+                                excelExporter.ExportExcelFile_poligons(Path.Combine(exportDirPath_YGA, "yga_poligonlar.xlsx").Replace('/', '\\'), dt,
                                     "yga_poligonlar", true);
                                 exportedAnyJoinedLayer = true;
                                 break;
                             case "YUK_JOINED":
-                                excelExporter.ExportExcelFile(Path.Combine(exportDirPath_YUK, "point_load_poligonlar.xlsx").Replace('/', '\\'),
+                                excelExporter.ExportExcelFile_poligons(Path.Combine(exportDirPath_YUK, "point_load_poligonlar.xlsx").Replace('/', '\\'),
                                     dt, "point_load_poligonlar", true);
                                 exportedAnyJoinedLayer = true;
                                 break;
@@ -8265,14 +8267,15 @@ namespace SLF
                         (string)ana_menu_form_objesi.config.program_dosyaları_path,
                         (string)ana_menu_form_objesi.config.SLF.abone_sayısı_tahmini_kodu).Replace('/', '\\');
 
+                    string tempStatusFile = Path.Combine(Path.GetTempPath(), "python_script_status.json");
 
-                    // Run cmd.exe with /k to keep the window open
+                    // code execution
                     var process = new Process
                     {
                         StartInfo = new ProcessStartInfo
                         {
                             FileName = "cmd.exe",
-                            Arguments = $"/C python \"{abone_sayısı_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
+                            Arguments = $"/k python \"{abone_sayısı_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\" \"{tempStatusFile}\"",
                             RedirectStandardOutput = false,
                             RedirectStandardError = false,
                             UseShellExecute = false,
@@ -8285,19 +8288,58 @@ namespace SLF
 
                     this.Cursor = Cursors.Default;
 
-                    // Show result
-                    if (process.ExitCode != 0)
-                        MessageBox.Show($"Bir hata meydana geldi.",
-                            "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    if (File.Exists(tempStatusFile))
+                    {
+                        try
+                        {
+                            string statusJson = File.ReadAllText(tempStatusFile);
+                            var status = System.Text.Json.JsonSerializer.Deserialize<PythonScriptStatus>(statusJson);
+
+                            if (status.ExitCode == 0)
+                            {
+                                MessageBox.Show($"Ufuk yılları için abone sayısı tahminleri oluşturuldu!",
+                                    "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            }
+                            else
+                            {
+                                MessageBox.Show($"Bir hata meydana geldi.\n\nError: {status.Error}",
+                                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Status file parsing failed: {ex.Message}\nAssuming script failed.",
+                                "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
                     else
-                        MessageBox.Show($"Ufuk yılları için abone sayısı tahminleri oluşturuldu!",
-                            "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    {
+                        MessageBox.Show("Python script was interrupted or failed to complete (no status file found).",
+                            "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+
+                    if (File.Exists(tempStatusFile))
+                    {
+                        try
+                        {
+                            File.Delete(tempStatusFile);
+                        }
+                        catch { /* Ignore cleanup errors */ }
+                    }
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Bir hata meydana geldi: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 }
             }
+        }
+
+        // Add this class at the bottom of the file or in a suitable location
+        public class PythonScriptStatus
+        {
+            public int ExitCode { get; set; }
+            public string Output { get; set; }
+            public string Error { get; set; }
         }
 
         private async void buton_SLF_tahmini_Click(object sender, EventArgs e)
@@ -8537,7 +8579,6 @@ namespace SLF
                     rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
             }
         }
-
 
         private void TextBox_KeyPress_NumbersOnly(object sender, KeyPressEventArgs e)
         {

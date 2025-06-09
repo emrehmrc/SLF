@@ -33,8 +33,12 @@ namespace SLF
         }
 
 
-        private void SelectCsvButton_Click(object sender, EventArgs e)
+        private async void SelectCsvButton_Click(object sender, EventArgs e)
         {
+            await Task.Delay(250);
+
+            this.Cursor = Cursors.WaitCursor;   
+
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Filter = "CSV Files (*.csv)|*.csv";
@@ -49,10 +53,15 @@ namespace SLF
                  
                 }
             }
+
+            this.Cursor = Cursors.Default;
         }
 
-        private void SelectKmlButton_Click(object sender, EventArgs e)
+        private async void SelectKmlButton_Click(object sender, EventArgs e)
         {
+            await Task.Delay(250);
+            this.Cursor = Cursors.WaitCursor;
+
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Filter = "KML Files (*.kml)|*.kml";
@@ -65,12 +74,20 @@ namespace SLF
                     label_imar_path.Visible= true;
                 }
             }
+
+            this.Cursor= Cursors.Default;
         }
 
-        private void OkButton_Click(object sender, EventArgs e)
+        private async void OkButton_Click(object sender, EventArgs e)
         {
             try
             {
+                OkButton.ForeColor = Color.LimeGreen;
+                OkButton.Refresh(); // Force UI update
+                await Task.Delay(300); // Non-blocking delay for 1 second
+                OkButton.ForeColor = Color.White;
+                OkButton.Refresh(); // Force UI update
+
                 Cursor.Current = Cursors.WaitCursor;
 
                 // PathService'te il ve ilçe bilgileri olup olmadığını kontrol et
@@ -85,7 +102,8 @@ namespace SLF
                     // Sadece KML dosyası gerekli
                     if (string.IsNullOrEmpty(KmlFilePath))
                     {
-                        MessageBox.Show("Lütfen bir KML dosyası seçin.", "Eksik Dosya", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Lütfen üstteki 'İmar Verisi Seç' bölümünden bir İmar dosyası (.kml) dosyası " +
+                            "seçin.", "Eksik Dosya", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return;
                     }
 
@@ -98,7 +116,9 @@ namespace SLF
                     // KML ve CSV dosyaları birlikte gerekli
                     if (string.IsNullOrEmpty(CsvFilePath) || string.IsNullOrEmpty(KmlFilePath))
                     {
-                        MessageBox.Show("Lütfen hem CSV hem de KML dosyalarını seçin.", "Eksik Dosya", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Lütfen üstteki 'İmar Verisi Seç' ve 'Overpass Verisi Seç' butonlarını kullanarak" +
+                            " bir İmar dosyası (.kml) ve daha önce indirilmiş bir Overpass verisi (.csv) seçiniz.", 
+                            "Eksik Dosya", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return;
                     }
 
@@ -108,7 +128,8 @@ namespace SLF
                 }
                 else
                 {
-                    MessageBox.Show("Lütfen bir yöntem seçin.", "Eksik Seçim", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Lütfen en üstteki dropdown butonunu kullanarak bir yöntem seçiniz.", 
+                        "Eksik Seçim", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
@@ -278,10 +299,17 @@ namespace SLF
             }
         }
 
-        private void TestCalıstır_Click(object sender, EventArgs e)
+        private async void TestCalıstır_Click(object sender, EventArgs e)
         {
             try
             {
+                TestCalıstır.ForeColor = Color.LimeGreen;
+                TestCalıstır.Refresh(); // Force UI update
+                await Task.Delay(300); // Non-blocking delay for 1 second
+                TestCalıstır.ForeColor = Color.White;
+                TestCalıstır.Refresh(); // Force UI update
+
+
                 Cursor.Current = Cursors.WaitCursor;
 
                 // Check if KML file is selected
@@ -591,24 +619,33 @@ namespace SLF
             }
         }
 
-        private void KmlTestButton_Click(object sender, EventArgs e)
+        private async void KmlTestButton_Click(object sender, EventArgs e)
         {
+            await Task.Delay(250);
+            this.Cursor = Cursors.WaitCursor;
+            this.Refresh();
+
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Filter = "KML Files (*.kml)|*.kml";
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     KmlFilePath = openFileDialog.FileName;
-                    //kmlFilePathLabel.Text = Path.GetFileName(KmlFilePath);
+                    string filename = KmlFilePath.Substring(KmlFilePath.LastIndexOf("\\") + 1);
+
+                    label_imar_test.Text = filename;
+                    label_imar_test.Visible = true;
+
                 }
             }
+            this.Cursor = Cursors.Default;
+            this.Refresh();
         }
 
         private async void label_imar_katman_listeleri_Click(object sender, EventArgs e)
         {
             try
             {
-                // Change text color to WhiteSmoke
                 label_imar_katman_listeleri.ForeColor = Color.LimeGreen;
                 label_imar_katman_listeleri.Refresh(); // Force UI update
                 await Task.Delay(1000); // Non-blocking delay for 1 second

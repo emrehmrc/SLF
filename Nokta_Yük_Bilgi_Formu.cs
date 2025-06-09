@@ -267,14 +267,14 @@ namespace SLF
                             double.TryParse(peakDemandCellValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double peakDemandValue))
                         {
                             // Calculate expected peak demand
-                            double expectedPeakDemand = powerValue * (peakLoadValue / 100); // Percentage correction
+                            double expectedPeakDemand = powerValue * (peakLoadValue); // Percentage correction
 
                             // Use a small tolerance for floating-point precision
-                            const double tolerance = 0.001; // Increased slightly for robustness
+                            const double tolerance = 1; // Increased slightly for robustness
                             if (Math.Abs(expectedPeakDemand - peakDemandValue) > tolerance)
                             {
                                 MessageBox.Show(
-                                    $"Satır {rowIndex + 1}: '{powerColumn}' * '{peakLoadColumn}' / 100 = '{peakDemandColumn}' eşitliği sağlanmıyor.\n" +
+                                    $"Satır {rowIndex + 1}: '{powerColumn}' * '{peakLoadColumn}' = '{peakDemandColumn}' eşitliği sağlanmıyor.\n" +
                                     $"Hesaplanan: {expectedPeakDemand:F2} kW, Girilen: {peakDemandValue:F2} kW",
                                     "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 return false;

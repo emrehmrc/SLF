@@ -133,6 +133,104 @@ namespace SLF
         }
 
 
+
+        public void ExportExcelFile_poligons(string filePath, DataTable dt, string seçilenVeriTipi, bool poligon_aktarma = false)
+        {
+            // Create a FileInfo object for the file
+            FileInfo file = new FileInfo(filePath);
+
+            using (ExcelPackage package = new ExcelPackage())
+            {
+                try
+                {
+                    ExcelWorksheet worksheet;
+                    int startRow = 1;
+
+                    // Check if the file already exists
+                    if (file.Exists)
+                    {
+                        // Load the existing file
+                        using (ExcelPackage existingPackage = new ExcelPackage(file))
+                        {
+                            worksheet = existingPackage.Workbook.Worksheets[seçilenVeriTipi] ??
+                                        existingPackage.Workbook.Worksheets.Add(seçilenVeriTipi);
+
+                            // Find the last used row (skip header row)
+                            startRow = worksheet.Dimension?.Rows + 1 ?? 2;
+
+                            // If there's no data yet, start from row 2 (after header)
+                            if (startRow == 1) startRow = 2;
+
+                            // Load the new DataTable into the worksheet, starting from the next available row
+                            worksheet.Cells[startRow, 1].LoadFromDataTable(dt, false); // false to skip headers
+
+                            // Copy the package content to the new package to avoid file access issues
+                            package.Workbook.Worksheets.Add(seçilenVeriTipi, worksheet);
+                            worksheet = package.Workbook.Worksheets[seçilenVeriTipi];
+                        }
+                    }
+                    else
+                    {
+                        // Create a new worksheet
+                        worksheet = package.Workbook.Worksheets.Add(seçilenVeriTipi);
+
+                        // Load the DataTable into the worksheet, including headers
+                        worksheet.Cells["A1"].LoadFromDataTable(dt, true);
+
+                        // Format the header row
+                        using (ExcelRange range = worksheet.Cells[1, 1, 1, dt.Columns.Count])
+                        {
+                            range.Style.Font.Bold = true;
+                            range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            range.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                            range.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                            range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                            range.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                        }
+                    }
+
+                    // AutoFit columns
+                    worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+                    // Set minimum column width
+                    for (int col = 1; col <= dt.Columns.Count; col++)
+                    {
+                        if (worksheet.Column(col).Width < 15)
+                        {
+                            worksheet.Column(col).Width = 15;
+                        }
+                    }
+
+                    // Save the file
+                    package.Workbook.CalcMode = ExcelCalcMode.Automatic;
+                    package.SaveAs(file);
+
+                    if (!poligon_aktarma)
+                    {
+                        MessageBox.Show("Dosya başarıyla kaydedildi.", "Dosya Kaydedildi",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                catch (InvalidOperationException)
+                {
+                    MessageBox.Show("Halihazırda böyle bir dosya açık ve kullanımda. Dosyayı kapatıp yeniden deneyin.",
+                        "Dosya Kaydetme Hatası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                catch (OutOfMemoryException)
+                {
+                    MessageBox.Show("Bu işlemi gerçekleştirmek için bellek yetersiz. Kaydetmek istediğiniz dosya çok büyük olabilir.",
+                        "Dosya Kaydetme Hatası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Dosya kaydedilirken hata oluştu: {ex.Message}",
+                        "Dosya Kaydetme Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+
+
         public void ExportExcelFile(string filePath, DataTable dt, string seçilenVeriTipi, bool poligon_aktarma = false)
         {
             // Create a new Excel package
