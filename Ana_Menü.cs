@@ -33,9 +33,9 @@ namespace SLF
                 "MRC\\MRC - 1.1.3_T&SI\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kır" +
                 "ılımları\\Program Dosyaları\\config.json").Replace("/", "\\");
 
-            config_path = Path.Combine("C:\\Users\\vural.bayrakli\\",
+            /*config_path = Path.Combine("C:\\Users\\vural.bayrakli\\",
                 @"OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\configVural.json");
-
+            */
 
             if (File.Exists(config_path))
             {

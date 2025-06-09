@@ -24,6 +24,9 @@ namespace SLF
         // the main index to use within the arrays and the associated checkboxes
         public int layer_index;
 
+        // center points of the polygons drawn - point load poligonları icin kullanılacak.
+        public (double Latitude, double Longitude)[] polygonCenterPoints { get; set; } = new (double, double)[20];
+
         private Dictionary<string, System.Drawing.Color> currentImarTipiColorMap; // Stores the color mapping for the current KML file
 
         // GMapOverlay arrays, one per map:
@@ -2306,7 +2309,7 @@ namespace SLF
             string secondLayerTag = tüm_katmanlar_array_polygon_tags[modülFormu.secondLayerToJoin];
 
             // List of valid base tags
-            string[] validBaseTags = { "YGA", "YUK", "MUSAADE", "KENTSEL_DONUSUM" };
+            string[] validBaseTags = { "YGA", "YUK", "KENTSEL_DONUSUM" };
 
             // Check if either layer has a valid base tag
             if (validBaseTags.Contains(firstLayerTag))

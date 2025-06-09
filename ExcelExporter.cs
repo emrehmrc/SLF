@@ -132,8 +132,6 @@ namespace SLF
             }
         }
 
-
-
         public void ExportExcelFile_poligons(string filePath, DataTable dt, string seçilenVeriTipi, bool poligon_aktarma = false)
         {
             // Create a FileInfo object for the file

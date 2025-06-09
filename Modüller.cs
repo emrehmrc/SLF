@@ -276,6 +276,7 @@ namespace SLF
 
             // Initialize tab_ekonometrik accessibility on form load
             UpdateTabEkonometrikAccessibility();
+
         }
 
         public ModülFormu() : this("", "")
@@ -5473,6 +5474,11 @@ namespace SLF
                     {
                         cbs.Draw_Polygon(polygonPoints, polygonOverlay, activeMap);
 
+                        // Calculate and store the center point
+                        double avgLat = polygonPoints.Average(p => p.Lat);
+                        double avgLng = polygonPoints.Average(p => p.Lng);
+                        cbs.polygonCenterPoints[layerIndex] = (avgLat, avgLng);
+
                         double area = cbs.CalculatePolygonArea(polygonPoints);
                         mesafe_metre.Visible = false;
                         mesafe.Visible = true;
@@ -6539,6 +6545,10 @@ namespace SLF
             if (result_dialog == DialogResult.Yes)
             {
                 point_load_konsolidasyonu = true;
+            }
+            else
+            {
+                point_load_konsolidasyonu = false;
             }
 
             isSelecting_polygon = true;
@@ -8272,6 +8282,27 @@ namespace SLF
                         //return;
                     }
 
+                    // ilgili kentsel donusum poligonu dosyası varsa o dosyayı sil - daha sonra sıfırdan poligon eklenebilecek
+                    FileInfo file = new FileInfo(Path.Combine(exportDirPath_kentsel, "kentsel_donusum_poligonlar.xlsx"));
+                    if (file.Exists)
+                    {
+                        file.Delete();
+                    }
+
+                    // ilgili kentsel donusum poligonu dosyası varsa o dosyayı sil - daha sonra sıfırdan poligon eklenebilecek
+                    FileInfo file1 = new FileInfo(Path.Combine(exportDirPath_YGA, "yga_poligonlar.xlsx"));
+                    if (file1.Exists)
+                    {
+                        file1.Delete();
+                    }
+
+                    // ilgili kentsel donusum poligonu dosyası varsa o dosyayı sil - daha sonra sıfırdan poligon eklenebilecek
+                    FileInfo file2 = new FileInfo(Path.Combine(exportDirPath_YUK, "point_load_poligonlar.xlsx"));
+                    if (file2.Exists)
+                    {
+                        file2.Delete();
+                    }
+
                     this.Cursor = Cursors.WaitCursor;
 
                     // Initialize the Excel exporter
@@ -8290,21 +8321,28 @@ namespace SLF
                         switch (tag)
                         {
                             case "KENTSEL_DONUSUM_JOINED":
+
                                 excelExporter.ExportExcelFile_poligons(Path.Combine(exportDirPath_kentsel, "kentsel_donusum_poligonlar.xlsx").Replace('/', '\\'),
                                     dt, "kentsel_donusum_poligonlar", true);
                                 exportedAnyJoinedLayer = true;
                                 break;
+
                             case "YGA_JOINED":
+
                                 excelExporter.ExportExcelFile_poligons(Path.Combine(exportDirPath_YGA, "yga_poligonlar.xlsx").Replace('/', '\\'), dt,
                                     "yga_poligonlar", true);
                                 exportedAnyJoinedLayer = true;
                                 break;
+
                             case "YUK_JOINED":
+
                                 excelExporter.ExportExcelFile_poligons(Path.Combine(exportDirPath_YUK, "point_load_poligonlar.xlsx").Replace('/', '\\'),
                                     dt, "point_load_poligonlar", true);
                                 exportedAnyJoinedLayer = true;
                                 break;
+
                             default:
+
                                 continue;
                         }
                     }
