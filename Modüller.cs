@@ -1110,7 +1110,6 @@ namespace SLF
         }
 
 
-
         private List<string> GetCompletedModulesFromJson()
         {
             try
@@ -1338,7 +1337,7 @@ namespace SLF
                                 }
 
                                 // İmar Analizi tamamlandıysa, İmar Verileri'ni de yüklü olarak işaretle
-                                if (completedModules.Contains("İmar Analizi"))
+                                if (completedModules.Contains("İmar Verileri"))
                                 {
                                     // İmar Verileri'ni yüklü olarak işaretle
                                     if (!GirdiModülü.dataTablesByType.ContainsKey("İmar Verileri"))
@@ -1391,6 +1390,7 @@ namespace SLF
                         return;
                     }
                 }
+
                 ResetYearSelectionProcessGirdiModulu();
                 foreach (var girdiModülü in girdiModülleri.Values)
                 {
@@ -2385,32 +2385,13 @@ namespace SLF
             // Modüllerin yüklü olup olmadığını kontrol et
             if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
-                if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Haritası Modülü") && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
+                if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Yoğunluğu Haritası") && 
+                    !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
                 {
                     //  -- add this later!!!
                     // Sekme geçişini tamamen iptal et
                     Console.WriteLine(GirdiModülü.dataTablesByType.Count);
                     MessageBox.Show("DTR verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
-                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
-                    Modül_Tabları.SelectedTab = tab_girdi;
-                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
-                    return;
-                }
-                else if (selectedTabText == "İmar Analizleri" && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")))
-                {
-                    // Sekme geçişini tamamen iptal et
-                    MessageBox.Show("İmar planı verileri yüklenmeden bu sekmeye geçiş yapılamaz.");
-                    Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
-                    Modül_Tabları.SelectedTab = tab_girdi;
-                    Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
-                    return;
-                }
-                else if (selectedTabText == "Optimal DTR Konumlandırma"
-                            && (!GirdiModülü.dataTablesByType.ContainsKey("İmar Planı")
-                            && !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri")))
-                {
-                    // Sekme geçişini tamamen iptal et
-                    MessageBox.Show("DTR verileri ve İmar planı yüklenmeden bu sekmeye geçiş yapılamaz.");
                     Modül_Tabları.SelectedIndexChanged -= Modül_Tabları_SelectedIndexChanged;
                     Modül_Tabları.SelectedTab = tab_girdi;
                     Modül_Tabları.SelectedIndexChanged += Modül_Tabları_SelectedIndexChanged;
@@ -3182,7 +3163,6 @@ namespace SLF
             {
                 if (popupForm.ShowDialog() == DialogResult.OK)
                 {
-                    // await eaHaritayaVeriYukleAsync();
 
                     DataTable dataTable = dataGridView_girdi.DataSource as DataTable;
                     DataRow updatedRow = dataTable.Rows.Cast<DataRow>().FirstOrDefault(r => r["id"].ToString() == cellId);
@@ -3525,7 +3505,7 @@ namespace SLF
                 // Validate Python script path
                 if (!File.Exists(pythonScriptPath))
                 {
-                    throw new Exception($"Python betiği bulunamadı: {pythonScriptPath}");
+                    throw new Exception($"Python scripti bulunamadı: {pythonScriptPath}");
                 }
 
                 // Check if 'python' command is available
@@ -3533,10 +3513,10 @@ namespace SLF
                 {
                     FileName = "python",
                     Arguments = "--version",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
                     UseShellExecute = false,
-                    CreateNoWindow = true
+                    CreateNoWindow = false
                 };
 
                 try
@@ -3546,13 +3526,14 @@ namespace SLF
                         pythonCheck.WaitForExit(10000); // 10-second timeout for version check
                         if (pythonCheck.ExitCode != 0)
                         {
-                            throw new Exception("Python komutu bulunamadı. Lütfen Python'un yüklü olduğundan ve PATH'e eklendiğinden emin olun.");
+                            throw new Exception("Python komutu bulunamadı. Lütfen Python'un yüklü olduğundan ve" +
+                                " sistem ortam değişkenleri path'ine eklendiğinden emin olun.");
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception($"Python çalıştırılabilir dosyası bulunamadı: {ex.Message}");
+                    throw new Exception($"Python çalıştırılabilir script dosyası bulunamadı: {ex.Message}");
                 }
 
                 ProcessStartInfo startInfo = new ProcessStartInfo
@@ -3569,31 +3550,19 @@ namespace SLF
                 {
                     process.Start();
 
-                    Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
-                    Task<string> errorTask = process.StandardError.ReadToEndAsync();
-
                     // Wait for the process to exit without a timeout
                     await Task.Run(() => process.WaitForExit());
 
-                    string output = await outputTask;
-                    string error = await errorTask;
 
                     if (process.ExitCode != 0)
                     {
-                        throw new Exception($"Python betiği başarısız oldu. Hata: {error}\nÇıkış kodu: {process.ExitCode}");
-                    }
-                    else if (!string.IsNullOrEmpty(output))
-                    {
-                        // Optionally display output to the user
-                        Console.WriteLine($"Python çıktısı: {output}");
-                        // Uncomment below to show output in a MessageBox if relevant
-                        // MessageBox.Show($"Python çıktısı: {output}", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        throw new Exception($"Python scripti başarısız oldu!.\nÇıkış kodu: {process.ExitCode}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception($"Python betiğini çalıştırma hatası: {ex.Message}");
+                throw new Exception($"Python scriptini çalıştırma hatası: {ex.Message}");
             }
         }
         // Add this event handler for the checkbox
@@ -3785,10 +3754,24 @@ namespace SLF
                     eaOverlay = new GMapOverlay("EA Layer");
                 }
 
-                if (dataGridView_girdi.DataSource == null)
+                // Ensure girdiModülü is initialized
+                if (girdiModülü == null)
                 {
-                    MessageBox.Show("Veri kaynağı bulunamadı. Lütfen verileri kontrol edin.");
-                    return;
+                    string seçilenVeriTipi = "EA Şarj Verileri";
+                    if (!girdiModülleri.ContainsKey(seçilenVeriTipi))
+                    {
+                        MessageBox.Show($"Geçersiz veri tipi: {seçilenVeriTipi}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    girdiModülü = girdiModülleri[seçilenVeriTipi];
+
+                    if (girdiModülü == null)
+                    {
+                        MessageBox.Show($"{seçilenVeriTipi} için girdi modülü oluşturulamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
                 }
 
                 DataTable eaData = await Task.Run(() => GirdiModülü.dataTablesByType["EA Şarj Verileri"]);
@@ -3801,49 +3784,60 @@ namespace SLF
                     // Clear existing markers
                     eaOverlay.Markers.Clear();
 
+                    if (!eaData.Columns.Contains("EA_X_KOORDINAT") ||
+                        !eaData.Columns.Contains("EA_Y_KOORDINAT") ||
+                        !eaData.Columns.Contains("ISTASYON_GUCU") ||
+                        !GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
+                    {
+                        MessageBox.Show("Lütfen EA Şarj modülü verilerinizi yükleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
                     Invoke(new Action(() =>
                     {
                         foreach (DataRow row in eaData.Rows)
                         {
-                            if (!eaData.Columns.Contains("EA_X_KOORDINAT") ||
-                                !eaData.Columns.Contains("EA_Y_KOORDINAT") ||
-                                !eaData.Columns.Contains("ISTASYON_GUCU") &&
-                                !GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
+                            var xCoord = row["EA_X_KOORDINAT"];
+                            var yCoord = row["EA_Y_KOORDINAT"];
+
+                            bool isXNullLike = girdiModülü.IsNullLike(xCoord);
+                            bool isYNullLike = girdiModülü.IsNullLike(yCoord);
+
+                            Console.WriteLine($"Row: {row["ISTASYON_ADI"]}, xCoord: '{xCoord}' (Type: {xCoord?.GetType().Name}), IsNullLike: {isXNullLike}");
+                            Console.WriteLine($"Row: {row["ISTASYON_ADI"]}, yCoord: '{yCoord}' (Type: {yCoord?.GetType().Name}), IsNullLike: {isYNullLike}");
+
+                            if (isXNullLike || isYNullLike)
                             {
-                                MessageBox.Show("Lütfen EA Sarj modülü verilerinizi yükleyin.");
-                                return;
+                                Console.WriteLine($"Skipping row due to null-like coordinates: x={xCoord}, y={yCoord}");
+                                continue;
                             }
 
-                            if (!girdiModülü.IsNullLike(row["EA_X_KOORDINAT"]) &&
-                                !girdiModülü.IsNullLike(row["EA_Y_KOORDINAT"]))
+                            if (double.TryParse(xCoord.ToString(), out double x) &&
+                                double.TryParse(yCoord.ToString(), out double y))
                             {
-                                if (double.TryParse(row["EA_X_KOORDINAT"].ToString(), out double x) &&
-                                    double.TryParse(row["EA_Y_KOORDINAT"].ToString(), out double y))
+                                if (int.TryParse(row["ISTASYON_GUCU"].ToString(), out int istasyonGucu))
                                 {
-                                    if (int.TryParse(row["ISTASYON_GUCU"].ToString(), out int istasyonGucu))
+                                    GMarkerGoogle marker;
+
+                                    if (istasyonGucu <= 22)
                                     {
-                                        GMarkerGoogle marker;
-
-                                        if (istasyonGucu <= 22)
-                                        {
-                                            marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.green);
-                                            greenAc++;
-                                        }
-                                        else
-                                        {
-                                            marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.red);
-                                            redDc++;
-                                        }
-
-                                        if (eaData.Columns.Contains("ISTASYON_ADI") &&
-                                            !girdiModülü.IsNullLike(row["ISTASYON_ADI"]))
-                                        {
-                                            string istasyonAdi = row["ISTASYON_ADI"].ToString();
-                                            marker.ToolTipText = istasyonAdi;
-                                        }
-
-                                        eaOverlay.Markers.Add(marker);
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.green);
+                                        greenAc++;
                                     }
+                                    else
+                                    {
+                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.red);
+                                        redDc++;
+                                    }
+
+                                    if (eaData.Columns.Contains("ISTASYON_ADI") &&
+                                        !girdiModülü.IsNullLike(row["ISTASYON_ADI"]))
+                                    {
+                                        string istasyonAdi = row["ISTASYON_ADI"].ToString();
+                                        marker.ToolTipText = istasyonAdi;
+                                    }
+
+                                    eaOverlay.Markers.Add(marker);
                                 }
                             }
                         }
@@ -3860,12 +3854,12 @@ namespace SLF
                 }
                 else
                 {
-                    MessageBox.Show("Lütfen Ea şarj noktalarını görebilmek için verilerinizi yükleyiniz.");
+                    MessageBox.Show("Lütfen Ea Şarj istasyonu noktalarını görebilmek için verilerinizi yükleyiniz.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Bir hata oluştu: {ex.Message}");
+                MessageBox.Show($"Bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -8550,8 +8544,8 @@ namespace SLF
 
                         this.Cursor = Cursors.Default;
 
-                        MessageBox.Show($"Ufuk yılları için hücre bazında SLF tahminleri oluşturuldu! Şimdi Yük Haritası Modülü'nü kullanarak" +
-                            $"her hücreye ait tahminleri ve yük yoğunluğu haritasını görebilirsiniz.",
+                        MessageBox.Show($"Ufuk yılları için hücre bazında SLF tahminleri oluşturuldu! Şimdi Yük Yoğunluğu Haritası sayfasını" +
+                            $"kullanarak her hücreye ait tahminleri ve yük yoğunluğu haritasını görebilirsiniz.",
                             "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
@@ -8673,6 +8667,7 @@ namespace SLF
                 label_data_count.Visible = false ;
             }
         }
+
 
         private void TextBox_KeyPress_NumbersOnly(object sender, KeyPressEventArgs e)
         {

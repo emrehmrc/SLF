@@ -40,6 +40,7 @@ namespace SLF
             "DTR Verileri",
             "DEK Verileri",
             "Abone Verileri",
+            "İmar Verileri",
             "Yeni Projelendirilmiş DTR Verileri"
         };
 
@@ -55,7 +56,8 @@ namespace SLF
             { "dek_verileri", "DEK Verileri" },
             { "projelendirilmis_trafolar", "Yeni Projelendirilmiş DTR Verileri" },
             { "dtr_verileri", "DTR Verileri" },
-            {"abone_final_tablosu","Abone Verileri" }
+            { "imar_verileri", "İmar Verileri" },
+            { "abone_final_tablosu","Abone Verileri" }
         };
         protected virtual List<string> Prerequisites { get; } = new List<string>();
         protected readonly List<string> nullLikeStrings = new List<string> // doluluk bosluk check kısımları kontrolu yapılıyor
@@ -168,26 +170,49 @@ namespace SLF
             return roundedKapasite;
         }
 
-        public bool IsNullLike(object value, bool isZero = false) // 0 VE negatif kontrolu 
+        public bool IsNullLike(object value, bool isZero = false)
         {
-            if (value == null || value == DBNull.Value)
+            try
             {
-                return true;
-            }
-            if (isZero && value.ToString() == "0")
-            {
-                return true;
-            }
+                Console.WriteLine($"IsNullLike called with value: '{value}' (Type: {value?.GetType().Name})");
 
-            string stringValue = value?.ToString() ?? ""; // Handle null safely
-            if (string.IsNullOrWhiteSpace(stringValue)) // Treat empty or whitespace as null-like
-            {
-                return true;
-            }
+                if (value == null || value == DBNull.Value)
+                {
+                    Console.WriteLine("Value is null or DBNull, returning true");
+                    return true;
+                }
 
-            return nullLikeStrings.Contains(stringValue, StringComparer.OrdinalIgnoreCase);
+                if (isZero && value.ToString() == "0")
+                {
+                    Console.WriteLine("Value is '0' with isZero, returning true");
+                    return true;
+                }
+
+                string stringValue = value?.ToString() ?? "";
+                Console.WriteLine($"Converted to string: '{stringValue}'");
+
+                if (string.IsNullOrWhiteSpace(stringValue))
+                {
+                    Console.WriteLine("String is null or whitespace, returning true");
+                    return true;
+                }
+
+                if (double.TryParse(stringValue, out _))
+                {
+                    Console.WriteLine("Value is numeric, returning false");
+                    return false;
+                }
+
+                bool result = nullLikeStrings.Contains(stringValue, StringComparer.OrdinalIgnoreCase);
+                Console.WriteLine($"Checked nullLikeStrings, result: {result}");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"IsNullLike Exception: {ex.Message} - StackTrace: {ex.StackTrace}");
+                return false; // Fallback to false on error
+            }
         }
-
 
         public void VEERReport(string seçilenVeriTipi)
         {
