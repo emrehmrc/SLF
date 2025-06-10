@@ -2215,7 +2215,7 @@ namespace SLF
                         FileName = "cmd.exe",
                         Arguments = $"/C rd /S /Q \"{path}\"",
                         WindowStyle = ProcessWindowStyle.Hidden,
-                        CreateNoWindow = false,
+                        CreateNoWindow = true,
                         UseShellExecute = false
                     }
                 };
@@ -3319,13 +3319,11 @@ namespace SLF
 
             }
         }
-
         private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
         {
             // Disable buttons to prevent interaction while processing
             EANewSimulationResultsButton.Enabled = false;
             SimulasyonSonucGoruntule.Enabled = false;
-            
 
             try
             {
@@ -3429,9 +3427,9 @@ namespace SLF
                 EANewSimulationResultsButton.Enabled = true;
                 if (!SimulasyonSonucGoruntule.Enabled)
                     SimulasyonSonucGoruntule.Enabled = false;
-                
             }
         }
+
         private async Task RunPythonScriptEAAsync(string config_path)
         {
             try
@@ -3479,10 +3477,10 @@ namespace SLF
                 {
                     FileName = "python",
                     Arguments = $"\"{pythonScriptPath}\" \"{config_path}\"",
-                    RedirectStandardOutput = false,
-                    RedirectStandardError = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
                     UseShellExecute = false,
-                    CreateNoWindow = false
+                    CreateNoWindow = true
                 };
 
                 using (Process process = new Process { StartInfo = startInfo })
@@ -3516,6 +3514,202 @@ namespace SLF
                 throw new Exception($"Python betiğini çalıştırma hatası: {ex.Message}");
             }
         }
+        /*        private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
+                {
+                    // Disable buttons to prevent interaction while processing
+                    EANewSimulationResultsButton.Enabled = false;
+                    SimulasyonSonucGoruntule.Enabled = false;
+
+
+                    try
+                    {
+                        Cursor = Cursors.WaitCursor;
+
+                        // Update status for initial state
+                        if (statusLabel != null)
+                        {
+                            statusLabel.Text = "Simülasyon başlatılıyor. Dosyalar kontrol ediliyor...";
+                            statusLabel.Visible = true;
+                        }
+                        else
+                        {
+                            MessageBox.Show("Simülasyon başlatılıyor. Dosyalar kontrol ediliyor...",
+                                "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+
+                        // Show progress bar if available
+                        if (progressBar != null)
+                        {
+                            progressBar.Style = ProgressBarStyle.Marquee;
+                            progressBar.Visible = true;
+                        }
+
+                        // Construct file paths
+                        string inputFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                            (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                            (string)ana_menu_form_objesi.config.İl,
+                            (string)ana_menu_form_objesi.config.İlçe,
+                            (string)ana_menu_form_objesi.config.EA.ea_klasörü,
+                            (string)ana_menu_form_objesi.config.EA.girdi_dosyası);
+
+                        string outputFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                            (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                            (string)ana_menu_form_objesi.config.İl,
+                            (string)ana_menu_form_objesi.config.İlçe,
+                            (string)ana_menu_form_objesi.config.EA.ea_klasörü,
+                            (string)ana_menu_form_objesi.config.EA.cikti_dosyasi);
+
+                        // Validate input file
+                        if (!File.Exists(inputFilePath))
+                        {
+                            MessageBox.Show("Girdi dosyası bulunamadı! Lütfen kaydedildiğinden emin olun.",
+                                "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            if (statusLabel != null) statusLabel.Text = "Hata: Girdi dosyası bulunamadı.";
+                            return;
+                        }
+
+                        // Validate config path
+                        if (!File.Exists(ana_menu_form_objesi.config_path))
+                        {
+                            MessageBox.Show("Yapılandırma dosyası bulunamadı! Lütfen config dosyasını kontrol edin.",
+                                "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            if (statusLabel != null) statusLabel.Text = "Hata: Yapılandırma dosyası bulunamadı.";
+                            return;
+                        }
+
+                        // Update status for script execution
+                        if (statusLabel != null)
+                        {
+                            statusLabel.Text = "Python kodu çalışıyor. Bu biraz zaman alabilir. Lütfen bekleyiniz...";
+                        }
+
+                        // Run the Python script
+                        await RunPythonScriptEAAsync(ana_menu_form_objesi.config_path);
+
+                        // Update status for output validation
+                        if (statusLabel != null)
+                        {
+                            statusLabel.Text = "Çıktı dosyası kontrol ediliyor...";
+                        }
+
+                        // Validate output file
+                        if (!File.Exists(outputFilePath))
+                        {
+                            MessageBox.Show("Çıktı dosyası oluşturulamadı! Lütfen Python dosyasını ve logları kontrol edin.",
+                                "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            if (statusLabel != null) statusLabel.Text = "Hata: Çıktı dosyası oluşturulamadı.";
+                            return;
+                        }
+
+                        // Show success message and enable SimulasyonSonucGoruntule button
+                        MessageBox.Show("Simülasyon başarıyla tamamlandı!",
+                            "İşlem Tamamlandı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        if (statusLabel != null) statusLabel.Text = "Simülasyon başarıyla tamamlandı.";
+                        SimulasyonSonucGoruntule.Enabled = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        if (statusLabel != null) statusLabel.Text = $"Hata: {ex.Message}";
+                    }
+                    finally
+                    {
+                        Cursor = Cursors.Default;
+                        if (progressBar != null)
+                            progressBar.Visible = false;
+                        if (statusLabel != null && string.IsNullOrEmpty(statusLabel.Text))
+                            statusLabel.Text = "Simülasyon tamamlandı veya hata oluştu.";
+
+                        EANewSimulationResultsButton.Enabled = true;
+                        if (!SimulasyonSonucGoruntule.Enabled)
+                            SimulasyonSonucGoruntule.Enabled = false;
+
+                    }
+                }
+                private async Task RunPythonScriptEAAsync(string config_path)
+                {
+                    try
+                    {
+                        string pythonScriptPath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                            (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                            (string)ana_menu_form_objesi.config.program_dosyaları_path,
+                            (string)ana_menu_form_objesi.config.EA.program_dosyası_klasörü,
+                            (string)ana_menu_form_objesi.config.EA.ea_python_dosyası);
+
+                        // Validate Python script path
+                        if (!File.Exists(pythonScriptPath))
+                        {
+                            throw new Exception($"Python betiği bulunamadı: {pythonScriptPath}");
+                        }
+
+                        // Check if 'python' command is available
+                        ProcessStartInfo checkPython = new ProcessStartInfo
+                        {
+                            FileName = "python",
+                            Arguments = "--version",
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        };
+
+                        try
+                        {
+                            using (Process pythonCheck = Process.Start(checkPython))
+                            {
+                                pythonCheck.WaitForExit(10000); // 10-second timeout for version check
+                                if (pythonCheck.ExitCode != 0)
+                                {
+                                    throw new Exception("Python komutu bulunamadı. Lütfen Python'un yüklü olduğundan ve PATH'e eklendiğinden emin olun.");
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception($"Python çalıştırılabilir dosyası bulunamadı: {ex.Message}");
+                        }
+
+                        ProcessStartInfo startInfo = new ProcessStartInfo
+                        {
+                            FileName = "python",
+                            Arguments = $"\"{pythonScriptPath}\" \"{config_path}\"",
+                            RedirectStandardOutput = false,
+                            RedirectStandardError = false,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        };
+
+                        using (Process process = new Process { StartInfo = startInfo })
+                        {
+                            process.Start();
+
+                            Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
+                            Task<string> errorTask = process.StandardError.ReadToEndAsync();
+
+                            // Wait for the process to exit without a timeout
+                            await Task.Run(() => process.WaitForExit());
+
+                            string output = await outputTask;
+                            string error = await errorTask;
+
+                            if (process.ExitCode != 0)
+                            {
+                                throw new Exception($"Python betiği başarısız oldu. Hata: {error}\nÇıkış kodu: {process.ExitCode}");
+                            }
+                            else if (!string.IsNullOrEmpty(output))
+                            {
+                                // Optionally display output to the user
+                                Console.WriteLine($"Python çıktısı: {output}");
+                                // Uncomment below to show output in a MessageBox if relevant
+                                // MessageBox.Show($"Python çıktısı: {output}", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception($"Python betiğini çalıştırma hatası: {ex.Message}");
+                    }
+                }*/
         // Add this event handler for the checkbox
         private void EAPointsLayerCheckBox_CheckedChanged(object sender, EventArgs e)
         {
@@ -6684,8 +6878,137 @@ namespace SLF
             }
             gMapControl_DEK.Refresh();
         }
-
         private async void DEKRunSimulationButton_Click(object sender, EventArgs e)
+        {
+            DEKRunSimulationButton.Enabled = false;
+            DEKSimulasyonSonucGoruntule.Enabled = false;
+
+            string inputFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                (string)ana_menu_form_objesi.config.İl,
+                (string)ana_menu_form_objesi.config.İlçe,
+                (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
+                (string)ana_menu_form_objesi.config.DEK.girdi_dosyası);
+
+            string outputFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                (string)ana_menu_form_objesi.config.İl,
+                (string)ana_menu_form_objesi.config.İlçe,
+                (string)ana_menu_form_objesi.config.DEK.dek_klasörü,
+                (string)ana_menu_form_objesi.config.DEK.cikti_dosyasi);
+
+
+            // Show the confirmation dialog for navigating to the home page
+            DialogResult result_dialog = MessageBox.Show("\n\n" +
+                "DEK Simülasyon kodu çalıştırılacaktır. Onaylıyor musunuz?",
+                "DEK Simülasyonu Çalıştır",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (result_dialog == DialogResult.Yes)
+            {
+                try
+                {
+                    Cursor = Cursors.WaitCursor;
+                    if (DEKStatusLabel != null)
+                    {
+                        DEKStatusLabel.Text = "Python kodu çalışıyor. Bu biraz zaman alabilir. Lütfen bekleyiniz...";
+                        DEKStatusLabel.Visible = true;
+                    }
+                    if (DEKProgressBar != null)
+                    {
+                        DEKProgressBar.Style = ProgressBarStyle.Marquee;
+                        DEKProgressBar.Visible = true;
+                    }
+
+                    if (!File.Exists(inputFilePath))
+                    {
+                        MessageBox.Show("Girdi dosyası bulunamadı! Lütfen kaydedildiğinden emin olun.",
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    await RunPythonDEKScriptAsync(ana_menu_form_objesi.config_path);
+
+                    if (!File.Exists(outputFilePath))
+                    {
+                        MessageBox.Show("Çıktı dosyası oluşturulamadı! Lütfen python dosyasını kontrol ediniz.",
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    MessageBox.Show("Simülasyon başarıyla tamamlandı!",
+                        "Process Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                finally
+                {
+                    Cursor = Cursors.Default;
+                    if (DEKProgressBar != null)
+                        DEKProgressBar.Visible = false;
+                    if (DEKStatusLabel != null)
+                        DEKStatusLabel.Text = "Simülasyon tamamlandı";
+
+                    DEKRunSimulationButton.Enabled = true;
+                    DEKSimulasyonSonucGoruntule.Enabled = true;
+                }
+            }
+        }
+
+        // Updated RunPythonScriptAsync to match your paths
+        private async Task RunPythonDEKScriptAsync(string config_path)
+        {
+            try
+            {
+                string pythonScriptPath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.program_dosyaları_path,
+                    (string)ana_menu_form_objesi.config.DEK.program_dosyası_klasörü,
+                    (string)ana_menu_form_objesi.config.DEK.dek_python_dosyası);
+
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = "python",
+                    // Use verbatim string with concatenation
+                    Arguments = @"""" + pythonScriptPath + @""" """ + config_path,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using (Process process = new Process { StartInfo = startInfo })
+                {
+                    process.Start();
+
+                    Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
+                    Task<string> errorTask = process.StandardError.ReadToEndAsync();
+
+                    await Task.Run(() => process.WaitForExit());
+
+                    string output = await outputTask;
+                    string error = await errorTask;
+
+                    if (process.ExitCode != 0)
+                    {
+                        throw new Exception($"Python betiği {process.ExitCode} çıkış koduyla başarısız oldu. Hata: {error}");
+                    }
+                    else if (!string.IsNullOrEmpty(output))
+                    {
+                        Console.WriteLine($"Python çıktısı: {output}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Python kodu çalıştırma hatası: {ex.Message}");
+            }
+        }
+/*        private async void DEKRunSimulationButton_Click(object sender, EventArgs e)
         {
             DEKRunSimulationButton.Enabled = false;
             DEKSimulasyonSonucGoruntule.Enabled = false;
@@ -6785,7 +7108,7 @@ namespace SLF
                     RedirectStandardOutput = false,
                     RedirectStandardError = false,
                     UseShellExecute = false,
-                    CreateNoWindow = false
+                    CreateNoWindow = true
                 };
 
                 using (Process process = new Process { StartInfo = startInfo })
@@ -6814,7 +7137,7 @@ namespace SLF
             {
                 throw new Exception($"Python kodu çalıştırma hatası: {ex.Message}");
             }
-        }
+        }*/
 
         private async void buton_HTML_Click(object sender, EventArgs e)
         {

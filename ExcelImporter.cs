@@ -19,10 +19,10 @@ namespace SLF
 
     internal class ExcelImporter
     {
-        private YearService _yearService;
+        private YearService _yearService = YearService.GetInstance();
         private Dictionary<string, List<string>> _expectedHeadersMap;
 
-        // Excel Importer'dan kopyalanacak temel başlıklar dizini
+        // Base headers without year-specific columns
         private readonly Dictionary<string, List<string>> _baseHeadersMap = new Dictionary<string, List<string>>
         {
             {
@@ -40,8 +40,7 @@ namespace SLF
                     "ABONE_GRUBU",
                     "GERILIM_SEVIYESI",
                     "ABONE_BASLANGIC_TARIHI",
-                    "ABONE_BITIS_TARIHI",
-                    // Dinamik yıl alanları oluşturulacak
+                    "ABONE_BITIS_TARIHI"
                 }
             },
             {
@@ -72,8 +71,7 @@ namespace SLF
                     "TRAFO_ADI",
                     "TRAFO_KURULUM_TARIHI",
                     "PRIMER_GERILIM",
-                    "SEKONDER_GERILIM",
-                    // Dinamik yıl alanları oluşturulacak
+                    "SEKONDER_GERILIM"
                 }
             },
             {
@@ -84,9 +82,9 @@ namespace SLF
                     "DEK_KURULU_GUCU",
                     "DEK_X_KOORDINAT",
                     "DEK_Y_KOORDINAT",
-                    "DEK_TM_ADI",
+                    "DEK_DTR_ADI",
                     "DEK_KURULUM_YERI",
-                    "DEK_BAGLANDIGI_TRAFO_KODU",
+                    "DEK_BAGLANDIGI_TRAFO_KODU"
                 }
             },
             {
@@ -145,7 +143,7 @@ namespace SLF
                     "FIDER_ID",
                     "FIDER_TARIH",
                     "FIDER_SAAT",
-                    "FIDER_DEMANT",
+                    "FIDER_DEMANT"
                 }
             },
             {
@@ -155,7 +153,7 @@ namespace SLF
                     "EDW_TRAFO_ID",
                     "EDW_TARIH",
                     "EDW_TM_TUKETIM",
-                    "EDW_TM_URETIM",
+                    "EDW_TM_URETIM"
                 }
             },
             {
@@ -164,19 +162,13 @@ namespace SLF
                     "ENERJI_MUSAADE_NO",
                     "ENERJI_MUSAADE_ABONE_GRUBU",
                     "Tipi",
-                   // "ENERJI_MUSAADE_ABONE_FAALIYET_KATEGORI",
-                    //"ENERJI_MUSAADE_TALEP_DURUMU",
                     "ENERJI_MUSAADE_GERILIM_SEVIYESI",
                     "ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL",
                     "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID",
                     "ENERJI_MUSAADE_BAGLANTI_GUCU",
-                    //"ENERJI_MUSAADE_IL",
-                    //"ENERJI_MUSAADE_ILCE",
-                    //"ENERJI_MUSAADE_MAHALLE",
                     "ENERJI_MUSAADE_ENERJILENDIRME_YILI",
-                    //"ENERJI_MUSAADE_BASVURU_TARIHI",
                     "ENERJI_MUSAADE_X_KOORDINAT",
-                    "ENERJI_MUSAADE_Y_KOORDINAT",
+                    "ENERJI_MUSAADE_Y_KOORDINAT"
                 }
             },
             {
@@ -190,23 +182,22 @@ namespace SLF
                     "PROJELENDIRILMIS_TRAFO_YENI_KAPASITE",
                     "PROJELENDIRILMIS_TRAFO_YATIRIM_YILI",
                     "PROJELENDIRILMIS_TRAFO_X_KOORDINAT",
-                    "PROJELENDIRILMIS_TRAFO_Y_KOORDINAT",
+                    "PROJELENDIRILMIS_TRAFO_Y_KOORDINAT"
                 }
             }
         };
 
         public ExcelImporter()
         {
-            _yearService = YearService.GetInstance();
             InitializeExpectedHeaders();
 
-            // YearService'deki değişiklikleri dinleyerek başlıkları güncelleme
+            // Listen to YearService changes to update headers dynamically
             _yearService.OnYearChanged += (sender, args) => {
                 InitializeExpectedHeaders();
             };
         }
 
-        // Dinamik başlıkları yeniden oluşturma metodu
+        // Initialize expected headers with dynamic year columns
         private void InitializeExpectedHeaders()
         {
             _expectedHeadersMap = new Dictionary<string, List<string>>();
@@ -216,7 +207,7 @@ namespace SLF
                 string dataType = entry.Key;
                 List<string> headers = new List<string>(entry.Value);
 
-                // Veri tipine göre yıl alanlarını ekle
+                // Add year-specific columns for relevant data types
                 if (dataType == "Abone Verileri")
                 {
                     AddYearColumnsToAboneVerileri(headers);
@@ -233,19 +224,19 @@ namespace SLF
         // Abone verileri için yıl kolonlarını ekleme
         private void AddYearColumnsToAboneVerileri(List<string> headers)
         {
-            // Son 2 yıl için tüketim kolonları ekle
-            for (int year = _yearService.slfStartYear - 2; year <= _yearService.slfStartYear; year++)
+            // Add TUKETIM columns for the last 5 years
+            for (int year = _yearService.PenultimateYear - 3; year <= _yearService.LastYear; year++)
             {
-                if (year > 0) // Geçerli bir yıl ise
+                if (year > 0) // Ensure valid year
                 {
                     headers.Add($"YIL_TUKETIM_{year}");
                 }
             }
 
-            // Son 2 yıl için talep kolonları ekle
-            for (int year = _yearService.slfStartYear - 2; year <= _yearService.slfStartYear; year++)
+            // Add DEMANT columns for the last 5 years
+            for (int year = _yearService.PenultimateYear - 3; year <= _yearService.LastYear; year++)
             {
-                if (year > 0) // Geçerli bir yıl ise
+                if (year > 0) // Ensure valid year
                 {
                     headers.Add($"YIL_DEMANT_{year}");
                 }
@@ -253,12 +244,12 @@ namespace SLF
         }
 
         // DTR verileri için yıl kolonlarını ekleme
-        private void AddYearColumnsToDTRVerileri(List<string> headers)
+               private void AddYearColumnsToDTRVerileri(List<string> headers)
         {
-            // Son 2 yıl için talep ve tüketim kolonları ekle
-            for (int year = _yearService.slfStartYear - 1; year <= _yearService.slfStartYear; year++)
+            // Add DEMANT and TUKETIM columns for the last 3 years
+            for (int year = _yearService.PenultimateYear - 1; year <= _yearService.LastYear; year++)
             {
-                if (year > 0) // Geçerli bir yıl ise
+                if (year > 0) // Ensure valid year
                 {
                     headers.Add($"YIL_DEMANT_{year}");
                     headers.Add($"YIL_TUKETIM_{year}");
@@ -266,33 +257,25 @@ namespace SLF
             }
         }
 
-
-
-
-
         private void ValidateColumnHeaders(ExcelWorksheet worksheet, string seçilenVeriTipi)
         {
             int colCount = worksheet.Dimension.Columns;
             List<string> expectedHeaders = _expectedHeadersMap[seçilenVeriTipi];
             int expectedCount = expectedHeaders.Count;
 
-            // Sütun sayılarını konsola yazdır (debug için)
+            // Debug: Log column counts
             System.Diagnostics.Debug.WriteLine($"Beklenen sütun sayısı: {expectedCount}, Excel'deki mevcut: {colCount}");
 
-            /* Geçici olarak sütun sayıları kontrolünü devre dışı bırakabilirsiniz
             if (colCount != expectedCount)
             {
                 throw new InvalidColumnHeadersException(
                     $"Sütun sayıları uyuşmuyor.\nBeklenen: {expectedCount}\nMevcut: {colCount}"
                 );
             }
-            */
 
-            // Sadece mevcut sütunların kontrolü
             bool headerMismatch = false;
             var invalidColumnMessage = new StringBuilder("Sütun adları uyuşmuyor.\n");
-
-            for (int col = 1; col <= Math.Min(colCount, expectedCount); col++)
+            for (int col = 1; col <= colCount; col++)
             {
                 string columnHeader = worksheet.Cells[1, col].Text;
                 if (string.IsNullOrEmpty(columnHeader) || !expectedHeaders.Contains(columnHeader))
@@ -302,7 +285,6 @@ namespace SLF
                     invalidColumnMessage.AppendLine($"{col}. sütun:\tBeklenen: {expectedHeader}\tMevcut: {columnHeader}");
                 }
             }
-
             if (headerMismatch)
             {
                 throw new InvalidColumnHeadersException(invalidColumnMessage.ToString());
