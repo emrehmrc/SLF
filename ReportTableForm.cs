@@ -1,14 +1,9 @@
-﻿using Irony;
-using SLF.Services;
+﻿using SLF.Services;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using OfficeOpenXml;
 
@@ -46,20 +41,6 @@ namespace SLF
             {
                 this.slfStartYear = yearService.slfStartYear;
                 this.slfEndYear = yearService.slfEndYear;
-            }
-
-            // Adjust year range based on data source
-            if (dataSource == "EA")
-            {
-                // EA uses years 2024–2035
-                slfStartYear = Math.Max(slfStartYear, 2024);
-                slfEndYear = Math.Min(slfEndYear, 2035);
-            }
-            else if (dataSource == "DEK")
-            {
-                // DEK uses years 2024–2030
-                slfStartYear = Math.Max(slfStartYear, 2024);
-                slfEndYear = Math.Min(slfEndYear, 2035);
             }
 
             var yearList = new List<int>();

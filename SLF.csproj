@@ -714,9 +714,6 @@
     <Compile Include="Services\DataValidationService.cs" />
     <Compile Include="Services\PathService.cs" />
     <Compile Include="Services\PythonHelper.cs" />
-    <Compile Include="Services\TurkceDiyalog.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Services\YearServices.cs" />
     <Compile Include="CBS.cs" />
     <Compile Include="EAStationPopupForm.cs">
@@ -927,7 +924,6 @@
     <None Include="CBS\SLF\ÇİĞLİ KARŞIYAKA REKORTMAN VERİSİ\REKORTMAN.MAP" />
     <None Include="CBS\SLF\ÇİĞLİ KARŞIYAKA REKORTMAN VERİSİ\REKORTMAN.TAB" />
     <None Include="CBS\SLF\ÇİĞLİ KARŞIYAKA REKORTMAN VERİSİ\REKORTMAN_kars_cigli.csv" />
-    <None Include="config.json" />
     <None Include="docs\VEER.md" />
     <None Include="Excel Files\Point Load Karakteristikleri\point_load.xlsx" />
     <None Include="Excel Files\SLF Sonuçları\SONUCLAR.xlsx" />
