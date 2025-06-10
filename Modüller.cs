@@ -1368,6 +1368,9 @@ namespace SLF
         private void yearApproveButton_Click(object sender, EventArgs e)
         {
             ana_menu_form_objesi.config.ELF.ufuk_yılı = (int)endYearComboBox.SelectedItem - (int)startYearComboBox.SelectedItem;
+            ana_menu_form_objesi.config.baslangıc_yılı = (int)startYearComboBox.SelectedItem;
+            ana_menu_form_objesi.config.bitis_yılı = (int)startYearComboBox.SelectedItem;
+
             methodFormObjesi.SaveConfigToFile();
 
             if (endYearComboBox.SelectedIndex == -1)
@@ -1404,11 +1407,10 @@ namespace SLF
                 // selections are completed
                 startYearComboBox.Enabled = false;
                 endYearComboBox.Enabled = false;
-                //veri_listesi_seçimi.Enabled = true;
                 slfStartYear = (int)startYearComboBox.SelectedItem;
                 slfEndYear = (int)endYearComboBox.SelectedItem;
-                MessageBox.Show($"Başlangıç yılı: {slfStartYear}, Bitiş yılı: {slfEndYear}", "Yıllar belirlendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                //yearApproveButton.Enabled = false;
+                MessageBox.Show($"Başlangıç yılı: {slfStartYear}, Bitiş yılı: {slfEndYear}", 
+                    "Yıllar belirlendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 yearApproveButton.Text = "Sıfırla";
             }
         }
@@ -1422,26 +1424,18 @@ namespace SLF
 
         private Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
         {
-            { "İzmir", new PointLatLng(38.4192, 27.1287) }, // Example coordinates for İzmir
-            { "Eskişehir", new PointLatLng(39.7768, 30.5206) }, // Example coordinates for Eskişehir
-            // Add more cities and their coordinates as needed
+            { "İzmir", new PointLatLng(38.4192, 27.1287) }, 
+            { "Eskişehir", new PointLatLng(39.7768, 30.5206) }, 
         };
 
 
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------ EA MODÜLÜ DEĞİŞKENLER ------------------------------------------- //
 
-        private readonly Dictionary<string, string> districtIdMap = new Dictionary<string, string>
-        {
-            { "Çiğli", "1" },
-            { "Karşıyaka", "2" },
-            { "Tepebaşı", "1" }
-        };
-
 
         private string SelectedSpeed = "";
-        public bool isAddingChargingStation = false; // Sadece şarj istasyonu eklenirken true olacak.
-        private bool isAddingDekPoint = false; // Sadece dek noktası eklenirken  true olacak.
+        public bool isAddingChargingStation = false; 
+        private bool isAddingDekPoint = false; 
         private int _selectedYear = -1;
         private string _selectedCity = null;
         private string _selectedDistrict;
@@ -6878,13 +6872,12 @@ namespace SLF
 
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
-                    FileName = "python",
-                    // Use verbatim string with concatenation
-                    Arguments = @"""" + pythonScriptPath + @""" """ + config_path,
+                    FileName = "cmd.exe", // Specify cmd.exe as the executable
+                    Arguments = $"/C python \"{pythonScriptPath}\" \"{config_path}\"", // Pass arguments correctly
                     RedirectStandardOutput = false,
                     RedirectStandardError = false,
-                    UseShellExecute = false,
-                    CreateNoWindow = false
+                    UseShellExecute = true, // Use true to show the window
+                    CreateNoWindow = false // Ensure the command window is visible
                 };
 
                 using (Process process = new Process { StartInfo = startInfo })
