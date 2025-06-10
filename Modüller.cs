@@ -3739,8 +3739,6 @@ namespace SLF
             }
         }
 
-
-
         private async Task eaHaritayaVeriYukleAsync()
         {
             int redDc = 0;
@@ -3771,7 +3769,6 @@ namespace SLF
                         MessageBox.Show($"{seçilenVeriTipi} için girdi modülü oluşturulamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
-
                 }
 
                 DataTable eaData = await Task.Run(() => GirdiModülü.dataTablesByType["EA Şarj Verileri"]);
@@ -3803,9 +3800,6 @@ namespace SLF
                             bool isXNullLike = girdiModülü.IsNullLike(xCoord);
                             bool isYNullLike = girdiModülü.IsNullLike(yCoord);
 
-                            Console.WriteLine($"Row: {row["ISTASYON_ADI"]}, xCoord: '{xCoord}' (Type: {xCoord?.GetType().Name}), IsNullLike: {isXNullLike}");
-                            Console.WriteLine($"Row: {row["ISTASYON_ADI"]}, yCoord: '{yCoord}' (Type: {yCoord?.GetType().Name}), IsNullLike: {isYNullLike}");
-
                             if (isXNullLike || isYNullLike)
                             {
                                 Console.WriteLine($"Skipping row due to null-like coordinates: x={xCoord}, y={yCoord}");
@@ -3830,11 +3824,25 @@ namespace SLF
                                         redDc++;
                                     }
 
-                                    if (eaData.Columns.Contains("ISTASYON_ADI") &&
-                                        !girdiModülü.IsNullLike(row["ISTASYON_ADI"]))
+                                    // Set tooltip text with ISTASYON_ADI, ISTASYON_GUCU, and EA_TRAFO_KODU
+                                    string tooltipText = "";
+                                    if (eaData.Columns.Contains("ISTASYON_ADI") && !girdiModülü.IsNullLike(row["ISTASYON_ADI"]))
                                     {
-                                        string istasyonAdi = row["ISTASYON_ADI"].ToString();
-                                        marker.ToolTipText = istasyonAdi;
+                                        tooltipText += $"İstasyon Adı: {row["ISTASYON_ADI"].ToString()}\n";
+                                    }
+                                    if (eaData.Columns.Contains("ISTASYON_GUCU") && !girdiModülü.IsNullLike(row["ISTASYON_GUCU"]))
+                                    {
+                                        tooltipText += $"İstasyon Gücü: {row["ISTASYON_GUCU"].ToString()}\n";
+                                    }
+                                    if (eaData.Columns.Contains("EA_TRAFO_KODU") && !girdiModülü.IsNullLike(row["EA_TRAFO_KODU"]))
+                                    {
+                                        tooltipText += $"Trafo Kodu: {row["EA_TRAFO_KODU"].ToString()}";
+                                    }
+
+                                    if (!string.IsNullOrEmpty(tooltipText))
+                                    {
+                                        marker.ToolTipText = tooltipText;
+                                        marker.ToolTipMode = MarkerTooltipMode.OnMouseOver; // Show tooltip on hover
                                     }
 
                                     eaOverlay.Markers.Add(marker);
@@ -4537,30 +4545,37 @@ namespace SLF
                 // CheckSelections();
             }
         }
-        /*        private void CheckSelections()
-                {
-                    // Seçimlerin yapıldığını kontrol ederek butonu etkinleştir
-                    EASimButton.Enabled = SelectedYear != -1 && SelectedCity != null; // ea modulu 
-                    DEKSimButton.Enabled = SelectedYear != -1 && SelectedCity != null; // dek modulu 
-                }
-        */
+
         private GMapOverlay dekOverlay; // Add this as a class-level variable
+
         private async Task dekHaritayaVeriYukleAsync()
         {
             try
             {
-                //  GMapOverlay dekOverlay = new GMapOverlay("Dek Layer");
-
-                if (dataGridView_girdi.DataSource == null)
-                {
-                    MessageBox.Show("Veri kaynağı bulunamadı. Lütfen verileri kontrol edin.");
-                    return;
-                }
-
                 // Initialize the overlay if not already created
                 if (dekOverlay == null)
                 {
                     dekOverlay = new GMapOverlay("DEK Layer");
+                }
+
+                // Ensure girdiModülü is initialized
+                if (girdiModülü == null)
+                {
+                    string seçilenVeriTipi = "DEK Verileri";
+                    if (!girdiModülleri.ContainsKey(seçilenVeriTipi))
+                    {
+                        MessageBox.Show($"Geçersiz veri tipi: {seçilenVeriTipi}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    girdiModülü = girdiModülleri[seçilenVeriTipi];
+                    if (girdiModülü == null)
+                    {
+                        MessageBox.Show($"{seçilenVeriTipi} için girdi modülü oluşturulamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    // Optional: Set any required properties like slfStartYear and slfEndYear if needed
+                    // girdiModülü.slfStartYear = slfStartYear;
+                    // girdiModülü.slfEndYear = slfEndYear;
                 }
 
                 DataTable dekData = await Task.Run(() => GirdiModülü.dataTablesByType["DEK Verileri"]);
@@ -4610,12 +4625,21 @@ namespace SLF
                                         marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.red);
                                     }
 
+                                    // Set tooltip text with KAYNAK_TIPI and DEK_KURULU_GUCU
+                                    string tooltipText = $"Kaynak Tipi: {kaynakTipi}";
+                                    if (dekData.Columns.Contains("DEK_KURULU_GUCU") && !girdiModülü.IsNullLike(row["DEK_KURULU_GUCU"]))
+                                    {
+                                        string kuruluGucu = row["DEK_KURULU_GUCU"].ToString();
+                                        tooltipText += $"\nKurulu Güç: {kuruluGucu}";
+                                    }
+                                    marker.ToolTipText = tooltipText;
+                                    marker.ToolTipMode = MarkerTooltipMode.OnMouseOver; // Show tooltip on hover
+
                                     dekOverlay.Markers.Add(marker);
                                 }
                             }
                         }
 
-                        //gMapControl_DEK.Overlays.Add(dekOverlay);
                         // Only add overlay if checkbox is checked and it's not already added
                         if (DEKPointsLayerCheckBox.Checked && !gMapControl_DEK.Overlays.Contains(dekOverlay))
                         {
@@ -4634,6 +4658,7 @@ namespace SLF
                 MessageBox.Show($"Bir hata oluştu: {ex.Message}");
             }
         }
+
         private DataTable FormatDEKTableForDisplay(DataTable originalDEKTable)
         {
             // Yeni bir DataTable oluşturun
@@ -5431,13 +5456,13 @@ namespace SLF
         }
 
         public void OnMapClickEventi(
-    PointLatLng pointClick,
-    MouseEventArgs e,
-    GMapOverlay markerOverlay,
-    ref List<PointLatLng> polygonPoints,
-    ref GMapOverlay polygonOverlay,
-    System.Windows.Forms.Label mesafe,
-    System.Windows.Forms.Label mesafe_metre)
+            PointLatLng pointClick,
+            MouseEventArgs e,
+            GMapOverlay markerOverlay,
+            ref List<PointLatLng> polygonPoints,
+            ref GMapOverlay polygonOverlay,
+            System.Windows.Forms.Label mesafe,
+            System.Windows.Forms.Label mesafe_metre)
         {
             if (e.Button == MouseButtons.Left)
             {
@@ -5666,14 +5691,9 @@ namespace SLF
             // cetvel eventi ile mesafe çiz 
             if (e.Button == MouseButtons.Left && isRulerEnabled == true)
             {
-                // seçilen piksel noktaları latitude ve longitude bilgisine dönüştür.
                 var point = gMapControl.FromLocalToLatLng(e.X, e.Y);
-
-                // bir marker objesi oluştur ve seçilen noktalara marker ata
                 GMapMarker marker = new GMarkerGoogle(point, GMarkerGoogleType.blue_dot);
                 markerOverlay.Markers.Add(marker);
-
-                // seçilen noktaları bir listeye koy
                 rulerPoints.Add(point);
                 cbs.CetvelSecimi(gMapControl, mesafe_metre, rulerPoints, markerOverlay,
                     rulerOverlay, ref rulerRoute);
@@ -5682,9 +5702,41 @@ namespace SLF
             // sağ tıklayarak poligon çizmeyi bitir 
             if (e.Button == MouseButtons.Right && isSelecting_polygon)
             {
+                // Always clear markerOverlay.Markers and polygonPoints
                 markerOverlay.Markers?.Clear();
                 polygonPoints?.Clear();
-                polygonOverlay?.Clear();
+
+                // Check if polygonOverlay should be cleared based on saved status
+                if (polygonOverlay != null && cbs.tüm_katmanlar_array_imar != null)
+                {
+                    bool isSaved = false;
+                    foreach (var savedOverlay in cbs.tüm_katmanlar_array_imar)
+                    {
+                        Console.WriteLine($"Comparing polygonOverlay (Id: {polygonOverlay.Id}) with savedOverlay (Id: {savedOverlay?.Id})");
+                        if (ReferenceEquals(polygonOverlay, savedOverlay)) // Use reference equality
+                        {
+                            isSaved = false;
+                            Console.WriteLine("Match found, polygonOverlay is saved.");
+                            break;
+                        }
+                    }
+
+                    if (!isSaved)
+                    {
+                        Console.WriteLine("No match found, clearing polygonOverlay.");
+                        polygonOverlay.Clear();
+                    }
+                    else
+                    {
+                        Console.WriteLine("polygonOverlay is saved, not clearing.");
+                    }
+                }
+                else
+                {
+                    // If polygonOverlay or cbs.tüm_katmanlar_array_imar is null, clear polygonOverlay
+                    Console.WriteLine("polygonOverlay or cbs.tüm_katmanlar_array_imar is null, clearing polygonOverlay.");
+                    polygonOverlay?.Clear();
+                }
 
                 mesafe.Visible = false;
                 mesafe_metre.Visible = false;
@@ -5692,7 +5744,7 @@ namespace SLF
                 cbs.GetActiveGMapControl().Refresh();
             }
 
-            // sağ tıklayarak poligon çizmeyi bitir 
+            // sağ tıklayarak cetvel çizmeyi bitir 
             if (e.Button == MouseButtons.Right && isRulerEnabled)
             {
                 markerOverlay.Markers?.Clear();
@@ -5708,8 +5760,8 @@ namespace SLF
 
                 cbs.GetActiveGMapControl().Refresh();
             }
-
         }
+
 
         private void ModülFormu_Load(object sender, EventArgs e)
         {
@@ -6839,22 +6891,14 @@ namespace SLF
                 {
                     process.Start();
 
-                    Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
-                    Task<string> errorTask = process.StandardError.ReadToEndAsync();
-
                     await Task.Run(() => process.WaitForExit());
 
-                    string output = await outputTask;
-                    string error = await errorTask;
 
                     if (process.ExitCode != 0)
                     {
-                        throw new Exception($"Python betiği {process.ExitCode} çıkış koduyla başarısız oldu. Hata: {error}");
+                        throw new Exception($"Python scripti {process.ExitCode} çıkış koduyla başarısız oldu.");
                     }
-                    else if (!string.IsNullOrEmpty(output))
-                    {
-                        Console.WriteLine($"Python çıktısı: {output}");
-                    }
+
                 }
             }
             catch (Exception ex)
@@ -8073,7 +8117,7 @@ namespace SLF
                         StartInfo = new ProcessStartInfo
                         {
                             FileName = "cmd.exe",
-                            Arguments = $"/k python \"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
+                            Arguments = $"/C python \"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
                             RedirectStandardOutput = false,
                             RedirectStandardError = false,
                             UseShellExecute = false,
