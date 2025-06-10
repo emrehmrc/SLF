@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.IO;
 using SLF.Services;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace SLF
 {
@@ -36,12 +37,10 @@ namespace SLF
         protected readonly List<string> veri_listesi_requires_xlsx = new List<string> {
             "Ekonometrik Yük Tahmini Verileri",
             "EA Şarj Verileri",
-            "Fider Verileri",
-            "TM Verileri",
             "DTR Verileri",
             "DEK Verileri",
             "Abone Verileri",
-            "Enerji Müsaadeleri Verileri",
+            "İmar Verileri",
             "Yeni Projelendirilmiş DTR Verileri"
         };
 
@@ -56,9 +55,9 @@ namespace SLF
             { "EA_Sarj_verileri", "EA Şarj Verileri" },
             { "dek_verileri", "DEK Verileri" },
             { "projelendirilmis_trafolar", "Yeni Projelendirilmiş DTR Verileri" },
-            { "enerji_musaade_verileri", "Enerji Müsaadeleri Verileri" },
             { "dtr_verileri", "DTR Verileri" },
-            {"abone_final_tablosu","Abone Verileri" }
+            { "imar_verileri", "İmar Verileri" },
+            { "abone_final_tablosu","Abone Verileri" }
         };
         protected virtual List<string> Prerequisites { get; } = new List<string>();
         protected readonly List<string> nullLikeStrings = new List<string> // doluluk bosluk check kısımları kontrolu yapılıyor
@@ -170,26 +169,50 @@ namespace SLF
 
             return roundedKapasite;
         }
-        public bool IsNullLike(object value, bool isZero = false) // 0 VE negatif kontrolu 
+
+        public bool IsNullLike(object value, bool isZero = false)
         {
-            if (value == null || value == DBNull.Value)
+            try
             {
-                return true;
-            }
-            if (isZero && value.ToString() == "0")
-            {
-                return true;
-            }
+                Console.WriteLine($"IsNullLike called with value: '{value}' (Type: {value?.GetType().Name})");
 
-            string stringValue = value?.ToString() ?? ""; // Handle null safely
-            if (string.IsNullOrWhiteSpace(stringValue)) // Treat empty or whitespace as null-like
-            {
-                return true;
-            }
+                if (value == null || value == DBNull.Value)
+                {
+                    Console.WriteLine("Value is null or DBNull, returning true");
+                    return true;
+                }
 
-            return nullLikeStrings.Contains(stringValue, StringComparer.OrdinalIgnoreCase);
+                if (isZero && value.ToString() == "0")
+                {
+                    Console.WriteLine("Value is '0' with isZero, returning true");
+                    return true;
+                }
+
+                string stringValue = value?.ToString() ?? "";
+                Console.WriteLine($"Converted to string: '{stringValue}'");
+
+                if (string.IsNullOrWhiteSpace(stringValue))
+                {
+                    Console.WriteLine("String is null or whitespace, returning true");
+                    return true;
+                }
+
+                if (double.TryParse(stringValue, out _))
+                {
+                    Console.WriteLine("Value is numeric, returning false");
+                    return false;
+                }
+
+                bool result = nullLikeStrings.Contains(stringValue, StringComparer.OrdinalIgnoreCase);
+                Console.WriteLine($"Checked nullLikeStrings, result: {result}");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"IsNullLike Exception: {ex.Message} - StackTrace: {ex.StackTrace}");
+                return false; // Fallback to false on error
+            }
         }
-
 
         public void VEERReport(string seçilenVeriTipi)
         {
@@ -284,14 +307,18 @@ namespace SLF
                 }
                 else
                 {
-                    MessageBox.Show("Veri tablosu boş veya yüklenemedi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    if(seçilenVeriTipi != "İmar Verileri")
+                    {
+                        MessageBox.Show("Veri tablosu boş veya yüklenemedi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+
                 }
                 Onizleme1.Onizleme_DataGrid1.ScrollBars = ScrollBars.Both;
 
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}\nStack Trace: {ex.StackTrace}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"İşlem sırasında hata oluştu!!\n\n{ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             return false;
@@ -453,11 +480,9 @@ namespace SLF
 
                 SaveModuleDataToCSV();
 
-                if (PathService.CurrentMode == PathService.WorkingMode.Temporary)
-                {
-                    string tempPath = Path.Combine(PathService.BaseDirectory, PathService.FullPath, PathService.CurrentWorkingFolder);
-                    SaveTempProjectState(tempPath);
-                }
+                // Update project state for both temporary and imported projects
+                string projectPath = Path.Combine(PathService.BaseDirectory, PathService.FullPath, PathService.CurrentWorkingFolder);
+                UpdateProjectState(projectPath);
 
                 if (seçilenVeriTipi == "Ekonometrik Yük Tahmini Verileri")
                 {
@@ -559,22 +584,41 @@ namespace SLF
             }
         }
 
-        private void SaveTempProjectState(string tempPath)
+        private void UpdateProjectState(string projectPath)
         {
-            // Tamamlanan modül listesini doğrudan dataTablesByType'dan al
-            var completedModules = dataTablesByType.Keys.ToList();
-
-            var projectState = new Dictionary<string, object>
+            try
             {
-                ["CompletedModules"] = completedModules,
-                ["LastUpdated"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-            };
+                var yearService = YearService.GetInstance();
+                string statePath = Path.Combine(projectPath, "project_state.json");
 
-            string json = System.Text.Json.JsonSerializer.Serialize(projectState,
-                new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+                Dictionary<string, object> projectState = new Dictionary<string, object>();
+                if (File.Exists(statePath))
+                {
+                    // Read existing project_state.json
+                    string existingJson = File.ReadAllText(statePath);
+                    projectState = JsonConvert.DeserializeObject<Dictionary<string, object>>(existingJson) ?? new Dictionary<string, object>();
+                }
 
-            string statePath = Path.Combine(tempPath, "temp_state.json");
-            File.WriteAllText(statePath, json);
+                // Update CompletedModules with current dataTablesByType keys
+                var completedModules = dataTablesByType.Keys.ToList();
+                projectState["CompletedModules"] = completedModules;
+
+                // Preserve or add other fields
+                projectState["SLFStartYear"] = projectState.ContainsKey("SLFStartYear") ? projectState["SLFStartYear"] : yearService.slfStartYear;
+                projectState["SLFEndYear"] = projectState.ContainsKey("SLFEndYear") ? projectState["SLFEndYear"] : yearService.slfEndYear;
+                projectState["LastSaved"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                projectState["CreatedBy"] = projectState.ContainsKey("CreatedBy") ? projectState["CreatedBy"] : Environment.UserName;
+
+                // Serialize and save the updated state
+                string updatedJson = JsonConvert.SerializeObject(projectState, Newtonsoft.Json.Formatting.Indented);
+                Directory.CreateDirectory(projectPath); // Ensure directory exists
+                File.WriteAllText(statePath, updatedJson);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Hata oluştu proje durumu güncellenirken: {ex.Message}");
+                throw;
+            }
         }
 
         private DataTable ConvertColumnNamesToUpperCase(DataTable dataTable)
@@ -658,6 +702,12 @@ namespace SLF
 
                 using (var fileDialog1 = new OpenFileDialog { Title = FileDialogTitle })
                 {
+
+                    if(seçilenVeriTipi == "İmar Verileri")
+                    {
+                        return;
+                    }
+
                     string filter = GetFileFilter(seçilenVeriTipi);
                     if (string.IsNullOrEmpty(filter))
                     {
@@ -945,7 +995,7 @@ namespace SLF
                 if (columnName.Contains("id") || columnName.Contains("adi") || columnName.Contains("kod") ||
                     columnName.Contains("mulkiyet") || columnName.Contains("mahalle") || columnName.Contains("ilce"))
                 {
-                    continue; // Treat as string (e.g., TRAFO_ID, FIDER_ADI, TRAFO_ADI)
+                    continue; // Treat as string (e.g., TRAFO_ID, TRAFO_ADI)
                 }
 
                 int validDateCount = 0;

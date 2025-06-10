@@ -279,5 +279,23 @@ namespace SLF.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+
+        internal static System.Drawing.Bitmap l1
+        {
+            get
+            {
+                object obj = ResourceManager.GetObject("l1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+
+        internal static System.Drawing.Bitmap html
+        {
+            get
+            {
+                object obj = ResourceManager.GetObject("html", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

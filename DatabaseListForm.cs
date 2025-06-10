@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
-using Newtonsoft.Json.Linq;
 using SLF.services;
 using SLF.Services;
 using System.Threading.Tasks;
+
 namespace SLF
 {
     public partial class DatabaseListForm : Form
     {
-        
 
         public DatabaseListForm()
         {
@@ -22,25 +18,6 @@ namespace SLF
 
             // Load event'ini manuel olarak bağla
             this.Load += DatabaseListForm_Load;
-
-            // Constructor'da direkt çağır (kesin çalışır)
-            try
-            {
-                // Form tamamen yüklendikten sonra çağırmak için Timer kullan
-                var timer = new Timer();
-                timer.Interval = 100; // 100ms bekle
-                timer.Tick += (s, e) =>
-                {
-                    timer.Stop();
-                    timer.Dispose();
-                    CheckDataValidation();
-                };
-                timer.Start();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Başlangıç kontrolü sırasında hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
         }
 
         private void DatabaseListForm_Load(object sender, EventArgs e)
@@ -97,18 +74,12 @@ namespace SLF
             }
         }
 
-        /// <summary>
-        /// Manuel veri doğrulaması butonu için
-        /// </summary>
-        private void buttonVerileriKontrolEt_Click(object sender, EventArgs e)
-        {
-            CheckDataValidation();
-        }
 
         private void buttonAboneVerisiOlustur_Click(object sender, EventArgs e)
         {
             try
             {
+
                 // Config yolunu al
                 string configPath = PathService._configKonum;
 
@@ -120,40 +91,6 @@ namespace SLF
 
                 // Önce veri durumunu kontrol et
                 var validationResult = DataValidationService.ValidateAboneData(configPath);
-
-                // Kullanıcıya durumu göster ve onay al
-                string confirmMessage;
-
-                if (validationResult.IsValid && validationResult.HasDepoCsvFiles && validationResult.IsDataUpToDate)
-                {
-                    confirmMessage = $"✅ Veriler güncel ve CSV dosyaları mevcut.\n\n" +
-                                   $"İşlem türü: Hızlı işleme (CSV'lerden)\n" +
-                                   $"Abone Bilgi: {validationResult.AboneBilgiConfigCount:N0} kayıt\n" +
-                                   $"Tüketim: {validationResult.AboneTuketimConfigCount:N0} kayıt\n\n" +
-                                   $"CSV dosyalarından abone verisi oluşturulsun mu?";
-                }
-                else if (!validationResult.DatabaseAccessible && validationResult.HasDepoCsvFiles)
-                {
-                    confirmMessage = $"⚠ Veritabanına erişim yok, CSV dosyaları kullanılacak.\n\n" +
-                                   $"İşlem türü: CSV'lerden işleme\n" +
-                                   $"Depo yolu: {validationResult.DepoPath}\n\n" +
-                                   $"Mevcut CSV dosyalarından abone verisi oluşturulsun mu?";
-                }
-                else
-                {
-                    confirmMessage = $"🔄 Veri güncelleme gerekli.\n\n" +
-                                   $"İşlem türü: Tam güncelleme (Veritabanı + CSV)\n" +
-                                   $"Abone Bilgi: {validationResult.AboneBilgiCurrentCount:N0} → {validationResult.AboneBilgiConfigCount:N0}\n" +
-                                   $"Tüketim: {validationResult.AboneTuketimCurrentCount:N0} → {validationResult.AboneTuketimConfigCount:N0}\n\n" +
-                                   $"Bu işlem zaman alabilir. Devam edilsin mi?";
-                }
-
-                var dialogResult = MessageBox.Show(confirmMessage, "Abone Verisi Oluşturma", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-                if (dialogResult != DialogResult.Yes)
-                {
-                    return;
-                }
 
                 // İşlem tipini belirle ve kullanıcıya bilgi ver
                 string processingMode;
@@ -183,6 +120,8 @@ namespace SLF
                     Dock = DockStyle.Fill,
                     TextAlign = ContentAlignment.MiddleCenter
                 };
+              
+
                 progressForm.Controls.Add(progressLabel);
 
                 // Async olarak Python script'ini çalıştır
@@ -190,6 +129,13 @@ namespace SLF
                 {
                     try
                     {
+                        buttonAboneVerisiOlustur.ForeColor = Color.Silver;
+                        
+                        System.Threading.Thread.Sleep(500);
+
+                        buttonAboneVerisiOlustur.ForeColor = Color.White;
+
+
                         // Python script'ini akıllı modda çalıştır
                         PythonHelper.RunPythonScriptForAboneVerisi(configPath);
 
@@ -204,8 +150,6 @@ namespace SLF
                                 MessageBoxIcon.Information
                             );
 
-                            // Abone verisi oluşturulduktan sonra tekrar kontrol et
-                            CheckDataValidation();
                         }));
                     }
                     catch (Exception ex)
@@ -225,7 +169,7 @@ namespace SLF
                 });
 
                 // İlerleme formunu göster
-                progressForm.ShowDialog(this);
+                progressForm.Close();
             }
             catch (Exception ex)
             {

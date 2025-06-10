@@ -31,44 +31,48 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DatabaseListForm));
             this.buttonAboneVerisiOlustur = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
+            this.buttonDTRVerileriniOlustur = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonAboneVerisiOlustur
             // 
-            this.buttonAboneVerisiOlustur.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
+            this.buttonAboneVerisiOlustur.BackColor = System.Drawing.Color.Green;
             this.buttonAboneVerisiOlustur.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.buttonAboneVerisiOlustur.ForeColor = System.Drawing.Color.DarkOrange;
-            this.buttonAboneVerisiOlustur.Location = new System.Drawing.Point(275, 150);
+            this.buttonAboneVerisiOlustur.ForeColor = System.Drawing.Color.White;
+            this.buttonAboneVerisiOlustur.Location = new System.Drawing.Point(40, 43);
             this.buttonAboneVerisiOlustur.Name = "buttonAboneVerisiOlustur";
-            this.buttonAboneVerisiOlustur.Size = new System.Drawing.Size(200, 76);
+            this.buttonAboneVerisiOlustur.Size = new System.Drawing.Size(345, 81);
             this.buttonAboneVerisiOlustur.TabIndex = 1;
-            this.buttonAboneVerisiOlustur.Text = "Abone Verisi Oluştur";
+            this.buttonAboneVerisiOlustur.Text = "Abone Verilerini Oluştur";
             this.buttonAboneVerisiOlustur.UseVisualStyleBackColor = false;
             this.buttonAboneVerisiOlustur.Click += new System.EventHandler(this.buttonAboneVerisiOlustur_Click);
             // 
-            // label1
+            // buttonDTRVerileriniOlustur
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Comic Sans MS", 20.25F, System.Drawing.FontStyle.Bold);
-            this.label1.ForeColor = System.Drawing.Color.DarkOrange;
-            this.label1.Location = new System.Drawing.Point(197, 34);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(363, 58);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Database Modülü";
+            this.buttonDTRVerileriniOlustur.BackColor = System.Drawing.Color.DarkSlateGray;
+            this.buttonDTRVerileriniOlustur.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.buttonDTRVerileriniOlustur.ForeColor = System.Drawing.Color.White;
+            this.buttonDTRVerileriniOlustur.Location = new System.Drawing.Point(40, 189);
+            this.buttonDTRVerileriniOlustur.Name = "buttonDTRVerileriniOlustur";
+            this.buttonDTRVerileriniOlustur.Size = new System.Drawing.Size(345, 81);
+            this.buttonDTRVerileriniOlustur.TabIndex = 2;
+            this.buttonDTRVerileriniOlustur.Text = "DTR Verilerini Oluştur";
+            this.buttonDTRVerileriniOlustur.UseVisualStyleBackColor = false;
             // 
             // DatabaseListForm
             // 
-            this.ClientSize = new System.Drawing.Size(783, 350);
-            this.Controls.Add(this.label1);
+            this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.ClientSize = new System.Drawing.Size(438, 346);
+            this.Controls.Add(this.buttonDTRVerileriniOlustur);
             this.Controls.Add(this.buttonAboneVerisiOlustur);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "DatabaseListForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Veritabanı Veri İşlemleri";
+            this.Text = "Veritabanı İşlemleri";
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -77,6 +81,6 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button aboneVeriTablosuOlustur;
         private System.Windows.Forms.Label tablo_label;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button buttonDTRVerileriniOlustur;
     }
 }

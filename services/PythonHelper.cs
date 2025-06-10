@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using SLF.Services;
 
 namespace SLF.services
@@ -31,8 +32,6 @@ namespace SLF.services
                 // Python script yolu - artık python_kod klasöründen alınıyor
                 string scriptRelativePath = Path.Combine("python_kod", "deep_learning", "kod", "model_learning.py");
                 string pythonScriptPath = PathService.GetPythonScriptPath(scriptRelativePath);
-                //Console.WriteLine("deeplearningpath"+pythonScriptPath.ToString());
-
 
                 if (!File.Exists(pythonScriptPath))
                 {
@@ -63,44 +62,46 @@ namespace SLF.services
                 string meskenSonucYolu = Path.Combine(imarAnaliziPath, $"mesken_data_{selectedCity}_{selectedDistrict}.csv");
                 string otherSonucYolu = Path.Combine(imarAnaliziPath, $"other_data_{selectedCity}_{selectedDistrict}.csv");
 
-                // Log mesajı oluştur
-                Console.WriteLine($"Python kod klasörü: {PathService.PythonKodDirectory}");
-                Console.WriteLine($"Python script: {pythonScriptPath}");
-                Console.WriteLine($"Abone verisi: {aboneVeriYolu}");
-                Console.WriteLine($"Çıktı klasörü: {imarAnaliziPath}");
-
                 // Python argümanlarını oluştur - İlçe parametresi eklendi
-                string arguments = $"\"{pythonScriptPath}\" \"{aboneVeriYolu}\" \"{meskenSonucYolu}\" \"{otherSonucYolu}\" \"{selectedCity}\" \"{selectedDistrict}\" \"{year}\"";
+                string arguments = $"/C python \"{pythonScriptPath}\" \"{aboneVeriYolu}\" \"{meskenSonucYolu}\" \"{otherSonucYolu}\" \"{selectedCity}\" \"{selectedDistrict}\" \"{year}\"";
 
                 // Python betiğini çalıştır
-                ProcessStartInfo processInfo = new ProcessStartInfo("python")
+                ProcessStartInfo processInfo = new ProcessStartInfo
                 {
+                    FileName = "cmd.exe",
                     Arguments = arguments,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
+                    RedirectStandardOutput = false, // Output will be displayed in the console
+                    RedirectStandardError = false,  // Errors will be displayed in the console
                     UseShellExecute = false,
-                    CreateNoWindow = true
+                    CreateNoWindow = false
                 };
 
-                string output = "";
-                string error = "";
-                using (Process process = Process.Start(processInfo))
+                Process process = new Process
                 {
-                    output = process.StandardOutput.ReadToEnd();
-                    error = process.StandardError.ReadToEnd();
-                    process.WaitForExit();
+                    StartInfo = processInfo
+                };
 
-                    if (process.ExitCode != 0)
-                    {
-                        throw new Exception($"Python betiği hata ile sonlandı. Çıktı: {output}, Hata: {error}");
-                    }
+                process.Start();
+
+                // İşlemin tamamlanmasını bekle
+                process.WaitForExit();
+
+                // Hata durumunda
+                if (process.ExitCode != 0)
+                {
+                    Console.WriteLine($"Python betiği hata ile sonlandı. Hata kodunu ve komut penceresindeki mesajları kontrol edin.");
+                    // Hata mesajını görmek için pencerenin açık kalmasını sağladık, ama hatayı üst katmana iletiyoruz.
+                    throw new Exception($"Python betiği hata ile sonlandı. Komut penceresindeki hata mesajlarını kontrol edin.");
                 }
+
+                // Process nesnesini kapat
+                process.Close();
 
                 // İşlem başarılı mesajı
                 Console.WriteLine("Deep Learning modeli başarıyla çalıştırıldı.");
-                Console.WriteLine(output);
 
-                return output;
+                // Since output is displayed in the console, return an empty string or a success message
+                return "Deep Learning modeli başarıyla çalıştırıldı.";
             }
             catch (Exception ex)
             {
@@ -108,7 +109,7 @@ namespace SLF.services
                 throw; // Üst seviye metodların hatayı yakalaması için yeniden fırlat
             }
         }
-        
+
         public static string RunKatmanDeneme(string kmlFilePath, string csvFilePath)
         {
             try
@@ -140,38 +141,40 @@ namespace SLF.services
                 string outputDirectory = Path.GetDirectoryName(kmlFilePath);
                 string outputFile = Path.Combine(outputDirectory, "katman_analiz_sonuc.csv");
 
-                // Create command arguments
-                string arguments = $"\"{pythonScriptPath}\" \"{csvFilePath}\" \"{kmlFilePath}\" \"{outputFile}\"";
+                string arguments = $"/C python \"{pythonScriptPath}\" \"{csvFilePath}\" \"{kmlFilePath}\" \"{outputFile}\"";
 
-                Console.WriteLine($"Çalıştırılacak komut: python {arguments}");
-
-                // Run the Python script
-                ProcessStartInfo processInfo = new ProcessStartInfo("python")
+                // Run the Python script using cmd.exe
+                ProcessStartInfo processInfo = new ProcessStartInfo
                 {
+                    FileName = "cmd.exe",
                     Arguments = arguments,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
                     UseShellExecute = false,
-                    CreateNoWindow = true,
+                    CreateNoWindow = false,
                     WorkingDirectory = Path.GetDirectoryName(pythonScriptPath)
                 };
 
-                string output = "";
-                string error = "";
-                using (Process process = Process.Start(processInfo))
+                Process process = new Process
                 {
-                    output = process.StandardOutput.ReadToEnd();
-                    error = process.StandardError.ReadToEnd();
-                    process.WaitForExit();
+                    StartInfo = processInfo
+                };
 
-                    if (process.ExitCode != 0)
-                    {
-                        throw new Exception($"Python betiği hata ile sonlandı. Çıkış kodu: {process.ExitCode}\nHata: {error}");
-                    }
+                process.Start();
+
+                // İşlemin tamamlanmasını bekle
+                process.WaitForExit();
+
+                // Hata durumunda
+                if (process.ExitCode != 0)
+                {
+                    Console.WriteLine($"Python betiği hata ile sonlandı. Hata kodunu ve komut penceresindeki mesajları kontrol edin.");
+                    // Hata mesajını görmek için pencerenin açık kalmasını sağladık, ama hatayı üst katmana iletiyoruz.
+                    throw new Exception($"Python betiği hata ile sonlandı. Komut penceresindeki hata mesajlarını kontrol edin.");
                 }
 
-                Console.WriteLine("Katman Deneme scripti başarıyla çalıştırıldı.");
-                Console.WriteLine(output);
+                // Process nesnesini kapat
+                process.Close();
 
                 // Return the output file path for further processing
                 return outputFile;
@@ -182,17 +185,15 @@ namespace SLF.services
                 throw; // Re-throw for upper level methods to catch
             }
         }
+
         /// <summary>
         /// Abone verisi oluşturma işlemi - Akıllı mod
         /// Veri durumuna göre CSV'den veya veritabanından çalışır
         /// </summary>
-        public static string RunPythonScriptForAboneVerisi(string configPath)
+        public static void RunPythonScriptForAboneVerisi(string configPath)
         {
             try
             {
-                Console.WriteLine("---------- Abone Verisi Python Script Çalıştırma Başladı ----------");
-                Console.WriteLine($"Config dosya yolu: {configPath}");
-
                 // Önce veri doğrulaması yap
                 var validationResult = DataValidationService.ValidateAboneData(configPath);
 
@@ -200,14 +201,13 @@ namespace SLF.services
                 {
                     // Veriler güncel ve CSV'ler mevcut - CSV'lerle işlem yap
                     Console.WriteLine("Veriler güncel ve CSV dosyaları mevcut. CSV'lerden abone verisi oluşturuluyor...");
-                    return ProcessAboneDataFromCsv(configPath, validationResult.DepoPath);
+                    ProcessAboneDataFromCsv(configPath, validationResult.DepoPath);
                 }
                 else
                 {
                     // Veriler güncel değil veya CSV'ler yok - Veritabanından çek
-                    // Veriler güncel değil veya CSV'ler yok - Veritabanından çek
                     Console.WriteLine("Veriler güncel değil veya CSV dosyaları yok. Veritabanından yeni veri çekiliyor...");
-                    return ProcessAboneDataFromDatabase(configPath);
+                    ProcessAboneDataFromDatabase(configPath);
                 }
             }
             catch (Exception ex)
@@ -216,19 +216,15 @@ namespace SLF.services
                 throw new Exception($"Abone verisi işlemi başarısız: {ex.Message}", ex);
             }
         }
-        /// <summary>
-        /// Mevcut CSV dosyalarından abone verisi oluşturur
-        /// </summary>
-        private static string ProcessAboneDataFromCsv(string configPath, string depoPath)
+
+        private static void ProcessAboneDataFromCsv(string configPath, string depoPath)
         {
             try
             {
-                Console.WriteLine($"CSV dosyalarından abone verisi oluşturuluyor...");
-                Console.WriteLine($"Depo klasörü: {depoPath}");
 
                 // CSV dosya yolları
                 string aboneCsvPath = Path.Combine(depoPath, "DWH_MRC_SLFPROJE_ABN_BLG.csv");
-                string tuketimCsvPath = Path.Combine(depoPath, "DWH_TUKETIM_DENEME.csv");
+                string tuketimCsvPath = Path.Combine(depoPath, "DWH_MRC_SLFPROJE_TUKETIM.csv");
 
                 // Dosyaların varlığını kontrol et
                 if (!File.Exists(aboneCsvPath))
@@ -241,83 +237,57 @@ namespace SLF.services
                     throw new FileNotFoundException($"Tüketim CSV dosyası bulunamadı: {tuketimCsvPath}");
                 }
 
-                Console.WriteLine($"CSV dosyaları bulundu:");
-                Console.WriteLine($"  Abone Bilgi: {aboneCsvPath}");
-                Console.WriteLine($"  Tüketim: {tuketimCsvPath}");
-
                 // Python script'ini CSV modunda çalıştır
-                string pythonExecutable = "python";
                 string pythonScript = PathService._configveritabanikod;
 
+                // Python script dosyasının varlığını kontrol et
                 if (string.IsNullOrEmpty(pythonScript) || !File.Exists(pythonScript))
                 {
                     throw new FileNotFoundException($"Python kod dosyası bulunamadı: {pythonScript}");
                 }
 
-                // Python sürecini CSV modunda başlat
+                // Çalışma dizininin varlığını kontrol et
+                string workingDirectory = Path.GetDirectoryName(pythonScript);
+                if (string.IsNullOrEmpty(workingDirectory) || !Directory.Exists(workingDirectory))
+                {
+                    throw new DirectoryNotFoundException($"Çalışma dizini bulunamadı: {workingDirectory}");
+                }
+
+                // configPath'in varlığını kontrol et (dosya olarak kontrol et, directory değil)
+                if (string.IsNullOrEmpty(configPath) || !File.Exists(configPath))
+                {
+                    throw new FileNotFoundException($"Config dosyası bulunamadı: {configPath}");
+                }
+
+                // Komut dizesini oluştururken tüm yolları çift tırnak içine al
+                // Python komutunu şu formatta oluştur: python "path/to/code.py" "path/to/config.json" --mode CSV ...
+                string arguments = $"/C python \"{pythonScript}\" \"{configPath}\" --mode CSV --abone-csv \"{aboneCsvPath}\" --tuketim-csv \"{tuketimCsvPath}\"";
+
+                // Python sürecini cmd.exe ile çalıştır
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
-                    FileName = pythonExecutable,
-                    Arguments = $"\"{pythonScript}\" \"{configPath}\" --mode CSV --abone-csv \"{aboneCsvPath}\" --tuketim-csv \"{tuketimCsvPath}\"",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = false,
-                    WorkingDirectory = Path.GetDirectoryName(pythonScript)
+                    FileName = "cmd.exe",
+                    Arguments = arguments,
+                    UseShellExecute = true,       // Kabuk kullanarak çalıştır, pencereyi göster
+                    RedirectStandardOutput = false,  // Çıktıyı yönlendirme, cmd penceresinde göster
+                    RedirectStandardError = false,   // Hataları yönlendirme, cmd penceresinde göster
+                    CreateNoWindow = false,       // Pencere oluştur
+                    WorkingDirectory = workingDirectory,
+                    WindowStyle = ProcessWindowStyle.Normal  // Pencereyi normal boyutta aç
                 };
 
-                StringBuilder output = new StringBuilder();
-                StringBuilder error = new StringBuilder();
-
-                using (Process process = new Process())
+                using (Process process = new Process { StartInfo = startInfo })
                 {
-                    process.StartInfo = startInfo;
                     process.Start();
-
-                    // Çıktıları asenkron olarak oku
-                    process.OutputDataReceived += (sender, e) => {
-                        if (e.Data != null)
-                        {
-                            output.AppendLine(e.Data);
-                            Console.WriteLine(e.Data);
-                        }
-                    };
-
-                    process.ErrorDataReceived += (sender, e) => {
-                        if (e.Data != null)
-                        {
-                            error.AppendLine(e.Data);
-                            Console.WriteLine($"ERR: {e.Data}");
-                        }
-                    };
-
-                    // Asenkron okumayı başlat
-                    process.BeginOutputReadLine();
-                    process.BeginErrorReadLine();
 
                     // İşlemin tamamlanmasını bekle
                     process.WaitForExit();
 
-                    string outputStr = output.ToString();
-                    string errorStr = error.ToString();
-
                     // Hata durumunda
                     if (process.ExitCode != 0)
                     {
-                        throw new Exception($"CSV işleme sırasında hata oluştu (Çıkış kodu: {process.ExitCode}).\nHata: {errorStr}");
+                        throw new Exception($"CSV işleme sırasında hata oluştu. Hata kodu: {process.ExitCode}. Cmd penceresindeki mesajları kontrol edin.");
                     }
-
-                    // İşlemin başarılı olduğunu kontrol et
-                    if (outputStr.Contains("Sonuçlar başarıyla Excel formatında kaydedildi"))
-                    {
-                        Console.WriteLine("Abone verileri CSV dosyalarından başarıyla işlendi.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("CSV işleme tamamlandı, ancak başarı mesajı alınamadı.");
-                    }
-
-                    return outputStr;
                 }
             }
             catch (Exception ex)
@@ -326,17 +296,13 @@ namespace SLF.services
                 throw;
             }
         }
-        /// <summary>
-        /// Veritabanından yeni veri çeker, CSV'leri günceller ve sonucu oluşturur
-        /// </summary>
-        private static string ProcessAboneDataFromDatabase(string configPath)
+
+        private static void ProcessAboneDataFromDatabase(string configPath)
         {
             try
             {
                 Console.WriteLine("Veritabanından veri çekme ve CSV güncelleme işlemi başlatılıyor...");
 
-                // Python yürütme ortamı
-                string pythonExecutable = "python";
 
                 // Python kod dosyasının yolunu PathService'ten al
                 string pythonScript = PathService._configveritabanikod;
@@ -358,71 +324,38 @@ namespace SLF.services
                 Console.WriteLine($"Python kodu çalıştırılıyor: {pythonScript}");
                 Console.WriteLine($"Config dosyası: {configPath}");
 
-                // Python sürecini başlat - "DATABASE" modunda çalışacak
+                // Python sürecini başlat - "DATABASE" modunda çalışacak, cmd.exe ile çalıştır
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
-                    FileName = pythonExecutable,
-                    Arguments = $"\"{pythonScript}\" \"{configPath}\" --mode DATABASE", // DATABASE modu eklendi
+                    FileName = "cmd.exe",
+                    Arguments = $"/C python \"{pythonScript}\" \"{configPath}\" --mode DATABASE",
                     UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
                     CreateNoWindow = false,
                     WorkingDirectory = Path.GetDirectoryName(pythonScript)
                 };
 
-                StringBuilder output = new StringBuilder();
-                StringBuilder error = new StringBuilder();
-
-                using (Process process = new Process())
+                Process process = new Process
                 {
-                    process.StartInfo = startInfo;
-                    process.Start();
+                    StartInfo = startInfo
+                };
 
-                    // Çıktıları asenkron olarak oku
-                    process.OutputDataReceived += (sender, e) => {
-                        if (e.Data != null)
-                        {
-                            output.AppendLine(e.Data);
-                            Console.WriteLine(e.Data);
-                        }
-                    };
+                process.Start();
 
-                    process.ErrorDataReceived += (sender, e) => {
-                        if (e.Data != null)
-                        {
-                            error.AppendLine(e.Data);
-                            Console.WriteLine($"ERR: {e.Data}");
-                        }
-                    };
+                // İşlemin tamamlanmasını bekle
+                process.WaitForExit();
 
-                    // Asenkron okumayı başlat
-                    process.BeginOutputReadLine();
-                    process.BeginErrorReadLine();
-
-                    // İşlemin tamamlanmasını bekle
-                    process.WaitForExit();
-
-                    string outputStr = output.ToString();
-                    string errorStr = error.ToString();
-
-                    // Hata durumunda
-                    if (process.ExitCode != 0)
-                    {
-                        throw new Exception($"Python kodu çalıştırılırken hata oluştu (Çıkış kodu: {process.ExitCode}).\nHata: {errorStr}");
-                    }
-
-                    // İşlemin başarılı olduğunu kontrol et
-                    if (outputStr.Contains("Sonuçlar başarıyla Excel formatında kaydedildi"))
-                    {
-                        Console.WriteLine("Abone verileri veritabanından başarıyla işlendi ve CSV dosyaları güncellendi.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Abone verileri işlemi tamamlandı, ancak başarı mesajı alınamadı.");
-                    }
-
-                    return outputStr;
+                // Hata durumunda
+                if (process.ExitCode != 0)
+                {
+                    Console.WriteLine($"Python kodu çalıştırılırken hata oluştu. Hata kodunu ve komut penceresindeki mesajları kontrol edin.");
+                    // Hata mesajını görmek için pencerenin açık kalmasını sağladık, bu yüzden burada throw yapıyoruz ama pencere kapanmayacak.
+                    throw new Exception($"Python kodu çalıştırılırken hata oluştu. Komut penceresindeki hata mesajlarını kontrol edin.");
                 }
+
+                // Process nesnesini kapat
+                process.Close();
             }
             catch (Exception ex)
             {
@@ -430,7 +363,8 @@ namespace SLF.services
                 throw;
             }
         }
-        public static string RunImarPlanModel(string kmlFilePath, string csvFilePath = null)
+
+        public static void RunImarPlanModel(string kmlFilePath, string csvFilePath = null)
         {
             try
             {
@@ -634,11 +568,12 @@ namespace SLF.services
 
                 // Argümanları oluştur
                 StringBuilder args = new StringBuilder();
-                args.Append($"\"{pythonScriptPath}\" process \"{selectedCity}\" \"{kmlFilePath}\"");
+                args.Append($"/C python \"{pythonScriptPath}\" process \"{selectedCity}\" \"{kmlFilePath}\"");
                 args.Append($" --district \"{selectedDistrict}\"");
                 args.Append($" --output-dir \"{imarAnaliziPath}\"");  // Ana çıktı klasörü
                 args.Append($" --output-prefix \"{outputPrefix}\"");
                 args.Append($" --Year \"{year}\"");
+
                 // Hücre verisi dosyasını ekle
                 if (!string.IsNullOrEmpty(hucreFilePath))
                 {
@@ -684,40 +619,17 @@ namespace SLF.services
                 // Python betiğini çalıştır
                 ProcessStartInfo processInfo = new ProcessStartInfo("python")
                 {
+                    FileName = "cmd.exe",
                     Arguments = args.ToString(),
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
                     UseShellExecute = false,
-                    CreateNoWindow = true,
+                    CreateNoWindow = false,
                     WorkingDirectory = Path.GetDirectoryName(pythonScriptPath)
                 };
 
-                string output = "";
-                string error = "";
                 using (Process process = Process.Start(processInfo))
                 {
-                    // Eş zamanlı çıktı yakalama
-                    process.OutputDataReceived += (sender, e) =>
-                    {
-                        if (!string.IsNullOrEmpty(e.Data))
-                        {
-                            Console.WriteLine($"PYTHON: {e.Data}");
-                            output += e.Data + Environment.NewLine;
-                        }
-                    };
-
-                    process.ErrorDataReceived += (sender, e) =>
-                    {
-                        if (!string.IsNullOrEmpty(e.Data))
-                        {
-                            Console.WriteLine($"PYTHON: {e.Data}");
-                            error += e.Data + Environment.NewLine;
-                        }
-                    };
-
-                    // Asenkron okumaları başlat
-                    process.BeginOutputReadLine();
-                    process.BeginErrorReadLine();
 
                     // İşlem durumunu izleme ve ilerleme raporu
                     DateTime startTime = DateTime.Now;
@@ -751,11 +663,6 @@ namespace SLF.services
                     }
                 }
 
-                // İşlem başarılı mesajı
-                Console.WriteLine("İmar Planı modeli başarıyla çalıştırıldı.");
-                Console.WriteLine($"Toplam çıktı uzunluğu: {output.Length} karakter");
-
-                return output;
             }
             catch (Exception ex)
             {

@@ -47,6 +47,7 @@
             this.Harita = new System.Windows.Forms.ToolStripMenuItem();
             this.OSM = new System.Windows.Forms.ToolStripMenuItem();
             this.Uydu = new System.Windows.Forms.ToolStripMenuItem();
+            this.button4 = new System.Windows.Forms.Button();
             this.panel3.SuspendLayout();
             this.panel7.SuspendLayout();
             this.panel4.SuspendLayout();
@@ -65,8 +66,8 @@
             this.gMapControl1.GrayScaleMode = false;
             this.gMapControl1.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
             this.gMapControl1.LevelsKeepInMemory = 5;
-            this.gMapControl1.Location = new System.Drawing.Point(300, 62);
-            this.gMapControl1.Margin = new System.Windows.Forms.Padding(18, 16, 18, 16);
+            this.gMapControl1.Location = new System.Drawing.Point(338, 78);
+            this.gMapControl1.Margin = new System.Windows.Forms.Padding(20);
             this.gMapControl1.MarkersEnabled = true;
             this.gMapControl1.MaxZoom = 2;
             this.gMapControl1.MinZoom = 2;
@@ -74,14 +75,14 @@
             this.gMapControl1.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
             this.gMapControl1.Name = "gMapControl1";
             this.gMapControl1.NegativeMode = false;
-            this.gMapControl1.Padding = new System.Windows.Forms.Padding(9, 8, 9, 8);
+            this.gMapControl1.Padding = new System.Windows.Forms.Padding(10);
             this.gMapControl1.PolygonsEnabled = true;
             this.gMapControl1.RetryLoadTile = 0;
             this.gMapControl1.RoutesEnabled = true;
             this.gMapControl1.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl1.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl1.ShowTileGridLines = false;
-            this.gMapControl1.Size = new System.Drawing.Size(1148, 463);
+            this.gMapControl1.Size = new System.Drawing.Size(1292, 579);
             this.gMapControl1.TabIndex = 0;
             this.gMapControl1.Zoom = 2D;
             this.gMapControl1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl1_MouseMove);
@@ -98,17 +99,17 @@
             this.panel3.Location = new System.Drawing.Point(0, 0);
             this.panel3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(278, 552);
+            this.panel3.Size = new System.Drawing.Size(313, 690);
             this.panel3.TabIndex = 8;
             // 
             // panel7
             // 
             this.panel7.Controls.Add(this.checkedListBox2);
             this.panel7.Controls.Add(this.label3);
-            this.panel7.Location = new System.Drawing.Point(9, 426);
+            this.panel7.Location = new System.Drawing.Point(10, 532);
             this.panel7.Margin = new System.Windows.Forms.Padding(1);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(228, 160);
+            this.panel7.Size = new System.Drawing.Size(256, 200);
             this.panel7.TabIndex = 13;
             // 
             // checkedListBox2
@@ -117,24 +118,28 @@
             this.checkedListBox2.Items.AddRange(new object[] {
             "Hepsi",
             "Mevcut",
+            "Gerilim Donüşümü",
+            "Deplase",
+            "Güç Artırımı",
+            "Projelendirilmiş Yeni Trafo",
             "Trafo Yenileme-Yaştan",
             "Trafo Yükseltme-Kapasiteden",
             "Trafo Yükseltme-Yükten",
             "Yeni Trafo Tesis"});
-            this.checkedListBox2.Location = new System.Drawing.Point(16, 41);
+            this.checkedListBox2.Location = new System.Drawing.Point(18, 51);
             this.checkedListBox2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkedListBox2.Name = "checkedListBox2";
             this.checkedListBox2.ScrollAlwaysVisible = true;
-            this.checkedListBox2.Size = new System.Drawing.Size(168, 89);
+            this.checkedListBox2.Size = new System.Drawing.Size(188, 96);
             this.checkedListBox2.TabIndex = 2;
             this.checkedListBox2.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.checkedListBox_ItemCheck);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(9, 14);
+            this.label3.Location = new System.Drawing.Point(10, 18);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(88, 16);
+            this.label3.Size = new System.Drawing.Size(107, 20);
             this.label3.TabIndex = 1;
             this.label3.Text = "Trafo Durumu";
             // 
@@ -142,10 +147,10 @@
             // 
             this.button1.BackColor = System.Drawing.Color.ForestGreen;
             this.button1.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.button1.Location = new System.Drawing.Point(9, 617);
+            this.button1.Location = new System.Drawing.Point(10, 738);
             this.button1.Margin = new System.Windows.Forms.Padding(1);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(198, 46);
+            this.button1.Size = new System.Drawing.Size(223, 58);
             this.button1.TabIndex = 9;
             this.button1.Text = "Filtrele";
             this.button1.UseVisualStyleBackColor = false;
@@ -155,18 +160,18 @@
             // 
             this.panel4.Controls.Add(this.label5);
             this.panel4.Controls.Add(this.checkedListBox1);
-            this.panel4.Location = new System.Drawing.Point(9, 188);
+            this.panel4.Location = new System.Drawing.Point(10, 235);
             this.panel4.Margin = new System.Windows.Forms.Padding(1);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(228, 208);
+            this.panel4.Size = new System.Drawing.Size(256, 260);
             this.panel4.TabIndex = 8;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(12, 10);
+            this.label5.Location = new System.Drawing.Point(14, 12);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(22, 16);
+            this.label5.Size = new System.Drawing.Size(26, 20);
             this.label5.TabIndex = 3;
             this.label5.Text = "Yıl";
             // 
@@ -187,11 +192,11 @@
             "2033",
             "2034",
             "2035"});
-            this.checkedListBox1.Location = new System.Drawing.Point(16, 29);
+            this.checkedListBox1.Location = new System.Drawing.Point(18, 36);
             this.checkedListBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkedListBox1.Name = "checkedListBox1";
             this.checkedListBox1.ScrollAlwaysVisible = true;
-            this.checkedListBox1.Size = new System.Drawing.Size(168, 157);
+            this.checkedListBox1.Size = new System.Drawing.Size(188, 188);
             this.checkedListBox1.TabIndex = 1;
             this.checkedListBox1.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.checkedListBox_ItemCheck);
             // 
@@ -201,20 +206,20 @@
             this.panel2.Controls.Add(this.radioButton3);
             this.panel2.Controls.Add(this.radioButton2);
             this.panel2.Controls.Add(this.label1);
-            this.panel2.Location = new System.Drawing.Point(9, 29);
+            this.panel2.Location = new System.Drawing.Point(10, 36);
             this.panel2.Margin = new System.Windows.Forms.Padding(1);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(228, 130);
+            this.panel2.Size = new System.Drawing.Size(256, 162);
             this.panel2.TabIndex = 2;
             // 
             // radioButton4
             // 
             this.radioButton4.AutoSize = true;
             this.radioButton4.Checked = true;
-            this.radioButton4.Location = new System.Drawing.Point(12, 98);
+            this.radioButton4.Location = new System.Drawing.Point(14, 122);
             this.radioButton4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.radioButton4.Name = "radioButton4";
-            this.radioButton4.Size = new System.Drawing.Size(64, 20);
+            this.radioButton4.Size = new System.Drawing.Size(75, 24);
             this.radioButton4.TabIndex = 8;
             this.radioButton4.TabStop = true;
             this.radioButton4.Text = "Hepsi";
@@ -223,10 +228,10 @@
             // radioButton3
             // 
             this.radioButton3.AutoSize = true;
-            this.radioButton3.Location = new System.Drawing.Point(12, 72);
+            this.radioButton3.Location = new System.Drawing.Point(14, 90);
             this.radioButton3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.radioButton3.Name = "radioButton3";
-            this.radioButton3.Size = new System.Drawing.Size(55, 20);
+            this.radioButton3.Size = new System.Drawing.Size(66, 24);
             this.radioButton3.TabIndex = 7;
             this.radioButton3.Text = "Özel";
             this.radioButton3.UseVisualStyleBackColor = true;
@@ -234,10 +239,10 @@
             // radioButton2
             // 
             this.radioButton2.AutoSize = true;
-            this.radioButton2.Location = new System.Drawing.Point(12, 41);
+            this.radioButton2.Location = new System.Drawing.Point(14, 51);
             this.radioButton2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(65, 20);
+            this.radioButton2.Size = new System.Drawing.Size(80, 24);
             this.radioButton2.TabIndex = 6;
             this.radioButton2.Text = "Kurum";
             this.radioButton2.UseVisualStyleBackColor = true;
@@ -245,9 +250,9 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(9, 14);
+            this.label1.Location = new System.Drawing.Point(10, 18);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(94, 16);
+            this.label1.Size = new System.Drawing.Size(110, 20);
             this.label1.TabIndex = 1;
             this.label1.Text = "Trafo Mülkiyeti";
             // 
@@ -255,10 +260,10 @@
             // 
             this.button2.BackColor = System.Drawing.SystemColors.MenuHighlight;
             this.button2.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.button2.Location = new System.Drawing.Point(465, 10);
+            this.button2.Location = new System.Drawing.Point(722, 11);
             this.button2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(265, 41);
+            this.button2.Size = new System.Drawing.Size(298, 51);
             this.button2.TabIndex = 11;
             this.button2.Text = "Çalıştır";
             this.button2.UseVisualStyleBackColor = false;
@@ -268,10 +273,10 @@
             // 
             this.button3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
             this.button3.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.button3.Location = new System.Drawing.Point(297, 10);
+            this.button3.Location = new System.Drawing.Point(543, 11);
             this.button3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(122, 41);
+            this.button3.Size = new System.Drawing.Size(137, 51);
             this.button3.TabIndex = 12;
             this.button3.Text = "Dosya Seç";
             this.button3.UseVisualStyleBackColor = false;
@@ -285,10 +290,10 @@
             this.buton_optimalDTR_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
             this.buton_optimalDTR_katmanlar.Cursor = System.Windows.Forms.Cursors.Default;
             this.buton_optimalDTR_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_optimalDTR_katmanlar.Location = new System.Drawing.Point(300, 473);
+            this.buton_optimalDTR_katmanlar.Location = new System.Drawing.Point(338, 591);
             this.buton_optimalDTR_katmanlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buton_optimalDTR_katmanlar.Name = "buton_optimalDTR_katmanlar";
-            this.buton_optimalDTR_katmanlar.Size = new System.Drawing.Size(58, 52);
+            this.buton_optimalDTR_katmanlar.Size = new System.Drawing.Size(65, 65);
             this.buton_optimalDTR_katmanlar.TabIndex = 42;
             this.buton_optimalDTR_katmanlar.UseVisualStyleBackColor = true;
             // 
@@ -302,13 +307,13 @@
             this.OSM,
             this.Uydu});
             this.harita_katmanları_right_click.Name = "harita_katmanları_right_click";
-            this.harita_katmanları_right_click.Size = new System.Drawing.Size(196, 134);
+            this.harita_katmanları_right_click.Size = new System.Drawing.Size(224, 164);
             // 
             // Arazi
             // 
             this.Arazi.Image = ((System.Drawing.Image)(resources.GetObject("Arazi.Image")));
             this.Arazi.Name = "Arazi";
-            this.Arazi.Size = new System.Drawing.Size(214, 26);
+            this.Arazi.Size = new System.Drawing.Size(223, 32);
             this.Arazi.Text = "Arazi";
             this.Arazi.Click += new System.EventHandler(this.Arazi_Click);
             // 
@@ -316,7 +321,7 @@
             // 
             this.Google_Earth.Image = ((System.Drawing.Image)(resources.GetObject("Google_Earth.Image")));
             this.Google_Earth.Name = "Google_Earth";
-            this.Google_Earth.Size = new System.Drawing.Size(214, 26);
+            this.Google_Earth.Size = new System.Drawing.Size(223, 32);
             this.Google_Earth.Text = "GE Online";
             this.Google_Earth.Click += new System.EventHandler(this.Google_Earth_Click);
             // 
@@ -324,7 +329,7 @@
             // 
             this.Harita.Image = ((System.Drawing.Image)(resources.GetObject("Harita.Image")));
             this.Harita.Name = "Harita";
-            this.Harita.Size = new System.Drawing.Size(214, 26);
+            this.Harita.Size = new System.Drawing.Size(223, 32);
             this.Harita.Text = "Harita";
             this.Harita.Click += new System.EventHandler(this.Harita_Click);
             // 
@@ -332,7 +337,7 @@
             // 
             this.OSM.Image = ((System.Drawing.Image)(resources.GetObject("OSM.Image")));
             this.OSM.Name = "OSM";
-            this.OSM.Size = new System.Drawing.Size(214, 26);
+            this.OSM.Size = new System.Drawing.Size(223, 32);
             this.OSM.Text = "Open Street Map";
             this.OSM.Click += new System.EventHandler(this.OSM_Click);
             // 
@@ -340,15 +345,29 @@
             // 
             this.Uydu.Image = ((System.Drawing.Image)(resources.GetObject("Uydu.Image")));
             this.Uydu.Name = "Uydu";
-            this.Uydu.Size = new System.Drawing.Size(214, 26);
+            this.Uydu.Size = new System.Drawing.Size(223, 32);
             this.Uydu.Text = "Uydu";
             this.Uydu.Click += new System.EventHandler(this.Uydu_Click);
             // 
+            // button4
+            // 
+            this.button4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.button4.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.button4.Location = new System.Drawing.Point(360, 11);
+            this.button4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(137, 51);
+            this.button4.TabIndex = 43;
+            this.button4.Text = "Parametreler";
+            this.button4.UseVisualStyleBackColor = false;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
             // DTR_Arayuz
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1476, 552);
+            this.ClientSize = new System.Drawing.Size(1660, 690);
+            this.Controls.Add(this.button4);
             this.Controls.Add(this.buton_optimalDTR_katmanlar);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
@@ -401,5 +420,6 @@
         private System.Windows.Forms.ToolStripMenuItem Harita;
         private System.Windows.Forms.ToolStripMenuItem OSM;
         private System.Windows.Forms.ToolStripMenuItem Uydu;
+        private System.Windows.Forms.Button button4;
     }
 }

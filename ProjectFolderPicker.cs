@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SLF
@@ -36,24 +32,6 @@ namespace SLF
             LoadProjectFolders();
         }
 
-        /// <summary>
-        /// Gelişmiş proje seçim formunu gösterir - Hem mevcut projeler arasından seçim hem de yeni proje oluşturma
-        /// </summary>
-        /// <param name="baseDir">Projelerin bulunduğu temel dizin</param>
-        /// <param name="allowCreate">Yeni proje oluşturmaya izin verilsin mi</param>
-        /// <returns>Seçilen veya oluşturulan proje adı, iptal edilirse null</returns>
-        public static string ShowProjectSelectionDialog(string baseDir, bool allowCreate = true)
-        {
-            using (var projectPicker = new ProjectFolderPicker(baseDir))
-            {
-                if (projectPicker.ShowDialog() == DialogResult.OK)
-                {
-                    return projectPicker.SelectedProjectName;
-                }
-
-                return null;
-            }
-        }
 
         /// <summary>
         /// Yeni proje oluşturma formunu gösterir

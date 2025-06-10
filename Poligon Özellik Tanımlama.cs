@@ -26,7 +26,6 @@ namespace SLF
 
         private bool isSelecting_YGA;
         private bool isSelecting_YUK;
-        private bool isSelecting_Musaade;
         private bool isSelecting_KentselDonusum;
 
         public bool is_poligon_saved = true;
@@ -38,28 +37,31 @@ namespace SLF
         // Field to store the current KeyPress lambda delegate
         private KeyPressEventHandler _currentKeyPressHandler;
 
-        public Poligon_Özellik_Tanımlama(bool isSelectingYUK, bool isSelectingYGA, bool isSelectingMusaade, bool isSelectingKentselDonusum,
-            List<PointLatLng> polygonPoints)
+
+        public Poligon_Özellik_Tanımlama(bool isSelectingYUK, bool isSelectingYGA, bool isSelectingKentselDonusum,
+            List<PointLatLng> polygonPoints, ModülFormu mainform)
         {
 
             InitializeComponent();
             modül_formu = new ModülFormu();
             cbsFormu = new CBS(modül_formu);
+            this.modül_formu = mainform;
 
             // Set the flags before calling SetupDataGridView
             isSelecting_YUK = isSelectingYUK;
             isSelecting_YGA = isSelectingYGA;
-            isSelecting_Musaade = isSelectingMusaade;
             isSelecting_KentselDonusum = isSelectingKentselDonusum;
 
-            excelFilePath = Path.Combine(modül_formu.ana_menu_form_objesi.userRootPath,
+            excelFilePath = System.IO.Path.Combine(modül_formu.ana_menu_form_objesi.userRootPath,
                 (string)modül_formu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
                 (string)modül_formu.ana_menu_form_objesi.config.İl,
                 (string)modül_formu.ana_menu_form_objesi.config.İlçe,
                 (string)modül_formu.ana_menu_form_objesi.config.Point_Load_Musaade).Replace('/', '\\');
 
-            // Determine layer index
-            layerIndex = FindFirstFreeLayerIndex();
+
+            // Determine layer index (already the polygon is added on to the overlay, so this will return 1)
+            layerIndex = Array.FindIndex(modül_formu.cbs.tüm_katmanlar_array_imar, s => s == null);
+
             if (layerIndex < 0)
             {
                 MessageBox.Show("Çizilen poligon geçersiz bir katmana ait!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -71,18 +73,6 @@ namespace SLF
 
         }
 
-        private int FindFirstFreeLayerIndex()
-        {
-            for (int i = 0; i < 15; i++)
-            {
-                // If all four overlays at index i are null, that means it’s free
-                if (cbsFormu.tüm_katmanlar_array_imar[i] == null && cbsFormu.tüm_katmanlar_array_yuk[i] == null)
-                {
-                    return i;
-                }
-            }
-            return -1; // none free
-        }
 
         private void SetupDataGridView(List<PointLatLng> polygonPoints)
         {
@@ -91,6 +81,7 @@ namespace SLF
             // Create a string representation of the coordinates in WKT format
             string coordinates = $"Polygon (({string.Join(", ", polygonPoints.Select(p => $"{p.Lat} {p.Lng}"))}))";
             string area = Math.Round(cbsFormu.CalculatePolygonArea(polygonPoints), 1).ToString() + " m2";
+
 
             // construct the parameters of the point load addition 
             if (isSelecting_YUK == true)
@@ -111,7 +102,7 @@ namespace SLF
                 dataTable.Rows.Add(dataTable.NewRow());
 
                 // Set "Polygon ID" value
-                dataTable.Rows[0]["Polygon ID"] = "Polygon_" + layerIndex;
+                dataTable.Rows[0]["Polygon ID"] = "Polygon_" + (layerIndex).ToString();
                 dataTable.Rows[0]["Koordinatlar"] = coordinates;
                 dataTable.Rows[0]["Çizilen Alan (m2)"] = area;
 
@@ -143,51 +134,7 @@ namespace SLF
                 }
                 SetupDropdownColumns(columnValues);
 
-            }
-            else if (isSelecting_Musaade == true)
-            {
-                // Add columns
-                dataTable.Columns.Add("Polygon ID", typeof(string));
-                dataTable.Columns.Add("Tipi", typeof(string));
-                dataTable.Columns.Add("ABONE_GRUBU", typeof(string));
-                dataTable.Columns.Add("ENERJILENDIRME_YILI", typeof(string));
-                dataTable.Columns.Add("Kurulu Güç (kW)", typeof(string));
-                dataTable.Columns.Add("Pik Yüklenme (%)", typeof(string));
-                dataTable.Columns.Add("Pik Demant (kW)", typeof(string));
-
-                // Add a single row
-                dataTable.Rows.Add(dataTable.NewRow());
-
-                // Set "Polygon ID" value
-                dataTable.Rows[0]["Polygon ID"] = "Polygon_" + layerIndex;
-
-                // Bind DataTable to PoligonDataGridView
-                PoligonDataGridView.DataSource = dataTable;
-                PoligonDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-                PoligonDataGridView.AllowUserToAddRows = false; // Prevent adding rows
-                PoligonDataGridView.AllowUserToDeleteRows = false; // Prevent deleting rows
-                PoligonDataGridView.ReadOnly = false; // Allow editing dropdowns
-                PoligonDataGridView.AllowUserToOrderColumns = false; // Prevent column reordering
-
-                // Set tooltips for column headers
-                PoligonDataGridView.Columns["Polygon ID"].ToolTipText = "Poligona ait özgün ID numarası";
-                PoligonDataGridView.Columns["Tipi"].ToolTipText = "Poligonun tipi veya kategorisi - AVM, Restoran vb.";
-                PoligonDataGridView.Columns["ABONE_GRUBU"].ToolTipText = "Enerji müsaadesi için abone grubu - Ticarethane, Sanayi, vb.";
-                PoligonDataGridView.Columns["ENERJILENDIRME_YILI"].ToolTipText = "Enerji müsaadesinin verileceği yıl";
-                PoligonDataGridView.Columns["Kurulu Güç (kW)"].ToolTipText = "Enerji müsaadesi verilecek yapıya ait kurulu güç kapasitesi (kilowatt)";
-                PoligonDataGridView.Columns["Pik Yüklenme (%)"].ToolTipText = "Enerji müsaadesi verilecek yapıya ait tahmini pik yüklenme oranı (yüzde)";
-                PoligonDataGridView.Columns["Pik Demant (kW)"].ToolTipText = "Enerji müsaadesi verilecek yapıya ait tahmini pik güç talebi (kilowatt)";
-
-                // Populate dropdowns and store Excel data
-                LoadExcelData();
-                if (columnValues == null)
-                {
-                    return;
-                }
-                SetupDropdownColumns(columnValues);
-
-            }
-            else if (isSelecting_YGA == true)
+            } else if (isSelecting_YGA == true)
             {
                 // Add "Polygon ID" column
                 dataTable.Columns.Add("Polygon ID", typeof(string));
@@ -199,11 +146,11 @@ namespace SLF
                 dataTable.Columns.Add("8 USTU KATLI MESKEN", typeof(string));
                 dataTable.Columns.Add("VILLA MESKEN", typeof(string));
                 dataTable.Columns.Add("AYDINLATMA", typeof(string));
-                dataTable.Columns.Add("KUCUK SANAYI", typeof(string));
-                dataTable.Columns.Add("KUCUK TICARETHANE", typeof(string));
-                dataTable.Columns.Add("ORTA SANAYI", typeof(string));
-                dataTable.Columns.Add("ORTA TICARETHANE", typeof(string));
-                dataTable.Columns.Add("TARIMSAL SULAMA", typeof(string));
+                dataTable.Columns.Add("KUCUK_SANAYI", typeof(string));
+                dataTable.Columns.Add("KUCUK_TICARETHANE", typeof(string));
+                dataTable.Columns.Add("ORTA_SANAYI", typeof(string));
+                dataTable.Columns.Add("ORTA_TICARETHANE", typeof(string));
+                dataTable.Columns.Add("TARIMSAL_SULAMA", typeof(string));
                 dataTable.Columns.Add("Başlangıç Yılı", typeof(string));
                 dataTable.Columns.Add("Satürasyon Hızı", typeof(string));
                 dataTable.Columns.Add("TAKS", typeof(string));
@@ -213,7 +160,7 @@ namespace SLF
                 dataTable.Rows.Add(dataTable.NewRow());
 
                 // Set "Polygon ID" value
-                dataTable.Rows[0]["Polygon ID"] = "Polygon_" + layerIndex;
+                dataTable.Rows[0]["Polygon ID"] = "Polygon_" + (layerIndex).ToString();
                 dataTable.Rows[0]["Koordinatlar"] = coordinates;
                 dataTable.Rows[0]["Çizilen Alan (m2)"] = area;
 
@@ -235,18 +182,17 @@ namespace SLF
                 PoligonDataGridView.Columns["8 USTU KATLI MESKEN"].ToolTipText = "Poligon içindeki tahmini 8 ve üzeri katlı mesken yapılarının oranı (0-100)";
                 PoligonDataGridView.Columns["VILLA MESKEN"].ToolTipText = "Poligon içindeki tahmini Villa mesken yapılarının oranı (0-100)";
                 PoligonDataGridView.Columns["AYDINLATMA"].ToolTipText = "Poligon içindeki tahmini Aydınlatma amaçlı oluşacak kullanım oranı (0-100)";
-                PoligonDataGridView.Columns["KUCUK SANAYI"].ToolTipText = "Poligon içindeki tahmini Küçük sanayi tesislerinin oranı (0-100)";
-                PoligonDataGridView.Columns["KUCUK TICARETHANE"].ToolTipText = "Poligon içindeki tahmini Küçük ticari işletmelerin oranı (0-100)";
-                PoligonDataGridView.Columns["ORTA SANAYI"].ToolTipText = "Poligon içindeki tahmini Orta ölçekli sanayi tesislerinin oranı (0-100)";
-                PoligonDataGridView.Columns["ORTA TICARETHANE"].ToolTipText = "Poligon içindeki tahmini Orta ölçekli ticari işletmelerin oranı (0-100)";
-                PoligonDataGridView.Columns["TARIMSAL SULAMA"].ToolTipText = "Poligon içindeki tahmini Tarımsal sulama amaçlı kullanım oranı (0-100)";
+                PoligonDataGridView.Columns["KUCUK_SANAYI"].ToolTipText = "Poligon içindeki tahmini Küçük sanayi tesislerinin oranı (0-100)";
+                PoligonDataGridView.Columns["KUCUK_TICARETHANE"].ToolTipText = "Poligon içindeki tahmini Küçük ticari işletmelerin oranı (0-100)";
+                PoligonDataGridView.Columns["ORTA_SANAYI"].ToolTipText = "Poligon içindeki tahmini Orta ölçekli sanayi tesislerinin oranı (0-100)";
+                PoligonDataGridView.Columns["ORTA_TICARETHANE"].ToolTipText = "Poligon içindeki tahmini Orta ölçekli ticari işletmelerin oranı (0-100)";
+                PoligonDataGridView.Columns["TARIMSAL_SULAMA"].ToolTipText = "Poligon içindeki tahmini Tarımsal sulama amaçlı kullanım oranı (0-100)";
                 PoligonDataGridView.Columns["Başlangıç Yılı"].ToolTipText = "Poligon için planlanan başlangıç yılı";
                 PoligonDataGridView.Columns["Satürasyon Hızı"].ToolTipText = "Poligonun tahmini doygunluğa ulaşma hızı (1-5)";
                 PoligonDataGridView.Columns["TAKS"].ToolTipText = "Poligona ait yaklaşık TAKS bilgisi";
                 PoligonDataGridView.Columns["Park, Yol, Kaldırım Oranı (%)"].ToolTipText = "Poligon içindeki tahmini Park, yol ve kaldırım alanlarının oranı (0-100)";
 
-            }
-            else if (isSelecting_KentselDonusum == true)
+            } else if (isSelecting_KentselDonusum == true)
             {
                 // Add "Polygon ID" column
                 dataTable.Columns.Add("Polygon ID", typeof(string));
@@ -258,11 +204,11 @@ namespace SLF
                 dataTable.Columns.Add("8 USTU KATLI MESKEN", typeof(string));
                 dataTable.Columns.Add("VILLA MESKEN", typeof(string));
                 dataTable.Columns.Add("AYDINLATMA", typeof(string));
-                dataTable.Columns.Add("KUCUK SANAYI", typeof(string));
-                dataTable.Columns.Add("KUCUK TICARETHANE", typeof(string));
-                dataTable.Columns.Add("ORTA SANAYI", typeof(string));
-                dataTable.Columns.Add("ORTA TICARETHANE", typeof(string));
-                dataTable.Columns.Add("TARIMSAL SULAMA", typeof(string));
+                dataTable.Columns.Add("KUCUK_SANAYI", typeof(string));
+                dataTable.Columns.Add("KUCUK_TICARETHANE", typeof(string));
+                dataTable.Columns.Add("ORTA_SANAYI", typeof(string));
+                dataTable.Columns.Add("ORTA_TICARETHANE", typeof(string));
+                dataTable.Columns.Add("TARIMSAL_SULAMA", typeof(string));
                 dataTable.Columns.Add("Başlangıç Yılı", typeof(string));
                 dataTable.Columns.Add("Satürasyon Hızı", typeof(string));
                 dataTable.Columns.Add("Park, Yol, Kaldırım Oranı (%)", typeof(string));
@@ -271,7 +217,7 @@ namespace SLF
                 dataTable.Rows.Add(dataTable.NewRow());
 
                 // Set "Polygon ID" value
-                dataTable.Rows[0]["Polygon ID"] = "Polygon_" + layerIndex;
+                dataTable.Rows[0]["Polygon ID"] = "Polygon_" + (layerIndex).ToString();
                 dataTable.Rows[0]["Koordinatlar"] = coordinates;
                 dataTable.Rows[0]["Çizilen Alan (m2)"] = area;
 
@@ -293,11 +239,11 @@ namespace SLF
                 PoligonDataGridView.Columns["8 USTU KATLI MESKEN"].ToolTipText = "Poligon içindeki tahmini 8 ve üzeri katlı mesken yapılarının oranı (0-100)";
                 PoligonDataGridView.Columns["VILLA MESKEN"].ToolTipText = "Poligon içindeki tahmini Villa mesken yapılarının oranı (0-100)";
                 PoligonDataGridView.Columns["AYDINLATMA"].ToolTipText = "Poligon içindeki tahmini Aydınlatma amaçlı oluşacak kullanım oranı (0-100)";
-                PoligonDataGridView.Columns["KUCUK SANAYI"].ToolTipText = "Poligon içindeki tahmini Küçük sanayi tesislerinin oranı (0-100)";
-                PoligonDataGridView.Columns["KUCUK TICARETHANE"].ToolTipText = "Poligon içindeki tahmini Küçük ticari işletmelerin oranı (0-100)";
-                PoligonDataGridView.Columns["ORTA SANAYI"].ToolTipText = "Poligon içindeki tahmini Orta ölçekli sanayi tesislerinin oranı (0-100)";
-                PoligonDataGridView.Columns["ORTA TICARETHANE"].ToolTipText = "Poligon içindeki tahmini Orta ölçekli ticari işletmelerin oranı (0-100)";
-                PoligonDataGridView.Columns["TARIMSAL SULAMA"].ToolTipText = "Poligon içindeki tahmini Tarımsal sulama amaçlı kullanım oranı (0-100)";
+                PoligonDataGridView.Columns["KUCUK_SANAYI"].ToolTipText = "Poligon içindeki tahmini Küçük sanayi tesislerinin oranı (0-100)";
+                PoligonDataGridView.Columns["KUCUK_TICARETHANE"].ToolTipText = "Poligon içindeki tahmini Küçük ticari işletmelerin oranı (0-100)";
+                PoligonDataGridView.Columns["ORTA_SANAYI"].ToolTipText = "Poligon içindeki tahmini Orta ölçekli sanayi tesislerinin oranı (0-100)";
+                PoligonDataGridView.Columns["ORTA_TICARETHANE"].ToolTipText = "Poligon içindeki tahmini Orta ölçekli ticari işletmelerin oranı (0-100)";
+                PoligonDataGridView.Columns["TARIMSAL_SULAMA"].ToolTipText = "Poligon içindeki tahmini Tarımsal sulama amaçlı kullanım oranı (0-100)";
                 PoligonDataGridView.Columns["Başlangıç Yılı"].ToolTipText = "Poligon için planlanan başlangıç yılı";
                 PoligonDataGridView.Columns["Satürasyon Hızı"].ToolTipText = "Poligonun tahmini doygunluğa ulaşma hızı (1-5)";
                 PoligonDataGridView.Columns["Park, Yol, Kaldırım Oranı (%)"].ToolTipText = "Poligon içindeki tahmini Park, yol ve kaldırım alanlarının oranı (0-100)";
@@ -322,21 +268,9 @@ namespace SLF
                     { "Pik Demant (kW)", new HashSet<string>() }
                 };
             }
-            else if (isSelecting_Musaade)
-            {
-                columnValues = new Dictionary<string, HashSet<string>>
-                {
-                    { "Tipi", new HashSet<string>() },
-                    { "ABONE_GRUBU", new HashSet<string>() },
-                    { "ENERJILENDIRME_YILI", new HashSet<string>() },
-                    { "Kurulu Güç (kW)", new HashSet<string>() },
-                    { "Pik Yüklenme (%)", new HashSet<string>() },
-                    { "Pik Demant (kW)", new HashSet<string>() }
-                };
-            }
             else
             {
-                MessageBox.Show("Geçersiz seçim: Ne YUK ne de Musaade seçildi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Geçersiz seçim: Herhangi bir point load seçilmedi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -366,17 +300,9 @@ namespace SLF
                             }
                             excelTable = result.Tables[0];
                         }
-                        else if (isSelecting_Musaade)
-                        {
-                            if (result.Tables.Count < 2)
-                            {
-                                throw new Exception("Excel dosyasında 'Musaade' için gerekli olan ikinci sayfa bulunamadı.");
-                            }
-                            excelTable = result.Tables[1];
-                        }
                         else
                         {
-                            throw new Exception("Geçersiz seçim: Ne YUK ne de Musaade seçildi.");
+                            throw new Exception("Geçersiz seçim: Herhangi bir point load seçilmedi.");
                         }
 
                         // Log column names for debugging
@@ -427,18 +353,11 @@ namespace SLF
             if (isSelecting_YUK)
             {
                 manualColumns = new HashSet<string>
-        {
-            "Polygon ID",
-            "Koordinatlar",
-            "Çizilen Alan (m2)"
-        };
-            }
-            else if (isSelecting_Musaade)
-            {
-                manualColumns = new HashSet<string>
-        {
-            "Polygon ID"
-        };
+                {
+                    "Polygon ID",
+                    "Koordinatlar",
+                    "Çizilen Alan (m2)"
+                };
             }
 
             var currentValues = new Dictionary<string, object>();
@@ -521,18 +440,18 @@ namespace SLF
                     // Columns to validate for percentage sum
                     string[] percentageColumns = new string[]
                     {
-                "1-2 KATLI MESKEN",
-                "3-4 KATLI MESKEN",
-                "5-7 KATLI MESKEN",
-                "8 USTU KATLI MESKEN",
-                "VILLA MESKEN",
-                "AYDINLATMA",
-                "KUCUK SANAYI",
-                "KUCUK TICARETHANE",
-                "ORTA SANAYI",
-                "ORTA TICARETHANE",
-                "TARIMSAL SULAMA",
-                "Park, Yol, Kaldırım Oranı (%)"
+                        "1-2 KATLI MESKEN",
+                        "3-4 KATLI MESKEN",
+                        "5-7 KATLI MESKEN",
+                        "8 USTU KATLI MESKEN",
+                        "VILLA MESKEN",
+                        "AYDINLATMA",
+                        "KUCUK_SANAYI",
+                        "KUCUK_TICARETHANE",
+                        "ORTA_SANAYI",
+                        "ORTA_TICARETHANE",
+                        "TARIMSAL_SULAMA",
+                        "Park, Yol, Kaldırım Oranı (%)"
                     };
 
                     // Additional columns to validate
@@ -617,10 +536,10 @@ namespace SLF
                     }
                 }
 
-                // Validation for isSelecting_YUK or isSelecting_Musaade
-                if (isSelecting_YUK || isSelecting_Musaade)
+                // Validation for isSelecting_YUK
+                if (isSelecting_YUK)
                 {
-                    // Required columns for both YUK and Musaade
+                    // Required columns for YUK
                     string[] columnsToValidate = { "Kurulu Güç (kW)", "Pik Yüklenme (%)", "Pik Demant (kW)", "ENERJILENDIRME_YILI" };
                     string categoryColumn = isSelecting_YUK ? "Tüketim Sınıfı" : "ABONE_GRUBU";
                     columnsToValidate = columnsToValidate.Concat(new[] { categoryColumn }).ToArray();
@@ -634,6 +553,37 @@ namespace SLF
                             return false;
                         }
                     }
+
+
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        // Validate Başlangıç Yılı
+                        string startYearStr = row["ENERJILENDIRME_YILI"]?.ToString();
+
+                        if (string.IsNullOrWhiteSpace(startYearStr))
+                        {
+                            MessageBox.Show("Hata: 'ENERJILENDIRME_YILI' sütunu boş olamaz.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+                        if (!int.TryParse(startYearStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int startYear) || startYear < 2025 || startYear > 2075)
+                        {
+                            MessageBox.Show($"Hata: 'ENERJILENDIRME_YILI' 2025 ile 2075 arasında olmalıdır. Girilen: {startYearStr}", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+
+                        string kuruluGucStr = row["Kurulu Güç (kW)"]?.ToString();
+
+
+                        if (!int.TryParse(kuruluGucStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int kuruluGuc) || kuruluGuc > 10000)
+                        {
+                            MessageBox.Show($"Hata: 'Kurulu Güç (kW)' değeri en fazla 10,000 kW olabilir. Girilen: {kuruluGucStr}", 
+                                "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return false;
+                        }
+
+
+                    }
+
 
                     // Iterate over each row in the DataTable
                     for (int rowIndex = 0; rowIndex < dataTable.Rows.Count; rowIndex++)
@@ -678,7 +628,7 @@ namespace SLF
 
                         // Validate the power equation
                         double expectedPeakDemand = powerValue * peakLoadValue;
-                        const double tolerance = 0.001;
+                        const double tolerance = 1;
                         if (Math.Abs(expectedPeakDemand - peakDemandValue) > tolerance)
                         {
                             MessageBox.Show(
@@ -691,151 +641,164 @@ namespace SLF
                         // Determine the category column in Excel
                         string excelColumn;
                         string categoryUpper = categoryValue.ToUpper();
-                        if (categoryUpper == "TİCARETHANE")
+                        if (categoryUpper == "TICARETHANE")
                         {
                             excelColumn = "TICARETHANE_HORIZONTAL";
                         }
-                        else if (categoryUpper == "SANAYİ")
+                        else if (categoryUpper == "SANAYI")
                         {
                             excelColumn = "SANAYI_HORIZONTAL";
+                        }
+                        else if (categoryUpper == "TARIMSAL_SULAMA")
+                        {
+                            excelColumn = "TARIMSAL_SULAMA_HORIZONTAL";
                         }
                         else
                         {
                             MessageBox.Show(
-                                $"Satır {rowIndex + 1}: {categoryColumn} yalnızca 'TİCARETHANE' veya 'SANAYİ' olabilir. Girilen: {categoryValue}",
+                                $"Satır {rowIndex + 1}: {categoryColumn} yalnızca 'TICARETHANE', 'SANAYI' veya 'TARIMSAL_SULAMA'" +
+                                $" olabilir. Girilen: {categoryValue}",
                                 "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return false;
                         }
 
-                        // Construct the path to the Excel file
-                        string hor_ver_path = Path.Combine(modül_formu.ana_menu_form_objesi.userRootPath,
-                            (string)modül_formu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                            (string)modül_formu.ana_menu_form_objesi.config.İl,
-                            (string)modül_formu.ana_menu_form_objesi.config.İlçe,
-                            (string)modül_formu.ana_menu_form_objesi.config.proje_ismi,
-                            (string)modül_formu.ana_menu_form_objesi.config.ELF.hor_ver_dosyası).Replace('/', '\\');
-
-                        if (!File.Exists(hor_ver_path))
+                        if(modül_formu.point_load_konsolidasyonu == true)
                         {
-                            MessageBox.Show($"Hata: Excel dosyası bulunamadı: {hor_ver_path}", "Dosya Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return false;
-                        }
+                            // Construct the path to the Excel file
+                            string hor_ver_path = System.IO.Path.Combine(modül_formu.ana_menu_form_objesi.userRootPath,
+                                (string)modül_formu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                                (string)modül_formu.ana_menu_form_objesi.config.İl,
+                                (string)modül_formu.ana_menu_form_objesi.config.İlçe,
+                                (string)modül_formu.ana_menu_form_objesi.config.proje_ismi,
+                                (string)modül_formu.ana_menu_form_objesi.config.ELF.hor_ver_dosyası).Replace('/', '\\');
 
-
-                        // Read the Excel file
-                        using (var package = new ExcelPackage(new FileInfo(hor_ver_path)))
-                        {
-                            var worksheet = package.Workbook.Worksheets[0]; // First worksheet
-                            int rowCount = worksheet.Dimension.Rows;
-                            int yearCol = 2; // "YIL" is the second column
-                            int horizontalCol = -1;
-
-                            // Find the column index for TICARETHANE_HORIZONTAL or SANAYI_HORIZONTAL
-                            for (int col = 1; col <= worksheet.Dimension.Columns; col++)
+                            if (!File.Exists(hor_ver_path))
                             {
-                                if (worksheet.Cells[1, col].Text == excelColumn)
-                                {
-                                    horizontalCol = col;
-                                    break;
-                                }
-                            }
-
-                            if (horizontalCol == -1)
-                            {
-                                MessageBox.Show($"Hata: '{excelColumn}' sütunu Excel dosyasında bulunamadı.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBox.Show($"Hata: Excel dosyası bulunamadı: {hor_ver_path}", "Dosya Hatası", 
+                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 return false;
                             }
 
-                            // Validate for years t0, t+1, and t+2
-                            for (int yearOffset = 0; yearOffset <= 2; yearOffset++)
-                            {
-                                int targetYear = energizationYear + yearOffset;
-                                double multiplier = (yearOffset == 0) ? 0.5 : 0.25;
-                                double calculatedValue = peakDemandValue / 2.5 * 8760 * multiplier;
-                                double thresholdMultiplier = 0.9; // 90%
 
-                                // Find the row for the target year
-                                double horizontalValue = 0;
-                                bool yearFound = false;
-                                for (int excelRow = 2; excelRow <= rowCount; excelRow++) // Renamed 'row' to 'excelRow'
+                            // Read the Excel file
+                            using (var package = new ExcelPackage(new FileInfo(hor_ver_path)))
+                            {
+                                var worksheet = package.Workbook.Worksheets[0]; // First worksheet
+                                int rowCount = worksheet.Dimension.Rows;
+                                int yearCol = 2; // "YIL" is the second column
+                                int horizontalCol = -1;
+
+                                // Find the column index for TICARETHANE_HORIZONTAL, SANAYI_HORIZONTAL or TARIMSAL_SULAMA_HORIZONTAL
+                                for (int col = 1; col <= worksheet.Dimension.Columns; col++)
                                 {
-                                    string yearStr = worksheet.Cells[excelRow, yearCol].Text?.Replace(",", "");
-                                    if (int.TryParse(yearStr, out int excelYear) && excelYear == targetYear)
+                                    if (worksheet.Cells[1, col].Text == excelColumn)
                                     {
-                                        string horizontalStr = worksheet.Cells[excelRow, horizontalCol].Text?.Replace(",", "");
-                                        if (double.TryParse(horizontalStr, NumberStyles.Any, CultureInfo.InvariantCulture, out horizontalValue))
-                                        {
-                                            yearFound = true;
-                                            break;
-                                        }
+                                        horizontalCol = col;
+                                        break;
                                     }
                                 }
 
-                                if (!yearFound)
+                                if (horizontalCol == -1)
                                 {
-                                    MessageBox.Show($"Hata: {targetYear} yılı Excel dosyasında bulunamadı.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    MessageBox.Show($"Hata: '{excelColumn}' sütunu Excel dosyasında bulunamadı.", "Doğrulama Hatası", 
+                                        MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return false;
                                 }
 
-                                // Adjust horizontal value if previous polygons have modified it
-                                double adjustedHorizontalValue = horizontalValue;
-                                if (AdjustedHorizontalValues.ContainsKey(targetYear) && AdjustedHorizontalValues[targetYear].ContainsKey(categoryUpper))
+                                // Validate for years t0, t+1, and t+2
+                                for (int yearOffset = 0; yearOffset <= 2; yearOffset++)
                                 {
-                                    adjustedHorizontalValue = AdjustedHorizontalValues[targetYear][categoryUpper];
-                                }
+                                    int targetYear = energizationYear + yearOffset;
+                                    double multiplier = (yearOffset == 0) ? 0.5 : 0.25;
+                                    double calculatedValue = peakDemandValue / 2.5 * 8760 * multiplier;
+                                    double thresholdMultiplier = 0.9; // 90%
 
-                                double threshold = adjustedHorizontalValue * thresholdMultiplier;
-                                if (calculatedValue > threshold)
-                                {
-                                    MessageBox.Show(
-                                        $"Satır {rowIndex + 1}: {targetYear} yılı için {excelColumn} ELF tahmininden gelen " +
-                                        $"kWh tüketim sınırını aşıyor.\n" +
-                                        $"Hesaplanan Değer: {calculatedValue:F0} kWh," +
-                                        $" İzin Verilen Maksimum ({targetYear} verisinin ({adjustedHorizontalValue:F0})" +
-                                        $" %90'ı) = {threshold:F0} kWh",
-                                        "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                    return false;
-                                }
-                            }
-
-                            // If all validations pass, calculate and store the differences
-                            for (int yearOffset = 0; yearOffset <= 2; yearOffset++)
-                            {
-                                int targetYear = energizationYear + yearOffset;
-                                double multiplier = (yearOffset == 0) ? 0.5 : 0.25;
-                                double calculatedValue = peakDemandValue / 2.5 * 8760 * multiplier;
-
-                                // Find the original horizontal value again for difference calculation
-                                double horizontalValue = 0;
-                                for (int excelRow = 2; excelRow <= rowCount; excelRow++) // Renamed 'row' to 'excelRow'
-                                {
-                                    string yearStr = worksheet.Cells[excelRow, yearCol].Text?.Replace(",", "");
-                                    if (int.TryParse(yearStr, out int excelYear) && excelYear == targetYear)
+                                    // Find the row for the target year
+                                    double horizontalValue = 0;
+                                    bool yearFound = false;
+                                    for (int excelRow = 2; excelRow <= rowCount; excelRow++) // Renamed 'row' to 'excelRow'
                                     {
-                                        string horizontalStr = worksheet.Cells[excelRow, horizontalCol].Text?.Replace(",", "");
-                                        if (double.TryParse(horizontalStr, NumberStyles.Any, CultureInfo.InvariantCulture, out horizontalValue))
+                                        string yearStr = worksheet.Cells[excelRow, yearCol].Text?.Replace(",", "");
+                                        if (int.TryParse(yearStr, out int excelYear) && excelYear == targetYear)
                                         {
-                                            break;
+                                            string horizontalStr = worksheet.Cells[excelRow, horizontalCol].Text?.Replace(",", "");
+                                            if (double.TryParse(horizontalStr, NumberStyles.Any, CultureInfo.InvariantCulture, out horizontalValue))
+                                            {
+                                                yearFound = true;
+                                                break;
+                                            }
                                         }
+                                    }
+
+                                    if (!yearFound)
+                                    {
+                                        MessageBox.Show($"Hata: {targetYear} yılı Excel dosyasında bulunamadı.", "Doğrulama Hatası", 
+                                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        return false;
+                                    }
+
+                                    // Adjust horizontal value if previous polygons have modified it
+                                    double adjustedHorizontalValue = horizontalValue;
+                                    if (AdjustedHorizontalValues.ContainsKey(targetYear) && AdjustedHorizontalValues[targetYear].ContainsKey(categoryUpper))
+                                    {
+                                        adjustedHorizontalValue = AdjustedHorizontalValues[targetYear][categoryUpper];
+                                    }
+
+                                    double threshold = adjustedHorizontalValue * thresholdMultiplier;
+                                    if (calculatedValue > threshold)
+                                    {
+                                        MessageBox.Show(
+                                            $"Satır {rowIndex + 1}: {targetYear} yılı için {excelColumn} ELF tahmininden gelen " +
+                                            $"kWh tüketim sınırını aşıyor.\n" +
+                                            $"Hesaplanan Değer: {calculatedValue:F0} kWh," +
+                                            $" İzin Verilen Maksimum ({targetYear} verisinin ({adjustedHorizontalValue:F0})" +
+                                            $" %90'ı) = {threshold:F0} kWh",
+                                            "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        return false;
                                     }
                                 }
 
-                                // Adjust the value (subtract the calculated value)
-                                double adjustedValue = horizontalValue;
-                                if (AdjustedHorizontalValues.ContainsKey(targetYear) && AdjustedHorizontalValues[targetYear].ContainsKey(categoryUpper))
+                                // If all validations pass, calculate and store the differences
+                                for (int yearOffset = 0; yearOffset <= 2; yearOffset++)
                                 {
-                                    adjustedValue = AdjustedHorizontalValues[targetYear][categoryUpper];
-                                }
-                                adjustedValue -= calculatedValue;
+                                    int targetYear = energizationYear + yearOffset;
+                                    double multiplier = (yearOffset == 0) ? 0.5 : 0.25;
+                                    double calculatedValue = peakDemandValue / 2.5 * 8760 * multiplier;
 
-                                // Store the adjusted value in the dictionary
-                                if (!AdjustedHorizontalValues.ContainsKey(targetYear))
-                                {
-                                    AdjustedHorizontalValues[targetYear] = new Dictionary<string, double>();
+                                    // Find the original horizontal value again for difference calculation
+                                    double horizontalValue = 0;
+                                    for (int excelRow = 2; excelRow <= rowCount; excelRow++) // Renamed 'row' to 'excelRow'
+                                    {
+                                        string yearStr = worksheet.Cells[excelRow, yearCol].Text?.Replace(",", "");
+                                        if (int.TryParse(yearStr, out int excelYear) && excelYear == targetYear)
+                                        {
+                                            string horizontalStr = worksheet.Cells[excelRow, horizontalCol].Text?.Replace(",", "");
+                                            if (double.TryParse(horizontalStr, NumberStyles.Any, CultureInfo.InvariantCulture, out horizontalValue))
+                                            {
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    // Adjust the value (subtract the calculated value)
+                                    double adjustedValue = horizontalValue;
+                                    if (AdjustedHorizontalValues.ContainsKey(targetYear) && AdjustedHorizontalValues[targetYear].ContainsKey(categoryUpper))
+                                    {
+                                        adjustedValue = AdjustedHorizontalValues[targetYear][categoryUpper];
+                                    }
+                                    adjustedValue -= calculatedValue;
+
+                                    // Store the adjusted value in the dictionary
+                                    if (!AdjustedHorizontalValues.ContainsKey(targetYear))
+                                    {
+                                        AdjustedHorizontalValues[targetYear] = new Dictionary<string, double>();
+                                    }
+                                    AdjustedHorizontalValues[targetYear][categoryUpper] = adjustedValue;
                                 }
-                                AdjustedHorizontalValues[targetYear][categoryUpper] = adjustedValue;
                             }
+
                         }
+
                     }
                 }
 
@@ -868,11 +831,11 @@ namespace SLF
                         "8 USTU KATLI MESKEN\n" +
                         "VILLA MESKEN\n" +
                         "AYDINLATMA\n" +
-                        "KUCUK SANAYI\n" +
-                        "KUCUK TICARETHANE\n" +
-                        "ORTA SANAYI\n" +
-                        "ORTA TICARETHANE\n" +
-                        "TARIMSAL SULAMA\n" +
+                        "KUCUK_SANAYI\n" +
+                        "KUCUK_TICARETHANE\n" +
+                        "ORTA_SANAYI\n" +
+                        "ORTA_TICARETHANE\n" +
+                        "TARIMSAL_SULAMA\n" +
                         "Park, Yol, Kaldırım Oranı (%)", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -883,13 +846,9 @@ namespace SLF
 
             if (isSelecting_YUK)
             {
-                yük_bilgi_formu_objesi = new Nokta_Yuk_Bilgi_Formu(excelFilePath,true,false);
+                yük_bilgi_formu_objesi = new Nokta_Yuk_Bilgi_Formu(excelFilePath,true);
             }
 
-            if (isSelecting_Musaade)
-            {
-                yük_bilgi_formu_objesi = new Nokta_Yuk_Bilgi_Formu(excelFilePath, false, true);
-            }
 
             yük_bilgi_formu_objesi.Owner = this;
             yük_bilgi_formu_objesi.ShowDialog();
@@ -912,13 +871,6 @@ namespace SLF
              {
                  yük_bilgi_formu_objesi.is_yukler_changed = false;
                  yük_bilgi_formu_objesi.yuk_select = true;
-                 yük_bilgi_formu_objesi.musaade_select = false;
-             }
-             else if (yük_bilgi_formu_objesi.is_musaade_changed)
-             {
-                 yük_bilgi_formu_objesi.is_musaade_changed = false;
-                 yük_bilgi_formu_objesi.musaade_select = true;
-                 yük_bilgi_formu_objesi.yuk_select = false;
              }
 
         }
@@ -949,28 +901,7 @@ namespace SLF
                     }
                 }
 
-            } else if (isSelecting_Musaade == true)
-            {
-                // Check if the changed cell is in the "Tipi" column
-                if (e.ColumnIndex == PoligonDataGridView.Columns["Tipi"].Index && e.RowIndex >= 0)
-                {
-                    string selectedTipi = PoligonDataGridView.Rows[e.RowIndex].Cells["Tipi"].Value?.ToString();
-                    if (!string.IsNullOrEmpty(selectedTipi))
-                    {
-                        // Find the row in excelDataRows that matches the selected Tipi
-                        var matchingRow = excelDataRows.FirstOrDefault(row => row["Tipi"] == selectedTipi);
-                        if (matchingRow != null)
-                        {
-                            PoligonDataGridView.Rows[e.RowIndex].Cells["ABONE_GRUBU"].Value = matchingRow["ABONE_GRUBU"];
-                            PoligonDataGridView.Rows[e.RowIndex].Cells["ENERJILENDIRME_YILI"].Value = matchingRow["ENERJILENDIRME_YILI"];
-                            PoligonDataGridView.Rows[e.RowIndex].Cells["Kurulu Güç (kW)"].Value = matchingRow["Kurulu Güç (kW)"];
-                            PoligonDataGridView.Rows[e.RowIndex].Cells["Pik Yüklenme (%)"].Value = matchingRow["Pik Yüklenme (%)"];
-                            PoligonDataGridView.Rows[e.RowIndex].Cells["Pik Demant (kW)"].Value = matchingRow["Pik Demant (kW)"];
-                        }
-                    }
-                }
-
-            }
+            } 
 
         }
 
@@ -985,7 +916,6 @@ namespace SLF
             {
                 isSelecting_YUK = false;
                 isSelecting_YGA = false;
-                isSelecting_Musaade = false;
                 isSelecting_KentselDonusum = false;
             }
         }
@@ -1005,7 +935,7 @@ namespace SLF
                 comboBox.TextChanged += ComboBox_TextChanged;
             }
 
-            if (e.Control is TextBox textBox)
+            if (e.Control is System.Windows.Forms.TextBox textBox)
             {
                 string columnName = PoligonDataGridView.Columns[PoligonDataGridView.CurrentCell.ColumnIndex].Name;
                 Console.WriteLine($"EditingControlShowing: ColumnName={columnName}, isSelecting_YGA={isSelecting_YGA}");
@@ -1109,7 +1039,7 @@ namespace SLF
             if (columnName == "TAKS" && isSelecting_YGA && (e.KeyChar == '.' || e.KeyChar.ToString() == decimalSeparator))
             {
                 // Check if a decimal separator already exists in the TextBox
-                TextBox textBox = sender as TextBox;
+                System.Windows.Forms.TextBox textBox = sender as System.Windows.Forms.TextBox;
                 if (textBox != null && !textBox.Text.Contains(decimalSeparator) && !textBox.Text.Contains("."))
                 {
                     Console.WriteLine("KeyPress: Decimal separator allowed.");

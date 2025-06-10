@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Configuration;
 using System.IO;
 using System.Windows.Forms;
-using System.Security.Cryptography;
-using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SLF.Services;
@@ -24,7 +21,9 @@ namespace SLF
 
             // Config dosyasının yolunu al
             string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            configPath = Path.Combine(userRootPath, "Desktop", "config.json");
+            configPath = Path.Combine(userRootPath,
+                "MRC\\MRC - 1.1.3_T&SI\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kır" +
+                "ılımları\\Program Dosyaları\\config.json").Replace("/", "\\");
 
             // Config dosyasını yükle
             LoadConfigFile();
@@ -155,10 +154,12 @@ namespace SLF
                 // DatabaseManager'ı başlat
                 DatabaseManager.GetInstance(connString).GetConnection();
 
-                // Başarılı giriş durumunda kullanıcı bilgilerini kaydet
                 SaveCredentials();
 
-                MessageBox.Show("Bağlantı başarılı!", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Bağlantı başarılı!\n\n Lütfen bu pencereyi kapattıktan sonra bekleyiniz," +
+                    " veritabanında ilgili SAP Abone tüketimleri tablosu (DWH_MRC_SLFPROJE_TUKETIM) ve " +
+                    "Abone bilgi tablosunun olup olmadığı (DWH_MRC_SLFPROJE_ABN_BLG) kontrol edilecek.", 
+                    "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 // Giriş başarılı, formu kapat ve ana uygulamayı devam ettir
                 this.DialogResult = DialogResult.OK;
@@ -168,11 +169,6 @@ namespace SLF
             {
                 MessageBox.Show("Bağlantı hatası: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-
-        private void checkBoxRememberMe_CheckedChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }

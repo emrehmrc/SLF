@@ -42,45 +42,47 @@
             // txtKullaniciAdi
             // 
             this.txtKullaniciAdi.AutoSize = true;
-            this.txtKullaniciAdi.Location = new System.Drawing.Point(489, 180);
+            this.txtKullaniciAdi.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtKullaniciAdi.Location = new System.Drawing.Point(244, 16);
             this.txtKullaniciAdi.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.txtKullaniciAdi.Name = "txtKullaniciAdi";
-            this.txtKullaniciAdi.Size = new System.Drawing.Size(93, 20);
+            this.txtKullaniciAdi.Size = new System.Drawing.Size(124, 24);
             this.txtKullaniciAdi.TabIndex = 0;
-            this.txtKullaniciAdi.Text = "Kullanıcı Adı";
+            this.txtKullaniciAdi.Text = "Kullanıcı Adı:";
             // 
             // txtSifre
             // 
             this.txtSifre.AutoSize = true;
-            this.txtSifre.Location = new System.Drawing.Point(489, 243);
+            this.txtSifre.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtSifre.Location = new System.Drawing.Point(315, 71);
             this.txtSifre.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.txtSifre.Name = "txtSifre";
-            this.txtSifre.Size = new System.Drawing.Size(42, 20);
+            this.txtSifre.Size = new System.Drawing.Size(53, 24);
             this.txtSifre.TabIndex = 1;
-            this.txtSifre.Text = "Şifre";
+            this.txtSifre.Text = "Şifre:";
             // 
             // textBoxUsername
             // 
-            this.textBoxUsername.Location = new System.Drawing.Point(613, 174);
-            this.textBoxUsername.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.textBoxUsername.Location = new System.Drawing.Point(381, 16);
+            this.textBoxUsername.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxUsername.Name = "textBoxUsername";
-            this.textBoxUsername.Size = new System.Drawing.Size(148, 26);
+            this.textBoxUsername.Size = new System.Drawing.Size(173, 22);
             this.textBoxUsername.TabIndex = 2;
             // 
             // textBoxPassword
             // 
-            this.textBoxPassword.Location = new System.Drawing.Point(613, 243);
-            this.textBoxPassword.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.textBoxPassword.Location = new System.Drawing.Point(381, 71);
+            this.textBoxPassword.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxPassword.Name = "textBoxPassword";
-            this.textBoxPassword.Size = new System.Drawing.Size(148, 26);
+            this.textBoxPassword.Size = new System.Drawing.Size(173, 22);
             this.textBoxPassword.TabIndex = 3;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(599, 397);
-            this.button1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.button1.Location = new System.Drawing.Point(369, 171);
+            this.button1.Margin = new System.Windows.Forms.Padding(4);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(162, 35);
+            this.button1.Size = new System.Drawing.Size(144, 28);
             this.button1.TabIndex = 4;
             this.button1.Text = "Giriş";
             this.button1.UseVisualStyleBackColor = true;
@@ -89,10 +91,9 @@
             // pictureBox1
             // 
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(57, 66);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.pictureBox1.Location = new System.Drawing.Point(12, 12);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(344, 356);
+            this.pictureBox1.Size = new System.Drawing.Size(200, 187);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 12;
             this.pictureBox1.TabStop = false;
@@ -101,19 +102,20 @@
             // 
             this.checkBoxRememberMe.AutoSize = true;
             this.checkBoxRememberMe.CausesValidation = false;
-            this.checkBoxRememberMe.Location = new System.Drawing.Point(613, 305);
+            this.checkBoxRememberMe.Location = new System.Drawing.Point(398, 121);
+            this.checkBoxRememberMe.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBoxRememberMe.Name = "checkBoxRememberMe";
-            this.checkBoxRememberMe.Size = new System.Drawing.Size(117, 24);
+            this.checkBoxRememberMe.Size = new System.Drawing.Size(98, 20);
             this.checkBoxRememberMe.TabIndex = 13;
             this.checkBoxRememberMe.Text = "Beni Hatırla";
             this.checkBoxRememberMe.UseVisualStyleBackColor = true;
-            this.checkBoxRememberMe.CheckedChanged += new System.EventHandler(this.checkBoxRememberMe_CheckedChanged);
             // 
             // LoginForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1037, 523);
+            this.BackColor = System.Drawing.SystemColors.Control;
+            this.ClientSize = new System.Drawing.Size(567, 223);
             this.Controls.Add(this.checkBoxRememberMe);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.button1);
@@ -121,9 +123,15 @@
             this.Controls.Add(this.textBoxUsername);
             this.Controls.Add(this.txtSifre);
             this.Controls.Add(this.txtKullaniciAdi);
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4);
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(585, 270);
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(585, 270);
             this.Name = "LoginForm";
-            this.Text = "loginForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Veritabanı Bağlantısı";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

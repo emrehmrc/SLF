@@ -438,5 +438,10 @@ namespace SLF
                 MessageBox.Show("İşlem iptal edildi.");
             }
         }
+
+        private void ChargingStationpanel2_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }

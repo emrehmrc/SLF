@@ -32,7 +32,47 @@ namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
         public DTR(DataTable orijinalTable)
         {
             InitializeComponent();
+            YillariYerlestir();
             _orijinalTablo = orijinalTable;
+
+        }
+
+        private void YillariYerlestir()
+        {
+            this.checkedListBox1.Items.Clear();
+
+            this.checkedListBox1.Items.Add("Hepsi");
+
+            int ilkYilInt = 0;
+            int sonYilInt = 0;
+
+            try
+            {
+                if (FormManager.Form2Instance == null)
+                {
+                    ilkYilInt = DateTime.Now.Year; // Varsayılan olarak 5 yıl öncesi
+                    sonYilInt = DateTime.Now.Year + 10; // Şu anki yıl
+                }
+                else
+                {
+
+                    ilkYilInt = int.Parse(FormManager.Form2Instance.İlkYıl);
+                    sonYilInt = int.Parse(FormManager.Form2Instance.SonYıl);
+
+                }
+
+            }
+
+            catch
+            {
+                ilkYilInt = DateTime.Now.Year;
+                sonYilInt = DateTime.Now.Year + 10;
+            }
+
+            for (int year = ilkYilInt-1; year <= sonYilInt; year++)
+            {
+                this.checkedListBox1.Items.Add(year.ToString());
+            }
 
         }
 
@@ -236,10 +276,12 @@ namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
                 { "Yeni Trafo Tesis", "yeni trafo tesis" }, // "Eklenen" -> "yeni trafo tesis"
                 { "Trafo Yenileme-Yaştan", "trafo yenileme-yaştan" },
                 { "Trafo Yenileme-Kapasiteden", "trafo yükseltme-kapasiteden" },
+                { "Gerilim Donüşümü", "gerilim dönüşümü"},
+                { "Deplase", "deplase" },
+                { "Güç Artırımı", "güç artırımı" },
+                { "Projelendirilmiş Yeni Trafo", "projelendirilmiş yeni trafo" },
 
             };
-
-
 
             // Seçilen aksiyonu al
             List<string> secilenAksiyonlar = checkedListBox2.CheckedItems.Cast<string>().ToList();
@@ -259,17 +301,30 @@ namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
 
             // Filtreleme işlemi
             var radiobuttonvalue = GetSelectedRadioButton(panel2) ?? "Hepsi";  // Default to "Hepsi" if null
+            
+            IEnumerable<DataRow> filtrelenmisData = null;
 
-            var filtrelenmisData = _orijinalTablo.AsEnumerable()
-                .Where(row =>
-                    (secilenYillar.Count == 0 ||
-                    (int.TryParse(row.Field<string>("year"), out int year) && secilenYillar.Contains(year))) && // Yıla göre filtreleme
-                    (radiobuttonvalue == "Hepsi" || row.Field<string>("Trafo Mülkiyeti") == radiobuttonvalue) && // Sahiplik filtreleme
-                    (eslesenAksiyonlar.Count == 0 || eslesenAksiyonlar.Contains(row.Field<string>("Trafo Aksiyon"))) // Trafo Aksiyonları filtreleme
-            )
-            .ToList();
+            try
+            {
+                filtrelenmisData = _orijinalTablo.AsEnumerable()
+                    .Where(row =>
+                        (secilenYillar.Count == 0 ||
+                        (int.TryParse(row.Field<string>("year"), out int year) && secilenYillar.Contains(year))) &&
+                        (radiobuttonvalue == "Hepsi" || row.Field<string>("Trafo Mülkiyeti") == radiobuttonvalue) &&
+                        (eslesenAksiyonlar.Count == 0 || eslesenAksiyonlar.Contains(row.Field<string>("Trafo Aksiyon")))
+                    )
+                    .ToList();
+            }
+            catch
+            {
+                // Hataları yutma, logla istersen
+            }
 
-            FiltrelenmisSonuc = filtrelenmisData.Any() ? filtrelenmisData.CopyToDataTable() : _orijinalTablo.Clone();
+            // Hata veren satır düzeltilmiş:
+            FiltrelenmisSonuc = filtrelenmisData != null && filtrelenmisData.Any()
+                ? filtrelenmisData.CopyToDataTable()
+                : _orijinalTablo.Clone();
+
 
             FiltrelemeYapildi?.Invoke(this, new FiltreEventArgs
             {

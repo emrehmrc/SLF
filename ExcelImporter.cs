@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -57,18 +56,11 @@ namespace SLF
             {
                 "DTR Verileri",
                 new List<string> {
-                    "TRAFO_ID",
                     "TRAFO_KODU",
-                    "TRAFO_ILCE_ADI",
-                    "TRAFO_MAHALLE_ADI",
                     "TRAFO_MULKIYET",
-                    "FIDER_ADI",
                     "TRAFO_KAPASITESI",
-                    "TM_ID",
-                    "TM_FIDER_ID",
                     "TRAFO_X_KOORDINAT",
                     "TRAFO_Y_KOORDINAT",
-                    "TRAFO_ADI",
                     "TRAFO_KURULUM_TARIHI",
                     "PRIMER_GERILIM",
                     "SEKONDER_GERILIM"
@@ -82,7 +74,6 @@ namespace SLF
                     "DEK_KURULU_GUCU",
                     "DEK_X_KOORDINAT",
                     "DEK_Y_KOORDINAT",
-                    "DEK_DTR_ADI",
                     "DEK_KURULUM_YERI",
                     "DEK_BAGLANDIGI_TRAFO_KODU"
                 }
@@ -133,42 +124,6 @@ namespace SLF
                     "GDP_INSAAT_URETIM_%",
                     "CDD",
                     "HDD"
-                }
-            },
-            {
-                "Fider Verileri",
-                new List<string> {
-                    "FIDER_TM_ADI",
-                    "FIDER_ADI",
-                    "FIDER_ID",
-                    "FIDER_TARIH",
-                    "FIDER_SAAT",
-                    "FIDER_DEMANT"
-                }
-            },
-            {
-                "TM Verileri",
-                new List<string> {
-                    "EDW_TM_ID",
-                    "EDW_TRAFO_ID",
-                    "EDW_TARIH",
-                    "EDW_TM_TUKETIM",
-                    "EDW_TM_URETIM"
-                }
-            },
-            {
-                "Enerji Müsaadeleri Verileri",
-                new List<string> {
-                    "ENERJI_MUSAADE_NO",
-                    "ENERJI_MUSAADE_ABONE_GRUBU",
-                    "Tipi",
-                    "ENERJI_MUSAADE_GERILIM_SEVIYESI",
-                    "ENERJI_MUSAADE_MUSTAKIL_TRAFO_BOOL",
-                    "ENERJI_MUSAADE_BAGLANACAGI_TRAFO_ID",
-                    "ENERJI_MUSAADE_BAGLANTI_GUCU",
-                    "ENERJI_MUSAADE_ENERJILENDIRME_YILI",
-                    "ENERJI_MUSAADE_X_KOORDINAT",
-                    "ENERJI_MUSAADE_Y_KOORDINAT"
                 }
             },
             {
@@ -224,8 +179,8 @@ namespace SLF
         // Abone verileri için yıl kolonlarını ekleme
         private void AddYearColumnsToAboneVerileri(List<string> headers)
         {
-            // Add TUKETIM columns for the last 5 years
-            for (int year = _yearService.PenultimateYear - 3; year <= _yearService.LastYear; year++)
+            // Son 2 yıl için tüketim kolonları ekle
+            for (int year = _yearService.slfStartYear - 5; year <= _yearService.slfStartYear; year++)
             {
                 if (year > 0) // Ensure valid year
                 {
@@ -233,8 +188,8 @@ namespace SLF
                 }
             }
 
-            // Add DEMANT columns for the last 5 years
-            for (int year = _yearService.PenultimateYear - 3; year <= _yearService.LastYear; year++)
+            // Son 2 yıl için talep kolonları ekle
+            for (int year = _yearService.slfStartYear - 5; year <= _yearService.slfStartYear; year++)
             {
                 if (year > 0) // Ensure valid year
                 {
@@ -246,8 +201,8 @@ namespace SLF
         // DTR verileri için yıl kolonlarını ekleme
                private void AddYearColumnsToDTRVerileri(List<string> headers)
         {
-            // Add DEMANT and TUKETIM columns for the last 3 years
-            for (int year = _yearService.PenultimateYear - 1; year <= _yearService.LastYear; year++)
+            // Son 2 yıl için talep ve tüketim kolonları ekle
+            for (int year = _yearService.slfStartYear - 3; year <= _yearService.slfStartYear; year++)
             {
                 if (year > 0) // Ensure valid year
                 {
@@ -256,6 +211,7 @@ namespace SLF
                 }
             }
         }
+
 
         private void ValidateColumnHeaders(ExcelWorksheet worksheet, string seçilenVeriTipi)
         {
@@ -266,12 +222,6 @@ namespace SLF
             // Debug: Log column counts
             System.Diagnostics.Debug.WriteLine($"Beklenen sütun sayısı: {expectedCount}, Excel'deki mevcut: {colCount}");
 
-            if (colCount != expectedCount)
-            {
-                throw new InvalidColumnHeadersException(
-                    $"Sütun sayıları uyuşmuyor.\nBeklenen: {expectedCount}\nMevcut: {colCount}"
-                );
-            }
 
             bool headerMismatch = false;
             var invalidColumnMessage = new StringBuilder("Sütun adları uyuşmuyor.\n");
@@ -384,8 +334,7 @@ namespace SLF
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"ImportExcelFile exception: {ex.Message}\nStack Trace: {ex.StackTrace}");
-                MessageBox.Show($"Excel dosyasını okurken hata oluştu: {ex.Message}\nStack Trace: {ex.StackTrace}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Excel dosyasını okurken hata oluştu!!\n\n{ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return new DataTable();
             }
 

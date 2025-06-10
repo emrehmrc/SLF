@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using DocumentFormat.OpenXml.Bibliography;
+using SLF.Optimal_DTR;
 
 namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
 {
@@ -23,7 +25,48 @@ namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
         public Alansal(DataTable dt)
         {
             InitializeComponent();
+            YillariYerlestir();
             _orijinalTablo = dt;
+        }
+
+        private void YillariYerlestir()
+        {
+            this.checkedListBox1.Items.Clear();
+
+            this.checkedListBox1.Items.Add("Hepsi");
+
+            int ilkYilInt = 0;
+            int sonYilInt = 0;
+
+            try
+            {
+                if(FormManager.Form2Instance == null)
+                {
+                    ilkYilInt = DateTime.Now.Year; // Varsayılan olarak 5 yıl öncesi
+                    sonYilInt = DateTime.Now.Year+10; // Şu anki yıl
+                }
+                else
+                {
+
+                    ilkYilInt = int.Parse(FormManager.Form2Instance.İlkYıl);
+                    sonYilInt = int.Parse(FormManager.Form2Instance.SonYıl);
+                                        
+                }
+                
+            }
+
+            catch
+            {
+                ilkYilInt = DateTime.Now.Year;
+                sonYilInt = DateTime.Now.Year + 10;
+            }
+
+
+            for (int year = ilkYilInt-1; year <= sonYilInt; year++)
+            {
+                this.checkedListBox1.Items.Add(year.ToString());
+            }
+
         }
 
         private void checkedListBox1_ItemCheck(object sender, ItemCheckEventArgs e)
