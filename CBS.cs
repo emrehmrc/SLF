@@ -145,7 +145,7 @@ namespace SLF
 
 
 
-        public CBS (ModülFormu mainform)
+        public CBS(ModülFormu mainform)
         {
             this.modülFormu = mainform;
 
@@ -1114,7 +1114,7 @@ namespace SLF
                         }
 
                         // Create or update legend panel
-                        if (modülFormu.imar_legendPanel == null)
+                        if (modülFormu.imar_legendPanel.Region == null)
                         {
                             modülFormu.imar_legendPanel = new Panel
                             {
@@ -1364,7 +1364,7 @@ namespace SLF
             // grid e ait oluşturulmuş mxm hücreleri "polygons" listesiyle return et.
             return polygons;
         }
-        
+
         // creates a grid and adds it onto the map
         public void AddGridToMap(GMapControl gMapControl)
         {
@@ -1398,7 +1398,7 @@ namespace SLF
             }
 
             gMapControl.Refresh();
-            
+
             // Find the first available slot in the array that holds shapefile overlay layers
             layer_index = Array.FindIndex(tüm_katmanlar_array_imar, s => s == null);
             tüm_katmanlar_array_imar[layer_index] = gridOverlay;
@@ -1791,6 +1791,7 @@ namespace SLF
             }
         }
 
+
         public double CalculatePolygonArea(List<PointLatLng> points)
         {
             double area = 0;
@@ -1815,7 +1816,7 @@ namespace SLF
         }
 
 
-        public void CreateHeatmap(GMapOverlay overlay, DataTable dataTable, string columnName, 
+        public void CreateHeatmap(GMapOverlay overlay, DataTable dataTable, string columnName,
             Dictionary<GMapPolygon, DataRow> polygonAttributes)
         {
             double[] brackets = { 0, 3, 5, 10, 20, 30, 40, 50, 75, 100, double.PositiveInfinity };

@@ -9,6 +9,7 @@ using System.IO;
 using SLF.Services;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace SLF
 {
@@ -307,7 +308,7 @@ namespace SLF
                 }
                 else
                 {
-                    if(seçilenVeriTipi != "İmar Verileri")
+                    if (seçilenVeriTipi != "İmar Verileri")
                     {
                         MessageBox.Show("Veri tablosu boş veya yüklenemedi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
@@ -323,6 +324,7 @@ namespace SLF
 
             return false;
         }
+
 
         public void ShowImportedMessage()
         {

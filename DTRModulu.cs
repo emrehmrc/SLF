@@ -627,7 +627,7 @@ namespace SLF
             Dictionary<int, int> fixedCounts = new Dictionary<int, int>();
 
             // Dynamic year range (e.g., last 3 years up to lastYear)
-            int startYear = Math.Max(2021, lastYear - 2); // Ensure at least 2021
+            int startYear = slfStartYear;
             for (int year = startYear; year <= lastYear; year++)
             {
                 string demandCol = $"YIL_DEMANT_{year}";
@@ -635,13 +635,13 @@ namespace SLF
 
                 issueRows[year] = new Dictionary<string, List<int>>
                 {
-                    { "nullDemand", new List<int>() },
-                    { "nonNumericDemand", new List<int>() },
-                    { "zeroNegativeDemand", new List<int>() },
-                    { "nullKapasite", new List<int>() },
-                    { "nonNumericKapasite", new List<int>() },
-                    { "zeroNegativeKapasite", new List<int>() },
-                    { "overloaded", new List<int>() }
+                    {"nullDemand", new List<int>() },
+                    {"nonNumericDemand", new List<int>() },
+                    {"zeroNegativeDemand", new List<int>() },
+                    {"nullKapasite", new List<int>() },
+                    {"nonNumericKapasite", new List<int>() },
+                    {"zeroNegativeKapasite", new List<int>() },
+                    {"overloaded", new List<int>() }
                 };
 
                 int nullDemandCount = 0;

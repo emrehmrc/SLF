@@ -23,7 +23,6 @@ using Newtonsoft.Json;
 using SLF.Optimal_DTR;
 using SLF.RaporlamaDosyası;
 using SLF.services;
-using OfficeOpenXml.Utils;
 
 
 namespace SLF
@@ -209,12 +208,20 @@ namespace SLF
             InitializeComponent();
             SetupLayout();
 
-            //this.FormClosed += Form_Closed;
+            imar_legendPanel = new Panel
+            {
+                Visible = false,
+                // Add other default properties as needed
+            };
 
+            // Add it to the form's controls if necessary
+            this.Controls.Add(imar_legendPanel);
+
+
+            //this.FormClosed += Form_Closed;
             ana_menu_form_objesi = new HomePageForm();
             methodFormObjesi = new MethodForm(ana_menu_form_objesi);
             bekleForm = new BekleForm();
-
 
             var yearService = YearService.GetInstance();
             if (this.slfStartYear > 0 && this.slfEndYear > 0)
@@ -277,6 +284,15 @@ namespace SLF
 
             // Initialize tab_ekonometrik accessibility on form load
             UpdateTabEkonometrikAccessibility();
+
+            string secilen_il = (string)ana_menu_form_objesi.config.İl;
+
+            if (secilen_il == "Eskişehir")
+            {
+
+                buton_database_giris.Visible = false;
+                button_tablo_olustur.Visible = false;
+            }
 
         }
 
@@ -503,25 +519,6 @@ namespace SLF
             }
         }
 
-        private void SortTabPagesAlphabetically(TabControl tabControl, bool ascending = true)
-        {
-            // Get the list of TabPages
-            List<TabPage> tabPages = new List<TabPage>();
-            foreach (TabPage tabPage in tabControl.TabPages)
-            {
-                tabPages.Add(tabPage);
-            }
-
-            // Sort the list of TabPages based on the Text property
-            tabPages.Sort((x, y) =>
-            {
-                return ascending ? string.Compare(x.Text, y.Text) : -string.Compare(x.Text, y.Text);
-            });
-
-            // Clear the current TabPages and add the sorted TabPages
-            tabControl.TabPages.Clear();
-            tabControl.TabPages.AddRange(tabPages.ToArray());
-        }
 
         // Initialize form based on the selected method
         private void InitializeFormBasedOnMethod()
@@ -628,12 +625,12 @@ namespace SLF
         {
 
             checkBoxes_imar = new System.Windows.Forms.CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4,
-                checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9,checkBox_imar_10, checkBox_imar_11, 
+                checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9,checkBox_imar_10, checkBox_imar_11,
                 checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15 , checkBox_imar_16,
                 checkBox_imar_17, checkBox_imar_18, checkBox_imar_19, checkBox_imar_20};
 
             checkBoxes_yuk = new System.Windows.Forms.CheckBox[] { checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4,
-                checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9,checkBox_yuk_10, checkBox_yuk_11, 
+                checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9,checkBox_yuk_10, checkBox_yuk_11,
                 checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15 , checkBox_yuk_16, checkBox_yuk_17, checkBox_yuk_18
             , checkBox_yuk_19, checkBox_yuk_20};
 
@@ -1410,7 +1407,7 @@ namespace SLF
                 endYearComboBox.Enabled = false;
                 slfStartYear = (int)startYearComboBox.SelectedItem;
                 slfEndYear = (int)endYearComboBox.SelectedItem;
-                MessageBox.Show($"Başlangıç yılı: {slfStartYear}, Bitiş yılı: {slfEndYear}", 
+                MessageBox.Show($"Başlangıç yılı: {slfStartYear}, Bitiş yılı: {slfEndYear}",
                     "Yıllar belirlendi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 yearApproveButton.Text = "Sıfırla";
             }
@@ -1425,8 +1422,8 @@ namespace SLF
 
         private Dictionary<string, PointLatLng> cityCoordinates = new Dictionary<string, PointLatLng>
         {
-            { "İzmir", new PointLatLng(38.4192, 27.1287) }, 
-            { "Eskişehir", new PointLatLng(39.7768, 30.5206) }, 
+            { "İzmir", new PointLatLng(38.4192, 27.1287) },
+            { "Eskişehir", new PointLatLng(39.7768, 30.5206) },
         };
 
 
@@ -1435,8 +1432,8 @@ namespace SLF
 
 
         private string SelectedSpeed = "";
-        public bool isAddingChargingStation = false; 
-        private bool isAddingDekPoint = false; 
+        public bool isAddingChargingStation = false;
+        private bool isAddingDekPoint = false;
         private int _selectedYear = -1;
         private string _selectedCity = null;
         private string _selectedDistrict;
@@ -1788,12 +1785,12 @@ namespace SLF
             try
             {
                 checkBoxes_imar = new System.Windows.Forms.CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4,
-                    checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9,checkBox_imar_10, checkBox_imar_11, 
+                    checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9,checkBox_imar_10, checkBox_imar_11,
                     checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15, checkBox_imar_16, checkBox_imar_17, checkBox_imar_18
                 , checkBox_imar_19, checkBox_imar_20};
 
                 checkBoxes_yuk = new System.Windows.Forms.CheckBox[] { checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4,
-                    checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9,checkBox_yuk_10, checkBox_yuk_11, 
+                    checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9,checkBox_yuk_10, checkBox_yuk_11,
                     checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15 , checkBox_yuk_16, checkBox_yuk_17, checkBox_yuk_18
                 , checkBox_yuk_19, checkBox_yuk_20};
 
@@ -2380,7 +2377,7 @@ namespace SLF
             // Modüllerin yüklü olup olmadığını kontrol et
             if (selectedMethod == "SLF (Jeo-Uzamsal)")
             {
-                if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Yoğunluğu Haritası") && 
+                if ((selectedTabText == "EA Şarj Modülü" || selectedTabText == "DEK Modülü" || selectedTabText == "Yük Yoğunluğu Haritası") &&
                     !GirdiModülü.dataTablesByType.ContainsKey("DTR Verileri"))
                 {
                     //  -- add this later!!!
@@ -3380,7 +3377,7 @@ namespace SLF
             // Disable buttons to prevent interaction while processing
             EANewSimulationResultsButton.Enabled = false;
             SimulasyonSonucGoruntule.Enabled = false;
-            
+
 
             try
             {
@@ -3484,7 +3481,7 @@ namespace SLF
                 EANewSimulationResultsButton.Enabled = true;
                 if (!SimulasyonSonucGoruntule.Enabled)
                     SimulasyonSonucGoruntule.Enabled = false;
-                
+
             }
         }
 
@@ -4863,7 +4860,7 @@ namespace SLF
                 gMapControl_imar.Zoom -= 1;
                 gMapControl_imar.Zoom += 1;
                 gMapControl_imar.Refresh();
-                
+
             }
         }
 
@@ -4952,23 +4949,26 @@ namespace SLF
                         return;
                     }
 
-                    foreach (var polygon in cbs.tüm_katmanlar_array_imar[checkbox_index].Polygons)
+                    if (cbs.tüm_katmanlar_array_imar[checkbox_index]?.Polygons != null && cbs.tüm_katmanlar_array_imar[checkbox_index].Polygons.Any())
                     {
-                        if (cbs.IsPointInPolygon(pointClick, polygon))
+                        foreach (var polygon in cbs.tüm_katmanlar_array_imar[checkbox_index].Polygons)
                         {
-                            // Highlight the polygon and update the layer index
-                            cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
-                            layer_index = checkbox_index;  // Update the current layer index to the clicked polygon's layer
+                            if (cbs.IsPointInPolygon(pointClick, polygon))
+                            {
+                                // Highlight the polygon and update the layer index
+                                cbs.HighlightPolygon(polygon, layer_index, cbs.GetActiveGMapControl());
+                                layer_index = checkbox_index;  // Update the current layer index to the clicked polygon's layer
 
-                            // Try to get the attributes of the clicked polygon
-                            if (cbs.polygonAttributes_imar.TryGetValue(polygon, out DataRow row))
-                            {
-                                ShowAttributeRow(row);  // Show the row attributes
-                                tablo_formu.Show();     // Display the table form
-                            }
-                            else
-                            {
-                                Console.WriteLine("Polygon attributes not found.");
+                                // Try to get the attributes of the clicked polygon
+                                if (cbs.polygonAttributes_imar.TryGetValue(polygon, out DataRow row))
+                                {
+                                    ShowAttributeRow(row);  // Show the row attributes
+                                    tablo_formu.Show();     // Display the table form
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Polygon attributes not found.");
+                                }
                             }
                         }
                     }
@@ -5465,6 +5465,7 @@ namespace SLF
                     {
                         string wkt = $"POLYGON (({string.Join(", ", polygonPoints.Select(p => $"{p.Lat} {p.Lng}"))}))";
                         var centroid = cbs.ParseWktCentroid(wkt);
+
                         if (centroid.HasValue)
                         {
                             cbs.Draw_Polygon(polygonPoints, polygonOverlay, activeMap);
@@ -5904,7 +5905,8 @@ namespace SLF
 
             if (imarPolygon == null && yukPolygon == null)
             {
-                string debugInfo = $"Satır_No: {targetRowNo}, imarOverlay Polygons: {(imarOverlay?.Polygons.Count ?? 0)}, yukOverlay Polygons: {(yukOverlay?.Polygons.Count ?? 0)}";
+                string debugInfo = $"Satır_No: {targetRowNo}, imarOverlay Polygons: {(imarOverlay?.Polygons.Count ?? 0)}, " +
+                    $"yukOverlay Polygons: {(yukOverlay?.Polygons.Count ?? 0)}";
                 MessageBox.Show($"Seçilen satıra karşılık gelen poligon bulunamadı.\n{debugInfo}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -6113,7 +6115,7 @@ namespace SLF
                                 {
                                     var activeMap = cbs.GetActiveGMapControl();
 
-                                    if (activeMap.Overlays.Contains(overlay_imar) )
+                                    if (activeMap.Overlays.Contains(overlay_imar))
                                     {
                                         gMapControl_imar.Overlays.Remove(overlay_imar);
                                         gMapControl_imar.Refresh();
@@ -6142,6 +6144,11 @@ namespace SLF
                                             gMapControl_yuk.Overlays.Remove(heatmapOverlayToRemove);
                                         }
                                     }
+
+                                    if (checkBox.Text == "İMAR_SONUÇLAR.kml")
+                                    {
+                                        imar_legendPanel.Visible = false;
+                                    }
                                 }
 
                                 // Dispose and nullify references
@@ -6156,7 +6163,7 @@ namespace SLF
                                 cbs.tüm_katmanlar_array_polygon_tags[checkbox_index] = null; // Clear tag
 
                                 // Remove from overlayTags
-                                if(overlay_imar != null)
+                                if (overlay_imar != null)
                                 {
                                     if (overlayTags.ContainsKey(overlay_imar))
                                         overlayTags.Remove(overlay_imar);
@@ -8455,7 +8462,7 @@ namespace SLF
                         (string)ana_menu_form_objesi.config.program_dosyaları_path,
                         (string)ana_menu_form_objesi.config.SLF.SLF_yük_tahmini_kodu).Replace('/', '\\');
 
-                    
+
                     // Run Rscript.exe directly with quoted paths
                     var process = new Process
                     {
@@ -8472,7 +8479,7 @@ namespace SLF
 
                     process.Start();
                     process.WaitForExit();
-                      
+
 
                     // Show result
                     if (process.ExitCode != 0)
@@ -8484,67 +8491,67 @@ namespace SLF
 
                         layer_index = FindFirstFreeLayerIndex();
 
-                        if (layer_index == -1)
-                        {
-                            MessageBox.Show("En fazla 20 adet katman seçilebilmektedir.");
-                            return;
-                        }
+                    if (layer_index == -1)
+                    {
+                        MessageBox.Show("En fazla 20 adet katman seçilebilmektedir.");
+                        return;
+                    }
 
 
-                        string filepath = Path.Combine(ana_menu_form_objesi.userRootPath,
-                        (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                        (string)ana_menu_form_objesi.config.İl,
-                        (string)ana_menu_form_objesi.config.İlçe,
-                        (string)ana_menu_form_objesi.config.proje_ismi,
-                        (string)ana_menu_form_objesi.config.Yük_Yoğunluğu.sonuclar_kml).Replace('/', '\\');
+                    string filepath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.İlçe,
+                    (string)ana_menu_form_objesi.config.proje_ismi,
+                    (string)ana_menu_form_objesi.config.Yük_Yoğunluğu.sonuclar_kml).Replace('/', '\\');
 
-                        string imported_filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
+                    string imported_filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
 
-                        GMapOverlay overlay_imar = new GMapOverlay($"overlay_{layer_index + 1}_imar");
-                        GMapOverlay overlay_yuk = new GMapOverlay($"overlay_{layer_index + 1}_yuk");
+                    GMapOverlay overlay_imar = new GMapOverlay($"overlay_{layer_index + 1}_imar");
+                    GMapOverlay overlay_yuk = new GMapOverlay($"overlay_{layer_index + 1}_yuk");
 
-                        gMapControl_imar.Overlays.Add(overlay_imar);
-                        gMapControl_yuk.Overlays.Add(overlay_yuk);
+                    gMapControl_imar.Overlays.Add(overlay_imar);
+                    gMapControl_yuk.Overlays.Add(overlay_yuk);
 
-                        DataTable dt = new DataTable();
+                    DataTable dt = new DataTable();
 
-                        await cbs.LoadKmlFile(filepath, overlay_imar, dt, gMapControl_imar);
+                    await cbs.LoadKmlFile(filepath, overlay_imar, dt, gMapControl_imar);
 
-                        cbs.CopyOverlayContents(overlay_imar, overlay_yuk, cbs.polygonAttributes_imar, cbs.polygonAttributes_yuk);
-                        cbs.tüm_katmanlar_array_imar[layer_index] = overlay_imar;
-                        cbs.tüm_katmanlar_array_yuk[layer_index] = overlay_yuk;
+                    cbs.CopyOverlayContents(overlay_imar, overlay_yuk, cbs.polygonAttributes_imar, cbs.polygonAttributes_yuk);
+                    cbs.tüm_katmanlar_array_imar[layer_index] = overlay_imar;
+                    cbs.tüm_katmanlar_array_yuk[layer_index] = overlay_yuk;
 
-                        cbs.tüm_katmanlar_datatable[layer_index] = dt;
-                        cbs.tüm_katmanlar_array_names[layer_index] = imported_filename;
+                    cbs.tüm_katmanlar_datatable[layer_index] = dt;
+                    cbs.tüm_katmanlar_array_names[layer_index] = imported_filename;
 
-                        List<CheckBox> associatedChecks = GetCheckBoxesByIndex(layer_index);
-                        foreach (var chk in associatedChecks)
-                        {
-                            chk.Text = imported_filename;
-                            chk.Visible = true;
-                            chk.Checked = true;
-                            chk.ForeColor = cbs.overlayColors[layer_index].BorderColor;
-                        }
+                    List<CheckBox> associatedChecks = GetCheckBoxesByIndex(layer_index);
+                    foreach (var chk in associatedChecks)
+                    {
+                        chk.Text = imported_filename;
+                        chk.Visible = true;
+                        chk.Checked = true;
+                        chk.ForeColor = cbs.overlayColors[layer_index].BorderColor;
+                    }
 
-                        // Mark all categories for update
-                        pendingUpdates["imar"] = true;
-                        pendingUpdates["yuk"] = true;
+                    // Mark all categories for update
+                    pendingUpdates["imar"] = true;
+                    pendingUpdates["yuk"] = true;
 
-                        // Update only the active tab immediately
-                        UpdateCheckboxPositions(checkBoxes_imar, "imar");
-                        UpdateCheckboxPositions(checkBoxes_yuk, "yuk");
+                    // Update only the active tab immediately
+                    UpdateCheckboxPositions(checkBoxes_imar, "imar");
+                    UpdateCheckboxPositions(checkBoxes_yuk, "yuk");
 
-                        // Zoom to the center of the layer
-                        cbs.ZoomToLayerCenter(overlay_imar, gMapControl_imar, gMapControl_yuk);
+                    // Zoom to the center of the layer
+                    cbs.ZoomToLayerCenter(overlay_imar, gMapControl_imar, gMapControl_yuk);
 
-                        gMapControl_imar.Refresh();
-                        gMapControl_yuk.Refresh();
+                    gMapControl_imar.Refresh();
+                    gMapControl_yuk.Refresh();
 
-                        this.Cursor = Cursors.Default;
+                    this.Cursor = Cursors.Default;
 
-                        MessageBox.Show($"Ufuk yılları için hücre bazında SLF tahminleri oluşturuldu! Şimdi Yük Yoğunluğu Haritası sayfasını" +
-                            $"kullanarak her hücreye ait tahminleri ve yük yoğunluğu haritasını görebilirsiniz.",
-                            "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show($"Ufuk yılları için hücre bazında SLF tahminleri oluşturuldu! Şimdi Yük Yoğunluğu Haritası sayfasını" +
+                        $"kullanarak her hücreye ait tahminleri ve yük yoğunluğu haritasını görebilirsiniz.",
+                        "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
@@ -8556,7 +8563,7 @@ namespace SLF
         private void buton_ELF_tablo_sec_Click(object sender, EventArgs e)
         {
             // Show the confirmation dialog for navigating to the home page
-            DialogResult result = MessageBox.Show("Şu an seçili olan sonuçlar: " + 
+            DialogResult result = MessageBox.Show("Şu an seçili olan sonuçlar: " +
                 ELFSonuçlarTabControls.SelectedTab.Text + ". ELF sonucu olarak bu sonuçları onaylamak istiyor musunuz?",
                 "ELF Sonuçları Onay",
                 MessageBoxButtons.YesNo,
@@ -8646,7 +8653,7 @@ namespace SLF
             // Determine the active map control and reset accordingly
             if (cbs.GetActiveGMapControl() == gMapControl_imar)
             {
-                ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar, 
+                ResetMapControls(gMapControl_imar, mesafe_metre_imar, Mesafe_imar, markerOverlay_imar,
                     rulerOverlay_imar, rulerRoute_imar, rulerPoints_imar);
             }
         }
@@ -8662,7 +8669,7 @@ namespace SLF
             else
             {
                 // Clear the label if no valid DataSource is set
-                label_data_count.Visible = false ;
+                label_data_count.Visible = false;
             }
         }
 
