@@ -314,7 +314,7 @@ namespace SLF
                         StartInfo = new ProcessStartInfo
                         {
                             FileName = "cmd.exe",
-                            Arguments = $"/C python \"{dtr_kodu_path}\" \"{anaMenuObjesi.config_path}\"",
+                            Arguments = $"/k python \"{dtr_kodu_path}\" \"{anaMenuObjesi.config_path}\"",
                             RedirectStandardOutput = false,
                             RedirectStandardError = false,
                             UseShellExecute = false,
