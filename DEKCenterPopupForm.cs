@@ -152,7 +152,7 @@ namespace SLF
             }
 
             var row = DEKCenterDataGridView.Rows[0];
-            string[] requiredColumns = { "KAYNAK_TIPI", "DEK_KURULU_GUCU", "DEK_X_KOORDINAT", "DEK_Y_KOORDINAT", "DEK_DTR_ADI", "DEK_KURULUM_YERI" };
+            string[] requiredColumns = { "KAYNAK_TIPI", "DEK_KURULU_GUCU", "DEK_X_KOORDINAT", "DEK_Y_KOORDINAT", /*"DEK_DTR_ADI"*/ "DEK_KURULUM_YERI" };
             foreach (string col in requiredColumns)
             {
                 if (!DEKCenterDataGridView.Columns.Contains(col) || row.Cells[col].Value == null ||
@@ -188,7 +188,7 @@ namespace SLF
             newRow["DEK_KURULU_GUCU"] = dekKuruluGucu;
             newRow["DEK_X_KOORDINAT"] = dekXKoordinat;
             newRow["DEK_Y_KOORDINAT"] = dekYKoordinat;
-            newRow["DEK_DTR_ADI"] = row.Cells["DEK_DTR_ADI"].Value.ToString();
+            //newRow["DEK_DTR_ADI"] = row.Cells["DEK_DTR_ADI"].Value.ToString();
             newRow["DEK_KURULUM_YERI"] = row.Cells["DEK_KURULUM_YERI"].Value.ToString();
 
             dataTable.Rows.Add(newRow);
