@@ -151,7 +151,7 @@ namespace SLF
                 return;
             }
 
-            var row = DEKCenterDataGridView.Rows[0];    
+            var row = DEKCenterDataGridView.Rows[0];
             string[] requiredColumns = { "KAYNAK_TIPI", "DEK_KURULU_GUCU", "DEK_X_KOORDINAT", "DEK_Y_KOORDINAT", "DEK_DTR_ADI", "DEK_KURULUM_YERI" };
             foreach (string col in requiredColumns)
             {
