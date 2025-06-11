@@ -77,6 +77,11 @@ namespace SLF.Optimal_DTR
         string AlansalYukTabloAdi;
         string HTML;
         public string VeriTabanıYolu;
+        string PointLoadYolu;
+        string YukVeriTabanıYolu;
+        string EAYukVeriTabanıYolu;
+
+        HomePageForm anaMenu;
 
         bool veriSeçildi_mi = false;
 
@@ -92,7 +97,7 @@ namespace SLF.Optimal_DTR
             
             ToolTipKismi();                     
 
-            HomePageForm anaMenu = new HomePageForm();
+            anaMenu = new HomePageForm();
 
             var configPath = anaMenu.config_path;
 
@@ -124,19 +129,24 @@ namespace SLF.Optimal_DTR
                 AlansalYukTabloAdi = config["ODTR:AlansalYukTabloAdi"];
                 HTML = config["ODTR:HTML"];
                 VeriTabanıYolu = Path.Combine(Dosyalar, config["ODTR:veriTabaniAdi"]);
+                PointLoadYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["SLF:YUK_poligonu"]);
+                YukVeriTabanıYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["Yük_Yoğunluğu:sonuclar_db"]);
+                EAYukVeriTabanıYolu = Path.Combine(İlİlceYol, config["EA:sonuclar_db"]);
 
                 il = config["İl"];
                 ilce = config["İlçe"];
                 İlkYıl = config["DEK:baslangıc_yılı"];
                 SonYıl = config["DEK:bitis_yılı"];
             }
-                
-
+            
+            
             catch (Exception ex)
             {
                 MessageBox.Show($"Konfigürasyon dosyası okunamadı: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
+            MessageBox.Show(PointLoadYolu);
 
             cityCoordinates = new Dictionary<string, PointLatLng>
                 {
@@ -307,23 +317,33 @@ namespace SLF.Optimal_DTR
             TrafoDosyaAdi = $"trafo_merkez_hucre_{ilce}.xlsx";
             TrafoAlanDosyaAdi = $"trafo_rezerv_alanlar_{ilce.ToLower()}.xlsx";
 
-            tuketim_path = Path.Combine(YükVeriYolu, TuketimDosyaAdi);
+            tuketim_path = Path.Combine(YükVeriYolu, "5.Yük Tahmini\\çıktı", TuketimDosyaAdi);
             string trafo_path = Path.Combine(İmarVeriYolu, TrafoDosyaAdi);
             string trafo_alan_path = Path.Combine(İmarVeriYolu, TrafoAlanDosyaAdi);
 
-            if (!File.Exists(tuketim_path) & !File.Exists(trafo_path) & !File.Exists(trafo_alan_path))
+            List<string> eksikDosyalar = new List<string>();
+
+            if (!File.Exists(tuketim_path))
+                eksikDosyalar.Add(TuketimDosyaAdi);
+
+            if (!File.Exists(trafo_path))
+                eksikDosyalar.Add(TrafoDosyaAdi);
+
+            if (!File.Exists(trafo_alan_path))
+                eksikDosyalar.Add(TrafoAlanDosyaAdi);
+
+            if (eksikDosyalar.Any())
             {
-                MessageBox.Show("Optimal DTR için gerekli veriler bulunamadı. Lütfen verileri yükleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                string mesaj = "Optimal DTR için aşağıdaki dosyalar bulunamadı:\n\n" + string.Join("\n", eksikDosyalar);
+                MessageBox.Show(mesaj, "Eksik Veri Uyarısı", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
             else
             {
-                MessageBox.Show("Optimal DTR için gerekli veriler bulundu.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Optimal DTR için gerekli tüm veriler bulundu.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return true;
             }
-
         }
-
 
         // ToolTip fonksiyonu
         private void SetToolTip(Control control, string message)
@@ -710,6 +730,8 @@ namespace SLF.Optimal_DTR
 
                     PythonFilePath = PythonFilePath,
 
+                    PointLoadYolu = PointLoadYolu,
+
                     VeriTabanıYolu = VeriTabanıYolu,
 
                     YükVeriYolu = YükVeriYolu,
@@ -717,6 +739,10 @@ namespace SLF.Optimal_DTR
                     İmarVeriYolu = İmarVeriYolu,
 
                     Arsiv = Arsiv,
+
+                    YukVeriTabanıYolu = YukVeriTabanıYolu,
+
+                    EAYukVeriTabanıYolu = EAYukVeriTabanıYolu
 
                 },
 
@@ -730,7 +756,7 @@ namespace SLF.Optimal_DTR
                     TrafoDosyaAdi = TrafoDosyaAdi,
                     TrafoAlanDosyaAdi = TrafoAlanDosyaAdi,
                     veriTabaniAdi = config["ODTR:veriTabaniAdi"],
-                    YukTabloAdi = YukTabloAdi,
+                    YukTabloAdi = config["ODTR:YukTabloAdi"],
                     AlansalYukTabloAdi = AlansalYukTabloAdi,
                     HTML = HTML
 
@@ -744,50 +770,39 @@ namespace SLF.Optimal_DTR
             string json = JsonConvert.SerializeObject(configODTR, Formatting.Indented);
 
             // JSON dosyasını yazma
-            //File.WriteAllText(ODTRJson, json);
+            File.WriteAllText(ODTRJson, json);
         }
 
         public async void button2_Click(object sender, EventArgs e)
         {
-            this.button2.Enabled = false; // Butonu devre dışı bırakıyoruz
-
-            string pythonPath = GetPythonPath();
-
-            PythonPath = Path.Combine(pythonPath);
+            this.button2.Enabled = false; // Butonu devre dışı bırakıyoruz    
 
             bool islemeDevam = CalismaYoluKontrol();
 
             string python_path = Path.Combine(PythonFilePath, "algoritmaÇalıştır.py");
             //bool islemeDevam = true;
-
-            if (PythonPath == null)
+                     
+            if (islemeDevam)
             {
-                MessageBox.Show("Python yolu bulunamadı. Lütfen Python yükleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            else
-            {
-                if (islemeDevam)
+                try
                 {
-                    try
-                    {
-                        ODTR_çalıştı_mı = true; // örneğin bir bool flag set etmek
+                    ODTR_çalıştı_mı = true; // örneğin bir bool flag set etmek
 
-                        await Task.Run(() => ODTRconfig());
+                    await Task.Run(() => ODTRconfig());
 
-                        //await PythonScriptCalistir(tuketim_path);
-                        await PythonScriptCalistir(python_path, ODTRJson);
+                    //await PythonScriptCalistir(tuketim_path);
+                    await PythonScriptCalistir(python_path, ODTRJson);
 
                         
-                    }
-
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Hata: " + ex.Message);
-                    }
-
                 }
+
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Hata: " + ex.Message);
+                }
+
             }
+            
 
             this.button2.Enabled = true; // İşlem tamamlandığında butonu tekrar etkinleştiriyoruz
         }
