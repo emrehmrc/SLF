@@ -10,6 +10,7 @@ namespace SLF.services
 {
     public static class PythonHelper
     {
+
         public static string RunDeepLearningModel()
         {
             try
@@ -217,11 +218,11 @@ namespace SLF.services
             }
         }
 
-        private static void ProcessAboneDataFromCsv(string configPath, string depoPath)
+
+        public static void ProcessAboneDataFromCsv(string configPath, string depoPath)
         {
             try
             {
-
                 // CSV dosya yolları
                 string aboneCsvPath = Path.Combine(depoPath, "DWH_MRC_SLFPROJE_ABN_BLG.csv");
                 string tuketimCsvPath = Path.Combine(depoPath, "DWH_MRC_SLFPROJE_TUKETIM.csv");
@@ -297,7 +298,8 @@ namespace SLF.services
             }
         }
 
-        private static void ProcessAboneDataFromDatabase(string configPath)
+
+        public static void ProcessAboneDataFromDatabase(string configPath)
         {
             try
             {
