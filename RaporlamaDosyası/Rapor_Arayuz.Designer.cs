@@ -33,9 +33,10 @@
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.button4 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
+            this.button6 = new System.Windows.Forms.Button();
             this.panel4 = new System.Windows.Forms.Panel();
             this.label3 = new System.Windows.Forms.Label();
+            this.button3 = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel7 = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
@@ -58,6 +59,7 @@
             // 
             this.panel1.Controls.Add(this.flowLayoutPanel1);
             this.panel1.Controls.Add(this.panel4);
+            this.panel1.Controls.Add(this.button3);
             this.panel1.Location = new System.Drawing.Point(295, 0);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1024, 85);
@@ -67,7 +69,7 @@
             // 
             this.flowLayoutPanel1.Controls.Add(this.button4);
             this.flowLayoutPanel1.Controls.Add(this.button1);
-            this.flowLayoutPanel1.Controls.Add(this.button3);
+            this.flowLayoutPanel1.Controls.Add(this.button6);
             this.flowLayoutPanel1.Location = new System.Drawing.Point(9, 12);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Size = new System.Drawing.Size(713, 64);
@@ -76,7 +78,7 @@
             // button4
             // 
             this.button4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.button4.ForeColor = System.Drawing.SystemColors.Control;
+            this.button4.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.button4.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button4.Location = new System.Drawing.Point(3, 3);
             this.button4.Name = "button4";
@@ -90,7 +92,7 @@
             // 
             this.button1.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.button1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.button1.ForeColor = System.Drawing.SystemColors.Control;
+            this.button1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.button1.Location = new System.Drawing.Point(203, 3);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(230, 56);
@@ -99,16 +101,18 @@
             this.button1.UseVisualStyleBackColor = false;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // button3
+            // button6
             // 
-            this.button3.Location = new System.Drawing.Point(439, 3);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(124, 56);
-            this.button3.TabIndex = 4;
-            this.button3.Text = "Excelde Aç";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Visible = false;
-            this.button3.Click += new System.EventHandler(this.button33_Click);
+            this.button6.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.button6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.button6.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.button6.Location = new System.Drawing.Point(439, 3);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(230, 56);
+            this.button6.TabIndex = 4;
+            this.button6.Text = "EA";
+            this.button6.UseVisualStyleBackColor = false;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // panel4
             // 
@@ -130,6 +134,17 @@
             this.label3.TabIndex = 5;
             this.label3.Text = "Sonuç görüntüleme alani";
             // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(763, 15);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(124, 56);
+            this.button3.TabIndex = 4;
+            this.button3.Text = "Excelde Aç";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Visible = false;
+            this.button3.Click += new System.EventHandler(this.button33_Click);
+            // 
             // panel2
             // 
             this.panel2.AutoScroll = true;
@@ -142,7 +157,8 @@
             // 
             // panel7
             // 
-            this.panel7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+            this.panel7.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panel7.AutoScroll = true;
             this.panel7.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.panel7.Controls.Add(this.label1);
@@ -153,10 +169,10 @@
             this.panel7.Controls.Add(this.label2);
             this.panel7.Controls.Add(this.ExcelDownloadButton);
             this.panel7.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.panel7.Location = new System.Drawing.Point(1078, 99);
+            this.panel7.Location = new System.Drawing.Point(1133, 99);
             this.panel7.Margin = new System.Windows.Forms.Padding(1);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(241, 565);
+            this.panel7.Size = new System.Drawing.Size(186, 565);
             this.panel7.TabIndex = 4;
             this.panel7.Paint += new System.Windows.Forms.PaintEventHandler(this.panel7_Paint);
             // 
@@ -236,7 +252,7 @@
             this.ExcelDownloadButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("ExcelDownloadButton.BackgroundImage")));
             this.ExcelDownloadButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ExcelDownloadButton.ForeColor = System.Drawing.Color.Transparent;
-            this.ExcelDownloadButton.Location = new System.Drawing.Point(44, 129);
+            this.ExcelDownloadButton.Location = new System.Drawing.Point(56, 129);
             this.ExcelDownloadButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ExcelDownloadButton.Name = "ExcelDownloadButton";
             this.ExcelDownloadButton.Size = new System.Drawing.Size(48, 45);
@@ -261,7 +277,7 @@
             this.panel5.Margin = new System.Windows.Forms.Padding(20, 20, 20, 0);
             this.panel5.Name = "panel5";
             this.panel5.Padding = new System.Windows.Forms.Padding(10);
-            this.panel5.Size = new System.Drawing.Size(779, 514);
+            this.panel5.Size = new System.Drawing.Size(804, 514);
             this.panel5.TabIndex = 8;
             // 
             // panel3
@@ -321,5 +337,6 @@
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button6;
     }
 }

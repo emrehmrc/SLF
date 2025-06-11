@@ -23,6 +23,8 @@ using Newtonsoft.Json;
 using SLF.Optimal_DTR;
 using SLF.RaporlamaDosyası;
 using SLF.services;
+using Microsoft.Extensions.Configuration;
+
 
 
 namespace SLF
@@ -49,6 +51,8 @@ namespace SLF
 
         DTR_Arayuz dtr;
         Rapor_Arayuz Rapor_Arayuz;
+        public string İlkProjeAdi;
+        public string SonProjeAdi;
 
         GMapOverlay simulationOverlay = new GMapOverlay("Simulasyon_Layer");
         GMapOverlay cellToolTipOverlay = new GMapOverlay("CellToolTips");
@@ -2489,12 +2493,20 @@ namespace SLF
                 {
                     // Eğer form zaten varsa ama panelde değilse tekrar ekle
                     if (!panel.Controls.Contains(FormManager.Form2Instance))
-                    {
+                    {                        
                         panel.Controls.Clear();
                         panel.Controls.Add(FormManager.Form2Instance);
                         FormManager.Form2Instance.Show();
                     }
                 }
+
+                var config = new ConfigurationBuilder()
+                .AddJsonFile(ana_menu_form_objesi.config_path, optional: false, reloadOnChange: true)
+                .Build();
+              
+                FormManager.Form2Instance.ConfigKismi(config);
+
+
 
                 return;
             }
@@ -2549,8 +2561,12 @@ namespace SLF
 
         public void Form_Closed(object sender, FormClosedEventArgs e)
         {
-            FormManager.Form2Instance.Dispose();
-            FormManager.Form2Instance = null; // Clear the instance to allow re-initialization
+            if (FormManager.Form2Instance != null)
+            {
+                FormManager.Form2Instance.Dispose();
+                FormManager.Form2Instance = null; // Clear the instance to allow re-initialization
+
+            }
 
             if (FormManager.RaporInstance != null)
             {
@@ -2604,6 +2620,7 @@ namespace SLF
 
                             // Projeyi aç
                             PathService.OpenProject(projectName);
+
 
                             // Varsayılan geçici klasörü temizle
                             CleanupDefaultTempFolder();

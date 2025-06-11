@@ -35,6 +35,11 @@
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
+  <PropertyGroup>
+    <CopySQLiteInteropFiles>true</CopySQLiteInteropFiles>
+    <SQLiteInteropStaticLink>false</SQLiteInteropStaticLink>
+    <UseSQLiteStandard>true</UseSQLiteStandard>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
@@ -73,6 +78,22 @@
   <PropertyGroup>
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
+  <ItemGroup>
+    <None Update="x86\SQLite.Interop.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="x64\SQLite.Interop.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="x86\SQLite.Interop.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="x64\SQLite.Interop.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="Avalonia, Version=11.0.10.0, Culture=neutral, PublicKeyToken=c8d484a7012f9a8b, processorArchitecture=MSIL">
       <HintPath>packages\Avalonia.11.0.10\lib\net461\Avalonia.dll</HintPath>
@@ -716,6 +737,7 @@
     <Compile Include="Services\ConfigService.cs" />
     <Compile Include="Services\ControlExtensions.cs" />
     <Compile Include="Services\DatabaseHelpers.cs" />
+    <Compile Include="Services\DatabaseManager.cs" />
     <Compile Include="Services\DataValidationService.cs" />
     <Compile Include="Services\PathService.cs" />
     <Compile Include="Services\PythonHelper.cs" />

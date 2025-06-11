@@ -62,7 +62,7 @@ namespace SLF.Optimal_DTR
         YearService yearService;
 
         string il;
-        string ilce;
+        public string ilce;
         public string İlkYıl;
         public string SonYıl;
 
@@ -78,8 +78,8 @@ namespace SLF.Optimal_DTR
         string HTML;
         public string VeriTabanıYolu;
         string PointLoadYolu;
-        string YukVeriTabanıYolu;
-        string EAYukVeriTabanıYolu;
+        public string YukVeriTabanıYolu;
+        public string EAYukVeriTabanıYolu;
 
         HomePageForm anaMenu;
 
@@ -89,7 +89,7 @@ namespace SLF.Optimal_DTR
 
         Dictionary<string, PointLatLng> cityCoordinates;
 
-        public bool ODTR_çalıştı_mı = false;
+        public bool ODTR_çalıştı_mı = true;
 
         public DTR_Arayuz()
         {
@@ -107,46 +107,12 @@ namespace SLF.Optimal_DTR
             config = new ConfigurationBuilder()
                 .AddJsonFile(configPath, optional: false, reloadOnChange: true)
                 .Build();
-
+            
             userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
-            //string Ana_Klasör_Yolu = Path.Combine(userRootPath, config["Ana_Klasör_Yolu"]);
-            string Ana_Klasör_Yolu = Path.Combine(config["Ana_Klasör_Yolu_vural"]);
+            //string Ana_Klasör_Yolu = Path.Combine(userRootPath, config["Ana_Klasör_Yolu"]);         
 
-
-            try
-            {
-                İlYol = Path.Combine(Ana_Klasör_Yolu, config["İl"]);
-                İlİlceYol = Path.Combine(İlYol, config["İlçe"]);
-                SonucYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:Sonuçlar_klasör"]);
-                PythonFilePath = Path.Combine(Ana_Klasör_Yolu, config["program_dosyaları_path"], config["ODTR:PYTHON_klasör"]);
-                YükVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Yük_klasör"]);
-                İmarVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Trafo_klasör"]);
-                Arsiv = Path.Combine(SonucYolu, config["ODTR:Arşiv"]);
-                Dosyalar = Path.Combine(PythonFilePath, config["ODTR:Dosyalar"]);
-                Katsayilar = Path.Combine(Dosyalar, config["ODTR:Katsayilar"]);
-                YukTabloAdi = config["ODTR:YukTabloAdi"];
-                AlansalYukTabloAdi = config["ODTR:AlansalYukTabloAdi"];
-                HTML = config["ODTR:HTML"];
-                VeriTabanıYolu = Path.Combine(Dosyalar, config["ODTR:veriTabaniAdi"]);
-                PointLoadYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["SLF:YUK_poligonu"]);
-                YukVeriTabanıYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["Yük_Yoğunluğu:sonuclar_db"]);
-                EAYukVeriTabanıYolu = Path.Combine(İlİlceYol, config["EA:sonuclar_db"]);
-
-                il = config["İl"];
-                ilce = config["İlçe"];
-                İlkYıl = config["DEK:baslangıc_yılı"];
-                SonYıl = config["DEK:bitis_yılı"];
-            }
-            
-            
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Konfigürasyon dosyası okunamadı: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            MessageBox.Show(PointLoadYolu);
+            ConfigKismi(config);
 
             cityCoordinates = new Dictionary<string, PointLatLng>
                 {
@@ -161,6 +127,50 @@ namespace SLF.Optimal_DTR
             YillariYerlestir();
         }
 
+        public void ConfigKismi(IConfigurationRoot config)
+        {
+            string Ana_Klasör_Yolu = Path.Combine(userRootPath, config["Ana_Klasör_Yolu"]);
+
+            try
+            {
+                İlYol = Path.Combine(Ana_Klasör_Yolu, config["İl"]);
+
+                İlİlceYol = Path.Combine(İlYol, config["İlçe"]);
+                SonucYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:Sonuçlar_klasör"]);
+                PythonFilePath = Path.Combine(Ana_Klasör_Yolu, config["program_dosyaları_path"], config["ODTR:PYTHON_klasör"]);
+                YükVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Yük_klasör"]);
+                İmarVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Trafo_klasör"]);
+                Arsiv = Path.Combine(SonucYolu, config["ODTR:Arşiv"]);
+                Dosyalar = Path.Combine(PythonFilePath, config["ODTR:Dosyalar"]);
+                Katsayilar = Path.Combine(Dosyalar, config["ODTR:Katsayilar"]);
+                YukTabloAdi = config["ODTR:YukTabloAdi"];
+                AlansalYukTabloAdi = config["ODTR:AlansalYukTabloAdi"];
+                HTML = config["ODTR:HTML"];
+                VeriTabanıYolu = Path.Combine(Dosyalar, config["ODTR:veriTabaniAdi"]);
+                PointLoadYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["SLF:YUK_poligonu"]);
+                YukVeriTabanıYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["Yük_Yoğunluğu:sonuclar_db"]);
+                EAYukVeriTabanıYolu = Path.Combine(İlİlceYol, config["EA:ea_klasörü"], config["EA:cikti_dosyasi"]);
+
+                MessageBox.Show($"EAYukVeriTabanıYolu Verisi Yolu: {EAYukVeriTabanıYolu}", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                il = config["İl"];
+                ilce = config["İlçe"];
+                string yilStr = config["baslangıc_yılı"];
+                İlkYıl = string.IsNullOrEmpty(yilStr) ? "2025" : yilStr;
+
+                yilStr = config["bitis_yılı"];
+                SonYıl = string.IsNullOrEmpty(yilStr) ? "2035" : yilStr;
+
+            }
+
+
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Konfigürasyon dosyası okunamadı: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+        }
 
         private async void InitBrowser(string path)
         {
@@ -313,12 +323,14 @@ namespace SLF.Optimal_DTR
 
         private bool CalismaYoluKontrol()
         {
-            TuketimDosyaAdi = $"SONUCLAR_{ilce}.xlsx";
+            TuketimDosyaAdi = $"SONUCLAR.db";
             TrafoDosyaAdi = $"trafo_merkez_hucre_{ilce}.xlsx";
             TrafoAlanDosyaAdi = $"trafo_rezerv_alanlar_{ilce.ToLower()}.xlsx";
 
-            tuketim_path = Path.Combine(YükVeriYolu, "5.Yük Tahmini\\çıktı", TuketimDosyaAdi);
+            tuketim_path = Path.Combine(YükVeriYolu, "5.Yük Tahmini\\çıktı", TuketimDosyaAdi);        
+
             string trafo_path = Path.Combine(İmarVeriYolu, TrafoDosyaAdi);
+
             string trafo_alan_path = Path.Combine(İmarVeriYolu, TrafoAlanDosyaAdi);
 
             List<string> eksikDosyalar = new List<string>();
@@ -951,15 +963,24 @@ namespace SLF.Optimal_DTR
             
             try
             {
-                trafo_path = Path.Combine(SonucYolu, trafo_path);
-                trafodt = ImportExcelFile(trafo_path);
-                veriSeçildi_mi = true; // Veri seçildi mi kontrolü için flag
+                if(trafo_path != null)
+                {
+                    trafo_path = Path.Combine(SonucYolu, trafo_path);
+                    trafodt = ImportExcelFile(trafo_path);
+                    veriSeçildi_mi = true; // Veri seçildi mi kontrolü için flag
+                }
+                
+                else
+                {
+                    MessageBox.Show("Herhangi bir dosya seçilmedi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
             }
 
             catch (Exception ex)
             {
-                MessageBox.Show("Dosya Seçilmedi. " + $"{ex.ToString()}");
+                MessageBox.Show("Dosya Seçilmedi.");
                 return;
             }
 
@@ -1147,15 +1168,15 @@ namespace SLF.Optimal_DTR
             {
                 ColumnCount = 6,
                 AutoSize = true,
-                Padding = new Padding(20),
+                Padding = new Padding(10),
             };
 
-            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25));
-            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15));
-            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
-            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
-            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
-            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
+            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10));
+            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 5));
+            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10));
+            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 5));
+            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 5));
+            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 5));
 
             // Başlıklar
             _layout.Controls.Add(CreateHeaderLabel("Parametre"), 0, 0);
