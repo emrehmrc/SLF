@@ -12,7 +12,8 @@ namespace SLF
 {
     public partial class DatabaseListForm : Form
     {
-
+        public string csv_file_path_1;
+        public string csv_file_path_2;
 
         public HomePageForm anaMenuObjesi;
 
@@ -79,11 +80,11 @@ namespace SLF
             }
         }
 
-
         private void buttonAboneVerisiOlustur_Click(object sender, EventArgs e)
         {
             try
             {
+                this.Cursor = Cursors.WaitCursor;
 
                 // Config yolunu al
                 string configPath = PathService._configKonum;
@@ -94,19 +95,16 @@ namespace SLF
                     return;
                 }
 
-                // Önce veri durumunu kontrol et
-                var validationResult = DataValidationService.ValidateAboneData(configPath);
+                // CSV dosya yollarını ayarla
+                csv_file_path_1 = Path.Combine(anaMenuObjesi.userRootPath,
+                    (string)anaMenuObjesi.config.Ana_Klasör_Yolu,
+                    (string)anaMenuObjesi.config.depo,
+                    "DWH_MRC_SLFPROJE_TUKETIM.csv");
 
-                // İşlem tipini belirle ve kullanıcıya bilgi ver
-                string processingMode;
-                if (validationResult.IsValid && validationResult.HasDepoCsvFiles && validationResult.IsDataUpToDate)
-                {
-                    processingMode = "CSV";
-                }
-                else
-                {
-                    processingMode = "DATABASE";
-                }
+                csv_file_path_2 = Path.Combine(anaMenuObjesi.userRootPath,
+                    (string)anaMenuObjesi.config.Ana_Klasör_Yolu,
+                    (string)anaMenuObjesi.config.depo,
+                    "DWH_MRC_SLFPROJE_ABN_BLG.csv");
 
                 // İlerleme formu göster (opsiyonel)
                 var progressForm = new Form()
@@ -121,38 +119,48 @@ namespace SLF
 
                 var progressLabel = new Label()
                 {
-                    Text = processingMode == "CSV" ? "CSV dosyalarından veri işleniyor..." : "Veritabanından veri çekiliyor ve güncelleniyor...",
+                    Text = "Veri işleniyor...",
                     Dock = DockStyle.Fill,
                     TextAlign = ContentAlignment.MiddleCenter
                 };
-              
 
                 progressForm.Controls.Add(progressLabel);
 
-                // Async olarak Python script'ini çalıştır
+                // Async olarak işlemi çalıştır
                 Task.Run(() =>
                 {
                     try
                     {
-                        buttonAboneVerisiOlustur.ForeColor = Color.Silver;     
+                        buttonAboneVerisiOlustur.ForeColor = Color.Silver;
                         System.Threading.Thread.Sleep(250);
                         buttonAboneVerisiOlustur.ForeColor = Color.White;
 
-
-                        // Python script'ini akıllı modda çalıştır
-                        PythonHelper.RunPythonScriptForAboneVerisi(configPath);
+                        string processingMode;
+                        if (File.Exists(csv_file_path_1) && File.Exists(csv_file_path_2))
+                        {
+                            // CSV dosyaları varsa, doğrudan ProcessAboneDataFromCsv'yi çalıştır
+                            Console.WriteLine("CSV dosyaları mevcut. CSV'lerden abone verisi oluşturuluyor...");
+                            PythonHelper.ProcessAboneDataFromCsv(configPath, Path.GetDirectoryName(csv_file_path_1));
+                            processingMode = "Hızlı (CSV)";
+                        }
+                        else
+                        {
+                            // CSV dosyaları yoksa, veritabanından çek
+                            Console.WriteLine("CSV dosyaları yok. Veritabanından yeni veri çekiliyor...");
+                            PythonHelper.RunPythonScriptForAboneVerisi(configPath); // Fallback to database mode
+                            processingMode = "Tam güncelleme";
+                        }
 
                         // UI thread'de sonucu göster
                         this.BeginInvoke(new Action(() =>
                         {
                             progressForm.Close();
                             MessageBox.Show(
-                                $"✅ Abone verisi başarıyla oluşturuldu!\n\nİşlem türü: {(processingMode == "CSV" ? "Hızlı (CSV)" : "Tam güncelleme")}",
+                                $"✅ Abone verisi başarıyla oluşturuldu!\n\nİşlem türü: {processingMode}",
                                 "Başarılı",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Information
                             );
-
                         }));
                     }
                     catch (Exception ex)
@@ -172,7 +180,9 @@ namespace SLF
                 });
 
                 // İlerleme formunu göster
-                progressForm.Close();
+                progressForm.ShowDialog();
+
+                this.Cursor = Cursors.Default;
             }
             catch (Exception ex)
             {
@@ -180,8 +190,7 @@ namespace SLF
             }
         }
 
-
-        // Tablo seçim formu
+        // Tablo seçim formu (Değiştirilmedi, aynı kalabilir)
         public class SelectTableForm : Form
         {
             private ComboBox comboBoxTables;
@@ -277,7 +286,6 @@ namespace SLF
         {
             try
             {
-
                 // Config yolunu al
                 string configPath = PathService._configKonum;
 
@@ -321,7 +329,7 @@ namespace SLF
                     this.BeginInvoke(new Action(() =>
                     {
                         MessageBox.Show(
-                            $"✅ DTR verisi başarıyla oluşturuldu!\n",
+                            $"✅ DTR verileri, OSOS tüketim verisini ve CBS OGAGTRF katmanını kullanarak başarıyla oluşturuldu!\n",
                             "Başarılı",
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Information
