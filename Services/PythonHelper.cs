@@ -570,7 +570,7 @@ namespace SLF.services
 
                 // Argümanları oluştur
                 StringBuilder args = new StringBuilder();
-                args.Append($"/k python \"{pythonScriptPath}\" process \"{selectedCity}\" \"{kmlFilePath}\"");
+                args.Append($"/C python \"{pythonScriptPath}\" process \"{selectedCity}\" \"{kmlFilePath}\"");
                 args.Append($" --district \"{selectedDistrict}\"");
                 args.Append($" --output-dir \"{imarAnaliziPath}\"");  // Ana çıktı klasörü
                 args.Append($" --output-prefix \"{outputPrefix}\"");
