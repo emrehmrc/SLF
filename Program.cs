@@ -13,7 +13,7 @@ namespace SLF
         static void Main()
         {
             // Set EPPlus license context
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // or LicenseContext.Commercial
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial; 
             
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

@@ -6,15 +6,20 @@ using System.Windows.Forms;
 using SLF.services;
 using SLF.Services;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace SLF
 {
     public partial class DatabaseListForm : Form
     {
 
+
+        public HomePageForm anaMenuObjesi;
+
         public DatabaseListForm()
         {
             InitializeComponent();
+            anaMenuObjesi = new HomePageForm();
 
             // Load event'ini manuel olarak bağla
             this.Load += DatabaseListForm_Load;
@@ -23,7 +28,7 @@ namespace SLF
         private void DatabaseListForm_Load(object sender, EventArgs e)
         {
             // Form yüklendiğinde veri doğrulaması yap
-            CheckDataValidation();
+            //CheckDataValidation();
         }
 
         /// <summary>
@@ -129,10 +134,8 @@ namespace SLF
                 {
                     try
                     {
-                        buttonAboneVerisiOlustur.ForeColor = Color.Silver;
-                        
-                        System.Threading.Thread.Sleep(500);
-
+                        buttonAboneVerisiOlustur.ForeColor = Color.Silver;     
+                        System.Threading.Thread.Sleep(250);
                         buttonAboneVerisiOlustur.ForeColor = Color.White;
 
 
@@ -176,6 +179,7 @@ namespace SLF
                 MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         // Tablo seçim formu
         public class SelectTableForm : Form
@@ -266,6 +270,71 @@ namespace SLF
                 {
                     MessageBox.Show("Lütfen bir tablo seçin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
+            }
+        }
+
+        private void buttonDTRVerileriniOlustur_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+                // Config yolunu al
+                string configPath = PathService._configKonum;
+
+                if (string.IsNullOrEmpty(configPath) || !File.Exists(configPath))
+                {
+                    MessageBox.Show("Config dosyası bulunamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Construct the path to the python script
+                string dtr_kodu_path = Path.Combine(anaMenuObjesi.userRootPath,
+                    (string)anaMenuObjesi.config.Ana_Klasör_Yolu,
+                    (string)anaMenuObjesi.config.program_dosyaları_path,
+                    "database/kod/dtr_kodu.py").Replace('/', '\\');
+
+                // Async olarak Python script'ini çalıştır
+                Task.Run(() =>
+                {
+                    buttonDTRVerileriniOlustur.ForeColor = Color.Silver;
+                    System.Threading.Thread.Sleep(250);
+                    buttonDTRVerileriniOlustur.ForeColor = Color.White;
+
+                    // Run the Python script with output and error capturing
+                    var process = new Process
+                    {
+                        StartInfo = new ProcessStartInfo
+                        {
+                            FileName = "cmd.exe",
+                            Arguments = $"/C python \"{dtr_kodu_path}\" \"{anaMenuObjesi.config_path}\"",
+                            RedirectStandardOutput = false,
+                            RedirectStandardError = false,
+                            UseShellExecute = false,
+                            CreateNoWindow = false
+                        }
+                    };
+
+                    process.Start();
+                    process.WaitForExit();
+
+                    // UI thread'de sonucu göster
+                    this.BeginInvoke(new Action(() =>
+                    {
+                        MessageBox.Show(
+                            $"✅ DTR verisi başarıyla oluşturuldu!\n",
+                            "Başarılı",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information
+                        );
+
+                    }));
+
+                });
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

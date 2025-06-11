@@ -23,6 +23,7 @@ using Newtonsoft.Json;
 using SLF.Optimal_DTR;
 using SLF.RaporlamaDosyası;
 using SLF.services;
+using OfficeOpenXml.Utils;
 
 
 namespace SLF
@@ -208,7 +209,7 @@ namespace SLF
             InitializeComponent();
             SetupLayout();
 
-            this.FormClosed += Form_Closed;
+            //this.FormClosed += Form_Closed;
 
             ana_menu_form_objesi = new HomePageForm();
             methodFormObjesi = new MethodForm(ana_menu_form_objesi);
@@ -3486,6 +3487,7 @@ namespace SLF
                 
             }
         }
+
         private async Task RunPythonScriptEAAsync(string config_path)
         {
             try
@@ -3496,44 +3498,11 @@ namespace SLF
                     (string)ana_menu_form_objesi.config.EA.program_dosyası_klasörü,
                     (string)ana_menu_form_objesi.config.EA.ea_python_dosyası);
 
-                // Validate Python script path
-                if (!File.Exists(pythonScriptPath))
-                {
-                    throw new Exception($"Python scripti bulunamadı: {pythonScriptPath}");
-                }
-
-                // Check if 'python' command is available
-                ProcessStartInfo checkPython = new ProcessStartInfo
-                {
-                    FileName = "python",
-                    Arguments = "--version",
-                    RedirectStandardOutput = false,
-                    RedirectStandardError = false,
-                    UseShellExecute = false,
-                    CreateNoWindow = false
-                };
-
-                try
-                {
-                    using (Process pythonCheck = Process.Start(checkPython))
-                    {
-                        pythonCheck.WaitForExit(10000); // 10-second timeout for version check
-                        if (pythonCheck.ExitCode != 0)
-                        {
-                            throw new Exception("Python komutu bulunamadı. Lütfen Python'un yüklü olduğundan ve" +
-                                " sistem ortam değişkenleri path'ine eklendiğinden emin olun.");
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception($"Python çalıştırılabilir script dosyası bulunamadı: {ex.Message}");
-                }
 
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
-                    FileName = "python",
-                    Arguments = $"\"{pythonScriptPath}\" \"{config_path}\"",
+                    FileName = "cmd.exe",
+                    Arguments = $"/C python \"{pythonScriptPath}\" \"{config_path}\"",
                     RedirectStandardOutput = false,
                     RedirectStandardError = false,
                     UseShellExecute = false,
@@ -3559,6 +3528,7 @@ namespace SLF
                 throw new Exception($"Python scriptini çalıştırma hatası: {ex.Message}");
             }
         }
+
         // Add this event handler for the checkbox
         private void EAPointsLayerCheckBox_CheckedChanged(object sender, EventArgs e)
         {
@@ -6470,15 +6440,6 @@ namespace SLF
         }
 
 
-        private void NoktaBilgileriniGoster(NoktaVeri nokta)
-        {
-            // Nokta bilgilerini göster
-            MessageBox.Show($"Enlem: {nokta.Enlem}\nBoylam: {nokta.Boylam}\nBina Demandi: " +
-                $"{nokta.Bina_Demandi}\nAbone Sayısı: {nokta.Abone_Sayısı}");
-
-            // Noktayı silmek için enlem ve boylamdan PointLatLng oluşturuyoruz
-            PointLatLng point = new PointLatLng(nokta.Enlem, nokta.Boylam);
-        }
 
         private void buton_database_giris_Click(object sender, EventArgs e)
         {
@@ -6517,7 +6478,7 @@ namespace SLF
                 // Veritabanı işlemleri
                 if (DatabaseManager.GetInstance().IsConnected())
                 {
-                    try
+                    /*try
                     {
                         using (var databaseListForm = new DatabaseListForm())
                         {
@@ -6537,7 +6498,7 @@ namespace SLF
                     {
                         MessageBox.Show($"Veritabanı listesi gösterilirken hata oluştu: {ex.Message}",
                             "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    }*/
                 }
                 else
                 {
@@ -6545,11 +6506,11 @@ namespace SLF
                     {
                         if (loginForm.ShowDialog() == DialogResult.OK)
                         {
-                            using (var databaseListForm = new DatabaseListForm())
+                            /*using (var databaseListForm = new DatabaseListForm())
                             {
                                 databaseListForm.Owner = this;
                                 databaseListForm.ShowDialog();
-                            }
+                            }*/
                         }
                     }
                 }
@@ -8705,6 +8666,11 @@ namespace SLF
             }
         }
 
+        private void button_tablo_olustur_Click(object sender, EventArgs e)
+        {
+            DatabaseListForm databaseListForm = new DatabaseListForm();
+            databaseListForm.ShowDialog();
+        }
 
         private void TextBox_KeyPress_NumbersOnly(object sender, KeyPressEventArgs e)
         {

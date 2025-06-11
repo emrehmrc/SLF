@@ -648,7 +648,7 @@ namespace SLF
             {
                 label_imar_katman_listeleri.ForeColor = Color.LimeGreen;
                 label_imar_katman_listeleri.Refresh(); // Force UI update
-                await Task.Delay(1000); // Non-blocking delay for 1 second
+                await Task.Delay(250); // Non-blocking delay for 1 second
                 label_imar_katman_listeleri.ForeColor = Color.Green;
                 label_imar_katman_listeleri.Refresh(); // Force UI update
 

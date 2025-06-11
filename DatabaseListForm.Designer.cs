@@ -60,6 +60,7 @@
             this.buttonDTRVerileriniOlustur.TabIndex = 2;
             this.buttonDTRVerileriniOlustur.Text = "DTR Verilerini Oluştur";
             this.buttonDTRVerileriniOlustur.UseVisualStyleBackColor = false;
+            this.buttonDTRVerileriniOlustur.Click += new System.EventHandler(this.buttonDTRVerileriniOlustur_Click);
             // 
             // DatabaseListForm
             // 

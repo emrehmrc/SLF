@@ -183,7 +183,7 @@ namespace SLF
         private void AddYearColumnsToAboneVerileri(List<string> headers)
         {
             // Son 2 yıl için tüketim kolonları ekle
-            for (int year = _yearService.slfStartYear - 5; year <= _yearService.slfStartYear; year++)
+            for (int year = _yearService.slfStartYear - 2; year <= _yearService.slfStartYear; year++)
             {
                 if (year > 0) // Geçerli bir yıl ise
                 {
@@ -192,7 +192,7 @@ namespace SLF
             }
 
             // Son 2 yıl için talep kolonları ekle
-            for (int year = _yearService.slfStartYear - 5; year <= _yearService.slfStartYear; year++)
+            for (int year = _yearService.slfStartYear - 2; year <= _yearService.slfStartYear; year++)
             {
                 if (year > 0) // Geçerli bir yıl ise
                 {
@@ -205,7 +205,7 @@ namespace SLF
         private void AddYearColumnsToDTRVerileri(List<string> headers)
         {
             // Son 2 yıl için talep ve tüketim kolonları ekle
-            for (int year = _yearService.slfStartYear - 3; year <= _yearService.slfStartYear; year++)
+            for (int year = _yearService.slfStartYear - 2; year <= _yearService.slfStartYear; year++)
             {
                 if (year > 0) // Geçerli bir yıl ise
                 {

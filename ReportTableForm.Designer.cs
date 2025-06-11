@@ -28,31 +28,32 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ReportTableForm));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ReportTableForm));
             this.ReportTablePanel = new System.Windows.Forms.Panel();
             this.comboBox_report_yıl_secimi = new System.Windows.Forms.ComboBox();
             this.ReportsTableDataGridView = new System.Windows.Forms.DataGridView();
-            this.ReportTableBottomPanel = new System.Windows.Forms.Panel();
             this.ReportExportButton = new System.Windows.Forms.Button();
             this.ReportCancelButton = new System.Windows.Forms.Button();
             this.ReportTablePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ReportsTableDataGridView)).BeginInit();
-            this.ReportTableBottomPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // ReportTablePanel
             // 
             this.ReportTablePanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(161)))), ((int)(((byte)(227)))), ((int)(((byte)(249)))));
+            this.ReportTablePanel.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("ReportTablePanel.BackgroundImage")));
+            this.ReportTablePanel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.ReportTablePanel.Controls.Add(this.ReportExportButton);
             this.ReportTablePanel.Controls.Add(this.comboBox_report_yıl_secimi);
+            this.ReportTablePanel.Controls.Add(this.ReportCancelButton);
             this.ReportTablePanel.Controls.Add(this.ReportsTableDataGridView);
-            this.ReportTablePanel.Controls.Add(this.ReportTableBottomPanel);
             this.ReportTablePanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ReportTablePanel.Location = new System.Drawing.Point(0, 0);
             this.ReportTablePanel.Name = "ReportTablePanel";
-            this.ReportTablePanel.Size = new System.Drawing.Size(1073, 550);
+            this.ReportTablePanel.Size = new System.Drawing.Size(944, 550);
             this.ReportTablePanel.TabIndex = 0;
             // 
             // comboBox_report_yıl_secimi
@@ -62,7 +63,7 @@
             this.comboBox_report_yıl_secimi.Location = new System.Drawing.Point(12, 11);
             this.comboBox_report_yıl_secimi.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.comboBox_report_yıl_secimi.Name = "comboBox_report_yıl_secimi";
-            this.comboBox_report_yıl_secimi.Size = new System.Drawing.Size(71, 24);
+            this.comboBox_report_yıl_secimi.Size = new System.Drawing.Size(85, 24);
             this.comboBox_report_yıl_secimi.TabIndex = 3;
             this.comboBox_report_yıl_secimi.Text = "YIL";
             // 
@@ -96,7 +97,7 @@
             this.ReportsTableDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
             this.ReportsTableDataGridView.EnableHeadersVisualStyles = false;
             this.ReportsTableDataGridView.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(204)))), ((int)(((byte)(213)))));
-            this.ReportsTableDataGridView.Location = new System.Drawing.Point(100, 29);
+            this.ReportsTableDataGridView.Location = new System.Drawing.Point(160, 38);
             this.ReportsTableDataGridView.Name = "ReportsTableDataGridView";
             this.ReportsTableDataGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -109,20 +110,8 @@
             this.ReportsTableDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.ReportsTableDataGridView.RowHeadersWidth = 18;
             this.ReportsTableDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.ReportsTableDataGridView.Size = new System.Drawing.Size(924, 402);
+            this.ReportsTableDataGridView.Size = new System.Drawing.Size(733, 396);
             this.ReportsTableDataGridView.TabIndex = 2;
-            // 
-            // ReportTableBottomPanel
-            // 
-            this.ReportTableBottomPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ReportTableBottomPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(161)))), ((int)(((byte)(227)))), ((int)(((byte)(249)))));
-            this.ReportTableBottomPanel.Controls.Add(this.ReportExportButton);
-            this.ReportTableBottomPanel.Controls.Add(this.ReportCancelButton);
-            this.ReportTableBottomPanel.Location = new System.Drawing.Point(3, 447);
-            this.ReportTableBottomPanel.Name = "ReportTableBottomPanel";
-            this.ReportTableBottomPanel.Size = new System.Drawing.Size(1067, 100);
-            this.ReportTableBottomPanel.TabIndex = 0;
             // 
             // ReportExportButton
             // 
@@ -132,7 +121,7 @@
             this.ReportExportButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ReportExportButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.ReportExportButton.ForeColor = System.Drawing.Color.White;
-            this.ReportExportButton.Location = new System.Drawing.Point(817, 26);
+            this.ReportExportButton.Location = new System.Drawing.Point(678, 482);
             this.ReportExportButton.Margin = new System.Windows.Forms.Padding(4);
             this.ReportExportButton.Name = "ReportExportButton";
             this.ReportExportButton.Size = new System.Drawing.Size(240, 55);
@@ -149,7 +138,7 @@
             this.ReportCancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ReportCancelButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.ReportCancelButton.ForeColor = System.Drawing.Color.White;
-            this.ReportCancelButton.Location = new System.Drawing.Point(569, 26);
+            this.ReportCancelButton.Location = new System.Drawing.Point(430, 482);
             this.ReportCancelButton.Margin = new System.Windows.Forms.Padding(4);
             this.ReportCancelButton.Name = "ReportCancelButton";
             this.ReportCancelButton.Size = new System.Drawing.Size(240, 55);
@@ -162,7 +151,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1073, 550);
+            this.ClientSize = new System.Drawing.Size(944, 550);
             this.Controls.Add(this.ReportTablePanel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ReportTableForm";
@@ -170,7 +159,6 @@
             this.Text = "Raporlama Penceresi";
             this.ReportTablePanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.ReportsTableDataGridView)).EndInit();
-            this.ReportTableBottomPanel.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -178,7 +166,6 @@
         #endregion
 
         private System.Windows.Forms.Panel ReportTablePanel;
-        private System.Windows.Forms.Panel ReportTableBottomPanel;
         private System.Windows.Forms.Button ReportExportButton;
         private System.Windows.Forms.Button ReportCancelButton;
         private System.Windows.Forms.DataGridView ReportsTableDataGridView;

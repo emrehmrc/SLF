@@ -12,18 +12,20 @@ namespace SLF
         private string configPath;
         private JObject configJson;
 
+        public HomePageForm anaMenuObjesi;
+
         public LoginForm()
         {
             InitializeComponent();
+
+            anaMenuObjesi = new HomePageForm();
 
             // Şifre alanını maskele
             textBoxPassword.PasswordChar = '*';
 
             // Config dosyasının yolunu al
             string userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            configPath = Path.Combine(userRootPath,
-                "MRC\\MRC - 1.1.3_T&SI\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kır" +
-                "ılımları\\Program Dosyaları\\config.json").Replace("/", "\\");
+            configPath = anaMenuObjesi.config_path;
 
             // Config dosyasını yükle
             LoadConfigFile();

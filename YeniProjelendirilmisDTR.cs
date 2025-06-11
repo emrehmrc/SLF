@@ -166,7 +166,6 @@ namespace SLF
         }
 
 
-
         private Dictionary<string, (float Min, float Max)> minMaxCheckMap; // No longer readonly
 
         private Dictionary<string, (float Min, float Max)> CalculateCoordinateBounds()
@@ -268,6 +267,7 @@ namespace SLF
             { "PROJELENDIRILMIS_TRAFO_KAPASITE", INFO_ONLY},
             { "PROJELENDIRILMIS_TRAFO_YATIRIM_YILI", WARNING_ONLY},
         };
+
         private void ReportNullCounts()
         {
             float nullPercentage = 0.0f;
