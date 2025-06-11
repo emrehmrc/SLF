@@ -716,7 +716,6 @@
     <Compile Include="Services\ConfigService.cs" />
     <Compile Include="Services\ControlExtensions.cs" />
     <Compile Include="Services\DatabaseHelpers.cs" />
-    <Compile Include="Services\DatabaseManager.cs" />
     <Compile Include="Services\DataValidationService.cs" />
     <Compile Include="Services\PathService.cs" />
     <Compile Include="Services\PythonHelper.cs" />

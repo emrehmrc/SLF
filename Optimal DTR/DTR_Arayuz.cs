@@ -111,7 +111,7 @@ namespace SLF.Optimal_DTR
             userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
             //string Ana_Klasör_Yolu = Path.Combine(userRootPath, config["Ana_Klasör_Yolu"]);
-            string Ana_Klasör_Yolu = Path.Combine(config["Ana_Klasör_Yolu"]);
+            string Ana_Klasör_Yolu = Path.Combine(config["Ana_Klasör_Yolu_vural"]);
 
 
             try
