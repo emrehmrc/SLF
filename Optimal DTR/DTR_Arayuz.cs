@@ -62,7 +62,7 @@ namespace SLF.Optimal_DTR
         YearService yearService;
 
         string il;
-        string ilce;
+        public string ilce;
         public string İlkYıl;
         public string SonYıl;
 
@@ -77,6 +77,11 @@ namespace SLF.Optimal_DTR
         string AlansalYukTabloAdi;
         string HTML;
         public string VeriTabanıYolu;
+        string PointLoadYolu;
+        public string YukVeriTabanıYolu;
+        public string EAYukVeriTabanıYolu;
+
+        HomePageForm anaMenu;
 
         bool veriSeçildi_mi = false;
 
@@ -92,7 +97,7 @@ namespace SLF.Optimal_DTR
             
             ToolTipKismi();                     
 
-            HomePageForm anaMenu = new HomePageForm();
+            anaMenu = new HomePageForm();
 
             var configPath = anaMenu.config_path;
 
@@ -102,16 +107,24 @@ namespace SLF.Optimal_DTR
             config = new ConfigurationBuilder()
                 .AddJsonFile(configPath, optional: false, reloadOnChange: true)
                 .Build();
-
+            
             userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
-            //string Ana_Klasör_Yolu = Path.Combine(userRootPath, config["Ana_Klasör_Yolu"]);
-            string Ana_Klasör_Yolu = Path.Combine(config["Ana_Klasör_Yolu"]);
+            //string Ana_Klasör_Yolu = Path.Combine(userRootPath, config["Ana_Klasör_Yolu"]);         
 
+            //ConfigKismi(config);
+
+            
+        }
+
+        public void ConfigKismi(IConfigurationRoot config)
+        {
+            string Ana_Klasör_Yolu = Path.Combine(userRootPath, config["Ana_Klasör_Yolu"]);
 
             try
             {
                 İlYol = Path.Combine(Ana_Klasör_Yolu, config["İl"]);
+
                 İlİlceYol = Path.Combine(İlYol, config["İlçe"]);
                 SonucYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:Sonuçlar_klasör"]);
                 PythonFilePath = Path.Combine(Ana_Klasör_Yolu, config["program_dosyaları_path"], config["ODTR:PYTHON_klasör"]);
@@ -124,13 +137,20 @@ namespace SLF.Optimal_DTR
                 AlansalYukTabloAdi = config["ODTR:AlansalYukTabloAdi"];
                 HTML = config["ODTR:HTML"];
                 VeriTabanıYolu = Path.Combine(Dosyalar, config["ODTR:veriTabaniAdi"]);
+                PointLoadYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["SLF:YUK_poligonu"]);
+                YukVeriTabanıYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["Yük_Yoğunluğu:sonuclar_db"]);
+                EAYukVeriTabanıYolu = Path.Combine(İlİlceYol, config["EA:ea_klasörü"], config["EA:cikti_dosyasi"]);
 
                 il = config["İl"];
                 ilce = config["İlçe"];
-                İlkYıl = config["DEK:baslangıc_yılı"];
-                SonYıl = config["DEK:bitis_yılı"];
+                string yilStr = config["baslangıc_yılı"];
+                İlkYıl = string.IsNullOrEmpty(yilStr) ? "2025" : yilStr;
+
+                yilStr = config["bitis_yılı"];
+                SonYıl = string.IsNullOrEmpty(yilStr) ? "2035" : yilStr;
+
             }
-                
+
 
             catch (Exception ex)
             {
@@ -140,8 +160,8 @@ namespace SLF.Optimal_DTR
 
             cityCoordinates = new Dictionary<string, PointLatLng>
                 {
-                    { "İzmir", new PointLatLng(38.5, 27.0) }, // Example coordinates for İzmir
-                    { "Eskişehir", new PointLatLng(39.7768, 30.5206) },// Example coordinates for Eskişehir
+                    { "İzmir", new PointLatLng(38.5, 27.0) }, // 
+                    { "Eskişehir", new PointLatLng(39.7768, 30.5206) },// 
                     { "Manisa", new PointLatLng(38.6191, 27.4289) }
 
                     // Add more cities and their coordinates as needed
@@ -149,8 +169,8 @@ namespace SLF.Optimal_DTR
 
             InitializeMap();
             YillariYerlestir();
-        }
 
+        }
 
         private async void InitBrowser(string path)
         {
@@ -303,27 +323,39 @@ namespace SLF.Optimal_DTR
 
         private bool CalismaYoluKontrol()
         {
-            TuketimDosyaAdi = $"SONUCLAR_{ilce}.xlsx";
+            TuketimDosyaAdi = $"SONUCLAR.db";
             TrafoDosyaAdi = $"trafo_merkez_hucre_{ilce}.xlsx";
             TrafoAlanDosyaAdi = $"trafo_rezerv_alanlar_{ilce.ToLower()}.xlsx";
 
-            tuketim_path = Path.Combine(YükVeriYolu, TuketimDosyaAdi);
+            tuketim_path = Path.Combine(YükVeriYolu, "5.Yük Tahmini\\çıktı", TuketimDosyaAdi);        
+
             string trafo_path = Path.Combine(İmarVeriYolu, TrafoDosyaAdi);
+
             string trafo_alan_path = Path.Combine(İmarVeriYolu, TrafoAlanDosyaAdi);
 
-            if (!File.Exists(tuketim_path) & !File.Exists(trafo_path) & !File.Exists(trafo_alan_path))
+            List<string> eksikDosyalar = new List<string>();
+
+            if (!File.Exists(tuketim_path))
+                eksikDosyalar.Add(TuketimDosyaAdi);
+
+            if (!File.Exists(trafo_path))
+                eksikDosyalar.Add(TrafoDosyaAdi);
+
+            if (!File.Exists(trafo_alan_path))
+                eksikDosyalar.Add(TrafoAlanDosyaAdi);
+
+            if (eksikDosyalar.Any())
             {
-                MessageBox.Show("Optimal DTR için gerekli veriler bulunamadı. Lütfen verileri yükleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                string mesaj = "Optimal DTR için aşağıdaki dosyalar bulunamadı:\n\n" + string.Join("\n", eksikDosyalar);
+                MessageBox.Show(mesaj, "Eksik Veri Uyarısı", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
             else
             {
-                MessageBox.Show("Optimal DTR için gerekli veriler bulundu.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Optimal DTR için gerekli tüm veriler bulundu.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return true;
             }
-
         }
-
 
         // ToolTip fonksiyonu
         private void SetToolTip(Control control, string message)
@@ -710,6 +742,8 @@ namespace SLF.Optimal_DTR
 
                     PythonFilePath = PythonFilePath,
 
+                    PointLoadYolu = PointLoadYolu,
+
                     VeriTabanıYolu = VeriTabanıYolu,
 
                     YükVeriYolu = YükVeriYolu,
@@ -717,6 +751,10 @@ namespace SLF.Optimal_DTR
                     İmarVeriYolu = İmarVeriYolu,
 
                     Arsiv = Arsiv,
+
+                    YukVeriTabanıYolu = YukVeriTabanıYolu,
+
+                    EAYukVeriTabanıYolu = EAYukVeriTabanıYolu
 
                 },
 
@@ -730,7 +768,7 @@ namespace SLF.Optimal_DTR
                     TrafoDosyaAdi = TrafoDosyaAdi,
                     TrafoAlanDosyaAdi = TrafoAlanDosyaAdi,
                     veriTabaniAdi = config["ODTR:veriTabaniAdi"],
-                    YukTabloAdi = YukTabloAdi,
+                    YukTabloAdi = config["ODTR:YukTabloAdi"],
                     AlansalYukTabloAdi = AlansalYukTabloAdi,
                     HTML = HTML
 
@@ -744,50 +782,39 @@ namespace SLF.Optimal_DTR
             string json = JsonConvert.SerializeObject(configODTR, Formatting.Indented);
 
             // JSON dosyasını yazma
-            //File.WriteAllText(ODTRJson, json);
+            File.WriteAllText(ODTRJson, json);
         }
 
         public async void button2_Click(object sender, EventArgs e)
         {
-            this.button2.Enabled = false; // Butonu devre dışı bırakıyoruz
-
-            string pythonPath = GetPythonPath();
-
-            PythonPath = Path.Combine(pythonPath);
+            this.button2.Enabled = false; // Butonu devre dışı bırakıyoruz    
 
             bool islemeDevam = CalismaYoluKontrol();
 
             string python_path = Path.Combine(PythonFilePath, "algoritmaÇalıştır.py");
             //bool islemeDevam = true;
-
-            if (PythonPath == null)
+                     
+            if (islemeDevam)
             {
-                MessageBox.Show("Python yolu bulunamadı. Lütfen Python yükleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            else
-            {
-                if (islemeDevam)
+                try
                 {
-                    try
-                    {
-                        ODTR_çalıştı_mı = true; // örneğin bir bool flag set etmek
 
-                        await Task.Run(() => ODTRconfig());
+                    await Task.Run(() => ODTRconfig());
 
-                        //await PythonScriptCalistir(tuketim_path);
-                        await PythonScriptCalistir(python_path, ODTRJson);
+                    //await PythonScriptCalistir(tuketim_path);
+                    await PythonScriptCalistir(python_path, ODTRJson);
 
-                        
-                    }
-
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Hata: " + ex.Message);
-                    }
+                    ODTR_çalıştı_mı = true; // örneğin bir bool flag set etmek
 
                 }
+
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Hata: " + ex.Message);
+                }
+
             }
+            
 
             this.button2.Enabled = true; // İşlem tamamlandığında butonu tekrar etkinleştiriyoruz
         }
@@ -936,15 +963,24 @@ namespace SLF.Optimal_DTR
             
             try
             {
-                trafo_path = Path.Combine(SonucYolu, trafo_path);
-                trafodt = ImportExcelFile(trafo_path);
-                veriSeçildi_mi = true; // Veri seçildi mi kontrolü için flag
+                if(trafo_path != null)
+                {
+                    trafo_path = Path.Combine(SonucYolu, trafo_path);
+                    trafodt = ImportExcelFile(trafo_path);
+                    veriSeçildi_mi = true; // Veri seçildi mi kontrolü için flag
+                }
+                
+                else
+                {
+                    MessageBox.Show("Herhangi bir dosya seçilmedi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
             }
 
             catch (Exception ex)
             {
-                MessageBox.Show("Dosya Seçilmedi. " + $"{ex.ToString()}");
+                MessageBox.Show("Dosya Seçilmedi.");
                 return;
             }
 
@@ -1132,15 +1168,15 @@ namespace SLF.Optimal_DTR
             {
                 ColumnCount = 6,
                 AutoSize = true,
-                Padding = new Padding(20),
+                Padding = new Padding(10),
             };
 
-            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25));
-            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15));
-            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
-            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
-            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
-            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
+            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10));
+            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 5));
+            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10));
+            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 5));
+            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 5));
+            _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 5));
 
             // Başlıklar
             _layout.Controls.Add(CreateHeaderLabel("Parametre"), 0, 0);

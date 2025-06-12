@@ -50,7 +50,7 @@
             // button1
             // 
             this.button1.BackColor = System.Drawing.Color.ForestGreen;
-            this.button1.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.button1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.button1.Location = new System.Drawing.Point(24, 410);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(223, 57);
@@ -65,13 +65,13 @@
             this.panel4.Controls.Add(this.checkedListBox1);
             this.panel4.Location = new System.Drawing.Point(24, 27);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(223, 326);
+            this.panel4.Size = new System.Drawing.Size(223, 365);
             this.panel4.TabIndex = 8;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(14, 13);
+            this.label5.Location = new System.Drawing.Point(14, 23);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(70, 20);
             this.label5.TabIndex = 3;
@@ -93,7 +93,7 @@
             "2032",
             "2033",
             "2034"});
-            this.checkedListBox1.Location = new System.Drawing.Point(18, 36);
+            this.checkedListBox1.Location = new System.Drawing.Point(18, 68);
             this.checkedListBox1.Name = "checkedListBox1";
             this.checkedListBox1.ScrollAlwaysVisible = true;
             this.checkedListBox1.Size = new System.Drawing.Size(189, 280);

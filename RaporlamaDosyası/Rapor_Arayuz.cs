@@ -84,6 +84,9 @@ namespace SLF.RaporlamaDosyası
 
         public string Dosyalar;
 
+        string Yuk_db;
+        string EAYuk_db;
+
         string html;
 
         string PythonPath;
@@ -114,6 +117,7 @@ namespace SLF.RaporlamaDosyası
                 userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
                 string Ana_Klasör_Yolu = Path.Combine(userRootPath, config["Ana_Klasör_Yolu"]);
+                //string Ana_Klasör_Yolu = config["Ana_Klasör_Yolu_vural"];
 
                 İlYol = Path.Combine(Ana_Klasör_Yolu, config["İl"]);
 
@@ -125,15 +129,15 @@ namespace SLF.RaporlamaDosyası
 
                 YükVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Yük_klasör"]);
 
-                İmarVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Trafo_klasör"]);
-
-                PythonPath = GetPythonPath();
+                İmarVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Trafo_klasör"]);              
 
                 Dosyalar = Path.Combine(PythonFilePath, config["ODTR:Dosyalar"]);
 
                 veriTabaniAdi = Path.Combine(Dosyalar, config["ODTR:veriTabaniAdi"]);
 
+                Yuk_db = FormManager.Form2Instance.YukVeriTabanıYolu;
 
+                EAYuk_db = FormManager.Form2Instance.EAYukVeriTabanıYolu;
 
                 AlansalYukTabloAdi = config["ODTR:AlansalYukTabloAdi"];
 
@@ -145,13 +149,7 @@ namespace SLF.RaporlamaDosyası
             {
                 MessageBox.Show("Konfigürasyon dosyası okunamadı: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
-            }
-
-
-            if (PythonPath == null)
-            {
-                MessageBox.Show("Python yolu bulunamadı. Lütfen Python yükleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            }           
 
             ArsivVeriYolu = Path.Combine(SonucYolu, "Arşiv");
 
@@ -369,7 +367,13 @@ namespace SLF.RaporlamaDosyası
             {
                 if (dtyol == null)
                 {
-                    MessageBox.Show("Lütfen bir dosya seçin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Herhangi dosya seçilmedi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    this.button4_Click(this.button4, EventArgs.Empty); // Yükleme butonuna tıklanmış gibi davranarak yükleme işlemini başlatıyoruz
+                    this.button4.Focus(); // Yükleme butonuna odaklanıyoruz
+
+                    this.button1.Enabled = true;
+                    this.button4.Enabled = true;
                     return;
                 }
 
@@ -442,9 +446,10 @@ namespace SLF.RaporlamaDosyası
                 VeriYazdir2(dt);
             }
 
-            else if (KullanilanModul == "DEK")
+            else if (KullanilanModul == "EA")
             {
-
+                currentDt = dt.Copy();
+                VeriYazdir2(dt);
             }
 
             else
@@ -558,12 +563,13 @@ namespace SLF.RaporlamaDosyası
             {
                 if (DosyaMevcutMu(SonucYolu, veriTabaniAdi))
                 {
-                    string sqlQuery = $"SELECT * FROM {AlansalYukTabloAdi}";
+                    string ilce = FormManager.Form2Instance.ilce;
+                    string sqlQuery = $"SELECT * FROM {ilce}";
                     //DataTableYuk = await GetDataTableFromSQLite(veritabaniYolu, sqlQuery).ConfigureAwait(false);
 
                     DataTableYuk = await Task.Run(() =>
                     {
-                        return GetDataTableFromSQLite(FormManager.Form2Instance.VeriTabanıYolu, sqlQuery).Result;
+                        return GetDataTableFromSQLite(Yuk_db, sqlQuery).Result;
                     });
 
                     currentDt = DataTableYuk.Copy();
@@ -1022,7 +1028,7 @@ namespace SLF.RaporlamaDosyası
             {
                 var startInfo = new ProcessStartInfo
                 {
-                    FileName = $"{PythonPath}", // Python'ın yüklü olduğu path
+                    FileName = $"python", // Python'ın yüklü olduğu path
                     //Arguments = $"{PythonFilePath} \"{inputpath}\"",
                     Arguments = $"\"{python_path}\" \"{inputpath}\"  \"{SonucYolu}\"",
                     UseShellExecute = false,
@@ -1378,6 +1384,94 @@ namespace SLF.RaporlamaDosyası
             loadingGif.Dispose();
 
             VeriYazdir2(dt);
+        }
+
+        private async void button6_Click(object sender, EventArgs e)
+        {
+            label1.Visible = false;
+            button2.Visible = false;
+            label7.Visible = false;
+            button5.Visible = false;
+            this.button1.Enabled = false; // DTR butonunu devre dışı bırakıyoruz
+            this.button4.Enabled = false; // DEK butonunu devre dışı bırakıyoruz
+            this.button6.Enabled = false;
+
+            KullanilanModul = "EA";
+
+            if (EskiKullanilanModul == null)
+            {
+                EskiKullanilanModul = "EA";
+            }
+
+            else
+            {
+                if (EskiKullanilanModul != KullanilanModul)
+                {
+                    this.panel3.Controls.Clear();
+                }
+            }
+
+            EskiKullanilanModul = "EA";
+
+            this.panel5.Controls.Clear();
+
+            // LOADING GIF EKLE
+            PictureBox loadingGif = new PictureBox();
+            loadingGif.SizeMode = PictureBoxSizeMode.Zoom;
+            //string gifPath = Path.Combine(PythonFilePath, "l1.gif");
+            loadingGif.Image = Properties.Resources.l1; // Burada gif yerine bir resim kullanıyoruz
+            loadingGif.Location = new Point(
+                (panel5.Width - loadingGif.Width) / 2,
+                (panel5.Height - loadingGif.Height) / 2
+            );
+            panel5.Controls.Add(loadingGif);
+            panel5.Refresh();
+
+            // ✨ UI thread'e nefes ver
+            await Task.Delay(1);
+            Application.DoEvents();
+
+            try
+            {
+                string EaDirectory = Path.GetDirectoryName(EAYuk_db);
+
+                if (DosyaMevcutMu(EaDirectory, EAYuk_db))
+                {
+                    string ilce = FormManager.Form2Instance.ilce;
+                    string sqlQuery = $"SELECT * FROM {ilce}";
+                    //DataTableYuk = await GetDataTableFromSQLite(veritabaniYolu, sqlQuery).ConfigureAwait(false);
+
+                    DataTableEA = await Task.Run(() =>
+                    {
+                        return GetDataTableFromSQLite(EAYuk_db, sqlQuery).Result;
+                    });
+
+                    currentDt = DataTableEA.Copy();
+
+                    if (eA == null)
+                    {
+                        eA = new EA(DataTableEA);
+                        eA.FiltrelemeYapildi += Form_FiltrelemeYapildi;
+                    }
+
+                    this.panel3.Controls.Add(eA.panel3);
+                    VeriYazdir2(DataTableEA);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Hata: " + ex.Message);
+            }
+            finally
+            {
+                // ✅ LOADING ANİMASYONUNU KALDIR
+                panel5.Controls.Remove(loadingGif);
+                loadingGif.Dispose();
+                this.button1.Enabled = true;
+                this.button4.Enabled = true;
+                this.button6.Enabled = true;
+
+            }
         }
     }
 
