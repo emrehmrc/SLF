@@ -76,7 +76,6 @@ namespace SLF
                     "DEK_KURULU_GUCU",
                     "DEK_X_KOORDINAT",
                     "DEK_Y_KOORDINAT",
-                    "DEK_TM_ADI",
                     "DEK_KURULUM_YERI",
                     "DEK_BAGLANDIGI_TRAFO_KODU",
                 }

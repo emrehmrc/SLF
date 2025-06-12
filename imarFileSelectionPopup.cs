@@ -222,10 +222,10 @@ namespace SLF
                                 completedModules = new List<string>();
                             }
 
-                            // "İmar Analizi" modülünü ekle (eğer zaten yoksa)
-                            if (!completedModules.Contains("İmar Analizi"))
+                            // "İmar Verileri" modülünü ekle (eğer zaten yoksa)
+                            if (!completedModules.Contains("İmar Verileri"))
                             {
-                                completedModules.Add("İmar Analizi");
+                                completedModules.Add("İmar Verileri");
                             }
 
                             // Saturasyon klasörünü kontrol et

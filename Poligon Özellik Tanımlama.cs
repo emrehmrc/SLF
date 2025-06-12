@@ -649,143 +649,156 @@ namespace SLF
                         {
                             excelColumn = "SANAYI_HORIZONTAL";
                         }
+                        else if (categoryUpper == "TARIMSAL_SULAMA")
+                        {
+                            excelColumn = "TARIMSAL_SULAMA_HORIZONTAL";
+                        }
                         else
                         {
                             MessageBox.Show(
-                                $"Satır {rowIndex + 1}: {categoryColumn} yalnızca 'TICARETHANE' veya 'SANAYI' olabilir. Girilen: {categoryValue}",
+                                $"Satır {rowIndex + 1}: {categoryColumn} yalnızca 'TICARETHANE', 'SANAYI' veya 'TARIMSAL_SULAMA'" +
+                                $" olabilir. Girilen: {categoryValue}",
                                 "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return false;
                         }
 
-                        // Construct the path to the Excel file
-                        string hor_ver_path = System.IO.Path.Combine(modül_formu.ana_menu_form_objesi.userRootPath,
-                            (string)modül_formu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
-                            (string)modül_formu.ana_menu_form_objesi.config.İl,
-                            (string)modül_formu.ana_menu_form_objesi.config.İlçe,
-                            (string)modül_formu.ana_menu_form_objesi.config.proje_ismi,
-                            (string)modül_formu.ana_menu_form_objesi.config.ELF.hor_ver_dosyası).Replace('/', '\\');
-
-                        if (!File.Exists(hor_ver_path))
+                        if(modül_formu.point_load_konsolidasyonu == true)
                         {
-                            MessageBox.Show($"Hata: Excel dosyası bulunamadı: {hor_ver_path}", "Dosya Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return false;
-                        }
+                            // Construct the path to the Excel file
+                            string hor_ver_path = System.IO.Path.Combine(modül_formu.ana_menu_form_objesi.userRootPath,
+                                (string)modül_formu.ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                                (string)modül_formu.ana_menu_form_objesi.config.İl,
+                                (string)modül_formu.ana_menu_form_objesi.config.İlçe,
+                                (string)modül_formu.ana_menu_form_objesi.config.proje_ismi,
+                                (string)modül_formu.ana_menu_form_objesi.config.ELF.hor_ver_dosyası).Replace('/', '\\');
 
-
-                        // Read the Excel file
-                        using (var package = new ExcelPackage(new FileInfo(hor_ver_path)))
-                        {
-                            var worksheet = package.Workbook.Worksheets[0]; // First worksheet
-                            int rowCount = worksheet.Dimension.Rows;
-                            int yearCol = 2; // "YIL" is the second column
-                            int horizontalCol = -1;
-
-                            // Find the column index for TICARETHANE_HORIZONTAL or SANAYI_HORIZONTAL
-                            for (int col = 1; col <= worksheet.Dimension.Columns; col++)
+                            if (!File.Exists(hor_ver_path))
                             {
-                                if (worksheet.Cells[1, col].Text == excelColumn)
-                                {
-                                    horizontalCol = col;
-                                    break;
-                                }
-                            }
-
-                            if (horizontalCol == -1)
-                            {
-                                MessageBox.Show($"Hata: '{excelColumn}' sütunu Excel dosyasında bulunamadı.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBox.Show($"Hata: Excel dosyası bulunamadı: {hor_ver_path}", "Dosya Hatası", 
+                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 return false;
                             }
 
-                            // Validate for years t0, t+1, and t+2
-                            for (int yearOffset = 0; yearOffset <= 2; yearOffset++)
-                            {
-                                int targetYear = energizationYear + yearOffset;
-                                double multiplier = (yearOffset == 0) ? 0.5 : 0.25;
-                                double calculatedValue = peakDemandValue / 2.5 * 8760 * multiplier;
-                                double thresholdMultiplier = 0.9; // 90%
 
-                                // Find the row for the target year
-                                double horizontalValue = 0;
-                                bool yearFound = false;
-                                for (int excelRow = 2; excelRow <= rowCount; excelRow++) // Renamed 'row' to 'excelRow'
+                            // Read the Excel file
+                            using (var package = new ExcelPackage(new FileInfo(hor_ver_path)))
+                            {
+                                var worksheet = package.Workbook.Worksheets[0]; // First worksheet
+                                int rowCount = worksheet.Dimension.Rows;
+                                int yearCol = 2; // "YIL" is the second column
+                                int horizontalCol = -1;
+
+                                // Find the column index for TICARETHANE_HORIZONTAL, SANAYI_HORIZONTAL or TARIMSAL_SULAMA_HORIZONTAL
+                                for (int col = 1; col <= worksheet.Dimension.Columns; col++)
                                 {
-                                    string yearStr = worksheet.Cells[excelRow, yearCol].Text?.Replace(",", "");
-                                    if (int.TryParse(yearStr, out int excelYear) && excelYear == targetYear)
+                                    if (worksheet.Cells[1, col].Text == excelColumn)
                                     {
-                                        string horizontalStr = worksheet.Cells[excelRow, horizontalCol].Text?.Replace(",", "");
-                                        if (double.TryParse(horizontalStr, NumberStyles.Any, CultureInfo.InvariantCulture, out horizontalValue))
-                                        {
-                                            yearFound = true;
-                                            break;
-                                        }
+                                        horizontalCol = col;
+                                        break;
                                     }
                                 }
 
-                                if (!yearFound)
+                                if (horizontalCol == -1)
                                 {
-                                    MessageBox.Show($"Hata: {targetYear} yılı Excel dosyasında bulunamadı.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    MessageBox.Show($"Hata: '{excelColumn}' sütunu Excel dosyasında bulunamadı.", "Doğrulama Hatası", 
+                                        MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     return false;
                                 }
 
-                                // Adjust horizontal value if previous polygons have modified it
-                                double adjustedHorizontalValue = horizontalValue;
-                                if (AdjustedHorizontalValues.ContainsKey(targetYear) && AdjustedHorizontalValues[targetYear].ContainsKey(categoryUpper))
+                                // Validate for years t0, t+1, and t+2
+                                for (int yearOffset = 0; yearOffset <= 2; yearOffset++)
                                 {
-                                    adjustedHorizontalValue = AdjustedHorizontalValues[targetYear][categoryUpper];
-                                }
+                                    int targetYear = energizationYear + yearOffset;
+                                    double multiplier = (yearOffset == 0) ? 0.5 : 0.25;
+                                    double calculatedValue = peakDemandValue / 2.5 * 8760 * multiplier;
+                                    double thresholdMultiplier = 0.9; // 90%
 
-                                double threshold = adjustedHorizontalValue * thresholdMultiplier;
-                                if (calculatedValue > threshold)
-                                {
-                                    MessageBox.Show(
-                                        $"Satır {rowIndex + 1}: {targetYear} yılı için {excelColumn} ELF tahmininden gelen " +
-                                        $"kWh tüketim sınırını aşıyor.\n" +
-                                        $"Hesaplanan Değer: {calculatedValue:F0} kWh," +
-                                        $" İzin Verilen Maksimum ({targetYear} verisinin ({adjustedHorizontalValue:F0})" +
-                                        $" %90'ı) = {threshold:F0} kWh",
-                                        "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                    return false;
-                                }
-                            }
-
-                            // If all validations pass, calculate and store the differences
-                            for (int yearOffset = 0; yearOffset <= 2; yearOffset++)
-                            {
-                                int targetYear = energizationYear + yearOffset;
-                                double multiplier = (yearOffset == 0) ? 0.5 : 0.25;
-                                double calculatedValue = peakDemandValue / 2.5 * 8760 * multiplier;
-
-                                // Find the original horizontal value again for difference calculation
-                                double horizontalValue = 0;
-                                for (int excelRow = 2; excelRow <= rowCount; excelRow++) // Renamed 'row' to 'excelRow'
-                                {
-                                    string yearStr = worksheet.Cells[excelRow, yearCol].Text?.Replace(",", "");
-                                    if (int.TryParse(yearStr, out int excelYear) && excelYear == targetYear)
+                                    // Find the row for the target year
+                                    double horizontalValue = 0;
+                                    bool yearFound = false;
+                                    for (int excelRow = 2; excelRow <= rowCount; excelRow++) // Renamed 'row' to 'excelRow'
                                     {
-                                        string horizontalStr = worksheet.Cells[excelRow, horizontalCol].Text?.Replace(",", "");
-                                        if (double.TryParse(horizontalStr, NumberStyles.Any, CultureInfo.InvariantCulture, out horizontalValue))
+                                        string yearStr = worksheet.Cells[excelRow, yearCol].Text?.Replace(",", "");
+                                        if (int.TryParse(yearStr, out int excelYear) && excelYear == targetYear)
                                         {
-                                            break;
+                                            string horizontalStr = worksheet.Cells[excelRow, horizontalCol].Text?.Replace(",", "");
+                                            if (double.TryParse(horizontalStr, NumberStyles.Any, CultureInfo.InvariantCulture, out horizontalValue))
+                                            {
+                                                yearFound = true;
+                                                break;
+                                            }
                                         }
+                                    }
+
+                                    if (!yearFound)
+                                    {
+                                        MessageBox.Show($"Hata: {targetYear} yılı Excel dosyasında bulunamadı.", "Doğrulama Hatası", 
+                                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        return false;
+                                    }
+
+                                    // Adjust horizontal value if previous polygons have modified it
+                                    double adjustedHorizontalValue = horizontalValue;
+                                    if (AdjustedHorizontalValues.ContainsKey(targetYear) && AdjustedHorizontalValues[targetYear].ContainsKey(categoryUpper))
+                                    {
+                                        adjustedHorizontalValue = AdjustedHorizontalValues[targetYear][categoryUpper];
+                                    }
+
+                                    double threshold = adjustedHorizontalValue * thresholdMultiplier;
+                                    if (calculatedValue > threshold)
+                                    {
+                                        MessageBox.Show(
+                                            $"Satır {rowIndex + 1}: {targetYear} yılı için {excelColumn} ELF tahmininden gelen " +
+                                            $"kWh tüketim sınırını aşıyor.\n" +
+                                            $"Hesaplanan Değer: {calculatedValue:F0} kWh," +
+                                            $" İzin Verilen Maksimum ({targetYear} verisinin ({adjustedHorizontalValue:F0})" +
+                                            $" %90'ı) = {threshold:F0} kWh",
+                                            "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        return false;
                                     }
                                 }
 
-                                // Adjust the value (subtract the calculated value)
-                                double adjustedValue = horizontalValue;
-                                if (AdjustedHorizontalValues.ContainsKey(targetYear) && AdjustedHorizontalValues[targetYear].ContainsKey(categoryUpper))
+                                // If all validations pass, calculate and store the differences
+                                for (int yearOffset = 0; yearOffset <= 2; yearOffset++)
                                 {
-                                    adjustedValue = AdjustedHorizontalValues[targetYear][categoryUpper];
-                                }
-                                adjustedValue -= calculatedValue;
+                                    int targetYear = energizationYear + yearOffset;
+                                    double multiplier = (yearOffset == 0) ? 0.5 : 0.25;
+                                    double calculatedValue = peakDemandValue / 2.5 * 8760 * multiplier;
 
-                                // Store the adjusted value in the dictionary
-                                if (!AdjustedHorizontalValues.ContainsKey(targetYear))
-                                {
-                                    AdjustedHorizontalValues[targetYear] = new Dictionary<string, double>();
+                                    // Find the original horizontal value again for difference calculation
+                                    double horizontalValue = 0;
+                                    for (int excelRow = 2; excelRow <= rowCount; excelRow++) // Renamed 'row' to 'excelRow'
+                                    {
+                                        string yearStr = worksheet.Cells[excelRow, yearCol].Text?.Replace(",", "");
+                                        if (int.TryParse(yearStr, out int excelYear) && excelYear == targetYear)
+                                        {
+                                            string horizontalStr = worksheet.Cells[excelRow, horizontalCol].Text?.Replace(",", "");
+                                            if (double.TryParse(horizontalStr, NumberStyles.Any, CultureInfo.InvariantCulture, out horizontalValue))
+                                            {
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    // Adjust the value (subtract the calculated value)
+                                    double adjustedValue = horizontalValue;
+                                    if (AdjustedHorizontalValues.ContainsKey(targetYear) && AdjustedHorizontalValues[targetYear].ContainsKey(categoryUpper))
+                                    {
+                                        adjustedValue = AdjustedHorizontalValues[targetYear][categoryUpper];
+                                    }
+                                    adjustedValue -= calculatedValue;
+
+                                    // Store the adjusted value in the dictionary
+                                    if (!AdjustedHorizontalValues.ContainsKey(targetYear))
+                                    {
+                                        AdjustedHorizontalValues[targetYear] = new Dictionary<string, double>();
+                                    }
+                                    AdjustedHorizontalValues[targetYear][categoryUpper] = adjustedValue;
                                 }
-                                AdjustedHorizontalValues[targetYear][categoryUpper] = adjustedValue;
                             }
+
                         }
+
                     }
                 }
 
