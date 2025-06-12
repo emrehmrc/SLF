@@ -13,8 +13,10 @@ namespace SLF
         static void Main()
         {
             // Set EPPlus license context
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial; 
-            
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new HomePageForm());
