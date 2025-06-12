@@ -89,7 +89,7 @@ namespace SLF.Optimal_DTR
 
         Dictionary<string, PointLatLng> cityCoordinates;
 
-        public bool ODTR_çalıştı_mı = true;
+        public bool ODTR_çalıştı_mı = false;
 
         public DTR_Arayuz()
         {
@@ -112,19 +112,9 @@ namespace SLF.Optimal_DTR
 
             //string Ana_Klasör_Yolu = Path.Combine(userRootPath, config["Ana_Klasör_Yolu"]);         
 
-            ConfigKismi(config);
+            //ConfigKismi(config);
 
-            cityCoordinates = new Dictionary<string, PointLatLng>
-                {
-                    { "İzmir", new PointLatLng(38.5, 27.0) }, // Example coordinates for İzmir
-                    { "Eskişehir", new PointLatLng(39.7768, 30.5206) },// Example coordinates for Eskişehir
-                    { "Manisa", new PointLatLng(38.6191, 27.4289) }
-
-                    // Add more cities and their coordinates as needed
-                };
-
-            InitializeMap();
-            YillariYerlestir();
+            
         }
 
         public void ConfigKismi(IConfigurationRoot config)
@@ -151,8 +141,6 @@ namespace SLF.Optimal_DTR
                 YukVeriTabanıYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["Yük_Yoğunluğu:sonuclar_db"]);
                 EAYukVeriTabanıYolu = Path.Combine(İlİlceYol, config["EA:ea_klasörü"], config["EA:cikti_dosyasi"]);
 
-                MessageBox.Show($"EAYukVeriTabanıYolu Verisi Yolu: {EAYukVeriTabanıYolu}", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
                 il = config["İl"];
                 ilce = config["İlçe"];
                 string yilStr = config["baslangıc_yılı"];
@@ -169,6 +157,18 @@ namespace SLF.Optimal_DTR
                 MessageBox.Show($"Konfigürasyon dosyası okunamadı: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
+            cityCoordinates = new Dictionary<string, PointLatLng>
+                {
+                    { "İzmir", new PointLatLng(38.5, 27.0) }, // 
+                    { "Eskişehir", new PointLatLng(39.7768, 30.5206) },// 
+                    { "Manisa", new PointLatLng(38.6191, 27.4289) }
+
+                    // Add more cities and their coordinates as needed
+                };
+
+            InitializeMap();
+            YillariYerlestir();
 
         }
 
@@ -798,14 +798,14 @@ namespace SLF.Optimal_DTR
             {
                 try
                 {
-                    ODTR_çalıştı_mı = true; // örneğin bir bool flag set etmek
 
                     await Task.Run(() => ODTRconfig());
 
                     //await PythonScriptCalistir(tuketim_path);
                     await PythonScriptCalistir(python_path, ODTRJson);
 
-                        
+                    ODTR_çalıştı_mı = true; // örneğin bir bool flag set etmek
+
                 }
 
                 catch (Exception ex)
