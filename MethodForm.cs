@@ -62,8 +62,13 @@ namespace SLF
         private void ForwardButton_Click(object sender, EventArgs e)
         {
 
-            homePageForm.config.İl = IlComboBox.SelectedItem.ToString();
-            homePageForm.config.İlçe = IlceComboBox.SelectedItem.ToString();
+            // Config dosyasını kendi sınıfında kullanmak için oku
+            string json_file = File.ReadAllText(homePageForm.config_path);
+            dynamic config = JsonConvert.DeserializeObject(json_file);
+
+
+            config.İl = IlComboBox.SelectedItem.ToString();
+            config.İlçe = IlceComboBox.SelectedItem.ToString();
 
             if (MethodComboBox.SelectedItem == null)
             {
@@ -100,8 +105,9 @@ namespace SLF
                 return;
             }
 
-            homePageForm.config.proje_ismi = PathService.CurrentWorkingFolder;
-            SaveConfigToFile();
+            config.proje_ismi = PathService.CurrentWorkingFolder;
+            string updatedJson = JsonConvert.SerializeObject(config, Newtonsoft.Json.Formatting.Indented);
+            File.WriteAllText(homePageForm.config_path, updatedJson);
 
             // Seçilen metoda göre modül formunu aç
             OpenModülFormuBasedOnSelection(selectedMethod);

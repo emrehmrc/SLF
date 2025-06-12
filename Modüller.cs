@@ -23,6 +23,7 @@ using Newtonsoft.Json;
 using SLF.Optimal_DTR;
 using SLF.RaporlamaDosyası;
 using SLF.services;
+using Newtonsoft.Json.Linq;
 
 
 namespace SLF
@@ -873,8 +874,43 @@ namespace SLF
 
         private void UpdateTabEkonometrikAccessibility()
         {
-            string requiredDataType = "Ekonometrik Yük Tahmini Verileri";
-            tab_ekonometrik.Enabled = modulescheck.Contains(requiredDataType);
+            string jsonFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                (string)ana_menu_form_objesi.config.İl,
+                (string)ana_menu_form_objesi.config.İlçe,
+                (string)ana_menu_form_objesi.config.proje_ismi,
+                "project_state.json");
+
+            // Check if the JSON file exists
+            if (File.Exists(jsonFilePath))
+            {
+                // Config dosyasını kendi sınıfında kullanmak için oku
+                string json_file = File.ReadAllText(jsonFilePath);
+                dynamic config_project_state = JsonConvert.DeserializeObject(json_file);
+
+                // Check if "Ekonometrik Yük Tahmini Verileri" is in CompletedModules
+                if (config_project_state.CompletedModules != null)
+                {
+                    bool isCompleted = false;
+                    foreach (var item in config_project_state.CompletedModules)
+                    {
+                        // Safely get the string value from JValue
+                        string moduleName = item is JValue jValue ? jValue.ToString() : item.ToString();
+                        if (moduleName == "Ekonometrik Yük Tahmini Verileri")
+                        {
+                            isCompleted = true;
+                            break;
+                        }
+                    }
+                    tab_ekonometrik.Enabled = isCompleted;
+                }
+            }
+            // Optional: Add else block if needed
+            else
+            {
+                // Handle case where file doesn't exist (e.g., disable tab or log warning)
+                tab_ekonometrik.Enabled = false;
+            }
         }
 
         private async void OpenModuleButton_Click(object sender, EventArgs e)
@@ -1367,7 +1403,7 @@ namespace SLF
         {
             ana_menu_form_objesi.config.ELF.ufuk_yılı = (int)endYearComboBox.SelectedItem - (int)startYearComboBox.SelectedItem;
             ana_menu_form_objesi.config.baslangıc_yılı = (int)startYearComboBox.SelectedItem;
-            ana_menu_form_objesi.config.bitis_yılı = (int)startYearComboBox.SelectedItem;
+            ana_menu_form_objesi.config.bitis_yılı = (int)endYearComboBox.SelectedItem;
 
             methodFormObjesi.SaveConfigToFile();
 
@@ -8353,7 +8389,7 @@ namespace SLF
                         StartInfo = new ProcessStartInfo
                         {
                             FileName = "cmd.exe",
-                            Arguments = $"/k python \"{abone_sayısı_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\" \"{tempStatusFile}\"",
+                            Arguments = $"/C python \"{abone_sayısı_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\" \"{tempStatusFile}\"",
                             RedirectStandardOutput = false,
                             RedirectStandardError = false,
                             UseShellExecute = false,
@@ -8562,6 +8598,12 @@ namespace SLF
 
         private void buton_ELF_tablo_sec_Click(object sender, EventArgs e)
         {
+
+            // Config dosyasını kendi sınıfında kullanmak için oku
+            string json_file = File.ReadAllText(ana_menu_form_objesi.config_path);
+            dynamic config = JsonConvert.DeserializeObject(json_file);
+
+
             // Show the confirmation dialog for navigating to the home page
             DialogResult result = MessageBox.Show("Şu an seçili olan sonuçlar: " +
                 ELFSonuçlarTabControls.SelectedTab.Text + ". ELF sonucu olarak bu sonuçları onaylamak istiyor musunuz?",
@@ -8569,6 +8611,7 @@ namespace SLF
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning
             );
+
 
             if (result == DialogResult.Yes)
             {
@@ -8578,23 +8621,35 @@ namespace SLF
                     switch (ELFSonuçlarTabControls.SelectedIndex + 1)
                     {
                         case 1:
-                            ana_menu_form_objesi.config.SLF.secilen_senaryo = "minimum";
+                            config.SLF.secilen_senaryo = "minimum";
                             break;
                         case 2:
-                            ana_menu_form_objesi.config.SLF.secilen_senaryo = "düşük";
+                            config.SLF.secilen_senaryo = "düşük";
                             break;
                         case 3:
-                            ana_menu_form_objesi.config.SLF.secilen_senaryo = "baz";
+                            config.SLF.secilen_senaryo = "baz";
                             break;
                         case 4:
-                            ana_menu_form_objesi.config.SLF.secilen_senaryo = "yüksek";
+                            config.SLF.secilen_senaryo = "yüksek";
                             break;
                         case 5:
-                            ana_menu_form_objesi.config.SLF.secilen_senaryo = "maksimum";
+                            config.SLF.secilen_senaryo = "maksimum";
                             break;
                     }
 
-                    methodFormObjesi.SaveConfigToFile();
+                    try
+                    {
+                        // Serialize the dynamic config object back to JSON with indentation
+                        string updatedJson = JsonConvert.SerializeObject(config, Newtonsoft.Json.Formatting.Indented);
+
+                        // Write the updated JSON back to the file
+                        File.WriteAllText(ana_menu_form_objesi.config_path, updatedJson);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Yapılandırma kaydedilirken hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
 
 
                     this.Cursor = Cursors.WaitCursor;
