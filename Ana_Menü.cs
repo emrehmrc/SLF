@@ -37,16 +37,19 @@ namespace SLF
                 @"OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\configVural.json");
 
 
-            //config_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configVural.json");
+            config_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configVural.json");
 
             string documentsYolu = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string hedefYol = Path.Combine(documentsYolu, "config.json");
 
             try
             {
-                File.Copy(config_path, hedefYol, overwrite: true);
-                
-                config_path = hedefYol; // Yeni yolu kullanmak için config_path'i güncelle
+                if(!File.Exists(hedefYol))
+                {
+                    File.Copy(config_path, hedefYol, overwrite: true);
+
+                    config_path = hedefYol; // Yeni yolu kullanmak için config_path'i güncelle
+                }
 
             }
             catch (Exception ex)
