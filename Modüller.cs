@@ -24,6 +24,8 @@ using SLF.Optimal_DTR;
 using SLF.RaporlamaDosyası;
 using SLF.services;
 using Newtonsoft.Json.Linq;
+using System.Data.SQLite;
+using Microsoft.Extensions.Configuration;
 
 
 namespace SLF
