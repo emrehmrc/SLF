@@ -3326,7 +3326,7 @@ namespace SLF
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
                     (string)ana_menu_form_objesi.config.EA.ea_klasörü,
-                    (string)ana_menu_form_objesi.config.EA.cikti_dosyasi);
+                    (string)ana_menu_form_objesi.config.EA.cikti_dosyasi_xlsx);
 
                 // Check if file exists
                 if (!File.Exists(filePath))
@@ -5114,10 +5114,9 @@ namespace SLF
                 //CheckSelections();  // Seçim durumunu kontrol et
             }
         }
-
         private void HesaplaMerkezNoktaVeEkle(DataTable dataTable)
         {
-            // Eğer "MerkezEnlem" ve "MerkezBoylam" sütunları yoksa bu sütunları ekle
+            // Add Enlem and Boylam columns if they don't exist
             if (!dataTable.Columns.Contains("Enlem"))
             {
                 dataTable.Columns.Add("Enlem", typeof(double));
@@ -5127,33 +5126,66 @@ namespace SLF
                 dataTable.Columns.Add("Boylam", typeof(double));
             }
 
-            // DataTable'daki verileri gezmek için
+            // Process rows to calculate center coordinates
             foreach (DataRow row in dataTable.Rows)
             {
-                // Koordinatları kontrol et ve null değilse işlemi yap
                 if (row["left"] != DBNull.Value &&
                     row["top"] != DBNull.Value &&
                     row["right"] != DBNull.Value &&
                     row["bottom"] != DBNull.Value)
                 {
-                    // Sol, sağ, üst, alt koordinatları double olarak al
-                    double left = Convert.ToDouble(row["left"]);
-                    double top = Convert.ToDouble(row["top"]);
-                    double right = Convert.ToDouble(row["right"]);
-                    double bottom = Convert.ToDouble(row["bottom"]);
+                    double left = SafeParseDouble(row["left"]);
+                    double top = SafeParseDouble(row["top"]);
+                    double right = SafeParseDouble(row["right"]);
+                    double bottom = SafeParseDouble(row["bottom"]);
 
-                    // Merkez koordinatları hesapla
                     double centerLat = (top + bottom) / 2;
                     double centerLng = (left + right) / 2;
 
-                    // Hesaplanan merkez enlem ve boylam değerlerini ilgili satıra ekle
                     row["Enlem"] = centerLat;
                     row["Boylam"] = centerLng;
                 }
             }
         }
+        /*        private void HesaplaMerkezNoktaVeEkle(DataTable dataTable)
+                {
+                    // Eğer "MerkezEnlem" ve "MerkezBoylam" sütunları yoksa bu sütunları ekle
+                    if (!dataTable.Columns.Contains("Enlem"))
+                    {
+                        dataTable.Columns.Add("Enlem", typeof(double));
+                    }
+                    if (!dataTable.Columns.Contains("Boylam"))
+                    {
+                        dataTable.Columns.Add("Boylam", typeof(double));
+                    }
 
+                    // DataTable'daki verileri gezmek için
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        // Koordinatları kontrol et ve null değilse işlemi yap
+                        if (row["left"] != DBNull.Value &&
+                            row["top"] != DBNull.Value &&
+                            row["right"] != DBNull.Value &&
+                            row["bottom"] != DBNull.Value)
+                        {
+                            // Sol, sağ, üst, alt koordinatları double olarak al
+                            double left = Convert.ToDouble(row["left"]);
+                            double top = Convert.ToDouble(row["top"]);
+                            double right = Convert.ToDouble(row["right"]);
+                            double bottom = Convert.ToDouble(row["bottom"]);
 
+                            // Merkez koordinatları hesapla
+                            double centerLat = (top + bottom) / 2;
+                            double centerLng = (left + right) / 2;
+
+                            // Hesaplanan merkez enlem ve boylam değerlerini ilgili satıra ekle
+                            row["Enlem"] = centerLat;
+                            row["Boylam"] = centerLng;
+                        }
+                    }
+                }
+
+        */
         // ------------------------------------------------------------------------------------------------------------ //
         // ------------------------------------------------------------------------------------------------------------ //
         // -------------------------------------------- İMAR ------------------------------------------------------------ //
