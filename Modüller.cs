@@ -3355,7 +3355,6 @@ namespace SLF
             EASimButton.Enabled = false;
             CreateReportButton2.Enabled = false; // Disable report button during simulation
 
-
             try
             {
                 string filePath = Path.Combine(ana_menu_form_objesi.userRootPath,
@@ -3363,50 +3362,103 @@ namespace SLF
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
                     (string)ana_menu_form_objesi.config.EA.ea_klasörü,
-                    (string)ana_menu_form_objesi.config.EA.cikti_dosyasi);
-                DataTable simulationData;
+                    (string)ana_menu_form_objesi.config.EA.cikti_dosyasi_xlsx);
+
+                // Check if file exists
+                if (!File.Exists(filePath))
+                {
+                    MessageBox.Show($"Dosya bulunamadı: {filePath}");
+                    return;
+                }
+
+                DataTable simulationData = null;
 
                 try
                 {
                     // Excel dosyasını aç
                     using (var package = new ExcelPackage(new FileInfo(filePath)))
                     {
-                        // Yıl seçimine göre sayfayı seç (SelectedYear değeri, sayfa indeksini temsil eder)
+                        // Check if SelectedYear is valid
+                        if (SelectedYear < 0 || SelectedYear >= package.Workbook.Worksheets.Count)
+                        {
+                            MessageBox.Show($"Geçersiz yıl seçimi. Seçilen indeks: {SelectedYear}, Mevcut sayfa sayısı: {package.Workbook.Worksheets.Count}");
+                            return;
+                        }
+
+                        // Yıl seçimine göre sayfayı seç
                         ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
+
+                        if (worksheet == null)
+                        {
+                            MessageBox.Show($"Seçilen sayfa bulunamadı. İndeks: {SelectedYear}");
+                            return;
+                        }
 
                         // Veriyi DataTable'a yükle
                         simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
 
+                        if (simulationData == null || simulationData.Rows.Count == 0)
+                        {
+                            MessageBox.Show("Yüklenecek veri bulunamadı.");
+                            return;
+                        }
                     }
+                }
+                catch (FormatException formatEx)
+                {
+                    MessageBox.Show($"Veri formatı hatası: {formatEx.Message}\n\nDetay: Sayısal değer dönüştürme işleminde hata oluştu. Excel dosyasındaki veri formatlarını kontrol edin.");
+                    return;
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
-                    return; // Hata durumunda işlemi sonlandır
+                    MessageBox.Show($"Excel dosyası yüklenirken hata: {ex.Message}");
+                    return;
                 }
 
+                // Clear existing overlays
                 gMapControl_EA.Overlays.Clear();
                 gMapControl_EA.Refresh();
 
-                HesaplaMerkezNoktaVeEkle(simulationData);
-                await HaritaUzerindeSimulasyonGosterimi(simulationData);
+                try
+                {
+                    // Calculate center point and add to map
+                    HesaplaMerkezNoktaVeEkle(simulationData);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Merkez nokta hesaplama hatası: {ex.Message}");
+                    // Continue with simulation display even if center calculation fails
+                }
 
-                MessageBox.Show("Veri başarıyla yüklendi.");
-
+                try
+                {
+                    // Display simulation on map
+                    await HaritaUzerindeSimulasyonGosterimi(simulationData);
+                    MessageBox.Show("Simülasyon başarıyla yüklendi.");
+                }
+                catch (FormatException formatEx)
+                {
+                    MessageBox.Show($"Harita görüntüleme sırasında format hatası: {formatEx.Message}\n\nBazı veriler doğru formatta olmayabilir.");
+                    // Data might still be partially loaded, so don't return here
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Harita görüntüleme hatası: {ex.Message}");
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Veri yüklenirken bir hata oluştu: {ex.Message}");
+                MessageBox.Show($"Genel hata: {ex.Message}\n\nStack Trace: {ex.StackTrace}");
             }
             finally
             {
+                // Always re-enable buttons
                 EAStationAddButton.Enabled = true;
                 EASimButton.Enabled = true;
-                CreateReportButton2.Enabled = true; // Enable the report button after simulation results are displayed
-
-
+                CreateReportButton2.Enabled = true;
             }
         }
+
 
         private async void EANewSimulationResultsButton_Click(object sender, EventArgs e)
         {

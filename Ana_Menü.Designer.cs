@@ -158,6 +158,7 @@ namespace SLF
             this.buton_hakkında.TabIndex = 11;
             this.buton_hakkında.Text = "Hakkında";
             this.buton_hakkında.UseVisualStyleBackColor = true;
+            this.buton_hakkında.Visible = false;
             this.buton_hakkında.Click += new System.EventHandler(this.buton_hakkında_Click);
             // 
             // buton_yardım
@@ -168,6 +169,7 @@ namespace SLF
             this.buton_yardım.TabIndex = 10;
             this.buton_yardım.Text = "Yardım";
             this.buton_yardım.UseVisualStyleBackColor = true;
+            this.buton_yardım.Visible = false;
             this.buton_yardım.Click += new System.EventHandler(this.buton_yardım_Click);
             // 
             // roundButton1
