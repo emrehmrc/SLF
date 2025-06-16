@@ -48,7 +48,12 @@ namespace SLF
                 {
                     File.Copy(config_path, hedefYol, overwrite: true);
 
+                }
+
+                else
+                {
                     config_path = hedefYol; // Yeni yolu kullanmak için config_path'i güncelle
+
                 }
 
             }
@@ -56,7 +61,6 @@ namespace SLF
             {
                 MessageBox.Show($"Kopyalama hatası: {ex.Message}");
             }
-
 
             if (File.Exists(config_path))
             {

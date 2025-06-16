@@ -125,7 +125,8 @@
             "Trafo Yenileme-Yaştan",
             "Trafo Yükseltme-Kapasiteden",
             "Trafo Yükseltme-Yükten",
-            "Yeni Trafo Tesis"});
+            "Yeni Trafo Tesis",
+            "Yeni Trafo Tesis EA"});
             this.checkedListBox2.Location = new System.Drawing.Point(18, 51);
             this.checkedListBox2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkedListBox2.Name = "checkedListBox2";

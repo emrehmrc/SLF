@@ -141,7 +141,7 @@ namespace SLF.RaporlamaDosyası
 
                 AlansalYukTabloAdi = config["ODTR:AlansalYukTabloAdi"];
 
-                html = Path.Combine(SonucYolu, config["ODTR:HTML"]);
+                html = Path.Combine(FormManager.Form2Instance.Arsiv, config["ODTR:HTML"]);
 
             }
 
