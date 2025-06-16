@@ -40,7 +40,13 @@ namespace SLF
             config_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configVural.json");
 
             string documentsYolu = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string hedefYol = Path.Combine(documentsYolu, "config.json");
+            string downloadsYolu = Path.Combine(
+                userRootPath,
+                "Desktop"
+            );
+
+
+            string hedefYol = Path.Combine(downloadsYolu, "config.json");
 
             try
             {
