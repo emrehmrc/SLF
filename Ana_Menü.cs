@@ -31,19 +31,12 @@ namespace SLF
 
             config_path = Path.Combine(userRootPath,
                 "MRC\\MRC - 1.1.3_T&SI\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kır" +
-                "ılımları\\Program Dosyaları\\config.json").Replace("/", "\\");
-
-            config_path = Path.Combine("C:\\Users\\vural.bayrakli\\",
-                @"OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\configVural.json");
-
-
+                "ılımları\\Program Dosyaları\\configVural.json").Replace("/", "\\");
+           
             config_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configVural.json");
 
-            string documentsYolu = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string downloadsYolu = Path.Combine(
-                userRootPath,
-                "Desktop"
-            );
+            //string documentsYolu = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string downloadsYolu = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
 
             string hedefYol = Path.Combine(downloadsYolu, "config.json");
@@ -54,13 +47,10 @@ namespace SLF
                 {
                     File.Copy(config_path, hedefYol, overwrite: true);
 
-                }
-
-                else
-                {
-                    config_path = hedefYol; // Yeni yolu kullanmak için config_path'i güncelle
 
                 }
+                
+                config_path = hedefYol; // Yeni yolu kullanmak için config_path'i güncelle
 
             }
             catch (Exception ex)

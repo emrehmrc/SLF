@@ -76,7 +76,7 @@ namespace SLF
          (string)ana_menu_form_objesi.config.İl,
          (string)ana_menu_form_objesi.config.İlçe,
          (string)ana_menu_form_objesi.config.EA.ea_klasörü,
-        (string)ana_menu_form_objesi.config.EA.cikti_dosyasi).Replace('/', '\\');
+        (string)ana_menu_form_objesi.config.EA.cikti_dosyasi_xlsx).Replace('/', '\\');
 
                 string dekExcelFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
                          (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,

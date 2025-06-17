@@ -3377,7 +3377,7 @@ namespace SLF
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
                     (string)ana_menu_form_objesi.config.EA.ea_klasörü,
-                    (string)ana_menu_form_objesi.config.EA.cikti_dosyasi);
+                    (string)ana_menu_form_objesi.config.EA.cikti_dosyasi_xlsx);
 
                 // Check if file exists
                 if (!File.Exists(filePath))
@@ -3649,7 +3649,7 @@ namespace SLF
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
                     (string)ana_menu_form_objesi.config.EA.ea_klasörü,
-                    (string)ana_menu_form_objesi.config.EA.cikti_dosyasi);
+                    (string)ana_menu_form_objesi.config.EA.cikti_dosyasi_xlsx);
 
                 // Validate input file
                 if (!File.Exists(inputFilePath))
