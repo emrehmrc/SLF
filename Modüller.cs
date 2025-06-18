@@ -3363,13 +3363,37 @@ namespace SLF
             // Refresh the map to reflect changes
             gMapControl_EA.Refresh();
         }
+        public async Task<DataTable> GetDataTableFromSQLite(string dbPath, string sqlQuery, params SQLiteParameter[] parameters)
+        {
+            DataTable dt = new DataTable();
+            string connectionString = $"Data Source={dbPath};Version=3;";
+
+            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
+            {
+                await conn.OpenAsync();
+                using (SQLiteCommand cmd = new SQLiteCommand(sqlQuery, conn))
+                {
+                    if (parameters != null && parameters.Length > 0)
+                    {
+                        cmd.Parameters.AddRange(parameters);
+                    }
+                    using (SQLiteDataAdapter adapter = new SQLiteDataAdapter(cmd))
+                    {
+                        adapter.Fill(dt);
+                    }
+                }
+            }
+
+            return dt;
+        }
+
         private async void SimulasyonSonucGoruntule_Click(object sender, EventArgs e)
         {
             // Disable the button to prevent multiple clicks while processing
             EAStationAddButton.Enabled = false;
             EASimButton.Enabled = false;
             CreateReportButton2.Enabled = false; // Disable report button during simulation
-
+            DataTable simulationData = null;
             try
             {
                 string filePath = Path.Combine(ana_menu_form_objesi.userRootPath,
@@ -3377,7 +3401,7 @@ namespace SLF
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
                     (string)ana_menu_form_objesi.config.EA.ea_klasörü,
-                    (string)ana_menu_form_objesi.config.EA.cikti_dosyasi_xlsx);
+                    (string)ana_menu_form_objesi.config.EA.cikti_dosyasi);
 
                 // Check if file exists
                 if (!File.Exists(filePath))
@@ -3385,50 +3409,35 @@ namespace SLF
                     MessageBox.Show($"Dosya bulunamadı: {filePath}");
                     return;
                 }
-
-                DataTable simulationData = null;
-
-                try
+                if (int.TryParse(comboBox_ea_yıl_secimi.SelectedItem.ToString(), out int year))
                 {
-                    // Excel dosyasını aç
-                    using (var package = new ExcelPackage(new FileInfo(filePath)))
-                    {
-                        // Check if SelectedYear is valid
-                        if (SelectedYear < 0 || SelectedYear >= package.Workbook.Worksheets.Count)
-                        {
-                            MessageBox.Show($"Geçersiz yıl seçimi. Seçilen indeks: {SelectedYear}, Mevcut sayfa sayısı: {package.Workbook.Worksheets.Count}");
-                            return;
-                        }
-
-                        // Yıl seçimine göre sayfayı seç
-                        ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
-
-                        if (worksheet == null)
-                        {
-                            MessageBox.Show($"Seçilen sayfa bulunamadı. İndeks: {SelectedYear}");
-                            return;
-                        }
-
-                        // Veriyi DataTable'a yükle
-                        simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
-
-                        if (simulationData == null || simulationData.Rows.Count == 0)
-                        {
-                            MessageBox.Show("Yüklenecek veri bulunamadı.");
-                            return;
-                        }
-                    }
+                    SelectedYear = year; // Yıl değerini ayarla
                 }
-                catch (FormatException formatEx)
+                else
                 {
-                    MessageBox.Show($"Veri formatı hatası: {formatEx.Message}\n\nDetay: Sayısal değer dönüştürme işleminde hata oluştu. Excel dosyasındaki veri formatlarını kontrol edin.");
-                    return;
+                    SelectedYear = 0; // Varsayılan değer
+                    MessageBox.Show("Geçersiz yıl değeri seçildi!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Excel dosyası yüklenirken hata: {ex.Message}");
-                    return;
-                }
+               // int Year = int.Parse(SelectedYear.ToString());
+                //MessageBox.Show((SelectedYear.ToString()));
+                string ilce = (string)ana_menu_form_objesi.config.İlçe;
+                string sqlQuery = $"SELECT * FROM {ilce}";
+
+                // Use await instead of Task.Run with .Result to avoid blocking
+                simulationData = await GetDataTableFromSQLite(filePath, sqlQuery);
+
+               // MessageBox.Show(simulationData.Rows.Count.ToString());
+                //MessageBox.Show($"The type of SelectedYear is: {SelectedYear.GetType().Name}", "Variable Type", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                var filteredRows = from row in simulationData.AsEnumerable()
+                                   where row.Field<long>("year") == year
+                                   select row;
+
+                simulationData = filteredRows.Any() ? filteredRows.CopyToDataTable() : simulationData.Clone();
+
+                // Filter data with safe casting for "year" column
+              
+               // MessageBox.Show(simulationData.Rows.Count.ToString());
 
                 // Clear existing overlays
                 gMapControl_EA.Overlays.Clear();
@@ -3463,7 +3472,8 @@ namespace SLF
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Genel hata: {ex.Message}\n\nStack Trace: {ex.StackTrace}");
+                MessageBox.Show($"Veri dosyası yüklenirken hata: {ex.Message}");
+                return;
             }
             finally
             {
@@ -3473,7 +3483,6 @@ namespace SLF
                 CreateReportButton2.Enabled = true;
             }
         }
-
         // Additional helper method to safely parse numeric values
         private double SafeParseDouble(object value, double defaultValue = 0.0)
         {
@@ -3817,7 +3826,22 @@ namespace SLF
             gMapControl_EA.Refresh();
         }
 
-
+        /*        private void yilSecimiMonteCarlo(object sender, EventArgs e)
+                {
+                    if (comboBox_ea_yıl_secimi.SelectedIndex != -1) // Geçerli bir seçim yapıldığında
+                    {
+                        if (int.TryParse(comboBox_ea_yıl_secimi.SelectedItem.ToString(), out int year))
+                        {
+                            SelectedYear = year; // Yıl değerini ayarla
+                        }
+                        else
+                        {
+                            SelectedYear = 0; // Varsayılan değer
+                            MessageBox.Show("Geçersiz yıl değeri seçildi!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                        // CheckSelections(); // Seçim durumunu kontrol et
+                    }
+                }*/
         // Yıl seçimi yapıldığında çağrılan metot
         private void yilSecimiMonteCarlo(object sender, EventArgs e)
         {
