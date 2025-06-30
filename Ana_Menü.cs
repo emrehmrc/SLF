@@ -49,6 +49,7 @@ namespace SLF
                 {
                     File.Copy(config_path, hedefYol, overwrite: true);
 
+
                 }
                 
                 config_path = hedefYol; // Yeni yolu kullanmak için config_path'i güncelle

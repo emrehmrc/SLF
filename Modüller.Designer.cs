@@ -945,7 +945,6 @@ namespace SLF
             // tab_ea
             // 
             this.tab_ea.Controls.Add(this.webView_EA);
-            this.tab_ea.Controls.Add(this.buton_ea_katmanlar);
             this.tab_ea.Controls.Add(this.gMapControl_EA);
             this.tab_ea.Controls.Add(this.EAStationsLegendPanel);
             this.tab_ea.Controls.Add(this.panel_ea);
@@ -1201,6 +1200,7 @@ namespace SLF
             // 
             this.GelecekSimPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
             this.GelecekSimPanel.Controls.Add(this.DCFastLegendValueLabel);
+            this.GelecekSimPanel.Controls.Add(this.buton_ea_katmanlar);
             this.GelecekSimPanel.Controls.Add(this.DCFastLegendLabel);
             this.GelecekSimPanel.Controls.Add(this.progressBar);
             this.GelecekSimPanel.Controls.Add(this.checkBox_DC_Fast);
