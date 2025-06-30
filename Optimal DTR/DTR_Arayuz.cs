@@ -35,8 +35,7 @@ namespace SLF.Optimal_DTR
     {
         CBS cbs;
 
-        public static string PythonPath;
-        public static string PythonFilePath;
+        public string PythonFilePath;
 
         public string centerX;
         public string centerY;
@@ -50,13 +49,13 @@ namespace SLF.Optimal_DTR
         GMapOverlay overlay;
 
         public string userRootPath;
-        string İlİlceYol;
-        string SonucYolu;
-        string İlYol;
+        public string İlİlceYol;
+        public string SonucYolu;
+        public string İlYol;
         string YükVeriYolu;
-        string İmarVeriYolu;
+        public string İmarVeriYolu;
         public string Arsiv;
-        string ODTRJson;
+        public string ODTRJson;
 
         DataTable trafodt;
         YearService yearService;
@@ -70,7 +69,7 @@ namespace SLF.Optimal_DTR
         private WebView2 webView;
         public Rapor_Arayuz Rapor_Arayuz;
 
-        string Dosyalar;
+        public string Dosyalar;
         string Katsayilar;
 
         string YukTabloAdi;
@@ -89,7 +88,7 @@ namespace SLF.Optimal_DTR
 
         Dictionary<string, PointLatLng> cityCoordinates;
 
-        public bool ODTR_çalıştı_mı = false;
+        public bool ODTR_çalıştı_mı = true;
 
         public DTR_Arayuz()
         {
@@ -964,9 +963,13 @@ namespace SLF.Optimal_DTR
             {
                 if(trafo_path != null)
                 {
-                    trafo_path = Path.Combine(SonucYolu, trafo_path);
-                    trafodt = ImportExcelFile(trafo_path);
-                    veriSeçildi_mi = true; // Veri seçildi mi kontrolü için flag
+                    using (new WaitCursor())
+                    {
+                        trafo_path = Path.Combine(SonucYolu, trafo_path);
+                        trafodt = ImportExcelFile(trafo_path);
+                        veriSeçildi_mi = true; // Veri seçildi mi kontrolü için flag
+                    }
+                  
                 }
                 
                 else
@@ -1127,6 +1130,23 @@ namespace SLF.Optimal_DTR
         }
     }
 
+    public class WaitCursor : IDisposable
+    {
+        private Cursor _previous;
+
+        public WaitCursor()
+        {
+            _previous = Cursor.Current;
+            Cursor.Current = Cursors.WaitCursor;
+        }
+
+        public void Dispose()
+        {
+            Cursor.Current = _previous;
+        }
+    }
+
+
     public class Form2 : Form
     {
         private string _excelPath;
@@ -1167,7 +1187,7 @@ namespace SLF.Optimal_DTR
             {
                 ColumnCount = 6,
                 AutoSize = true,
-                Padding = new Padding(10),
+                Padding = new Padding(5),
             };
 
             _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10));

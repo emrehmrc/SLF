@@ -37,16 +37,11 @@ namespace SLF
                 @"OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\configVural.json");
 
 
-            config_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configVural.json");
+            //config_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configVural.json");
 
-            string documentsYolu = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string downloadsYolu = Path.Combine(
-                userRootPath,
-                "Desktop"
-            );
-
-
-            string hedefYol = Path.Combine(downloadsYolu, "config.json");
+            string desktopYolu = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            
+            string hedefYol = Path.Combine(desktopYolu, "config.json");
 
             try
             {
@@ -55,13 +50,9 @@ namespace SLF
                     File.Copy(config_path, hedefYol, overwrite: true);
 
                 }
-
-                else
-                {
-                    config_path = hedefYol; // Yeni yolu kullanmak için config_path'i güncelle
-
-                }
-
+                
+                config_path = hedefYol; // Yeni yolu kullanmak için config_path'i güncelle
+               
             }
             catch (Exception ex)
             {

@@ -257,8 +257,9 @@ namespace SLF
                 {
                     var row = currentDataTable.Rows[i];
                     var value1 = row["TRAFO_KODU"]?.ToString() ?? string.Empty;
-                    var value2 = row["TRAFO_X_KOORDINAT"]?.ToString() ?? string.Empty;
-                    var value3 = row["TRAFO_Y_KOORDINAT"]?.ToString() ?? string.Empty;
+                    var value2 = Convert.ToDouble(row["TRAFO_X_KOORDINAT"]).ToString(CultureInfo.InvariantCulture);
+                    var value3 = Convert.ToDouble(row["TRAFO_Y_KOORDINAT"]).ToString(CultureInfo.InvariantCulture);
+
                     var compositeKey = $"{value1}|{value2}|{value3}";
 
                     // Check for NULL or empty TRAFO_KODU

@@ -120,18 +120,24 @@ namespace SLF.RaporlamaDosyası
                 //string Ana_Klasör_Yolu = config["Ana_Klasör_Yolu_vural"];
 
                 İlYol = Path.Combine(Ana_Klasör_Yolu, config["İl"]);
+                İlYol = FormManager.Form2Instance.İlYol;
 
                 İlİlceYol = Path.Combine(Ana_Klasör_Yolu, config["İl"], config["İlçe"]);
+                İlİlceYol = FormManager.Form2Instance.İlİlceYol;
 
                 SonucYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:Sonuçlar_klasör"]);
+                SonucYolu = FormManager.Form2Instance.SonucYolu;
 
                 PythonFilePath = Path.Combine(Ana_Klasör_Yolu, config["program_dosyaları_path"], config["ODTR:PYTHON_klasör"]);
+                PythonFilePath = FormManager.Form2Instance.PythonFilePath;  
 
-                YükVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Yük_klasör"]);
+                //YükVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Yük_klasör"]);
 
-                İmarVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Trafo_klasör"]);              
+                //İmarVeriYolu = Path.Combine(İlİlceYol, config["proje_ismi"], config["ODTR:INPUT_Trafo_klasör"]);
+                İmarVeriYolu = FormManager.Form2Instance.İmarVeriYolu;
 
-                Dosyalar = Path.Combine(PythonFilePath, config["ODTR:Dosyalar"]);
+                //Dosyalar = Path.Combine(PythonFilePath, config["ODTR:Dosyalar"]);
+                Dosyalar = FormManager.Form2Instance.Dosyalar;
 
                 veriTabaniAdi = Path.Combine(Dosyalar, config["ODTR:veriTabaniAdi"]);
 
@@ -566,13 +572,20 @@ namespace SLF.RaporlamaDosyası
                     string ilce = FormManager.Form2Instance.ilce;
                     string sqlQuery = $"SELECT * FROM {ilce}";
                     //DataTableYuk = await GetDataTableFromSQLite(veritabaniYolu, sqlQuery).ConfigureAwait(false);
-
+                    
                     DataTableYuk = await Task.Run(() =>
                     {
                         return GetDataTableFromSQLite(Yuk_db, sqlQuery).Result;
                     });
+                    
 
-                    currentDt = DataTableYuk.Copy();
+                    int ilkyil = int.Parse(FormManager.Form2Instance.İlkYıl);
+
+                    var filteredRows = from row in DataTableYuk.AsEnumerable()
+                                       where row.Field<long>("year") == ilkyil
+                                       select row;
+
+                    currentDt = filteredRows.Any() ? filteredRows.CopyToDataTable() : DataTableYuk.Clone();
 
                     if (yuk == null)
                     {
@@ -581,7 +594,7 @@ namespace SLF.RaporlamaDosyası
                     }
 
                     this.panel3.Controls.Add(yuk.panel3);
-                    VeriYazdir2(DataTableYuk);
+                    VeriYazdir2(currentDt);
                 }
             }
             catch (Exception ex)
@@ -1446,7 +1459,13 @@ namespace SLF.RaporlamaDosyası
                         return GetDataTableFromSQLite(EAYuk_db, sqlQuery).Result;
                     });
 
-                    currentDt = DataTableEA.Copy();
+                    int ilkyil = int.Parse(FormManager.Form2Instance.İlkYıl);
+
+                    var filteredRows = from row in DataTableEA.AsEnumerable()
+                                       where row.Field<long>("year") == ilkyil
+                                       select row;
+
+                    currentDt = filteredRows.Any() ? filteredRows.CopyToDataTable() : DataTableEA.Clone();
 
                     if (eA == null)
                     {

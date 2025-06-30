@@ -213,6 +213,8 @@ namespace SLF
             InitializeComponent();
             SetupLayout();
 
+            
+
             imar_legendPanel = new Panel
             {
                 Visible = false,
@@ -778,7 +780,7 @@ namespace SLF
             {"Yeni Projelendirilmiş DTR Verileri", new YeniProjelendirilmisDTR()},
         };
 
-        private void SelectFolderButton_Click(object sender, EventArgs e)
+        private async void SelectFolderButton_Click(object sender, EventArgs e)
         {
             // Handle file loading logic for the "Girdi" module
             if (slfStartYear == 0 || slfEndYear == 0)
@@ -840,7 +842,10 @@ namespace SLF
 
 
             // Call VEERProcess with skipPrerequisites flag
-            isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
+            using (new WaitCursor())
+            {
+                isImported = await girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
+            }         
 
             // Set the DataSource for dataGridView_girdi
             if (GirdiModülü.dataTablesByType.ContainsKey(seçilenVeriTipi))
@@ -854,6 +859,7 @@ namespace SLF
                     // Update label_data_count with the row 
                     label_data_count.Text = $"(Satır Sayısı: {GirdiModülü.dataTablesByType[seçilenVeriTipi].Rows.Count})";
                     label_data_count.Visible = true;
+                    MessageBox.Show("Veer process bitti.");
                 }
             }
             else
@@ -1296,18 +1302,20 @@ namespace SLF
             // Disable the endYearComboBox initially
             startYearComboBox.Enabled = true;
             endYearComboBox.Enabled = false;
-            yearApproveButton.Enabled = false;
+            yearApproveButton.Enabled = true;
             // veri_listesi_seçimi.Enabled = false;
         }
 
         private void startYearComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            
             if (startYearComboBox.SelectedIndex == -1)
             {
                 return;
             }
             // Get the selected year
-            int selectedYear = (int)startYearComboBox.SelectedItem;
+            //int selectedYear = (int)startYearComboBox.SelectedItem;
+            int selectedYear = 2024;
 
 
             // Enable the endYearComboBox
@@ -1327,7 +1335,8 @@ namespace SLF
         }
 
         private void endYearComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
+        {            
+
             yearApproveButton.Enabled = true;
         }
 
@@ -1405,10 +1414,12 @@ namespace SLF
 
         private void yearApproveButton_Click(object sender, EventArgs e)
         {
+
             ana_menu_form_objesi.config.ELF.ufuk_yılı = (int)endYearComboBox.SelectedItem - (int)startYearComboBox.SelectedItem;
             ana_menu_form_objesi.config.baslangıc_yılı = (int)startYearComboBox.SelectedItem;
             ana_menu_form_objesi.config.bitis_yılı = (int)endYearComboBox.SelectedItem;
 
+ 
             methodFormObjesi.SaveConfigToFile();
 
             if (endYearComboBox.SelectedIndex == -1)
@@ -8599,7 +8610,7 @@ namespace SLF
                         StartInfo = new ProcessStartInfo
                         {
                             FileName = "cmd.exe",
-                            Arguments = $"/C python \"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
+                            Arguments = $"python.exe \"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
                             RedirectStandardOutput = false,
                             RedirectStandardError = false,
                             UseShellExecute = false,

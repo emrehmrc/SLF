@@ -6,6 +6,8 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using SLF.Services;
+using System.Threading.Tasks;
+using System.Globalization;
 
 namespace SLF
 {
@@ -346,5 +348,129 @@ namespace SLF
 
             return dataTable;
         }
+
+        public DataTable ImportExcelFileAsync(string filePath, string seçilenVeriTipi)
+        {
+            DataTable dataTable = new DataTable();
+
+            try
+            {
+                using (var package = new ExcelPackage(new FileInfo(filePath)))
+                {
+                    var worksheet = package.Workbook.Worksheets[0];
+                    ValidateColumnHeaders(worksheet, seçilenVeriTipi);
+
+                    int rowCount = worksheet.Dimension?.Rows ?? 0;
+                    int colCount = worksheet.Dimension?.Columns ?? 0;
+                    if (rowCount < 2 || colCount < 1)
+                        throw new Exception("Excel dosyasında veri veya sütun başlığı bulunamadı.");
+
+                    // Sütunları oluştur
+                    for (int col = 1; col <= colCount; col++)
+                    {
+                        string columnName = worksheet.Cells[1, col].Text?.Trim() ?? $"Column{col}";
+                        Type columnType = (columnName == "ABONE_X_KOORDINAT"
+                                        || columnName == "ABONE_Y_KOORDINAT"
+                                        || columnName == "TRAFO_X_KOORDINAT"
+                                        || columnName == "TRAFO_Y_KOORDINAT")
+                                        ? typeof(double)
+                                        : typeof(string);
+
+                        dataTable.Columns.Add(new DataColumn
+                        {
+                            ColumnName = columnName,
+                            DataType = columnType,
+                            AllowDBNull = true
+                        });
+                    }
+
+                    int rowsAdded = 0;
+
+                    for (int row = 2; row <= rowCount; row++)
+                    {
+                        var dataRow = dataTable.NewRow();
+                        bool rowHasData = false;
+
+                        for (int col = 1; col <= colCount; col++)
+                        {
+                            var cell = worksheet.Cells[row, col];
+                            object rawValue = cell.Value;
+                            string textValue = cell.Text?.Trim() ?? "";
+
+                            var column = dataTable.Columns[col - 1];
+
+                            // 1. Null ya da hata hücresi mi?
+                            if (rawValue == null || rawValue is ExcelErrorValue)
+                            {
+                                dataRow[col - 1] = DBNull.Value;
+                                continue;
+                            }
+
+                            // 2. Double sütunlar
+                            if (column.DataType == typeof(double))
+                            {
+                                // ✅ Clean number: remove thousands (.) and convert comma to dot
+                                string cleaned = textValue.Replace(".", "").Replace(',', '.');
+
+                                if (double.TryParse(cleaned, NumberStyles.Float, CultureInfo.InvariantCulture, out double parsedValue))
+                                {
+                                    double finalValue = Math.Round(parsedValue, 6);
+                                    dataRow[col - 1] = finalValue;
+                                    rowHasData = true;
+
+                                    Console.WriteLine($"Row {row}, Col {col}: Raw = '{textValue}', Cleaned = '{cleaned}', Parsed = {finalValue}");
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Row {row}, Col {col}: Could not parse → Raw = '{textValue}', Cleaned = '{cleaned}'");
+                                    dataRow[col - 1] = DBNull.Value;
+                                }
+
+                            }
+
+                            // 3. String sütunlar
+                            else
+                            {
+                                if (string.IsNullOrEmpty(textValue) ||
+                                    textValue.Equals("#N/A", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    dataRow[col - 1] = DBNull.Value;
+                                }
+                                else
+                                {
+                                    dataRow[col - 1] = textValue;
+                                    rowHasData = true;
+                                }
+                            }
+                        }
+
+                        if (rowHasData)
+                        {
+                            dataTable.Rows.Add(dataRow);
+                            rowsAdded++;
+                        }
+                    }
+
+                    System.Diagnostics.Debug.WriteLine(
+                        $"Imported {rowsAdded} rows into DataTable with {dataTable.Columns.Count} columns.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Excel dosyasını okurken hata oluştu!!\n\n{ex.Message}",
+                    "Hata",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return new DataTable();
+            }
+
+            return dataTable;
+        }
+
+
+
+
+
     }
 }

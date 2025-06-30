@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 using SLF.Services;
 
 namespace SLF.services
@@ -377,6 +380,7 @@ namespace SLF.services
                 string uyduVeriFilePath = null;
                 var yearService = YearService.GetInstance();
                 string year = yearService.slfStartYear.ToString();
+                
                 // Seçilen il/ilçe bilgilerini al
                 string selectedCity = PathService.SelectedCity;
                 string selectedDistrict = PathService.SelectedDistrict;
@@ -393,7 +397,7 @@ namespace SLF.services
                     string[] hucreFiles = Directory.GetFiles(hucrePath, "*.shp");
                     if (hucreFiles.Length > 0)
                     {
-                        hucreFilePath = hucreFiles[0]; // İlk bulunan SHP dosyasını kullan
+                        hucreFilePath = Path.Combine(hucrePath, $"{selectedDistrict}_grid.shp"); // İlk bulunan SHP dosyasını kullan
                         Console.WriteLine($"Hücre SHP dosyası bulundu: {hucreFilePath}");
                     }
                     else
@@ -497,7 +501,7 @@ namespace SLF.services
                 }
 
                 // Çıktı dosya yolları - DL modelindeki yaklaşıma benzer
-                string outputPrefix = $"imar_plan_{selectedCity}_{selectedDistrict}";
+                string outputPrefix = $"{selectedDistrict}";
                 string outputCsvPath = Path.Combine(imarAnaliziPath, $"{outputPrefix}.csv");
                 string outputKmlPath = Path.Combine(imarAnaliziPath, $"{outputPrefix}.kml");
                 string tempDirPath = Path.Combine(imarAnaliziPath, "temp");
@@ -617,6 +621,46 @@ namespace SLF.services
                 }
 
                 Console.WriteLine($"Çalıştırılacak komut: python {args}");
+
+                // Prepare the dictionary
+                // Prepare the dictionary
+                var argsDict = new Dictionary<string, string>
+                {
+                    { "region", selectedCity },
+                    { "district", selectedDistrict },
+                    { "kml_file", kmlFilePath },
+                    { "output_dir", imarAnaliziPath },
+                    { "output_prefix", outputPrefix },
+                    { "year", year },
+                };
+
+                // Optional entries (added only if not null or empty)
+                if (!string.IsNullOrEmpty(hucreFilePath))
+                    argsDict["hucre_data"] = hucreFilePath;
+
+                if (!string.IsNullOrEmpty(meskenFile))
+                    argsDict["mesken_file"] = meskenFile;
+
+                if (!string.IsNullOrEmpty(otherFile))
+                    argsDict["other_file"] = otherFile;
+
+                if (!string.IsNullOrEmpty(dtrModuluFilePath))
+                    argsDict["dtr_modulu"] = dtrModuluFilePath;
+
+                if (!string.IsNullOrEmpty(yeniDtrModuluFilePath))
+                    argsDict["yeni_dtr_modulu"] = yeniDtrModuluFilePath;
+
+                if (!string.IsNullOrEmpty(uyduVeriFilePath))
+                    argsDict["uydu_data"] = uyduVeriFilePath;
+
+                if (!string.IsNullOrEmpty(csvFilePath))
+                    argsDict["overpass_data"] = csvFilePath;    
+                                             
+                // JSON formatında serileştirme
+                string json = JsonConvert.SerializeObject(argsDict, Formatting.Indented);
+
+                // JSON dosyasını yazma
+                File.WriteAllText("arguments.json", json);
 
                 // Python betiğini çalıştır
                 ProcessStartInfo processInfo = new ProcessStartInfo("python")

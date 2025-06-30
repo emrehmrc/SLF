@@ -82,7 +82,7 @@
             this.gMapControl1.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl1.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl1.ShowTileGridLines = false;
-            this.gMapControl1.Size = new System.Drawing.Size(1292, 579);
+            this.gMapControl1.Size = new System.Drawing.Size(1292, 764);
             this.gMapControl1.TabIndex = 0;
             this.gMapControl1.Zoom = 2D;
             this.gMapControl1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl1_MouseMove);
@@ -99,7 +99,7 @@
             this.panel3.Location = new System.Drawing.Point(0, 0);
             this.panel3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(313, 690);
+            this.panel3.Size = new System.Drawing.Size(313, 875);
             this.panel3.TabIndex = 8;
             // 
             // panel7
@@ -109,7 +109,7 @@
             this.panel7.Location = new System.Drawing.Point(10, 532);
             this.panel7.Margin = new System.Windows.Forms.Padding(1);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(256, 200);
+            this.panel7.Size = new System.Drawing.Size(290, 245);
             this.panel7.TabIndex = 13;
             // 
             // checkedListBox2
@@ -127,11 +127,11 @@
             "Trafo Yükseltme-Yükten",
             "Yeni Trafo Tesis",
             "Yeni Trafo Tesis EA"});
-            this.checkedListBox2.Location = new System.Drawing.Point(18, 51);
+            this.checkedListBox2.Location = new System.Drawing.Point(0, 55);
             this.checkedListBox2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkedListBox2.Name = "checkedListBox2";
             this.checkedListBox2.ScrollAlwaysVisible = true;
-            this.checkedListBox2.Size = new System.Drawing.Size(188, 96);
+            this.checkedListBox2.Size = new System.Drawing.Size(269, 188);
             this.checkedListBox2.TabIndex = 2;
             this.checkedListBox2.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.checkedListBox_ItemCheck);
             // 
@@ -148,10 +148,10 @@
             // 
             this.button1.BackColor = System.Drawing.Color.ForestGreen;
             this.button1.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.button1.Location = new System.Drawing.Point(10, 738);
+            this.button1.Location = new System.Drawing.Point(10, 807);
             this.button1.Margin = new System.Windows.Forms.Padding(1);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(223, 58);
+            this.button1.Size = new System.Drawing.Size(276, 58);
             this.button1.TabIndex = 9;
             this.button1.Text = "Filtrele";
             this.button1.UseVisualStyleBackColor = false;
@@ -164,7 +164,7 @@
             this.panel4.Location = new System.Drawing.Point(10, 235);
             this.panel4.Margin = new System.Windows.Forms.Padding(1);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(256, 260);
+            this.panel4.Size = new System.Drawing.Size(290, 260);
             this.panel4.TabIndex = 8;
             // 
             // label5
@@ -193,11 +193,11 @@
             "2033",
             "2034",
             "2035"});
-            this.checkedListBox1.Location = new System.Drawing.Point(18, 36);
+            this.checkedListBox1.Location = new System.Drawing.Point(0, 47);
             this.checkedListBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkedListBox1.Name = "checkedListBox1";
             this.checkedListBox1.ScrollAlwaysVisible = true;
-            this.checkedListBox1.Size = new System.Drawing.Size(188, 188);
+            this.checkedListBox1.Size = new System.Drawing.Size(273, 211);
             this.checkedListBox1.TabIndex = 1;
             this.checkedListBox1.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.checkedListBox_ItemCheck);
             // 
@@ -210,7 +210,7 @@
             this.panel2.Location = new System.Drawing.Point(10, 36);
             this.panel2.Margin = new System.Windows.Forms.Padding(1);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(256, 162);
+            this.panel2.Size = new System.Drawing.Size(287, 162);
             this.panel2.TabIndex = 2;
             // 
             // radioButton4
@@ -291,7 +291,7 @@
             this.buton_optimalDTR_katmanlar.ContextMenuStrip = this.harita_katmanları_right_click;
             this.buton_optimalDTR_katmanlar.Cursor = System.Windows.Forms.Cursors.Default;
             this.buton_optimalDTR_katmanlar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.buton_optimalDTR_katmanlar.Location = new System.Drawing.Point(338, 591);
+            this.buton_optimalDTR_katmanlar.Location = new System.Drawing.Point(338, 776);
             this.buton_optimalDTR_katmanlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buton_optimalDTR_katmanlar.Name = "buton_optimalDTR_katmanlar";
             this.buton_optimalDTR_katmanlar.Size = new System.Drawing.Size(65, 65);
@@ -367,7 +367,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1660, 690);
+            this.ClientSize = new System.Drawing.Size(1660, 875);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.buton_optimalDTR_katmanlar);
             this.Controls.Add(this.button3);

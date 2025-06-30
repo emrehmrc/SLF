@@ -5,7 +5,10 @@ using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using DocumentFormat.OpenXml.VariantTypes;
 
 namespace SLF
 {
@@ -133,7 +136,7 @@ namespace SLF
                 }
                 else if (!validTrafos.Contains(connectedTrafo))
                 {
-                    row["BAGLANDIGI_TRAFO_KODU"] = "#N/A";
+                    //row["BAGLANDIGI_TRAFO_KODU"] = "#N/A";
                 }
             }
         }
@@ -862,15 +865,27 @@ namespace SLF
 
             foreach (DataRow row in currentDataTable.Rows)
             {
-                if (float.TryParse(row[lastYearTuketim]?.ToString(), out float tuketim) && tuketim > 0)
+                if (float.TryParse(row[lastYearTuketim]?.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out float tuketim))
                 {
-                    var baglantiGucu = row["BAGLANTI_GUCU"];
-                    if (float.TryParse(baglantiGucu?.ToString(), out float guc) && guc > 0)
+                    var baglantiGucuRaw = row["BAGLANTI_GUCU"]?.ToString()?.Trim();
+                    var rawObj = row["BAGLANTI_GUCU"];
+                    var rawStr = rawObj?.ToString();
+
+                    Console.WriteLine($"===> Satır {currentDataTable.Rows.IndexOf(row)}");
+                    Console.WriteLine($"Orijinal Value: {rawObj} ({rawObj?.GetType().Name})");
+                    Console.WriteLine($"String Hali: {rawStr}");
+                    Console.WriteLine("----------------------------------");
+                    // Türkçe kültürle güvenli parse
+                    if (float.TryParse(baglantiGucuRaw, NumberStyles.Float, new CultureInfo("tr-TR"), out float guc) && guc > 0)
                     {
                         float kapasite = (tuketim / HoursInYear) / guc;
 
-                        // Format check for kapasite
-                        if (float.IsNaN(kapasite) || float.IsInfinity(kapasite) || kapasite > 10.0f) // 1000% sanity check
+                        Console.WriteLine("*****************************************");
+                        Console.WriteLine($"Row: {currentDataTable.Rows.IndexOf(row)}, Tuketim: {tuketim}, Baglanti Gucu: {guc}, Kapasite: {kapasite}");
+                        Console.WriteLine("*****************************************");
+
+                        // Aşırı ya da geçersiz değer kontrolü
+                        if (float.IsNaN(kapasite) || float.IsInfinity(kapasite) || kapasite > 10.0f)
                         {
                             invalidKapasiteRows.Add(currentDataTable.Rows.IndexOf(row));
                             continue;
@@ -884,6 +899,7 @@ namespace SLF
                     }
                 }
             }
+
 
             // Log rows with invalid kapasite values
             if (invalidKapasiteRows.Any())
@@ -1135,16 +1151,19 @@ namespace SLF
             for (int i = 0; i < totalRows; i++)
             {
                 var row = currentDataTable.Rows[i];
-                var trafoKodu = Convert.ToString(row["BAGLANDIGI_TRAFO_KODU"]);
+                var trafoKodu = Convert.ToString(row["BAGLANDIGI_TRAFO_KODU"]);                
+                
                 // Debug: Log the value to understand what's being encountered
                 Console.WriteLine($"Row {i}: BAGLANDIGI_TRAFO_KODU = '{trafoKodu}'");
                 if (IsNullLike(trafoKodu, true) || trafoKodu == "0" || trafoKodu == "#N/A")
                 {
+                    Console.WriteLine(trafoKodu);
                     invalidCount++;
                     invalidRows.Add(i);
                 }
             }
 
+            MessageBox.Show($"{invalidCount} değeri");
             columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"] = invalidRows;
 
             float percentage = (float)invalidCount / totalRows;
@@ -1439,6 +1458,7 @@ namespace SLF
             aboneTrafoConnectivityPass = connectivityPassPercentage > 0.95;
         }
 
+
         public void DeferredImputeTrafoTuketimDemand()
         {
             var trafoDataTable = dataTablesByType["DTR Verileri"];
@@ -1466,13 +1486,38 @@ namespace SLF
                 if (aboneTrafoConnectivityPass)
                 {
                     double sumOfTrafo = 0;
-                    foreach (DataRow row in currentDataTable.Rows)
-                    {
-                        if (row["BAGLANDIGI_TRAFO_KODU"].ToString() == trafoKodu.ToString())
+                    //foreach (DataRow row in currentDataTable.Rows)
+                    //{
+                    //    if (row["BAGLANDIGI_TRAFO_KODU"].ToString() == trafoKodu.ToString())
+                    //    {
+                    //        sumOfTrafo += Convert.ToDouble(row[$"YIL_TUKETIM_{lastYear}"]);
+                    //    }
+                    //}                   
+
+                    long sumAsLong = 0;
+
+                    Parallel.ForEach(currentDataTable.AsEnumerable(),
+                        () => 0.0,
+                        (row, loopState, localSum) =>
                         {
-                            sumOfTrafo += Convert.ToDouble(row[$"YIL_TUKETIM_{lastYear}"]);
+                            if (row["BAGLANDIGI_TRAFO_KODU"].ToString() == trafoKodu.ToString())
+                            {
+                                localSum += Convert.ToDouble(row[$"YIL_TUKETIM_{lastYear}"]);
+                            }
+                            return localSum;
+                        },
+                        localSum =>
+                        {
+                            // double → long bits → atomik toplama
+                            long localBits = BitConverter.DoubleToInt64Bits(localSum);
+                            Interlocked.Add(ref sumAsLong, localBits);
                         }
-                    }
+                    );
+
+                    // Toplamı double'a çevir
+                    sumOfTrafo = BitConverter.Int64BitsToDouble(sumAsLong);
+
+
                     var aboneGrubu = missingRow["ABONE_GRUBU"].ToString();
                     var kFactorForTheGrup = K_FACTOR; // kFactorByAboneGrubu[aboneGrubu];
                     imputedValue = 1.03 * sumOfTrafo;
