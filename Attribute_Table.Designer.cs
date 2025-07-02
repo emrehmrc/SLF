@@ -36,6 +36,7 @@
             this.vektörel_attribute_table = new System.Windows.Forms.DataGridView();
             this.contextMenuStrip_tablo = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem_tablo = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem_S = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.vektörel_attribute_table)).BeginInit();
             this.contextMenuStrip_tablo.SuspendLayout();
             this.SuspendLayout();
@@ -91,16 +92,24 @@
             // 
             this.contextMenuStrip_tablo.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.contextMenuStrip_tablo.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripMenuItem_tablo});
+            this.toolStripMenuItem_tablo,
+            this.toolStripMenuItem_S});
             this.contextMenuStrip_tablo.Name = "contextMenuStrip_tablo";
-            this.contextMenuStrip_tablo.Size = new System.Drawing.Size(188, 30);
+            this.contextMenuStrip_tablo.Size = new System.Drawing.Size(190, 56);
             // 
             // toolStripMenuItem_tablo
             // 
             this.toolStripMenuItem_tablo.Image = ((System.Drawing.Image)(resources.GetObject("toolStripMenuItem_tablo.Image")));
             this.toolStripMenuItem_tablo.Name = "toolStripMenuItem_tablo";
-            this.toolStripMenuItem_tablo.Size = new System.Drawing.Size(187, 26);
+            this.toolStripMenuItem_tablo.Size = new System.Drawing.Size(189, 26);
             this.toolStripMenuItem_tablo.Text = "Haritada Göster";
+            // 
+            // toolStripMenuItem_S
+            // 
+            this.toolStripMenuItem_S.Image = ((System.Drawing.Image)(resources.GetObject("toolStripMenuItem_S.Image")));
+            this.toolStripMenuItem_S.Name = "toolStripMenuItem_S";
+            this.toolStripMenuItem_S.Size = new System.Drawing.Size(189, 26);
+            this.toolStripMenuItem_S.Text = "S Eğrisini Göster";
             // 
             // Tablo_Formu
             // 
@@ -128,5 +137,6 @@
         public System.Windows.Forms.DataGridView vektörel_attribute_table;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip_tablo;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_tablo;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_S;
     }
 }

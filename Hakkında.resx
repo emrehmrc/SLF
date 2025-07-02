@@ -117,11 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <metadata name="richTextBox1.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAEWEAAAmrCAYAAACMlaypAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAy
-        ugAAMroBVw3lAAAA/7JJREFUeF7s3QdYVMfaB3AsiSWWJKb38uXem3L7TXJzE3vsDayxJJremymk2egg
+        uQAAMrkB+rTEbQAA/7JJREFUeF7s3QdYVMfaB3AsiSWWJKb38uXem3L7TXJzE3vsDayxJJremymk2egg
         LCoqIMvSO4iwlbYsze7aEHtBRUQB6WV3z/l/z8yCMQejYCyUd57n9+xi2YPL8eycmXf+Y2PTCdpy/ev2
         hJD2YoS9u34Ef+5lGG3vt2m2fd6xUHuLxWQPgBNFsU0gWv9enanK/ljZDvvsY8H2ii3v2Tukvmy/NPXf
         F49HOi93dj7pR9j76IfZh6a/Yr8p9S/2FzT32ovKAfYm5V32DeSamTTscZB9nfJe+6LEp+wTFXb2Hyz3

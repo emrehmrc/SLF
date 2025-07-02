@@ -39,7 +39,6 @@ namespace SLF
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.buton_hakkında = new System.Windows.Forms.Button();
-            this.buton_yardım = new System.Windows.Forms.Button();
             this.roundButton1 = new System.Windows.Forms.Button();
             this.roundButton2 = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -141,7 +140,6 @@ namespace SLF
             // 
             this.panel1.BackColor = System.Drawing.Color.Moccasin;
             this.panel1.Controls.Add(this.buton_hakkında);
-            this.panel1.Controls.Add(this.buton_yardım);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
@@ -152,25 +150,13 @@ namespace SLF
             // 
             // buton_hakkında
             // 
-            this.buton_hakkında.Location = new System.Drawing.Point(1099, 30);
+            this.buton_hakkında.Location = new System.Drawing.Point(1093, 13);
             this.buton_hakkında.Name = "buton_hakkında";
-            this.buton_hakkında.Size = new System.Drawing.Size(86, 50);
+            this.buton_hakkında.Size = new System.Drawing.Size(92, 41);
             this.buton_hakkında.TabIndex = 11;
             this.buton_hakkında.Text = "Hakkında";
             this.buton_hakkında.UseVisualStyleBackColor = true;
-            this.buton_hakkında.Visible = false;
             this.buton_hakkında.Click += new System.EventHandler(this.buton_hakkında_Click);
-            // 
-            // buton_yardım
-            // 
-            this.buton_yardım.Location = new System.Drawing.Point(995, 30);
-            this.buton_yardım.Name = "buton_yardım";
-            this.buton_yardım.Size = new System.Drawing.Size(75, 50);
-            this.buton_yardım.TabIndex = 10;
-            this.buton_yardım.Text = "Yardım";
-            this.buton_yardım.UseVisualStyleBackColor = true;
-            this.buton_yardım.Visible = false;
-            this.buton_yardım.Click += new System.EventHandler(this.buton_yardım_Click);
             // 
             // roundButton1
             // 
@@ -249,7 +235,6 @@ namespace SLF
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button buton_hakkında;
-        private System.Windows.Forms.Button buton_yardım;
     }
 }
 

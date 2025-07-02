@@ -1235,42 +1235,6 @@ namespace SLF
 
         }
 
-        private void csvExportButton_Click(object sender, EventArgs e)
-        {
-            if (slfStartYear == 0 || slfEndYear == 0)
-            {
-                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            const string FilterCsvFiles = "Csv dosyaları (*.csv)|*.csv";
-            const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
-            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
-            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
-            if (dataTable.Rows.Count == 0)
-            {
-                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Csv dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            var fileDialog = new SaveFileDialog
-            {
-                Title = "Kaydedeceğiniz dosyanın adını giriniz.",
-                Filter = $"{FilterCsvFiles}|{FilterAllFiles}"
-            };
-            if (fileDialog.ShowDialog() == DialogResult.OK)
-            {
-                var filePath = fileDialog.FileName;
-                var csvHandler = new CsvHandler();
-                csvHandler.ExportCsvFile(
-                    filePath,
-                    dataTable
-                );
-            }
-            else
-            {
-                MessageBox.Show("Dosya seçilmedi.");
-            }
-        }
-
 
         private void ResetYearSelectionProcessGirdiModulu()
         {
@@ -9182,6 +9146,42 @@ namespace SLF
         {
             DatabaseListForm databaseListForm = new DatabaseListForm();
             databaseListForm.ShowDialog();
+        }
+
+        private void csvExportButton_Click(object sender, EventArgs e)
+        {
+            if (slfStartYear == 0 || slfEndYear == 0)
+            {
+                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            const string FilterCsvFiles = "Csv dosyaları (*.csv)|*.csv";
+            const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
+            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
+            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
+            if (dataTable.Rows.Count == 0)
+            {
+                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Csv dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            var fileDialog = new SaveFileDialog
+            {
+                Title = "Kaydedeceğiniz dosyanın adını giriniz.",
+                Filter = $"{FilterCsvFiles}|{FilterAllFiles}"
+            };
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var filePath = fileDialog.FileName;
+                var csvHandler = new CsvHandler();
+                csvHandler.ExportCsvFile(
+                    filePath,
+                    dataTable
+                );
+            }
+            else
+            {
+                MessageBox.Show("Dosya seçilmedi.");
+            }
         }
 
         private void TextBox_KeyPress_NumbersOnly(object sender, KeyPressEventArgs e)
