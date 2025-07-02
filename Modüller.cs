@@ -9256,6 +9256,169 @@ namespace SLF
             }
         }
 
+        private void button_proje_kaydet_Click(object sender, EventArgs e)
+        {
+            // Değişiklikler var mı kontrol et
+            bool hasChanges = false;
+
+            // Son kaydedilen modül listesi ile mevcut modül listesini karşılaştır
+            if (PathService.CurrentMode == PathService.WorkingMode.Project)
+            {
+                // Proje zaten açık, değişiklik var mı kontrol et
+                string statePath = Path.Combine(
+                    PathService.BaseDirectory,
+                    PathService.FullPath,
+                    PathService.CurrentWorkingFolder,
+                    "project_state.json");
+
+                if (File.Exists(statePath))
+                {
+                    try
+                    {
+                        string json = File.ReadAllText(statePath);
+                        var projectState = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+
+                        if (projectState.TryGetValue("CompletedModules", out object modulesObj))
+                        {
+                            string modulesJson = modulesObj.ToString();
+                            List<string> savedModules = System.Text.Json.JsonSerializer.Deserialize<List<string>>(modulesJson);
+
+                            // Mevcut modüller
+                            var currentModules = GirdiModülü.dataTablesByType.Keys.ToList();
+
+                            // Değişiklik var mı?
+                            if (currentModules.Count != savedModules.Count ||
+                                !currentModules.All(m => savedModules.Contains(m)))
+                            {
+                                hasChanges = true;
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // Hata olduğunda değişiklikler olduğunu varsay
+                        hasChanges = true;
+                    }
+                }
+                else if (GirdiModülü.dataTablesByType.Count > 0)
+                {
+                    // Hiç kayıt yoksa ama veriler varsa değişiklikler var demektir
+                    hasChanges = true;
+                }
+            }
+            else if (PathService.CurrentMode == PathService.WorkingMode.Temporary && GirdiModülü.dataTablesByType.Count > 0)
+            {
+                // Geçici moddayız ve veri var, değişiklik var demektir
+                hasChanges = true;
+            }
+
+            // Değişiklikler varsa kaydetme seçeneği sun
+            if (hasChanges)
+            {
+                DialogResult result = MessageBox.Show(
+                    "Değişiklikler Kaydedilsin mi?","",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (result == DialogResult.Cancel)
+                {
+                    return;
+                }
+                else if (result == DialogResult.Yes)
+                {
+                    // Projeyi kaydet
+                    bool saveSuccess = false;
+
+                    if (PathService.CurrentMode == PathService.WorkingMode.Project)
+                    {
+                        // Mevcut projeyi güncelle
+                        saveSuccess = UpdateExistingProject();
+                    }
+                    else
+                    {
+                        //// Geçici moddayız, yeni proje adı sor
+                        string projectName = ProjectFolderPicker.ShowNewProjectDialog(
+                            Path.Combine(PathService.BaseDirectory, PathService.FullPath));
+
+                        if (!string.IsNullOrEmpty(projectName))
+                        {
+                            // Projeyi oluştur
+                            saveSuccess = CreateAndSaveProject(projectName);
+                        }
+                        else
+                        {
+                            // Kullanıcı iptal etti veya geçersiz isim
+                            DialogResult continueResult = MessageBox.Show(
+                                "Proje kaydedilmedi",
+                                "Kaydetme İptal Edildi",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+
+                            if (continueResult == DialogResult.No)
+                            {
+                                return;
+                            }
+                        }
+
+                        ana_menu_form_objesi.config.proje_ismi = "proje_" + projectName;
+
+                        methodFormObjesi.SaveConfigToFile();
+
+                    }
+
+                    if (!saveSuccess)
+                    {
+                        // Kaydetme başarısız olduysa tekrar sor
+                        DialogResult retryResult = MessageBox.Show(
+                            "Proje kaydedilmedi",
+                            "Kaydetme Başarısız",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+
+                        if (retryResult == DialogResult.No)
+                        {
+                            return;
+                        }
+                    }
+                }
+
+
+                // Çıkış işlemine devam et
+                try
+                {
+                    // UI durumunu temizle - yeni eklenen metot
+                    ClearUserInterfaceState();
+
+                    // Global veri yapılarını temizle
+                    ClearGlobalData();
+
+                    // Geçici klasörleri temizle - tümünü temizle
+                    CleanupTemporaryFolders(true);
+
+                    // Veritabanı bağlantısını kapat
+                    try
+                    {
+                        DatabaseManager.GetInstance("").CloseConnection();
+                    }
+                    catch (Exception dbEx)
+                    {
+                        Console.WriteLine($"Veritabanı kapatılırken hata: {dbEx.Message}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Kapanış sırasında hata: " + ex.Message);
+                }
+
+            }
+            else
+            {
+                MessageBox.Show("Projeyi kaydetmeden önce lütfen herhangi bir veri yüklemesi yapınız.",
+                    "",MessageBoxButtons.OK,MessageBoxIcon.Information);
+            }
+
+        }
+
         private void TextBox_KeyPress_NumbersOnly(object sender, KeyPressEventArgs e)
         {
             // Allow digits (0-9), backspace, and control characters (e.g., Enter, Tab)
