@@ -142,7 +142,7 @@ namespace SLF
                 if (IsNullLike(demandValue))
                 {
                     nullDemandCount++;
-                    nullDemandRows.Add(rowIndex);
+                    //nullDemandRows.Add(rowIndex);
                     row[lastYearDemand] = 0; // Impute null demand to 0
                 }
                 else if (!float.TryParse(demandValue, out demand))
@@ -257,8 +257,9 @@ namespace SLF
                 {
                     var row = currentDataTable.Rows[i];
                     var value1 = row["TRAFO_KODU"]?.ToString() ?? string.Empty;
-                    var value2 = row["TRAFO_X_KOORDINAT"]?.ToString() ?? string.Empty;
-                    var value3 = row["TRAFO_Y_KOORDINAT"]?.ToString() ?? string.Empty;
+                    var value2 = Convert.ToDouble(row["TRAFO_X_KOORDINAT"]).ToString(CultureInfo.InvariantCulture);
+                    var value3 = Convert.ToDouble(row["TRAFO_Y_KOORDINAT"]).ToString(CultureInfo.InvariantCulture);
+
                     var compositeKey = $"{value1}|{value2}|{value3}";
 
                     // Check for NULL or empty TRAFO_KODU
@@ -782,7 +783,7 @@ namespace SLF
 
             // Add row indices from different columns to the combined list
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["NONUNIQUE_TRAFO_X_Y"]);
-            combinedRowsToRemoveList.AddRange(columnNullRowsMap[$"YIL_TUKETIM_{lastYear}"]);
+            //combinedRowsToRemoveList.AddRange(columnNullRowsMap[$"YIL_TUKETIM_{lastYear}"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["NULL_TRAFO_KODU"]);
 
 

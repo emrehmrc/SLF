@@ -23,9 +23,10 @@ using Newtonsoft.Json;
 using SLF.Optimal_DTR;
 using SLF.RaporlamaDosyası;
 using SLF.services;
-using System.Data.SQLite;
 using Newtonsoft.Json.Linq;
+using System.Data.SQLite;
 using Microsoft.Extensions.Configuration;
+
 
 namespace SLF
 {
@@ -211,6 +212,8 @@ namespace SLF
             // initialize the Modul Formu
             InitializeComponent();
             SetupLayout();
+
+            
 
             imar_legendPanel = new Panel
             {
@@ -777,7 +780,7 @@ namespace SLF
             {"Yeni Projelendirilmiş DTR Verileri", new YeniProjelendirilmisDTR()},
         };
 
-        private void SelectFolderButton_Click(object sender, EventArgs e)
+        private async void SelectFolderButton_Click(object sender, EventArgs e)
         {
             // Handle file loading logic for the "Girdi" module
             if (slfStartYear == 0 || slfEndYear == 0)
@@ -839,7 +842,10 @@ namespace SLF
 
 
             // Call VEERProcess with skipPrerequisites flag
-            isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
+            using (new WaitCursor())
+            {
+                isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
+            }         
 
             // Set the DataSource for dataGridView_girdi
             if (GirdiModülü.dataTablesByType.ContainsKey(seçilenVeriTipi))
@@ -853,6 +859,7 @@ namespace SLF
                     // Update label_data_count with the row 
                     label_data_count.Text = $"(Satır Sayısı: {GirdiModülü.dataTablesByType[seçilenVeriTipi].Rows.Count})";
                     label_data_count.Visible = true;
+                    MessageBox.Show("Veer process bitti.");
                 }
             }
             else
@@ -1259,18 +1266,20 @@ namespace SLF
             // Disable the endYearComboBox initially
             startYearComboBox.Enabled = true;
             endYearComboBox.Enabled = false;
-            yearApproveButton.Enabled = false;
+            yearApproveButton.Enabled = true;
             // veri_listesi_seçimi.Enabled = false;
         }
 
         private void startYearComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            
             if (startYearComboBox.SelectedIndex == -1)
             {
                 return;
             }
             // Get the selected year
-            int selectedYear = (int)startYearComboBox.SelectedItem;
+            //int selectedYear = (int)startYearComboBox.SelectedItem;
+            int selectedYear = 2024;
 
 
             // Enable the endYearComboBox
@@ -1290,7 +1299,8 @@ namespace SLF
         }
 
         private void endYearComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
+        {            
+
             yearApproveButton.Enabled = true;
         }
 
@@ -1368,10 +1378,12 @@ namespace SLF
 
         private void yearApproveButton_Click(object sender, EventArgs e)
         {
+
             ana_menu_form_objesi.config.ELF.ufuk_yılı = (int)endYearComboBox.SelectedItem - (int)startYearComboBox.SelectedItem;
             ana_menu_form_objesi.config.baslangıc_yılı = (int)startYearComboBox.SelectedItem;
             ana_menu_form_objesi.config.bitis_yılı = (int)endYearComboBox.SelectedItem;
 
+ 
             methodFormObjesi.SaveConfigToFile();
 
             if (endYearComboBox.SelectedIndex == -1)
@@ -3326,13 +3338,37 @@ namespace SLF
             // Refresh the map to reflect changes
             gMapControl_EA.Refresh();
         }
+        public async Task<DataTable> GetDataTableFromSQLite(string dbPath, string sqlQuery, params SQLiteParameter[] parameters)
+        {
+            DataTable dt = new DataTable();
+            string connectionString = $"Data Source={dbPath};Version=3;";
+
+            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
+            {
+                await conn.OpenAsync();
+                using (SQLiteCommand cmd = new SQLiteCommand(sqlQuery, conn))
+                {
+                    if (parameters != null && parameters.Length > 0)
+                    {
+                        cmd.Parameters.AddRange(parameters);
+                    }
+                    using (SQLiteDataAdapter adapter = new SQLiteDataAdapter(cmd))
+                    {
+                        adapter.Fill(dt);
+                    }
+                }
+            }
+
+            return dt;
+        }
+
         private async void SimulasyonSonucGoruntule_Click(object sender, EventArgs e)
         {
             // Disable the button to prevent multiple clicks while processing
             EAStationAddButton.Enabled = false;
             EASimButton.Enabled = false;
             CreateReportButton2.Enabled = false; // Disable report button during simulation
-
+            DataTable simulationData = null;
             try
             {
                 string filePath = Path.Combine(ana_menu_form_objesi.userRootPath,
@@ -3348,50 +3384,35 @@ namespace SLF
                     MessageBox.Show($"Dosya bulunamadı: {filePath}");
                     return;
                 }
-
-                DataTable simulationData = null;
-
-                try
+                if (int.TryParse(comboBox_ea_yıl_secimi.SelectedItem.ToString(), out int year))
                 {
-                    // Excel dosyasını aç
-                    using (var package = new ExcelPackage(new FileInfo(filePath)))
-                    {
-                        // Check if SelectedYear is valid
-                        if (SelectedYear < 0 || SelectedYear >= package.Workbook.Worksheets.Count)
-                        {
-                            MessageBox.Show($"Geçersiz yıl seçimi. Seçilen indeks: {SelectedYear}, Mevcut sayfa sayısı: {package.Workbook.Worksheets.Count}");
-                            return;
-                        }
-
-                        // Yıl seçimine göre sayfayı seç
-                        ExcelWorksheet worksheet = package.Workbook.Worksheets[SelectedYear];
-
-                        if (worksheet == null)
-                        {
-                            MessageBox.Show($"Seçilen sayfa bulunamadı. İndeks: {SelectedYear}");
-                            return;
-                        }
-
-                        // Veriyi DataTable'a yükle
-                        simulationData = excelService.LoadWorksheetIntoDataTable(worksheet);
-
-                        if (simulationData == null || simulationData.Rows.Count == 0)
-                        {
-                            MessageBox.Show("Yüklenecek veri bulunamadı.");
-                            return;
-                        }
-                    }
+                    SelectedYear = year; // Yıl değerini ayarla
                 }
-                catch (FormatException formatEx)
+                else
                 {
-                    MessageBox.Show($"Veri formatı hatası: {formatEx.Message}\n\nDetay: Sayısal değer dönüştürme işleminde hata oluştu. Excel dosyasındaki veri formatlarını kontrol edin.");
-                    return;
+                    SelectedYear = 0; // Varsayılan değer
+                    MessageBox.Show("Geçersiz yıl değeri seçildi!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Excel dosyası yüklenirken hata: {ex.Message}");
-                    return;
-                }
+               // int Year = int.Parse(SelectedYear.ToString());
+                //MessageBox.Show((SelectedYear.ToString()));
+                string ilce = (string)ana_menu_form_objesi.config.İlçe;
+                string sqlQuery = $"SELECT * FROM {ilce}";
+
+                // Use await instead of Task.Run with .Result to avoid blocking
+                simulationData = await GetDataTableFromSQLite(filePath, sqlQuery);
+
+               // MessageBox.Show(simulationData.Rows.Count.ToString());
+                //MessageBox.Show($"The type of SelectedYear is: {SelectedYear.GetType().Name}", "Variable Type", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                var filteredRows = from row in simulationData.AsEnumerable()
+                                   where row.Field<long>("year") == year
+                                   select row;
+
+                simulationData = filteredRows.Any() ? filteredRows.CopyToDataTable() : simulationData.Clone();
+
+                // Filter data with safe casting for "year" column
+              
+               // MessageBox.Show(simulationData.Rows.Count.ToString());
 
                 // Clear existing overlays
                 gMapControl_EA.Overlays.Clear();
@@ -3426,7 +3447,8 @@ namespace SLF
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Genel hata: {ex.Message}\n\nStack Trace: {ex.StackTrace}");
+                MessageBox.Show($"Veri dosyası yüklenirken hata: {ex.Message}");
+                return;
             }
             finally
             {
@@ -3436,7 +3458,6 @@ namespace SLF
                 CreateReportButton2.Enabled = true;
             }
         }
-
         // Additional helper method to safely parse numeric values
         private double SafeParseDouble(object value, double defaultValue = 0.0)
         {
@@ -3536,7 +3557,7 @@ namespace SLF
         {
             // Disable buttons to prevent interaction while processing
             EANewSimulationResultsButton.Enabled = false;
-            SimulasyonSonucGoruntule.Enabled = true;
+            SimulasyonSonucGoruntule.Enabled = false;
             
 
             try
@@ -3612,7 +3633,7 @@ namespace SLF
                     (string)ana_menu_form_objesi.config.İl,
                     (string)ana_menu_form_objesi.config.İlçe,
                     (string)ana_menu_form_objesi.config.EA.ea_klasörü,
-                    (string)ana_menu_form_objesi.config.EA.cikti_dosyasi);
+                    (string)ana_menu_form_objesi.config.EA.cikti_dosyasi_xlsx);
 
                 // Validate input file
                 if (!File.Exists(inputFilePath))
@@ -3692,6 +3713,40 @@ namespace SLF
                     (string)ana_menu_form_objesi.config.EA.program_dosyası_klasörü,
                     (string)ana_menu_form_objesi.config.EA.ea_python_dosyası);
 
+                // Validate Python script path
+                if (!File.Exists(pythonScriptPath))
+                {
+                    throw new Exception($"Python scripti bulunamadı: {pythonScriptPath}");
+                }
+
+                // Check if 'python' command is available
+                ProcessStartInfo checkPython = new ProcessStartInfo
+                {
+                    FileName = "python",
+                    Arguments = "--version",
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
+                    UseShellExecute = false,
+                    CreateNoWindow = false
+                };
+
+                try
+                {
+                    using (Process pythonCheck = Process.Start(checkPython))
+                    {
+                        pythonCheck.WaitForExit(10000); // 10-second timeout for version check
+                        if (pythonCheck.ExitCode != 0)
+                        {
+                            throw new Exception("Python komutu bulunamadı. Lütfen Python'un yüklü olduğundan ve" +
+                                " sistem ortam değişkenleri path'ine eklendiğinden emin olun.");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Python çalıştırılabilir script dosyası bulunamadı: {ex.Message}");
+                }
+
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
                     FileName = "cmd.exe",
@@ -3746,7 +3801,22 @@ namespace SLF
             gMapControl_EA.Refresh();
         }
 
-
+        /*        private void yilSecimiMonteCarlo(object sender, EventArgs e)
+                {
+                    if (comboBox_ea_yıl_secimi.SelectedIndex != -1) // Geçerli bir seçim yapıldığında
+                    {
+                        if (int.TryParse(comboBox_ea_yıl_secimi.SelectedItem.ToString(), out int year))
+                        {
+                            SelectedYear = year; // Yıl değerini ayarla
+                        }
+                        else
+                        {
+                            SelectedYear = 0; // Varsayılan değer
+                            MessageBox.Show("Geçersiz yıl değeri seçildi!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                        // CheckSelections(); // Seçim durumunu kontrol et
+                    }
+                }*/
         // Yıl seçimi yapıldığında çağrılan metot
         private void yilSecimiMonteCarlo(object sender, EventArgs e)
         {
@@ -6977,7 +7047,7 @@ namespace SLF
             }
         }
 
-        private void buton_DL_calıstır_Click(object sender, EventArgs e)
+        public void buton_DL_calıstır_Click(object sender, EventArgs e)
         {
             try
             {
@@ -8528,7 +8598,7 @@ namespace SLF
                         StartInfo = new ProcessStartInfo
                         {
                             FileName = "cmd.exe",
-                            Arguments = $"/C python \"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
+                            Arguments = $"python.exe \"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
                             RedirectStandardOutput = false,
                             RedirectStandardError = false,
                             UseShellExecute = false,
@@ -8968,6 +9038,8 @@ namespace SLF
                     await cbs.LoadKmlFile(filepath, overlay_imar, dt, gMapControl_imar);
 
                     cbs.CopyOverlayContents(overlay_imar, overlay_yuk, cbs.polygonAttributes_imar, cbs.polygonAttributes_yuk);
+                    gMapControl_yuk.Refresh();
+
                     cbs.tüm_katmanlar_array_imar[layer_index] = overlay_imar;
                     cbs.tüm_katmanlar_array_yuk[layer_index] = overlay_yuk;
 

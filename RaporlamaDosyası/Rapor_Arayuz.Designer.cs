@@ -172,7 +172,7 @@
             this.panel7.Location = new System.Drawing.Point(1133, 99);
             this.panel7.Margin = new System.Windows.Forms.Padding(1);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(186, 565);
+            this.panel7.Size = new System.Drawing.Size(167, 565);
             this.panel7.TabIndex = 4;
             this.panel7.Paint += new System.Windows.Forms.PaintEventHandler(this.panel7_Paint);
             // 
@@ -252,7 +252,7 @@
             this.ExcelDownloadButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("ExcelDownloadButton.BackgroundImage")));
             this.ExcelDownloadButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ExcelDownloadButton.ForeColor = System.Drawing.Color.Transparent;
-            this.ExcelDownloadButton.Location = new System.Drawing.Point(56, 129);
+            this.ExcelDownloadButton.Location = new System.Drawing.Point(56, 138);
             this.ExcelDownloadButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ExcelDownloadButton.Name = "ExcelDownloadButton";
             this.ExcelDownloadButton.Size = new System.Drawing.Size(48, 45);
@@ -277,7 +277,7 @@
             this.panel5.Margin = new System.Windows.Forms.Padding(20, 20, 20, 0);
             this.panel5.Name = "panel5";
             this.panel5.Padding = new System.Windows.Forms.Padding(10);
-            this.panel5.Size = new System.Drawing.Size(804, 514);
+            this.panel5.Size = new System.Drawing.Size(817, 514);
             this.panel5.TabIndex = 8;
             // 
             // panel3
@@ -288,7 +288,7 @@
             this.panel3.Location = new System.Drawing.Point(12, 0);
             this.panel3.Margin = new System.Windows.Forms.Padding(3, 3, 3, 150);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(277, 662);
+            this.panel3.Size = new System.Drawing.Size(260, 662);
             this.panel3.TabIndex = 9;
             // 
             // Rapor_Arayuz

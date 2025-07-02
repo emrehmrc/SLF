@@ -71,6 +71,7 @@ namespace SLF
                 return;
             }
 
+            
             selectedMethod = MethodComboBox.SelectedItem.ToString();
 
 

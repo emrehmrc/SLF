@@ -17,14 +17,16 @@ namespace SLF.Services
         /// <summary>
         /// Uygulama genelinde path yönetimi sağlayan servis sınıfı
         /// </summary>
-        public static string _configPythonKodPath;
-        public static string _configImarAnaliziPath;
-        public static string _configKatmanEslestirmePath;
-        public static string _configKatmanDenemePath;
-        public static string _configDeepLearningModelPath;
-        public static string _configCbs_abone;
-        public static string _configveritabanikod;
-        public static string _configKonum;
+            public static string _configPythonKodPath;
+            public static string _configImarAnaliziPath;
+            public static string _configImarAnaliziKodPath;
+            public static string dtr_bağlantısallıkPath;
+            public static string _configKatmanEslestirmePath;
+            public static string _configKatmanDenemePath;
+            public static string _configDeepLearningModelPath;
+            public static string _configCbs_abone;
+            public static string _configveritabanikod;
+            public static string _configKonum;
         // Proje klasörüne göre relatif il-ilçe kırılımı klasörü yolu
         private static string _relativeDataPath = "il_ilce_kırılımları"; // Varsayılan değer
         public static string _configSLFMainPath;
@@ -250,6 +252,24 @@ namespace SLF.Services
 
                                     // SLF Main yolunu ayarla
                                     _configSLFMainPath = slfMainFullPath;
+                                    Debug.WriteLine($"Config'den alınan SLF Main kod yolu: {_configSLFMainPath}");
+                                }
+
+                                if (config["Python Kodları"].dtr_bağlantısallık != null)
+                                {
+                                    string dtr_bağlantısallık = config["Python Kodları"].dtr_bağlantısallık.ToString();
+
+                                    // Eğer yol "/" ile başlıyorsa, başındaki "/" karakterini kaldır
+                                    if (dtr_bağlantısallık.StartsWith("/"))
+                                    {
+                                        dtr_bağlantısallık = dtr_bağlantısallık.Substring(1);
+                                    }
+
+                                    // ÖNEMLİ DEĞİŞİKLİK: İl değerini path'e dahil etme, doğrudan program dosyaları ile birleştir
+                                    string slfMainFullPath = Path.Combine(programDosyalariFullPath, dtr_bağlantısallık);                                   
+
+                                    // SLF Main yolunu ayarla
+                                    dtr_bağlantısallıkPath = slfMainFullPath;
                                     Debug.WriteLine($"Config'den alınan SLF Main kod yolu: {_configSLFMainPath}");
                                 }
                             }

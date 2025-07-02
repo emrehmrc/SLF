@@ -117,7 +117,7 @@ namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
             });
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        public void button1_Click(object sender, EventArgs e)
         {
             // Seçili yılları listeye al
             List<int> secilenYillar = new List<int>();

@@ -75,7 +75,7 @@ namespace SLF.Services
         /// </summary>
         public int LastYear
         {
-            get { return slfStartYear - 1; }
+            get { return slfStartYear; }
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace SLF.Services
         /// </summary>
         public int PenultimateYear
         {
-            get { return slfStartYear - 2; }
+            get { return slfStartYear - 1; }
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace SLF.Services
         /// </summary>
         public int HorizonYear
         {
-            get { return slfStartYear; }
+            get { return slfStartYear+1; }
         }
 
         /// <summary>

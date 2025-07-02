@@ -280,6 +280,7 @@ namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
                 { "Deplase", "deplase" },
                 { "Güç Artırımı", "güç artırımı" },
                 { "Projelendirilmiş Yeni Trafo", "projelendirilmiş yeni trafo" },
+                { "Yeni Trafo Tesis EA", "yeni trafo tesis EA" }
 
             };
 

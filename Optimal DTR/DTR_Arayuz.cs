@@ -35,8 +35,7 @@ namespace SLF.Optimal_DTR
     {
         CBS cbs;
 
-        public static string PythonPath;
-        public static string PythonFilePath;
+        public string PythonFilePath;
 
         public string centerX;
         public string centerY;
@@ -50,13 +49,13 @@ namespace SLF.Optimal_DTR
         GMapOverlay overlay;
 
         public string userRootPath;
-        string İlİlceYol;
-        string SonucYolu;
-        string İlYol;
+        public string İlİlceYol;
+        public string SonucYolu;
+        public string İlYol;
         string YükVeriYolu;
-        string İmarVeriYolu;
-        string Arsiv;
-        string ODTRJson;
+        public string İmarVeriYolu;
+        public string Arsiv;
+        public string ODTRJson;
 
         DataTable trafodt;
         YearService yearService;
@@ -70,7 +69,7 @@ namespace SLF.Optimal_DTR
         private WebView2 webView;
         public Rapor_Arayuz Rapor_Arayuz;
 
-        string Dosyalar;
+        public string Dosyalar;
         string Katsayilar;
 
         string YukTabloAdi;
@@ -89,7 +88,7 @@ namespace SLF.Optimal_DTR
 
         Dictionary<string, PointLatLng> cityCoordinates;
 
-        public bool ODTR_çalıştı_mı = false;
+        public bool ODTR_çalıştı_mı = true;
 
         public DTR_Arayuz()
         {
@@ -284,35 +283,33 @@ namespace SLF.Optimal_DTR
                 {
                     unique_x = Convert.ToDouble(trafo["Koord_x"]);
                     unique_y = Convert.ToDouble(trafo["Koord_y"]);
+
+                    // Eğer unique koordinatlar varsa, onları kullan
+                    PointLatLng konum = new PointLatLng(unique_y, unique_x);  // Unique X ve Y'yi buraya ekliyoruz
+
+                    string owner = trafo["Trafo Mülkiyeti"].ToString();
+                    GMarkerGoogleType markerType = owner == "Özel" ? GMarkerGoogleType.red_dot : GMarkerGoogleType.blue_dot;
+
+                    string tooltip = $"TrafoID: {trafo["trafo_id"]}\n" +
+                                        $"Mülkiyet: {trafo["Trafo Mülkiyeti"]}\n" +
+                                        $"İşlem Tarihi: {trafo["İşlem Tarihi"]}\n" +
+                                        $"Trafo Aksiyon: {trafo["Trafo Aksiyon"]}\n" +
+                                        $"Trafo Kapasite: {trafo["kapasite"]}";
+
+                    var marker = new GMarkerGoogle(konum, markerType)
+                    {
+                        ToolTipText = tooltip,
+                        Tag = trafo["trafo_id"]
+                    };
+
+                    overlay.Markers.Add(marker);
                 }
 
                 catch
                 {
-                    MessageBox.Show("Koordinat bilgisi bulunamadı", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-                // Unique X ve Y koordinatları (DataTable'dan alınıyor)
-
-
-                // Eğer unique koordinatlar varsa, onları kullan
-                PointLatLng konum = new PointLatLng(unique_y, unique_x);  // Unique X ve Y'yi buraya ekliyoruz
-
-                string owner = trafo["Trafo Mülkiyeti"].ToString();
-                GMarkerGoogleType markerType = owner == "Özel" ? GMarkerGoogleType.red_dot : GMarkerGoogleType.blue_dot;
-
-                string tooltip = $"TrafoID: {trafo["trafo_id"]}\n" +
-                                    $"Mülkiyet: {trafo["Trafo Mülkiyeti"]}\n" +
-                                    $"İşlem Tarihi: {trafo["İşlem Tarihi"]}\n" +
-                                    $"Trafo Aksiyon: {trafo["Trafo Aksiyon"]}\n" +
-                                    $"Trafo Kapasite: {trafo["kapasite"]}";
-
-                var marker = new GMarkerGoogle(konum, markerType)
-                {
-                    ToolTipText = tooltip,
-                    Tag = trafo["trafo_id"]
-                };
-
-                overlay.Markers.Add(marker);
+                    
+                    
+                }                              
 
             }
 
@@ -425,6 +422,9 @@ namespace SLF.Optimal_DTR
             
             form.Show();
 
+            form.BringToFront();
+            form.Activate();
+
             // Yeni bir ProgressBar oluşturuluyor
             ProgressBar progressBar1 = new ProgressBar
             {
@@ -462,16 +462,13 @@ namespace SLF.Optimal_DTR
             {
                 var startInfo = new ProcessStartInfo
                 {
-                    //FileName = $"{PythonPath}", // Python'ın yüklü olduğu path
-                    //Arguments = $"{PythonFilePath} \"{inputpath}\"",
-                    FileName = $"python", // Python'ın yüklü olduğu path
+                    FileName = $"python",
                     Arguments = $"\"{python_path}\" \"{inputpath}\"",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     CreateNoWindow = true,
-                    StandardOutputEncoding = Encoding.UTF8 // Çıktıyı UTF-8 olarak al
-
+                    StandardOutputEncoding = Encoding.UTF8
                 };
 
                 CancellationTokenSource cts = new CancellationTokenSource();
@@ -479,19 +476,15 @@ namespace SLF.Optimal_DTR
 
                 form.FormClosed += (s, e) =>
                 {
-
-
                     if (!cts.IsCancellationRequested)
                         cts.Cancel();
 
-                    this.button2.Enabled = true; // Butonu devre dışı bırakıyoruz
+                    this.button2.Enabled = true;
                 };
 
                 using (var process = new Process { StartInfo = startInfo })
                 {
                     process.Start();
-
-                    // Python script'inin çıktısını UTF-8 ile yakalıyoruz ve gerçek zamanlı olarak okuyoruz
 
                     var outputTask = Task.Run(() =>
                     {
@@ -515,7 +508,6 @@ namespace SLF.Optimal_DTR
                         }
                     }, token);
 
-                    // Hata çıktılarını asenkron olarak okuyalım
                     var errorTask = Task.Run(() =>
                     {
                         using (StreamReader reader = new StreamReader(process.StandardError.BaseStream, Encoding.UTF8))
@@ -524,12 +516,11 @@ namespace SLF.Optimal_DTR
                             {
                                 string error = reader.ReadLine();
 
-                                // Form kapanmışsa hiçbir şey yapma
                                 if (!form.IsDisposed && form.IsHandleCreated)
                                 {
                                     form.Invoke(new Action(() =>
                                     {
-                                        if (!form.IsDisposed) // Label vs. yoksa bile en azından form sağlam mı bakalım
+                                        if (!form.IsDisposed)
                                         {
                                             Console.WriteLine($"Hata: {error}");
                                         }
@@ -539,11 +530,18 @@ namespace SLF.Optimal_DTR
                         }
                     });
 
-
-                    // Python script'inin tamamlanmasını bekleyelim
-                    await Task.WhenAll(outputTask, errorTask);  // Her iki görevi de bekliyoruz
-
+                    await Task.WhenAll(outputTask, errorTask);
                     process.WaitForExit();
+
+                    // ✅ Hata kodu kontrolü eklendi
+                    if (process.ExitCode != 0)
+                    {
+                        MessageBox.Show(form, "Python scripti hata ile sonlandı. Algoritma tamamlanmadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        MessageBox.Show(form, "Algoritma başarıyla tamamlandı.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
 
                 }
 
@@ -551,11 +549,11 @@ namespace SLF.Optimal_DTR
 
             catch (Exception ex)
             {
-                Console.WriteLine("Hata: " + ex.Message);
+                MessageBox.Show($"Algoritma çalıştırılırken hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Hata gerçekleşti. Algoritma tamamlanmadı.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             form.Close();
-            MessageBox.Show("İşlem tamamlandı", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void InitializeMap()
@@ -623,9 +621,9 @@ namespace SLF.Optimal_DTR
                 { "Deplase", "deplase" },
                 { "Güç Artırımı", "güç artırımı" },
                 { "Projelendirilmiş Yeni Trafo", "projelendirilmiş yeni trafo" },
-
+                { "Yeni Trafo Tesis EA", "yeni trafo tesis EA" }, // "Yeni Trafo Tesis EA" -> "yeni trafo tesis ea"
+                
             };
-
 
             // Seçilen aksiyonu al
             List<string> secilenAksiyonlar = checkedListBox2.CheckedItems.Cast<string>().ToList();
@@ -965,9 +963,13 @@ namespace SLF.Optimal_DTR
             {
                 if(trafo_path != null)
                 {
-                    trafo_path = Path.Combine(SonucYolu, trafo_path);
-                    trafodt = ImportExcelFile(trafo_path);
-                    veriSeçildi_mi = true; // Veri seçildi mi kontrolü için flag
+                    using (new WaitCursor())
+                    {
+                        trafo_path = Path.Combine(SonucYolu, trafo_path);
+                        trafodt = ImportExcelFile(trafo_path);
+                        veriSeçildi_mi = true; // Veri seçildi mi kontrolü için flag
+                    }
+                  
                 }
                 
                 else
@@ -1128,6 +1130,23 @@ namespace SLF.Optimal_DTR
         }
     }
 
+    public class WaitCursor : IDisposable
+    {
+        private Cursor _previous;
+
+        public WaitCursor()
+        {
+            _previous = Cursor.Current;
+            Cursor.Current = Cursors.WaitCursor;
+        }
+
+        public void Dispose()
+        {
+            Cursor.Current = _previous;
+        }
+    }
+
+
     public class Form2 : Form
     {
         private string _excelPath;
@@ -1168,7 +1187,7 @@ namespace SLF.Optimal_DTR
             {
                 ColumnCount = 6,
                 AutoSize = true,
-                Padding = new Padding(10),
+                Padding = new Padding(5),
             };
 
             _layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10));

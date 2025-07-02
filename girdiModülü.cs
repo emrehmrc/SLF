@@ -705,7 +705,7 @@ namespace SLF
                 using (var fileDialog1 = new OpenFileDialog { Title = FileDialogTitle })
                 {
 
-                    if(seçilenVeriTipi == "İmar Verileri")
+                    if (seçilenVeriTipi == "İmar Verileri")
                     {
                         return;
                     }

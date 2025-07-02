@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Globalization;
+using System.IO;
+using System.Threading;
 using System.Windows.Forms;
 using OfficeOpenXml;
 
@@ -12,15 +15,32 @@ namespace SLF
         [STAThread]
         static void Main()
         {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // or LicenseContext.Commercial
+            // Inside your Program.cs -> Main()
+            CultureInfo culture = new CultureInfo("en-US");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-            // Setup global error handlers
+            var logPath = Path.Combine(Application.StartupPath, "log.txt");
+            var logWriter = new StreamWriter(logPath, append: true);
+            logWriter.AutoFlush = true;
+
+            Console.SetOut(logWriter);      // Console.WriteLine -> log.txt
+            Console.SetError(logWriter);    // Hatalar da log.txt'ye gider
+
+            Console.WriteLine("Uygulama başlatıldı: " + DateTime.Now);
+            // Set EPPlus license context
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new HomePageForm());  // or your main form
+            Application.Run(new HomePageForm());
+            //Application.Run(new ModülFormu());                  
+
+            Console.WriteLine("Uygulama kapatılıyor: " + DateTime.Now);
+            logWriter.Close(); // Uygulama kapanırken dosyayı kapat
+
 
         }
 
