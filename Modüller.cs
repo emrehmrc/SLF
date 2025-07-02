@@ -859,7 +859,6 @@ namespace SLF
                     // Update label_data_count with the row 
                     label_data_count.Text = $"(Satır Sayısı: {GirdiModülü.dataTablesByType[seçilenVeriTipi].Rows.Count})";
                     label_data_count.Visible = true;
-                    MessageBox.Show("Veer process bitti.");
                 }
             }
             else
@@ -1201,45 +1200,67 @@ namespace SLF
 
         private void ExcelDownloadButton_Click(object sender, EventArgs e)
         {
+            // Check if veri_listesi_seçimi is null or no item is selected
+            if (veri_listesi_seçimi == null || veri_listesi_seçimi.SelectedItem == null)
+            {
+                MessageBox.Show("Lütfen veri listesinden bir veri tipi seçin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Check if start and end years are set
             if (slfStartYear == 0 || slfEndYear == 0)
             {
                 MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
             const string FilterExcelFiles = "Excel dosyaları (*.xlsx)|*.xlsx";
             const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
             string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
             var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
+
+            // Check if dataTable is empty
             if (dataTable.Rows.Count == 0)
             {
                 MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Excel dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+            // Check if dataTable is too large
             else if (dataTable.Rows.Count > 50000)
             {
                 MessageBox.Show($"{seçilenVeriTipi} için veri boyutu çok büyük. CSV olarak dışa aktarmayı deneyebilirsiniz.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+
+            // Show file save dialog
             var fileDialog = new SaveFileDialog
             {
                 Title = "Kaydedeceğiniz dosyanın adını giriniz.",
                 Filter = $"{FilterExcelFiles}|{FilterAllFiles}"
             };
+
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
                 var filePath = fileDialog.FileName;
-                var excelExporter = new ExcelExporter();
-                excelExporter.ExportExcelFile(
-                    filePath,
-                    dataTable,
-                    seçilenVeriTipi
-                );
+                try
+                {
+                    var excelExporter = new ExcelExporter();
+                    excelExporter.ExportExcelFile(
+                        filePath,
+                        dataTable,
+                        seçilenVeriTipi
+                    );
+                    MessageBox.Show("Excel dosyası başarıyla kaydedildi.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Excel dosyası kaydedilirken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
             else
             {
-                MessageBox.Show("Dosya seçilmedi.");
+                MessageBox.Show("Dosya seçilmedi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
         }
 
 
@@ -9220,42 +9241,6 @@ namespace SLF
             databaseListForm.ShowDialog();
         }
 
-        private void csvExportButton_Click(object sender, EventArgs e)
-        {
-            if (slfStartYear == 0 || slfEndYear == 0)
-            {
-                MessageBox.Show("Lütfen başlangıç ve bitiş yıllarını belirleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            const string FilterCsvFiles = "Csv dosyaları (*.csv)|*.csv";
-            const string FilterAllFiles = "Tüm dosyalar (*.*)|*.*";
-            string seçilenVeriTipi = veri_listesi_seçimi.SelectedItem.ToString();
-            var dataTable = girdiModülleri[seçilenVeriTipi].importedDataTable;
-            if (dataTable.Rows.Count == 0)
-            {
-                MessageBox.Show($"{seçilenVeriTipi} henüz içeri aktarılmadığından Csv dosyası kaydedilemiyor.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            var fileDialog = new SaveFileDialog
-            {
-                Title = "Kaydedeceğiniz dosyanın adını giriniz.",
-                Filter = $"{FilterCsvFiles}|{FilterAllFiles}"
-            };
-            if (fileDialog.ShowDialog() == DialogResult.OK)
-            {
-                var filePath = fileDialog.FileName;
-                var csvHandler = new CsvHandler();
-                csvHandler.ExportCsvFile(
-                    filePath,
-                    dataTable
-                );
-            }
-            else
-            {
-                MessageBox.Show("Dosya seçilmedi.");
-            }
-        }
-
         private void button_proje_kaydet_Click(object sender, EventArgs e)
         {
             // Değişiklikler var mı kontrol et
@@ -9316,7 +9301,7 @@ namespace SLF
             if (hasChanges)
             {
                 DialogResult result = MessageBox.Show(
-                    "Değişiklikler Kaydedilsin mi?","",
+                    "Değişiklikler Kaydedilsin mi?", "",
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Question);
 
@@ -9336,7 +9321,7 @@ namespace SLF
                     }
                     else
                     {
-                        //// Geçici moddayız, yeni proje adı sor
+                        // Geçici moddayız, yeni proje adı sor
                         string projectName = ProjectFolderPicker.ShowNewProjectDialog(
                             Path.Combine(PathService.BaseDirectory, PathService.FullPath));
 
@@ -9361,9 +9346,7 @@ namespace SLF
                         }
 
                         ana_menu_form_objesi.config.proje_ismi = "proje_" + projectName;
-
                         methodFormObjesi.SaveConfigToFile();
-
                     }
 
                     if (!saveSuccess)
@@ -9382,17 +9365,16 @@ namespace SLF
                     }
                 }
 
-
                 // Çıkış işlemine devam et
-                try
+                /*try
                 {
-                    // UI durumunu temizle - yeni eklenen metot
+                    // UI durumunu temizle
                     ClearUserInterfaceState();
 
                     // Global veri yapılarını temizle
                     ClearGlobalData();
 
-                    // Geçici klasörleri temizle - tümünü temizle
+                    // Geçici klasörleri temizle
                     CleanupTemporaryFolders(true);
 
                     // Veritabanı bağlantısını kapat
@@ -9404,19 +9386,47 @@ namespace SLF
                     {
                         Console.WriteLine($"Veritabanı kapatılırken hata: {dbEx.Message}");
                     }
+
+                    // Clear the CompletedModules in project_state.json to make all ComboBox items red
+                    string statePath = Path.Combine(
+                        PathService.BaseDirectory,
+                        PathService.FullPath,
+                        PathService.CurrentWorkingFolder,
+                        "project_state.json");
+
+                    if (File.Exists(statePath))
+                    {
+                        try
+                        {
+                            var projectState = new Dictionary<string, object>
+                    {
+                        { "CompletedModules", new List<string>() } // Empty the CompletedModules list
+                    };
+                            string json = System.Text.Json.JsonSerializer.Serialize(projectState, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+                            File.WriteAllText(statePath, json);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"project_state.json güncellenirken hata: {ex.Message}");
+                        }
+                    }
+
+                    // Invalidate the ComboBox to trigger redraw with all items in red
+                    veri_listesi_seçimi.Invalidate();
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Kapanış sırasında hata: " + ex.Message);
-                }
+                }*/
 
+                MessageBox.Show("Proje başarıyla kaydedildi.!","Başarı!",MessageBoxButtons.OK, 
+                    MessageBoxIcon.Exclamation);
             }
             else
             {
                 MessageBox.Show("Projeyi kaydetmeden önce lütfen herhangi bir veri yüklemesi yapınız.",
-                    "",MessageBoxButtons.OK,MessageBoxIcon.Information);
+                    "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
         }
 
         private void TextBox_KeyPress_NumbersOnly(object sender, KeyPressEventArgs e)
