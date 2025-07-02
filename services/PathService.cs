@@ -196,6 +196,12 @@ namespace SLF.Services
                             string programDosyalariPath = config.program_dosyaları_path?.ToString() ?? "Program Dosyaları";
                             string programDosyalariFullPath = Path.Combine(fullPath, programDosyalariPath);
 
+
+                            // ÖNEMLİ DEĞİŞİKLİK: İl değerini path'e dahil etme, doğrudan program dosyaları ile birleştir
+                            dtr_bağlantısallıkPath = Path.Combine(programDosyalariFullPath,
+                                "imar\\python_kod\\imar_analizi\\dtr_bağlantısallık.py");
+
+
                             // "Python Kodları" bölümünü oku
                             if (config["Python Kodları"] != null)
                             {
@@ -255,23 +261,6 @@ namespace SLF.Services
                                     Debug.WriteLine($"Config'den alınan SLF Main kod yolu: {_configSLFMainPath}");
                                 }
 
-                                if (config["Python Kodları"].dtr_bağlantısallık != null)
-                                {
-                                    string dtr_bağlantısallık = config["Python Kodları"].dtr_bağlantısallık.ToString();
-
-                                    // Eğer yol "/" ile başlıyorsa, başındaki "/" karakterini kaldır
-                                    if (dtr_bağlantısallık.StartsWith("/"))
-                                    {
-                                        dtr_bağlantısallık = dtr_bağlantısallık.Substring(1);
-                                    }
-
-                                    // ÖNEMLİ DEĞİŞİKLİK: İl değerini path'e dahil etme, doğrudan program dosyaları ile birleştir
-                                    string slfMainFullPath = Path.Combine(programDosyalariFullPath, dtr_bağlantısallık);                                   
-
-                                    // SLF Main yolunu ayarla
-                                    dtr_bağlantısallıkPath = slfMainFullPath;
-                                    Debug.WriteLine($"Config'den alınan SLF Main kod yolu: {_configSLFMainPath}");
-                                }
                             }
                             if (config.katman_eslestirme != null)
                             {
