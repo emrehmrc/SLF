@@ -62,13 +62,8 @@ namespace SLF
         private void ForwardButton_Click(object sender, EventArgs e)
         {
 
-            // Config dosyasını kendi sınıfında kullanmak için oku
-            string json_file = File.ReadAllText(homePageForm.config_path);
-            dynamic config = JsonConvert.DeserializeObject(json_file);
-
-
-            config.İl = IlComboBox.SelectedItem.ToString();
-            config.İlçe = IlceComboBox.SelectedItem.ToString();
+            homePageForm.config.İl = IlComboBox.SelectedItem.ToString();
+            homePageForm.config.İlçe = IlceComboBox.SelectedItem.ToString();
 
             if (MethodComboBox.SelectedItem == null)
             {
@@ -95,7 +90,7 @@ namespace SLF
 
             // Var olan oturum veya proje verilerini temizle
             CleanupExistingSessionData();
-            
+
             // Sadece burada, kullanıcı onayladığında PathService'i güncelle ve klasör oluştur
             bool pathUpdated = PathService.UpdatePath(selectedCity, selectedDistrict);
 
@@ -106,9 +101,8 @@ namespace SLF
                 return;
             }
 
-            config.proje_ismi = PathService.CurrentWorkingFolder;
-            string updatedJson = JsonConvert.SerializeObject(config, Newtonsoft.Json.Formatting.Indented);
-            File.WriteAllText(homePageForm.config_path, updatedJson);
+            homePageForm.config.proje_ismi = PathService.CurrentWorkingFolder;
+            SaveConfigToFile();
 
             // Seçilen metoda göre modül formunu aç
             OpenModülFormuBasedOnSelection(selectedMethod);
@@ -212,6 +206,17 @@ namespace SLF
             this.DoubleBuffered = true;
         }
 
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            // Only trigger the ForwardButton's click event if MethodForm is the active form
+            if (keyData == Keys.Enter && this == Form.ActiveForm)
+            {
+                // Trigger ForwardButton's Click event
+                ForwardButton.PerformClick();
+                return true; // Mark the key as handled
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
 
         private void IlComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {

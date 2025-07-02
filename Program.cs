@@ -44,6 +44,7 @@ namespace SLF
 
         }
 
+        // UI Thread exceptions
         private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
             HandleException(e.Exception);
@@ -59,7 +60,8 @@ namespace SLF
             }
             else
             {
-                MessageBox.Show("Bilinmeyen Hata Gerçekleşti.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Öngörülemeyen bir hata oluştu!\nLütfen tekrar deneyiniz", 
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -67,9 +69,12 @@ namespace SLF
         private static void HandleException(Exception ex)
         {
             // Example: show a message box and continue running
-            MessageBox.Show($"Hata:\n\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Bir hata oluştu!\n Hata mesajı:\n{ex.Message}", 
+                "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             // Optionally: log the exception to a file, telemetry, etc.
         }
+
+
     }
 }

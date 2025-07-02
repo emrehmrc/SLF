@@ -11,7 +11,7 @@ namespace SLF.Services
     /// Uygulama genelinde path yönetimi sağlayan servis sınıfı
     /// </summary>
     /// 
- 
+
     public class PathService
     {
         /// <summary>
@@ -19,8 +19,6 @@ namespace SLF.Services
         /// </summary>
             public static string _configPythonKodPath;
             public static string _configImarAnaliziPath;
-            public static string _configImarAnaliziKodPath;
-            public static string dtr_bağlantısallıkPath;
             public static string _configKatmanEslestirmePath;
             public static string _configKatmanDenemePath;
             public static string _configDeepLearningModelPath;
@@ -28,31 +26,31 @@ namespace SLF.Services
             public static string _configveritabanikod;
             public static string _configKonum;
         // Proje klasörüne göre relatif il-ilçe kırılımı klasörü yolu
-            private static string _relativeDataPath = "il_ilce_kırılımları"; // Varsayılan değer
-            public static string _configSLFMainPath;
-            public static string _configDepo; // Yeni eklenen depo path'i
-                                              // Temel dizin - ilk çalıştırmada hesaplanır
-            public static string _baseDirectory;
+        private static string _relativeDataPath = "il_ilce_kırılımları"; // Varsayılan değer
+        public static string _configSLFMainPath;
+        public static string _configDepo; // Yeni eklenen depo path'i
+                                          // Temel dizin - ilk çalıştırmada hesaplanır
+        public static string _baseDirectory;
 
-            // Seçilen il
-            public static string SelectedCity { get; private set; }
+        // Seçilen il
+        public static string SelectedCity { get; private set; }
 
-            // Seçilen ilçe
-            public static string SelectedDistrict { get; private set; }
+        // Seçilen ilçe
+        public static string SelectedDistrict { get; private set; }
 
-            // Aktif çalışma klasörü (temp veya proje)
-            public static string CurrentWorkingFolder { get; private set; }
-            
-           
-            // Çalışma modu
-            public static WorkingMode CurrentMode { get; private set; } = WorkingMode.Temporary;
+        // Aktif çalışma klasörü (temp veya proje)
+        public static string CurrentWorkingFolder { get; private set; }
 
-            // Çalışma modları
-            public enum WorkingMode
-            {
-                Temporary, // Geçici çalışma klasörü
-                Project    // Kaydedilmiş proje klasörü
-            }
+
+        // Çalışma modu
+        public static WorkingMode CurrentMode { get; private set; } = WorkingMode.Temporary;
+
+        // Çalışma modları
+        public enum WorkingMode
+        {
+            Temporary, // Geçici çalışma klasörü
+            Project    // Kaydedilmiş proje klasörü
+        }
 
         public static string KatmanEslestirmePath
         {
@@ -119,7 +117,7 @@ namespace SLF.Services
                 if (File.Exists(configPath))
                 {
                     string jsonFile = File.ReadAllText(configPath);
-                     _configKonum = configPath;
+                    _configKonum = configPath;
                     dynamic config = JsonConvert.DeserializeObject(jsonFile);
 
                     // Ana_Klasör_Yolu değerini al
@@ -365,7 +363,7 @@ namespace SLF.Services
 
                                 Console.WriteLine($"Konum değeri ayarlandı: {_configKonum}");
                             }
-                            
+
                             else
                             {
                                 // Python Kodları bölümü yoksa varsayılan yapıya devam et
@@ -443,7 +441,7 @@ namespace SLF.Services
                 }
 
                 // Hala bulunamadıysa, son çare olarak tam path'i dene
-               
+
 
                 // Veri klasörü bulunamadıysa, exe dizini altında yeni bir klasör oluştur
                 if (!foundDataFolder)
@@ -476,7 +474,7 @@ namespace SLF.Services
             {    // Eğer config'den ayarlanmışsa, o yolu kullan
                 if (!string.IsNullOrEmpty(_configPythonKodPath) && Directory.Exists(_configPythonKodPath))
                 {
-                    return  _configPythonKodPath;
+                    return _configPythonKodPath;
                 }
                 try
                 {

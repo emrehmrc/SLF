@@ -33,32 +33,30 @@ namespace SLF
                 "MRC\\MRC - 1.1.3_T&SI\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kır" +
                 "ılımları\\Program Dosyaları\\config.json").Replace("/", "\\");
 
+<<<<<<<<< Temporary merge branch 1
+=========
             config_path = Path.Combine("C:\\Users\\vural.bayrakli\\",
                 @"OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\configVural.json");
-
+            
 
             //config_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configVural.json");
 
-            string desktopYolu = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            
-            string hedefYol = Path.Combine(desktopYolu, "config.json");
+            string documentsYolu = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string hedefYol = Path.Combine(documentsYolu, "config.json");
 
             try
             {
-                if(!File.Exists(hedefYol))
-                {
-                    File.Copy(config_path, hedefYol, overwrite: true);
-
-
-                }
+                File.Copy(config_path, hedefYol, overwrite: true);
                 
                 config_path = hedefYol; // Yeni yolu kullanmak için config_path'i güncelle
-               
+
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Kopyalama hatası: {ex.Message}");
             }
+
+>>>>>>>>> Temporary merge branch 2
 
             if (File.Exists(config_path))
             {
@@ -102,11 +100,6 @@ namespace SLF
             this.Hide();
         }
 
-        private void buton_yardım_Click(object sender, EventArgs e)
-        {
-            Yardım yardım = new Yardım();
-            yardım.Show();
-        }
 
         private void buton_hakkında_Click(object sender, EventArgs e)
         {

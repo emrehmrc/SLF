@@ -24,10 +24,12 @@ namespace SLF
         private Label csvFilePathLabel; // Label değişkenini ekleyin
         private Label kmlFilePathLabel; // Label değişkenini ekleyin
 
+        private HomePageForm anaMenuObjesi;
+
         public imarFileSelectionPopup(DataGridView dataGridViewGirdi)
         {
             InitializeComponent();
-
+            anaMenuObjesi = new HomePageForm();
             _dataGridViewGirdi = dataGridViewGirdi;
 
         }
@@ -78,6 +80,46 @@ namespace SLF
             this.Cursor= Cursors.Default;
         }
 
+        // Updated RunPythonScriptAsync to match your paths
+        private async Task RunPythonSEgrisiScriptAsync()
+        {
+            try
+            {
+                string pythonScriptPath = Path.Combine(anaMenuObjesi.userRootPath,
+                    (string)anaMenuObjesi.config.Ana_Klasör_Yolu,
+                    (string)anaMenuObjesi.config.program_dosyaları_path,
+                    "SLF\\S_Eğrisi_çıkarım.py");
+
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe", // Specify cmd.exe as the executable
+                    Arguments = $"/C python \"{pythonScriptPath}\" \"{anaMenuObjesi.config_path}\"", // Pass arguments correctly
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
+                    UseShellExecute = true, // Use true to show the window
+                    CreateNoWindow = false // Ensure the command window is visible
+                };
+
+                using (Process process = new Process { StartInfo = startInfo })
+                {
+                    process.Start();
+
+                    await Task.Run(() => process.WaitForExit());
+
+
+                    if (process.ExitCode != 0)
+                    {
+                        throw new Exception($"Python scripti {process.ExitCode} çıkış koduyla başarısız oldu.");
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Python kodu çalıştırma hatası: {ex.Message}");
+            }
+        }
+
         private async void OkButton_Click(object sender, EventArgs e)
         {
             try
@@ -110,6 +152,8 @@ namespace SLF
 
                     // PythonHelper.RunImarPlanModel'i çağır
                     RunImarPlanPython(KmlFilePath);
+
+                    await RunPythonSEgrisiScriptAsync();
                 }
                 else if (imarMethodSelectionComboBox.SelectedIndex == 1)
                 {
@@ -125,6 +169,8 @@ namespace SLF
 
                     // PythonHelper.RunImarPlanModel'i çağır
                     RunImarPlanPython(KmlFilePath, CsvFilePath);
+
+                    await RunPythonSEgrisiScriptAsync();
                 }
                 else
                 {

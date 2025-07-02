@@ -607,6 +607,7 @@ namespace SLF
                 });
             }
         }
+
         private void ReportDateFormatErrors()
         {
             float invalidPercentage = 0.0f;
@@ -636,6 +637,7 @@ namespace SLF
                 }
             }
         }
+
         private void ReportDuplicateRowCounts()
         {
             // HashSet to store unique rows
@@ -666,6 +668,7 @@ namespace SLF
                 });
             }
         }
+
         private void ReportDuplicateCounts()
         {
             float duplicatePercentage;
@@ -718,6 +721,7 @@ namespace SLF
                 }
             }
         }
+
         private void ReportCoordinatesOutOfLimits()
         {
             var (minXValue, maxXValue) = minMaxCheckMap["ABONE_X_KOORDINAT"];
@@ -1519,11 +1523,11 @@ namespace SLF
 
 
                     var aboneGrubu = missingRow["ABONE_GRUBU"].ToString();
-                    var kFactorForTheGrup = K_FACTOR; // kFactorByAboneGrubu[aboneGrubu];
+                    var kFactorForTheGrup = K_FACTOR; 
                     imputedValue = 1.03 * sumOfTrafo;
                     imputedDemandValue = kFactorForTheGrup * imputedValue / HoursInYear;
                 }
-                else // if (!aboneTrafoConnectivityPass)
+                else 
                 {
                     double missingX = Convert.ToDouble(missingRow["TRAFO_X_KOORDINAT"]);
                     double missingY = Convert.ToDouble(missingRow["TRAFO_Y_KOORDINAT"]);
@@ -1557,7 +1561,7 @@ namespace SLF
                         {
                             double rowDemand = Convert.ToDouble(row[demandColumn]);
                             double rowKapasite = Convert.ToDouble(row[kapasiteColumn]);
-                            //double rowTuketim = Convert.ToDouble(row[tuketimColumn]);
+                            double rowTuketim = Convert.ToDouble(row[tuketimColumn]);
 
                             double load = rowDemand / rowKapasite;
 
