@@ -84,6 +84,7 @@ namespace SLF
         // Updated RunPythonScriptAsync to match your paths
         private async Task RunPythonSEgrisiScriptAsync()
         {
+
             try
             {
                 string pythonScriptPath = Path.Combine(anaMenuObjesi.userRootPath,
