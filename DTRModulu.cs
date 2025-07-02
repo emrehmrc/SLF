@@ -205,9 +205,9 @@ namespace SLF
             var invalidRows = nullDemandRows.Concat(nonNumericDemandRows).Concat(zeroNegativeDemandRows)
                                             .Concat(nullKapasiteRows).Concat(nonNumericKapasiteRows)
                                             .Concat(zeroNegativeKapasiteRows).Concat(overLoadRows).ToList();
-            columnNullRowsMap["TRAFO_LOAD"] = invalidRows; // Store invalid rows for reference
+            //columnNullRowsMap["TRAFO_LOAD"] = invalidRows; // Store invalid rows for reference
 
-            if (invalidPercentage > 0)
+            /*if (invalidPercentage > 0)
             {
                 string message = "Geçersiz veya aşırı yük değerleri: ";
                 var issues = new List<string>();
@@ -227,7 +227,7 @@ namespace SLF
             $"{invalidPercentage:P1}",
             message
                 });
-            }
+            }*/
         }
         private readonly List<string> duplicateFieldsGivingError = new List<string>
         {
@@ -1057,6 +1057,13 @@ namespace SLF
             {
                 int rowIndex = currentDataTable.Rows.IndexOf(row);
                 var value = row[column]?.ToString();
+
+                // Skip processing for columns starting with YIL_DEMANT or YIL_TUKETIM
+                if (columnName.StartsWith("YIL_DEMANT") || columnName.StartsWith("YIL_TUKETIM"))
+                {
+                    continue;
+                }
+
                 if (row.IsNull(column) || row[column] == DBNull.Value || string.IsNullOrEmpty(value) || nullLikeStrings.Contains(value, StringComparer.OrdinalIgnoreCase))
                 {
                     nullCount++;
@@ -1086,11 +1093,15 @@ namespace SLF
             float combinedPercentage;
             if (columnName.StartsWith("YIL_DEMANT"))
             {
-                combinedPercentage = (float)(nullCount + negativeCount + zeroCount + formatErrorCount) / totalRows; // Include zeros for DEMANT
+                combinedPercentage = 0f; // No issues counted for YIL_DEMANT
             }
-            else // YIL_TUKETIM
+            else if (columnName.StartsWith("YIL_TUKETIM"))
             {
-                combinedPercentage = (float)(nullCount + negativeCount + formatErrorCount) / totalRows; // Exclude zeros for TUKETIM
+                combinedPercentage = 0f; // No issues counted for YIL_TUKETIM
+            }
+            else
+            {
+                combinedPercentage = (float)(nullCount + negativeCount + zeroCount + formatErrorCount) / totalRows;
             }
 
             nullPercentage = (float)nullCount / totalRows;
@@ -1101,14 +1112,7 @@ namespace SLF
             var thresholds = TUKETIM_ERROR_THRESHOLD; // (0.2f, 0.2f)
             var datatableLevel = GetDataTableBasedOnThreshold(combinedPercentage, thresholds.warningThreshold, thresholds.errorThreshold);
 
-            // Handle zero rows based on column type
-            if (columnName.StartsWith("YIL_TUKETIM") && zeroPercentage > 0)
-            {
-                foreach (int zeroIndex in zeroRows.OrderByDescending(i => i))
-                {
-                    currentDataTable.Rows.RemoveAt(zeroIndex);
-                }
-            }
+            // No row deletion logic remains (already commented out)
 
             if (combinedPercentage > 0)
             {
@@ -1117,14 +1121,14 @@ namespace SLF
                 if (nullPercentage > 0) issues.Add($"{nullPercentage:P1} NULL/boş (Satır: {string.Join(", ", nullRows)})");
                 if (negativePercentage > 0) issues.Add($"{negativePercentage:P1} negatif (Satır: {string.Join(", ", negativeRows)})");
                 if (formatPercentage > 0) issues.Add($"{formatPercentage:P1} geçersiz format (Satır: {string.Join(", ", formatErrorRows)})");
-                if (zeroPercentage > 0 && columnName.StartsWith("YIL_DEMANT")) issues.Add($"{zeroPercentage:P1} sıfır (Satır: {string.Join(", ", zeroRows)})");
+                if (zeroPercentage > 0) issues.Add($"{zeroPercentage:P1} sıfır (Satır: {string.Join(", ", zeroRows)})");
                 message += string.Join("; ", issues);
 
                 if (combinedPercentage <= thresholds.errorThreshold) // Below or equal to 20%
                 {
                     imputableRows.AddRange(nullRows);
                     imputableRows.AddRange(negativeRows);
-                    if (columnName.StartsWith("YIL_DEMANT")) imputableRows.AddRange(zeroRows); // Impute zeros for DEMANT
+                    imputableRows.AddRange(zeroRows);
                     imputableRows.AddRange(formatErrorRows);
                     message += ". Bu veriler için imputation uygulanacak.";
                 }
@@ -1145,19 +1149,20 @@ namespace SLF
                 });
             }
 
-            if (zeroPercentage > 0 && columnName.StartsWith("YIL_TUKETIM"))
+            // Remove warning for YIL_TUKETIM zero values since no rows are processed
+            /*if (zeroPercentage > 0 && columnName.StartsWith("YIL_TUKETIM"))
             {
-                infoDataTable.Rows.Add(new object[]
+                warningDataTable.Rows.Add(new object[]
                 {
-            column.ColumnName,
-            "Son yıl verisi",
-            $"{zeroPercentage:P1}",
-            $"Satır: {string.Join(", ", zeroRows)}. Bu trafolarda son yıl tüketim verisi sıfır; bu satırlar silindi."
+                    column.ColumnName,
+                    "Son yıl verisi",
+                    $"{zeroPercentage:P1}",
+                    $"Satır: {string.Join(", ", zeroRows)}. Bu trafolarda son yıl tüketim verisi sıfır; bu satırlar silindi."
                 });
-            }
+            }*/
 
             // Update maps
-            columnNullRowsMap[column.ColumnName] = new List<int>(); // Zeros are handled separately
+            //columnNullRowsMap[column.ColumnName] = new List<int>(); // Zeros are handled separately
             imputableRowsMap[column.ColumnName] = imputableRows; // Only populated if below 20%
         }
 

@@ -10,6 +10,7 @@ using SLF.Services;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
+using SLF.Optimal_DTR;
 
 namespace SLF
 {
@@ -229,7 +230,7 @@ namespace SLF
             }
         }
 
-        public bool VEERProcess(string seçilenVeriTipi, bool skipPrerequisites = false)
+        public async Task<bool> VEERProcess(string seçilenVeriTipi, bool skipPrerequisites = false)
         {
             try
             {
@@ -239,10 +240,11 @@ namespace SLF
                     CheckPrerequisites(seçilenVeriTipi);
                 }
 
-                ProcessFileSelection(seçilenVeriTipi);
+                await ProcessFileSelection(seçilenVeriTipi);
                 System.Diagnostics.Debug.WriteLine("File selection processed.");
 
                 DataTable dataTable = CurrentDataTable;
+
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
                     System.Diagnostics.Debug.WriteLine($"DataTable has {dataTable.Rows.Count} rows, {dataTable.Columns.Count} columns.");
@@ -297,10 +299,17 @@ namespace SLF
                             break;
                         }
 
-                        Remove();
-                        ClearRows();
-                        Validate();
-                        Impute();
+                        using (new WaitCursor(modülFormu))
+                        {
+                            await Task.Yield(); // Allow UI to update
+
+                            Remove();
+                            ClearRows();
+                            Validate();
+                            Impute();
+
+                        }
+                        
                     }
 
                     Postprocess();
@@ -690,7 +699,7 @@ namespace SLF
         }
 
 
-        public void ProcessFileSelection(string seçilenVeriTipi)
+        public async Task ProcessFileSelection(string seçilenVeriTipi)
         {
             try
             {
@@ -721,7 +730,7 @@ namespace SLF
                     fileDialog1.Filter = filter;
                     if (fileDialog1.ShowDialog() == DialogResult.OK)
                     {
-                        ProcessSelectedFile(fileDialog1.FileName, seçilenVeriTipi);
+                        await ProcessSelectedFile(fileDialog1.FileName, seçilenVeriTipi);
                     }
                     else
                     {
@@ -748,11 +757,20 @@ namespace SLF
             return null;
         }
 
-        private void ProcessSelectedFile(string fileName, string seçilenVeriTipi)
+        private async Task ProcessSelectedFile(string fileName, string seçilenVeriTipi)
         {
             if (veri_listesi_requires_xlsx.Contains(seçilenVeriTipi))
             {
-                currentDataTable = ProcessExcelFile(fileName, seçilenVeriTipi);
+
+                
+                    currentDataTable = await Task.Run(() =>
+                    {
+                        using (var stream = File.OpenRead(fileName))
+                        {
+                            return ProcessExcelFile(stream, seçilenVeriTipi);
+                        }
+                    });                                                               
+
             }
             else if (veri_listesi_requires_csv.Contains(seçilenVeriTipi))
             {
@@ -789,11 +807,15 @@ namespace SLF
             }
         }
 
-        protected DataTable ProcessExcelFile(string fileName, string seçilenVeriTipi)
+        protected DataTable ProcessExcelFile(Stream stream, string seçilenVeriTipi)
         {
             ExcelImporter importer = new ExcelImporter();
-            DataTable dataTable = importer.ImportExcelFile(fileName, seçilenVeriTipi);
-            return NormalizeDataTableTypes(dataTable); // Return normalized table
+                       
+            var table = importer.ImportExcelFileAsync(stream, seçilenVeriTipi);
+            return NormalizeDataTableTypes(table);
+            
+            //DataTable dataTable = importer.ImportExcelFile(fileName, seçilenVeriTipi);
+            //return NormalizeDataTableTypes(dataTable); // Return normalized table
         }
 
         protected DataTable ProcessCsvFile(string fileName)

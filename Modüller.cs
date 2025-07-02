@@ -842,9 +842,12 @@ namespace SLF
 
 
             // Call VEERProcess with skipPrerequisites flag
-            using (new WaitCursor())
+            using (new WaitCursor(this))
             {
-                isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
+                Application.DoEvents(); // 🗝️ Force cursor to repaint!
+
+                isImported = await girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
+                
             }         
 
             // Set the DataSource for dataGridView_girdi

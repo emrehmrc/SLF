@@ -963,7 +963,7 @@ namespace SLF.Optimal_DTR
             {
                 if(trafo_path != null)
                 {
-                    using (new WaitCursor())
+                    using (new WaitCursor(this))
                     {
                         trafo_path = Path.Combine(SonucYolu, trafo_path);
                         trafodt = ImportExcelFile(trafo_path);
@@ -1133,18 +1133,24 @@ namespace SLF.Optimal_DTR
     public class WaitCursor : IDisposable
     {
         private Cursor _previous;
+        private Control _control;
 
-        public WaitCursor()
+        public WaitCursor(Control control)
         {
+            _control = control;
             _previous = Cursor.Current;
-            Cursor.Current = Cursors.WaitCursor;
+
+            _control.UseWaitCursor = true; // ✅ more reliable!
+            Application.DoEvents();
         }
 
         public void Dispose()
         {
+            _control.UseWaitCursor = false;
             Cursor.Current = _previous;
         }
     }
+
 
 
     public class Form2 : Form

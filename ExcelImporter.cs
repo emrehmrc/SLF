@@ -351,13 +351,13 @@ namespace SLF
             return dataTable;
         }
 
-        public DataTable ImportExcelFileAsync(string filePath, string seçilenVeriTipi)
+        public DataTable ImportExcelFileAsync(Stream stream, string seçilenVeriTipi)
         {
             DataTable dataTable = new DataTable();
 
             try
             {
-                using (var package = new ExcelPackage(new FileInfo(filePath)))
+                using (var package = new ExcelPackage(stream))
                 {
                     var worksheet = package.Workbook.Worksheets[0];
                     ValidateColumnHeaders(worksheet, seçilenVeriTipi);
@@ -466,7 +466,6 @@ namespace SLF
                     MessageBoxIcon.Error);
                 return new DataTable();
             }
-
             return dataTable;
         }
 

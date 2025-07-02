@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
 using System.Threading.Tasks;
+using SLF.Optimal_DTR;
 
 
 namespace SLF
@@ -149,11 +150,17 @@ namespace SLF
                         return;
                     }
 
+                    using (new WaitCursor(this))
+                    {
+                        await Task.Yield(); // Allow UI to update
 
-                    // PythonHelper.RunImarPlanModel'i çağır
-                    RunImarPlanPython(KmlFilePath);
+                        // PythonHelper.RunImarPlanModel'i çağır
+                        RunImarPlanPython(KmlFilePath);
 
-                    await RunPythonSEgrisiScriptAsync();
+                        await RunPythonSEgrisiScriptAsync();
+
+                    }
+                    
                 }
                 else if (imarMethodSelectionComboBox.SelectedIndex == 1)
                 {
@@ -166,11 +173,17 @@ namespace SLF
                         return;
                     }
 
+                    using (new WaitCursor(this))
+                    {
+                        await Task.Yield(); // Allow UI to update
 
-                    // PythonHelper.RunImarPlanModel'i çağır
-                    RunImarPlanPython(KmlFilePath, CsvFilePath);
+                        // PythonHelper.RunImarPlanModel'i çağır
+                        RunImarPlanPython(KmlFilePath, CsvFilePath);
 
-                    await RunPythonSEgrisiScriptAsync();
+                        await RunPythonSEgrisiScriptAsync();
+
+                    }
+                    
                 }
                 else
                 {
