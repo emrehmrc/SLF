@@ -637,9 +637,9 @@ namespace SLF
             // imported_filename ile kontrol et
             if (imported_filename == "İMAR_SONUÇLAR.kml" && currentImarTipiColorMap != null)
             {
-                if (attributes.Table.Columns.Contains("Imar Tipi") && attributes["Imar Tipi"] != DBNull.Value)
+                if (attributes.Table.Columns.Contains("İmar Tipi") && attributes["İmar Tipi"] != DBNull.Value)
                 {
-                    string imarTipi = attributes["Imar Tipi"].ToString();
+                    string imarTipi = attributes["İmar Tipi"].ToString();
                     if (currentImarTipiColorMap.TryGetValue(imarTipi, out System.Drawing.Color mappedColor))
                     {
                         fillColor = mappedColor;
@@ -647,12 +647,12 @@ namespace SLF
                     }
                     else
                     {
-                        File.AppendAllText("color_map_log.txt", $"Imar Tipi '{imarTipi}' için renk bulunamadı.\n");
+                        File.AppendAllText("color_map_log.txt", $"İmar Tipi '{imarTipi}' için renk bulunamadı.\n");
                     }
                 }
                 else
                 {
-                    File.AppendAllText("color_map_log.txt", "Imar Tipi sütunu bulunamadı veya değer null.\n");
+                    File.AppendAllText("color_map_log.txt", "İmar Tipi sütunu bulunamadı veya değer null.\n");
                 }
             }
 
@@ -924,183 +924,186 @@ namespace SLF
 
             try
             {
-                // Use XmlReader for streaming instead of loading the entire document
-                using (FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read))
-                using (XmlReader reader = XmlReader.Create(fs, new XmlReaderSettings { Async = true }))
+                XDocument kmlDoc = XDocument.Load(filepath);
+                // Handle namespace: use empty namespace if xmlns is missing, otherwise use specified
+                XNamespace ns = kmlDoc.Root?.Attribute("xmlns")?.Value ?? "";
+                XNamespace gx = "http://www.google.com/kml/ext/2.2"; // For 2nd structure's extended namespace
+
+                if (kmlDoc.Root == null || kmlDoc.Root.Name.LocalName != "kml")
                 {
-                    XNamespace ns = "";
-                    XNamespace gx = "http://www.google.com/kml/ext/2.2";
-                    bool schemaProcessed = false;
+                    MessageBox.Show("KML dosyasında kml elementi bulunamadı.");
+                    return;
+                }
 
-                    // Initialize DataTable with base columns
-                    if (!data_table.Columns.Contains("Row_No")) data_table.Columns.Add("Row_No");
-                    if (!data_table.Columns.Contains("coordinates")) data_table.Columns.Add("coordinates");
+                // Initialize DataTable with base columns
+                if (!data_table.Columns.Contains("Row_No")) data_table.Columns.Add("Row_No");
+                if (!data_table.Columns.Contains("coordinates")) data_table.Columns.Add("coordinates");
 
-                    while (await reader.ReadAsync())
+                // Pre-process Schema to add SimpleField columns (for 3rd structure)
+                var schema = kmlDoc.Descendants(ns + "Schema").FirstOrDefault();
+                if (schema != null)
+                {
+                    foreach (var simpleField in schema.Elements(ns + "SimpleField"))
                     {
-                        if (reader.NodeType == XmlNodeType.Element)
+                        string fieldName = simpleField.Attribute("name")?.Value;
+                        if (!string.IsNullOrEmpty(fieldName) && !data_table.Columns.Contains(fieldName))
                         {
-                            if (reader.Name == "kml" && ns == "")
+                            data_table.Columns.Add(fieldName);
+                        }
+                    }
+                }
+
+                // Collect all Placemarks recursively
+                var placemarks = new List<XElement>();
+                void CollectPlacemarks(XElement element)
+                {
+                    if (element == null) return;
+                    placemarks.AddRange(element.Elements(ns + "Placemark"));
+                    foreach (var child in element.Elements().Where(e => e.Name.LocalName == "Folder" || e.Name.LocalName == "Document"))
+                    {
+                        CollectPlacemarks(child);
+                    }
+                }
+
+                CollectPlacemarks(kmlDoc.Root);
+
+                if (!placemarks.Any())
+                {
+                    MessageBox.Show("KML dosyasında Placemark elementi bulunamadı.");
+                    return;
+                }
+
+                foreach (var placemark in placemarks)
+                {
+                    var row = data_table.NewRow();
+                    row["Row_No"] = row_cnt;
+
+                    // Handle name
+                    var nameElement = placemark.Element(ns + "name");
+                    if (nameElement != null)
+                    {
+                        if (!data_table.Columns.Contains("name")) data_table.Columns.Add("name");
+                        row["name"] = nameElement.Value;
+                    }
+
+                    // Handle description (for 3rd structure)
+                    var descriptionElement = placemark.Element(ns + "description");
+                    if (descriptionElement != null)
+                    {
+                        if (!data_table.Columns.Contains("description")) data_table.Columns.Add("description");
+                        row["description"] = descriptionElement.Value;
+                    }
+
+                    // Handle styleUrl
+                    var styleUrlElement = placemark.Element(ns + "styleUrl");
+                    if (styleUrlElement != null)
+                    {
+                        if (!data_table.Columns.Contains("styleUrl")) data_table.Columns.Add("styleUrl");
+                        row["styleUrl"] = styleUrlElement.Value;
+                    }
+
+                    // Handle ExtendedData (for 1st and 3rd structures)
+                    var extendedData = placemark.Element(ns + "ExtendedData");
+                    if (extendedData != null)
+                    {
+                        // Process <Data> elements (1st structure)
+                        foreach (var data in extendedData.Elements(ns + "Data"))
+                        {
+                            string name = data.Attribute("name")?.Value;
+                            string value = data.Element(ns + "value")?.Value;
+                            if (!string.IsNullOrEmpty(name))
                             {
-                                // Set namespace from root element if present
-                                ns = reader.GetAttribute("xmlns") ?? "";
+                                if (!data_table.Columns.Contains(name)) data_table.Columns.Add(name);
+                                row[name] = value ?? "";
                             }
-                            else if (reader.Name == "Schema" && !schemaProcessed && ns != "")
+                        }
+
+                        // Process <SchemaData> and <SimpleData> elements (3rd structure)
+                        var schemaData = extendedData.Element(ns + "SchemaData");
+                        if (schemaData != null)
+                        {
+                            foreach (var simpleData in schemaData.Elements(ns + "SimpleData"))
                             {
-                                // Pre-process Schema to add SimpleField columns
-                                var schemaElement = XElement.ReadFrom(reader) as XElement;
-                                if (schemaElement != null)
+                                string name = simpleData.Attribute("name")?.Value;
+                                string value = simpleData.Value;
+                                if (!string.IsNullOrEmpty(name))
                                 {
-                                    foreach (var simpleField in schemaElement.Elements(ns + "SimpleField"))
-                                    {
-                                        string fieldName = simpleField.Attribute("name")?.Value;
-                                        if (!string.IsNullOrEmpty(fieldName) && !data_table.Columns.Contains(fieldName))
-                                        {
-                                            data_table.Columns.Add(fieldName);
-                                        }
-                                    }
-                                    schemaProcessed = true;
-                                }
-                            }
-                            else if (reader.Name == "Placemark" && ns != "")
-                            {
-                                // Process each Placemark incrementally
-                                var placemark = XElement.ReadFrom(reader) as XElement;
-                                if (placemark != null)
-                                {
-                                    var row = data_table.NewRow();
-                                    row["Row_No"] = row_cnt;
-
-                                    // Handle name
-                                    var nameElement = placemark.Element(ns + "name");
-                                    if (nameElement != null)
-                                    {
-                                        if (!data_table.Columns.Contains("name")) data_table.Columns.Add("name");
-                                        row["name"] = nameElement.Value;
-                                    }
-
-                                    // Handle description
-                                    var descriptionElement = placemark.Element(ns + "description");
-                                    if (descriptionElement != null)
-                                    {
-                                        if (!data_table.Columns.Contains("description")) data_table.Columns.Add("description");
-                                        row["description"] = descriptionElement.Value;
-                                    }
-
-                                    // Handle styleUrl
-                                    var styleUrlElement = placemark.Element(ns + "styleUrl");
-                                    if (styleUrlElement != null)
-                                    {
-                                        if (!data_table.Columns.Contains("styleUrl")) data_table.Columns.Add("styleUrl");
-                                        row["styleUrl"] = styleUrlElement.Value;
-                                    }
-
-                                    // Handle ExtendedData
-                                    var extendedData = placemark.Element(ns + "ExtendedData");
-                                    if (extendedData != null)
-                                    {
-                                        foreach (var data in extendedData.Elements(ns + "Data"))
-                                        {
-                                            string name = data.Attribute("name")?.Value;
-                                            string value = data.Element(ns + "value")?.Value;
-                                            if (!string.IsNullOrEmpty(name))
-                                            {
-                                                if (!data_table.Columns.Contains(name)) data_table.Columns.Add(name);
-                                                row[name] = value ?? "";
-                                            }
-                                        }
-
-                                        var schemaData = extendedData.Element(ns + "SchemaData");
-                                        if (schemaData != null)
-                                        {
-                                            foreach (var simpleData in schemaData.Elements(ns + "SimpleData"))
-                                            {
-                                                string name = simpleData.Attribute("name")?.Value;
-                                                string value = simpleData.Value;
-                                                if (!string.IsNullOrEmpty(name))
-                                                {
-                                                    if (!data_table.Columns.Contains(name)) data_table.Columns.Add(name);
-                                                    row[name] = value ?? "";
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    // Handle Polygon
-                                    var polygon = placemark.Element(ns + "Polygon");
-                                    if (polygon != null)
-                                    {
-                                        var coordinatesElement = polygon.Element(ns + "outerBoundaryIs")?.Element(ns + "LinearRing")?.Element(ns + "coordinates");
-                                        if (coordinatesElement != null)
-                                        {
-                                            string coordinatesString = coordinatesElement.Value.Trim();
-                                            var coords = coordinatesString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
-                                                .Select(coord =>
-                                                {
-                                                    var parts = coord.Split(',');
-                                                    if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
-                                                        return $"{Math.Round(lon, 6)},{Math.Round(lat, 6)}";
-                                                    return null;
-                                                })
-                                                .Where(c => c != null);
-                                            row["coordinates"] = string.Join(" ; ", coords);
-                                        }
-                                    }
-
-                                    // Handle Point
-                                    var point = placemark.Element(ns + "Point");
-                                    if (point != null)
-                                    {
-                                        var coordinatesElement = point.Element(ns + "coordinates");
-                                        if (coordinatesElement != null)
-                                        {
-                                            var parts = coordinatesElement.Value.Trim().Split(',');
-                                            if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
-                                            {
-                                                string point_coordinates = $"{Math.Round(lon, 6)} ; {Math.Round(lat, 6)}";
-                                                row["coordinates"] = point_coordinates;
-                                            }
-                                        }
-                                    }
-
-                                    // Handle LineString
-                                    var lineString = placemark.Element(ns + "LineString");
-                                    if (lineString != null)
-                                    {
-                                        var coordinatesElement = lineString.Element(ns + "coordinates");
-                                        if (coordinatesElement != null)
-                                        {
-                                            string coordinatesString = coordinatesElement.Value.Trim();
-                                            var coords = coordinatesString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
-                                                .Select(coord =>
-                                                {
-                                                    var parts = coord.Split(',');
-                                                    if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
-                                                        return $"{Math.Round(lon, 6)},{Math.Round(lat, 6)}";
-                                                    return null;
-                                                })
-                                                .Where(c => c != null);
-                                            row["coordinates"] = string.Join(" ; ", coords);
-                                            AddLineStringToOverlay_kml(coordinatesString, kmlOverlay);
-                                        }
-                                    }
-
-                                    data_table.Rows.Add(row);
-                                    row_cnt++;
-
-                                    // Yield to prevent memory overload (process in batches)
-                                    if (row_cnt % 1000 == 0) await Task.Yield();
+                                    if (!data_table.Columns.Contains(name)) data_table.Columns.Add(name);
+                                    row[name] = value ?? "";
                                 }
                             }
                         }
                     }
 
-                    // Handle legend for İMAR_SONUÇLAR.kml (after all Placemarks are processed)
-                    if (Path.GetFileName(filepath) == "İMAR_SONUÇLAR.kml")
+                    // Handle Polygon
+                    var polygon = placemark.Element(ns + "Polygon");
+                    if (polygon != null)
+                    {
+                        var coordinatesElement = polygon.Element(ns + "outerBoundaryIs")?.Element(ns + "LinearRing")?.Element(ns + "coordinates");
+                        if (coordinatesElement != null)
+                        {
+                            string coordinatesString = coordinatesElement.Value.Trim();
+                            var coords = coordinatesString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                                .Select(coord =>
+                                {
+                                    var parts = coord.Split(',');
+                                    if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
+                                        return $"{Math.Round(lon, 6)},{Math.Round(lat, 6)}";
+                                    return null;
+                                })
+                                .Where(c => c != null);
+                            row["coordinates"] = string.Join(" ; ", coords);
+                        }
+                    }
+
+                    // Handle Point
+                    var point = placemark.Element(ns + "Point");
+                    if (point != null)
+                    {
+                        var coordinatesElement = point.Element(ns + "coordinates");
+                        if (coordinatesElement != null)
+                        {
+                            var parts = coordinatesElement.Value.Trim().Split(',');
+                            if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
+                            {
+                                string point_coordinates = $"{Math.Round(lon, 6)} ; {Math.Round(lat, 6)}";
+                                row["coordinates"] = point_coordinates;
+                            }
+                        }
+                    }
+
+                    // Handle LineString
+                    var lineString = placemark.Element(ns + "LineString");
+                    if (lineString != null)
+                    {
+                        var coordinatesElement = lineString.Element(ns + "coordinates");
+                        if (coordinatesElement != null)
+                        {
+                            string coordinatesString = coordinatesElement.Value.Trim();
+                            var coords = coordinatesString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                                .Select(coord =>
+                                {
+                                    var parts = coord.Split(',');
+                                    if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
+                                        return $"{Math.Round(lon, 6)},{Math.Round(lat, 6)}";
+                                    return null;
+                                })
+                                .Where(c => c != null);
+                            row["coordinates"] = string.Join(" ; ", coords);
+                            AddLineStringToOverlay_kml(coordinatesString, kmlOverlay);
+                        }
+                    }
+
+                    data_table.Rows.Add(row);
+                    row_cnt++;
+                }
+
+                // Handle legend for İMAR_SONUÇLAR.kml (after all Placemarks are processed)
+                if (Path.GetFileName(filepath) == "İMAR_SONUÇLAR.kml")
                     {
                         var imarTipiValues = data_table.AsEnumerable()
-                            .Where(row => row["Imar Tipi"] != DBNull.Value)
-                            .Select(row => row["Imar Tipi"].ToString())
+                            .Where(row => row["İmar Tipi"] != DBNull.Value)
+                            .Select(row => row["İmar Tipi"].ToString())
                             .Distinct()
                             .ToList();
 
@@ -1185,7 +1188,7 @@ namespace SLF
                             AddPolygonToOverlay_kml(coordinates, kmlOverlay, row);
                         }
                     }
-                }
+                
             }
             catch (Exception ex)
             {
@@ -1650,11 +1653,11 @@ namespace SLF
 
                         if (layerName == "İMAR_SONUÇLAR.kml" && currentImarTipiColorMap != null)
                         {
-                            // Restore color based on Imar Tipi
+                            // Restore color based on İmar Tipi
                             if (polygonAttributes_yuk.TryGetValue(selectedPolygon, out DataRow row) &&
-                                row.Table.Columns.Contains("Imar Tipi") && row["Imar Tipi"] != DBNull.Value)
+                                row.Table.Columns.Contains("İmar Tipi") && row["İmar Tipi"] != DBNull.Value)
                             {
-                                string imarTipi = row["Imar Tipi"].ToString();
+                                string imarTipi = row["İmar Tipi"].ToString();
                                 if (currentImarTipiColorMap.TryGetValue(imarTipi, out System.Drawing.Color mappedColor))
                                 {
                                     if (selectedPolygonImar != null)
@@ -1670,7 +1673,7 @@ namespace SLF
                                 }
                                 else
                                 {
-                                    // Fallback to default color if Imar Tipi not found
+                                    // Fallback to default color if İmar Tipi not found
                                     if (selectedPolygonImar != null)
                                     {
                                         selectedPolygonImar.Stroke = new Pen(overlayColors[overlayIndex].BorderColor, 3);
