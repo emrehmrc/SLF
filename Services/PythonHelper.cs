@@ -68,17 +68,17 @@ namespace SLF.services
                 string otherSonucYolu = Path.Combine(imarAnaliziPath, $"other_data_{selectedCity}_{selectedDistrict}.csv");
 
                 // Python argümanlarını oluştur - İlçe parametresi eklendi
-                string arguments = $"/k python \"{pythonScriptPath}\" \"{aboneVeriYolu}\" \"{meskenSonucYolu}\" \"{otherSonucYolu}\" \"{selectedCity}\" \"{selectedDistrict}\" \"{year}\"";
+                string arguments = $"/C python \"{pythonScriptPath}\" \"{aboneVeriYolu}\" \"{meskenSonucYolu}\" \"{otherSonucYolu}\" \"{selectedCity}\" \"{selectedDistrict}\" \"{year}\"";
 
                 // Python betiğini çalıştır
                 ProcessStartInfo processInfo = new ProcessStartInfo
                 {
                     FileName = "cmd.exe",
                     Arguments = arguments,
-                    RedirectStandardOutput = false, // Output will be displayed in the console
-                    RedirectStandardError = false,  // Errors will be displayed in the console
-                    UseShellExecute = false,
-                    CreateNoWindow = false
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
+                    UseShellExecute = true, // Use true to show the window
+                    CreateNoWindow = false // Ensure the command window is visible
                 };
 
                 Process process = new Process
@@ -155,9 +155,8 @@ namespace SLF.services
                     Arguments = arguments,
                     RedirectStandardOutput = false,
                     RedirectStandardError = false,
-                    UseShellExecute = false,
-                    CreateNoWindow = false,
-                    WorkingDirectory = Path.GetDirectoryName(pythonScriptPath)
+                    UseShellExecute = true, // Use true to show the window
+                    CreateNoWindow = false // Ensure the command window is visible
                 };
 
                 Process process = new Process
@@ -273,12 +272,10 @@ namespace SLF.services
                 {
                     FileName = "cmd.exe",
                     Arguments = arguments,
-                    UseShellExecute = true,       // Kabuk kullanarak çalıştır, pencereyi göster
-                    RedirectStandardOutput = false,  // Çıktıyı yönlendirme, cmd penceresinde göster
-                    RedirectStandardError = false,   // Hataları yönlendirme, cmd penceresinde göster
-                    CreateNoWindow = false,       // Pencere oluştur
-                    WorkingDirectory = workingDirectory,
-                    WindowStyle = ProcessWindowStyle.Normal  // Pencereyi normal boyutta aç
+                    RedirectStandardOutput = false,
+                    RedirectStandardError = false,
+                    UseShellExecute = true, // Use true to show the window
+                    CreateNoWindow = false // Ensure the command window is visible
                 };
 
                 using (Process process = new Process { StartInfo = startInfo })
@@ -335,11 +332,10 @@ namespace SLF.services
                 {
                     FileName = "cmd.exe",
                     Arguments = $"/C python \"{pythonScript}\" \"{configPath}\" --mode DATABASE",
-                    UseShellExecute = false,
                     RedirectStandardOutput = false,
                     RedirectStandardError = false,
-                    CreateNoWindow = false,
-                    WorkingDirectory = Path.GetDirectoryName(pythonScript)
+                    UseShellExecute = true, // Use true to show the window
+                    CreateNoWindow = false // Ensure the command window is visible
                 };
 
                 Process process = new Process
@@ -370,44 +366,6 @@ namespace SLF.services
             }
         }
 
-        private static void DeepLearningRuns()
-        {
-            try
-            {
-                // İşlem sırasında imleç görünümünü değiştir
-                Cursor.Current = Cursors.WaitCursor;
-
-                // Gerekli kontroller (Abone verisi yüklü mü, il-ilçe seçilmiş mi)
-                if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
-                {
-                    MessageBox.Show("Lütfen önce il ve ilçe seçimini yapın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                if (!GirdiModülü.dataTablesByType.ContainsKey("Abone Verileri"))
-                {
-                    MessageBox.Show("Lütfen önce Abone Verileri'ni yükleyin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                // Deep Learning modelini çalıştır
-                string result = RunDeepLearningModel();
-
-                // İşlem tamamlandığında başarı mesajı göster
-                MessageBox.Show("İmar analizi başarıyla tamamlandı.\nSonuçlar 'imar_analizi_sonuclari/deep_learning_modeli' klasöründe kaydedildi.",
-                                "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                // İşlem bittiğinde imleci normal duruma getir
-                Cursor.Current = Cursors.Default;
-            }
-        }
 
         public static void Dtr_Bağlantısallık()
         {
@@ -424,19 +382,16 @@ namespace SLF.services
             var yearService = YearService.GetInstance();
             string year = yearService.slfStartYear.ToString();
 
-            string pythonScriptPath = !string.IsNullOrEmpty(PathService.dtr_bağlantısallıkPath)
-                    ? PathService.dtr_bağlantısallıkPath
-                    : PathService.GetPythonScriptPath("main.py");
+            string pythonScriptPath = Path.Combine(PathService.dtr_bağlantısallıkPath);
 
             ProcessStartInfo processInfo = new ProcessStartInfo
             {
-                FileName = "python",
-                Arguments = $"\"{pythonScriptPath}\" \"{aboneVeriYolu}\" \"{dtrModuluFilePath}\" \"{year}\"",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true,
-                StandardOutputEncoding = Encoding.UTF8
+                FileName = "cmd.exe",
+                Arguments = $"/C python \"{pythonScriptPath}\" \"{aboneVeriYolu}\" \"{dtrModuluFilePath}\" \"{year}\"",
+                RedirectStandardOutput = false,
+                RedirectStandardError = false,
+                UseShellExecute = true, // Use true to show the window
+                CreateNoWindow = false // Ensure the command window is visible
             };
 
 
@@ -481,11 +436,48 @@ namespace SLF.services
         public static void RunImarPlanModel(string kmlFilePath, string csvFilePath = null)
         {
             try
-
             {
-                DeepLearningRuns();
+
+                try
+                {
+                    // İşlem sırasında imleç görünümünü değiştir
+                    Cursor.Current = Cursors.WaitCursor;
+
+                    // Gerekli kontroller (Abone verisi yüklü mü, il-ilçe seçilmiş mi)
+                    if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
+                    {
+                        MessageBox.Show("Lütfen önce il ve ilçe seçimini yapın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    if (!GirdiModülü.dataTablesByType.ContainsKey("Abone Verileri"))
+                    {
+                        MessageBox.Show("Lütfen önce Abone Verileri'ni yükleyin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    // Deep Learning modelini çalıştır
+                    string result = RunDeepLearningModel();
+
+                    // İşlem tamamlandığında başarı mesajı göster
+                    MessageBox.Show("Makine öğrenmesi analizi başarıyla tamamlandı.\n" +
+                        "Sonuçlar 'imar_analizi_sonuclari/deep_learning_modeli' klasöründe kaydedildi.",
+                                    "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                finally
+                {
+                    // İşlem bittiğinde imleci normal duruma getir
+                    Cursor.Current = Cursors.Default;
+                }
+
 
                 Dtr_Bağlantısallık();
+
 
                 // Hücre verisi yolunu al - SHP ya da CSV dosyasını bul
                 string hucrePath = PathService.HucrePath;
@@ -494,7 +486,6 @@ namespace SLF.services
                 string uyduVeriFilePath = null;
                 var yearService = YearService.GetInstance();
                 string year = yearService.slfStartYear.ToString();
-                
                 // Seçilen il/ilçe bilgilerini al
                 string selectedCity = PathService.SelectedCity;
                 string selectedDistrict = PathService.SelectedDistrict;
@@ -511,7 +502,7 @@ namespace SLF.services
                     string[] hucreFiles = Directory.GetFiles(hucrePath, "*.shp");
                     if (hucreFiles.Length > 0)
                     {
-                        hucreFilePath = Path.Combine(hucrePath, $"{selectedDistrict}_grid.shp"); // İlk bulunan SHP dosyasını kullan
+                        hucreFilePath = hucreFiles[0]; // İlk bulunan SHP dosyasını kullan
                         Console.WriteLine($"Hücre SHP dosyası bulundu: {hucreFilePath}");
                     }
                     else
@@ -615,7 +606,7 @@ namespace SLF.services
                 }
 
                 // Çıktı dosya yolları - DL modelindeki yaklaşıma benzer
-                string outputPrefix = $"{selectedDistrict}";
+                string outputPrefix = $"imar_plan_{selectedCity}_{selectedDistrict}";
                 string outputCsvPath = Path.Combine(imarAnaliziPath, $"{outputPrefix}.csv");
                 string outputKmlPath = Path.Combine(imarAnaliziPath, $"{outputPrefix}.kml");
                 string tempDirPath = Path.Combine(imarAnaliziPath, "temp");
@@ -736,46 +727,6 @@ namespace SLF.services
 
                 Console.WriteLine($"Çalıştırılacak komut: python {args}");
 
-                // Prepare the dictionary
-                // Prepare the dictionary
-                var argsDict = new Dictionary<string, string>
-                {
-                    { "region", selectedCity },
-                    { "district", selectedDistrict },
-                    { "kml_file", kmlFilePath },
-                    { "output_dir", imarAnaliziPath },
-                    { "output_prefix", outputPrefix },
-                    { "year", year },
-                };
-
-                // Optional entries (added only if not null or empty)
-                if (!string.IsNullOrEmpty(hucreFilePath))
-                    argsDict["hucre_data"] = hucreFilePath;
-
-                if (!string.IsNullOrEmpty(meskenFile))
-                    argsDict["mesken_file"] = meskenFile;
-
-                if (!string.IsNullOrEmpty(otherFile))
-                    argsDict["other_file"] = otherFile;
-
-                if (!string.IsNullOrEmpty(dtrModuluFilePath))
-                    argsDict["dtr_modulu"] = dtrModuluFilePath;
-
-                if (!string.IsNullOrEmpty(yeniDtrModuluFilePath))
-                    argsDict["yeni_dtr_modulu"] = yeniDtrModuluFilePath;
-
-                if (!string.IsNullOrEmpty(uyduVeriFilePath))
-                    argsDict["uydu_data"] = uyduVeriFilePath;
-
-                if (!string.IsNullOrEmpty(csvFilePath))
-                    argsDict["overpass_data"] = csvFilePath;    
-                                             
-                // JSON formatında serileştirme
-                string json = JsonConvert.SerializeObject(argsDict, Formatting.Indented);
-
-                // JSON dosyasını yazma
-                File.WriteAllText("arguments.json", json);
-
                 // Python betiğini çalıştır
                 ProcessStartInfo processInfo = new ProcessStartInfo("python")
                 {
@@ -783,9 +734,8 @@ namespace SLF.services
                     Arguments = args.ToString(),
                     RedirectStandardOutput = false,
                     RedirectStandardError = false,
-                    UseShellExecute = false,
-                    CreateNoWindow = false,
-                    WorkingDirectory = Path.GetDirectoryName(pythonScriptPath)
+                    UseShellExecute = true, // Use true to show the window
+                    CreateNoWindow = false // Ensure the command window is visible
                 };
 
                 using (Process process = Process.Start(processInfo))
