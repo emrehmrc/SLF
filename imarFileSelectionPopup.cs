@@ -35,29 +35,6 @@ namespace SLF
         }
 
 
-        private async void SelectCsvButton_Click(object sender, EventArgs e)
-        {
-            await Task.Delay(250);
-
-            this.Cursor = Cursors.WaitCursor;   
-
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
-            {
-                openFileDialog.Filter = "CSV Files (*.csv)|*.csv";
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    CsvFilePath = openFileDialog.FileName;
-                    string filename = CsvFilePath.Substring(CsvFilePath.LastIndexOf("\\") + 1);
-
-
-                    label_overpass_path.Text = filename;
-                    label_overpass_path.Visible = true;
-                 
-                }
-            }
-
-            this.Cursor = Cursors.Default;
-        }
 
         private async void SelectKmlButton_Click(object sender, EventArgs e)
         {
@@ -140,45 +117,21 @@ namespace SLF
                     return;
                 }
 
-                if (imarMethodSelectionComboBox.SelectedIndex == 0)
+
+                // Sadece KML dosyası gerekli
+                if (string.IsNullOrEmpty(KmlFilePath))
                 {
-                    // Sadece KML dosyası gerekli
-                    if (string.IsNullOrEmpty(KmlFilePath))
-                    {
-                        MessageBox.Show("Lütfen üstteki 'İmar Verisi Seç' bölümünden bir İmar dosyası (.kml) dosyası " +
-                            "seçin.", "Eksik Dosya", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
-
-
-                    // PythonHelper.RunImarPlanModel'i çağır
-                    RunImarPlanPython(KmlFilePath);
-
-                    await RunPythonSEgrisiScriptAsync();
-                }
-                else if (imarMethodSelectionComboBox.SelectedIndex == 1)
-                {
-                    // KML ve CSV dosyaları birlikte gerekli
-                    if (string.IsNullOrEmpty(CsvFilePath) || string.IsNullOrEmpty(KmlFilePath))
-                    {
-                        MessageBox.Show("Lütfen üstteki 'İmar Verisi Seç' ve 'Overpass Verisi Seç' butonlarını kullanarak" +
-                            " bir İmar dosyası (.kml) ve daha önce indirilmiş bir Overpass verisi (.csv) seçiniz.", 
-                            "Eksik Dosya", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
-
-
-                    // PythonHelper.RunImarPlanModel'i çağır
-                    RunImarPlanPython(KmlFilePath, CsvFilePath);
-
-                    await RunPythonSEgrisiScriptAsync();
-                }
-                else
-                {
-                    MessageBox.Show("Lütfen en üstteki dropdown butonunu kullanarak bir yöntem seçiniz.", 
-                        "Eksik Seçim", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Lütfen üstteki 'İmar Verisi Seç' bölümünden bir İmar dosyası (.kml) dosyası " +
+                        "seçin.", "Eksik Dosya", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
+
+
+                // PythonHelper.RunImarPlanModel'i çağır
+                RunImarPlanPython(KmlFilePath);
+
+                await RunPythonSEgrisiScriptAsync();
+
 
                 this.Close();
             }

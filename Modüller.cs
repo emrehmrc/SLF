@@ -7068,44 +7068,6 @@ namespace SLF
             }
         }
 
-        public void buton_DL_calıstır_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                // İşlem sırasında imleç görünümünü değiştir
-                Cursor.Current = Cursors.WaitCursor;
-
-                // Gerekli kontroller (Abone verisi yüklü mü, il-ilçe seçilmiş mi)
-                if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
-                {
-                    MessageBox.Show("Lütfen önce il ve ilçe seçimini yapın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                if (!GirdiModülü.dataTablesByType.ContainsKey("Abone Verileri"))
-                {
-                    MessageBox.Show("Lütfen önce Abone Verileri'ni yükleyin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                // Deep Learning modelini çalıştır
-                string result = PythonHelper.RunDeepLearningModel();
-
-                // İşlem tamamlandığında başarı mesajı göster
-                MessageBox.Show("İmar analizi başarıyla tamamlandı.\nSonuçlar 'imar_analizi_sonuclari/deep_learning_modeli' klasöründe kaydedildi.",
-                                "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                // İşlem bittiğinde imleci normal duruma getir
-                Cursor.Current = Cursors.Default;
-            }
-        }
 
         private void gMapControl_yuk_MouseMove(object sender, MouseEventArgs e)
         {
