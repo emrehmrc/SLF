@@ -8598,7 +8598,7 @@ namespace SLF
                         StartInfo = new ProcessStartInfo
                         {
                             FileName = "cmd.exe",
-                            Arguments = $"python.exe \"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
+                            Arguments = $"/C python.exe \"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
                             RedirectStandardOutput = false,
                             RedirectStandardError = false,
                             UseShellExecute = false,
