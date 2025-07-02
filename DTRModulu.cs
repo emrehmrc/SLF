@@ -142,7 +142,7 @@ namespace SLF
                 if (IsNullLike(demandValue))
                 {
                     nullDemandCount++;
-                    nullDemandRows.Add(rowIndex);
+                    //nullDemandRows.Add(rowIndex);
                     row[lastYearDemand] = 0; // Impute null demand to 0
                 }
                 else if (!float.TryParse(demandValue, out demand))
@@ -783,7 +783,7 @@ namespace SLF
 
             // Add row indices from different columns to the combined list
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["NONUNIQUE_TRAFO_X_Y"]);
-            combinedRowsToRemoveList.AddRange(columnNullRowsMap[$"YIL_TUKETIM_{lastYear}"]);
+            //combinedRowsToRemoveList.AddRange(columnNullRowsMap[$"YIL_TUKETIM_{lastYear}"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["NULL_TRAFO_KODU"]);
 
 

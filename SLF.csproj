@@ -102,6 +102,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Apache.Arrow, Version=14.0.2.0, Culture=neutral, PublicKeyToken=204f54e5a45c07df, processorArchitecture=MSIL">
+      <HintPath>packages\Apache.Arrow.14.0.2\lib\netstandard2.0\Apache.Arrow.dll</HintPath>
+    </Reference>
     <Reference Include="Avalonia, Version=11.0.10.0, Culture=neutral, PublicKeyToken=c8d484a7012f9a8b, processorArchitecture=MSIL">
       <HintPath>packages\Avalonia.11.0.10\lib\net461\Avalonia.dll</HintPath>
       <Private>True</Private>
@@ -286,6 +289,9 @@
     <Reference Include="Microsoft.CodeAnalysis.Scripting, Version=4.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.CodeAnalysis.Scripting.Common.4.9.2\lib\netstandard2.0\Microsoft.CodeAnalysis.Scripting.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Data.Analysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Data.Analysis.0.22.2\lib\netstandard2.0\Microsoft.Data.Analysis.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Extensions.Configuration, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Extensions.Configuration.8.0.0\lib\net462\Microsoft.Extensions.Configuration.dll</HintPath>
     </Reference>
@@ -318,6 +324,9 @@
     </Reference>
     <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.IO.RecyclableMemoryStream.3.0.0\lib\netstandard2.0\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ML.DataView, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.ML.DataView.4.0.2\lib\netstandard2.0\Microsoft.ML.DataView.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Office.Interop.Excel.15.0.4795.1000\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
+using System.Threading;
 using System.Windows.Forms;
 using OfficeOpenXml;
 
@@ -13,6 +15,11 @@ namespace SLF
         [STAThread]
         static void Main()
         {
+            // Inside your Program.cs -> Main()
+            CultureInfo culture = new CultureInfo("en-US");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+
             var logPath = Path.Combine(Application.StartupPath, "log.txt");
             var logWriter = new StreamWriter(logPath, append: true);
             logWriter.AutoFlush = true;

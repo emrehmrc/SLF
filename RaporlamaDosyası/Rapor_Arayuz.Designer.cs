@@ -172,7 +172,7 @@
             this.panel7.Location = new System.Drawing.Point(1133, 99);
             this.panel7.Margin = new System.Windows.Forms.Padding(1);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(186, 565);
+            this.panel7.Size = new System.Drawing.Size(167, 565);
             this.panel7.TabIndex = 4;
             this.panel7.Paint += new System.Windows.Forms.PaintEventHandler(this.panel7_Paint);
             // 
@@ -277,7 +277,7 @@
             this.panel5.Margin = new System.Windows.Forms.Padding(20, 20, 20, 0);
             this.panel5.Name = "panel5";
             this.panel5.Padding = new System.Windows.Forms.Padding(10);
-            this.panel5.Size = new System.Drawing.Size(804, 514);
+            this.panel5.Size = new System.Drawing.Size(817, 514);
             this.panel5.TabIndex = 8;
             // 
             // panel3
@@ -288,7 +288,7 @@
             this.panel3.Location = new System.Drawing.Point(12, 0);
             this.panel3.Margin = new System.Windows.Forms.Padding(3, 3, 3, 150);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(277, 662);
+            this.panel3.Size = new System.Drawing.Size(260, 662);
             this.panel3.TabIndex = 9;
             // 
             // Rapor_Arayuz

@@ -379,45 +379,43 @@ namespace SLF
         }
 
         public void CopyOverlayContents(
-            GMapOverlay sourceOverlay,
-            GMapOverlay targetOverlay,
-            Dictionary<GMapPolygon, DataRow> sourceDict,
-            Dictionary<GMapPolygon, DataRow> targetDict)
+     GMapOverlay sourceOverlay,
+     GMapOverlay targetOverlay,
+     Dictionary<GMapPolygon, DataRow> sourceDict,
+     Dictionary<GMapPolygon, DataRow> targetDict)
         {
-            // 1) Copy Polygons
+            // Polygons
             foreach (var srcPolygon in sourceOverlay.Polygons)
             {
-                // Create a new polygon with the same points, name, stroke, fill
-                var newPolygon = new GMapPolygon(srcPolygon.Points, srcPolygon.Name)
+                var newPoints = srcPolygon.Points.Select(pt => new PointLatLng(pt.Lat, pt.Lng)).ToList();
+                var newPolygon = new GMapPolygon(newPoints, srcPolygon.Name)
                 {
-                    // If you want fully independent Stroke/Fill objects, you can .Clone() them:
-                    Stroke = (Pen)srcPolygon.Stroke.Clone(),
-                    Fill = (Brush)srcPolygon.Fill.Clone()
+                    Stroke = (Pen)srcPolygon.Stroke.Clone()
                 };
 
-                // Add the new polygon to the target overlay
+                if (srcPolygon.Fill is SolidBrush solidBrush)
+                    newPolygon.Fill = new SolidBrush(solidBrush.Color);
+                else
+                    newPolygon.Fill = srcPolygon.Fill;
+
                 targetOverlay.Polygons.Add(newPolygon);
 
-                // Now copy the attribute row from the source dictionary (if present)
                 if (sourceDict.TryGetValue(srcPolygon, out DataRow row))
-                {
-                    // Associate the same DataRow with the new polygon in the target dictionary
                     targetDict[newPolygon] = row;
-                }
             }
 
-            // 2) Copy Routes (no dictionary logic shown—add if you have route attributes)
+            // Routes
             foreach (var srcRoute in sourceOverlay.Routes)
             {
-                var newRoute = new GMapRoute(srcRoute.Points, srcRoute.Name)
+                var newPoints = srcRoute.Points.Select(pt => new PointLatLng(pt.Lat, pt.Lng)).ToList();
+                var newRoute = new GMapRoute(newPoints, srcRoute.Name)
                 {
-                    // Same note about .Clone() for stroke if you want separate objects
                     Stroke = (Pen)srcRoute.Stroke.Clone()
                 };
                 targetOverlay.Routes.Add(newRoute);
             }
 
-            // 3) Copy Markers (same idea—no dictionary logic unless you store marker attributes)
+            // Markers
             foreach (var srcMarker in sourceOverlay.Markers)
             {
                 GMapMarker newMarker;
@@ -436,10 +434,10 @@ namespace SLF
                     };
                 }
                 targetOverlay.Markers.Add(newMarker);
-
-                // If you store marker attributes in a dictionary, do a similar lookup + assignment here
             }
+
         }
+
 
 
         // define default colors for each overlay object
@@ -1094,7 +1092,7 @@ namespace SLF
                             }
                         }
                     }
-
+                    MessageBox.Show(row_cnt.ToString() + " Placemarks loaded from KML file.");
                     // Handle legend for İMAR_SONUÇLAR.kml (after all Placemarks are processed)
                     if (Path.GetFileName(filepath) == "İMAR_SONUÇLAR.kml")
                     {

@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using DocumentFormat.OpenXml.VariantTypes;
+using Microsoft.Data.Analysis;
 
 namespace SLF
 {
@@ -100,7 +101,7 @@ namespace SLF
             }
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["BINA_TURU"]);
             combinedRowsToRemoveList.AddRange(columnNullRowsMap["KAPASITE"]);
-            combinedRowsToRemoveList.AddRange(columnNullRowsMap[$"YIL_TUKETIM_{lastYear}"]);
+            //combinedRowsToRemoveList.AddRange(columnNullRowsMap[$"YIL_TUKETIM_{lastYear}"]);
 
             RemoveCombinedRows(combinedRowsToRemoveList);
         }
@@ -151,8 +152,8 @@ namespace SLF
             AboneGrubuImpute();
             BaglantiGucuImpute();
             ImputeLastYearTuketim();
-        }
-
+        }  
+        
         private void ImputeLastYearTuketim()
         {
             var column = $"YIL_TUKETIM_{lastYear}";
@@ -1163,7 +1164,6 @@ namespace SLF
                 }
             }
 
-            MessageBox.Show($"{invalidCount} değeri");
             columnNullRowsMap["BAGLANDIGI_TRAFO_KODU"] = invalidRows;
 
             float percentage = (float)invalidCount / totalRows;

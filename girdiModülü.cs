@@ -10,7 +10,6 @@ using SLF.Services;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
-using System.Data.Entity.Infrastructure;
 
 namespace SLF
 {
@@ -230,7 +229,7 @@ namespace SLF
             }
         }
 
-        public async Task<bool> VEERProcess(string seçilenVeriTipi, bool skipPrerequisites = false)
+        public bool VEERProcess(string seçilenVeriTipi, bool skipPrerequisites = false)
         {
             try
             {
@@ -240,7 +239,7 @@ namespace SLF
                     CheckPrerequisites(seçilenVeriTipi);
                 }
 
-                await ProcessFileSelection(seçilenVeriTipi);
+                ProcessFileSelection(seçilenVeriTipi);
                 System.Diagnostics.Debug.WriteLine("File selection processed.");
 
                 DataTable dataTable = CurrentDataTable;
@@ -278,7 +277,6 @@ namespace SLF
                             Onizleme1.Buton_İLERLE.Enabled = false;
                         }
                         if (!IsInfo() && !IsWarning())
-                        
                         {
                             System.Diagnostics.Debug.WriteLine("No info/warnings, enabling YUKLE.");
                             Onizleme1.Buton_YUKLE.Enabled = true;
@@ -692,7 +690,7 @@ namespace SLF
         }
 
 
-        public async Task ProcessFileSelection(string seçilenVeriTipi)
+        public void ProcessFileSelection(string seçilenVeriTipi)
         {
             try
             {
@@ -707,7 +705,7 @@ namespace SLF
                 using (var fileDialog1 = new OpenFileDialog { Title = FileDialogTitle })
                 {
 
-                    if(seçilenVeriTipi == "İmar Verileri")
+                    if (seçilenVeriTipi == "İmar Verileri")
                     {
                         return;
                     }
@@ -723,7 +721,7 @@ namespace SLF
                     fileDialog1.Filter = filter;
                     if (fileDialog1.ShowDialog() == DialogResult.OK)
                     {
-                        await ProcessSelectedFile(fileDialog1.FileName, seçilenVeriTipi);
+                        ProcessSelectedFile(fileDialog1.FileName, seçilenVeriTipi);
                     }
                     else
                     {
@@ -750,17 +748,11 @@ namespace SLF
             return null;
         }
 
-        private async Task ProcessSelectedFile(string fileName, string seçilenVeriTipi)
+        private void ProcessSelectedFile(string fileName, string seçilenVeriTipi)
         {
             if (veri_listesi_requires_xlsx.Contains(seçilenVeriTipi))
             {
-                currentDataTable = await ProcessExcelFile(fileName, seçilenVeriTipi);
-
-                /*currentDataTable = await Task.Run(() =>
-                {
-                    return ProcessExcelFile(fileName, seçilenVeriTipi);
-                });*/
-
+                currentDataTable = ProcessExcelFile(fileName, seçilenVeriTipi);
             }
             else if (veri_listesi_requires_csv.Contains(seçilenVeriTipi))
             {
@@ -797,18 +789,11 @@ namespace SLF
             }
         }
 
-        protected async Task<DataTable> ProcessExcelFile(string fileName, string seçilenVeriTipi)
+        protected DataTable ProcessExcelFile(string fileName, string seçilenVeriTipi)
         {
             ExcelImporter importer = new ExcelImporter();
-            //DataTable dataTable = importer.ImportExcelFile(fileName, seçilenVeriTipi);
-
-            //DataTable dataTable = Task.Run(() => importer.ImportExcelFileAsync(fileName, seçilenVeriTipi)).Result;
-
-            Task<DataTable> task = Task.Run(() => importer.ImportExcelFileAsync(fileName, seçilenVeriTipi));
-            DataTable dataTable = await task;
-
+            DataTable dataTable = importer.ImportExcelFile(fileName, seçilenVeriTipi);
             return NormalizeDataTableTypes(dataTable); // Return normalized table
-   
         }
 
         protected DataTable ProcessCsvFile(string fileName)

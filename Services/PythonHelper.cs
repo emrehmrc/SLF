@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using SLF.Services;
+using static Guna.UI2.Native.WinApi;
 
 namespace SLF.services
 {
@@ -18,6 +19,9 @@ namespace SLF.services
         {
             try
             {
+
+                
+
                 // Seçilen il/ilçe bilgilerini al
                 string selectedCity = PathService.SelectedCity;
                 string selectedDistrict = PathService.SelectedDistrict;
@@ -369,10 +373,123 @@ namespace SLF.services
             }
         }
 
-        public static void RunImarPlanModel(string kmlFilePath, string csvFilePath = null)
+        private static void DeepLearningRuns()
         {
             try
             {
+                // İşlem sırasında imleç görünümünü değiştir
+                Cursor.Current = Cursors.WaitCursor;
+
+                // Gerekli kontroller (Abone verisi yüklü mü, il-ilçe seçilmiş mi)
+                if (string.IsNullOrEmpty(PathService.SelectedCity) || string.IsNullOrEmpty(PathService.SelectedDistrict))
+                {
+                    MessageBox.Show("Lütfen önce il ve ilçe seçimini yapın.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (!GirdiModülü.dataTablesByType.ContainsKey("Abone Verileri"))
+                {
+                    MessageBox.Show("Lütfen önce Abone Verileri'ni yükleyin.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Deep Learning modelini çalıştır
+                string result = RunDeepLearningModel();
+
+                // İşlem tamamlandığında başarı mesajı göster
+                MessageBox.Show("İmar analizi başarıyla tamamlandı.\nSonuçlar 'imar_analizi_sonuclari/deep_learning_modeli' klasöründe kaydedildi.",
+                                "İşlem Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"İşlem sırasında hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // İşlem bittiğinde imleci normal duruma getir
+                Cursor.Current = Cursors.Default;
+            }
+        }
+
+        public static void Dtr_Bağlantısallık()
+        {
+            string girdilerPath = PathService.GetGirdilerPathForDataType("Abone Verileri");
+            string aboneVeriYolu = Directory.GetFiles(girdilerPath, "*.csv")
+                                          .OrderByDescending(f => new FileInfo(f).LastWriteTime)
+                                          .FirstOrDefault();
+
+            string dtrModuluPath = PathService.GetGirdilerPathForDataType("DTR Verileri");
+            string dtrModuluFilePath = Directory.GetFiles(dtrModuluPath, "*.csv")
+                                                .OrderByDescending(f => new FileInfo(f).LastWriteTime)
+                                                .FirstOrDefault();
+
+            var yearService = YearService.GetInstance();
+            string year = yearService.slfStartYear.ToString();
+
+            string pythonScriptPath = !string.IsNullOrEmpty(PathService.dtr_bağlantısallıkPath)
+                    ? PathService.dtr_bağlantısallıkPath
+                    : PathService.GetPythonScriptPath("main.py");
+
+            ProcessStartInfo processInfo = new ProcessStartInfo
+            {
+                FileName = "python",
+                Arguments = $"\"{pythonScriptPath}\" \"{aboneVeriYolu}\" \"{dtrModuluFilePath}\" \"{year}\"",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true,
+                StandardOutputEncoding = Encoding.UTF8
+            };
+
+
+            using (Process process = Process.Start(processInfo))
+            {
+
+                // İşlem durumunu izleme ve ilerleme raporu
+                DateTime startTime = DateTime.Now;
+
+                // İlerleme raporlama için bir Timer başlat
+                System.Timers.Timer progressTimer = new System.Timers.Timer(30000); // 30 saniyede bir rapor
+                progressTimer.Elapsed += (sender, e) =>
+                {
+                    TimeSpan elapsed = DateTime.Now - startTime;
+                    Console.WriteLine($"İşlem devam ediyor... Geçen süre: {elapsed.Minutes} dakika {elapsed.Seconds} saniye");
+                };
+                progressTimer.AutoReset = true;
+                progressTimer.Start();
+
+                try
+                {
+                    // İşlemin tamamlanmasını sonsuza kadar bekle (zaman kısıtlaması yok)
+                    process.WaitForExit();
+
+                    // İşlem tamamlandı, çıkış kodunu kontrol et
+                    if (process.ExitCode != 0)
+                    {
+                        throw new Exception($"Python betiği hata ile sonlandı. Çıkış kodu: {process.ExitCode}");
+                    }
+                }
+
+                finally
+                {
+                    // Her durumda Timer'ı durdur
+                    progressTimer.Stop();
+                    progressTimer.Dispose();
+                }
+            }
+
+        }
+
+        public static void RunImarPlanModel(string kmlFilePath, string csvFilePath = null)
+        {
+            try
+
+            {
+                DeepLearningRuns();
+
+                Dtr_Bağlantısallık();
+
                 // Hücre verisi yolunu al - SHP ya da CSV dosyasını bul
                 string hucrePath = PathService.HucrePath;
                 string hucreFilePath = null;
@@ -718,7 +835,10 @@ namespace SLF.services
         }
 
     }
+
 }
+
+
 
 
 

@@ -844,7 +844,7 @@ namespace SLF
             // Call VEERProcess with skipPrerequisites flag
             using (new WaitCursor())
             {
-                isImported = await girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
+                isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
             }         
 
             // Set the DataSource for dataGridView_girdi
@@ -7083,7 +7083,7 @@ namespace SLF
             }
         }
 
-        private void buton_DL_calıstır_Click(object sender, EventArgs e)
+        public void buton_DL_calıstır_Click(object sender, EventArgs e)
         {
             try
             {
@@ -9074,6 +9074,8 @@ namespace SLF
                     await cbs.LoadKmlFile(filepath, overlay_imar, dt, gMapControl_imar);
 
                     cbs.CopyOverlayContents(overlay_imar, overlay_yuk, cbs.polygonAttributes_imar, cbs.polygonAttributes_yuk);
+                    gMapControl_yuk.Refresh();
+
                     cbs.tüm_katmanlar_array_imar[layer_index] = overlay_imar;
                     cbs.tüm_katmanlar_array_yuk[layer_index] = overlay_yuk;
 
