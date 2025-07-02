@@ -423,7 +423,7 @@ namespace SLF.services
 
             string pythonScriptPath = !string.IsNullOrEmpty(PathService.dtr_bağlantısallıkPath)
                     ? PathService.dtr_bağlantısallıkPath
-                    : PathService.GetPythonScriptPath("main.py");
+                    : PathService.GetPythonScriptPath("python_kod/imar_analizi/dtr_bağlantısallık.py");
 
             ProcessStartInfo processInfo = new ProcessStartInfo
             {
@@ -436,15 +436,11 @@ namespace SLF.services
                 StandardOutputEncoding = Encoding.UTF8
             };
 
-
             using (Process process = Process.Start(processInfo))
             {
-
-                // İşlem durumunu izleme ve ilerleme raporu
                 DateTime startTime = DateTime.Now;
 
-                // İlerleme raporlama için bir Timer başlat
-                System.Timers.Timer progressTimer = new System.Timers.Timer(30000); // 30 saniyede bir rapor
+                System.Timers.Timer progressTimer = new System.Timers.Timer(30000);
                 progressTimer.Elapsed += (sender, e) =>
                 {
                     TimeSpan elapsed = DateTime.Now - startTime;
@@ -455,24 +451,33 @@ namespace SLF.services
 
                 try
                 {
-                    // İşlemin tamamlanmasını sonsuza kadar bekle (zaman kısıtlaması yok)
+                    string output = process.StandardOutput.ReadToEnd();
+                    string errorOutput = process.StandardError.ReadToEnd();
+
                     process.WaitForExit();
 
-                    // İşlem tamamlandı, çıkış kodunu kontrol et
                     if (process.ExitCode != 0)
                     {
-                        throw new Exception($"Python betiği hata ile sonlandı. Çıkış kodu: {process.ExitCode}");
-                    }
-                }
+                        // Python hatasını da göster!
+                        MessageBox.Show(
+                            $"Python betiği hata ile sonlandı. Çıkış kodu: {process.ExitCode}\n\nHata Çıktısı:\n{errorOutput}",
+                            "Python Hatası",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error
+                        );
 
+                        throw new Exception($"Python betiği hata ile sonlandı. Çıkış kodu: {process.ExitCode}\nHata Çıktısı:\n{errorOutput}");
+                    }
+
+                    // İstersen normal çıktıyı da logla
+                    Console.WriteLine("Python çıktısı:\n" + output);
+                }
                 finally
                 {
-                    // Her durumda Timer'ı durdur
                     progressTimer.Stop();
                     progressTimer.Dispose();
                 }
             }
-
         }
 
         public static void RunImarPlanModel(string kmlFilePath, string csvFilePath = null)
