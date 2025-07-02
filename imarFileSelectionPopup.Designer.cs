@@ -34,20 +34,16 @@ namespace SLF
             this.label2 = new System.Windows.Forms.Label();
             this.OkButton = new System.Windows.Forms.Button();
             this.SelectKmlButton = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.SelectCsvButton = new System.Windows.Forms.Button();
-            this.imarMethodSelectionComboBox = new System.Windows.Forms.ComboBox();
             this.imarCitySelectionPanel = new System.Windows.Forms.Panel();
             this.label4 = new System.Windows.Forms.Label();
-            this.label_overpass_path = new System.Windows.Forms.Label();
             this.label_imar_path = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label_imar_test = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label_imar_katman_listeleri = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.TestCalıstır = new System.Windows.Forms.Button();
             this.KmlTestButton = new System.Windows.Forms.Button();
-            this.label_imar_test = new System.Windows.Forms.Label();
             this.imarCitySelectionPanel.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -57,7 +53,7 @@ namespace SLF
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
             this.label2.ForeColor = System.Drawing.Color.MidnightBlue;
-            this.label2.Location = new System.Drawing.Point(22, 177);
+            this.label2.Location = new System.Drawing.Point(25, 77);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.MaximumSize = new System.Drawing.Size(150, 100);
             this.label2.Name = "label2";
@@ -70,12 +66,12 @@ namespace SLF
             this.OkButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.OkButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.OkButton.ForeColor = System.Drawing.Color.White;
-            this.OkButton.Location = new System.Drawing.Point(213, 249);
+            this.OkButton.Location = new System.Drawing.Point(183, 144);
             this.OkButton.Margin = new System.Windows.Forms.Padding(4);
             this.OkButton.Name = "OkButton";
-            this.OkButton.Size = new System.Drawing.Size(118, 39);
+            this.OkButton.Size = new System.Drawing.Size(131, 47);
             this.OkButton.TabIndex = 5;
-            this.OkButton.Text = "TAMAM";
+            this.OkButton.Text = "Çalıştır";
             this.OkButton.UseVisualStyleBackColor = false;
             this.OkButton.Click += new System.EventHandler(this.OkButton_Click);
             // 
@@ -83,7 +79,7 @@ namespace SLF
             // 
             this.SelectKmlButton.BackgroundImage = global::SLF.Properties.Resources.KML21;
             this.SelectKmlButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.SelectKmlButton.Location = new System.Drawing.Point(180, 172);
+            this.SelectKmlButton.Location = new System.Drawing.Point(183, 72);
             this.SelectKmlButton.Margin = new System.Windows.Forms.Padding(4);
             this.SelectKmlButton.Name = "SelectKmlButton";
             this.SelectKmlButton.Size = new System.Drawing.Size(44, 47);
@@ -91,61 +87,18 @@ namespace SLF
             this.SelectKmlButton.UseVisualStyleBackColor = true;
             this.SelectKmlButton.Click += new System.EventHandler(this.SelectKmlButton_Click);
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
-            this.label1.ForeColor = System.Drawing.Color.MidnightBlue;
-            this.label1.Location = new System.Drawing.Point(22, 85);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label1.MaximumSize = new System.Drawing.Size(150, 100);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(142, 56);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Overpass Veri Seçimi";
-            // 
-            // SelectCsvButton
-            // 
-            this.SelectCsvButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("SelectCsvButton.BackgroundImage")));
-            this.SelectCsvButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.SelectCsvButton.Location = new System.Drawing.Point(180, 94);
-            this.SelectCsvButton.Margin = new System.Windows.Forms.Padding(4);
-            this.SelectCsvButton.Name = "SelectCsvButton";
-            this.SelectCsvButton.Size = new System.Drawing.Size(44, 47);
-            this.SelectCsvButton.TabIndex = 0;
-            this.SelectCsvButton.UseVisualStyleBackColor = true;
-            this.SelectCsvButton.Click += new System.EventHandler(this.SelectCsvButton_Click);
-            // 
-            // imarMethodSelectionComboBox
-            // 
-            this.imarMethodSelectionComboBox.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.imarMethodSelectionComboBox.ForeColor = System.Drawing.Color.Teal;
-            this.imarMethodSelectionComboBox.FormattingEnabled = true;
-            this.imarMethodSelectionComboBox.Items.AddRange(new object[] {
-            "İmar Verilerini Güncelle",
-            "Varolan İmar Verilerini Kullan"});
-            this.imarMethodSelectionComboBox.Location = new System.Drawing.Point(119, 13);
-            this.imarMethodSelectionComboBox.Margin = new System.Windows.Forms.Padding(4);
-            this.imarMethodSelectionComboBox.Name = "imarMethodSelectionComboBox";
-            this.imarMethodSelectionComboBox.Size = new System.Drawing.Size(295, 29);
-            this.imarMethodSelectionComboBox.TabIndex = 6;
-            this.imarMethodSelectionComboBox.Text = "Yapmak istediğiniz işlemi seçiniz.";
-            // 
             // imarCitySelectionPanel
             // 
             this.imarCitySelectionPanel.BackColor = System.Drawing.Color.White;
             this.imarCitySelectionPanel.Controls.Add(this.label4);
-            this.imarCitySelectionPanel.Controls.Add(this.label_overpass_path);
             this.imarCitySelectionPanel.Controls.Add(this.label_imar_path);
             this.imarCitySelectionPanel.Controls.Add(this.OkButton);
             this.imarCitySelectionPanel.Controls.Add(this.label2);
             this.imarCitySelectionPanel.Controls.Add(this.SelectKmlButton);
-            this.imarCitySelectionPanel.Controls.Add(this.label1);
-            this.imarCitySelectionPanel.Controls.Add(this.SelectCsvButton);
-            this.imarCitySelectionPanel.Location = new System.Drawing.Point(13, 311);
+            this.imarCitySelectionPanel.Location = new System.Drawing.Point(13, 262);
             this.imarCitySelectionPanel.Margin = new System.Windows.Forms.Padding(4);
             this.imarCitySelectionPanel.Name = "imarCitySelectionPanel";
-            this.imarCitySelectionPanel.Size = new System.Drawing.Size(521, 308);
+            this.imarCitySelectionPanel.Size = new System.Drawing.Size(521, 219);
             this.imarCitySelectionPanel.TabIndex = 7;
             // 
             // label4
@@ -156,27 +109,15 @@ namespace SLF
             this.label4.Location = new System.Drawing.Point(143, 15);
             this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(246, 28);
+            this.label4.Size = new System.Drawing.Size(207, 28);
             this.label4.TabIndex = 8;
-            this.label4.Text = "İmar Verileri Analizleri";
-            // 
-            // label_overpass_path
-            // 
-            this.label_overpass_path.AutoSize = true;
-            this.label_overpass_path.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label_overpass_path.Location = new System.Drawing.Point(231, 106);
-            this.label_overpass_path.MaximumSize = new System.Drawing.Size(200, 100);
-            this.label_overpass_path.Name = "label_overpass_path";
-            this.label_overpass_path.Size = new System.Drawing.Size(55, 23);
-            this.label_overpass_path.TabIndex = 7;
-            this.label_overpass_path.Text = "label4";
-            this.label_overpass_path.Visible = false;
+            this.label4.Text = "İmar Analizleri Yap";
             // 
             // label_imar_path
             // 
             this.label_imar_path.AutoSize = true;
             this.label_imar_path.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label_imar_path.Location = new System.Drawing.Point(231, 182);
+            this.label_imar_path.Location = new System.Drawing.Point(234, 82);
             this.label_imar_path.MaximumSize = new System.Drawing.Size(200, 100);
             this.label_imar_path.Name = "label_imar_path";
             this.label_imar_path.Size = new System.Drawing.Size(55, 23);
@@ -193,23 +134,35 @@ namespace SLF
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.TestCalıstır);
             this.panel1.Controls.Add(this.KmlTestButton);
-            this.panel1.Location = new System.Drawing.Point(13, 62);
+            this.panel1.Location = new System.Drawing.Point(13, 13);
             this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(521, 218);
             this.panel1.TabIndex = 6;
+            // 
+            // label_imar_test
+            // 
+            this.label_imar_test.AutoSize = true;
+            this.label_imar_test.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.label_imar_test.Location = new System.Drawing.Point(259, 94);
+            this.label_imar_test.MaximumSize = new System.Drawing.Size(200, 100);
+            this.label_imar_test.Name = "label_imar_test";
+            this.label_imar_test.Size = new System.Drawing.Size(55, 23);
+            this.label_imar_test.TabIndex = 8;
+            this.label_imar_test.Text = "label4";
+            this.label_imar_test.Visible = false;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Bahnschrift SemiBold", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.label5.ForeColor = System.Drawing.Color.MidnightBlue;
-            this.label5.Location = new System.Drawing.Point(122, 11);
+            this.label5.Location = new System.Drawing.Point(126, 13);
             this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(316, 28);
+            this.label5.Size = new System.Drawing.Size(300, 28);
             this.label5.TabIndex = 6;
-            this.label5.Text = "İmar Katmanları Test Bölümü";
+            this.label5.Text = "İmar Katmanları Eşleştirme";
             // 
             // label_imar_katman_listeleri
             // 
@@ -263,34 +216,20 @@ namespace SLF
             this.KmlTestButton.UseVisualStyleBackColor = true;
             this.KmlTestButton.Click += new System.EventHandler(this.KmlTestButton_Click);
             // 
-            // label_imar_test
-            // 
-            this.label_imar_test.AutoSize = true;
-            this.label_imar_test.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label_imar_test.Location = new System.Drawing.Point(259, 94);
-            this.label_imar_test.MaximumSize = new System.Drawing.Size(200, 100);
-            this.label_imar_test.Name = "label_imar_test";
-            this.label_imar_test.Size = new System.Drawing.Size(55, 23);
-            this.label_imar_test.TabIndex = 8;
-            this.label_imar_test.Text = "label4";
-            this.label_imar_test.Visible = false;
-            // 
             // imarFileSelectionPopup
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.NavajoWhite;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
-            this.ClientSize = new System.Drawing.Size(562, 628);
+            this.ClientSize = new System.Drawing.Size(562, 498);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.imarCitySelectionPanel);
-            this.Controls.Add(this.imarMethodSelectionComboBox);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(580, 675);
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(527, 605);
             this.Name = "imarFileSelectionPopup";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -304,12 +243,8 @@ namespace SLF
         }
 
         #endregion
-
-        private System.Windows.Forms.Button SelectCsvButton;
         private System.Windows.Forms.Button SelectKmlButton;
         private System.Windows.Forms.Button OkButton;
-        private System.Windows.Forms.ComboBox imarMethodSelectionComboBox;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel imarCitySelectionPanel;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Panel panel1;
@@ -318,7 +253,6 @@ namespace SLF
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button KmlTestButton;
-        private System.Windows.Forms.Label label_overpass_path;
         private System.Windows.Forms.Label label_imar_path;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label_imar_test;

@@ -9,7 +9,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{56900907-8C82-496F-937E-63839AABAB48}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>SLF</RootNamespace>
     <AssemblyName>SLF</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
