@@ -19,9 +19,6 @@ namespace SLF.services
         {
             try
             {
-
-                
-
                 // Seçilen il/ilçe bilgilerini al
                 string selectedCity = PathService.SelectedCity;
                 string selectedDistrict = PathService.SelectedDistrict;
@@ -71,7 +68,7 @@ namespace SLF.services
                 string otherSonucYolu = Path.Combine(imarAnaliziPath, $"other_data_{selectedCity}_{selectedDistrict}.csv");
 
                 // Python argümanlarını oluştur - İlçe parametresi eklendi
-                string arguments = $"/C python \"{pythonScriptPath}\" \"{aboneVeriYolu}\" \"{meskenSonucYolu}\" \"{otherSonucYolu}\" \"{selectedCity}\" \"{selectedDistrict}\" \"{year}\"";
+                string arguments = $"/k python \"{pythonScriptPath}\" \"{aboneVeriYolu}\" \"{meskenSonucYolu}\" \"{otherSonucYolu}\" \"{selectedCity}\" \"{selectedDistrict}\" \"{year}\"";
 
                 // Python betiğini çalıştır
                 ProcessStartInfo processInfo = new ProcessStartInfo
