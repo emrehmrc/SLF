@@ -5,6 +5,8 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLF", "SLF.csproj", "{56900907-8C82-496F-937E-63839AABAB48}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SLFsetup", "..\SLFsetup\SLFsetup.vdproj", "{1AB75708-0913-43CF-8215-197748962DDB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,8 @@ Global
 		{56900907-8C82-496F-937E-63839AABAB48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56900907-8C82-496F-937E-63839AABAB48}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56900907-8C82-496F-937E-63839AABAB48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AB75708-0913-43CF-8215-197748962DDB}.Debug|Any CPU.ActiveCfg = Debug
+		{1AB75708-0913-43CF-8215-197748962DDB}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

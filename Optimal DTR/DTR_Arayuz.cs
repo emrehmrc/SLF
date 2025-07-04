@@ -88,7 +88,7 @@ namespace SLF.Optimal_DTR
 
         Dictionary<string, PointLatLng> cityCoordinates;
 
-        public bool ODTR_çalıştı_mı = true;
+        public bool ODTR_çalıştı_mı = false;
 
         public DTR_Arayuz()
         {
@@ -321,7 +321,7 @@ namespace SLF.Optimal_DTR
         private bool CalismaYoluKontrol()
         {
             TuketimDosyaAdi = $"SONUCLAR.db";
-            TrafoDosyaAdi = $"trafo_merkez_hucre_{ilce}.xlsx";
+            TrafoDosyaAdi = $"trafo_hucre.xlsx";
             TrafoAlanDosyaAdi = $"trafo_rezerv_alanlar_{ilce.ToLower()}.xlsx";
 
             tuketim_path = Path.Combine(YükVeriYolu, "5.Yük Tahmini\\çıktı", TuketimDosyaAdi);        
@@ -802,7 +802,7 @@ namespace SLF.Optimal_DTR
                     //await PythonScriptCalistir(tuketim_path);
                     await PythonScriptCalistir(python_path, ODTRJson);
 
-                    ODTR_çalıştı_mı = true; // örneğin bir bool flag set etmek
+                    ODTR_çalıştı_mı = true;
 
                 }
 

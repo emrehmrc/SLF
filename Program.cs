@@ -20,14 +20,6 @@ namespace SLF
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-            var logPath = Path.Combine(Application.StartupPath, "log.txt");
-            var logWriter = new StreamWriter(logPath, append: true);
-            logWriter.AutoFlush = true;
-
-            Console.SetOut(logWriter);      // Console.WriteLine -> log.txt
-            Console.SetError(logWriter);    // Hatalar da log.txt'ye gider
-
-            Console.WriteLine("Uygulama başlatıldı: " + DateTime.Now);
             // Set EPPlus license context
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
@@ -36,11 +28,7 @@ namespace SLF
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new HomePageForm());
-            //Application.Run(new ModülFormu());                  
-
-            Console.WriteLine("Uygulama kapatılıyor: " + DateTime.Now);
-            logWriter.Close(); // Uygulama kapanırken dosyayı kapat
-
+                         
 
         }
 

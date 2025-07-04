@@ -303,10 +303,10 @@ namespace SLF
                         {
                             await Task.Yield(); // Allow UI to update
 
-                            Remove();
-                            ClearRows();
-                            Validate();
-                            Impute();
+                            await Task.Run(() => Remove());
+                            await Task.Run(() => ClearRows());
+                            await Task.Run(() => Validate());
+                            await Task.Run(() => Impute());
 
                         }
                         
