@@ -39,7 +39,7 @@ namespace SLF
 
             //config_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configVural.json");
 
-            /*string desktopYolu = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string desktopYolu = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             
             string hedefYol = Path.Combine(desktopYolu, "config.json");
 
@@ -58,7 +58,7 @@ namespace SLF
             catch (Exception ex)
             {
                 MessageBox.Show($"Kopyalama hatası: {ex.Message}");
-            }*/
+            }
 
             if (File.Exists(config_path))
             {
