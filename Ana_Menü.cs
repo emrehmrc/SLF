@@ -33,14 +33,7 @@ namespace SLF
                 "MRC\\MRC - 1.1.3_T&SI\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kır" +
                 "ılımları\\Program Dosyaları\\config.json").Replace("/", "\\");
 
-            //config_path = Path.Combine("C:\\Users\\vural.bayrakli\\",
-            //@"OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\configVural.json");
-
-
-            config_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configVural.json");
-
-            string desktopYolu = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            
+            string desktopYolu = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);         
             string hedefYol = Path.Combine(desktopYolu, "config.json");
 
             try
@@ -102,13 +95,10 @@ namespace SLF
             this.Hide();
         }
 
-
         private void buton_hakkında_Click(object sender, EventArgs e)
         {
             Hakkında hakkında = new Hakkında();
             hakkında.Show();
         }
-
     }
-
 }

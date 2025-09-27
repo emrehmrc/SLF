@@ -22,7 +22,6 @@ using System.Globalization;
 using Newtonsoft.Json;
 using SLF.Optimal_DTR;
 using SLF.RaporlamaDosyası;
-using SLF.services;
 using Newtonsoft.Json.Linq;
 using System.Data.SQLite;
 using Microsoft.Extensions.Configuration;
@@ -634,14 +633,22 @@ namespace SLF
             checkBoxes_imar = new System.Windows.Forms.CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4,
                 checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9,checkBox_imar_10, checkBox_imar_11,
                 checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15 , checkBox_imar_16,
-                checkBox_imar_17, checkBox_imar_18, checkBox_imar_19, checkBox_imar_20};
+                checkBox_imar_17, checkBox_imar_18, checkBox_imar_19, checkBox_imar_20, checkBox_imar_21, checkBox_imar_22, checkBox_imar_23
+            , checkBox_imar_24, checkBox_imar_25, checkBox_imar_26, checkBox_imar_27, checkBox_imar_28, checkBox_imar_29, checkBox_imar_30
+            , checkBox_imar_31, checkBox_imar_32, checkBox_imar_33, checkBox_imar_34, checkBox_imar_35, checkBox_imar_36, checkBox_imar_37
+            , checkBox_imar_38, checkBox_imar_39, checkBox_imar_40, checkBox_imar_41, checkBox_imar_42, checkBox_imar_43
+            , checkBox_imar_44, checkBox_imar_45, checkBox_imar_46, checkBox_imar_47, checkBox_imar_48, checkBox_imar_49, checkBox_imar_50};
 
             checkBoxes_yuk = new System.Windows.Forms.CheckBox[] { checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4,
                 checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9,checkBox_yuk_10, checkBox_yuk_11,
-                checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15 , checkBox_yuk_16, checkBox_yuk_17, checkBox_yuk_18
-            , checkBox_yuk_19, checkBox_yuk_20};
+                checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15 , checkBox_yuk_16, checkBox_yuk_17, checkBox_yuk_18,
+                checkBox_yuk_19, checkBox_yuk_20,checkBox_yuk_21, checkBox_yuk_22,checkBox_yuk_23, checkBox_yuk_24, checkBox_yuk_25,
+             checkBox_yuk_26, checkBox_yuk_27,checkBox_yuk_28, checkBox_yuk_29,checkBox_yuk_30, checkBox_yuk_31, checkBox_yuk_32,
+             checkBox_yuk_33, checkBox_yuk_34,checkBox_yuk_35, checkBox_yuk_36,checkBox_yuk_37, checkBox_yuk_38, checkBox_yuk_39,
+             checkBox_yuk_40, checkBox_yuk_41,checkBox_yuk_42, checkBox_yuk_43,checkBox_yuk_44, checkBox_yuk_45, checkBox_yuk_46,
+             checkBox_yuk_47, checkBox_yuk_48,checkBox_yuk_49, checkBox_yuk_50};
 
-            int[] tagValuesForCheckboxes = Enumerable.Range(1, 20).ToArray();
+            int[] tagValuesForCheckboxes = Enumerable.Range(1, 50).ToArray();
 
             void initializeCheckBoxes(System.Windows.Forms.CheckBox[] checkBoxes, int[] tagValues)
             {
@@ -719,11 +726,23 @@ namespace SLF
                 checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
                 checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15,
                 checkBox_imar_16,checkBox_imar_17,checkBox_imar_18,checkBox_imar_19,checkBox_imar_20,
+                checkBox_imar_21, checkBox_imar_22, checkBox_imar_23, checkBox_imar_24, checkBox_imar_25,
+                checkBox_imar_26, checkBox_imar_27, checkBox_imar_28, checkBox_imar_29, checkBox_imar_30,
+                checkBox_imar_31, checkBox_imar_32, checkBox_imar_33, checkBox_imar_34, checkBox_imar_35,
+                checkBox_imar_36,checkBox_imar_37,checkBox_imar_38,checkBox_imar_39,checkBox_imar_40,
+                checkBox_imar_41, checkBox_imar_42, checkBox_imar_43, checkBox_imar_44, checkBox_imar_45,
+                checkBox_imar_46,checkBox_imar_47,checkBox_imar_48,checkBox_imar_49,checkBox_imar_50,
 
                 checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4, checkBox_yuk_5,
                 checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9, checkBox_yuk_10,
                 checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15,
-                checkBox_yuk_16, checkBox_yuk_17, checkBox_yuk_18, checkBox_yuk_19, checkBox_yuk_20
+                checkBox_yuk_16, checkBox_yuk_17, checkBox_yuk_18, checkBox_yuk_19, checkBox_yuk_20,
+                checkBox_yuk_21, checkBox_yuk_22, checkBox_yuk_23, checkBox_yuk_24, checkBox_yuk_25,
+                checkBox_yuk_26, checkBox_yuk_27, checkBox_yuk_28, checkBox_yuk_29, checkBox_yuk_30,
+                checkBox_yuk_31, checkBox_yuk_32, checkBox_yuk_33, checkBox_yuk_34, checkBox_yuk_35,
+                checkBox_yuk_36, checkBox_yuk_37, checkBox_yuk_38, checkBox_yuk_39, checkBox_yuk_40,
+                checkBox_yuk_41, checkBox_yuk_42, checkBox_yuk_43, checkBox_yuk_44, checkBox_yuk_45,
+                checkBox_yuk_46, checkBox_yuk_47, checkBox_yuk_48, checkBox_yuk_49, checkBox_yuk_50
             };
 
             var categoryCheckboxes = new Dictionary<string, CheckBox[]>
@@ -1823,12 +1842,21 @@ namespace SLF
                 checkBoxes_imar = new System.Windows.Forms.CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4,
                     checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9,checkBox_imar_10, checkBox_imar_11,
                     checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15, checkBox_imar_16, checkBox_imar_17, checkBox_imar_18
-                , checkBox_imar_19, checkBox_imar_20};
+                , checkBox_imar_19, checkBox_imar_20, checkBox_imar_21, checkBox_imar_22, checkBox_imar_23, checkBox_imar_24
+                , checkBox_imar_25, checkBox_imar_26, checkBox_imar_27, checkBox_imar_28, checkBox_imar_29, checkBox_imar_30
+                , checkBox_imar_31, checkBox_imar_32, checkBox_imar_33, checkBox_imar_34, checkBox_imar_35, checkBox_imar_36
+                , checkBox_imar_37, checkBox_imar_38, checkBox_imar_39, checkBox_imar_40, checkBox_imar_41, checkBox_imar_42
+                , checkBox_imar_43, checkBox_imar_44, checkBox_imar_45, checkBox_imar_46, checkBox_imar_47, checkBox_imar_48,
+                 checkBox_imar_49, checkBox_imar_50};
 
                 checkBoxes_yuk = new System.Windows.Forms.CheckBox[] { checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4,
                     checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9,checkBox_yuk_10, checkBox_yuk_11,
-                    checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15 , checkBox_yuk_16, checkBox_yuk_17, checkBox_yuk_18
-                , checkBox_yuk_19, checkBox_yuk_20};
+                    checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15 , checkBox_yuk_16, checkBox_yuk_17, checkBox_yuk_18,
+                    checkBox_yuk_19, checkBox_yuk_20, checkBox_yuk_21, checkBox_yuk_22, checkBox_yuk_23, checkBox_yuk_24, checkBox_yuk_25,
+                checkBox_yuk_26, checkBox_yuk_27, checkBox_yuk_28, checkBox_yuk_29, checkBox_yuk_30, checkBox_yuk_31, checkBox_yuk_32,
+                checkBox_yuk_33, checkBox_yuk_34, checkBox_yuk_35, checkBox_yuk_36, checkBox_yuk_37, checkBox_yuk_38, checkBox_yuk_39,
+                checkBox_yuk_40, checkBox_yuk_41, checkBox_yuk_42, checkBox_yuk_43, checkBox_yuk_44, checkBox_yuk_45, checkBox_yuk_46,
+                checkBox_yuk_47, checkBox_yuk_48, checkBox_yuk_49, checkBox_yuk_50};
 
 
                 // EA modülü checkboxlarını sıfırla
@@ -5925,7 +5953,7 @@ namespace SLF
                     int layerIndex = FindFirstFreeLayerIndex();
                     if (layerIndex == -1)
                     {
-                        MessageBox.Show("En fazla 20 adet katman!");
+                        MessageBox.Show("En fazla 50 adet katman seçilebilir!");
                         return;
                     }
 
@@ -6226,16 +6254,29 @@ namespace SLF
 
             var imarCheckBoxes = new CheckBox[] { checkBox_imar_1, checkBox_imar_2, checkBox_imar_3, checkBox_imar_4,
                 checkBox_imar_5, checkBox_imar_6, checkBox_imar_7, checkBox_imar_8, checkBox_imar_9, checkBox_imar_10,
-                checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15
-            , checkBox_imar_16, checkBox_imar_17, checkBox_imar_18, checkBox_imar_19, checkBox_imar_20};
+                checkBox_imar_11, checkBox_imar_12, checkBox_imar_13, checkBox_imar_14, checkBox_imar_15, 
+                checkBox_imar_16, checkBox_imar_17, checkBox_imar_18, checkBox_imar_19, checkBox_imar_20,
+                checkBox_imar_21, checkBox_imar_22, checkBox_imar_23, checkBox_imar_24, checkBox_imar_25,
+                checkBox_imar_26, checkBox_imar_27, checkBox_imar_28, checkBox_imar_29, checkBox_imar_30,
+                checkBox_imar_31, checkBox_imar_32, checkBox_imar_33, checkBox_imar_34, checkBox_imar_35,
+                checkBox_imar_36, checkBox_imar_37, checkBox_imar_38, checkBox_imar_39, checkBox_imar_40,
+                checkBox_imar_41, checkBox_imar_42, checkBox_imar_43, checkBox_imar_44, checkBox_imar_45,
+                checkBox_imar_46, checkBox_imar_47, checkBox_imar_48, checkBox_imar_49, checkBox_imar_50};
+
 
             var yukCheckBoxes = new CheckBox[] { checkBox_yuk_1, checkBox_yuk_2, checkBox_yuk_3, checkBox_yuk_4,
                 checkBox_yuk_5, checkBox_yuk_6, checkBox_yuk_7, checkBox_yuk_8, checkBox_yuk_9, checkBox_yuk_10,
-                checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15
-            , checkBox_yuk_16, checkBox_yuk_17, checkBox_yuk_18, checkBox_yuk_19, checkBox_yuk_20};
+                checkBox_yuk_11, checkBox_yuk_12, checkBox_yuk_13, checkBox_yuk_14, checkBox_yuk_15,
+                checkBox_yuk_16, checkBox_yuk_17, checkBox_yuk_18, checkBox_yuk_19, checkBox_yuk_20, checkBox_yuk_21,
+                checkBox_yuk_22, checkBox_yuk_23, checkBox_yuk_24, checkBox_yuk_25, checkBox_yuk_26, checkBox_yuk_27,
+                checkBox_yuk_28, checkBox_yuk_29, checkBox_yuk_30, checkBox_yuk_31, checkBox_yuk_32, checkBox_yuk_33,
+                checkBox_yuk_34, checkBox_yuk_35, checkBox_yuk_36, checkBox_yuk_37, checkBox_yuk_38, checkBox_yuk_39,
+                checkBox_yuk_40, checkBox_yuk_41, checkBox_yuk_42, checkBox_yuk_43, checkBox_yuk_44, checkBox_yuk_45,
+                checkBox_yuk_46, checkBox_yuk_47, checkBox_yuk_48, checkBox_yuk_49, checkBox_yuk_50};
+
 
             // Ensure the index is valid before accessing arrays
-            if (index >= 0 && index < 20)
+            if (index >= 0 && index < 50)
             {
                 // Return the checkboxes for the given index
                 return new List<CheckBox> { imarCheckBoxes[index], yukCheckBoxes[index] };
@@ -6287,7 +6328,7 @@ namespace SLF
                 return;
             }
 
-            // Adjust the index since the tags are from 1 to 20 but the checkbox_indexes in the arrays are 0 to 24
+            // Adjust the index since the tags are from 1 to 50 but the checkbox_indexes in the arrays are 0 to 24
             checkbox_index -= 1;
             lastSelectedCheckboxIndex = checkbox_index; // Store the index
 
@@ -6818,7 +6859,7 @@ namespace SLF
 
         private int FindFirstFreeLayerIndex()
         {
-            for (int i = 0; i < 13; i++)  // or whatever max size
+            for (int i = 0; i < 50; i++)  // or whatever max size
             {
                 if (cbs.tüm_katmanlar_datatable[i] == null)
                 {
@@ -6832,7 +6873,7 @@ namespace SLF
         public int FindLayerIndexFromOverlay(GMapOverlay overlay)
         {
             // Check each array for a match
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 50; i++)
             {
                 if (cbs.tüm_katmanlar_array_imar[i] == overlay) return i;
                 if (cbs.tüm_katmanlar_array_yuk[i] == overlay) return i;
@@ -8996,7 +9037,7 @@ namespace SLF
 
                     if (layer_index == -1)
                     {
-                        MessageBox.Show("En fazla 20 adet katman seçilebilmektedir.");
+                        MessageBox.Show("En fazla 50 adet katman seçilebilmektedir.");
                         return;
                     }
 

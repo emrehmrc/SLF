@@ -20,33 +20,33 @@ namespace SLF
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ModülFormu));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle23 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle24 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle25 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle26 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle27 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle163 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle164 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle165 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle166 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle167 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle168 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle169 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle170 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle171 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle172 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle173 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle174 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle175 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle176 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle177 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle178 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle179 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle180 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle181 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle182 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle183 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle184 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle185 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle186 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle187 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle188 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle189 = new System.Windows.Forms.DataGridViewCellStyle();
             this.Modül_Tabları = new System.Windows.Forms.TabControl();
             this.tab_girdi = new System.Windows.Forms.TabPage();
             this.label_data_count = new System.Windows.Forms.Label();
@@ -131,17 +131,53 @@ namespace SLF
             this.ACWorkLegendLabel = new System.Windows.Forms.Label();
             this.ACHomeLegendValueLabel = new System.Windows.Forms.Label();
             this.tab_imar = new System.Windows.Forms.TabPage();
-            this.checkBox_imar_20 = new System.Windows.Forms.CheckBox();
+            this.panel_imar_checkboxes = new System.Windows.Forms.Panel();
+            this.checkBox_imar_38 = new System.Windows.Forms.CheckBox();
             this.katmanlar_right_click = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tabloyuGörToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.rengiDeğiştirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.temizleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.yenidenAdlandırToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.kaydetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.checkBox_imar_39 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_40 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_29 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_30 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_31 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_32 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_33 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_34 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_35 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_36 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_37 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_24 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_26 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_27 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_28 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_25 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_22 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_23 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_21 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_1 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_20 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_7 = new System.Windows.Forms.CheckBox();
             this.checkBox_imar_19 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_6 = new System.Windows.Forms.CheckBox();
             this.checkBox_imar_18 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_5 = new System.Windows.Forms.CheckBox();
             this.checkBox_imar_17 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_4 = new System.Windows.Forms.CheckBox();
             this.checkBox_imar_16 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_3 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_2 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_8 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_13 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_12 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_11 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_15 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_10 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_14 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_9 = new System.Windows.Forms.CheckBox();
             this.buton_SLF_tahmini = new System.Windows.Forms.Button();
             this.buton_abone_sayısı_tahmini = new System.Windows.Forms.Button();
             this.buton_imar_tahmini = new System.Windows.Forms.Button();
@@ -152,21 +188,6 @@ namespace SLF
             this.webView_imar = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.mesafe_metre_imar = new System.Windows.Forms.Label();
             this.gMapControl_imar = new GMap.NET.WindowsForms.GMapControl();
-            this.checkBox_imar_15 = new System.Windows.Forms.CheckBox();
-            this.checkBox_imar_14 = new System.Windows.Forms.CheckBox();
-            this.checkBox_imar_1 = new System.Windows.Forms.CheckBox();
-            this.checkBox_imar_2 = new System.Windows.Forms.CheckBox();
-            this.checkBox_imar_3 = new System.Windows.Forms.CheckBox();
-            this.checkBox_imar_4 = new System.Windows.Forms.CheckBox();
-            this.checkBox_imar_5 = new System.Windows.Forms.CheckBox();
-            this.checkBox_imar_6 = new System.Windows.Forms.CheckBox();
-            this.checkBox_imar_7 = new System.Windows.Forms.CheckBox();
-            this.checkBox_imar_8 = new System.Windows.Forms.CheckBox();
-            this.checkBox_imar_9 = new System.Windows.Forms.CheckBox();
-            this.checkBox_imar_10 = new System.Windows.Forms.CheckBox();
-            this.checkBox_imar_11 = new System.Windows.Forms.CheckBox();
-            this.checkBox_imar_12 = new System.Windows.Forms.CheckBox();
-            this.checkBox_imar_13 = new System.Windows.Forms.CheckBox();
             this.label_imar_katmanlar = new System.Windows.Forms.Label();
             this.imar_dosya_seçimi = new System.Windows.Forms.Button();
             this.toolStrip_imar = new System.Windows.Forms.ToolStrip();
@@ -281,6 +302,47 @@ namespace SLF
             this.miniToolStrip = new System.Windows.Forms.ToolStrip();
             this.buton_ea_harita_katmanlar = new System.Windows.Forms.Button();
             this.ELFMinSenaryoGraphPicBox = new System.Windows.Forms.PictureBox();
+            this.checkBox_imar_50 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_49 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_48 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_47 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_46 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_45 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_44 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_43 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_42 = new System.Windows.Forms.CheckBox();
+            this.checkBox_imar_41 = new System.Windows.Forms.CheckBox();
+            this.panel_yuk_checkboxes = new System.Windows.Forms.Panel();
+            this.checkBox_yuk_50 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_49 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_48 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_47 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_46 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_45 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_44 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_43 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_41 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_42 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_40 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_39 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_38 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_37 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_35 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_33 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_30 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_29 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_28 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_36 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_24 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_34 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_32 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_31 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_27 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_26 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_25 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_23 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_22 = new System.Windows.Forms.CheckBox();
+            this.checkBox_yuk_21 = new System.Windows.Forms.CheckBox();
             this.Modül_Tabları.SuspendLayout();
             this.tab_girdi.SuspendLayout();
             this.panel_proje_ekle.SuspendLayout();
@@ -299,6 +361,7 @@ namespace SLF
             this.GelecekSimPanel.SuspendLayout();
             this.harita_katmanları_right_click.SuspendLayout();
             this.tab_imar.SuspendLayout();
+            this.panel_imar_checkboxes.SuspendLayout();
             this.katmanlar_right_click.SuspendLayout();
             this.panel_imar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.webView_imar)).BeginInit();
@@ -343,6 +406,7 @@ namespace SLF
             this.ModuleTabPanel.SuspendLayout();
             this.HeaderPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ELFMinSenaryoGraphPicBox)).BeginInit();
+            this.panel_yuk_checkboxes.SuspendLayout();
             this.SuspendLayout();
             // 
             // Modül_Tabları
@@ -530,31 +594,31 @@ namespace SLF
             this.dataGridView_girdi.BackgroundColor = System.Drawing.Color.Snow;
             this.dataGridView_girdi.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridView_girdi.ColumnHeadersHeight = 29;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.DarkOrange;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridView_girdi.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle163.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle163.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle163.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle163.ForeColor = System.Drawing.Color.DarkOrange;
+            dataGridViewCellStyle163.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle163.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle163.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridView_girdi.DefaultCellStyle = dataGridViewCellStyle163;
             this.dataGridView_girdi.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.dataGridView_girdi.Location = new System.Drawing.Point(3, 113);
             this.dataGridView_girdi.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.dataGridView_girdi.Name = "dataGridView_girdi";
             this.dataGridView_girdi.ReadOnly = true;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView_girdi.RowHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle164.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle164.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle164.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle164.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle164.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle164.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle164.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView_girdi.RowHeadersDefaultCellStyle = dataGridViewCellStyle164;
             this.dataGridView_girdi.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            this.dataGridView_girdi.RowsDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle165.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle165.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            this.dataGridView_girdi.RowsDefaultCellStyle = dataGridViewCellStyle165;
             this.dataGridView_girdi.RowTemplate.Height = 24;
             this.dataGridView_girdi.Size = new System.Drawing.Size(1283, 590);
             this.dataGridView_girdi.TabIndex = 4;
@@ -1537,31 +1601,12 @@ namespace SLF
             // tab_imar
             // 
             this.tab_imar.AutoScroll = true;
-            this.tab_imar.Controls.Add(this.checkBox_imar_20);
-            this.tab_imar.Controls.Add(this.checkBox_imar_19);
-            this.tab_imar.Controls.Add(this.checkBox_imar_18);
-            this.tab_imar.Controls.Add(this.checkBox_imar_17);
-            this.tab_imar.Controls.Add(this.checkBox_imar_16);
+            this.tab_imar.Controls.Add(this.panel_imar_checkboxes);
             this.tab_imar.Controls.Add(this.buton_SLF_tahmini);
             this.tab_imar.Controls.Add(this.buton_abone_sayısı_tahmini);
             this.tab_imar.Controls.Add(this.buton_imar_tahmini);
             this.tab_imar.Controls.Add(this.panel2);
             this.tab_imar.Controls.Add(this.panel_imar);
-            this.tab_imar.Controls.Add(this.checkBox_imar_15);
-            this.tab_imar.Controls.Add(this.checkBox_imar_14);
-            this.tab_imar.Controls.Add(this.checkBox_imar_1);
-            this.tab_imar.Controls.Add(this.checkBox_imar_2);
-            this.tab_imar.Controls.Add(this.checkBox_imar_3);
-            this.tab_imar.Controls.Add(this.checkBox_imar_4);
-            this.tab_imar.Controls.Add(this.checkBox_imar_5);
-            this.tab_imar.Controls.Add(this.checkBox_imar_6);
-            this.tab_imar.Controls.Add(this.checkBox_imar_7);
-            this.tab_imar.Controls.Add(this.checkBox_imar_8);
-            this.tab_imar.Controls.Add(this.checkBox_imar_9);
-            this.tab_imar.Controls.Add(this.checkBox_imar_10);
-            this.tab_imar.Controls.Add(this.checkBox_imar_11);
-            this.tab_imar.Controls.Add(this.checkBox_imar_12);
-            this.tab_imar.Controls.Add(this.checkBox_imar_13);
             this.tab_imar.Controls.Add(this.label_imar_katmanlar);
             this.tab_imar.Controls.Add(this.imar_dosya_seçimi);
             this.tab_imar.Controls.Add(this.toolStrip_imar);
@@ -1574,18 +1619,79 @@ namespace SLF
             this.tab_imar.Text = "Jeo-Uzamsal Talep Tahmini";
             this.tab_imar.UseVisualStyleBackColor = true;
             // 
-            // checkBox_imar_20
+            // panel_imar_checkboxes
             // 
-            this.checkBox_imar_20.AutoSize = true;
-            this.checkBox_imar_20.BackColor = System.Drawing.Color.Transparent;
-            this.checkBox_imar_20.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_20.Location = new System.Drawing.Point(15, 710);
-            this.checkBox_imar_20.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.checkBox_imar_20.Name = "checkBox_imar_20";
-            this.checkBox_imar_20.Size = new System.Drawing.Size(171, 27);
-            this.checkBox_imar_20.TabIndex = 87;
-            this.checkBox_imar_20.Text = "checkBox_imar_20";
-            this.checkBox_imar_20.UseVisualStyleBackColor = false;
+            this.panel_imar_checkboxes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.panel_imar_checkboxes.AutoScroll = true;
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_41);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_42);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_43);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_44);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_45);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_46);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_47);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_48);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_49);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_50);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_38);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_39);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_40);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_29);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_30);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_31);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_32);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_33);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_34);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_35);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_36);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_37);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_24);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_26);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_27);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_28);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_25);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_22);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_23);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_21);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_1);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_20);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_7);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_19);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_6);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_18);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_5);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_17);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_4);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_16);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_3);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_2);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_8);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_13);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_12);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_11);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_15);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_10);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_14);
+            this.panel_imar_checkboxes.Controls.Add(this.checkBox_imar_9);
+            this.panel_imar_checkboxes.Location = new System.Drawing.Point(3, 137);
+            this.panel_imar_checkboxes.Name = "panel_imar_checkboxes";
+            this.panel_imar_checkboxes.Size = new System.Drawing.Size(250, 603);
+            this.panel_imar_checkboxes.TabIndex = 88;
+            // 
+            // checkBox_imar_38
+            // 
+            this.checkBox_imar_38.AutoSize = true;
+            this.checkBox_imar_38.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_38.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_38.Location = new System.Drawing.Point(15, 1113);
+            this.checkBox_imar_38.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_38.Name = "checkBox_imar_38";
+            this.checkBox_imar_38.Size = new System.Drawing.Size(171, 27);
+            this.checkBox_imar_38.TabIndex = 107;
+            this.checkBox_imar_38.Text = "checkBox_imar_38";
+            this.checkBox_imar_38.UseVisualStyleBackColor = false;
+            this.checkBox_imar_38.Visible = false;
             // 
             // katmanlar_right_click
             // 
@@ -1641,25 +1747,345 @@ namespace SLF
             this.kaydetToolStripMenuItem.Text = "Kaydet";
             this.kaydetToolStripMenuItem.Click += new System.EventHandler(this.kaydetToolStripMenuItem_Click);
             // 
+            // checkBox_imar_39
+            // 
+            this.checkBox_imar_39.AutoSize = true;
+            this.checkBox_imar_39.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_39.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_39.Location = new System.Drawing.Point(15, 1143);
+            this.checkBox_imar_39.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_39.Name = "checkBox_imar_39";
+            this.checkBox_imar_39.Size = new System.Drawing.Size(171, 27);
+            this.checkBox_imar_39.TabIndex = 106;
+            this.checkBox_imar_39.Text = "checkBox_imar_39";
+            this.checkBox_imar_39.UseVisualStyleBackColor = false;
+            this.checkBox_imar_39.Visible = false;
+            // 
+            // checkBox_imar_40
+            // 
+            this.checkBox_imar_40.AutoSize = true;
+            this.checkBox_imar_40.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_40.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_40.Location = new System.Drawing.Point(15, 1173);
+            this.checkBox_imar_40.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_40.Name = "checkBox_imar_40";
+            this.checkBox_imar_40.Size = new System.Drawing.Size(172, 27);
+            this.checkBox_imar_40.TabIndex = 105;
+            this.checkBox_imar_40.Text = "checkBox_imar_40";
+            this.checkBox_imar_40.UseVisualStyleBackColor = false;
+            this.checkBox_imar_40.Visible = false;
+            // 
+            // checkBox_imar_29
+            // 
+            this.checkBox_imar_29.AutoSize = true;
+            this.checkBox_imar_29.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_29.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_29.Location = new System.Drawing.Point(15, 843);
+            this.checkBox_imar_29.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_29.Name = "checkBox_imar_29";
+            this.checkBox_imar_29.Size = new System.Drawing.Size(171, 27);
+            this.checkBox_imar_29.TabIndex = 104;
+            this.checkBox_imar_29.Text = "checkBox_imar_29";
+            this.checkBox_imar_29.UseVisualStyleBackColor = false;
+            this.checkBox_imar_29.Visible = false;
+            // 
+            // checkBox_imar_30
+            // 
+            this.checkBox_imar_30.AutoSize = true;
+            this.checkBox_imar_30.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_30.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_30.Location = new System.Drawing.Point(15, 873);
+            this.checkBox_imar_30.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_30.Name = "checkBox_imar_30";
+            this.checkBox_imar_30.Size = new System.Drawing.Size(171, 27);
+            this.checkBox_imar_30.TabIndex = 103;
+            this.checkBox_imar_30.Text = "checkBox_imar_30";
+            this.checkBox_imar_30.UseVisualStyleBackColor = false;
+            this.checkBox_imar_30.Visible = false;
+            // 
+            // checkBox_imar_31
+            // 
+            this.checkBox_imar_31.AutoSize = true;
+            this.checkBox_imar_31.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_31.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_31.Location = new System.Drawing.Point(15, 903);
+            this.checkBox_imar_31.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_31.Name = "checkBox_imar_31";
+            this.checkBox_imar_31.Size = new System.Drawing.Size(169, 27);
+            this.checkBox_imar_31.TabIndex = 102;
+            this.checkBox_imar_31.Text = "checkBox_imar_31";
+            this.checkBox_imar_31.UseVisualStyleBackColor = false;
+            this.checkBox_imar_31.Visible = false;
+            // 
+            // checkBox_imar_32
+            // 
+            this.checkBox_imar_32.AutoSize = true;
+            this.checkBox_imar_32.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_32.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_32.Location = new System.Drawing.Point(15, 933);
+            this.checkBox_imar_32.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_32.Name = "checkBox_imar_32";
+            this.checkBox_imar_32.Size = new System.Drawing.Size(171, 27);
+            this.checkBox_imar_32.TabIndex = 101;
+            this.checkBox_imar_32.Text = "checkBox_imar_32";
+            this.checkBox_imar_32.UseVisualStyleBackColor = false;
+            this.checkBox_imar_32.Visible = false;
+            // 
+            // checkBox_imar_33
+            // 
+            this.checkBox_imar_33.AutoSize = true;
+            this.checkBox_imar_33.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_33.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_33.Location = new System.Drawing.Point(15, 963);
+            this.checkBox_imar_33.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_33.Name = "checkBox_imar_33";
+            this.checkBox_imar_33.Size = new System.Drawing.Size(171, 27);
+            this.checkBox_imar_33.TabIndex = 100;
+            this.checkBox_imar_33.Text = "checkBox_imar_33";
+            this.checkBox_imar_33.UseVisualStyleBackColor = false;
+            this.checkBox_imar_33.Visible = false;
+            // 
+            // checkBox_imar_34
+            // 
+            this.checkBox_imar_34.AutoSize = true;
+            this.checkBox_imar_34.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_34.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_34.Location = new System.Drawing.Point(15, 993);
+            this.checkBox_imar_34.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_34.Name = "checkBox_imar_34";
+            this.checkBox_imar_34.Size = new System.Drawing.Size(172, 27);
+            this.checkBox_imar_34.TabIndex = 99;
+            this.checkBox_imar_34.Text = "checkBox_imar_34";
+            this.checkBox_imar_34.UseVisualStyleBackColor = false;
+            this.checkBox_imar_34.Visible = false;
+            // 
+            // checkBox_imar_35
+            // 
+            this.checkBox_imar_35.AutoSize = true;
+            this.checkBox_imar_35.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_35.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_35.Location = new System.Drawing.Point(15, 1023);
+            this.checkBox_imar_35.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_35.Name = "checkBox_imar_35";
+            this.checkBox_imar_35.Size = new System.Drawing.Size(171, 27);
+            this.checkBox_imar_35.TabIndex = 98;
+            this.checkBox_imar_35.Text = "checkBox_imar_35";
+            this.checkBox_imar_35.UseVisualStyleBackColor = false;
+            this.checkBox_imar_35.Visible = false;
+            // 
+            // checkBox_imar_36
+            // 
+            this.checkBox_imar_36.AutoSize = true;
+            this.checkBox_imar_36.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_36.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_36.Location = new System.Drawing.Point(15, 1053);
+            this.checkBox_imar_36.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_36.Name = "checkBox_imar_36";
+            this.checkBox_imar_36.Size = new System.Drawing.Size(171, 27);
+            this.checkBox_imar_36.TabIndex = 97;
+            this.checkBox_imar_36.Text = "checkBox_imar_36";
+            this.checkBox_imar_36.UseVisualStyleBackColor = false;
+            this.checkBox_imar_36.Visible = false;
+            // 
+            // checkBox_imar_37
+            // 
+            this.checkBox_imar_37.AutoSize = true;
+            this.checkBox_imar_37.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_37.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_37.Location = new System.Drawing.Point(15, 1083);
+            this.checkBox_imar_37.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_37.Name = "checkBox_imar_37";
+            this.checkBox_imar_37.Size = new System.Drawing.Size(171, 27);
+            this.checkBox_imar_37.TabIndex = 96;
+            this.checkBox_imar_37.Text = "checkBox_imar_37";
+            this.checkBox_imar_37.UseVisualStyleBackColor = false;
+            this.checkBox_imar_37.Visible = false;
+            // 
+            // checkBox_imar_24
+            // 
+            this.checkBox_imar_24.AutoSize = true;
+            this.checkBox_imar_24.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_24.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_24.Location = new System.Drawing.Point(15, 693);
+            this.checkBox_imar_24.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_24.Name = "checkBox_imar_24";
+            this.checkBox_imar_24.Size = new System.Drawing.Size(172, 27);
+            this.checkBox_imar_24.TabIndex = 95;
+            this.checkBox_imar_24.Text = "checkBox_imar_24";
+            this.checkBox_imar_24.UseVisualStyleBackColor = false;
+            this.checkBox_imar_24.Visible = false;
+            // 
+            // checkBox_imar_26
+            // 
+            this.checkBox_imar_26.AutoSize = true;
+            this.checkBox_imar_26.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_26.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_26.Location = new System.Drawing.Point(15, 753);
+            this.checkBox_imar_26.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_26.Name = "checkBox_imar_26";
+            this.checkBox_imar_26.Size = new System.Drawing.Size(171, 27);
+            this.checkBox_imar_26.TabIndex = 94;
+            this.checkBox_imar_26.Text = "checkBox_imar_26";
+            this.checkBox_imar_26.UseVisualStyleBackColor = false;
+            this.checkBox_imar_26.Visible = false;
+            // 
+            // checkBox_imar_27
+            // 
+            this.checkBox_imar_27.AutoSize = true;
+            this.checkBox_imar_27.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_27.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_27.Location = new System.Drawing.Point(15, 783);
+            this.checkBox_imar_27.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_27.Name = "checkBox_imar_27";
+            this.checkBox_imar_27.Size = new System.Drawing.Size(171, 27);
+            this.checkBox_imar_27.TabIndex = 93;
+            this.checkBox_imar_27.Text = "checkBox_imar_27";
+            this.checkBox_imar_27.UseVisualStyleBackColor = false;
+            this.checkBox_imar_27.Visible = false;
+            // 
+            // checkBox_imar_28
+            // 
+            this.checkBox_imar_28.AutoSize = true;
+            this.checkBox_imar_28.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_28.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_28.Location = new System.Drawing.Point(15, 813);
+            this.checkBox_imar_28.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_28.Name = "checkBox_imar_28";
+            this.checkBox_imar_28.Size = new System.Drawing.Size(171, 27);
+            this.checkBox_imar_28.TabIndex = 92;
+            this.checkBox_imar_28.Text = "checkBox_imar_28";
+            this.checkBox_imar_28.UseVisualStyleBackColor = false;
+            this.checkBox_imar_28.Visible = false;
+            // 
+            // checkBox_imar_25
+            // 
+            this.checkBox_imar_25.AutoSize = true;
+            this.checkBox_imar_25.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_25.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_25.Location = new System.Drawing.Point(15, 723);
+            this.checkBox_imar_25.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_25.Name = "checkBox_imar_25";
+            this.checkBox_imar_25.Size = new System.Drawing.Size(171, 27);
+            this.checkBox_imar_25.TabIndex = 91;
+            this.checkBox_imar_25.Text = "checkBox_imar_25";
+            this.checkBox_imar_25.UseVisualStyleBackColor = false;
+            this.checkBox_imar_25.Visible = false;
+            // 
+            // checkBox_imar_22
+            // 
+            this.checkBox_imar_22.AutoSize = true;
+            this.checkBox_imar_22.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_22.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_22.Location = new System.Drawing.Point(15, 633);
+            this.checkBox_imar_22.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_22.Name = "checkBox_imar_22";
+            this.checkBox_imar_22.Size = new System.Drawing.Size(171, 27);
+            this.checkBox_imar_22.TabIndex = 90;
+            this.checkBox_imar_22.Text = "checkBox_imar_22";
+            this.checkBox_imar_22.UseVisualStyleBackColor = false;
+            this.checkBox_imar_22.Visible = false;
+            // 
+            // checkBox_imar_23
+            // 
+            this.checkBox_imar_23.AutoSize = true;
+            this.checkBox_imar_23.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_23.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_23.Location = new System.Drawing.Point(15, 663);
+            this.checkBox_imar_23.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_23.Name = "checkBox_imar_23";
+            this.checkBox_imar_23.Size = new System.Drawing.Size(171, 27);
+            this.checkBox_imar_23.TabIndex = 89;
+            this.checkBox_imar_23.Text = "checkBox_imar_23";
+            this.checkBox_imar_23.UseVisualStyleBackColor = false;
+            this.checkBox_imar_23.Visible = false;
+            // 
+            // checkBox_imar_21
+            // 
+            this.checkBox_imar_21.AutoSize = true;
+            this.checkBox_imar_21.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_21.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_21.Location = new System.Drawing.Point(15, 603);
+            this.checkBox_imar_21.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_21.Name = "checkBox_imar_21";
+            this.checkBox_imar_21.Size = new System.Drawing.Size(169, 27);
+            this.checkBox_imar_21.TabIndex = 88;
+            this.checkBox_imar_21.Text = "checkBox_imar_21";
+            this.checkBox_imar_21.UseVisualStyleBackColor = false;
+            this.checkBox_imar_21.Visible = false;
+            // 
+            // checkBox_imar_1
+            // 
+            this.checkBox_imar_1.AutoSize = true;
+            this.checkBox_imar_1.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_1.Location = new System.Drawing.Point(15, 2);
+            this.checkBox_imar_1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_1.Name = "checkBox_imar_1";
+            this.checkBox_imar_1.Size = new System.Drawing.Size(160, 27);
+            this.checkBox_imar_1.TabIndex = 55;
+            this.checkBox_imar_1.Text = "checkBox_imar_1";
+            this.checkBox_imar_1.UseVisualStyleBackColor = true;
+            this.checkBox_imar_1.Visible = false;
+            // 
+            // checkBox_imar_20
+            // 
+            this.checkBox_imar_20.AutoSize = true;
+            this.checkBox_imar_20.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_20.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_20.Location = new System.Drawing.Point(15, 573);
+            this.checkBox_imar_20.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_20.Name = "checkBox_imar_20";
+            this.checkBox_imar_20.Size = new System.Drawing.Size(171, 27);
+            this.checkBox_imar_20.TabIndex = 87;
+            this.checkBox_imar_20.Text = "checkBox_imar_20";
+            this.checkBox_imar_20.UseVisualStyleBackColor = false;
+            this.checkBox_imar_20.Visible = false;
+            // 
+            // checkBox_imar_7
+            // 
+            this.checkBox_imar_7.AutoSize = true;
+            this.checkBox_imar_7.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_7.Location = new System.Drawing.Point(15, 182);
+            this.checkBox_imar_7.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_7.Name = "checkBox_imar_7";
+            this.checkBox_imar_7.Size = new System.Drawing.Size(162, 27);
+            this.checkBox_imar_7.TabIndex = 49;
+            this.checkBox_imar_7.Text = "checkBox_imar_7";
+            this.checkBox_imar_7.UseVisualStyleBackColor = true;
+            this.checkBox_imar_7.Visible = false;
+            // 
             // checkBox_imar_19
             // 
             this.checkBox_imar_19.AutoSize = true;
             this.checkBox_imar_19.BackColor = System.Drawing.Color.Transparent;
             this.checkBox_imar_19.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_19.Location = new System.Drawing.Point(15, 679);
+            this.checkBox_imar_19.Location = new System.Drawing.Point(15, 542);
             this.checkBox_imar_19.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.checkBox_imar_19.Name = "checkBox_imar_19";
             this.checkBox_imar_19.Size = new System.Drawing.Size(169, 27);
             this.checkBox_imar_19.TabIndex = 81;
             this.checkBox_imar_19.Text = "checkBox_imar_19";
             this.checkBox_imar_19.UseVisualStyleBackColor = false;
+            this.checkBox_imar_19.Visible = false;
+            // 
+            // checkBox_imar_6
+            // 
+            this.checkBox_imar_6.AutoSize = true;
+            this.checkBox_imar_6.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_6.Location = new System.Drawing.Point(15, 152);
+            this.checkBox_imar_6.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_6.Name = "checkBox_imar_6";
+            this.checkBox_imar_6.Size = new System.Drawing.Size(162, 27);
+            this.checkBox_imar_6.TabIndex = 50;
+            this.checkBox_imar_6.Text = "checkBox_imar_6";
+            this.checkBox_imar_6.UseVisualStyleBackColor = true;
+            this.checkBox_imar_6.Visible = false;
             // 
             // checkBox_imar_18
             // 
             this.checkBox_imar_18.AutoSize = true;
             this.checkBox_imar_18.BackColor = System.Drawing.Color.Transparent;
             this.checkBox_imar_18.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_18.Location = new System.Drawing.Point(15, 650);
+            this.checkBox_imar_18.Location = new System.Drawing.Point(15, 512);
             this.checkBox_imar_18.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.checkBox_imar_18.Name = "checkBox_imar_18";
             this.checkBox_imar_18.Size = new System.Drawing.Size(169, 27);
@@ -1668,12 +2094,25 @@ namespace SLF
             this.checkBox_imar_18.UseVisualStyleBackColor = false;
             this.checkBox_imar_18.Visible = false;
             // 
+            // checkBox_imar_5
+            // 
+            this.checkBox_imar_5.AutoSize = true;
+            this.checkBox_imar_5.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_5.Location = new System.Drawing.Point(15, 122);
+            this.checkBox_imar_5.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_5.Name = "checkBox_imar_5";
+            this.checkBox_imar_5.Size = new System.Drawing.Size(162, 27);
+            this.checkBox_imar_5.TabIndex = 51;
+            this.checkBox_imar_5.Text = "checkBox_imar_5";
+            this.checkBox_imar_5.UseVisualStyleBackColor = true;
+            this.checkBox_imar_5.Visible = false;
+            // 
             // checkBox_imar_17
             // 
             this.checkBox_imar_17.AutoSize = true;
             this.checkBox_imar_17.BackColor = System.Drawing.Color.Transparent;
             this.checkBox_imar_17.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_17.Location = new System.Drawing.Point(15, 620);
+            this.checkBox_imar_17.Location = new System.Drawing.Point(15, 482);
             this.checkBox_imar_17.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.checkBox_imar_17.Name = "checkBox_imar_17";
             this.checkBox_imar_17.Size = new System.Drawing.Size(169, 27);
@@ -1682,18 +2121,165 @@ namespace SLF
             this.checkBox_imar_17.UseVisualStyleBackColor = false;
             this.checkBox_imar_17.Visible = false;
             // 
+            // checkBox_imar_4
+            // 
+            this.checkBox_imar_4.AutoSize = true;
+            this.checkBox_imar_4.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_4.Location = new System.Drawing.Point(15, 92);
+            this.checkBox_imar_4.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_4.Name = "checkBox_imar_4";
+            this.checkBox_imar_4.Size = new System.Drawing.Size(163, 27);
+            this.checkBox_imar_4.TabIndex = 52;
+            this.checkBox_imar_4.Text = "checkBox_imar_4";
+            this.checkBox_imar_4.UseVisualStyleBackColor = true;
+            this.checkBox_imar_4.Visible = false;
+            // 
             // checkBox_imar_16
             // 
             this.checkBox_imar_16.AutoSize = true;
             this.checkBox_imar_16.BackColor = System.Drawing.Color.Transparent;
             this.checkBox_imar_16.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_16.Location = new System.Drawing.Point(15, 590);
+            this.checkBox_imar_16.Location = new System.Drawing.Point(15, 452);
             this.checkBox_imar_16.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.checkBox_imar_16.Name = "checkBox_imar_16";
             this.checkBox_imar_16.Size = new System.Drawing.Size(169, 27);
             this.checkBox_imar_16.TabIndex = 78;
             this.checkBox_imar_16.Text = "checkBox_imar_16";
             this.checkBox_imar_16.UseVisualStyleBackColor = false;
+            this.checkBox_imar_16.Visible = false;
+            // 
+            // checkBox_imar_3
+            // 
+            this.checkBox_imar_3.AutoSize = true;
+            this.checkBox_imar_3.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_3.Location = new System.Drawing.Point(15, 62);
+            this.checkBox_imar_3.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_3.Name = "checkBox_imar_3";
+            this.checkBox_imar_3.Size = new System.Drawing.Size(162, 27);
+            this.checkBox_imar_3.TabIndex = 53;
+            this.checkBox_imar_3.Text = "checkBox_imar_3";
+            this.checkBox_imar_3.UseVisualStyleBackColor = true;
+            this.checkBox_imar_3.Visible = false;
+            // 
+            // checkBox_imar_2
+            // 
+            this.checkBox_imar_2.AutoSize = true;
+            this.checkBox_imar_2.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_2.Location = new System.Drawing.Point(15, 32);
+            this.checkBox_imar_2.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_2.Name = "checkBox_imar_2";
+            this.checkBox_imar_2.Size = new System.Drawing.Size(162, 27);
+            this.checkBox_imar_2.TabIndex = 54;
+            this.checkBox_imar_2.Text = "checkBox_imar_2";
+            this.checkBox_imar_2.UseVisualStyleBackColor = true;
+            this.checkBox_imar_2.Visible = false;
+            // 
+            // checkBox_imar_8
+            // 
+            this.checkBox_imar_8.AutoSize = true;
+            this.checkBox_imar_8.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_8.Location = new System.Drawing.Point(15, 212);
+            this.checkBox_imar_8.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_8.Name = "checkBox_imar_8";
+            this.checkBox_imar_8.Size = new System.Drawing.Size(162, 27);
+            this.checkBox_imar_8.TabIndex = 48;
+            this.checkBox_imar_8.Text = "checkBox_imar_8";
+            this.checkBox_imar_8.UseVisualStyleBackColor = true;
+            this.checkBox_imar_8.Visible = false;
+            // 
+            // checkBox_imar_13
+            // 
+            this.checkBox_imar_13.AutoSize = true;
+            this.checkBox_imar_13.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_13.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_13.Location = new System.Drawing.Point(15, 362);
+            this.checkBox_imar_13.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_13.Name = "checkBox_imar_13";
+            this.checkBox_imar_13.Size = new System.Drawing.Size(169, 27);
+            this.checkBox_imar_13.TabIndex = 43;
+            this.checkBox_imar_13.Text = "checkBox_imar_13";
+            this.checkBox_imar_13.UseVisualStyleBackColor = false;
+            this.checkBox_imar_13.Visible = false;
+            // 
+            // checkBox_imar_12
+            // 
+            this.checkBox_imar_12.AutoSize = true;
+            this.checkBox_imar_12.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_12.Location = new System.Drawing.Point(15, 332);
+            this.checkBox_imar_12.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_12.Name = "checkBox_imar_12";
+            this.checkBox_imar_12.Size = new System.Drawing.Size(169, 27);
+            this.checkBox_imar_12.TabIndex = 44;
+            this.checkBox_imar_12.Text = "checkBox_imar_12";
+            this.checkBox_imar_12.UseVisualStyleBackColor = true;
+            this.checkBox_imar_12.Visible = false;
+            // 
+            // checkBox_imar_11
+            // 
+            this.checkBox_imar_11.AutoSize = true;
+            this.checkBox_imar_11.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_11.Location = new System.Drawing.Point(15, 302);
+            this.checkBox_imar_11.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_11.Name = "checkBox_imar_11";
+            this.checkBox_imar_11.Size = new System.Drawing.Size(167, 27);
+            this.checkBox_imar_11.TabIndex = 45;
+            this.checkBox_imar_11.Text = "checkBox_imar_11";
+            this.checkBox_imar_11.UseVisualStyleBackColor = true;
+            this.checkBox_imar_11.Visible = false;
+            // 
+            // checkBox_imar_15
+            // 
+            this.checkBox_imar_15.AutoSize = true;
+            this.checkBox_imar_15.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_15.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_15.Location = new System.Drawing.Point(15, 422);
+            this.checkBox_imar_15.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_15.Name = "checkBox_imar_15";
+            this.checkBox_imar_15.Size = new System.Drawing.Size(169, 27);
+            this.checkBox_imar_15.TabIndex = 60;
+            this.checkBox_imar_15.Text = "checkBox_imar_15";
+            this.checkBox_imar_15.UseVisualStyleBackColor = false;
+            this.checkBox_imar_15.Visible = false;
+            // 
+            // checkBox_imar_10
+            // 
+            this.checkBox_imar_10.AutoSize = true;
+            this.checkBox_imar_10.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_10.Location = new System.Drawing.Point(15, 272);
+            this.checkBox_imar_10.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_10.Name = "checkBox_imar_10";
+            this.checkBox_imar_10.Size = new System.Drawing.Size(169, 27);
+            this.checkBox_imar_10.TabIndex = 46;
+            this.checkBox_imar_10.Text = "checkBox_imar_10";
+            this.checkBox_imar_10.UseVisualStyleBackColor = true;
+            this.checkBox_imar_10.Visible = false;
+            // 
+            // checkBox_imar_14
+            // 
+            this.checkBox_imar_14.AutoSize = true;
+            this.checkBox_imar_14.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_14.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_14.Location = new System.Drawing.Point(15, 392);
+            this.checkBox_imar_14.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_14.Name = "checkBox_imar_14";
+            this.checkBox_imar_14.Size = new System.Drawing.Size(170, 27);
+            this.checkBox_imar_14.TabIndex = 59;
+            this.checkBox_imar_14.Text = "checkBox_imar_14";
+            this.checkBox_imar_14.UseVisualStyleBackColor = false;
+            this.checkBox_imar_14.Visible = false;
+            // 
+            // checkBox_imar_9
+            // 
+            this.checkBox_imar_9.AutoSize = true;
+            this.checkBox_imar_9.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_9.Location = new System.Drawing.Point(15, 242);
+            this.checkBox_imar_9.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_9.Name = "checkBox_imar_9";
+            this.checkBox_imar_9.Size = new System.Drawing.Size(162, 27);
+            this.checkBox_imar_9.TabIndex = 47;
+            this.checkBox_imar_9.Text = "checkBox_imar_9";
+            this.checkBox_imar_9.UseVisualStyleBackColor = true;
+            this.checkBox_imar_9.Visible = false;
             // 
             // buton_SLF_tahmini
             // 
@@ -1759,10 +2345,10 @@ namespace SLF
             this.panel_imar.Controls.Add(this.webView_imar);
             this.panel_imar.Controls.Add(this.mesafe_metre_imar);
             this.panel_imar.Controls.Add(this.gMapControl_imar);
-            this.panel_imar.Location = new System.Drawing.Point(287, 38);
+            this.panel_imar.Location = new System.Drawing.Point(314, 38);
             this.panel_imar.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.panel_imar.Name = "panel_imar";
-            this.panel_imar.Size = new System.Drawing.Size(1015, 647);
+            this.panel_imar.Size = new System.Drawing.Size(988, 647);
             this.panel_imar.TabIndex = 73;
             // 
             // buton_imar_katmanlar
@@ -1798,7 +2384,7 @@ namespace SLF
             this.webView_imar.Location = new System.Drawing.Point(0, 0);
             this.webView_imar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.webView_imar.Name = "webView_imar";
-            this.webView_imar.Size = new System.Drawing.Size(1015, 647);
+            this.webView_imar.Size = new System.Drawing.Size(988, 647);
             this.webView_imar.Source = new System.Uri("https://www.google.com/maps/@38.4420517,27.1028334,13.29z?entry=ttu", System.UriKind.Absolute);
             this.webView_imar.TabIndex = 72;
             this.webView_imar.Visible = false;
@@ -1837,7 +2423,7 @@ namespace SLF
             this.gMapControl_imar.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl_imar.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl_imar.ShowTileGridLines = false;
-            this.gMapControl_imar.Size = new System.Drawing.Size(1015, 647);
+            this.gMapControl_imar.Size = new System.Drawing.Size(988, 647);
             this.gMapControl_imar.TabIndex = 60;
             this.gMapControl_imar.Zoom = 0D;
             this.gMapControl_imar.OnMapClick += new GMap.NET.WindowsForms.MapClick(this.gMapControl_imar_OnMapClick);
@@ -1846,208 +2432,11 @@ namespace SLF
             this.gMapControl_imar.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl_imar_MouseMove);
             this.gMapControl_imar.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gMapControl_imar_MouseUp);
             // 
-            // checkBox_imar_15
-            // 
-            this.checkBox_imar_15.AutoSize = true;
-            this.checkBox_imar_15.BackColor = System.Drawing.Color.Transparent;
-            this.checkBox_imar_15.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_15.Location = new System.Drawing.Point(15, 560);
-            this.checkBox_imar_15.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.checkBox_imar_15.Name = "checkBox_imar_15";
-            this.checkBox_imar_15.Size = new System.Drawing.Size(169, 27);
-            this.checkBox_imar_15.TabIndex = 60;
-            this.checkBox_imar_15.Text = "checkBox_imar_15";
-            this.checkBox_imar_15.UseVisualStyleBackColor = false;
-            // 
-            // checkBox_imar_14
-            // 
-            this.checkBox_imar_14.AutoSize = true;
-            this.checkBox_imar_14.BackColor = System.Drawing.Color.Transparent;
-            this.checkBox_imar_14.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_14.Location = new System.Drawing.Point(15, 530);
-            this.checkBox_imar_14.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.checkBox_imar_14.Name = "checkBox_imar_14";
-            this.checkBox_imar_14.Size = new System.Drawing.Size(170, 27);
-            this.checkBox_imar_14.TabIndex = 59;
-            this.checkBox_imar_14.Text = "checkBox_imar_14";
-            this.checkBox_imar_14.UseVisualStyleBackColor = false;
-            this.checkBox_imar_14.Visible = false;
-            // 
-            // checkBox_imar_1
-            // 
-            this.checkBox_imar_1.AutoSize = true;
-            this.checkBox_imar_1.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_1.Location = new System.Drawing.Point(15, 140);
-            this.checkBox_imar_1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.checkBox_imar_1.Name = "checkBox_imar_1";
-            this.checkBox_imar_1.Size = new System.Drawing.Size(160, 27);
-            this.checkBox_imar_1.TabIndex = 55;
-            this.checkBox_imar_1.Text = "checkBox_imar_1";
-            this.checkBox_imar_1.UseVisualStyleBackColor = true;
-            this.checkBox_imar_1.Visible = false;
-            // 
-            // checkBox_imar_2
-            // 
-            this.checkBox_imar_2.AutoSize = true;
-            this.checkBox_imar_2.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_2.Location = new System.Drawing.Point(15, 170);
-            this.checkBox_imar_2.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.checkBox_imar_2.Name = "checkBox_imar_2";
-            this.checkBox_imar_2.Size = new System.Drawing.Size(162, 27);
-            this.checkBox_imar_2.TabIndex = 54;
-            this.checkBox_imar_2.Text = "checkBox_imar_2";
-            this.checkBox_imar_2.UseVisualStyleBackColor = true;
-            this.checkBox_imar_2.Visible = false;
-            // 
-            // checkBox_imar_3
-            // 
-            this.checkBox_imar_3.AutoSize = true;
-            this.checkBox_imar_3.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_3.Location = new System.Drawing.Point(15, 199);
-            this.checkBox_imar_3.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.checkBox_imar_3.Name = "checkBox_imar_3";
-            this.checkBox_imar_3.Size = new System.Drawing.Size(162, 27);
-            this.checkBox_imar_3.TabIndex = 53;
-            this.checkBox_imar_3.Text = "checkBox_imar_3";
-            this.checkBox_imar_3.UseVisualStyleBackColor = true;
-            this.checkBox_imar_3.Visible = false;
-            // 
-            // checkBox_imar_4
-            // 
-            this.checkBox_imar_4.AutoSize = true;
-            this.checkBox_imar_4.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_4.Location = new System.Drawing.Point(15, 230);
-            this.checkBox_imar_4.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.checkBox_imar_4.Name = "checkBox_imar_4";
-            this.checkBox_imar_4.Size = new System.Drawing.Size(163, 27);
-            this.checkBox_imar_4.TabIndex = 52;
-            this.checkBox_imar_4.Text = "checkBox_imar_4";
-            this.checkBox_imar_4.UseVisualStyleBackColor = true;
-            this.checkBox_imar_4.Visible = false;
-            // 
-            // checkBox_imar_5
-            // 
-            this.checkBox_imar_5.AutoSize = true;
-            this.checkBox_imar_5.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_5.Location = new System.Drawing.Point(15, 260);
-            this.checkBox_imar_5.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.checkBox_imar_5.Name = "checkBox_imar_5";
-            this.checkBox_imar_5.Size = new System.Drawing.Size(162, 27);
-            this.checkBox_imar_5.TabIndex = 51;
-            this.checkBox_imar_5.Text = "checkBox_imar_5";
-            this.checkBox_imar_5.UseVisualStyleBackColor = true;
-            this.checkBox_imar_5.Visible = false;
-            // 
-            // checkBox_imar_6
-            // 
-            this.checkBox_imar_6.AutoSize = true;
-            this.checkBox_imar_6.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_6.Location = new System.Drawing.Point(15, 290);
-            this.checkBox_imar_6.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.checkBox_imar_6.Name = "checkBox_imar_6";
-            this.checkBox_imar_6.Size = new System.Drawing.Size(162, 27);
-            this.checkBox_imar_6.TabIndex = 50;
-            this.checkBox_imar_6.Text = "checkBox_imar_6";
-            this.checkBox_imar_6.UseVisualStyleBackColor = true;
-            this.checkBox_imar_6.Visible = false;
-            // 
-            // checkBox_imar_7
-            // 
-            this.checkBox_imar_7.AutoSize = true;
-            this.checkBox_imar_7.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_7.Location = new System.Drawing.Point(15, 320);
-            this.checkBox_imar_7.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.checkBox_imar_7.Name = "checkBox_imar_7";
-            this.checkBox_imar_7.Size = new System.Drawing.Size(162, 27);
-            this.checkBox_imar_7.TabIndex = 49;
-            this.checkBox_imar_7.Text = "checkBox_imar_7";
-            this.checkBox_imar_7.UseVisualStyleBackColor = true;
-            this.checkBox_imar_7.Visible = false;
-            // 
-            // checkBox_imar_8
-            // 
-            this.checkBox_imar_8.AutoSize = true;
-            this.checkBox_imar_8.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_8.Location = new System.Drawing.Point(15, 350);
-            this.checkBox_imar_8.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.checkBox_imar_8.Name = "checkBox_imar_8";
-            this.checkBox_imar_8.Size = new System.Drawing.Size(162, 27);
-            this.checkBox_imar_8.TabIndex = 48;
-            this.checkBox_imar_8.Text = "checkBox_imar_8";
-            this.checkBox_imar_8.UseVisualStyleBackColor = true;
-            this.checkBox_imar_8.Visible = false;
-            // 
-            // checkBox_imar_9
-            // 
-            this.checkBox_imar_9.AutoSize = true;
-            this.checkBox_imar_9.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_9.Location = new System.Drawing.Point(15, 380);
-            this.checkBox_imar_9.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.checkBox_imar_9.Name = "checkBox_imar_9";
-            this.checkBox_imar_9.Size = new System.Drawing.Size(162, 27);
-            this.checkBox_imar_9.TabIndex = 47;
-            this.checkBox_imar_9.Text = "checkBox_imar_9";
-            this.checkBox_imar_9.UseVisualStyleBackColor = true;
-            this.checkBox_imar_9.Visible = false;
-            // 
-            // checkBox_imar_10
-            // 
-            this.checkBox_imar_10.AutoSize = true;
-            this.checkBox_imar_10.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_10.Location = new System.Drawing.Point(15, 410);
-            this.checkBox_imar_10.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.checkBox_imar_10.Name = "checkBox_imar_10";
-            this.checkBox_imar_10.Size = new System.Drawing.Size(169, 27);
-            this.checkBox_imar_10.TabIndex = 46;
-            this.checkBox_imar_10.Text = "checkBox_imar_10";
-            this.checkBox_imar_10.UseVisualStyleBackColor = true;
-            this.checkBox_imar_10.Visible = false;
-            // 
-            // checkBox_imar_11
-            // 
-            this.checkBox_imar_11.AutoSize = true;
-            this.checkBox_imar_11.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_11.Location = new System.Drawing.Point(15, 441);
-            this.checkBox_imar_11.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.checkBox_imar_11.Name = "checkBox_imar_11";
-            this.checkBox_imar_11.Size = new System.Drawing.Size(167, 27);
-            this.checkBox_imar_11.TabIndex = 45;
-            this.checkBox_imar_11.Text = "checkBox_imar_11";
-            this.checkBox_imar_11.UseVisualStyleBackColor = true;
-            this.checkBox_imar_11.Visible = false;
-            // 
-            // checkBox_imar_12
-            // 
-            this.checkBox_imar_12.AutoSize = true;
-            this.checkBox_imar_12.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_12.Location = new System.Drawing.Point(15, 470);
-            this.checkBox_imar_12.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.checkBox_imar_12.Name = "checkBox_imar_12";
-            this.checkBox_imar_12.Size = new System.Drawing.Size(169, 27);
-            this.checkBox_imar_12.TabIndex = 44;
-            this.checkBox_imar_12.Text = "checkBox_imar_12";
-            this.checkBox_imar_12.UseVisualStyleBackColor = true;
-            this.checkBox_imar_12.Visible = false;
-            // 
-            // checkBox_imar_13
-            // 
-            this.checkBox_imar_13.AutoSize = true;
-            this.checkBox_imar_13.BackColor = System.Drawing.Color.Transparent;
-            this.checkBox_imar_13.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_imar_13.Location = new System.Drawing.Point(15, 500);
-            this.checkBox_imar_13.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.checkBox_imar_13.Name = "checkBox_imar_13";
-            this.checkBox_imar_13.Size = new System.Drawing.Size(169, 27);
-            this.checkBox_imar_13.TabIndex = 43;
-            this.checkBox_imar_13.Text = "checkBox_imar_13";
-            this.checkBox_imar_13.UseVisualStyleBackColor = false;
-            this.checkBox_imar_13.Visible = false;
-            // 
             // label_imar_katmanlar
             // 
             this.label_imar_katmanlar.AutoSize = true;
             this.label_imar_katmanlar.Font = new System.Drawing.Font("Maiandra GD", 12F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label_imar_katmanlar.Location = new System.Drawing.Point(25, 100);
+            this.label_imar_katmanlar.Location = new System.Drawing.Point(14, 100);
             this.label_imar_katmanlar.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label_imar_katmanlar.Name = "label_imar_katmanlar";
             this.label_imar_katmanlar.Size = new System.Drawing.Size(99, 24);
@@ -2386,34 +2775,34 @@ namespace SLF
             // 
             // ELFMinSenaryoTable
             // 
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.Navy;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.Snow;
-            this.ELFMinSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle166.SelectionBackColor = System.Drawing.Color.Navy;
+            dataGridViewCellStyle166.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFMinSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle166;
             this.ELFMinSenaryoTable.BackgroundColor = System.Drawing.Color.White;
             this.ELFMinSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFMinSenaryoTable.ColumnHeadersHeight = 29;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.Color.Snow;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFMinSenaryoTable.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle167.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle167.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle167.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle167.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle167.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle167.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle167.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFMinSenaryoTable.DefaultCellStyle = dataGridViewCellStyle167;
             this.ELFMinSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFMinSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFMinSenaryoTable.Location = new System.Drawing.Point(3, 2);
             this.ELFMinSenaryoTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFMinSenaryoTable.Name = "ELFMinSenaryoTable";
             this.ELFMinSenaryoTable.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.ELFMinSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle168.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle168.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle168.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle168.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle168.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle168.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle168.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ELFMinSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle168;
             this.ELFMinSenaryoTable.RowHeadersWidth = 18;
             this.ELFMinSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
             this.ELFMinSenaryoTable.Size = new System.Drawing.Size(818, 713);
@@ -2435,33 +2824,33 @@ namespace SLF
             // 
             // ELFLowSenaryoTable
             // 
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.Color.Navy;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.Color.Snow;
-            this.ELFLowSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle169.SelectionBackColor = System.Drawing.Color.Navy;
+            dataGridViewCellStyle169.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFLowSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle169;
             this.ELFLowSenaryoTable.BackgroundColor = System.Drawing.Color.White;
             this.ELFLowSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFLowSenaryoTable.ColumnHeadersHeight = 29;
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle8.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle8.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFLowSenaryoTable.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle170.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle170.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle170.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle170.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle170.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle170.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle170.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFLowSenaryoTable.DefaultCellStyle = dataGridViewCellStyle170;
             this.ELFLowSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFLowSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFLowSenaryoTable.Location = new System.Drawing.Point(3, 2);
             this.ELFLowSenaryoTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFLowSenaryoTable.Name = "ELFLowSenaryoTable";
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle9.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.ELFLowSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle171.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle171.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle171.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle171.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle171.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle171.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle171.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ELFLowSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle171;
             this.ELFLowSenaryoTable.RowHeadersWidth = 18;
             this.ELFLowSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
             this.ELFLowSenaryoTable.Size = new System.Drawing.Size(818, 713);
@@ -2483,28 +2872,28 @@ namespace SLF
             // 
             // ELFBaseSenaryoTable
             // 
-            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.Color.Snow;
-            this.ELFBaseSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle172.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle172.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFBaseSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle172;
             this.ELFBaseSenaryoTable.BackgroundColor = System.Drawing.Color.White;
             this.ELFBaseSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFBaseSenaryoTable.ColumnHeadersHeight = 29;
-            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle11.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle11.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.Color.MidnightBlue;
-            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.Color.Snow;
-            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFBaseSenaryoTable.DefaultCellStyle = dataGridViewCellStyle11;
+            dataGridViewCellStyle173.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle173.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle173.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle173.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle173.SelectionBackColor = System.Drawing.Color.MidnightBlue;
+            dataGridViewCellStyle173.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle173.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFBaseSenaryoTable.DefaultCellStyle = dataGridViewCellStyle173;
             this.ELFBaseSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFBaseSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFBaseSenaryoTable.Location = new System.Drawing.Point(3, 2);
             this.ELFBaseSenaryoTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFBaseSenaryoTable.Name = "ELFBaseSenaryoTable";
             this.ELFBaseSenaryoTable.RowHeadersWidth = 18;
-            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.ELFBaseSenaryoTable.RowsDefaultCellStyle = dataGridViewCellStyle12;
+            dataGridViewCellStyle174.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.ELFBaseSenaryoTable.RowsDefaultCellStyle = dataGridViewCellStyle174;
             this.ELFBaseSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
             this.ELFBaseSenaryoTable.Size = new System.Drawing.Size(818, 713);
             this.ELFBaseSenaryoTable.TabIndex = 1;
@@ -2525,28 +2914,28 @@ namespace SLF
             // 
             // ELFHighSenaryoTable
             // 
-            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.Color.Snow;
-            this.ELFHighSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle13;
+            dataGridViewCellStyle175.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle175.SelectionForeColor = System.Drawing.Color.Snow;
+            this.ELFHighSenaryoTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle175;
             this.ELFHighSenaryoTable.BackgroundColor = System.Drawing.Color.White;
             this.ELFHighSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFHighSenaryoTable.ColumnHeadersHeight = 29;
-            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle14.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle14.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle14.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.Color.Snow;
-            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFHighSenaryoTable.DefaultCellStyle = dataGridViewCellStyle14;
+            dataGridViewCellStyle176.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle176.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle176.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle176.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle176.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle176.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle176.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFHighSenaryoTable.DefaultCellStyle = dataGridViewCellStyle176;
             this.ELFHighSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFHighSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFHighSenaryoTable.Location = new System.Drawing.Point(3, 2);
             this.ELFHighSenaryoTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFHighSenaryoTable.Name = "ELFHighSenaryoTable";
             this.ELFHighSenaryoTable.RowHeadersWidth = 51;
-            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.ELFHighSenaryoTable.RowsDefaultCellStyle = dataGridViewCellStyle15;
+            dataGridViewCellStyle177.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.ELFHighSenaryoTable.RowsDefaultCellStyle = dataGridViewCellStyle177;
             this.ELFHighSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
             this.ELFHighSenaryoTable.Size = new System.Drawing.Size(818, 713);
             this.ELFHighSenaryoTable.TabIndex = 1;
@@ -2570,27 +2959,27 @@ namespace SLF
             this.ELFMaxSenaryoTable.BackgroundColor = System.Drawing.Color.White;
             this.ELFMaxSenaryoTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFMaxSenaryoTable.ColumnHeadersHeight = 29;
-            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle16.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle16.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle16.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
-            dataGridViewCellStyle16.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle16.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle16.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFMaxSenaryoTable.DefaultCellStyle = dataGridViewCellStyle16;
+            dataGridViewCellStyle178.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle178.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle178.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle178.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(42)))), ((int)(((byte)(57)))));
+            dataGridViewCellStyle178.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle178.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle178.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFMaxSenaryoTable.DefaultCellStyle = dataGridViewCellStyle178;
             this.ELFMaxSenaryoTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFMaxSenaryoTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFMaxSenaryoTable.Location = new System.Drawing.Point(3, 2);
             this.ELFMaxSenaryoTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFMaxSenaryoTable.Name = "ELFMaxSenaryoTable";
-            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle17.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle17.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle17.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle17.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle17.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.ELFMaxSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle17;
+            dataGridViewCellStyle179.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle179.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle179.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle179.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle179.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle179.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle179.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ELFMaxSenaryoTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle179;
             this.ELFMaxSenaryoTable.RowHeadersWidth = 18;
             this.ELFMaxSenaryoTable.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
             this.ELFMaxSenaryoTable.Size = new System.Drawing.Size(818, 713);
@@ -2643,22 +3032,22 @@ namespace SLF
             this.ELFMinimumResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
             this.ELFMinimumResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFMinimumResultsTable.ColumnHeadersHeight = 29;
-            dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle18.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle18.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle18.ForeColor = System.Drawing.Color.DarkOrange;
-            dataGridViewCellStyle18.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle18.SelectionForeColor = System.Drawing.Color.Snow;
-            dataGridViewCellStyle18.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFMinimumResultsTable.DefaultCellStyle = dataGridViewCellStyle18;
+            dataGridViewCellStyle180.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle180.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle180.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle180.ForeColor = System.Drawing.Color.DarkOrange;
+            dataGridViewCellStyle180.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle180.SelectionForeColor = System.Drawing.Color.Snow;
+            dataGridViewCellStyle180.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFMinimumResultsTable.DefaultCellStyle = dataGridViewCellStyle180;
             this.ELFMinimumResultsTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFMinimumResultsTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFMinimumResultsTable.Location = new System.Drawing.Point(3, 2);
             this.ELFMinimumResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFMinimumResultsTable.Name = "ELFMinimumResultsTable";
             this.ELFMinimumResultsTable.RowHeadersWidth = 51;
-            dataGridViewCellStyle19.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.ELFMinimumResultsTable.RowsDefaultCellStyle = dataGridViewCellStyle19;
+            dataGridViewCellStyle181.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.ELFMinimumResultsTable.RowsDefaultCellStyle = dataGridViewCellStyle181;
             this.ELFMinimumResultsTable.Size = new System.Drawing.Size(816, 589);
             this.ELFMinimumResultsTable.TabIndex = 0;
             this.ELFMinimumResultsTable.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.ELFMinimumResultsTable_EditingControlShowing);
@@ -2680,27 +3069,27 @@ namespace SLF
             this.ELFDüşükResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
             this.ELFDüşükResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFDüşükResultsTable.ColumnHeadersHeight = 29;
-            dataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle20.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle20.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle20.ForeColor = System.Drawing.Color.DarkOrange;
-            dataGridViewCellStyle20.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle20.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle20.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFDüşükResultsTable.DefaultCellStyle = dataGridViewCellStyle20;
+            dataGridViewCellStyle182.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle182.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle182.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle182.ForeColor = System.Drawing.Color.DarkOrange;
+            dataGridViewCellStyle182.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle182.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle182.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFDüşükResultsTable.DefaultCellStyle = dataGridViewCellStyle182;
             this.ELFDüşükResultsTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFDüşükResultsTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFDüşükResultsTable.Location = new System.Drawing.Point(3, 2);
             this.ELFDüşükResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFDüşükResultsTable.Name = "ELFDüşükResultsTable";
-            dataGridViewCellStyle21.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle21.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle21.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle21.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle21.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle21.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle21.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.ELFDüşükResultsTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle21;
+            dataGridViewCellStyle183.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle183.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle183.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle183.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle183.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle183.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle183.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ELFDüşükResultsTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle183;
             this.ELFDüşükResultsTable.RowHeadersWidth = 51;
             this.ELFDüşükResultsTable.Size = new System.Drawing.Size(816, 589);
             this.ELFDüşükResultsTable.TabIndex = 1;
@@ -2723,27 +3112,27 @@ namespace SLF
             this.ELFBazResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
             this.ELFBazResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFBazResultsTable.ColumnHeadersHeight = 29;
-            dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle22.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle22.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle22.ForeColor = System.Drawing.Color.DarkOrange;
-            dataGridViewCellStyle22.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle22.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle22.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFBazResultsTable.DefaultCellStyle = dataGridViewCellStyle22;
+            dataGridViewCellStyle184.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle184.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle184.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle184.ForeColor = System.Drawing.Color.DarkOrange;
+            dataGridViewCellStyle184.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle184.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle184.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFBazResultsTable.DefaultCellStyle = dataGridViewCellStyle184;
             this.ELFBazResultsTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFBazResultsTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFBazResultsTable.Location = new System.Drawing.Point(3, 2);
             this.ELFBazResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFBazResultsTable.Name = "ELFBazResultsTable";
-            dataGridViewCellStyle23.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle23.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle23.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle23.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle23.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle23.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle23.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.ELFBazResultsTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle23;
+            dataGridViewCellStyle185.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle185.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle185.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle185.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle185.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle185.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle185.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ELFBazResultsTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle185;
             this.ELFBazResultsTable.RowHeadersWidth = 51;
             this.ELFBazResultsTable.Size = new System.Drawing.Size(816, 589);
             this.ELFBazResultsTable.TabIndex = 1;
@@ -2766,22 +3155,22 @@ namespace SLF
             this.ELFYüksekResultsTable.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
             this.ELFYüksekResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFYüksekResultsTable.ColumnHeadersHeight = 29;
-            dataGridViewCellStyle24.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle24.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle24.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle24.ForeColor = System.Drawing.Color.DarkOrange;
-            dataGridViewCellStyle24.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle24.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle24.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFYüksekResultsTable.DefaultCellStyle = dataGridViewCellStyle24;
+            dataGridViewCellStyle186.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle186.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle186.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle186.ForeColor = System.Drawing.Color.DarkOrange;
+            dataGridViewCellStyle186.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle186.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle186.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFYüksekResultsTable.DefaultCellStyle = dataGridViewCellStyle186;
             this.ELFYüksekResultsTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFYüksekResultsTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFYüksekResultsTable.Location = new System.Drawing.Point(3, 2);
             this.ELFYüksekResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFYüksekResultsTable.Name = "ELFYüksekResultsTable";
             this.ELFYüksekResultsTable.RowHeadersWidth = 51;
-            dataGridViewCellStyle25.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.ELFYüksekResultsTable.RowsDefaultCellStyle = dataGridViewCellStyle25;
+            dataGridViewCellStyle187.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.ELFYüksekResultsTable.RowsDefaultCellStyle = dataGridViewCellStyle187;
             this.ELFYüksekResultsTable.Size = new System.Drawing.Size(816, 589);
             this.ELFYüksekResultsTable.TabIndex = 1;
             this.ELFYüksekResultsTable.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.ELFYüksekResultsTable_EditingControlShowing);
@@ -2804,27 +3193,27 @@ namespace SLF
             this.ELFMaksimumResultsTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.ELFMaksimumResultsTable.ColumnHeadersHeight = 29;
             this.ELFMaksimumResultsTable.Cursor = System.Windows.Forms.Cursors.Default;
-            dataGridViewCellStyle26.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle26.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle26.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle26.ForeColor = System.Drawing.Color.DarkOrange;
-            dataGridViewCellStyle26.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle26.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle26.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ELFMaksimumResultsTable.DefaultCellStyle = dataGridViewCellStyle26;
+            dataGridViewCellStyle188.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle188.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle188.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle188.ForeColor = System.Drawing.Color.DarkOrange;
+            dataGridViewCellStyle188.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle188.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle188.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ELFMaksimumResultsTable.DefaultCellStyle = dataGridViewCellStyle188;
             this.ELFMaksimumResultsTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ELFMaksimumResultsTable.GridColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ELFMaksimumResultsTable.Location = new System.Drawing.Point(3, 2);
             this.ELFMaksimumResultsTable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ELFMaksimumResultsTable.Name = "ELFMaksimumResultsTable";
-            dataGridViewCellStyle27.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle27.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle27.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            dataGridViewCellStyle27.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle27.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle27.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle27.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.ELFMaksimumResultsTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle27;
+            dataGridViewCellStyle189.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle189.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle189.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            dataGridViewCellStyle189.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle189.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle189.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle189.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ELFMaksimumResultsTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle189;
             this.ELFMaksimumResultsTable.RowHeadersWidth = 51;
             this.ELFMaksimumResultsTable.Size = new System.Drawing.Size(816, 589);
             this.ELFMaksimumResultsTable.TabIndex = 1;
@@ -2856,30 +3245,11 @@ namespace SLF
             // 
             // tab_yükHaritası
             // 
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_20);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_19);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_17);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_18);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_16);
+            this.tab_yükHaritası.Controls.Add(this.panel_yuk_checkboxes);
             this.tab_yükHaritası.Controls.Add(this.label1);
             this.tab_yükHaritası.Controls.Add(this.buton_HTML);
             this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_main);
             this.tab_yükHaritası.Controls.Add(this.panel_yuk);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_15);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_8);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_6);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_11);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_14);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_13);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_12);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_10);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_9);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_7);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_4);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_5);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_3);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_2);
-            this.tab_yükHaritası.Controls.Add(this.checkBox_yuk_1);
             this.tab_yükHaritası.Controls.Add(this.legendPanel);
             this.tab_yükHaritası.Controls.Add(this.yuk_yıl_deger);
             this.tab_yükHaritası.Controls.Add(this.yuk_yıl_text);
@@ -2897,7 +3267,7 @@ namespace SLF
             // 
             this.checkBox_yuk_20.AutoSize = true;
             this.checkBox_yuk_20.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_20.Location = new System.Drawing.Point(15, 710);
+            this.checkBox_yuk_20.Location = new System.Drawing.Point(3, 572);
             this.checkBox_yuk_20.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_20.Name = "checkBox_yuk_20";
             this.checkBox_yuk_20.Size = new System.Drawing.Size(165, 27);
@@ -2910,7 +3280,7 @@ namespace SLF
             // 
             this.checkBox_yuk_19.AutoSize = true;
             this.checkBox_yuk_19.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_19.Location = new System.Drawing.Point(15, 679);
+            this.checkBox_yuk_19.Location = new System.Drawing.Point(3, 542);
             this.checkBox_yuk_19.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_19.Name = "checkBox_yuk_19";
             this.checkBox_yuk_19.Size = new System.Drawing.Size(163, 27);
@@ -2923,7 +3293,7 @@ namespace SLF
             // 
             this.checkBox_yuk_17.AutoSize = true;
             this.checkBox_yuk_17.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_17.Location = new System.Drawing.Point(15, 620);
+            this.checkBox_yuk_17.Location = new System.Drawing.Point(3, 482);
             this.checkBox_yuk_17.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_17.Name = "checkBox_yuk_17";
             this.checkBox_yuk_17.Size = new System.Drawing.Size(163, 27);
@@ -2936,7 +3306,7 @@ namespace SLF
             // 
             this.checkBox_yuk_18.AutoSize = true;
             this.checkBox_yuk_18.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_18.Location = new System.Drawing.Point(15, 650);
+            this.checkBox_yuk_18.Location = new System.Drawing.Point(3, 512);
             this.checkBox_yuk_18.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_18.Name = "checkBox_yuk_18";
             this.checkBox_yuk_18.Size = new System.Drawing.Size(163, 27);
@@ -2949,7 +3319,7 @@ namespace SLF
             // 
             this.checkBox_yuk_16.AutoSize = true;
             this.checkBox_yuk_16.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_16.Location = new System.Drawing.Point(15, 590);
+            this.checkBox_yuk_16.Location = new System.Drawing.Point(3, 452);
             this.checkBox_yuk_16.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_16.Name = "checkBox_yuk_16";
             this.checkBox_yuk_16.Size = new System.Drawing.Size(163, 27);
@@ -3077,7 +3447,7 @@ namespace SLF
             // 
             this.checkBox_yuk_15.AutoSize = true;
             this.checkBox_yuk_15.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_15.Location = new System.Drawing.Point(15, 560);
+            this.checkBox_yuk_15.Location = new System.Drawing.Point(3, 422);
             this.checkBox_yuk_15.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_15.Name = "checkBox_yuk_15";
             this.checkBox_yuk_15.Size = new System.Drawing.Size(163, 27);
@@ -3090,7 +3460,7 @@ namespace SLF
             // 
             this.checkBox_yuk_8.AutoSize = true;
             this.checkBox_yuk_8.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_8.Location = new System.Drawing.Point(15, 350);
+            this.checkBox_yuk_8.Location = new System.Drawing.Point(3, 212);
             this.checkBox_yuk_8.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_8.Name = "checkBox_yuk_8";
             this.checkBox_yuk_8.Size = new System.Drawing.Size(156, 27);
@@ -3103,7 +3473,7 @@ namespace SLF
             // 
             this.checkBox_yuk_6.AutoSize = true;
             this.checkBox_yuk_6.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_6.Location = new System.Drawing.Point(15, 290);
+            this.checkBox_yuk_6.Location = new System.Drawing.Point(3, 152);
             this.checkBox_yuk_6.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_6.Name = "checkBox_yuk_6";
             this.checkBox_yuk_6.Size = new System.Drawing.Size(156, 27);
@@ -3116,7 +3486,7 @@ namespace SLF
             // 
             this.checkBox_yuk_11.AutoSize = true;
             this.checkBox_yuk_11.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_11.Location = new System.Drawing.Point(15, 441);
+            this.checkBox_yuk_11.Location = new System.Drawing.Point(3, 303);
             this.checkBox_yuk_11.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_11.Name = "checkBox_yuk_11";
             this.checkBox_yuk_11.Size = new System.Drawing.Size(161, 27);
@@ -3129,7 +3499,7 @@ namespace SLF
             // 
             this.checkBox_yuk_14.AutoSize = true;
             this.checkBox_yuk_14.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_14.Location = new System.Drawing.Point(15, 530);
+            this.checkBox_yuk_14.Location = new System.Drawing.Point(3, 392);
             this.checkBox_yuk_14.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_14.Name = "checkBox_yuk_14";
             this.checkBox_yuk_14.Size = new System.Drawing.Size(164, 27);
@@ -3142,7 +3512,7 @@ namespace SLF
             // 
             this.checkBox_yuk_13.AutoSize = true;
             this.checkBox_yuk_13.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_13.Location = new System.Drawing.Point(15, 500);
+            this.checkBox_yuk_13.Location = new System.Drawing.Point(3, 362);
             this.checkBox_yuk_13.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_13.Name = "checkBox_yuk_13";
             this.checkBox_yuk_13.Size = new System.Drawing.Size(163, 27);
@@ -3155,7 +3525,7 @@ namespace SLF
             // 
             this.checkBox_yuk_12.AutoSize = true;
             this.checkBox_yuk_12.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_12.Location = new System.Drawing.Point(15, 470);
+            this.checkBox_yuk_12.Location = new System.Drawing.Point(3, 332);
             this.checkBox_yuk_12.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_12.Name = "checkBox_yuk_12";
             this.checkBox_yuk_12.Size = new System.Drawing.Size(163, 27);
@@ -3168,7 +3538,7 @@ namespace SLF
             // 
             this.checkBox_yuk_10.AutoSize = true;
             this.checkBox_yuk_10.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_10.Location = new System.Drawing.Point(15, 410);
+            this.checkBox_yuk_10.Location = new System.Drawing.Point(3, 272);
             this.checkBox_yuk_10.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_10.Name = "checkBox_yuk_10";
             this.checkBox_yuk_10.Size = new System.Drawing.Size(163, 27);
@@ -3181,7 +3551,7 @@ namespace SLF
             // 
             this.checkBox_yuk_9.AutoSize = true;
             this.checkBox_yuk_9.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_9.Location = new System.Drawing.Point(15, 380);
+            this.checkBox_yuk_9.Location = new System.Drawing.Point(3, 242);
             this.checkBox_yuk_9.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_9.Name = "checkBox_yuk_9";
             this.checkBox_yuk_9.Size = new System.Drawing.Size(156, 27);
@@ -3194,7 +3564,7 @@ namespace SLF
             // 
             this.checkBox_yuk_7.AutoSize = true;
             this.checkBox_yuk_7.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_7.Location = new System.Drawing.Point(15, 320);
+            this.checkBox_yuk_7.Location = new System.Drawing.Point(3, 182);
             this.checkBox_yuk_7.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_7.Name = "checkBox_yuk_7";
             this.checkBox_yuk_7.Size = new System.Drawing.Size(156, 27);
@@ -3207,7 +3577,7 @@ namespace SLF
             // 
             this.checkBox_yuk_4.AutoSize = true;
             this.checkBox_yuk_4.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_4.Location = new System.Drawing.Point(15, 230);
+            this.checkBox_yuk_4.Location = new System.Drawing.Point(3, 92);
             this.checkBox_yuk_4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_4.Name = "checkBox_yuk_4";
             this.checkBox_yuk_4.Size = new System.Drawing.Size(157, 27);
@@ -3220,7 +3590,7 @@ namespace SLF
             // 
             this.checkBox_yuk_5.AutoSize = true;
             this.checkBox_yuk_5.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_5.Location = new System.Drawing.Point(15, 260);
+            this.checkBox_yuk_5.Location = new System.Drawing.Point(3, 122);
             this.checkBox_yuk_5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_5.Name = "checkBox_yuk_5";
             this.checkBox_yuk_5.Size = new System.Drawing.Size(156, 27);
@@ -3233,7 +3603,7 @@ namespace SLF
             // 
             this.checkBox_yuk_3.AutoSize = true;
             this.checkBox_yuk_3.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_3.Location = new System.Drawing.Point(15, 199);
+            this.checkBox_yuk_3.Location = new System.Drawing.Point(3, 61);
             this.checkBox_yuk_3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_3.Name = "checkBox_yuk_3";
             this.checkBox_yuk_3.Size = new System.Drawing.Size(156, 27);
@@ -3246,7 +3616,7 @@ namespace SLF
             // 
             this.checkBox_yuk_2.AutoSize = true;
             this.checkBox_yuk_2.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_2.Location = new System.Drawing.Point(15, 170);
+            this.checkBox_yuk_2.Location = new System.Drawing.Point(3, 32);
             this.checkBox_yuk_2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_2.Name = "checkBox_yuk_2";
             this.checkBox_yuk_2.Size = new System.Drawing.Size(156, 27);
@@ -3259,7 +3629,7 @@ namespace SLF
             // 
             this.checkBox_yuk_1.AutoSize = true;
             this.checkBox_yuk_1.ContextMenuStrip = this.katmanlar_right_click;
-            this.checkBox_yuk_1.Location = new System.Drawing.Point(15, 140);
+            this.checkBox_yuk_1.Location = new System.Drawing.Point(3, 2);
             this.checkBox_yuk_1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBox_yuk_1.Name = "checkBox_yuk_1";
             this.checkBox_yuk_1.Size = new System.Drawing.Size(154, 27);
@@ -3658,6 +4028,596 @@ namespace SLF
             this.ELFMinSenaryoGraphPicBox.TabIndex = 22;
             this.ELFMinSenaryoGraphPicBox.TabStop = false;
             // 
+            // checkBox_imar_50
+            // 
+            this.checkBox_imar_50.AutoSize = true;
+            this.checkBox_imar_50.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_50.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_50.Location = new System.Drawing.Point(15, 1473);
+            this.checkBox_imar_50.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_50.Name = "checkBox_imar_50";
+            this.checkBox_imar_50.Size = new System.Drawing.Size(171, 27);
+            this.checkBox_imar_50.TabIndex = 108;
+            this.checkBox_imar_50.Text = "checkBox_imar_50";
+            this.checkBox_imar_50.UseVisualStyleBackColor = false;
+            this.checkBox_imar_50.Visible = false;
+            // 
+            // checkBox_imar_49
+            // 
+            this.checkBox_imar_49.AutoSize = true;
+            this.checkBox_imar_49.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_49.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_49.Location = new System.Drawing.Point(15, 1443);
+            this.checkBox_imar_49.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_49.Name = "checkBox_imar_49";
+            this.checkBox_imar_49.Size = new System.Drawing.Size(172, 27);
+            this.checkBox_imar_49.TabIndex = 109;
+            this.checkBox_imar_49.Text = "checkBox_imar_49";
+            this.checkBox_imar_49.UseVisualStyleBackColor = false;
+            this.checkBox_imar_49.Visible = false;
+            // 
+            // checkBox_imar_48
+            // 
+            this.checkBox_imar_48.AutoSize = true;
+            this.checkBox_imar_48.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_48.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_48.Location = new System.Drawing.Point(15, 1413);
+            this.checkBox_imar_48.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_48.Name = "checkBox_imar_48";
+            this.checkBox_imar_48.Size = new System.Drawing.Size(172, 27);
+            this.checkBox_imar_48.TabIndex = 110;
+            this.checkBox_imar_48.Text = "checkBox_imar_48";
+            this.checkBox_imar_48.UseVisualStyleBackColor = false;
+            this.checkBox_imar_48.Visible = false;
+            // 
+            // checkBox_imar_47
+            // 
+            this.checkBox_imar_47.AutoSize = true;
+            this.checkBox_imar_47.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_47.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_47.Location = new System.Drawing.Point(15, 1383);
+            this.checkBox_imar_47.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_47.Name = "checkBox_imar_47";
+            this.checkBox_imar_47.Size = new System.Drawing.Size(172, 27);
+            this.checkBox_imar_47.TabIndex = 111;
+            this.checkBox_imar_47.Text = "checkBox_imar_47";
+            this.checkBox_imar_47.UseVisualStyleBackColor = false;
+            this.checkBox_imar_47.Visible = false;
+            // 
+            // checkBox_imar_46
+            // 
+            this.checkBox_imar_46.AutoSize = true;
+            this.checkBox_imar_46.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_46.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_46.Location = new System.Drawing.Point(15, 1353);
+            this.checkBox_imar_46.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_46.Name = "checkBox_imar_46";
+            this.checkBox_imar_46.Size = new System.Drawing.Size(172, 27);
+            this.checkBox_imar_46.TabIndex = 112;
+            this.checkBox_imar_46.Text = "checkBox_imar_46";
+            this.checkBox_imar_46.UseVisualStyleBackColor = false;
+            this.checkBox_imar_46.Visible = false;
+            // 
+            // checkBox_imar_45
+            // 
+            this.checkBox_imar_45.AutoSize = true;
+            this.checkBox_imar_45.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_45.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_45.Location = new System.Drawing.Point(15, 1323);
+            this.checkBox_imar_45.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_45.Name = "checkBox_imar_45";
+            this.checkBox_imar_45.Size = new System.Drawing.Size(172, 27);
+            this.checkBox_imar_45.TabIndex = 113;
+            this.checkBox_imar_45.Text = "checkBox_imar_45";
+            this.checkBox_imar_45.UseVisualStyleBackColor = false;
+            this.checkBox_imar_45.Visible = false;
+            // 
+            // checkBox_imar_44
+            // 
+            this.checkBox_imar_44.AutoSize = true;
+            this.checkBox_imar_44.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_44.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_44.Location = new System.Drawing.Point(15, 1293);
+            this.checkBox_imar_44.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_44.Name = "checkBox_imar_44";
+            this.checkBox_imar_44.Size = new System.Drawing.Size(173, 27);
+            this.checkBox_imar_44.TabIndex = 114;
+            this.checkBox_imar_44.Text = "checkBox_imar_44";
+            this.checkBox_imar_44.UseVisualStyleBackColor = false;
+            this.checkBox_imar_44.Visible = false;
+            // 
+            // checkBox_imar_43
+            // 
+            this.checkBox_imar_43.AutoSize = true;
+            this.checkBox_imar_43.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_43.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_43.Location = new System.Drawing.Point(15, 1263);
+            this.checkBox_imar_43.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_43.Name = "checkBox_imar_43";
+            this.checkBox_imar_43.Size = new System.Drawing.Size(172, 27);
+            this.checkBox_imar_43.TabIndex = 115;
+            this.checkBox_imar_43.Text = "checkBox_imar_43";
+            this.checkBox_imar_43.UseVisualStyleBackColor = false;
+            this.checkBox_imar_43.Visible = false;
+            // 
+            // checkBox_imar_42
+            // 
+            this.checkBox_imar_42.AutoSize = true;
+            this.checkBox_imar_42.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_42.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_42.Location = new System.Drawing.Point(15, 1233);
+            this.checkBox_imar_42.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_42.Name = "checkBox_imar_42";
+            this.checkBox_imar_42.Size = new System.Drawing.Size(172, 27);
+            this.checkBox_imar_42.TabIndex = 116;
+            this.checkBox_imar_42.Text = "checkBox_imar_42";
+            this.checkBox_imar_42.UseVisualStyleBackColor = false;
+            this.checkBox_imar_42.Visible = false;
+            // 
+            // checkBox_imar_41
+            // 
+            this.checkBox_imar_41.AutoSize = true;
+            this.checkBox_imar_41.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox_imar_41.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_imar_41.Location = new System.Drawing.Point(15, 1203);
+            this.checkBox_imar_41.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.checkBox_imar_41.Name = "checkBox_imar_41";
+            this.checkBox_imar_41.Size = new System.Drawing.Size(170, 27);
+            this.checkBox_imar_41.TabIndex = 117;
+            this.checkBox_imar_41.Text = "checkBox_imar_41";
+            this.checkBox_imar_41.UseVisualStyleBackColor = false;
+            this.checkBox_imar_41.Visible = false;
+            // 
+            // panel_yuk_checkboxes
+            // 
+            this.panel_yuk_checkboxes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.panel_yuk_checkboxes.AutoScroll = true;
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_21);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_22);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_23);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_25);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_26);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_27);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_31);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_32);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_34);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_24);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_36);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_28);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_29);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_30);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_33);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_35);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_37);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_38);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_39);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_40);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_42);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_41);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_43);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_44);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_45);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_46);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_47);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_48);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_49);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_50);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_3);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_20);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_1);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_19);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_2);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_17);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_5);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_18);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_4);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_16);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_7);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_9);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_10);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_12);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_13);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_15);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_14);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_8);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_11);
+            this.panel_yuk_checkboxes.Controls.Add(this.checkBox_yuk_6);
+            this.panel_yuk_checkboxes.Location = new System.Drawing.Point(9, 127);
+            this.panel_yuk_checkboxes.Name = "panel_yuk_checkboxes";
+            this.panel_yuk_checkboxes.Size = new System.Drawing.Size(284, 613);
+            this.panel_yuk_checkboxes.TabIndex = 83;
+            // 
+            // checkBox_yuk_50
+            // 
+            this.checkBox_yuk_50.AutoSize = true;
+            this.checkBox_yuk_50.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_50.Location = new System.Drawing.Point(3, 1472);
+            this.checkBox_yuk_50.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_50.Name = "checkBox_yuk_50";
+            this.checkBox_yuk_50.Size = new System.Drawing.Size(165, 27);
+            this.checkBox_yuk_50.TabIndex = 83;
+            this.checkBox_yuk_50.Text = "checkBox_yuk_50";
+            this.checkBox_yuk_50.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_50.Visible = false;
+            // 
+            // checkBox_yuk_49
+            // 
+            this.checkBox_yuk_49.AutoSize = true;
+            this.checkBox_yuk_49.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_49.Location = new System.Drawing.Point(3, 1442);
+            this.checkBox_yuk_49.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_49.Name = "checkBox_yuk_49";
+            this.checkBox_yuk_49.Size = new System.Drawing.Size(166, 27);
+            this.checkBox_yuk_49.TabIndex = 84;
+            this.checkBox_yuk_49.Text = "checkBox_yuk_49";
+            this.checkBox_yuk_49.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_49.Visible = false;
+            // 
+            // checkBox_yuk_48
+            // 
+            this.checkBox_yuk_48.AutoSize = true;
+            this.checkBox_yuk_48.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_48.Location = new System.Drawing.Point(3, 1412);
+            this.checkBox_yuk_48.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_48.Name = "checkBox_yuk_48";
+            this.checkBox_yuk_48.Size = new System.Drawing.Size(166, 27);
+            this.checkBox_yuk_48.TabIndex = 85;
+            this.checkBox_yuk_48.Text = "checkBox_yuk_48";
+            this.checkBox_yuk_48.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_48.Visible = false;
+            // 
+            // checkBox_yuk_47
+            // 
+            this.checkBox_yuk_47.AutoSize = true;
+            this.checkBox_yuk_47.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_47.Location = new System.Drawing.Point(3, 1382);
+            this.checkBox_yuk_47.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_47.Name = "checkBox_yuk_47";
+            this.checkBox_yuk_47.Size = new System.Drawing.Size(166, 27);
+            this.checkBox_yuk_47.TabIndex = 86;
+            this.checkBox_yuk_47.Text = "checkBox_yuk_47";
+            this.checkBox_yuk_47.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_47.Visible = false;
+            // 
+            // checkBox_yuk_46
+            // 
+            this.checkBox_yuk_46.AutoSize = true;
+            this.checkBox_yuk_46.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_46.Location = new System.Drawing.Point(3, 1352);
+            this.checkBox_yuk_46.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_46.Name = "checkBox_yuk_46";
+            this.checkBox_yuk_46.Size = new System.Drawing.Size(166, 27);
+            this.checkBox_yuk_46.TabIndex = 87;
+            this.checkBox_yuk_46.Text = "checkBox_yuk_46";
+            this.checkBox_yuk_46.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_46.Visible = false;
+            // 
+            // checkBox_yuk_45
+            // 
+            this.checkBox_yuk_45.AutoSize = true;
+            this.checkBox_yuk_45.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_45.Location = new System.Drawing.Point(3, 1322);
+            this.checkBox_yuk_45.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_45.Name = "checkBox_yuk_45";
+            this.checkBox_yuk_45.Size = new System.Drawing.Size(166, 27);
+            this.checkBox_yuk_45.TabIndex = 88;
+            this.checkBox_yuk_45.Text = "checkBox_yuk_45";
+            this.checkBox_yuk_45.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_45.Visible = false;
+            // 
+            // checkBox_yuk_44
+            // 
+            this.checkBox_yuk_44.AutoSize = true;
+            this.checkBox_yuk_44.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_44.Location = new System.Drawing.Point(3, 1292);
+            this.checkBox_yuk_44.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_44.Name = "checkBox_yuk_44";
+            this.checkBox_yuk_44.Size = new System.Drawing.Size(167, 27);
+            this.checkBox_yuk_44.TabIndex = 89;
+            this.checkBox_yuk_44.Text = "checkBox_yuk_44";
+            this.checkBox_yuk_44.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_44.Visible = false;
+            // 
+            // checkBox_yuk_43
+            // 
+            this.checkBox_yuk_43.AutoSize = true;
+            this.checkBox_yuk_43.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_43.Location = new System.Drawing.Point(3, 1262);
+            this.checkBox_yuk_43.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_43.Name = "checkBox_yuk_43";
+            this.checkBox_yuk_43.Size = new System.Drawing.Size(166, 27);
+            this.checkBox_yuk_43.TabIndex = 90;
+            this.checkBox_yuk_43.Text = "checkBox_yuk_43";
+            this.checkBox_yuk_43.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_43.Visible = false;
+            // 
+            // checkBox_yuk_41
+            // 
+            this.checkBox_yuk_41.AutoSize = true;
+            this.checkBox_yuk_41.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_41.Location = new System.Drawing.Point(3, 1202);
+            this.checkBox_yuk_41.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_41.Name = "checkBox_yuk_41";
+            this.checkBox_yuk_41.Size = new System.Drawing.Size(164, 27);
+            this.checkBox_yuk_41.TabIndex = 91;
+            this.checkBox_yuk_41.Text = "checkBox_yuk_41";
+            this.checkBox_yuk_41.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_41.Visible = false;
+            // 
+            // checkBox_yuk_42
+            // 
+            this.checkBox_yuk_42.AutoSize = true;
+            this.checkBox_yuk_42.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_42.Location = new System.Drawing.Point(3, 1232);
+            this.checkBox_yuk_42.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_42.Name = "checkBox_yuk_42";
+            this.checkBox_yuk_42.Size = new System.Drawing.Size(166, 27);
+            this.checkBox_yuk_42.TabIndex = 92;
+            this.checkBox_yuk_42.Text = "checkBox_yuk_42";
+            this.checkBox_yuk_42.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_42.Visible = false;
+            // 
+            // checkBox_yuk_40
+            // 
+            this.checkBox_yuk_40.AutoSize = true;
+            this.checkBox_yuk_40.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_40.Location = new System.Drawing.Point(3, 1172);
+            this.checkBox_yuk_40.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_40.Name = "checkBox_yuk_40";
+            this.checkBox_yuk_40.Size = new System.Drawing.Size(166, 27);
+            this.checkBox_yuk_40.TabIndex = 93;
+            this.checkBox_yuk_40.Text = "checkBox_yuk_40";
+            this.checkBox_yuk_40.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_40.Visible = false;
+            // 
+            // checkBox_yuk_39
+            // 
+            this.checkBox_yuk_39.AutoSize = true;
+            this.checkBox_yuk_39.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_39.Location = new System.Drawing.Point(3, 1142);
+            this.checkBox_yuk_39.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_39.Name = "checkBox_yuk_39";
+            this.checkBox_yuk_39.Size = new System.Drawing.Size(165, 27);
+            this.checkBox_yuk_39.TabIndex = 94;
+            this.checkBox_yuk_39.Text = "checkBox_yuk_39";
+            this.checkBox_yuk_39.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_39.Visible = false;
+            // 
+            // checkBox_yuk_38
+            // 
+            this.checkBox_yuk_38.AutoSize = true;
+            this.checkBox_yuk_38.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_38.Location = new System.Drawing.Point(3, 1112);
+            this.checkBox_yuk_38.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_38.Name = "checkBox_yuk_38";
+            this.checkBox_yuk_38.Size = new System.Drawing.Size(165, 27);
+            this.checkBox_yuk_38.TabIndex = 95;
+            this.checkBox_yuk_38.Text = "checkBox_yuk_38";
+            this.checkBox_yuk_38.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_38.Visible = false;
+            // 
+            // checkBox_yuk_37
+            // 
+            this.checkBox_yuk_37.AutoSize = true;
+            this.checkBox_yuk_37.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_37.Location = new System.Drawing.Point(3, 1082);
+            this.checkBox_yuk_37.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_37.Name = "checkBox_yuk_37";
+            this.checkBox_yuk_37.Size = new System.Drawing.Size(165, 27);
+            this.checkBox_yuk_37.TabIndex = 96;
+            this.checkBox_yuk_37.Text = "checkBox_yuk_37";
+            this.checkBox_yuk_37.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_37.Visible = false;
+            // 
+            // checkBox_yuk_35
+            // 
+            this.checkBox_yuk_35.AutoSize = true;
+            this.checkBox_yuk_35.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_35.Location = new System.Drawing.Point(3, 1022);
+            this.checkBox_yuk_35.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_35.Name = "checkBox_yuk_35";
+            this.checkBox_yuk_35.Size = new System.Drawing.Size(165, 27);
+            this.checkBox_yuk_35.TabIndex = 97;
+            this.checkBox_yuk_35.Text = "checkBox_yuk_35";
+            this.checkBox_yuk_35.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_35.Visible = false;
+            // 
+            // checkBox_yuk_33
+            // 
+            this.checkBox_yuk_33.AutoSize = true;
+            this.checkBox_yuk_33.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_33.Location = new System.Drawing.Point(3, 962);
+            this.checkBox_yuk_33.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_33.Name = "checkBox_yuk_33";
+            this.checkBox_yuk_33.Size = new System.Drawing.Size(165, 27);
+            this.checkBox_yuk_33.TabIndex = 98;
+            this.checkBox_yuk_33.Text = "checkBox_yuk_33";
+            this.checkBox_yuk_33.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_33.Visible = false;
+            // 
+            // checkBox_yuk_30
+            // 
+            this.checkBox_yuk_30.AutoSize = true;
+            this.checkBox_yuk_30.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_30.Location = new System.Drawing.Point(3, 872);
+            this.checkBox_yuk_30.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_30.Name = "checkBox_yuk_30";
+            this.checkBox_yuk_30.Size = new System.Drawing.Size(165, 27);
+            this.checkBox_yuk_30.TabIndex = 99;
+            this.checkBox_yuk_30.Text = "checkBox_yuk_30";
+            this.checkBox_yuk_30.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_30.Visible = false;
+            // 
+            // checkBox_yuk_29
+            // 
+            this.checkBox_yuk_29.AutoSize = true;
+            this.checkBox_yuk_29.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_29.Location = new System.Drawing.Point(3, 842);
+            this.checkBox_yuk_29.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_29.Name = "checkBox_yuk_29";
+            this.checkBox_yuk_29.Size = new System.Drawing.Size(165, 27);
+            this.checkBox_yuk_29.TabIndex = 100;
+            this.checkBox_yuk_29.Text = "checkBox_yuk_29";
+            this.checkBox_yuk_29.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_29.Visible = false;
+            // 
+            // checkBox_yuk_28
+            // 
+            this.checkBox_yuk_28.AutoSize = true;
+            this.checkBox_yuk_28.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_28.Location = new System.Drawing.Point(3, 812);
+            this.checkBox_yuk_28.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_28.Name = "checkBox_yuk_28";
+            this.checkBox_yuk_28.Size = new System.Drawing.Size(165, 27);
+            this.checkBox_yuk_28.TabIndex = 101;
+            this.checkBox_yuk_28.Text = "checkBox_yuk_28";
+            this.checkBox_yuk_28.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_28.Visible = false;
+            // 
+            // checkBox_yuk_36
+            // 
+            this.checkBox_yuk_36.AutoSize = true;
+            this.checkBox_yuk_36.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_36.Location = new System.Drawing.Point(3, 1052);
+            this.checkBox_yuk_36.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_36.Name = "checkBox_yuk_36";
+            this.checkBox_yuk_36.Size = new System.Drawing.Size(165, 27);
+            this.checkBox_yuk_36.TabIndex = 102;
+            this.checkBox_yuk_36.Text = "checkBox_yuk_36";
+            this.checkBox_yuk_36.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_36.Visible = false;
+            // 
+            // checkBox_yuk_24
+            // 
+            this.checkBox_yuk_24.AutoSize = true;
+            this.checkBox_yuk_24.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_24.Location = new System.Drawing.Point(3, 692);
+            this.checkBox_yuk_24.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_24.Name = "checkBox_yuk_24";
+            this.checkBox_yuk_24.Size = new System.Drawing.Size(166, 27);
+            this.checkBox_yuk_24.TabIndex = 103;
+            this.checkBox_yuk_24.Text = "checkBox_yuk_24";
+            this.checkBox_yuk_24.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_24.Visible = false;
+            // 
+            // checkBox_yuk_34
+            // 
+            this.checkBox_yuk_34.AutoSize = true;
+            this.checkBox_yuk_34.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_34.Location = new System.Drawing.Point(3, 992);
+            this.checkBox_yuk_34.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_34.Name = "checkBox_yuk_34";
+            this.checkBox_yuk_34.Size = new System.Drawing.Size(166, 27);
+            this.checkBox_yuk_34.TabIndex = 104;
+            this.checkBox_yuk_34.Text = "checkBox_yuk_34";
+            this.checkBox_yuk_34.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_34.Visible = false;
+            // 
+            // checkBox_yuk_32
+            // 
+            this.checkBox_yuk_32.AutoSize = true;
+            this.checkBox_yuk_32.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_32.Location = new System.Drawing.Point(3, 932);
+            this.checkBox_yuk_32.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_32.Name = "checkBox_yuk_32";
+            this.checkBox_yuk_32.Size = new System.Drawing.Size(165, 27);
+            this.checkBox_yuk_32.TabIndex = 105;
+            this.checkBox_yuk_32.Text = "checkBox_yuk_32";
+            this.checkBox_yuk_32.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_32.Visible = false;
+            // 
+            // checkBox_yuk_31
+            // 
+            this.checkBox_yuk_31.AutoSize = true;
+            this.checkBox_yuk_31.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_31.Location = new System.Drawing.Point(3, 902);
+            this.checkBox_yuk_31.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_31.Name = "checkBox_yuk_31";
+            this.checkBox_yuk_31.Size = new System.Drawing.Size(163, 27);
+            this.checkBox_yuk_31.TabIndex = 106;
+            this.checkBox_yuk_31.Text = "checkBox_yuk_31";
+            this.checkBox_yuk_31.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_31.Visible = false;
+            // 
+            // checkBox_yuk_27
+            // 
+            this.checkBox_yuk_27.AutoSize = true;
+            this.checkBox_yuk_27.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_27.Location = new System.Drawing.Point(3, 782);
+            this.checkBox_yuk_27.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_27.Name = "checkBox_yuk_27";
+            this.checkBox_yuk_27.Size = new System.Drawing.Size(165, 27);
+            this.checkBox_yuk_27.TabIndex = 107;
+            this.checkBox_yuk_27.Text = "checkBox_yuk_27";
+            this.checkBox_yuk_27.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_27.Visible = false;
+            // 
+            // checkBox_yuk_26
+            // 
+            this.checkBox_yuk_26.AutoSize = true;
+            this.checkBox_yuk_26.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_26.Location = new System.Drawing.Point(3, 752);
+            this.checkBox_yuk_26.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_26.Name = "checkBox_yuk_26";
+            this.checkBox_yuk_26.Size = new System.Drawing.Size(165, 27);
+            this.checkBox_yuk_26.TabIndex = 108;
+            this.checkBox_yuk_26.Text = "checkBox_yuk_26";
+            this.checkBox_yuk_26.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_26.Visible = false;
+            // 
+            // checkBox_yuk_25
+            // 
+            this.checkBox_yuk_25.AutoSize = true;
+            this.checkBox_yuk_25.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_25.Location = new System.Drawing.Point(3, 722);
+            this.checkBox_yuk_25.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_25.Name = "checkBox_yuk_25";
+            this.checkBox_yuk_25.Size = new System.Drawing.Size(165, 27);
+            this.checkBox_yuk_25.TabIndex = 109;
+            this.checkBox_yuk_25.Text = "checkBox_yuk_25";
+            this.checkBox_yuk_25.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_25.Visible = false;
+            // 
+            // checkBox_yuk_23
+            // 
+            this.checkBox_yuk_23.AutoSize = true;
+            this.checkBox_yuk_23.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_23.Location = new System.Drawing.Point(3, 662);
+            this.checkBox_yuk_23.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_23.Name = "checkBox_yuk_23";
+            this.checkBox_yuk_23.Size = new System.Drawing.Size(165, 27);
+            this.checkBox_yuk_23.TabIndex = 110;
+            this.checkBox_yuk_23.Text = "checkBox_yuk_23";
+            this.checkBox_yuk_23.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_23.Visible = false;
+            // 
+            // checkBox_yuk_22
+            // 
+            this.checkBox_yuk_22.AutoSize = true;
+            this.checkBox_yuk_22.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_22.Location = new System.Drawing.Point(3, 632);
+            this.checkBox_yuk_22.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_22.Name = "checkBox_yuk_22";
+            this.checkBox_yuk_22.Size = new System.Drawing.Size(165, 27);
+            this.checkBox_yuk_22.TabIndex = 111;
+            this.checkBox_yuk_22.Text = "checkBox_yuk_22";
+            this.checkBox_yuk_22.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_22.Visible = false;
+            // 
+            // checkBox_yuk_21
+            // 
+            this.checkBox_yuk_21.AutoSize = true;
+            this.checkBox_yuk_21.ContextMenuStrip = this.katmanlar_right_click;
+            this.checkBox_yuk_21.Location = new System.Drawing.Point(3, 602);
+            this.checkBox_yuk_21.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.checkBox_yuk_21.Name = "checkBox_yuk_21";
+            this.checkBox_yuk_21.Size = new System.Drawing.Size(163, 27);
+            this.checkBox_yuk_21.TabIndex = 112;
+            this.checkBox_yuk_21.Text = "checkBox_yuk_21";
+            this.checkBox_yuk_21.UseVisualStyleBackColor = true;
+            this.checkBox_yuk_21.Visible = false;
+            // 
             // ModülFormu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -3708,6 +4668,8 @@ namespace SLF
             this.harita_katmanları_right_click.ResumeLayout(false);
             this.tab_imar.ResumeLayout(false);
             this.tab_imar.PerformLayout();
+            this.panel_imar_checkboxes.ResumeLayout(false);
+            this.panel_imar_checkboxes.PerformLayout();
             this.katmanlar_right_click.ResumeLayout(false);
             this.panel_imar.ResumeLayout(false);
             this.panel_imar.PerformLayout();
@@ -3756,6 +4718,8 @@ namespace SLF
             this.ModuleTabPanel.ResumeLayout(false);
             this.HeaderPanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.ELFMinSenaryoGraphPicBox)).EndInit();
+            this.panel_yuk_checkboxes.ResumeLayout(false);
+            this.panel_yuk_checkboxes.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -4003,5 +4967,67 @@ namespace SLF
         private Button button_tablo_olustur;
         private Button button_proje_kaydet;
         private Label label_proje_kaydet;
+        private Panel panel_imar_checkboxes;
+        private CheckBox checkBox_imar_29;
+        private CheckBox checkBox_imar_30;
+        private CheckBox checkBox_imar_31;
+        private CheckBox checkBox_imar_32;
+        private CheckBox checkBox_imar_33;
+        private CheckBox checkBox_imar_34;
+        private CheckBox checkBox_imar_35;
+        private CheckBox checkBox_imar_36;
+        private CheckBox checkBox_imar_37;
+        private CheckBox checkBox_imar_24;
+        private CheckBox checkBox_imar_26;
+        private CheckBox checkBox_imar_27;
+        private CheckBox checkBox_imar_28;
+        private CheckBox checkBox_imar_25;
+        private CheckBox checkBox_imar_22;
+        private CheckBox checkBox_imar_23;
+        private CheckBox checkBox_imar_21;
+        private CheckBox checkBox_imar_38;
+        private CheckBox checkBox_imar_39;
+        private CheckBox checkBox_imar_40;
+        private CheckBox checkBox_imar_41;
+        private CheckBox checkBox_imar_42;
+        private CheckBox checkBox_imar_43;
+        private CheckBox checkBox_imar_44;
+        private CheckBox checkBox_imar_45;
+        private CheckBox checkBox_imar_46;
+        private CheckBox checkBox_imar_47;
+        private CheckBox checkBox_imar_48;
+        private CheckBox checkBox_imar_49;
+        private CheckBox checkBox_imar_50;
+        private Panel panel_yuk_checkboxes;
+        private CheckBox checkBox_yuk_21;
+        private CheckBox checkBox_yuk_22;
+        private CheckBox checkBox_yuk_23;
+        private CheckBox checkBox_yuk_25;
+        private CheckBox checkBox_yuk_26;
+        private CheckBox checkBox_yuk_27;
+        private CheckBox checkBox_yuk_31;
+        private CheckBox checkBox_yuk_32;
+        private CheckBox checkBox_yuk_34;
+        private CheckBox checkBox_yuk_24;
+        private CheckBox checkBox_yuk_36;
+        private CheckBox checkBox_yuk_28;
+        private CheckBox checkBox_yuk_29;
+        private CheckBox checkBox_yuk_30;
+        private CheckBox checkBox_yuk_33;
+        private CheckBox checkBox_yuk_35;
+        private CheckBox checkBox_yuk_37;
+        private CheckBox checkBox_yuk_38;
+        private CheckBox checkBox_yuk_39;
+        private CheckBox checkBox_yuk_40;
+        private CheckBox checkBox_yuk_42;
+        private CheckBox checkBox_yuk_41;
+        private CheckBox checkBox_yuk_43;
+        private CheckBox checkBox_yuk_44;
+        private CheckBox checkBox_yuk_45;
+        private CheckBox checkBox_yuk_46;
+        private CheckBox checkBox_yuk_47;
+        private CheckBox checkBox_yuk_48;
+        private CheckBox checkBox_yuk_49;
+        private CheckBox checkBox_yuk_50;
     }
 }
