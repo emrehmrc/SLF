@@ -6521,7 +6521,7 @@ namespace SLF
 
                 SaveFileDialog kaydet_file_dialog = new SaveFileDialog();
 
-                kaydet_file_dialog.Filter = "Shapefile |*.shp|MapInfo File|*.tab|Google Earth File|*.kml";
+                kaydet_file_dialog.Filter = "Shapefile |*.shp|Google Earth File|*.kml";
                 kaydet_file_dialog.InitialDirectory = cbs.targetDirectory;
 
                 DialogResult kaydet_result = kaydet_file_dialog.ShowDialog();

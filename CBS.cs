@@ -1260,8 +1260,8 @@ namespace SLF
                 return;
             }
 
-            MapWinGIS.Shapefile myShapefile = ConvertOverlayToShapefile(shapeFileOverlay);
-            shapeFileArray_MapWinGIS[layer_index] = myShapefile;
+            //MapWinGIS.Shapefile myShapefile = ConvertOverlayToShapefile(shapeFileOverlay);
+            //shapeFileArray_MapWinGIS[layer_index] = myShapefile;
         }
 
 

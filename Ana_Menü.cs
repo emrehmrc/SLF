@@ -37,7 +37,7 @@ namespace SLF
             //@"OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\configVural.json");
 
 
-            //config_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configVural.json");
+            config_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configVural.json");
 
             string desktopYolu = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             
