@@ -15,8 +15,6 @@ using System.Windows.Forms;
 using GMap.NET.WindowsForms.Markers;
 using System.Globalization;
 using System.Xml.Linq;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
-using System.Xml;
 
 
 namespace SLF
@@ -27,19 +25,19 @@ namespace SLF
         public int layer_index;
 
         // center points of the polygons drawn - point load poligonları icin kullanılacak.
-        public (double Latitude, double Longitude)[] polygonCenterPoints { get; set; } = new (double, double)[20];
+        public (double Latitude, double Longitude)[] polygonCenterPoints { get; set; } = new (double, double)[50];
 
         private Dictionary<string, System.Drawing.Color> currentImarTipiColorMap; // Stores the color mapping for the current KML file
 
         // GMapOverlay arrays, one per map:
-        public GMapOverlay[] tüm_katmanlar_array_imar = new GMapOverlay[20];
-        public GMapOverlay[] tüm_katmanlar_array_yuk = new GMapOverlay[20];
-        public string[] tüm_katmanlar_array_polygon_tags = new string[20];
+        public GMapOverlay[] tüm_katmanlar_array_imar = new GMapOverlay[50];
+        public GMapOverlay[] tüm_katmanlar_array_yuk = new GMapOverlay[50];
+        public string[] tüm_katmanlar_array_polygon_tags = new string[50];
 
-        public string[] tüm_katmanlar_array_names = new string[20];
-        public System.Data.DataTable[] tüm_katmanlar_datatable = new DataTable[20];
+        public string[] tüm_katmanlar_array_names = new string[50];
+        public System.Data.DataTable[] tüm_katmanlar_datatable = new DataTable[50];
 
-        public MapWinGIS.Shapefile[] shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[20];
+        public MapWinGIS.Shapefile[] shapeFileArray_MapWinGIS = new MapWinGIS.Shapefile[50];
 
 
         // see the attributes of a polygon when clicked on it on the map 
@@ -144,8 +142,6 @@ namespace SLF
             }
         }
 
-
-
         public CBS(ModülFormu mainform)
         {
             this.modülFormu = mainform;
@@ -160,7 +156,6 @@ namespace SLF
 
         public CBS()
         {
-
         }
 
 
@@ -237,7 +232,7 @@ namespace SLF
 
         private int FindFirstFreeLayerIndex()
         {
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 50; i++)
             {
                 // If all four overlays at index i are null, that means it’s free
                 if (tüm_katmanlar_array_imar[i] == null && tüm_katmanlar_array_yuk[i] == null)
@@ -255,7 +250,7 @@ namespace SLF
 
             if (layer_index == -1)
             {
-                MessageBox.Show("En fazla 20 adet katman seçilebilmektedir.");
+                MessageBox.Show("En fazla 50 adet katman seçilebilmektedir.");
                 return;
             }
 
@@ -458,13 +453,43 @@ namespace SLF
             (System.Drawing.Color.DarkTurquoise, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.DarkTurquoise)),
             (System.Drawing.Color.Black, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Black)),
             (System.Drawing.Color.Violet, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Violet)),
-            (System.Drawing.Color.Violet, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Ivory)),
-            (System.Drawing.Color.Violet, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Navy)),
-            (System.Drawing.Color.Red, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.AliceBlue)),
-            (System.Drawing.Color.Blue, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.BurlyWood)),
-            (System.Drawing.Color.Green, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.MintCream)),
-            (System.Drawing.Color.DarkGoldenrod, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Beige)),
-            (System.Drawing.Color.Purple, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Chartreuse))
+            (System.Drawing.Color.MistyRose, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.MistyRose)),
+            (System.Drawing.Color.Navy, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Navy)),
+            (System.Drawing.Color.Chocolate, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Chocolate)),
+            (System.Drawing.Color.BurlyWood, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.BurlyWood)),
+            (System.Drawing.Color.DarkGray, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.MintCream)),
+            (System.Drawing.Color.DarkGreen, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Beige)),
+            (System.Drawing.Color.Chartreuse, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Chartreuse)),
+            (System.Drawing.Color.Yellow, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Yellow)),
+            (System.Drawing.Color.Magenta, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Magenta)),
+            (System.Drawing.Color.Lime, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Lime)),
+            (System.Drawing.Color.Teal, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Teal)),
+            (System.Drawing.Color.Maroon, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Maroon)),
+            (System.Drawing.Color.Olive, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Olive)),
+            (System.Drawing.Color.Silver, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Silver)),
+            (System.Drawing.Color.Gold, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Gold)),
+            (System.Drawing.Color.Indigo, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Indigo)),
+            (System.Drawing.Color.Coral, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Coral)),
+            (System.Drawing.Color.Crimson, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Crimson)),
+            (System.Drawing.Color.DarkBlue, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.DarkBlue)),
+            (System.Drawing.Color.DarkCyan, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.DarkCyan)),
+            (System.Drawing.Color.DarkGreen, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.DarkGreen)),
+            (System.Drawing.Color.DarkMagenta, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.DarkMagenta)),
+            (System.Drawing.Color.DarkOrange, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.DarkOrange)),
+            (System.Drawing.Color.DarkRed, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.DarkRed)),
+            (System.Drawing.Color.DarkViolet, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.DarkViolet)),
+            (System.Drawing.Color.DeepPink, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.DeepPink)),
+            (System.Drawing.Color.DeepSkyBlue, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.DeepSkyBlue)),
+            (System.Drawing.Color.DodgerBlue, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.DodgerBlue)),
+            (System.Drawing.Color.Firebrick, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Firebrick)),
+            (System.Drawing.Color.ForestGreen, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.ForestGreen)),
+            (System.Drawing.Color.Fuchsia, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Fuchsia)),
+            (System.Drawing.Color.HotPink, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.HotPink)),
+            (System.Drawing.Color.IndianRed, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.IndianRed)),
+            (System.Drawing.Color.Khaki, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Khaki)),
+            (System.Drawing.Color.Lavender, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.Lavender)),
+            (System.Drawing.Color.LawnGreen, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.LawnGreen)),
+            (System.Drawing.Color.LightBlue, System.Drawing.Color.FromArgb(opacity, System.Drawing.Color.LightBlue))
         };
 
         private System.Data.DataTable LoadAttributeTable(DataRow row, DataGridView dataGridView,
@@ -1251,12 +1276,13 @@ namespace SLF
             }
 
             // Log the DataTable to verify Row_No values
-            File.WriteAllText("shapefile_datatable.txt", string.Join("\n", shapefile_datatable.Rows.Cast<DataRow>().Select(r => $"Row_No: {r["Row_No"]}")));
+            File.WriteAllText("shapefile_datatable.txt", string.Join("\n", 
+                shapefile_datatable.Rows.Cast<DataRow>().Select(r => $"Row_No: {r["Row_No"]}")));
 
             layer_index = Array.FindIndex(tüm_katmanlar_array_imar, s => s == null);
             if (layer_index == -1)
             {
-                MessageBox.Show("En fazla 20 adet katman seçilebilmektedir.");
+                MessageBox.Show("En fazla 50 adet katman seçilebilmektedir.");
                 return;
             }
 

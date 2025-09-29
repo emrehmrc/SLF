@@ -116,13 +116,10 @@ namespace SLF
             this.Hide();
         }
 
-
         private void buton_hakkında_Click(object sender, EventArgs e)
         {
             Hakkında hakkında = new Hakkında();
             hakkında.Show();
         }
-
     }
-
 }
