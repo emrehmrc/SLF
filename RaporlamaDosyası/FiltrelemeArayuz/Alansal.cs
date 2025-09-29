@@ -62,7 +62,7 @@ namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
             }
 
 
-            for (int year = ilkYilInt-1; year <= sonYilInt; year++)
+            for (int year = ilkYilInt; year <= sonYilInt; year++)
             {
                 this.checkedListBox1.Items.Add(year.ToString());
             }

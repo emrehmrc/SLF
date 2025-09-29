@@ -33,30 +33,73 @@ namespace SLF
 
         private void ImputeCoordinate()
         {
+            // Güvenlik kontrolleri
+            if (currentDataTable == null)
+            {
+                Console.WriteLine("currentDataTable is null");
+                return;
+            }
+            if (!dataTablesByType.ContainsKey("DTR Verileri") || dataTablesByType["DTR Verileri"] == null)
+            {
+                Console.WriteLine("DTR Verileri table not found");
+                return;
+            }
             DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
 
+            // Performans için Dictionary oluştur (O(1) lookup)
+            var trafoLookup = new Dictionary<string, (double? x, double? y)>();
+            foreach (DataRow dtrRow in trafoDataTable.Rows)
+            {
+                string trafoKodu = dtrRow.Field<string>("TRAFO_KODU") ?? string.Empty;
+                if (!string.IsNullOrEmpty(trafoKodu) && !trafoLookup.ContainsKey(trafoKodu))
+                {
+                    double? xCoord = dtrRow.Field<double?>("TRAFO_X_KOORDINAT");
+                    double? yCoord = dtrRow.Field<double?>("TRAFO_Y_KOORDINAT");
+                    trafoLookup[trafoKodu] = (xCoord, yCoord);
+                }
+            }
+
+            // Ana döngü - şimdi O(n) complexity
+            int updatedCount = 0;
             foreach (DataRow row in currentDataTable.Rows)
             {
-                if (IsNullLike(row["EA_X_KOORDINAT"]) || IsNullLike(row["EA_Y_KOORDINAT"]))
+                try
                 {
-                    string eaTrafoKodu = row.Field<string>("EA_TRAFO_KODU") ?? string.Empty;
-
-                    foreach (DataRow dtrRow in trafoDataTable.Rows)
+                    if (IsNullLike(row["EA_X_KOORDINAT"]) || IsNullLike(row["EA_Y_KOORDINAT"]))
                     {
-                        string trafoKodu = dtrRow.Field<string>("TRAFO_KODU") ?? string.Empty;
-                        if (trafoKodu == eaTrafoKodu)
+                        string eaTrafoKodu = row.Field<string>("EA_TRAFO_KODU") ?? string.Empty;
+                        if (!string.IsNullOrEmpty(eaTrafoKodu) && trafoLookup.TryGetValue(eaTrafoKodu, out var coords))
                         {
-                            double? xCoord = dtrRow.Field<double?>("TRAFO_X_KOORDINAT");
-                            double? yCoord = dtrRow.Field<double?>("TRAFO_Y_KOORDINAT");
-                            row["EA_X_KOORDINAT"] = xCoord.HasValue ? (object)xCoord.Value : DBNull.Value;
-                            row["EA_Y_KOORDINAT"] = yCoord.HasValue ? (object)yCoord.Value : DBNull.Value;
-                            break;
+                            bool wasUpdated = false;
+
+                            // Sadece null olanları güncelle
+                            if (IsNullLike(row["EA_X_KOORDINAT"]) && coords.x.HasValue)
+                            {
+                                row["EA_X_KOORDINAT"] = coords.x.Value;
+                                wasUpdated = true;
+                            }
+                            if (IsNullLike(row["EA_Y_KOORDINAT"]) && coords.y.HasValue)
+                            {
+                                row["EA_Y_KOORDINAT"] = coords.y.Value;
+                                wasUpdated = true;
+                            }
+
+                            // Sadece gerçekten güncelleme yapıldıysa say
+                            if (wasUpdated)
+                            {
+                                updatedCount++;
+                            }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error processing row: {ex.Message}");
+                    // Devam et, bir satırdaki hata tüm işlemi durdurmasın
+                }
             }
+            Console.WriteLine($"Imputed coordinates for {updatedCount} records");
         }
-
 
         private const int AC_DC_THRESHOLD = 22;
         private const int AC_CONSTANT = 0;
@@ -80,7 +123,7 @@ namespace SLF
 
         //burada şarj istasyonunun tipi olmaması durumunda istasyon gücüne bakıp tipi belirleyecek olan kodun fonksiyonunu yazdım.
 
-        private void ImputeIstasyonTipi()
+        /*private void ImputeIstasyonTipi()
         {
             foreach (DataRow row in currentDataTable.Rows)
             {
@@ -96,6 +139,41 @@ namespace SLF
                         row["ISTASYON_TIPI"] = DC_CONSTANT;
                     }
                 }
+            }
+        }*/
+
+        // ✅ DAHA KISA VE GÜVENLİ VERSİYON
+        private void ImputeIstasyonTipi()
+        {
+            foreach (DataRow row in currentDataTable.Rows)
+            {
+                if (IsNullLike(row["ISTASYON_TIPI"]))
+                {
+                    // Güvenli int dönüştürme helper metodu
+                    int istasyonGucu = GetSafeInt(row, "ISTASYON_GUCU", 0);
+
+                    // Threshold kontrolü ve atama
+                    row["ISTASYON_TIPI"] = istasyonGucu <= AC_DC_THRESHOLD ? AC_CONSTANT : DC_CONSTANT;
+                }
+            }
+        }
+
+        // ✅ HELPER METODLAR
+        private int GetSafeInt(DataRow row, string columnName, int defaultValue = 0)
+        {
+            try
+            {
+                if (row[columnName] == null || row[columnName] == DBNull.Value)
+                    return defaultValue;
+
+                if (int.TryParse(row[columnName].ToString(), out int result))
+                    return result;
+
+                return defaultValue;
+            }
+            catch
+            {
+                return defaultValue;
             }
         }
 
@@ -168,7 +246,7 @@ namespace SLF
         // New field to store out-of-bounds rows and their EA_TRAFO_KODU
         private Dictionary<int, string> outOfBoundsRowsToTrafoKodu;
 
-        private void InitializeCoordinateBounds()
+        /*private void InitializeCoordinateBounds()
         {
             DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
 
@@ -206,6 +284,167 @@ namespace SLF
                 { "EA_X_KOORDINAT", (xMin - xRange * COORDINATE_BUFFER_PERCENTAGE, xMax + xRange * COORDINATE_BUFFER_PERCENTAGE) },
                 { "EA_Y_KOORDINAT", (yMin - yRange * COORDINATE_BUFFER_PERCENTAGE, yMax + yRange * COORDINATE_BUFFER_PERCENTAGE) }
             };
+        }
+        */
+
+        // ✅ DÜZELTİLMİŞ VE GÜVENLİ VERSİYON
+        private void InitializeCoordinateBounds()
+        {
+            try
+            {
+                // Dictionary kontrolü
+                if (!dataTablesByType.ContainsKey("DTR Verileri"))
+                {
+                    throw new InvalidOperationException("'DTR Verileri' anahtarı dataTablesByType içinde bulunamadı.");
+                }
+
+                DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
+                if (trafoDataTable == null || trafoDataTable.Rows.Count == 0)
+                {
+                    throw new InvalidOperationException("Transformer data ('DTR Verileri') is missing or empty. Cannot compute coordinate bounds.");
+                }
+
+                // Sütunların varlığını kontrol et
+                string[] requiredColumns = { "TRAFO_X_KOORDINAT", "TRAFO_Y_KOORDINAT" };
+                foreach (string column in requiredColumns)
+                {
+                    if (!trafoDataTable.Columns.Contains(column))
+                    {
+                        throw new InvalidOperationException($"Required column '{column}' not found in DTR Verileri table.");
+                    }
+                }
+
+                // Güvenli koordinat okuma - farklı veri tiplerini handle et
+                var xCoords = GetSafeCoordinates(trafoDataTable, "TRAFO_X_KOORDINAT");
+                var yCoords = GetSafeCoordinates(trafoDataTable, "TRAFO_Y_KOORDINAT");
+
+                // Koordinat validasyonu
+                if (xCoords.Count == 0 || yCoords.Count == 0)
+                {
+                    throw new InvalidOperationException($"No valid transformer coordinates found in 'DTR Verileri'. X count: {xCoords.Count}, Y count: {yCoords.Count}");
+                }
+
+                // Min/Max hesaplama
+                double xMin = xCoords.Min();
+                double xMax = xCoords.Max();
+                double yMin = yCoords.Min();
+                double yMax = yCoords.Max();
+
+                // Sıfır range kontrolü
+                double xRange = xMax - xMin;
+                double yRange = yMax - yMin;
+
+                if (xRange == 0 || yRange == 0)
+                {
+                    throw new InvalidOperationException($"Invalid coordinate range detected. X range: {xRange}, Y range: {yRange}");
+                }
+
+                // Buffer percentage kontrolü
+                double bufferPercentage = COORDINATE_BUFFER_PERCENTAGE;
+                if (bufferPercentage < 0 || bufferPercentage > 1.0)
+                {
+                    throw new InvalidOperationException($"Invalid COORDINATE_BUFFER_PERCENTAGE: {bufferPercentage}. Should be between 0 and 1.");
+                }
+
+                // Float dönüştürme - precision kontrolü ile
+                float xMinFloat = SafeDoubleToFloat(xMin - xRange * bufferPercentage);
+                float xMaxFloat = SafeDoubleToFloat(xMax + xRange * bufferPercentage);
+                float yMinFloat = SafeDoubleToFloat(yMin - yRange * bufferPercentage);
+                float yMaxFloat = SafeDoubleToFloat(yMax + yRange * bufferPercentage);
+
+                // Dictionary oluşturma
+                minMaxCheckMap = new Dictionary<string, (float Min, float Max)>
+        {
+            { "EA_X_KOORDINAT", (xMinFloat, xMaxFloat) },
+            { "EA_Y_KOORDINAT", (yMinFloat, yMaxFloat) }
+        };
+
+               
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Error initializing coordinate bounds: {ex.Message}", ex);
+            }
+        }
+
+        private float SafeDoubleToFloat(double value)
+        {
+            // Double'ın float aralığında olup olmadığını kontrol et
+            if (value > float.MaxValue)
+                return float.MaxValue;
+            if (value < float.MinValue)
+                return float.MinValue;
+            if (double.IsNaN(value))
+                return float.NaN;
+            if (double.IsPositiveInfinity(value))
+                return float.PositiveInfinity;
+            if (double.IsNegativeInfinity(value))
+                return float.NegativeInfinity;
+
+            return (float)value;
+        }
+
+
+        // ✅ HELPER METODLAR
+        private List<double> GetSafeCoordinates(DataTable table, string columnName)
+        {
+            var coordinates = new List<double>();
+
+            foreach (DataRow row in table.Rows)
+            {
+                try
+                {
+                    object value = row[columnName];
+
+                    // Null ve DBNull kontrolü
+                    if (value == null || value == DBNull.Value)
+                        continue;
+
+                    // Farklı veri tiplerini handle et
+                    double coord = 0;
+
+                    if (value is double doubleValue)
+                    {
+                        coord = doubleValue;
+                    }
+                    else if (value is float floatValue)
+                    {
+                        coord = floatValue;
+                    }
+                    else if (value is decimal decimalValue)
+                    {
+                        coord = (double)decimalValue;
+                    }
+                    else if (value is int intValue)
+                    {
+                        coord = intValue;
+                    }
+                    else if (value is string stringValue)
+                    {
+                        if (!double.TryParse(stringValue, out coord))
+                            continue; // Geçersiz string değeri atla
+                    }
+                    else
+                    {
+                        // Diğer tipler için Convert.ToDouble dene
+                        if (!double.TryParse(value.ToString(), out coord))
+                            continue;
+                    }
+
+                    // Koordinat validasyonu
+                    if (!double.IsNaN(coord) && !double.IsInfinity(coord))
+                    {
+                        coordinates.Add(coord);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Hatalı satırı logla ama işleme devam et
+                    Console.WriteLine($"Error processing coordinate in column {columnName}: {ex.Message}");
+                }
+            }
+
+            return coordinates;
         }
 
         private void ReportCoordinatesOutOfLimits()
@@ -278,59 +517,134 @@ namespace SLF
             DataTable trafoDataTable = dataTablesByType["DTR Verileri"];
             if (trafoDataTable == null || trafoDataTable.Rows.Count == 0)
             {
-                // Log a warning if transformer data is missing during imputation
-                var datatableLevel = GetDataTableBasedOnThreshold(1.0f, 0.0f, 0.0f); // Treat as error
+                var datatableLevel = GetDataTableBasedOnThreshold(1.0f, 0.0f, 0.0f);
                 datatableLevel.Rows.Add(new object[]
                 {
-                "EA_X_KOORDINAT & EA_Y_KOORDINAT",
-                "Koordinat Imputasyonu",
-                "N/A",
-                "Transformer data ('DTR Verileri') is missing or empty. Cannot impute out-of-bounds coordinates."
+            "EA_X_KOORDINAT & EA_Y_KOORDINAT",
+            "Koordinat Imputasyonu",
+            "N/A",
+            "Transformer data ('DTR Verileri') is missing or empty. Cannot impute out-of-bounds coordinates."
                 });
                 return;
             }
 
-            // Create a lookup for transformer coordinates to avoid nested loops
-            var trafoLookup = trafoDataTable.AsEnumerable()
-                .ToDictionary(
-                    row => row.Field<string>("TRAFO_KODU"),
-                    row => (X: row.Field<string>("TRAFO_X_KOORDINAT"), Y: row.Field<string>("TRAFO_Y_KOORDINAT")));
+            // Güvenli lookup oluştur
+            var trafoLookup = new Dictionary<string, (double? X, double? Y)>();
 
-            // Impute out-of-bounds coordinates
-            foreach (var kvp in outOfBoundsRowsToTrafoKodu)
+            foreach (DataRow trafoRow in trafoDataTable.Rows)
+            {
+                try
+                {
+                    string trafoKodu = trafoRow.Field<string>("TRAFO_KODU");
+                    if (!string.IsNullOrEmpty(trafoKodu) && !trafoLookup.ContainsKey(trafoKodu))
+                    {
+                        // Koordinatları uygun tipe çevir
+                        double? xCoord = null;
+                        double? yCoord = null;
+
+                        var xValue = trafoRow["TRAFO_X_KOORDINAT"];
+                        var yValue = trafoRow["TRAFO_Y_KOORDINAT"];
+
+                        if (xValue != null && xValue != DBNull.Value)
+                        {
+                            if (double.TryParse(xValue.ToString(), out double x))
+                            {
+                                xCoord = x;
+                            }
+                        }
+
+                        if (yValue != null && yValue != DBNull.Value)
+                        {
+                            if (double.TryParse(yValue.ToString(), out double y))
+                            {
+                                yCoord = y;
+                            }
+                        }
+
+                        trafoLookup[trafoKodu] = (xCoord, yCoord);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error processing trafo row: {ex.Message}");
+                }
+            }
+
+            // Out-of-bounds koordinatları impute et
+            int successCount = 0;
+            int failCount = 0;
+
+            foreach (var kvp in outOfBoundsRowsToTrafoKodu.ToList()) // ToList() ile safe iteration
             {
                 int rowIndex = kvp.Key;
                 string eaTrafoKodu = kvp.Value;
 
-                if (rowIndex >= currentDataTable.Rows.Count)
+                if (rowIndex >= currentDataTable.Rows.Count || rowIndex < 0)
                 {
-                    continue; // Skip if row index is out of bounds (e.g., after removals)
+                    failCount++;
+                    continue; // Skip if row index is out of bounds
                 }
 
-                DataRow row = currentDataTable.Rows[rowIndex];
-                if (trafoLookup.TryGetValue(eaTrafoKodu, out var coords))
+                try
                 {
-                    row["EA_X_KOORDINAT"] = coords.X;
-                    row["EA_Y_KOORDINAT"] = coords.Y;
-                }
-                else
-                {
-                    // Log a warning if the transformer code is not found
-                    var datatableLevel = GetDataTableBasedOnThreshold(1.0f, 0.0f, 0.0f); // Treat as error
-                    datatableLevel.Rows.Add(new object[]
+                    DataRow row = currentDataTable.Rows[rowIndex];
+
+                    if (!string.IsNullOrEmpty(eaTrafoKodu) && trafoLookup.TryGetValue(eaTrafoKodu, out var coords))
                     {
+                        // Sadece geçerli koordinatları ata
+                        if (coords.X.HasValue)
+                        {
+                            row["EA_X_KOORDINAT"] = coords.X.Value;
+                        }
+                        if (coords.Y.HasValue)
+                        {
+                            row["EA_Y_KOORDINAT"] = coords.Y.Value;
+                        }
+
+                        if (coords.X.HasValue || coords.Y.HasValue)
+                        {
+                            successCount++;
+                        }
+                        else
+                        {
+                            failCount++;
+                            // Log koordinat bulunamadı
+                            var datatableLevel = GetDataTableBasedOnThreshold(1.0f, 0.0f, 0.0f);
+                            datatableLevel.Rows.Add(new object[]
+                            {
+                        "EA_X_KOORDINAT & EA_Y_KOORDINAT",
+                        "Koordinat Imputasyonu",
+                        "N/A",
+                        $"Transformer '{eaTrafoKodu}' found but coordinates are null/invalid."
+                            });
+                        }
+                    }
+                    else
+                    {
+                        failCount++;
+                        // Log trafo bulunamadı
+                        var datatableLevel = GetDataTableBasedOnThreshold(1.0f, 0.0f, 0.0f);
+                        datatableLevel.Rows.Add(new object[]
+                        {
                     "EA_X_KOORDINAT & EA_Y_KOORDINAT",
                     "Koordinat Imputasyonu",
                     "N/A",
                     $"Transformer code '{eaTrafoKodu}' not found in 'DTR Verileri'. Cannot impute coordinates for row {rowIndex}."
-                    });
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    failCount++;
+                    Console.WriteLine($"Error imputing coordinates for row {rowIndex}: {ex.Message}");
                 }
             }
+
+            Console.WriteLine($"Coordinate imputation completed: {successCount} success, {failCount} failed");
 
             // Clear the dictionary after imputation
             outOfBoundsRowsToTrafoKodu.Clear();
         }
-
         private void ReportNullCounts()
         {
             float nullPercentage = 0.0f;

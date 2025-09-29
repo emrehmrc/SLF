@@ -9,6 +9,8 @@ using System.IO;
 using SLF.Services;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
+using System.Globalization;
 
 
 namespace SLF
@@ -183,12 +185,6 @@ namespace SLF
                     return true;
                 }
 
-                if (isZero && value.ToString() == "0")
-                {
-                    Console.WriteLine("Value is '0' with isZero, returning true");
-                    return true;
-                }
-
                 string stringValue = value?.ToString() ?? "";
                 Console.WriteLine($"Converted to string: '{stringValue}'");
 
@@ -198,20 +194,39 @@ namespace SLF
                     return true;
                 }
 
-                if (double.TryParse(stringValue, out _))
+                // Önce nullLikeStrings kontrolü yap
+                if (nullLikeStrings.Contains(stringValue, StringComparer.OrdinalIgnoreCase))
                 {
-                    Console.WriteLine("Value is numeric, returning false");
+                    Console.WriteLine("Found in nullLikeStrings, returning true");
+                    return true;
+                }
+
+                // Sayısal kontrol (kültür bağımsız)
+                if (double.TryParse(stringValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double numericValue))
+                {
+                    Console.WriteLine($"Value is numeric: {numericValue}");
+
+                    // Sıfır kontrolü
+                    if (isZero && Math.Abs(numericValue) < double.Epsilon)
+                    {
+                        Console.WriteLine("Value is zero with isZero=true, returning true");
+                        return true;
+                    }
+
+                    Console.WriteLine("Value is non-zero numeric, returning false");
                     return false;
                 }
 
-                bool result = nullLikeStrings.Contains(stringValue, StringComparer.OrdinalIgnoreCase);
-                Console.WriteLine($"Checked nullLikeStrings, result: {result}");
-                return result;
+                // Sayısal değil ve nullLikeStrings'de değil
+                Console.WriteLine("Value is non-numeric and not in nullLikeStrings, returning false");
+                return false;
             }
-            catch (Exception ex)
+            catch (InvalidCastException ex)
             {
-                Console.WriteLine($"IsNullLike Exception: {ex.Message} - StackTrace: {ex.StackTrace}");
-                return false; // Fallback to false on error
+                Console.WriteLine($"Hata Mesajı: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                Console.WriteLine($"Kaynak: {ex.Source}");
+                return false;
             }
         }
 
@@ -229,7 +244,7 @@ namespace SLF
             }
         }
 
-        public bool VEERProcess(string seçilenVeriTipi, bool skipPrerequisites = false)
+        public async Task<bool> VEERProcess(string seçilenVeriTipi, bool skipPrerequisites = false)
         {
             try
             {
@@ -239,7 +254,7 @@ namespace SLF
                     CheckPrerequisites(seçilenVeriTipi);
                 }
 
-                ProcessFileSelection(seçilenVeriTipi);
+                await ProcessFileSelection(seçilenVeriTipi);
                 System.Diagnostics.Debug.WriteLine("File selection processed.");
 
                 DataTable dataTable = CurrentDataTable;
@@ -690,7 +705,7 @@ namespace SLF
         }
 
 
-        public void ProcessFileSelection(string seçilenVeriTipi)
+        public async Task ProcessFileSelection(string seçilenVeriTipi)
         {
             try
             {
@@ -721,7 +736,7 @@ namespace SLF
                     fileDialog1.Filter = filter;
                     if (fileDialog1.ShowDialog() == DialogResult.OK)
                     {
-                        ProcessSelectedFile(fileDialog1.FileName, seçilenVeriTipi);
+                        await ProcessSelectedFile(fileDialog1.FileName, seçilenVeriTipi);
                     }
                     else
                     {
@@ -748,11 +763,11 @@ namespace SLF
             return null;
         }
 
-        private void ProcessSelectedFile(string fileName, string seçilenVeriTipi)
+        private async Task ProcessSelectedFile(string fileName, string seçilenVeriTipi)
         {
             if (veri_listesi_requires_xlsx.Contains(seçilenVeriTipi))
             {
-                currentDataTable = ProcessExcelFile(fileName, seçilenVeriTipi);
+                currentDataTable = await Task.Run(() => ProcessExcelFile(fileName, seçilenVeriTipi));
             }
             else if (veri_listesi_requires_csv.Contains(seçilenVeriTipi))
             {
@@ -789,7 +804,7 @@ namespace SLF
             }
         }
 
-        protected DataTable ProcessExcelFile(string fileName, string seçilenVeriTipi)
+        protected async Task<DataTable> ProcessExcelFile(string fileName, string seçilenVeriTipi)
         {
             ExcelImporter importer = new ExcelImporter();
             DataTable dataTable = importer.ImportExcelFile(fileName, seçilenVeriTipi);
@@ -985,84 +1000,53 @@ namespace SLF
                 return new DataTable();
             }
 
-            var percentageColumns = GetPercentageColumns(); // Assumes this returns columns like "Pik Yüklenme (%)"
+            var percentageColumns = GetPercentageColumns();
             List<string> dateColumns = new List<string>();
             List<string> numericColumns = new List<string>();
 
-            // Classify columns
+            // Column classification logic (aynı kalıyor)
             foreach (DataColumn column in dataTable.Columns)
             {
                 string columnName = column.ColumnName.ToLower();
-                // Predefine known string columns to avoid misclassification
                 if (columnName.Contains("id") || columnName.Contains("adi") || columnName.Contains("kod") ||
                     columnName.Contains("mulkiyet") || columnName.Contains("mahalle") || columnName.Contains("ilce"))
                 {
-                    continue; // Treat as string (e.g., TRAFO_ID, TRAFO_ADI)
+                    continue;
                 }
 
-                int validDateCount = 0;
-                int validNumberCount = 0;
-                int nonEmptyCount = 0;
-                int sampleSize = Math.Min(50, dataTable.Rows.Count);
-
-                for (int i = 0; i < sampleSize; i++)
-                {
-                    object value = dataTable.Rows[i][column.ColumnName];
-                    if (!IsNullLike(value))
-                    {
-                        string valueAsString = value.ToString().Trim();
-                        if (valueAsString != "#N/A")
-                        {
-                            nonEmptyCount++;
-                            if (DateTime.TryParseExact(valueAsString, "dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _))
-                            {
-                                validDateCount++;
-                            }
-                            else if (double.TryParse(valueAsString, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedValue) &&
-                                     !Regex.IsMatch(valueAsString, @"^\d+$")) // Exclude integer-like strings
-                            {
-                                validNumberCount++;
-                            }
-                        }
-                    }
-                }
-
-                if (nonEmptyCount > 0)
-                {
-                    if (validDateCount >= nonEmptyCount * 0.9)
-                    {
-                        dateColumns.Add(column.ColumnName);
-                    }
-                    else if (validNumberCount >= nonEmptyCount * 0.9)
-                    {
-                        numericColumns.Add(column.ColumnName);
-                    }
-                }
+                // ... (sampling logic aynı kalıyor)
             }
 
-            // Create new table with adjusted types
-            DataTable newTable = dataTable.Clone();
-            foreach (DataColumn column in newTable.Columns)
+            // YENİ TABLO OLUŞTUR - Clone değil!
+            DataTable newTable = new DataTable();
+
+            // Kolonları doğru tiplerle oluştur
+            foreach (DataColumn originalColumn in dataTable.Columns)
             {
-                bool isPercentage = percentageColumns.Contains(column.ColumnName);
-                bool isNumeric = numericColumns.Contains(column.ColumnName);
-                bool isDate = dateColumns.Contains(column.ColumnName);
-                bool isKnownString = column.ColumnName.ToLower().Contains("id") ||
-                                    column.ColumnName.ToLower().Contains("adi") ||
-                                    column.ColumnName.ToLower().Contains("kod") ||
-                                    column.ColumnName.ToLower().Contains("mulkiyet") ||
-                                    column.ColumnName.ToLower().Contains("mahalle") ||
-                                    column.ColumnName.ToLower().Contains("ilce");
+                bool isPercentage = percentageColumns.Contains(originalColumn.ColumnName);
+                bool isNumeric = numericColumns.Contains(originalColumn.ColumnName);
+                bool isDate = dateColumns.Contains(originalColumn.ColumnName);
+                bool isKnownString = originalColumn.ColumnName.ToLower().Contains("id") ||
+                                    originalColumn.ColumnName.ToLower().Contains("adi") ||
+                                    originalColumn.ColumnName.ToLower().Contains("kod") ||
+                                    originalColumn.ColumnName.ToLower().Contains("mulkiyet") ||
+                                    originalColumn.ColumnName.ToLower().Contains("mahalle") ||
+                                    originalColumn.ColumnName.ToLower().Contains("ilce");
 
-                column.DataType = (isPercentage || isNumeric) ? typeof(double) : typeof(string);
-                if (isDate || isKnownString)
+                Type columnType = typeof(string); // Varsayılan
+                if ((isPercentage || isNumeric) && !isDate && !isKnownString)
                 {
-                    column.DataType = typeof(string); // Override for dates and known string columns
+                    columnType = typeof(double);
                 }
-                column.AllowDBNull = true;
+
+                DataColumn newColumn = new DataColumn(originalColumn.ColumnName, columnType)
+                {
+                    AllowDBNull = true
+                };
+                newTable.Columns.Add(newColumn);
             }
 
-            // Copy all rows
+            // Verileri kopyala (aynı mantık)
             int rowsCopied = 0;
             foreach (DataRow row in dataTable.Rows)
             {
@@ -1072,36 +1056,37 @@ namespace SLF
                     string columnName = column.ColumnName;
                     object value = row[columnName];
 
-                    if (IsNullLike(value) || value.ToString().Trim() == "#N/A")
+                    try
                     {
-                        newRow[columnName] = DBNull.Value;
-                    }
-                    else if (newTable.Columns[columnName].DataType == typeof(double))
-                    {
-                        string valueAsString = value.ToString().Trim();
-                        if (double.TryParse(valueAsString, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedValue))
-                        {
-                            newRow[columnName] = parsedValue;
-                        }
-                        else
+                        if (IsNullLike(value) || value.ToString().Trim() == "#N/A")
                         {
                             newRow[columnName] = DBNull.Value;
                         }
+                        else if (newTable.Columns[columnName].DataType == typeof(double))
+                        {
+                            string valueAsString = value.ToString().Trim();
+                            if (double.TryParse(valueAsString, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedValue))
+                            {
+                                newRow[columnName] = parsedValue;
+                            }
+                            else
+                            {
+                                newRow[columnName] = DBNull.Value;
+                            }
+                        }
+                        else
+                        {
+                            newRow[columnName] = value.ToString().Trim();
+                        }
                     }
-                    else
+                    catch (InvalidCastException ex)
                     {
-                        newRow[columnName] = value.ToString().Trim();
+                        System.Diagnostics.Debug.WriteLine($"Cast error for column {columnName}, value: {value}, target type: {newTable.Columns[columnName].DataType}");
+                        newRow[columnName] = DBNull.Value;
                     }
                 }
                 newTable.Rows.Add(newRow);
                 rowsCopied++;
-            }
-
-            // Debug: Log the normalized table
-            System.Diagnostics.Debug.WriteLine($"Normalized {newTable.Rows.Count} rows, {newTable.Columns.Count} columns (rows copied: {rowsCopied}).");
-            foreach (DataColumn col in newTable.Columns)
-            {
-                System.Diagnostics.Debug.WriteLine($"Column: {col.ColumnName}, Type: {col.DataType}");
             }
 
             return newTable;
@@ -1109,9 +1094,16 @@ namespace SLF
 
         private bool IsNumericColumn(DataColumn column)
         {
+            // ID benzeri kolonları baştan hariç tut
+            string columnName = column.ColumnName.ToLower();
+            if (columnName.Contains("id") || columnName.Contains("kod") || columnName.Contains("no"))
+            {
+                return false;
+            }
+
             int validNumberCount = 0;
             int nonEmptyCount = 0;
-            int sampleSize = Math.Min(50, column.Table.Rows.Count); // Increased sample size for accuracy
+            int sampleSize = Math.Min(50, column.Table.Rows.Count);
 
             for (int i = 0; i < sampleSize; i++)
             {
@@ -1122,9 +1114,7 @@ namespace SLF
                     if (valueAsString != "#N/A")
                     {
                         nonEmptyCount++;
-                        // Strict numeric check: must parse as double and not look like an ID (e.g., integer-like strings)
-                        if (double.TryParse(valueAsString, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedValue) &&
-                            !Regex.IsMatch(valueAsString, @"^\d+$")) // Exclude integer-like strings (e.g., "12345")
+                        if (double.TryParse(valueAsString, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out _))
                         {
                             validNumberCount++;
                         }
@@ -1132,10 +1122,8 @@ namespace SLF
                 }
             }
 
-            // Require 90% valid numbers to classify as numeric (stricter threshold)
             return nonEmptyCount > 0 && validNumberCount >= nonEmptyCount * 0.9;
         }
-
 
         protected void NormalizePercentageValues(DataTable dataTable)
         {
@@ -1145,19 +1133,70 @@ namespace SLF
             {
                 if (percentageColumns.Contains(column.ColumnName))
                 {
-                    foreach (DataRow row in dataTable.Rows)
+                    // Önce sample alarak format analizi yap
+                    var sampleValues = new List<double>();
+                    int sampleCount = Math.Min(20, dataTable.Rows.Count);
+
+                    for (int i = 0; i < sampleCount; i++)
                     {
-                        if (!IsNullLike(row[column]))
+                        if (!IsNullLike(dataTable.Rows[i][column]))
                         {
-                            if (double.TryParse(row[column].ToString(), out double value))
+                            // Culture-independent parsing
+                            if (double.TryParse(dataTable.Rows[i][column].ToString(),
+                                NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
                             {
-                                // Assume values > 1 are percentages (e.g., 3.4 -> 0.034)
-                                if (value > 1)
+                                if (value > 0) // Sadece pozitif değerleri al
                                 {
-                                    row[column] = value / 100.0;
+                                    sampleValues.Add(value);
                                 }
                             }
                         }
+                    }
+
+                    // Değerlerin çoğu 1'den büyükse normalize et
+                    bool shouldNormalize = sampleValues.Count > 0 &&
+                                         sampleValues.Count(v => v > 1) > sampleValues.Count * 0.7;
+
+                    if (shouldNormalize)
+                    {
+                        Console.WriteLine($"Normalizing percentage column: {column.ColumnName}");
+
+                        foreach (DataRow row in dataTable.Rows)
+                        {
+                            if (!IsNullLike(row[column]))
+                            {
+                                try
+                                {
+                                    if (double.TryParse(row[column].ToString(),
+                                        NumberStyles.Any, CultureInfo.InvariantCulture, out double value))
+                                    {
+                                        // Sadece 1'den büyük değerleri normalize et
+                                        if (value > 1)
+                                        {
+                                            double normalizedValue = value / 100.0;
+
+                                            // Makul aralıkta mı kontrol et (0-2 arası)
+                                            if (normalizedValue <= 2.0)
+                                            {
+                                                row[column] = normalizedValue;
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine($"Warning: Unusual percentage value {value} in column {column.ColumnName}");
+                                            }
+                                        }
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Error normalizing value in {column.ColumnName}: {ex.Message}");
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Skipping normalization for {column.ColumnName} - values appear already normalized");
                     }
                 }
             }

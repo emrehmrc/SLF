@@ -37,7 +37,7 @@ namespace SLF
             //@"OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\configVural.json");
 
 
-            //config_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configVural.json");
+            config_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json");
 
             string desktopYolu = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             
@@ -75,6 +75,20 @@ namespace SLF
                 MessageBox.Show("Config dosyası bulunamadı!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
+        }
+
+        public void ConfigYenidenOku()
+        {
+            if (File.Exists(config_path))
+            {
+                // Config dosyasını kendi sınıfında kullanmak için oku
+                json_file = File.ReadAllText(config_path);
+                config = JsonConvert.DeserializeObject(json_file);
+            }
+            else
+            {
+                MessageBox.Show("Config dosyası bulunamadı!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void HomePageForm_Shown(object sender, EventArgs e)

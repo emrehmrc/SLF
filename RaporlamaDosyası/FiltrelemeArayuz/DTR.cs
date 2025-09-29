@@ -69,7 +69,7 @@ namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
                 sonYilInt = DateTime.Now.Year + 10;
             }
 
-            for (int year = ilkYilInt-1; year <= sonYilInt; year++)
+            for (int year = ilkYilInt; year <= sonYilInt; year++)
             {
                 this.checkedListBox1.Items.Add(year.ToString());
             }
@@ -310,7 +310,7 @@ namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
                 filtrelenmisData = _orijinalTablo.AsEnumerable()
                     .Where(row =>
                         (secilenYillar.Count == 0 ||
-                        (int.TryParse(row.Field<string>("year"), out int year) && secilenYillar.Contains(year))) &&
+                        (int.TryParse(row.Field<string>("yıl"), out int year) && secilenYillar.Contains(year))) &&
                         (radiobuttonvalue == "Hepsi" || row.Field<string>("Trafo Mülkiyeti") == radiobuttonvalue) &&
                         (eslesenAksiyonlar.Count == 0 || eslesenAksiyonlar.Contains(row.Field<string>("Trafo Aksiyon")))
                     )
@@ -346,5 +346,9 @@ namespace SLF.RaporlamaDosyası.FiltrelemeArayuz
             return "Hiçbiri seçili değil";
         }
 
+        private void checkedListBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

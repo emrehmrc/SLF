@@ -26,6 +26,8 @@ using SLF.services;
 using Newtonsoft.Json.Linq;
 using System.Data.SQLite;
 using Microsoft.Extensions.Configuration;
+using ServiceStack.Text;
+using Formatting = Newtonsoft.Json.Formatting;
 
 
 namespace SLF
@@ -842,9 +844,9 @@ namespace SLF
 
 
             // Call VEERProcess with skipPrerequisites flag
-            using (new WaitCursor())
+            using (new WaitCursor(this))
             {
-                isImported = girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
+                isImported =  await girdiModülü.VEERProcess(seçilenVeriTipi, skipPrerequisites);
             }         
 
             // Set the DataSource for dataGridView_girdi
@@ -2507,36 +2509,39 @@ namespace SLF
                     tab_optDTR.Controls.Add(panel);
                 }
 
-                // Form instance yoksa oluştur
-                if (FormManager.Form2Instance == null)
+                // Önceki form instance'ını tamamen sil
+                if (FormManager.Form2Instance != null)
                 {
-                    FormManager.InitializeForms();
-                    FormManager.Form2Instance.TopLevel = false;
-                    FormManager.Form2Instance.FormBorderStyle = FormBorderStyle.None;
-                    FormManager.Form2Instance.Dock = DockStyle.Fill;
-
-                    panel.Controls.Clear(); // Temizlik
-                    panel.Controls.Add(FormManager.Form2Instance);
-                    FormManager.Form2Instance.Show();
-                }
-                else
-                {
-                    // Eğer form zaten varsa ama panelde değilse tekrar ekle
-                    if (!panel.Controls.Contains(FormManager.Form2Instance))
-                    {                        
-                        panel.Controls.Clear();
-                        panel.Controls.Add(FormManager.Form2Instance);
-                        FormManager.Form2Instance.Show();
+                    // Panel'den çıkar
+                    if (panel.Controls.Contains(FormManager.Form2Instance))
+                    {
+                        panel.Controls.Remove(FormManager.Form2Instance);
                     }
+
+                    // Form'u dispose et
+                    FormManager.Form2Instance.Dispose();
+                    FormManager.Form2Instance = null;
                 }
 
+                // Panel'i temizle (güvenlik için)
+                panel.Controls.Clear();
+
+                // Her zaman yeni form oluştur
+                FormManager.InitializeForms();
+                FormManager.Form2Instance.TopLevel = false;
+                FormManager.Form2Instance.FormBorderStyle = FormBorderStyle.None;
+                FormManager.Form2Instance.Dock = DockStyle.Fill;
+
+                // Yeni form'u panel'e ekle
+                panel.Controls.Add(FormManager.Form2Instance);
+                FormManager.Form2Instance.Show();
+
+                // Konfigürasyonu ayarla
                 var config = new ConfigurationBuilder()
-                .AddJsonFile(ana_menu_form_objesi.config_path, optional: false, reloadOnChange: true)
-                .Build();
-              
+                    .AddJsonFile(ana_menu_form_objesi.config_path, optional: false, reloadOnChange: true)
+                    .Build();
+
                 FormManager.Form2Instance.ConfigKismi(config);
-
-
 
                 return;
             }
@@ -2560,21 +2565,41 @@ namespace SLF
                 }
 
                 bool odtrNesne = FormManager.Form2Instance != null;
-
                 if (odtrNesne && FormManager.Form2Instance.ODTR_çalıştı_mı)
                 {
-                    if (FormManager.RaporInstance == null)
+                    // Önceki rapor form'unu temizle
+                    if (FormManager.RaporInstance != null)
                     {
-                        FormManager.InitializeRapor();
+                        if (panel2.Controls.Contains(FormManager.RaporInstance))
+                        {
+                            panel2.Controls.Remove(FormManager.RaporInstance);
+                        }
+                        FormManager.RaporInstance.Dispose();
+                        FormManager.RaporInstance = null;
+                    }
 
+                    panel2.Controls.Clear(); // Panel'i temizle
+
+                    // Yeni rapor form'u oluştur
+                    FormManager.InitializeRapor();
+
+                    if (FormManager.RaporInstance != null) // Null kontrolü ekle
+                    {
                         FormManager.RaporInstance.TopLevel = false;
                         FormManager.RaporInstance.FormBorderStyle = FormBorderStyle.None;
                         FormManager.RaporInstance.Dock = DockStyle.Fill;
+                        FormManager.RaporInstance.Visible = true; // Görünürlük kontrolü
 
-                        panel2.Controls.Clear(); // Aynı formu tekrar koymamak için temizle
                         panel2.Controls.Add(FormManager.RaporInstance);
-
                         FormManager.RaporInstance.Show();
+                        FormManager.RaporInstance.BringToFront(); // Öne getir
+
+                        // Debug için
+                        Console.WriteLine($"Rapor form eklendi. Panel kontrol sayısı: {panel2.Controls.Count}");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Rapor formu oluşturulamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
                 else
@@ -4021,103 +4046,173 @@ namespace SLF
                     }
                 }
 
-                DataTable eaData = await Task.Run(() => GirdiModülü.dataTablesByType["EA Şarj Verileri"]);
-
-                if (eaData != null && eaData.Rows.Count > 0)
+                // Thread-safe veri erişimi
+                DataTable eaData = await Task.Run(() =>
                 {
-                    greenAc = 0;  // Reset counters
-                    redDc = 0;
-
-                    // Clear existing markers
-                    eaOverlay.Markers.Clear();
-
-                    if (!eaData.Columns.Contains("EA_X_KOORDINAT") ||
-                        !eaData.Columns.Contains("EA_Y_KOORDINAT") ||
-                        !eaData.Columns.Contains("ISTASYON_GUCU") ||
-                        !GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
+                    if (GirdiModülü.dataTablesByType.ContainsKey("EA Şarj Verileri"))
                     {
-                        MessageBox.Show("Lütfen EA Şarj modülü verilerinizi yükleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
+                        return GirdiModülü.dataTablesByType["EA Şarj Verileri"];
                     }
+                    return null;
+                });
 
-                    Invoke(new Action(() =>
+                if (eaData == null || eaData.Rows.Count == 0)
+                {
+                    MessageBox.Show("Lütfen EA Şarj istasyonu noktalarını görebilmek için verilerinizi yükleyiniz.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Gerekli kolonları kontrol et
+                var requiredColumns = new[] { "EA_X_KOORDINAT", "EA_Y_KOORDINAT", "ISTASYON_GUCU" };
+                var missingColumns = requiredColumns.Where(col => !eaData.Columns.Contains(col)).ToList();
+
+                if (missingColumns.Any())
+                {
+                    MessageBox.Show($"Eksik kolonlar: {string.Join(", ", missingColumns)}. Lütfen EA Şarj modülü verilerinizi yükleyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Background thread'de marker'ları hazırla
+                var markers = await Task.Run(() =>
+                {
+                    var markerList = new List<(GMarkerGoogle marker, bool isGreen)>();
+
+                    foreach (DataRow row in eaData.Rows)
                     {
-                        foreach (DataRow row in eaData.Rows)
+                        try
                         {
                             var xCoord = row["EA_X_KOORDINAT"];
                             var yCoord = row["EA_Y_KOORDINAT"];
+                            var istasyonGucuObj = row["ISTASYON_GUCU"];
 
                             bool isXNullLike = girdiModülü.IsNullLike(xCoord);
                             bool isYNullLike = girdiModülü.IsNullLike(yCoord);
+                            bool isGucuNullLike = girdiModülü.IsNullLike(istasyonGucuObj);
 
-                            if (isXNullLike || isYNullLike)
+                            if (isXNullLike || isYNullLike || isGucuNullLike)
                             {
-                                Console.WriteLine($"Skipping row due to null-like coordinates: x={xCoord}, y={yCoord}");
+                                Console.WriteLine($"Skipping row due to null-like values: x={xCoord}, y={yCoord}, güç={istasyonGucuObj}");
                                 continue;
                             }
 
-                            if (double.TryParse(xCoord.ToString(), out double x) &&
-                                double.TryParse(yCoord.ToString(), out double y))
+                            // Culture-independent parsing
+                            if (double.TryParse(xCoord.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double x) &&
+                                double.TryParse(yCoord.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double y) &&
+                                int.TryParse(istasyonGucuObj.ToString(), out int istasyonGucu))
                             {
-                                if (int.TryParse(row["ISTASYON_GUCU"].ToString(), out int istasyonGucu))
+                                // Koordinat geçerliliği kontrolü (Türkiye sınırları için yaklaşık)
+                                if (x < 25.0 || x > 45.0 || y < 35.0 || y > 43.0)
                                 {
-                                    GMarkerGoogle marker;
-
-                                    if (istasyonGucu <= 22)
-                                    {
-                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.green);
-                                        greenAc++;
-                                    }
-                                    else
-                                    {
-                                        marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.red);
-                                        redDc++;
-                                    }
-
-                                    // Set tooltip text with ISTASYON_ADI, ISTASYON_GUCU, and EA_TRAFO_KODU
-                                    string tooltipText = "";
-                                    if (eaData.Columns.Contains("ISTASYON_ADI") && !girdiModülü.IsNullLike(row["ISTASYON_ADI"]))
-                                    {
-                                        tooltipText += $"İstasyon Adı: {row["ISTASYON_ADI"].ToString()}\n";
-                                    }
-                                    if (eaData.Columns.Contains("ISTASYON_GUCU") && !girdiModülü.IsNullLike(row["ISTASYON_GUCU"]))
-                                    {
-                                        tooltipText += $"İstasyon Gücü: {row["ISTASYON_GUCU"].ToString()}\n";
-                                    }
-                                    if (eaData.Columns.Contains("EA_TRAFO_KODU") && !girdiModülü.IsNullLike(row["EA_TRAFO_KODU"]))
-                                    {
-                                        tooltipText += $"Trafo Kodu: {row["EA_TRAFO_KODU"].ToString()}";
-                                    }
-
-                                    if (!string.IsNullOrEmpty(tooltipText))
-                                    {
-                                        marker.ToolTipText = tooltipText;
-                                        marker.ToolTipMode = MarkerTooltipMode.OnMouseOver; // Show tooltip on hover
-                                    }
-
-                                    eaOverlay.Markers.Add(marker);
+                                    Console.WriteLine($"Suspicious coordinates: x={x}, y={y}");
                                 }
+
+                                GMarkerGoogle marker;
+                                bool isGreen = istasyonGucu <= 22;
+
+                                if (isGreen)
+                                {
+                                    marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.green);
+                                }
+                                else
+                                {
+                                    marker = new GMarkerGoogle(new PointLatLng(y, x), GMarkerGoogleType.red);
+                                }
+
+                                // Tooltip oluştur
+                                var tooltipParts = new List<string>();
+
+                                if (eaData.Columns.Contains("ISTASYON_ADI") && !girdiModülü.IsNullLike(row["ISTASYON_ADI"]))
+                                {
+                                    tooltipParts.Add($"İstasyon Adı: {row["ISTASYON_ADI"].ToString().Trim()}");
+                                }
+
+                                tooltipParts.Add($"İstasyon Gücü: {istasyonGucu}");
+
+                                if (eaData.Columns.Contains("EA_TRAFO_KODU") && !girdiModülü.IsNullLike(row["EA_TRAFO_KODU"]))
+                                {
+                                    tooltipParts.Add($"Trafo Kodu: {row["EA_TRAFO_KODU"].ToString().Trim()}");
+                                }
+
+                                if (tooltipParts.Any())
+                                {
+                                    marker.ToolTipText = string.Join("\n", tooltipParts);
+                                    marker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                                }
+
+                                markerList.Add((marker, isGreen));
                             }
                         }
-
-                        // Only add overlay if checkbox is checked and it's not already added
-                        if (EAPointsLayerCheckBox.Checked && !gMapControl_EA.Overlays.Contains(eaOverlay))
+                        catch (Exception ex)
                         {
-                            gMapControl_EA.Overlays.Add(eaOverlay);
+                            Console.WriteLine($"Error processing row: {ex.Message}");
                         }
+                    }
 
-                        gMapControl_EA.Refresh();
-                        calculateChargeStation(greenAc, redDc);
+                    return markerList;
+                });
+
+                // UI thread'de marker'ları ekle
+                if (InvokeRequired)
+                {
+                    Invoke(new Action(() =>
+                    {
+                        try
+                        {
+                            greenAc = 0;
+                            redDc = 0;
+
+                            // Clear existing markers
+                            eaOverlay.Markers.Clear();
+
+                            foreach (var (marker, isGreen) in markers)
+                            {
+                                eaOverlay.Markers.Add(marker);
+                                if (isGreen)
+                                    greenAc++;
+                                else
+                                    redDc++;
+                            }
+
+                            // Only add overlay if checkbox is checked and it's not already added
+                            if (EAPointsLayerCheckBox.Checked && !gMapControl_EA.Overlays.Contains(eaOverlay))
+                            {
+                                gMapControl_EA.Overlays.Add(eaOverlay);
+                            }
+
+                            gMapControl_EA.Refresh();
+                            calculateChargeStation(greenAc, redDc);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"UI güncellemesi sırasında hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
                     }));
                 }
                 else
                 {
-                    MessageBox.Show("Lütfen Ea Şarj istasyonu noktalarını görebilmek için verilerinizi yükleyiniz.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // Already on UI thread
+                    greenAc = markers.Count(m => m.isGreen);
+                    redDc = markers.Count(m => !m.isGreen);
+
+                    eaOverlay.Markers.Clear();
+                    foreach (var (marker, _) in markers)
+                    {
+                        eaOverlay.Markers.Add(marker);
+                    }
+
+                    if (EAPointsLayerCheckBox.Checked && !gMapControl_EA.Overlays.Contains(eaOverlay))
+                    {
+                        gMapControl_EA.Overlays.Add(eaOverlay);
+                    }
+
+                    gMapControl_EA.Refresh();
+                    calculateChargeStation(greenAc, redDc);
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine($"Full exception: {ex}");
             }
         }
 
@@ -6521,7 +6616,7 @@ namespace SLF
 
                 SaveFileDialog kaydet_file_dialog = new SaveFileDialog();
 
-                kaydet_file_dialog.Filter = "Shapefile |*.shp|MapInfo File|*.tab|Google Earth File|*.kml";
+                kaydet_file_dialog.Filter = "Google Earth File|*.kml";
                 kaydet_file_dialog.InitialDirectory = cbs.targetDirectory;
 
                 DialogResult kaydet_result = kaydet_file_dialog.ShowDialog();
@@ -8043,6 +8138,8 @@ namespace SLF
                     ELFResultsFilePath = outputData.Trim(); // Capture the file path
                 }
 
+                ana_menu_form_objesi.ConfigYenidenOku();
+
                 // Deserialize on the UI thread since it might be used by UI components
                 ana_menu_form_objesi.config = JsonConvert.DeserializeObject(ana_menu_form_objesi.json_file);
 
@@ -8088,8 +8185,6 @@ namespace SLF
             }
         }
 
-
-
         private async void ELFTahminButonu_Click(object sender, EventArgs e)
         {
             try
@@ -8125,10 +8220,13 @@ namespace SLF
 
                 string resultsFilePath = await RunModelRScript();
 
+                Debug.WriteLine($"RScript çalıştırıldı, sonuç dosyası yolu: {resultsFilePath}");
+
                 if (resultsFilePath == null)
                 {
                     return;
                 }
+                
 
                 await Task.Run(() => LoadEkonometrikResults(resultsFilePath));
             }
@@ -8150,17 +8248,15 @@ namespace SLF
 
         private void LoadEkonometrikResults(string resultsFilePath)
         {
+            /*resultsFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
+                    (string)ana_menu_form_objesi.config.Ana_Klasör_Yolu,
+                    (string)ana_menu_form_objesi.config.İl,
+                    (string)ana_menu_form_objesi.config.İlçe,
+                    (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_klasör,
+                    (string)ana_menu_form_objesi.config.ELF.SONUÇLAR_name).Replace('/', '\\');*/
 
-            // Config dosyasını kendi sınıfında kullanmak için oku
-            string json_file = File.ReadAllText(ana_menu_form_objesi.config_path);
-            dynamic config = JsonConvert.DeserializeObject(json_file);
 
-            resultsFilePath = Path.Combine(ana_menu_form_objesi.userRootPath,
-                    (string)config.Ana_Klasör_Yolu,
-                    (string)config.İl,
-                    (string)config.İlçe,
-                    (string)config.ELF.SONUÇLAR_klasör,
-                    (string)config.ELF.SONUÇLAR_name).Replace('/', '\\');
+            Debug.WriteLine($"Sonuç dosyası yolu: {resultsFilePath}");
 
             if (!File.Exists(resultsFilePath))
             {
@@ -8562,6 +8658,8 @@ namespace SLF
                 MessageBoxIcon.Warning
             );
 
+            ana_menu_form_objesi.ConfigYenidenOku();
+
             if (result == DialogResult.Yes)
             {
                 this.Cursor = Cursors.WaitCursor;
@@ -8581,7 +8679,7 @@ namespace SLF
                         StartInfo = new ProcessStartInfo
                         {
                             FileName = "cmd.exe",
-                            Arguments = $"/C python.exe \"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
+                            Arguments = $"/k python.exe \"{imar_tahmini_path}\" \"{ana_menu_form_objesi.config_path}\"",
                             RedirectStandardOutput = false,
                             RedirectStandardError = false,
                             UseShellExecute = false,
@@ -8653,6 +8751,8 @@ namespace SLF
                         this.Cursor = Cursors.Default;
                         //return;
                     }
+
+                    ana_menu_form_objesi.ConfigYenidenOku();
 
                     // Create the specified YGA directory
                     string ygaDirectoryPath = Path.Combine(
@@ -8932,6 +9032,8 @@ namespace SLF
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning
             );
+
+            ana_menu_form_objesi.ConfigYenidenOku();
 
             if (result == DialogResult.Yes)
             {

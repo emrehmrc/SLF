@@ -28,6 +28,9 @@ using Size = System.Drawing.Size;
 using Formatting = Newtonsoft.Json.Formatting;
 using DataTable = System.Data.DataTable;
 using System.Threading;
+using System.Text.Json;
+using System.Text.Encodings.Web;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace SLF.Optimal_DTR
 {
@@ -88,13 +91,15 @@ namespace SLF.Optimal_DTR
 
         Dictionary<string, PointLatLng> cityCoordinates;
 
-        public bool ODTR_çalıştı_mı = true;
+        public bool ODTR_çalıştı_mı = false;
+
+        string statePath;
 
         public DTR_Arayuz()
         {
             InitializeComponent();
-            
-            ToolTipKismi();                     
+
+            ToolTipKismi();
 
             anaMenu = new HomePageForm();
 
@@ -106,15 +111,23 @@ namespace SLF.Optimal_DTR
             config = new ConfigurationBuilder()
                 .AddJsonFile(configPath, optional: false, reloadOnChange: true)
                 .Build();
-            
+
             userRootPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
-            //string Ana_Klasör_Yolu = Path.Combine(userRootPath, config["Ana_Klasör_Yolu"]);         
+            statePath = Path.Combine(
+                    PathService.BaseDirectory,
+                    PathService.FullPath,
+                    PathService.CurrentWorkingFolder,
+                    "project_state.json");
 
-            //ConfigKismi(config);
+            Odtr_çalıştı_mi();
 
-            
-        }
+                //string Ana_Klasör_Yolu = Path.Combine(userRootPath, config["Ana_Klasör_Yolu"]);         
+
+                //ConfigKismi(config);
+
+
+            }
 
         public void ConfigKismi(IConfigurationRoot config)
         {
@@ -146,7 +159,7 @@ namespace SLF.Optimal_DTR
                 İlkYıl = string.IsNullOrEmpty(yilStr) ? "2025" : yilStr;
 
                 yilStr = config["bitis_yılı"];
-                SonYıl = string.IsNullOrEmpty(yilStr) ? "2035" : yilStr;
+                SonYıl = string.IsNullOrEmpty(yilStr) ? "2035" : yilStr;              
 
             }
 
@@ -171,11 +184,53 @@ namespace SLF.Optimal_DTR
 
         }
 
+        public void Odtr_çalıştı_mi()
+        {
+
+            try
+            {
+
+                string json = File.ReadAllText(statePath, Encoding.UTF8);
+                var projectState = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+
+
+                if (projectState != null && projectState.TryGetValue("CompletedModules", out object modulesObj))
+                {
+                    if (modulesObj is JsonElement jsonElement && jsonElement.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var module in jsonElement.EnumerateArray())
+                        {
+                            if (module.GetString() == "ODTR")
+                            {
+                                ODTR_çalıştı_mı = true;
+                                break; // Bulundu, döngüden çık
+                            }
+                        }
+                    }
+                }
+            }
+
+            catch
+            {
+                MessageBox.Show("Gerekli Modülleri Çalıştırın.");
+            }
+            
+
+
+          
+            // odtrCompleted değişkeni artık true veya false değerine sahip
+
+        }
+
+
+
+
+
         private async void InitBrowser(string path)
         {
             this.gMapControl1.Visible = false; // GMapControl'ü gizle
 
-            if(panelWebview != null)
+            if (panelWebview != null)
             {
                 panelWebview.Dispose();
             }
@@ -194,7 +249,7 @@ namespace SLF.Optimal_DTR
             webView = new WebView2
             {
                 Dock = DockStyle.Fill,
-                
+
             };
 
             PictureBox loadingGif = new PictureBox();
@@ -307,9 +362,9 @@ namespace SLF.Optimal_DTR
 
                 catch
                 {
-                    
-                    
-                }                              
+
+
+                }
 
             }
 
@@ -321,10 +376,10 @@ namespace SLF.Optimal_DTR
         private bool CalismaYoluKontrol()
         {
             TuketimDosyaAdi = $"SONUCLAR.db";
-            TrafoDosyaAdi = $"trafo_merkez_hucre_{ilce}.xlsx";
-            TrafoAlanDosyaAdi = $"trafo_rezerv_alanlar_{ilce.ToLower()}.xlsx";
+            TrafoDosyaAdi = $"trafo_merkez_hucre_{ilce}.csv";
+            TrafoAlanDosyaAdi = $"trafo_rezerv_alanlar_{ilce.ToLower()}.csv";
 
-            tuketim_path = Path.Combine(YükVeriYolu, "5.Yük Tahmini\\çıktı", TuketimDosyaAdi);        
+            tuketim_path = Path.Combine(YükVeriYolu, "5.Yük Tahmini\\çıktı", TuketimDosyaAdi);
 
             string trafo_path = Path.Combine(İmarVeriYolu, TrafoDosyaAdi);
 
@@ -419,7 +474,7 @@ namespace SLF.Optimal_DTR
 
             };
 
-            
+
             form.Show();
 
             form.BringToFront();
@@ -543,6 +598,8 @@ namespace SLF.Optimal_DTR
                         MessageBox.Show(form, "Algoritma başarıyla tamamlandı.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
 
+
+
                 }
 
             }
@@ -568,7 +625,7 @@ namespace SLF.Optimal_DTR
             gMapControl1.MaxZoom = 18;
             gMapControl1.Zoom = 12;
             //gMapControl1.Position = new PointLatLng(38.5, 27.0); // Başlangıç konumu
-            
+
             try
             {
                 gMapControl1.Position = cityCoordinates[il];
@@ -655,7 +712,7 @@ namespace SLF.Optimal_DTR
                 filtrelenmisData = trafodt.AsEnumerable()
                 .Where(row =>
                     (secilenYillar.Count == 0 ||
-                    (int.TryParse(row.Field<string>("year"), out int year) && secilenYillar.Contains(year))) && // Yıla göre filtreleme
+                    (int.TryParse(row.Field<string>("yıl"), out int year) && secilenYillar.Contains(year))) && // Yıla göre filtreleme
                     (radiobuttonvalue == "Hepsi" || row.Field<string>("Trafo Mülkiyeti") == radiobuttonvalue) && // Sahiplik filtreleme
                     (eslesenAksiyonlar.Count == 0 || eslesenAksiyonlar.Contains(row.Field<string>("Trafo Aksiyon"))) // Trafo Aksiyonları filtreleme
                 )
@@ -667,7 +724,7 @@ namespace SLF.Optimal_DTR
                 MessageBox.Show("Filtreleme işlemi sırasında hata oluştu.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            
+
 
             DataTable filtrelenmis = filtrelenmisData.Any() ? filtrelenmisData.CopyToDataTable() : trafodt.Clone();
 
@@ -688,11 +745,11 @@ namespace SLF.Optimal_DTR
 
             string python_path = Path.Combine(PythonFilePath, "PydeckRun.py");
 
-            if(File.Exists(filePath))
+            if (File.Exists(filePath))
             {
                 MessageBox.Show("Excel dosyası başarıyla oluşturuldu.");
             }
-           
+
             try
             {
 
@@ -791,7 +848,7 @@ namespace SLF.Optimal_DTR
 
             string python_path = Path.Combine(PythonFilePath, "algoritmaÇalıştır.py");
             //bool islemeDevam = true;
-                     
+
             if (islemeDevam)
             {
                 try
@@ -802,7 +859,45 @@ namespace SLF.Optimal_DTR
                     //await PythonScriptCalistir(tuketim_path);
                     await PythonScriptCalistir(python_path, ODTRJson);
 
-                    ODTR_çalıştı_mı = true; // örneğin bir bool flag set etmek
+                    ODTR_çalıştı_mı = true;
+
+                    if (File.Exists(statePath))
+                    {
+                        
+                        string json = File.ReadAllText(statePath, Encoding.UTF8); // UTF-8 ile oku
+                        var projectState = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+                        List<string> completedModules;
+
+                        if (projectState != null && projectState.TryGetValue("CompletedModules", out object modulesObj))
+                        {
+                            completedModules = new List<string>();
+
+                            if (modulesObj is JsonElement jsonElement && jsonElement.ValueKind == JsonValueKind.Array)
+                            {
+                                foreach (var module in jsonElement.EnumerateArray())
+                                {
+                                    completedModules.Add(module.GetString());
+                                }
+                            }
+
+                            completedModules.Add("ODTR");
+                            projectState["CompletedModules"] = completedModules;
+
+                            var options = new JsonSerializerOptions
+                            {
+                                WriteIndented = true,
+                                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping // Türkçe karakterler için
+                            };
+
+                            string updatedJson = JsonSerializer.Serialize(projectState, options);
+                            File.WriteAllText(statePath, updatedJson, Encoding.UTF8); // UTF-8 ile yaz
+                        }
+
+
+
+
+
+                    }
 
                 }
 
@@ -812,15 +907,17 @@ namespace SLF.Optimal_DTR
                 }
 
             }
-            
+
 
             this.button2.Enabled = true; // İşlem tamamlandığında butonu tekrar etkinleştiriyoruz
         }
 
+        
+
         private void checkedListBox_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             CheckedListBox checkedListBox = sender as CheckedListBox;
-            
+
             if (checkedListBox == null)
                 return;
 
@@ -880,11 +977,11 @@ namespace SLF.Optimal_DTR
                 string[] dosyaYollari = Directory.GetFiles(klasorYolu);
                 foreach (var yol in dosyaYollari)
                 {
-                    if(yol.Contains("Optimal Trafo Yıllık"))
+                    if (yol.Contains("Optimal Trafo Yıllık"))
                     {
                         listBox.Items.Add(Path.GetFileName(yol)); // sadece dosya adı
                     }
-                    
+
                 }
             }
             else
@@ -958,20 +1055,20 @@ namespace SLF.Optimal_DTR
             string trafo_path = DosyaSeciciGoster(SonucYolu);
             //trafo_path = Path.Combine(SonucYolu, trafo_path);
             //InitBrowser(trafo_path);
-            
+
             try
             {
-                if(trafo_path != null)
+                if (trafo_path != null)
                 {
-                    using (new WaitCursor())
+                    using (new WaitCursor(this))
                     {
                         trafo_path = Path.Combine(SonucYolu, trafo_path);
                         trafodt = ImportExcelFile(trafo_path);
                         veriSeçildi_mi = true; // Veri seçildi mi kontrolü için flag
                     }
-                  
+
                 }
-                
+
                 else
                 {
                     MessageBox.Show("Herhangi bir dosya seçilmedi.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -986,14 +1083,14 @@ namespace SLF.Optimal_DTR
                 return;
             }
 
-            
+
             // Verileri sisteme yükle
             var filtrelenmisData = new List<DataRow>();
             try
             {
                 filtrelenmisData = trafodt.AsEnumerable()
-                .Where(row =>                       
-                    (int.TryParse(row.Field<string>("year"), out int year) && year == int.Parse(İlkYıl))                    
+                .Where(row =>
+                    (int.TryParse(row.Field<string>("yıl"), out int year) && year == int.Parse(İlkYıl))
                 )
                 .ToList();
             }
@@ -1009,8 +1106,8 @@ namespace SLF.Optimal_DTR
             DrawMap3(trafodt);
             //string path = Path.Combine(SonucYolu, "hucre_trafo_pydeck.html");
             //InitBrowser(path);
-                
-            
+
+
             MessageBox.Show("Trafo verileri başarıyla yüklendi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
 
@@ -1120,7 +1217,7 @@ namespace SLF.Optimal_DTR
             int ilkYilInt = int.Parse(İlkYıl);
             int sonYilInt = int.Parse(SonYıl);
 
-            for (int year = ilkYilInt - 1; year <= sonYilInt; year++)
+            for (int year = ilkYilInt; year <= sonYilInt; year++)
             {
                 this.checkedListBox1.Items.Add(year.ToString());
             }
@@ -1133,18 +1230,24 @@ namespace SLF.Optimal_DTR
     public class WaitCursor : IDisposable
     {
         private Cursor _previous;
+        private Control _control;
 
-        public WaitCursor()
+        public WaitCursor(Control control)
         {
+            _control = control;
             _previous = Cursor.Current;
-            Cursor.Current = Cursors.WaitCursor;
+
+            _control.UseWaitCursor = true; // ✅ more reliable!
+            Application.DoEvents();
         }
 
         public void Dispose()
         {
+            _control.UseWaitCursor = false;
             Cursor.Current = _previous;
         }
     }
+
 
 
     public class Form2 : Form
@@ -1239,13 +1342,13 @@ namespace SLF.Optimal_DTR
 
                 if ((double.TryParse(deger, out double p2Value)))
                 {
-                    if((i == 1) | i == 0)
+                    if ((i == 1) | i == 0)
                         txt.Text = p2Value.ToString("P1", System.Globalization.CultureInfo.InvariantCulture); // Yüzdelik format
                 }
 
 
                 if (i == 1)
-                {                    
+                {
 
                     txt.ReadOnly = true;
                     txt.BackColor = SystemColors.Control;
@@ -1320,11 +1423,11 @@ namespace SLF.Optimal_DTR
                     double p2Value = (1.0 - p1Value) / 4.0;
 
                     TextBox txtBoxP2 = _textBoxes[1];
-                   
-                    txtBoxP2.Text = p2Value.ToString("P1", System.Globalization.CultureInfo.InvariantCulture);         
-                    
+
+                    txtBoxP2.Text = p2Value.ToString("P1", System.Globalization.CultureInfo.InvariantCulture);
+
                     txtBox.Text = p1Value.ToString("P1", System.Globalization.CultureInfo.InvariantCulture);
-          
+
                 }
             }
         }
@@ -1356,7 +1459,7 @@ namespace SLF.Optimal_DTR
                     double p2Value = (1.0 - p1Value) / 4.0;
 
                     // P2 kutusunu güncelle
-                    
+
                     TextBox txtBoxP2 = _textBoxes[1];
                     txtBoxP2.TextChanged -= Txt_TextChanged; // Döngüyü önlemek için geçici çıkar
                     txtBoxP2.Text = p2Value.ToString("P1", System.Globalization.CultureInfo.InvariantCulture); // Yüzdelik format
@@ -1415,52 +1518,52 @@ namespace SLF.Optimal_DTR
     }
 
     public class Trafo
+    {
+        public string TrafoID { get; set; }
+
+        public int HucreID { get; set; }
+
+        public double BosKapasite { get; set; }
+
+        public string Owner { get; set; }
+
+        public int Year { get; set; }
+
+        public string Durumu { get; set; }
+
+
+
+        public Trafo(string trafoID, int hucreID, string owner, int year, string durum)
         {
-            public string TrafoID { get; set; }
-
-            public int HucreID { get; set; }
-
-            public double BosKapasite { get; set; }
-
-            public string Owner { get; set; }
-
-            public int Year { get; set; }
-
-            public string Durumu { get; set; }
+            TrafoID = trafoID;
+            HucreID = hucreID;
+            Owner = owner;
+            Year = year;
+            Durumu = durum;
+        }
 
 
 
-            public Trafo(string trafoID, int hucreID, string owner, int year, string durum)
+        public class Hucre
+        {
+            public int HucreId { get; set; }
+            public double Left { get; set; }
+            public double Top { get; set; }
+            public double Right { get; set; }
+            public double Bottom { get; set; }
+
+            public Hucre(int id, double left, double top, double right, double bottom)
             {
-                TrafoID = trafoID;
-                HucreID = hucreID;
-                Owner = owner;
-                Year = year;
-                Durumu = durum;
-            }
-
-
-
-            public class Hucre
-            {
-                public int HucreId { get; set; }
-                public double Left { get; set; }
-                public double Top { get; set; }
-                public double Right { get; set; }
-                public double Bottom { get; set; }
-
-                public Hucre(int id, double left, double top, double right, double bottom)
-                {
-                    HucreId = id;
-                    Left = left;
-                    Top = top;
-                    Right = right;
-                    Bottom = bottom;
-                }
-
+                HucreId = id;
+                Left = left;
+                Top = top;
+                Right = right;
+                Bottom = bottom;
             }
 
         }
 
     }
+
+}
 

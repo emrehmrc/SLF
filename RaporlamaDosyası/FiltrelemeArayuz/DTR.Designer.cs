@@ -58,16 +58,16 @@
             this.panel3.Controls.Add(this.panel2);
             this.panel3.Location = new System.Drawing.Point(12, 21);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(348, 867);
+            this.panel3.Size = new System.Drawing.Size(348, 711);
             this.panel3.TabIndex = 9;
             // 
             // panel7
             // 
             this.panel7.Controls.Add(this.checkedListBox2);
             this.panel7.Controls.Add(this.label3);
-            this.panel7.Location = new System.Drawing.Point(10, 491);
+            this.panel7.Location = new System.Drawing.Point(7, 394);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(335, 277);
+            this.panel7.Size = new System.Drawing.Size(335, 237);
             this.panel7.TabIndex = 13;
             // 
             // checkedListBox2
@@ -89,7 +89,7 @@
             this.checkedListBox2.Location = new System.Drawing.Point(18, 51);
             this.checkedListBox2.Name = "checkedListBox2";
             this.checkedListBox2.ScrollAlwaysVisible = true;
-            this.checkedListBox2.Size = new System.Drawing.Size(296, 211);
+            this.checkedListBox2.Size = new System.Drawing.Size(296, 165);
             this.checkedListBox2.TabIndex = 2;
             this.checkedListBox2.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.checkedListBox2_ItemCheck);
             // 
@@ -106,7 +106,7 @@
             // 
             this.button1.BackColor = System.Drawing.Color.ForestGreen;
             this.button1.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.button1.Location = new System.Drawing.Point(10, 791);
+            this.button1.Location = new System.Drawing.Point(7, 647);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(223, 57);
             this.button1.TabIndex = 9;
@@ -118,9 +118,9 @@
             // 
             this.panel4.Controls.Add(this.label5);
             this.panel4.Controls.Add(this.checkedListBox1);
-            this.panel4.Location = new System.Drawing.Point(10, 225);
+            this.panel4.Location = new System.Drawing.Point(10, 172);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(335, 260);
+            this.panel4.Size = new System.Drawing.Size(335, 216);
             this.panel4.TabIndex = 8;
             // 
             // label5
@@ -151,9 +151,10 @@
             this.checkedListBox1.Location = new System.Drawing.Point(18, 36);
             this.checkedListBox1.Name = "checkedListBox1";
             this.checkedListBox1.ScrollAlwaysVisible = true;
-            this.checkedListBox1.Size = new System.Drawing.Size(296, 211);
+            this.checkedListBox1.Size = new System.Drawing.Size(296, 165);
             this.checkedListBox1.TabIndex = 1;
             this.checkedListBox1.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.checkedListBox1_ItemCheck);
+            this.checkedListBox1.SelectedIndexChanged += new System.EventHandler(this.checkedListBox1_SelectedIndexChanged);
             // 
             // panel2
             // 
@@ -161,7 +162,7 @@
             this.panel2.Controls.Add(this.radioButton3);
             this.panel2.Controls.Add(this.radioButton2);
             this.panel2.Controls.Add(this.label1);
-            this.panel2.Location = new System.Drawing.Point(10, 36);
+            this.panel2.Location = new System.Drawing.Point(10, 3);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(314, 163);
             this.panel2.TabIndex = 2;
@@ -212,7 +213,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(365, 900);
+            this.ClientSize = new System.Drawing.Size(365, 744);
             this.Controls.Add(this.panel3);
             this.Name = "DTR";
             this.Text = "Form1";

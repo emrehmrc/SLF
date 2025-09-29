@@ -72,7 +72,7 @@
             this.flowLayoutPanel1.Controls.Add(this.button6);
             this.flowLayoutPanel1.Location = new System.Drawing.Point(9, 12);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(713, 64);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(679, 64);
             this.flowLayoutPanel1.TabIndex = 4;
             // 
             // button4
@@ -152,7 +152,7 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(0, 674);
+            this.panel2.Size = new System.Drawing.Size(0, 824);
             this.panel2.TabIndex = 1;
             // 
             // panel7
@@ -172,7 +172,7 @@
             this.panel7.Location = new System.Drawing.Point(1133, 99);
             this.panel7.Margin = new System.Windows.Forms.Padding(1);
             this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(167, 565);
+            this.panel7.Size = new System.Drawing.Size(155, 715);
             this.panel7.TabIndex = 4;
             this.panel7.Paint += new System.Windows.Forms.PaintEventHandler(this.panel7_Paint);
             // 
@@ -277,7 +277,7 @@
             this.panel5.Margin = new System.Windows.Forms.Padding(20, 20, 20, 0);
             this.panel5.Name = "panel5";
             this.panel5.Padding = new System.Windows.Forms.Padding(10);
-            this.panel5.Size = new System.Drawing.Size(817, 514);
+            this.panel5.Size = new System.Drawing.Size(817, 691);
             this.panel5.TabIndex = 8;
             // 
             // panel3
@@ -285,10 +285,10 @@
             this.panel3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.panel3.AutoScroll = true;
-            this.panel3.Location = new System.Drawing.Point(12, 0);
+            this.panel3.Location = new System.Drawing.Point(12, 99);
             this.panel3.Margin = new System.Windows.Forms.Padding(3, 3, 3, 150);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(260, 662);
+            this.panel3.Size = new System.Drawing.Size(260, 713);
             this.panel3.TabIndex = 9;
             // 
             // Rapor_Arayuz
@@ -296,7 +296,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1331, 674);
+            this.ClientSize = new System.Drawing.Size(1331, 824);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.panel7);

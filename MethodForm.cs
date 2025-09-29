@@ -62,6 +62,8 @@ namespace SLF
         private void ForwardButton_Click(object sender, EventArgs e)
         {
 
+            homePageForm.ConfigYenidenOku();
+
             homePageForm.config.İl = IlComboBox.SelectedItem.ToString();
             homePageForm.config.İlçe = IlceComboBox.SelectedItem.ToString();
 

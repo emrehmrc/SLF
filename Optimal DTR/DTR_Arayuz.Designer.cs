@@ -66,7 +66,7 @@
             this.gMapControl1.GrayScaleMode = false;
             this.gMapControl1.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
             this.gMapControl1.LevelsKeepInMemory = 5;
-            this.gMapControl1.Location = new System.Drawing.Point(338, 78);
+            this.gMapControl1.Location = new System.Drawing.Point(338, 87);
             this.gMapControl1.Margin = new System.Windows.Forms.Padding(20);
             this.gMapControl1.MarkersEnabled = true;
             this.gMapControl1.MaxZoom = 2;
@@ -82,7 +82,7 @@
             this.gMapControl1.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl1.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl1.ShowTileGridLines = false;
-            this.gMapControl1.Size = new System.Drawing.Size(1292, 764);
+            this.gMapControl1.Size = new System.Drawing.Size(1292, 755);
             this.gMapControl1.TabIndex = 0;
             this.gMapControl1.Zoom = 2D;
             this.gMapControl1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.gMapControl1_MouseMove);
@@ -106,7 +106,7 @@
             // 
             this.panel7.Controls.Add(this.checkedListBox2);
             this.panel7.Controls.Add(this.label3);
-            this.panel7.Location = new System.Drawing.Point(10, 532);
+            this.panel7.Location = new System.Drawing.Point(13, 447);
             this.panel7.Margin = new System.Windows.Forms.Padding(1);
             this.panel7.Name = "panel7";
             this.panel7.Size = new System.Drawing.Size(290, 245);
@@ -148,7 +148,7 @@
             // 
             this.button1.BackColor = System.Drawing.Color.ForestGreen;
             this.button1.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.button1.Location = new System.Drawing.Point(10, 807);
+            this.button1.Location = new System.Drawing.Point(13, 735);
             this.button1.Margin = new System.Windows.Forms.Padding(1);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(276, 58);
@@ -161,7 +161,7 @@
             // 
             this.panel4.Controls.Add(this.label5);
             this.panel4.Controls.Add(this.checkedListBox1);
-            this.panel4.Location = new System.Drawing.Point(10, 235);
+            this.panel4.Location = new System.Drawing.Point(13, 162);
             this.panel4.Margin = new System.Windows.Forms.Padding(1);
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(290, 260);
@@ -207,17 +207,17 @@
             this.panel2.Controls.Add(this.radioButton3);
             this.panel2.Controls.Add(this.radioButton2);
             this.panel2.Controls.Add(this.label1);
-            this.panel2.Location = new System.Drawing.Point(10, 36);
+            this.panel2.Location = new System.Drawing.Point(13, 11);
             this.panel2.Margin = new System.Windows.Forms.Padding(1);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(287, 162);
+            this.panel2.Size = new System.Drawing.Size(287, 149);
             this.panel2.TabIndex = 2;
             // 
             // radioButton4
             // 
             this.radioButton4.AutoSize = true;
             this.radioButton4.Checked = true;
-            this.radioButton4.Location = new System.Drawing.Point(14, 122);
+            this.radioButton4.Location = new System.Drawing.Point(15, 102);
             this.radioButton4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.radioButton4.Name = "radioButton4";
             this.radioButton4.Size = new System.Drawing.Size(75, 24);
@@ -229,7 +229,7 @@
             // radioButton3
             // 
             this.radioButton3.AutoSize = true;
-            this.radioButton3.Location = new System.Drawing.Point(14, 90);
+            this.radioButton3.Location = new System.Drawing.Point(15, 65);
             this.radioButton3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.radioButton3.Name = "radioButton3";
             this.radioButton3.Size = new System.Drawing.Size(66, 24);
@@ -240,7 +240,7 @@
             // radioButton2
             // 
             this.radioButton2.AutoSize = true;
-            this.radioButton2.Location = new System.Drawing.Point(14, 51);
+            this.radioButton2.Location = new System.Drawing.Point(14, 27);
             this.radioButton2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.radioButton2.Name = "radioButton2";
             this.radioButton2.Size = new System.Drawing.Size(80, 24);
@@ -251,7 +251,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(10, 18);
+            this.label1.Location = new System.Drawing.Point(11, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(110, 20);
             this.label1.TabIndex = 1;
