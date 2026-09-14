@@ -68,7 +68,7 @@ namespace SLF.services
                 string otherSonucYolu = Path.Combine(imarAnaliziPath, $"other_data_{selectedCity}_{selectedDistrict}.csv");
 
                 // Python argümanlarını oluştur - İlçe parametresi eklendi
-                string arguments = $"/C python \"{pythonScriptPath}\" \"{aboneVeriYolu}\" \"{meskenSonucYolu}\" \"{otherSonucYolu}\" \"{selectedCity}\" \"{selectedDistrict}\" \"{year}\"";
+                string arguments = $"/K python \"{pythonScriptPath}\" \"{aboneVeriYolu}\" \"{meskenSonucYolu}\" \"{otherSonucYolu}\" \"{selectedCity}\" \"{selectedDistrict}\" \"{year}\"";
 
                 // Python betiğini çalıştır
                 ProcessStartInfo processInfo = new ProcessStartInfo
@@ -88,6 +88,7 @@ namespace SLF.services
 
                 process.Start();
 
+                /*
                 // İşlemin tamamlanmasını bekle
                 process.WaitForExit();
 
@@ -98,7 +99,7 @@ namespace SLF.services
                     // Hata mesajını görmek için pencerenin açık kalmasını sağladık, ama hatayı üst katmana iletiyoruz.
                     throw new Exception($"Python betiği hata ile sonlandı. Komut penceresindeki hata mesajlarını kontrol edin.");
                 }
-
+                */
                 // Process nesnesini kapat
                 process.Close();
 
@@ -146,7 +147,7 @@ namespace SLF.services
                 string outputDirectory = Path.GetDirectoryName(kmlFilePath);
                 string outputFile = Path.Combine(outputDirectory, "katman_analiz_sonuc.csv");
 
-                string arguments = $"/C python \"{pythonScriptPath}\" \"{csvFilePath}\" \"{kmlFilePath}\" \"{outputFile}\"";
+                string arguments = $"/K python \"{pythonScriptPath}\" \"{csvFilePath}\" \"{kmlFilePath}\" \"{outputFile}\"";
 
                 // Run the Python script using cmd.exe
                 ProcessStartInfo processInfo = new ProcessStartInfo
@@ -166,6 +167,8 @@ namespace SLF.services
 
                 process.Start();
 
+                /*
+
                 // İşlemin tamamlanmasını bekle
                 process.WaitForExit();
 
@@ -176,6 +179,7 @@ namespace SLF.services
                     // Hata mesajını görmek için pencerenin açık kalmasını sağladık, ama hatayı üst katmana iletiyoruz.
                     throw new Exception($"Python betiği hata ile sonlandı. Komut penceresindeki hata mesajlarını kontrol edin.");
                 }
+                */
 
                 // Process nesnesini kapat
                 process.Close();
@@ -265,7 +269,7 @@ namespace SLF.services
 
                 // Komut dizesini oluştururken tüm yolları çift tırnak içine al
                 // Python komutunu şu formatta oluştur: python "path/to/code.py" "path/to/config.json" --mode CSV ...
-                string arguments = $"/C python \"{pythonScript}\" \"{configPath}\" --mode CSV --abone-csv \"{aboneCsvPath}\" --tuketim-csv \"{tuketimCsvPath}\"";
+                string arguments = $"/K python \"{pythonScript}\" \"{configPath}\" --mode CSV --abone-csv \"{aboneCsvPath}\" --tuketim-csv \"{tuketimCsvPath}\"";
 
                 // Python sürecini cmd.exe ile çalıştır
                 ProcessStartInfo startInfo = new ProcessStartInfo
@@ -281,7 +285,7 @@ namespace SLF.services
                 using (Process process = new Process { StartInfo = startInfo })
                 {
                     process.Start();
-
+                    /*
                     // İşlemin tamamlanmasını bekle
                     process.WaitForExit();
 
@@ -289,7 +293,7 @@ namespace SLF.services
                     if (process.ExitCode != 0)
                     {
                         throw new Exception($"CSV işleme sırasında hata oluştu. Hata kodu: {process.ExitCode}. Cmd penceresindeki mesajları kontrol edin.");
-                    }
+                    }*/
                 }
             }
             catch (Exception ex)
@@ -331,7 +335,7 @@ namespace SLF.services
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
                     FileName = "cmd.exe",
-                    Arguments = $"/C python \"{pythonScript}\" \"{configPath}\" --mode DATABASE",
+                    Arguments = $"/K python \"{pythonScript}\" \"{configPath}\" --mode DATABASE",
                     RedirectStandardOutput = false,
                     RedirectStandardError = false,
                     UseShellExecute = true, // Use true to show the window
@@ -344,7 +348,7 @@ namespace SLF.services
                 };
 
                 process.Start();
-
+                /*
                 // İşlemin tamamlanmasını bekle
                 process.WaitForExit();
 
@@ -355,7 +359,7 @@ namespace SLF.services
                     // Hata mesajını görmek için pencerenin açık kalmasını sağladık, bu yüzden burada throw yapıyoruz ama pencere kapanmayacak.
                     throw new Exception($"Python kodu çalıştırılırken hata oluştu. Komut penceresindeki hata mesajlarını kontrol edin.");
                 }
-
+                */
                 // Process nesnesini kapat
                 process.Close();
             }
@@ -387,7 +391,7 @@ namespace SLF.services
             ProcessStartInfo processInfo = new ProcessStartInfo
             {
                 FileName = "cmd.exe",
-                Arguments = $"/C python \"{pythonScriptPath}\" \"{aboneVeriYolu}\" \"{dtrModuluFilePath}\" \"{year}\"",
+                Arguments = $"/K python \"{pythonScriptPath}\" \"{aboneVeriYolu}\" \"{dtrModuluFilePath}\" \"{year}\"",
                 RedirectStandardOutput = false,
                 RedirectStandardError = false,
                 UseShellExecute = true, // Use true to show the window
@@ -411,6 +415,7 @@ namespace SLF.services
                 progressTimer.AutoReset = true;
                 progressTimer.Start();
 
+                /*
                 try
                 {
                     // İşlemin tamamlanmasını sonsuza kadar bekle (zaman kısıtlaması yok)
@@ -428,7 +433,7 @@ namespace SLF.services
                     // Her durumda Timer'ı durdur
                     progressTimer.Stop();
                     progressTimer.Dispose();
-                }
+                }*/
             }
 
         }
@@ -679,7 +684,7 @@ namespace SLF.services
 
                 // Argümanları oluştur
                 StringBuilder args = new StringBuilder();
-                args.Append($"/C python \"{pythonScriptPath}\" process \"{selectedCity}\" \"{kmlFilePath}\"");
+                args.Append($"/K python \"{pythonScriptPath}\" process \"{selectedCity}\" \"{kmlFilePath}\"");
                 args.Append($" --district \"{selectedDistrict}\"");
                 args.Append($" --output-dir \"{imarAnaliziPath}\"");  // Ana çıktı klasörü
                 args.Append($" --output-prefix \"{outputPrefix}\"");
@@ -754,6 +759,7 @@ namespace SLF.services
                     progressTimer.AutoReset = true;
                     progressTimer.Start();
 
+                    /*
                     try
                     {
                         // İşlemin tamamlanmasını sonsuza kadar bekle (zaman kısıtlaması yok)
@@ -770,7 +776,7 @@ namespace SLF.services
                         // Her durumda Timer'ı durdur
                         progressTimer.Stop();
                         progressTimer.Dispose();
-                    }
+                    }*/
                 }
 
             }

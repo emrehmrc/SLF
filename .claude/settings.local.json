@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -l \"config.json\\\\|config\\\\[\" \"C:/Users/Emre Hangul/Desktop/MRC/SLF/\"*.cs)"
+    ]
+  }
+}

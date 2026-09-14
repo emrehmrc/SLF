@@ -37,27 +37,29 @@ namespace SLF
             //@"OneDrive - MRC\İletişim sitesi - MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\Program Dosyaları\configVural.json");
 
 
+            // 1. bin/Debug içinde ara (deploy edilen build)
             config_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json");
 
+            // 2. Bulunamazsa Kod\ klasöründe ara (Visual Studio geliştirme modu: bin\Debug\..\..\Kod\)
+            if (!File.Exists(config_path))
+            {
+                string kodKlasorYolu = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\Kod\config.json"));
+                if (File.Exists(kodKlasorYolu))
+                    config_path = kodKlasorYolu;
+            }
+
+            // 3. Hâlâ bulunamazsa Desktop'ta ara / kopyala
             string desktopYolu = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            
             string hedefYol = Path.Combine(desktopYolu, "config.json");
 
-            try
+            if (!File.Exists(config_path))
             {
-                if(!File.Exists(hedefYol))
-                {
-                    File.Copy(config_path, hedefYol, overwrite: true);
-
-
-                }
-                
-                config_path = hedefYol; // Yeni yolu kullanmak için config_path'i güncelle
-               
+                config_path = hedefYol;
             }
-            catch (Exception ex)
+            else if (!File.Exists(hedefYol))
             {
-                MessageBox.Show($"Kopyalama hatası: {ex.Message}");
+                try { File.Copy(config_path, hedefYol, overwrite: false); }
+                catch { /* kopyalama opsiyonel, hata olursa devam et */ }
             }
 
             if (File.Exists(config_path))
@@ -68,11 +70,14 @@ namespace SLF
                 // Config dosyasını kendi sınıfında kullanmak için oku
                 json_file = File.ReadAllText(config_path);
                 config = JsonConvert.DeserializeObject(json_file);
-
             }
             else
             {
-                MessageBox.Show("Config dosyası bulunamadı!", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Config dosyası bulunamadı!\n\nAranan yollar:\n" +
+                    $"- {Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json")}\n" +
+                    $"- {Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\Kod\config.json"))}\n" +
+                    $"- {hedefYol}",
+                    "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
         }

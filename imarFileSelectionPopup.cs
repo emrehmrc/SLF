@@ -71,7 +71,7 @@ namespace SLF
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
                     FileName = "cmd.exe", // Specify cmd.exe as the executable
-                    Arguments = $"/C python \"{pythonScriptPath}\" \"{anaMenuObjesi.config_path}\"", // Pass arguments correctly
+                    Arguments = $"/K python \"{pythonScriptPath}\" \"{anaMenuObjesi.config_path}\"", // Pass arguments correctly
                     RedirectStandardOutput = false,
                     RedirectStandardError = false,
                     UseShellExecute = true, // Use true to show the window
@@ -746,6 +746,7 @@ namespace SLF
                     "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
     }
 }
     

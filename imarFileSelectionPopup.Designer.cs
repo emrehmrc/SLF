@@ -66,7 +66,7 @@ namespace SLF
             this.OkButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.OkButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.OkButton.ForeColor = System.Drawing.Color.White;
-            this.OkButton.Location = new System.Drawing.Point(183, 144);
+            this.OkButton.Location = new System.Drawing.Point(273, 77);
             this.OkButton.Margin = new System.Windows.Forms.Padding(4);
             this.OkButton.Name = "OkButton";
             this.OkButton.Size = new System.Drawing.Size(131, 47);
@@ -98,7 +98,7 @@ namespace SLF
             this.imarCitySelectionPanel.Location = new System.Drawing.Point(13, 262);
             this.imarCitySelectionPanel.Margin = new System.Windows.Forms.Padding(4);
             this.imarCitySelectionPanel.Name = "imarCitySelectionPanel";
-            this.imarCitySelectionPanel.Size = new System.Drawing.Size(521, 219);
+            this.imarCitySelectionPanel.Size = new System.Drawing.Size(521, 186);
             this.imarCitySelectionPanel.TabIndex = 7;
             // 
             // label4
@@ -117,7 +117,7 @@ namespace SLF
             // 
             this.label_imar_path.AutoSize = true;
             this.label_imar_path.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label_imar_path.Location = new System.Drawing.Point(234, 82);
+            this.label_imar_path.Location = new System.Drawing.Point(26, 127);
             this.label_imar_path.MaximumSize = new System.Drawing.Size(200, 100);
             this.label_imar_path.Name = "label_imar_path";
             this.label_imar_path.Size = new System.Drawing.Size(55, 23);
@@ -144,7 +144,7 @@ namespace SLF
             // 
             this.label_imar_test.AutoSize = true;
             this.label_imar_test.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.label_imar_test.Location = new System.Drawing.Point(259, 94);
+            this.label_imar_test.Location = new System.Drawing.Point(15, 131);
             this.label_imar_test.MaximumSize = new System.Drawing.Size(200, 100);
             this.label_imar_test.Name = "label_imar_test";
             this.label_imar_test.Size = new System.Drawing.Size(55, 23);
@@ -170,7 +170,7 @@ namespace SLF
             this.label_imar_katman_listeleri.BackColor = System.Drawing.Color.SeaShell;
             this.label_imar_katman_listeleri.Font = new System.Drawing.Font("Segoe UI", 10.2F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.label_imar_katman_listeleri.ForeColor = System.Drawing.Color.Green;
-            this.label_imar_katman_listeleri.Location = new System.Drawing.Point(144, 179);
+            this.label_imar_katman_listeleri.Location = new System.Drawing.Point(15, 177);
             this.label_imar_katman_listeleri.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label_imar_katman_listeleri.Name = "label_imar_katman_listeleri";
             this.label_imar_katman_listeleri.Size = new System.Drawing.Size(226, 23);
@@ -183,19 +183,19 @@ namespace SLF
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Segoe UI", 10.8F, System.Drawing.FontStyle.Bold);
             this.label3.ForeColor = System.Drawing.Color.DarkOrange;
-            this.label3.Location = new System.Drawing.Point(67, 69);
+            this.label3.Location = new System.Drawing.Point(14, 79);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(138, 25);
+            this.label3.Size = new System.Drawing.Size(143, 25);
             this.label3.TabIndex = 3;
-            this.label3.Text = "Girdi Verisi Seç";
+            this.label3.Text = "Girdi Verisi Seç:";
             // 
             // TestCalıstır
             // 
             this.TestCalıstır.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.TestCalıstır.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
             this.TestCalıstır.ForeColor = System.Drawing.Color.White;
-            this.TestCalıstır.Location = new System.Drawing.Point(131, 98);
+            this.TestCalıstır.Location = new System.Drawing.Point(306, 74);
             this.TestCalıstır.Margin = new System.Windows.Forms.Padding(4);
             this.TestCalıstır.Name = "TestCalıstır";
             this.TestCalıstır.Size = new System.Drawing.Size(74, 38);
@@ -208,7 +208,7 @@ namespace SLF
             // 
             this.KmlTestButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("KmlTestButton.BackgroundImage")));
             this.KmlTestButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.KmlTestButton.Location = new System.Drawing.Point(54, 94);
+            this.KmlTestButton.Location = new System.Drawing.Point(160, 71);
             this.KmlTestButton.Margin = new System.Windows.Forms.Padding(4);
             this.KmlTestButton.Name = "KmlTestButton";
             this.KmlTestButton.Size = new System.Drawing.Size(54, 47);
@@ -222,7 +222,7 @@ namespace SLF
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.NavajoWhite;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
-            this.ClientSize = new System.Drawing.Size(562, 498);
+            this.ClientSize = new System.Drawing.Size(562, 471);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.imarCitySelectionPanel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));

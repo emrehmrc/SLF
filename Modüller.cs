@@ -5927,7 +5927,7 @@ namespace SLF
         {
             cbs.GetActiveGMapControl().Visible = true;
             cbs.GetActiveWebView().Visible = false;
-            cbs.GetActiveGMapControl().MapProvider = GMapProviders.OpenStreetMap;
+            cbs.GetActiveGMapControl().MapProvider = GMapProviders.ArcGIS_World_Street_Map;
         }
 
         // haritalardaki Google Earth katmanı

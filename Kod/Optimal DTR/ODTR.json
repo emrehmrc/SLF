@@ -1,0 +1,28 @@
+{
+  "FilePaths": {
+    "İlYol": "C:\\Users\\vural.bayrakli\\OneDrive - MRC\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\İzmir",
+    "İlİlceYol": "C:\\Users\\vural.bayrakli\\OneDrive - MRC\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\İzmir\\Karşıyaka",
+    "SonucYolu": "C:\\Users\\vural.bayrakli\\OneDrive - MRC\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\İzmir\\Karşıyaka\\proje_a929\\sonuclar/Optimal DTR Sonuçları",
+    "PythonFilePath": "C:\\Users\\vural.bayrakli\\OneDrive - MRC\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\Program Dosyaları\\Optimal DTR",
+    "PointLoadYolu": "C:\\Users\\vural.bayrakli\\OneDrive - MRC\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\İzmir\\Karşıyaka\\proje_a929\\sonuclar/SLF Sonuçları/Point Load/Girdi/point_load_poligonlar.xlsx",
+    "VeriTabanıYolu": "C:\\Users\\vural.bayrakli\\OneDrive - MRC\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\Program Dosyaları\\Optimal DTR\\dosyalar\\veriler.db",
+    "YükVeriYolu": "C:\\Users\\vural.bayrakli\\OneDrive - MRC\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\İzmir\\Karşıyaka\\proje_a929\\sonuclar/SLF Sonuçları",
+    "İmarVeriYolu": "C:\\Users\\vural.bayrakli\\OneDrive - MRC\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\İzmir\\Karşıyaka\\proje_a929\\imar_analizi_sonuclari/imar_planlari/hucresel_dtr_verileri",
+    "Arsiv": "C:\\Users\\vural.bayrakli\\OneDrive - MRC\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\İzmir\\Karşıyaka\\proje_a929\\sonuclar/Optimal DTR Sonuçları\\Arşiv",
+    "YukVeriTabanıYolu": "C:\\Users\\vural.bayrakli\\OneDrive - MRC\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\İzmir\\Karşıyaka\\proje_a929\\sonuclar/SLF Sonuçları/5.Yük Tahmini/çıktı/SONUCLAR.db",
+    "EAYukVeriTabanıYolu": "C:\\Users\\vural.bayrakli\\OneDrive - MRC\\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\\il_ilce_kırılımları\\İzmir\\Karşıyaka\\EA Şarj\\cıktı/sonuclar2.db"
+  },
+  "Degiskenler": {
+    "İl": "İzmir",
+    "İlçe": "Karşıyaka",
+    "İlkYıl": "2024",
+    "SonYıl": "2028",
+    "TuketimDosyaAdi": "SONUCLAR.db",
+    "TrafoDosyaAdi": "trafo_merkez_hucre_Karşıyaka.csv",
+    "TrafoAlanDosyaAdi": "trafo_rezerv_alanlar_karşıyaka.csv",
+    "veriTabaniAdi": "veriler.db",
+    "YukTabloAdi": "DfYukButun",
+    "AlansalYukTabloAdi": "EAYuk",
+    "HTML": "Trafo_merkez.html"
+  }
+}
