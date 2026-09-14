@@ -82,12 +82,12 @@ namespace SLF
             // 
             this.label2.AutoSize = true;
             this.label2.BackColor = System.Drawing.Color.Transparent;
-            this.label2.Font = new System.Drawing.Font("Maiandra GD", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.ForeColor = System.Drawing.Color.OrangeRed;
+            this.label2.Font = new System.Drawing.Font("Segoe UI Semibold", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.ForeColor = System.Drawing.Color.Navy;
             this.label2.Location = new System.Drawing.Point(12, 9);
             this.label2.MaximumSize = new System.Drawing.Size(1362, 1810);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(457, 45);
+            this.label2.Size = new System.Drawing.Size(446, 50);
             this.label2.TabIndex = 3;
             this.label2.Text = "Jeo-Uzamsal Yük Tahmini";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -98,11 +98,11 @@ namespace SLF
             this.StartButton.BackColor = System.Drawing.Color.Transparent;
             this.StartButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.LightGreen;
             this.StartButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.StartButton.Font = new System.Drawing.Font("Maiandra GD", 25.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.StartButton.Font = new System.Drawing.Font("Segoe UI Semibold", 25.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.StartButton.ForeColor = System.Drawing.Color.Transparent;
-            this.StartButton.Location = new System.Drawing.Point(937, 8);
+            this.StartButton.Location = new System.Drawing.Point(937, 3);
             this.StartButton.Name = "StartButton";
-            this.StartButton.Size = new System.Drawing.Size(222, 63);
+            this.StartButton.Size = new System.Drawing.Size(222, 68);
             this.StartButton.TabIndex = 8;
             this.StartButton.Text = "BAŞLA";
             this.StartButton.UseVisualStyleBackColor = false;
@@ -112,12 +112,12 @@ namespace SLF
             // 
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
-            this.label1.Font = new System.Drawing.Font("Maiandra GD", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.OrangeRed;
+            this.label1.Font = new System.Drawing.Font("Segoe UI Semibold", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.Color.Navy;
             this.label1.Location = new System.Drawing.Point(291, 57);
             this.label1.MaximumSize = new System.Drawing.Size(1362, 1810);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(244, 45);
+            this.label1.Size = new System.Drawing.Size(243, 50);
             this.label1.TabIndex = 9;
             this.label1.Text = "Ar-GE Projesi";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -138,7 +138,7 @@ namespace SLF
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.Color.Moccasin;
+            this.panel1.BackColor = System.Drawing.Color.SeaShell;
             this.panel1.Controls.Add(this.buton_hakkında);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.label2);
@@ -150,6 +150,8 @@ namespace SLF
             // 
             // buton_hakkında
             // 
+            this.buton_hakkında.Font = new System.Drawing.Font("Segoe UI Semibold", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buton_hakkında.ForeColor = System.Drawing.Color.Navy;
             this.buton_hakkında.Location = new System.Drawing.Point(1093, 13);
             this.buton_hakkında.Name = "buton_hakkında";
             this.buton_hakkında.Size = new System.Drawing.Size(92, 41);

@@ -495,8 +495,8 @@ namespace SLF.Services
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Python kod dizini belirlenirken hata: {ex.Message}");
-                    // Hata durumunda sabit yolu döndür
-                    return @"C:\Users\batuhan.yetis\source\repos\SLF\python_kod";
+                    // Hata durumunda exe dizini altındaki python_kod yolunu döndür
+                    return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "python_kod");
                 }
             }
         }

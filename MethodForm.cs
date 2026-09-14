@@ -202,23 +202,6 @@ namespace SLF
             this.Show();  // Show MethodForm again after ModülFormu is closed
         }
 
-        private void MethodPanel_Paint(object sender, PaintEventArgs e)
-        {
-            MethodPanel.BackColor = Color.FromArgb(100, 0, 0, 0);
-            this.DoubleBuffered = true;
-        }
-
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
-        {
-            // Only trigger the ForwardButton's click event if MethodForm is the active form
-            if (keyData == Keys.Enter && this == Form.ActiveForm)
-            {
-                // Trigger ForwardButton's Click event
-                ForwardButton.PerformClick();
-                return true; // Mark the key as handled
-            }
-            return base.ProcessCmdKey(ref msg, keyData);
-        }
 
         private void IlComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
