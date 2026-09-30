@@ -5537,8 +5537,22 @@ namespace SLF
 
         private void UpdateHeatmapForYear(string columnName)
         {
-            // Use the active GMapControl (ensure you're consistent with one control)
-            GMapControl mapControl = cbs.GetActiveGMapControl();
+            // The heatmap always belongs to the Yük Yoğunluğu map, even when
+            // the source KML was selected from the Jeo-Uzamsal/İmar tab.
+            GMapControl mapControl = gMapControl_yuk;
+            if (mapControl == null)
+                return;
+
+            mapControl.Visible = true;
+            if (mapControl.MapProvider == null)
+                mapControl.MapProvider = GMapProviders.GoogleSatelliteMap;
+            if (mapControl.MinZoom >= mapControl.MaxZoom)
+            {
+                mapControl.MinZoom = 8;
+                mapControl.MaxZoom = 20;
+            }
+            if (mapControl.Zoom < mapControl.MinZoom || mapControl.Zoom > mapControl.MaxZoom)
+                mapControl.Zoom = 13;
 
             // Instead of clearing all overlays, remove only the heatmapOverlay if it exists
             GMapOverlay existingHeatmapOverlay = mapControl.Overlays.FirstOrDefault(o => o.Id == "HeatmapOverlay");
@@ -5576,11 +5590,9 @@ namespace SLF
 
             buton_HTML.Visible = true;
 
-            // Force a repaint by toggling the visibility of the heatmap overlay
-            SetOverlayVisibility(heatmapOverlay, false); // Hide
-            SetOverlayVisibility(heatmapOverlay, true);  // Show
-                                                         //mapControl.Invalidate(); // Force a full repaint
-            mapControl.Refresh(); // Refresh the map control
+            SetOverlayVisibility(heatmapOverlay, true);
+            mapControl.Invalidate();
+            mapControl.Refresh();
         }
 
         private void InitializeHeatmapLegendControls()
@@ -5646,9 +5658,10 @@ namespace SLF
             bool isVisible = cb.Checked;
             SetOverlayVisibility(overlay, isVisible);
 
-            // Refresh the map control to show updates
-            cbs.GetActiveGMapControl().ReloadMap();
-            cbs.GetActiveGMapControl().Refresh();
+            // Refresh the Yük Yoğunluğu map, not whichever map tab is active.
+            gMapControl_yuk.ReloadMap();
+            gMapControl_yuk.Invalidate();
+            gMapControl_yuk.Refresh();
         }
 
         // Helper to toggle polygons/routes/markers

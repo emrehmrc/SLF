@@ -31,6 +31,10 @@ namespace SLF
         private Dictionary<string, System.Drawing.Color> currentImarTipiColorMap; // Stores the color mapping for the current KML file
         private readonly Dictionary<System.Drawing.Color, Pen> kmlPenCache = new Dictionary<System.Drawing.Color, Pen>();
         private readonly Dictionary<System.Drawing.Color, SolidBrush> kmlBrushCache = new Dictionary<System.Drawing.Color, SolidBrush>();
+        private readonly Dictionary<System.Drawing.Color, Pen> shapefilePenCache = new Dictionary<System.Drawing.Color, Pen>();
+        private readonly Dictionary<System.Drawing.Color, SolidBrush> shapefileBrushCache = new Dictionary<System.Drawing.Color, SolidBrush>();
+        private readonly Dictionary<System.Drawing.Color, Pen> heatmapPenCache = new Dictionary<System.Drawing.Color, Pen>();
+        private readonly Dictionary<System.Drawing.Color, SolidBrush> heatmapBrushCache = new Dictionary<System.Drawing.Color, SolidBrush>();
 
         // GMapOverlay arrays, one per map:
         public GMapOverlay[] tüm_katmanlar_array_imar = new GMapOverlay[50];
@@ -399,73 +403,20 @@ namespace SLF
 
             foreach (var srcPolygon in sourceOverlay.Polygons)
             {
-                try
+                // Reuse Stroke/Fill and Points references to minimize allocations
+                var newPolygon = new GMapPolygon(srcPolygon.Points, srcPolygon.Name)
                 {
-                    // Reuse Stroke/Fill and Points references to minimize allocations
-                    var newPolygon = new GMapPolygon(srcPolygon.Points, srcPolygon.Name)
-                    {
-                        Stroke = srcPolygon.Stroke, // reuse reference
-                        Fill = srcPolygon.Fill      // reuse reference
-                    };
-                    // Preserve Tag (Row_No) so feature lookup by Row_No still works after copying
-                    try { newPolygon.Tag = srcPolygon.Tag; } catch { /* ignore tagging failures */ }
+                    Stroke = srcPolygon.Stroke,
+                    Fill = srcPolygon.Fill
+                };
+                newPolygon.Tag = srcPolygon.Tag;
 
-                    // Add the new polygon to the target overlay
-                    targetOverlay.Polygons.Add(newPolygon);
+                targetOverlay.Polygons.Add(newPolygon);
 
-                    // Now copy the attribute row from the source dictionary (if present)
-                    if (sourceDict != null && sourceDict.TryGetValue(srcPolygon, out DataRow row))
-                    {
-                        // Wrap assignment in try/catch for memory pressure cases
-                        try
-                        {
-                            targetDict[newPolygon] = row;
-                        }
-                        catch (OutOfMemoryException)
-                        {
-                            // Try to recover: force a GC, wait, then attempt a lighter-weight association
-                            GC.Collect();
-                            GC.WaitForPendingFinalizers();
-                            System.Threading.Thread.Sleep(200);
-
-                            try
-                            {
-                                // As a fallback, store only the raw item array (lighter than DataRow reference)
-                                // We store it as an object[] boxed in the dictionary to preserve data without keeping heavy DataRow structures
-                                var values = row.ItemArray;
-                                // Use a cast dictionary if caller expects DataRow; store a wrapper DataRow is impractical under memory pressure
-                                // So skip the association to avoid OOM if still failing
-                                // (Better approach: store a separate lightweight map elsewhere if needed)
-                                // For now, skip association to keep UI responsive
-                            }
-                            catch { /* swallow fallback errors */ }
-                        }
-                    }
-                }
-                catch (OutOfMemoryException)
+                if (sourceDict != null && sourceDict.TryGetValue(srcPolygon, out DataRow row))
                 {
-                    // If we hit OOM while creating polygon objects, attempt to recover gracefully
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                    System.Threading.Thread.Sleep(500);
-
-                    // Try one more time for this polygon but if it still fails skip it to continue processing remaining ones
-                    try
-                    {
-                        var retryPolygon = new GMapPolygon(srcPolygon.Points, srcPolygon.Name) { Stroke = srcPolygon.Stroke, Fill = srcPolygon.Fill };
-                        targetOverlay.Polygons.Add(retryPolygon);
-                        if (sourceDict != null && sourceDict.TryGetValue(srcPolygon, out DataRow retryRow))
-                        {
-                            try { targetDict[retryPolygon] = retryRow; } catch { /* ignore */ }
-                        }
-                    }
-                    catch (OutOfMemoryException)
-                    {
-                        // Give up on this polygon but continue the loop
-                        continue;
-                    }
+                    targetDict[newPolygon] = row;
                 }
-
             }
 
             // 2) Copy Routes (no dictionary logic shown—add if you have route attributes)
@@ -573,9 +524,6 @@ namespace SLF
             // add the resulting row to the datatable
             data_table.Rows.Add(row);
 
-            // Bind the DataTable to the DataGridView
-            dataGridView.DataSource = data_table;
-
             return (data_table);
         }
 
@@ -602,8 +550,8 @@ namespace SLF
             // Create the GMapPolygon
             GMapPolygon gMapPolygon = new GMapPolygon(points_list, gMapPolygonId)
             {
-                Stroke = new Pen(baseBorderColor, 3), // Use original border color or transparentBorderColor if uncommented
-                Fill = new SolidBrush(transparentFillColor)
+                Stroke = GetShapefilePen(baseBorderColor),
+                Fill = GetShapefileBrush(transparentFillColor)
             };
 
             // Store the Row_No in the polygon's Tag property
@@ -829,6 +777,50 @@ namespace SLF
             {
                 brush = new SolidBrush(color);
                 kmlBrushCache[color] = brush;
+            }
+
+            return brush;
+        }
+
+        private Pen GetShapefilePen(System.Drawing.Color color)
+        {
+            if (!shapefilePenCache.TryGetValue(color, out Pen pen))
+            {
+                pen = new Pen(color, 3);
+                shapefilePenCache[color] = pen;
+            }
+
+            return pen;
+        }
+
+        private SolidBrush GetShapefileBrush(System.Drawing.Color color)
+        {
+            if (!shapefileBrushCache.TryGetValue(color, out SolidBrush brush))
+            {
+                brush = new SolidBrush(color);
+                shapefileBrushCache[color] = brush;
+            }
+
+            return brush;
+        }
+
+        private Pen GetHeatmapPen(System.Drawing.Color color)
+        {
+            if (!heatmapPenCache.TryGetValue(color, out Pen pen))
+            {
+                pen = new Pen(color, 1);
+                heatmapPenCache[color] = pen;
+            }
+
+            return pen;
+        }
+
+        private SolidBrush GetHeatmapBrush(System.Drawing.Color color)
+        {
+            if (!heatmapBrushCache.TryGetValue(color, out SolidBrush brush))
+            {
+                brush = new SolidBrush(color);
+                heatmapBrushCache[color] = brush;
             }
 
             return brush;
@@ -1162,14 +1154,14 @@ namespace SLF
                                 }
                             }
 
-                            string polygonCoordinates = null;
-                            var polygon = FindKmlElement(placemark, "Polygon");
-                            if (polygon != null)
-                            {
-                                polygonCoordinates = FindKmlElement(polygon, "coordinates")?.Value.Trim();
-                                if (!string.IsNullOrEmpty(polygonCoordinates))
-                                    row["coordinates"] = NormalizeKmlCoordinates(polygonCoordinates);
-                            }
+                            var polygonCoordinatesList = placemark.Descendants()
+                                .Where(element => element.Name.LocalName == "Polygon")
+                                .Select(polygon => FindKmlElement(polygon, "coordinates")?.Value.Trim())
+                                .Where(coordinates => !string.IsNullOrEmpty(coordinates))
+                                .ToList();
+
+                            if (polygonCoordinatesList.Count > 0)
+                                row["coordinates"] = NormalizeKmlCoordinates(polygonCoordinatesList[0]);
 
                             string lineCoordinates = null;
                             var lineString = FindKmlElement(placemark, "LineString");
@@ -1181,7 +1173,7 @@ namespace SLF
                             }
 
                             var point = FindKmlElement(placemark, "Point");
-                            if (polygon == null && lineString == null && point != null)
+                            if (polygonCoordinatesList.Count == 0 && lineString == null && point != null)
                             {
                                 string pointCoordinates = FindKmlElement(point, "coordinates")?.Value.Trim();
                                 if (!string.IsNullOrEmpty(pointCoordinates))
@@ -1190,8 +1182,11 @@ namespace SLF
 
                             data_table.Rows.Add(row);
 
-                            if (!string.IsNullOrEmpty(polygonCoordinates))
-                                AddPolygonToOverlay_kml(polygonCoordinates, kmlOverlay, row);
+                            if (polygonCoordinatesList.Count > 0)
+                            {
+                                foreach (var polygonCoordinates in polygonCoordinatesList)
+                                    AddPolygonToOverlay_kml(polygonCoordinates, kmlOverlay, row);
+                            }
                             else if (!string.IsNullOrEmpty(lineCoordinates))
                                 AddLineStringToOverlay_kml(lineCoordinates, kmlOverlay);
                         }
@@ -1283,6 +1278,8 @@ namespace SLF
                     return;
                 }
 
+                var polygonCoordinateRows = new List<Tuple<DataRow, string>>();
+
                 foreach (var placemark in placemarks)
                 {
                     var row = data_table.NewRow();
@@ -1345,25 +1342,27 @@ namespace SLF
                         }
                     }
 
-                    // Handle Polygon
-                    var polygon = placemark.Element(ns + "Polygon");
-                    if (polygon != null)
+                    // Handle all polygons, including polygons inside MultiGeometry
+                    var polygonCoordinatesList = placemark.Descendants(ns + "Polygon")
+                        .Select(polygon => polygon.Descendants(ns + "coordinates").FirstOrDefault()?.Value.Trim())
+                        .Where(coordinates => !string.IsNullOrEmpty(coordinates))
+                        .ToList();
+                    if (polygonCoordinatesList.Count > 0)
                     {
-                        var coordinatesElement = polygon.Element(ns + "outerBoundaryIs")?.Element(ns + "LinearRing")?.Element(ns + "coordinates");
-                        if (coordinatesElement != null)
-                        {
-                            string coordinatesString = coordinatesElement.Value.Trim();
-                            var coords = coordinatesString.Split(new[] { ' ', '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries)
-                                .Select(coord =>
-                                {
-                                    var parts = coord.Split(',');
-                                    if (parts.Length >= 2 && TryParseKmlCoordinate(parts[0], out double lon) && TryParseKmlCoordinate(parts[1], out double lat))
-                                        return $"{Math.Round(lon, 6).ToString(CultureInfo.InvariantCulture)},{Math.Round(lat, 6).ToString(CultureInfo.InvariantCulture)}";
-                                    return null;
-                                })
-                                .Where(c => c != null);
-                            row["coordinates"] = string.Join(" ; ", coords);
-                        }
+                        string firstPolygonCoordinates = polygonCoordinatesList[0];
+                        var coords = firstPolygonCoordinates.Split(new[] { ' ', '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(coord =>
+                            {
+                                var parts = coord.Split(',');
+                                if (parts.Length >= 2 && TryParseKmlCoordinate(parts[0], out double lon) && TryParseKmlCoordinate(parts[1], out double lat))
+                                    return $"{Math.Round(lon, 6).ToString(CultureInfo.InvariantCulture)},{Math.Round(lat, 6).ToString(CultureInfo.InvariantCulture)}";
+                                return null;
+                            })
+                            .Where(c => c != null);
+                        row["coordinates"] = string.Join(" ; ", coords);
+
+                        foreach (var polygonCoordinates in polygonCoordinatesList)
+                            polygonCoordinateRows.Add(Tuple.Create(row, polygonCoordinates));
                     }
 
                     // Handle Point
@@ -1488,11 +1487,12 @@ namespace SLF
                             modülFormu.imar_legendPanel.Visible = false;
                     }
 
-                    // Add polygons to overlay (after all Placemarks are processed)
-                    for (int i = 0; i < data_table.Rows.Count; i++)
+                    // Add all polygons to overlay after all Placemarks are processed
+                    for (int i = 0; i < polygonCoordinateRows.Count; i++)
                     {
-                        var row = data_table.Rows[i];
-                        var coordinates = row["coordinates"]?.ToString();
+                        var polygonRow = polygonCoordinateRows[i];
+                        var row = polygonRow.Item1;
+                        var coordinates = polygonRow.Item2;
                         if (!string.IsNullOrEmpty(coordinates))
                         {
                             try
@@ -1501,12 +1501,8 @@ namespace SLF
                             }
                             catch (OutOfMemoryException oom)
                             {
-                                // Try to recover and skip this polygon if still failing
-                                try { GC.Collect(); GC.WaitForPendingFinalizers(); System.Threading.Thread.Sleep(200); }
-                                catch { }
-                                // log and continue
                                 File.AppendAllText("kml_load_errors.txt", $"OOM while adding polygon row {i}: {oom.Message}\n");
-                                continue;
+                                throw;
                             }
                             catch (Exception ex)
                             {
@@ -1577,6 +1573,8 @@ namespace SLF
 
                 row_cnt++;
             }
+
+            dataGridView.DataSource = shapefile_datatable;
 
             // Log the DataTable to verify Row_No values
             File.WriteAllText("shapefile_datatable.txt", string.Join("\n", 
@@ -2182,16 +2180,16 @@ namespace SLF
                             // Normalize the bracket index to a value between 0 and 1 for color mapping
                             double normalizedValue = (double)bracketIndex / (bracketCount - 1);
                             System.Drawing.Color heatColor = GetHeatmapColor(normalizedValue);
-                            polygon.Stroke = new Pen(heatColor, 1);
-                            polygon.Fill = new SolidBrush(heatColor);
+                            polygon.Stroke = GetHeatmapPen(heatColor);
+                            polygon.Fill = GetHeatmapBrush(heatColor);
                             continue;
                         }
                     }
                 }
 
                 // If parsing fails or no value is provided, color the polygon with a default gray.
-                polygon.Stroke = new Pen(System.Drawing.Color.Gray, 1);
-                polygon.Fill = new SolidBrush(System.Drawing.Color.Gray);
+                polygon.Stroke = GetHeatmapPen(System.Drawing.Color.Gray);
+                polygon.Fill = GetHeatmapBrush(System.Drawing.Color.Gray);
             }
 
             // Refresh the map control to show updated colors.
