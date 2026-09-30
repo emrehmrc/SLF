@@ -15,6 +15,7 @@ using System.Windows.Forms;
 using GMap.NET.WindowsForms.Markers;
 using System.Globalization;
 using System.Xml.Linq;
+using System.Xml;
 
 
 namespace SLF
@@ -28,6 +29,8 @@ namespace SLF
         public (double Latitude, double Longitude)[] polygonCenterPoints { get; set; } = new (double, double)[50];
 
         private Dictionary<string, System.Drawing.Color> currentImarTipiColorMap; // Stores the color mapping for the current KML file
+        private readonly Dictionary<System.Drawing.Color, Pen> kmlPenCache = new Dictionary<System.Drawing.Color, Pen>();
+        private readonly Dictionary<System.Drawing.Color, SolidBrush> kmlBrushCache = new Dictionary<System.Drawing.Color, SolidBrush>();
 
         // GMapOverlay arrays, one per map:
         public GMapOverlay[] tüm_katmanlar_array_imar = new GMapOverlay[50];
@@ -289,8 +292,17 @@ namespace SLF
 
                     // Build both overlays off-map. Attach them only after all geometry is ready
                     // so adding thousands of objects cannot trigger a redraw for each object.
-                    modülFormu.gMapControl_imar.Overlays.Add(overlay_imar);
-                    modülFormu.gMapControl_yuk.Overlays.Add(overlay_yuk);
+                    bool imarWasVisible = modülFormu.gMapControl_imar.Visible;
+                    bool yukWasVisible = modülFormu.gMapControl_yuk.Visible;
+                    modülFormu.gMapControl_imar.SuspendLayout();
+                    modülFormu.gMapControl_yuk.SuspendLayout();
+                    modülFormu.gMapControl_imar.Visible = false;
+                    modülFormu.gMapControl_yuk.Visible = false;
+
+                    try
+                    {
+                        modülFormu.gMapControl_imar.Overlays.Add(overlay_imar);
+                        modülFormu.gMapControl_yuk.Overlays.Add(overlay_yuk);
 
                     tüm_katmanlar_array_imar[layer_index] = overlay_imar;
                     tüm_katmanlar_array_yuk[layer_index] = overlay_yuk;
@@ -299,15 +311,10 @@ namespace SLF
                     tüm_katmanlar_array_names[layer_index] = imported_filename;
                     tüm_katmanlar_array_polygon_tags[layer_index] = "IMPORTED"; // Default tag for imported layers
 
-                    List<CheckBox> associatedChecks = modülFormu.GetCheckBoxesByIndex(layer_index);
-                    foreach (var chk in associatedChecks)
-                    {
-                        chk.Text = imported_filename;
-                        chk.Visible = true;
-                        chk.Checked = true;
-                        chk.ForeColor = overlayColors[layer_index].BorderColor;
-                        chk.Tag = (layer_index + 1).ToString(); // Set Tag to 1-based layer index
-                    }
+                    modülFormu.SetImportedLayerCheckBoxes(
+                        layer_index,
+                        imported_filename,
+                        overlayColors[layer_index].BorderColor);
 
                     // Mark all categories for update
                     modülFormu.pendingUpdates["imar"] = true;
@@ -319,6 +326,14 @@ namespace SLF
 
                     // Zoom to the center of the layer
                     ZoomToLayerCenter(overlay_imar, modülFormu.gMapControl_imar, modülFormu.gMapControl_yuk);
+                    }
+                    finally
+                    {
+                        modülFormu.gMapControl_imar.Visible = imarWasVisible;
+                        modülFormu.gMapControl_yuk.Visible = yukWasVisible;
+                        modülFormu.gMapControl_imar.ResumeLayout(false);
+                        modülFormu.gMapControl_yuk.ResumeLayout(false);
+                    }
                 }
                 finally
                 {
@@ -631,7 +646,7 @@ namespace SLF
                 .Select(coord =>
                 {
                     var parts = coord.Split(',');
-                    if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
+                    if (parts.Length >= 2 && TryParseKmlCoordinate(parts[0], out double lon) && TryParseKmlCoordinate(parts[1], out double lat))
                     {
                         return new PointLatLng(lat, lon);
                     }
@@ -693,11 +708,11 @@ namespace SLF
                 return;
 
             var points = coordinatesString.Trim()
-                .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                .Split(new[] { ' ', '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(coord =>
                 {
                     var parts = coord.Split(',');
-                    if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
+                    if (parts.Length >= 2 && TryParseKmlCoordinate(parts[0], out double lon) && TryParseKmlCoordinate(parts[1], out double lat))
                     {
                         return new PointLatLng(lat, lon);
                     }
@@ -706,6 +721,9 @@ namespace SLF
                 .Where(p => p.HasValue)
                 .Select(p => p.Value)
                 .ToList();
+
+            if (points.Count < 3)
+                return;
 
             // Varsayılan renk
             System.Drawing.Color fillColor = overlayColors[layer_index].FillColor;
@@ -722,6 +740,7 @@ namespace SLF
                         fillColor = mappedColor;
                         borderColor = System.Drawing.Color.Black;
                     }
+
                     else
                     {
                         File.AppendAllText("color_map_log.txt", $"İmar Tipi '{imarTipi}' için renk bulunamadı.\n");
@@ -737,8 +756,8 @@ namespace SLF
 
             GMapPolygon polygon = new GMapPolygon(points, "KmlPolygon")
             {
-                Stroke = new Pen(borderColor, 3),
-                Fill = new SolidBrush(fillColor)
+                Stroke = GetKmlPen(borderColor),
+                Fill = GetKmlBrush(fillColor)
             };
 
             // Store the Row_No in the polygon's Tag property as an integer when possible
@@ -763,6 +782,56 @@ namespace SLF
             overlay.Polygons.Add(polygon);
             polygonAttributes_imar[polygon] = attributes;
             polygonAttributes_yuk[polygon] = attributes;
+        }
+
+        private static bool TryParseKmlCoordinate(string value, out double result)
+        {
+            return double.TryParse(
+                value,
+                NumberStyles.Float,
+                CultureInfo.InvariantCulture,
+                out result);
+        }
+
+        private static string NormalizeKmlCoordinates(string coordinatesString)
+        {
+            var coordinates = coordinatesString
+                .Split(new[] { ' ', '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(coord =>
+                {
+                    var parts = coord.Split(',');
+                    if (parts.Length >= 2 && TryParseKmlCoordinate(parts[0], out double lon) && TryParseKmlCoordinate(parts[1], out double lat))
+                    {
+                        return $"{Math.Round(lon, 6).ToString(CultureInfo.InvariantCulture)},{Math.Round(lat, 6).ToString(CultureInfo.InvariantCulture)}";
+                    }
+
+                    return null;
+                })
+                .Where(coord => coord != null);
+
+            return string.Join(" ; ", coordinates);
+        }
+
+        private Pen GetKmlPen(System.Drawing.Color color)
+        {
+            if (!kmlPenCache.TryGetValue(color, out Pen pen))
+            {
+                pen = new Pen(color, 3);
+                kmlPenCache[color] = pen;
+            }
+
+            return pen;
+        }
+
+        private SolidBrush GetKmlBrush(System.Drawing.Color color)
+        {
+            if (!kmlBrushCache.TryGetValue(color, out SolidBrush brush))
+            {
+                brush = new SolidBrush(color);
+                kmlBrushCache[color] = brush;
+            }
+
+            return brush;
         }
 
 
@@ -1001,12 +1070,163 @@ namespace SLF
         }
 
 
+        private static void EnsureKmlColumn(DataTable dataTable, string columnName)
+        {
+            if (!string.IsNullOrEmpty(columnName) && !dataTable.Columns.Contains(columnName))
+                dataTable.Columns.Add(columnName);
+        }
+
+        private static XElement FindKmlElement(XElement parent, string localName)
+        {
+            return parent?.Descendants().FirstOrDefault(element => element.Name.LocalName == localName);
+        }
+
+        private Task LoadLargeKmlFileStreaming(string filepath, GMapOverlay kmlOverlay, DataTable data_table)
+        {
+            int row_cnt = 1;
+
+            try
+            {
+                EnsureKmlColumn(data_table, "Row_No");
+                EnsureKmlColumn(data_table, "coordinates");
+
+                var settings = new XmlReaderSettings
+                {
+                    IgnoreComments = true,
+                    IgnoreWhitespace = true,
+                    DtdProcessing = DtdProcessing.Prohibit
+                };
+
+                using (var reader = XmlReader.Create(filepath, settings))
+                {
+                    while (reader.Read())
+                    {
+                        if (reader.NodeType != XmlNodeType.Element || reader.LocalName != "Placemark")
+                            continue;
+
+                        var placemark = XNode.ReadFrom(reader) as XElement;
+                        if (placemark == null)
+                            continue;
+
+                        try
+                        {
+                            var row = data_table.NewRow();
+                            row["Row_No"] = row_cnt;
+
+                            var nameElement = placemark.Elements().FirstOrDefault(element => element.Name.LocalName == "name");
+                            if (nameElement != null)
+                            {
+                                EnsureKmlColumn(data_table, "name");
+                                row["name"] = nameElement.Value;
+                            }
+
+                            var descriptionElement = placemark.Elements().FirstOrDefault(element => element.Name.LocalName == "description");
+                            if (descriptionElement != null)
+                            {
+                                EnsureKmlColumn(data_table, "description");
+                                row["description"] = descriptionElement.Value;
+                            }
+
+                            var styleUrlElement = placemark.Elements().FirstOrDefault(element => element.Name.LocalName == "styleUrl");
+                            if (styleUrlElement != null)
+                            {
+                                EnsureKmlColumn(data_table, "styleUrl");
+                                row["styleUrl"] = styleUrlElement.Value;
+                            }
+
+                            var extendedData = FindKmlElement(placemark, "ExtendedData");
+                            if (extendedData != null)
+                            {
+                                foreach (var data in extendedData.Elements().Where(element => element.Name.LocalName == "Data"))
+                                {
+                                    string name = data.Attribute("name")?.Value;
+                                    if (!string.IsNullOrEmpty(name))
+                                    {
+                                        EnsureKmlColumn(data_table, name);
+                                        row[name] = data.Elements().FirstOrDefault(element => element.Name.LocalName == "value")?.Value ?? "";
+                                    }
+                                }
+
+                                var schemaData = extendedData.Elements().FirstOrDefault(element => element.Name.LocalName == "SchemaData");
+                                if (schemaData != null)
+                                {
+                                    foreach (var simpleData in schemaData.Elements().Where(element => element.Name.LocalName == "SimpleData"))
+                                    {
+                                        string name = simpleData.Attribute("name")?.Value;
+                                        if (!string.IsNullOrEmpty(name))
+                                        {
+                                            EnsureKmlColumn(data_table, name);
+                                            row[name] = simpleData.Value;
+                                        }
+                                    }
+                                }
+                            }
+
+                            string polygonCoordinates = null;
+                            var polygon = FindKmlElement(placemark, "Polygon");
+                            if (polygon != null)
+                            {
+                                polygonCoordinates = FindKmlElement(polygon, "coordinates")?.Value.Trim();
+                                if (!string.IsNullOrEmpty(polygonCoordinates))
+                                    row["coordinates"] = NormalizeKmlCoordinates(polygonCoordinates);
+                            }
+
+                            string lineCoordinates = null;
+                            var lineString = FindKmlElement(placemark, "LineString");
+                            if (lineString != null)
+                            {
+                                lineCoordinates = FindKmlElement(lineString, "coordinates")?.Value.Trim();
+                                if (!string.IsNullOrEmpty(lineCoordinates))
+                                    row["coordinates"] = NormalizeKmlCoordinates(lineCoordinates);
+                            }
+
+                            var point = FindKmlElement(placemark, "Point");
+                            if (polygon == null && lineString == null && point != null)
+                            {
+                                string pointCoordinates = FindKmlElement(point, "coordinates")?.Value.Trim();
+                                if (!string.IsNullOrEmpty(pointCoordinates))
+                                    row["coordinates"] = NormalizeKmlCoordinates(pointCoordinates);
+                            }
+
+                            data_table.Rows.Add(row);
+
+                            if (!string.IsNullOrEmpty(polygonCoordinates))
+                                AddPolygonToOverlay_kml(polygonCoordinates, kmlOverlay, row);
+                            else if (!string.IsNullOrEmpty(lineCoordinates))
+                                AddLineStringToOverlay_kml(lineCoordinates, kmlOverlay);
+                        }
+                        catch (Exception ex)
+                        {
+                            File.AppendAllText("kml_load_errors.txt", $"Error processing Placemark row {row_cnt}: {ex}\n");
+                        }
+
+                        row_cnt++;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                File.AppendAllText("kml_load_errors.txt", $"Fatal streaming KML error after row {row_cnt - 1}: {ex}\n");
+                MessageBox.Show($"KML yükleme {row_cnt - 1} satırdan sonra durdu. Ayrıntı: kml_load_errors.txt");
+            }
+
+            return Task.CompletedTask;
+        }
+
         public async Task LoadKmlFile(string filepath, GMapOverlay kmlOverlay,
             System.Data.DataTable data_table, GMapControl gMapControl)
         {
             if (!File.Exists(filepath))
             {
                 MessageBox.Show("KML dosyası bulunamadı!");
+                return;
+            }
+
+            var fileInfo = new FileInfo(filepath);
+            if (fileInfo.Length > 32 * 1024 * 1024 &&
+                string.Equals(Path.GetFileName(filepath), "SONUCLAR_Yük_Yoğunluğu.kml", StringComparison.OrdinalIgnoreCase))
+            {
+                await LoadLargeKmlFileStreaming(filepath, kmlOverlay, data_table);
                 return;
             }
 
@@ -1133,12 +1353,12 @@ namespace SLF
                         if (coordinatesElement != null)
                         {
                             string coordinatesString = coordinatesElement.Value.Trim();
-                            var coords = coordinatesString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                            var coords = coordinatesString.Split(new[] { ' ', '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries)
                                 .Select(coord =>
                                 {
                                     var parts = coord.Split(',');
-                                    if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
-                                        return $"{Math.Round(lon, 6)},{Math.Round(lat, 6)}";
+                                    if (parts.Length >= 2 && TryParseKmlCoordinate(parts[0], out double lon) && TryParseKmlCoordinate(parts[1], out double lat))
+                                        return $"{Math.Round(lon, 6).ToString(CultureInfo.InvariantCulture)},{Math.Round(lat, 6).ToString(CultureInfo.InvariantCulture)}";
                                     return null;
                                 })
                                 .Where(c => c != null);
@@ -1154,9 +1374,9 @@ namespace SLF
                         if (coordinatesElement != null)
                         {
                             var parts = coordinatesElement.Value.Trim().Split(',');
-                            if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
+                            if (parts.Length >= 2 && TryParseKmlCoordinate(parts[0], out double lon) && TryParseKmlCoordinate(parts[1], out double lat))
                             {
-                                string point_coordinates = $"{Math.Round(lon, 6)} ; {Math.Round(lat, 6)}";
+                                string point_coordinates = $"{Math.Round(lon, 6).ToString(CultureInfo.InvariantCulture)} ; {Math.Round(lat, 6).ToString(CultureInfo.InvariantCulture)}";
                                 row["coordinates"] = point_coordinates;
                             }
                         }
@@ -1170,12 +1390,12 @@ namespace SLF
                         if (coordinatesElement != null)
                         {
                             string coordinatesString = coordinatesElement.Value.Trim();
-                            var coords = coordinatesString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                            var coords = coordinatesString.Split(new[] { ' ', '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries)
                                 .Select(coord =>
                                 {
                                     var parts = coord.Split(',');
-                                    if (parts.Length >= 2 && double.TryParse(parts[0], out double lon) && double.TryParse(parts[1], out double lat))
-                                        return $"{Math.Round(lon, 6)},{Math.Round(lat, 6)}";
+                                    if (parts.Length >= 2 && TryParseKmlCoordinate(parts[0], out double lon) && TryParseKmlCoordinate(parts[1], out double lat))
+                                        return $"{Math.Round(lon, 6).ToString(CultureInfo.InvariantCulture)},{Math.Round(lat, 6).ToString(CultureInfo.InvariantCulture)}";
                                     return null;
                                 })
                                 .Where(c => c != null);
@@ -1300,7 +1520,8 @@ namespace SLF
             }
             catch (Exception ex)
             {
-                return;
+                File.AppendAllText("kml_load_errors.txt", $"Fatal KML error after row {row_cnt - 1}: {ex}\n");
+                MessageBox.Show($"KML yükleme {row_cnt - 1} satırdan sonra durdu. Ayrıntı: kml_load_errors.txt");
             }
 
         }

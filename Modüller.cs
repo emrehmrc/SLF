@@ -620,6 +620,27 @@ namespace SLF
             }
         }
 
+        public void SetImportedLayerCheckBoxes(int index, string layerName, Color foreColor)
+        {
+            _isSynchronizingCheckboxes = true;
+
+            try
+            {
+                foreach (var chk in GetCheckBoxesByIndex(index))
+                {
+                    chk.Text = layerName;
+                    chk.Visible = true;
+                    chk.Checked = true;
+                    chk.ForeColor = foreColor;
+                    chk.Tag = (index + 1).ToString();
+                }
+            }
+            finally
+            {
+                _isSynchronizingCheckboxes = false;
+            }
+        }
+
 
         private void InitializeCategoryTabPages()
         {
