@@ -81,6 +81,9 @@ namespace SLF
         public string ELFResultsFilePath;
         public string ELFSenaryolarFilePath;
 
+        private const string FixedELFResultsFilePath =
+            @"C:\Users\Emre Hangul\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı\il_ilce_kırılımları\İzmir\Karşıyaka\Ekonometrik Yük Tahmini Verileri\SONUÇLAR\ELF_Tahmin_Sonuçları_2025-09-30 15_59_43.xlsx";
+
         List<string> modulescheck = new List<string>();
         public readonly CBS cbs;
         public int slfStartYear = 0, slfEndYear = 0;
@@ -8267,26 +8270,16 @@ namespace SLF
 
             if (SenaryoModuleTabControl.SelectedTab == EkonometrikSonuclarTabPage)
             {
-
-                // Config dosyasını kendi sınıfında kullanmak için oku
-                string json_file = File.ReadAllText(ana_menu_form_objesi.config_path);
-                dynamic config = JsonConvert.DeserializeObject(json_file);
-
                 label_graphics.Visible = false;
                 comboBox_ekonometrik.Visible = false;
 
-                string results_path = Path.Combine(ana_menu_form_objesi.userRootPath,
-                    (string)config.Ana_Klasör_Yolu,
-                    (string)config.İl,
-                    (string)config.İlçe,
-                    (string)config.ELF.SONUÇLAR_klasör,
-                    (string)config.ELF.SONUÇLAR_name).Replace('/', '\\');
-                LoadEkonometrikResults(results_path);
+                ELFResultsFilePath = FixedELFResultsFilePath;
+                LoadEkonometrikResults(ELFResultsFilePath);
 
                 buton_ELF_tablo_sec.Visible = true;
                 label_s_ELF.Visible = true;
                 textBox_sonuc_ELF.Visible = true;
-                textBox_sonuc_ELF.Text = (string)config.ELF.SONUÇLAR_name;
+                textBox_sonuc_ELF.Text = Path.GetFileName(ELFResultsFilePath);
             }
             else if (SenaryoModuleTabControl.SelectedTab == EkonometrikGrafiklerTabPage)
             {
