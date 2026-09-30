@@ -1091,14 +1091,26 @@ namespace SLF
 
                 using (var reader = XmlReader.Create(filepath, settings))
                 {
-                    while (reader.Read())
-                    {
-                        if (reader.NodeType != XmlNodeType.Element || reader.LocalName != "Placemark")
-                            continue;
+                    reader.MoveToContent();
 
+                    while (!reader.EOF)
+                    {
+                        // Placemark değilse sadece ilerle
+                        if (reader.NodeType != XmlNodeType.Element || reader.LocalName != "Placemark")
+                        {
+                            reader.Read();
+                            continue;
+                        }
+
+                        // ReadFrom Placemark'ı komple okur ve reader'ı SONRAKİ düğümde bırakır.
+                        // Bu yüzden bu dalda ayrıca reader.Read() çağrılmaz, aksi halde bir sonraki
+                        // Placemark atlanır.
                         var placemark = XNode.ReadFrom(reader) as XElement;
                         if (placemark == null)
+                        {
+                            row_cnt++;
                             continue;
+                        }
 
                         try
                         {
