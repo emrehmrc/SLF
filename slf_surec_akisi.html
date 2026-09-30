@@ -1,0 +1,320 @@
+<title>SLF Süreç Akışı</title>
+<style>
+:root{
+  --bg:#F5F8FC; --surface:#FFFFFF; --surface-2:#EEF3F9; --border:#D8E0EA;
+  --text:#1B2433; --text-dim:#5B6B80; --line:#B9C7D6;
+  --accent:#1F4E79; --accent-soft:#DCE8F2;
+  --accent2:#2E8B84; --accent2-soft:#DFF0EE;
+  --warn:#B5690A; --warn-soft:#F7E8D5;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1620; --surface:#171F2B; --surface-2:#1C2632; --border:#2B3747;
+    --text:#E7EDF5; --text-dim:#95A5B8; --line:#37475A;
+    --accent:#6FA8DC; --accent-soft:#1E3448;
+    --accent2:#5FBDB3; --accent2-soft:#1B3733;
+    --warn:#E2A24B; --warn-soft:#3A2A15;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1620; --surface:#171F2B; --surface-2:#1C2632; --border:#2B3747;
+  --text:#E7EDF5; --text-dim:#95A5B8; --line:#37475A;
+  --accent:#6FA8DC; --accent-soft:#1E3448;
+  --accent2:#5FBDB3; --accent2-soft:#1B3733;
+  --warn:#E2A24B; --warn-soft:#3A2A15;
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box;}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:"IBM Plex Sans", -apple-system, "Segoe UI", sans-serif;
+  padding:0 16px; padding-block:32px;
+}
+.wrap{max-width:880px; margin:0 auto;}
+
+.mono{font-family:"IBM Plex Mono", ui-monospace, monospace;}
+
+h1{
+  font-size:1.7rem; font-weight:700; letter-spacing:-0.01em;
+  margin:0 0 6px; text-wrap:balance;
+}
+.subtitle{color:var(--text-dim); font-size:.95rem; margin:0 0 24px; max-width:60ch;}
+
+.thesis{
+  background:var(--accent-soft); border:1px solid var(--border);
+  border-left:4px solid var(--accent);
+  border-radius:10px; padding:16px 18px; margin-bottom:28px;
+  font-size:.98rem; line-height:1.55;
+}
+.thesis b{color:var(--accent);}
+
+/* ---- girdi verileri şeridi ---- */
+.inputs-label{
+  font-family:"IBM Plex Mono"; font-size:.72rem; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--text-dim); margin:0 0 8px;
+}
+.chips{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px;}
+.chip{
+  background:var(--surface); border:1px solid var(--border); border-radius:999px;
+  padding:6px 13px; font-size:.82rem; color:var(--text-dim); white-space:nowrap;
+}
+.feed-arrow{
+  display:flex; justify-content:center; color:var(--line); font-size:1.3rem;
+  margin:2px 0 26px; line-height:1;
+}
+
+/* ---- ana spine ---- */
+.spine{position:relative; padding-left:44px;}
+.spine::before{
+  content:""; position:absolute; left:17px; top:6px; bottom:6px; width:2px;
+  background:var(--line);
+}
+.stage{position:relative; margin-bottom:30px;}
+.stage:last-child{margin-bottom:0;}
+.node{
+  position:absolute; left:-44px; top:0; width:36px; height:36px; border-radius:50%;
+  background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center;
+  font-family:"IBM Plex Mono"; font-weight:600; font-size:.95rem; z-index:1;
+  box-shadow:0 0 0 4px var(--bg);
+}
+.card{
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:16px 18px 18px;
+}
+.card h2{font-size:1.08rem; margin:0 0 4px; font-weight:700;}
+.card .tag{
+  font-family:"IBM Plex Mono"; font-size:.68rem; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--accent); margin:0 0 8px; display:block;
+}
+.card p{margin:0 0 10px; font-size:.92rem; line-height:1.55; color:var(--text);}
+.card p:last-child{margin-bottom:0;}
+
+.why{
+  margin-top:10px; background:var(--warn-soft); border:1px solid var(--border);
+  border-left:3px solid var(--warn); border-radius:8px; padding:10px 13px;
+  font-size:.86rem; line-height:1.5;
+}
+.why b{color:var(--warn);}
+
+/* ---- ikili yol (Imar Analizi icin) ---- */
+.branch{
+  display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:12px 0 4px;
+}
+.path{
+  border-radius:9px; padding:11px 13px; font-size:.85rem; line-height:1.5;
+  border:1px solid var(--border);
+}
+.path.a{background:var(--accent2-soft); border-left:3px solid var(--accent2);}
+.path.b{background:var(--surface-2); border-left:3px solid var(--text-dim);}
+.path .ptitle{font-weight:700; font-size:.82rem; margin-bottom:4px; display:block;}
+.path.a .ptitle{color:var(--accent2);}
+.merge{
+  text-align:center; color:var(--line); font-size:1rem; margin:2px 0 2px;
+}
+
+/* ---- yatay/dikey mini kartlar (ELF) ---- */
+.split{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0 2px;}
+.split .box{
+  border-radius:9px; padding:11px 13px; font-size:.85rem; line-height:1.5;
+  background:var(--surface-2); border:1px solid var(--border);
+}
+.split .box .stitle{font-weight:700; font-size:.82rem; margin-bottom:3px; display:block; color:var(--accent);}
+
+/* ---- yan yana besleyen modüller (DEK/EA) ---- */
+.feeders{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:2px;}
+.feeder{
+  border-radius:9px; padding:11px 13px; font-size:.85rem; line-height:1.5;
+  background:var(--surface-2); border:1px solid var(--border);
+}
+.feeder .ftitle{font-weight:700; font-size:.82rem; margin-bottom:3px; display:block;}
+
+.final{
+  border-color:var(--warn); box-shadow:0 0 0 1px var(--warn) inset;
+}
+.final .node{background:var(--warn);}
+
+footer{
+  margin-top:34px; padding-top:16px; border-top:1px solid var(--border);
+  color:var(--text-dim); font-size:.78rem; line-height:1.6;
+}
+
+@media (max-width:560px){
+  .branch, .split, .feeders{grid-template-columns:1fr;}
+  h1{font-size:1.4rem;}
+  .spine{padding-left:38px;}
+  .node{left:-38px; width:30px; height:30px; font-size:.82rem;}
+}
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+
+<div class="wrap">
+  <h1>SLF — Uçtan Uca Süreç Akışı</h1>
+  <p class="subtitle">Jeo-uzamsal elektrik yük tahmini yazılımının, ham veriden trafo yatırım kararına kadar izlediği yol.</p>
+
+  <div class="thesis">
+    <b>Tek cümleyle:</b> yazılım, bir bölgedeki elektrik talebinin <b>gelecekte ne kadar</b>,
+    <b>haritada nerede</b> ve <b>ne zaman</b> artacağını tahmin eder; bu tahmini kullanarak
+    hangi trafoya, ne zaman, ne büyüklükte yatırım yapılması gerektiğine karar verir.
+  </div>
+
+  <div class="inputs-label">Girdi Verileri</div>
+  <div class="chips">
+    <div class="chip mono">Abone (sayaç) verisi</div>
+    <div class="chip mono">Mevcut trafo (DTR) verisi</div>
+    <div class="chip mono">İmar / zonlama planı (KML)</div>
+    <div class="chip mono">Uydu görüntüsü</div>
+    <div class="chip mono">Makro ekonomik veri (GSYH, nüfus, hava)</div>
+  </div>
+  <div class="feed-arrow">↓</div>
+
+  <div class="spine">
+
+    <div class="stage">
+      <div class="node">1</div>
+      <div class="card">
+        <span class="tag">İmar Analizi</span>
+        <h2>Arazi bugün ne durumda, ne kadar büyüyebilir?</h2>
+
+        <div class="why">
+          <b>İmar verisi burada işleniyor — regex nerede ve neden kullanılıyor?</b>
+          Belediyeden gelen ham imar planı (KML) dosyasında her poligonun bir stil/katman
+          kodu var (örn. <span class="mono">#PL_KUCUK_SAN_TIC</span>,
+          <span class="mono">#PL_GELISME_KONUT</span>) — bunların 300-400 farklı ham
+          varyasyonu oluyor. Bir eşleştirme tablosu üzerinden <b>regex (metin örüntü
+          eşleştirme)</b> ile her kod, bizim standart imar tiplerimize (Mesken, Sanayi,
+          Ticarethane, Tarımsal Sulama, Aydınlatma) indirgeniyor. Aynı KML'deki
+          <span class="mono">#SM_TAK</span> / <span class="mono">#SM_KAK</span> /
+          <span class="mono">#SM_HM</span> etiketli noktalardan da regex ile TAKS, KAKS ve
+          maksimum yükseklik gibi sayısal parsel bilgileri çıkarılıp ilgili parsele işleniyor.
+        </div>
+
+        <p>Bu temizlenmiş imar tipi + TAKS/KAKS verisiyle bölge, küçük hücrelere (yaklaşık
+        100×100 m) bölünür. Her hücre için imar planı ve uydu görüntüsü karşılaştırılarak
+        "bu hücrenin imarlı arazisinin ne kadarı zaten inşa edilmiş" sorusuna cevap aranır.
+        Buna <b>satürasyon (doluluk oranı)</b> denir.</p>
+
+        <div class="branch">
+          <div class="path a">
+            <span class="ptitle">A — Kısmen dolu, hâlâ boş kapasitesi olan alanlar</span>
+            Zaten üzerinde bina var ama imarın izin verdiği kapasitenin tamamı dolmamış
+            (ör. bir mahallede hâlâ boş arsa/parsel var). Bu hücreler zamanla dolmaya devam eder.
+          </div>
+          <div class="path b">
+            <span class="ptitle">B — Hiç yapılaşmamış yeni alanlar</span>
+            İmarlı ama üzerinde henüz hiç bina olmayan araziler (yeni genişleme bölgeleri).
+            Sıfırdan inşaata başlayacak alanlar.
+          </div>
+        </div>
+        <div class="merge">↓ ikisi de aynı mantıkla izlenir ↓</div>
+        <p>Bir hücrenin doluluk oranı yıldan yıla arttıysa, aradaki fark kadar
+        <b>yeni bina</b> o hücreye ekleneceği varsayılır. Yani A ve B ayrı ayrı model
+        değil, aynı "doluluk artışı" mantığının iki farklı başlangıç noktası.</p>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="node">2</div>
+      <div class="card">
+        <span class="tag">Bina Tipi Belirleme</span>
+        <h2>Yeni bina, kaç katlı ve kaç abone getirecek?</h2>
+        <p>1. adımda bir hücreye "yeni bina eklenecek" dendiğinde, imar tipi (Mesken/Sanayi/
+        Ticarethane) zaten biliniyor — ama mesken ise kaç katlı olacağını (dolayısıyla kaç
+        daire/abone getireceğini) ayrıca tahmin etmemiz gerekiyor:</p>
+
+        <div class="why">
+          <b>Neden 1-5 arası makine öğrenmesi sınıflaması?</b> Bir mesken binasının kaç
+          katlı olduğu (1-2 katlı mı, 8+ katlı mı) imar planından doğrudan verilmiyor; ama
+          katı ne kadar çoksa o kadar çok daire/abone demek. Geçmişteki gerçek binaların
+          özelliklerinden (ortalama tüketim, bağlantı gücü, abone sayısı) öğrenen bir model,
+          yeni ortaya çıkacak binanın hangi kat grubuna (1'den 5'e) benzediğini tahmin ediyor.
+        </div>
+        <div class="why">
+          <b>Not:</b> abone kayıtlarındaki "abone grubu" metninde de (MESKEN/Mesken/MSKN gibi
+          yazım farkları) benzer bir metin-standardizasyonu ayrıca yapılıyor, ama bu küçük bir
+          veri temizliği adımı — 1. adımdaki imar katmanı eşleştirmesiyle karıştırılmamalı.
+        </div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="node">3</div>
+      <div class="card">
+        <span class="tag">Ekonometrik Yük Tahmini (ELF)</span>
+        <h2>İlçe genelinde büyüme ne kadar olacak?</h2>
+        <p>İmar/bina modelinden bağımsız, ayrı bir istatistiksel model: geçmiş yıllardaki
+        tüketim, abone sayısı, GSYH ve nüfus verisiyle, ilçenin <b>toplam</b> elektrik
+        talebinin gelecek yıllarda ne kadar büyüyeceği tahmin edilir (5 senaryo: minimum →
+        maksimum). Bu büyüme ikiye ayrılır:</p>
+        <div class="split">
+          <div class="box">
+            <span class="stitle">Yatay büyüme</span>
+            Yeni gelen abonelerden kaynaklanan artış — "kaç yeni bağlantı geldi" sorusunun cevabı.
+          </div>
+          <div class="box">
+            <span class="stitle">Dikey büyüme</span>
+            Zaten var olan abonelerin daha fazla tüketmesinden kaynaklanan artış (klima,
+            elektrikli cihaz artışı vb.) — yeni bağlantı yok, mevcut abone daha çok kullanıyor.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="node">4</div>
+      <div class="card">
+        <span class="tag">Uzamsal Yük Tahmini (SLF)</span>
+        <h2>Bu büyüme haritada nereye düşüyor?</h2>
+        <p>İlçenin toplam <b>yatay</b> büyümesi, 1. adımda bulunan "yeni bina çıkacak"
+        hücrelere dağıtılır — yeni abone nerede bina çıkıyorsa oraya düşer. <b>Dikey</b>
+        büyüme ise zaten abonesi olan her hücreye, o hücrenin mevcut abone sayısına göre
+        orantılı dağıtılır. Sonuçta her hücre için yıllık tüketim ve pik (puant) güç
+        tahmini elde edilir — bu, haritadaki en ince mekânsal çözünürlüktür.</p>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="node">5</div>
+      <div class="card">
+        <span class="tag">DEK &amp; EA — Ek Etkiler</span>
+        <h2>Bu tabloyu değiştiren iki ayrı faktör</h2>
+        <p>Hücre bazlı tahmine iki yönlü ek katkı/düzeltme uygulanır:</p>
+        <div class="feeders">
+          <div class="feeder">
+            <span class="ftitle">DEK — çatı güneş enerjisi</span>
+            Bağlı olduğu trafo sanayi/ticarethane ağırlıklıysa, o trafonun öğle saatlerindeki
+            pikinden güneş üretimi kadar düşülür (mesken trafolarında pik akşam olduğu için
+            bu etki uygulanmaz).
+          </div>
+          <div class="feeder">
+            <span class="ftitle">EA — elektrikli araç şarjı</span>
+            Yeni şarj istasyonları, bulundukları hücreye ek yük olarak eklenir.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="node">6</div>
+      <div class="card final">
+        <span class="tag" style="color:var(--warn)">Optimal DTR — Nihai Karar</span>
+        <h2>Hangi trafoya, ne zaman, ne kadar yatırım?</h2>
+        <p>Her hücrenin (DEK/EA düzeltmeleri dahil) yükü, bina-trafo bağlantısı üzerinden
+        en yakın/ilgili trafoya atanır. Trafonun boş kapasitesi yetiyorsa yük oraya işlenir;
+        yetmiyorsa sırasıyla <b>kapasite yükseltme</b> veya <b>yeni trafo tesisi</b> kararı
+        üretilir. Bu, sürecin nihai çıktısıdır: saha ekiplerine "nerede, ne zaman, ne
+        büyüklükte" yatırım yapılacağını söyleyen liste.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    Bu şema SLF kod tabanının doğrudan incelenmesiyle hazırlanmıştır (bkz. proje köküdeki
+    methodology.md ve SLF_Modul_Metodolojileri.xlsx). Basitleştirilmiştir; her kutunun
+    arkasında birden fazla alt-adım ve istatistiksel yöntem vardır.
+  </footer>
+</div>

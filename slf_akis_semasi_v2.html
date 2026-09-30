@@ -1,0 +1,291 @@
+<title>SLF Akış Şeması</title>
+<style>
+:root{
+  --bg:#F5F8FC; --surface:#FFFFFF; --surface-2:#EEF3F9; --border:#D8E0EA;
+  --text:#1B2433; --text-dim:#5B6B80; --line:#93A6BC;
+  --accent:#1F4E79; --accent-soft:#DCE8F2;
+  --warn:#B5690A; --warn-soft:#F7E8D5;
+  --term:#1F4E79; --term-text:#FFFFFF;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1620; --surface:#171F2B; --surface-2:#1C2632; --border:#2B3747;
+    --text:#E7EDF5; --text-dim:#95A5B8; --line:#5C7086;
+    --accent:#7AB4E8; --accent-soft:#1E3448;
+    --warn:#E2A24B; --warn-soft:#3A2A15;
+    --term:#7AB4E8; --term-text:#0F1620;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1620; --surface:#171F2B; --surface-2:#1C2632; --border:#2B3747;
+  --text:#E7EDF5; --text-dim:#95A5B8; --line:#5C7086;
+  --accent:#7AB4E8; --accent-soft:#1E3448;
+  --warn:#E2A24B; --warn-soft:#3A2A15;
+  --term:#7AB4E8; --term-text:#0F1620;
+  color-scheme: dark;
+}
+*{box-sizing:border-box;}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:"IBM Plex Sans", -apple-system, "Segoe UI", sans-serif;
+  padding:0 16px; padding-block:28px;
+}
+.wrap{max-width:1000px; margin:0 auto;}
+h1{font-size:1.55rem; font-weight:700; letter-spacing:-0.01em; margin:0 0 6px; text-wrap:balance;}
+.subtitle{color:var(--text-dim); font-size:.92rem; margin:0 0 18px; max-width:65ch;}
+
+.legend{
+  display:flex; flex-wrap:wrap; gap:14px; margin-bottom:18px;
+  font-size:.78rem; color:var(--text-dim);
+}
+.legend .item{display:flex; align-items:center; gap:6px;}
+.legend svg{flex:none;}
+
+.diagram-scroll{
+  overflow-x:auto; border:1px solid var(--border); border-radius:12px;
+  background:var(--surface); padding:10px 6px;
+}
+.diagram-scroll svg{display:block; min-width:640px; width:100%; height:auto; margin:0 auto;}
+
+.box{fill:var(--surface); stroke:var(--accent); stroke-width:1.6;}
+.io{fill:var(--accent-soft); stroke:var(--accent); stroke-width:1.6;}
+.dec{fill:var(--warn-soft); stroke:var(--warn); stroke-width:1.6;}
+.term{fill:var(--term); stroke:none;}
+.sub{fill:var(--surface-2); stroke:var(--border); stroke-width:1.4;}
+.note{fill:var(--surface-2); stroke:var(--text-dim); stroke-width:1.2; stroke-dasharray:4 3;}
+.note-line{fill:none; stroke:var(--text-dim); stroke-width:1.2; stroke-dasharray:3 3;}
+.lbl-note{font-family:"IBM Plex Sans"; font-size:11px; fill:var(--text-dim); text-anchor:start;}
+.lbl-note-tag{font-family:"IBM Plex Mono"; font-size:9.5px; fill:var(--text-dim); text-anchor:start; letter-spacing:.04em;}
+.edge{fill:none; stroke:var(--line); stroke-width:1.8;}
+.lbl{font-family:"IBM Plex Sans"; font-size:13px; fill:var(--text); text-anchor:middle; font-weight:500;}
+.lbl-term{font-family:"IBM Plex Sans"; font-size:13.5px; fill:var(--term-text); text-anchor:middle; font-weight:700;}
+.lbl-tag{font-family:"IBM Plex Mono"; font-size:10px; fill:var(--accent); text-anchor:middle; letter-spacing:.04em;}
+.lbl-tag.warn{fill:var(--warn);}
+.edge-lbl{font-family:"IBM Plex Mono"; font-size:11.5px; fill:var(--text-dim); text-anchor:middle;}
+
+footer{margin-top:20px; padding-top:14px; border-top:1px solid var(--border); color:var(--text-dim); font-size:.78rem; line-height:1.6;}
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+
+<div class="wrap">
+  <h1>SLF — Akış Şeması</h1>
+  <p class="subtitle">Standart akış şeması sembolleriyle: başlangıç/bitiş (oval), işlem (dikdörtgen), veri girişi/çıkışı (paralelkenar), karar noktası (eşkenar dörtgen).</p>
+
+  <div class="legend">
+    <div class="item"><svg width="20" height="14"><rect x="1" y="1" width="18" height="12" rx="6" class="term"/></svg> Başlangıç / Bitiş</div>
+    <div class="item"><svg width="20" height="14"><rect x="1" y="1" width="18" height="12" rx="2" class="box"/></svg> İşlem</div>
+    <div class="item"><svg width="22" height="14"><polygon points="4,1 21,1 18,13 1,13" class="io"/></svg> Veri Girişi / Çıkışı</div>
+    <div class="item"><svg width="20" height="16"><polygon points="10,0 20,8 10,16 0,8" class="dec"/></svg> Karar Noktası</div>
+  </div>
+
+  <div class="diagram-scroll">
+    <svg viewBox="0 0 960 1980" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="var(--line)"/>
+        </marker>
+      </defs>
+
+      <!-- N1 Start -->
+      <rect x="370" y="20" width="220" height="50" rx="25" class="term"/>
+      <text x="480" y="50" class="lbl-term">BAŞLA</text>
+
+      <path class="edge" d="M480,70 L480,106" marker-end="url(#arrow)"/>
+
+      <!-- N2 Girdi verileri (I/O) -->
+      <polygon points="320,106 660,106 630,170 350,170" class="io"/>
+      <text x="480" y="128" class="lbl-tag">GİRDİ</text>
+      <text x="480" y="146" class="lbl">Abone · DTR · İmar planı</text>
+      <text x="480" y="162" class="lbl">Uydu görüntüsü · Makro veri</text>
+
+      <path class="edge" d="M480,170 L480,206" marker-end="url(#arrow)"/>
+
+      <!-- N3 İmar Analizi -->
+      <rect x="330" y="206" width="300" height="64" rx="8" class="box"/>
+      <text x="480" y="228" class="lbl-tag">1 · İMAR ANALİZİ</text>
+      <text x="480" y="248" class="lbl">Hücre bazlı doluluk oranı</text>
+      <text x="480" y="264" class="lbl">(satürasyon) hesabı</text>
+
+      <!-- Not: KML #PL/#SM regex isleme -->
+      <path class="note-line" d="M630,238 L666,238"/>
+      <rect x="666" y="176" width="270" height="188" rx="6" class="note"/>
+      <text x="680" y="196" class="lbl-note-tag">İMAR VERİSİ BURADA İŞLENİYOR</text>
+      <text x="680" y="214" class="lbl-note">Ham KML'deki #PL katman kodları</text>
+      <text x="680" y="230" class="lbl-note">(300-400 farklı ham etiket, örn.</text>
+      <text x="680" y="246" class="lbl-note">#PL_KUCUK_SAN_TIC) regex ile</text>
+      <text x="680" y="262" class="lbl-note">standart imar tipine (Mesken/</text>
+      <text x="680" y="278" class="lbl-note">Sanayi/Ticarethane...) indirgenir.</text>
+      <text x="680" y="300" class="lbl-note">#SM_TAK / #SM_KAK / #SM_HM</text>
+      <text x="680" y="316" class="lbl-note">etiketli noktalardan da regex ile</text>
+      <text x="680" y="332" class="lbl-note">TAKS, KAKS, maksimum yükseklik</text>
+      <text x="680" y="348" class="lbl-note">değerleri çıkarılıp parsele işlenir.</text>
+
+      <path class="edge" d="M480,270 L480,306" marker-end="url(#arrow)"/>
+
+      <!-- N4 Diamond: doluluk artti mi -->
+      <polygon points="480,306 610,361 480,416 350,361" class="dec"/>
+      <text x="480" y="352" class="lbl">Doluluk oranı bir önceki</text>
+      <text x="480" y="368" class="lbl">yıla göre arttı mı?</text>
+
+      <!-- Evet -> down -->
+      <path class="edge" d="M480,416 L480,452" marker-end="url(#arrow)"/>
+      <text x="500" y="438" class="edge-lbl">Evet</text>
+
+      <!-- Hayır -> left, straight down to N7 -->
+      <path class="edge" d="M350,361 L120,361 L120,684 L322,684" marker-end="url(#arrow)"/>
+      <text x="120" y="352" class="edge-lbl">Hayır</text>
+
+      <!-- N5 yeni bina sayısı -->
+      <rect x="330" y="452" width="300" height="64" rx="8" class="box"/>
+      <text x="480" y="474" class="lbl-tag">İşlem</text>
+      <text x="480" y="494" class="lbl">Yeni bina sayısı = yapılabilir</text>
+      <text x="480" y="510" class="lbl">alan ÷ ortalama bina alanı</text>
+
+      <path class="edge" d="M480,516 L480,552" marker-end="url(#arrow)"/>
+
+      <!-- N6 bina tipi ML -->
+      <rect x="330" y="552" width="300" height="64" rx="8" class="box"/>
+      <text x="480" y="574" class="lbl-tag">2 · BİNA TİPİ BELİRLEME</text>
+      <text x="480" y="594" class="lbl">Mesken ise: ML modeli (1-5) ile</text>
+      <text x="480" y="610" class="lbl">kat sayısı sınıfı tahmini</text>
+
+      <path class="edge" d="M480,616 L480,652" marker-end="url(#arrow)"/>
+
+      <!-- N7 Çıktı 1 (I/O) - merge point -->
+      <polygon points="320,652 660,652 630,716 350,716" class="io"/>
+      <text x="480" y="674" class="lbl-tag">ÇIKTI</text>
+      <text x="480" y="694" class="lbl">Hücre bazlı yeni bina /</text>
+      <text x="480" y="710" class="lbl">abone sayısı</text>
+
+      <path class="edge" d="M480,716 L480,752" marker-end="url(#arrow)"/>
+
+      <!-- N8 ELF -->
+      <rect x="330" y="752" width="300" height="64" rx="8" class="box"/>
+      <text x="480" y="774" class="lbl-tag">3 · EKONOMETRİK TAHMİN (ELF)</text>
+      <text x="480" y="794" class="lbl">İlçe geneli, senaryo bazlı</text>
+      <text x="480" y="810" class="lbl">büyüme tahmini</text>
+
+      <path class="edge" d="M480,816 L480,838" marker-end="url(#arrow)"/>
+      <path class="edge" d="M295,838 L665,838" />
+      <path class="edge" d="M295,838 L295,852" marker-end="url(#arrow)"/>
+      <path class="edge" d="M665,838 L665,852" marker-end="url(#arrow)"/>
+
+      <!-- N9a Yatay -->
+      <rect x="160" y="852" width="270" height="70" rx="8" class="sub"/>
+      <text x="295" y="876" class="lbl-tag">YATAY BÜYÜME</text>
+      <text x="295" y="896" class="lbl">Yeni gelen abonelerden</text>
+      <text x="295" y="912" class="lbl">kaynaklanan artış</text>
+
+      <!-- N9b Dikey -->
+      <rect x="530" y="852" width="270" height="70" rx="8" class="sub"/>
+      <text x="665" y="876" class="lbl-tag">DİKEY BÜYÜME</text>
+      <text x="665" y="896" class="lbl">Mevcut abonenin daha</text>
+      <text x="665" y="912" class="lbl">fazla tüketmesinden artış</text>
+
+      <path class="edge" d="M295,922 L470,952" marker-end="url(#arrow)"/>
+      <path class="edge" d="M665,922 L490,952" marker-end="url(#arrow)"/>
+
+      <!-- N10 SLF dağıtım -->
+      <rect x="330" y="952" width="300" height="70" rx="8" class="box"/>
+      <text x="480" y="974" class="lbl-tag">4 · UZAMSAL YÜK TAHMİNİ (SLF)</text>
+      <text x="480" y="994" class="lbl">Yatay → yeni bina hücreleri,</text>
+      <text x="480" y="1010" class="lbl">Dikey → mevcut abone hücreleri</text>
+
+      <path class="edge" d="M480,1022 L480,1058" marker-end="url(#arrow)"/>
+
+      <!-- N11 Çıktı 2 -->
+      <polygon points="320,1058 660,1058 630,1122 350,1122" class="io"/>
+      <text x="480" y="1080" class="lbl-tag">ÇIKTI</text>
+      <text x="480" y="1100" class="lbl">Hücre bazlı yıllık tüketim</text>
+      <text x="480" y="1116" class="lbl">+ pik (puant) yük</text>
+
+      <path class="edge" d="M480,1122 L480,1158" marker-end="url(#arrow)"/>
+
+      <!-- N12 Diamond DEK -->
+      <polygon points="480,1158 610,1213 480,1268 350,1213" class="dec"/>
+      <text x="480" y="1204" class="lbl">Hücrede DEK var ve trafo</text>
+      <text x="480" y="1220" class="lbl">sanayi/ticari ağırlıklı mı?</text>
+
+      <path class="edge" d="M610,1213 L720,1213 L720,1268" marker-end="url(#arrow)"/>
+      <text x="655" y="1204" class="edge-lbl">Evet</text>
+
+      <path class="edge" d="M480,1268 L480,1304" marker-end="url(#arrow)"/>
+      <text x="500" y="1290" class="edge-lbl">Hayır</text>
+
+      <!-- N13 pikten güneş düş -->
+      <rect x="590" y="1268" width="260" height="56" rx="8" class="box"/>
+      <text x="720" y="1290" class="lbl-tag">5 · DEK ETKİSİ</text>
+      <text x="720" y="1308" class="lbl">Pikten güneş üretimini düş</text>
+
+      <path class="edge" d="M720,1324 L720,1360 L630,1360" marker-end="url(#arrow)"/>
+
+      <!-- N14 EA yükü ekle - merge -->
+      <rect x="330" y="1332" width="300" height="56" rx="8" class="box"/>
+      <text x="480" y="1354" class="lbl-tag">EA ETKİSİ</text>
+      <text x="480" y="1372" class="lbl">EA şarj yükünü ekle (varsa)</text>
+
+      <path class="edge" d="M480,1388 L480,1424" marker-end="url(#arrow)"/>
+
+      <!-- N15 Optimal DTR atama -->
+      <rect x="330" y="1424" width="300" height="64" rx="8" class="box"/>
+      <text x="480" y="1446" class="lbl-tag">6 · OPTIMAL DTR</text>
+      <text x="480" y="1466" class="lbl">Yükü, bina-trafo bağlantısı</text>
+      <text x="480" y="1482" class="lbl">üzerinden trafoya ata</text>
+
+      <path class="edge" d="M480,1488 L480,1524" marker-end="url(#arrow)"/>
+
+      <!-- N16 Diamond kapasite yeterli mi -->
+      <polygon points="480,1524 620,1580 480,1636 340,1580" class="dec"/>
+      <text x="480" y="1576" class="lbl">Trafo kapasitesi</text>
+      <text x="480" y="1592" class="lbl">yeterli mi?</text>
+
+      <path class="edge" d="M620,1580 L760,1580 L760,1610" marker-end="url(#arrow)"/>
+      <text x="700" y="1571" class="edge-lbl">Evet</text>
+
+      <path class="edge" d="M480,1636 L480,1672" marker-end="url(#arrow)"/>
+      <text x="500" y="1658" class="edge-lbl">Hayır</text>
+
+      <!-- N17 Bitiş - yatırım yok -->
+      <rect x="640" y="1610" width="240" height="50" rx="25" class="term"/>
+      <text x="760" y="1640" class="lbl-term">BİTİŞ — yatırım gerekmiyor</text>
+
+      <!-- N18 Diamond kademeli yükseltme yeterli mi -->
+      <polygon points="480,1672 610,1726 480,1780 350,1726" class="dec"/>
+      <text x="480" y="1722" class="lbl">Kademeli kapasite artırma</text>
+      <text x="480" y="1738" class="lbl">yeterli mi?</text>
+
+      <path class="edge" d="M350,1726 L200,1726 L200,1774" marker-end="url(#arrow)"/>
+      <text x="270" y="1717" class="edge-lbl">Evet</text>
+
+      <path class="edge" d="M610,1726 L760,1726 L760,1774" marker-end="url(#arrow)"/>
+      <text x="690" y="1717" class="edge-lbl">Hayır</text>
+
+      <!-- N19 kapasite yükselt -->
+      <rect x="70" y="1774" width="260" height="56" rx="8" class="box"/>
+      <text x="200" y="1796" class="lbl-tag">İşlem</text>
+      <text x="200" y="1814" class="lbl">Trafo kapasitesini yükselt</text>
+
+      <!-- N20 yeni trafo -->
+      <rect x="630" y="1774" width="260" height="56" rx="8" class="box"/>
+      <text x="760" y="1796" class="lbl-tag">İşlem</text>
+      <text x="760" y="1814" class="lbl">Yeni trafo tesis et</text>
+
+      <path class="edge" d="M200,1830 L200,1876 L470,1876" marker-end="url(#arrow)"/>
+      <path class="edge" d="M760,1830 L760,1876 L490,1876" marker-end="url(#arrow)"/>
+
+      <!-- N21 Bitiş final -->
+      <rect x="360" y="1876" width="240" height="50" rx="25" class="term"/>
+      <text x="480" y="1906" class="lbl-term">BİTİŞ — yatırım planı</text>
+
+    </svg>
+  </div>
+
+  <footer>
+    Standart akış şeması notasyonu kullanılmıştır. Kod tabanının doğrudan incelenmesiyle
+    hazırlanmıştır (bkz. methodology.md, SLF_Modul_Metodolojileri.xlsx). Basitleştirilmiştir;
+    her kutunun arkasında birden fazla alt-adım ve istatistiksel yöntem vardır.
+  </footer>
+</div>
