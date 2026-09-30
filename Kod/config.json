@@ -3,7 +3,7 @@
   "program_dosyaları_path": "C:/Users/Emre Hangul/Desktop/MRC/SLF/Kod",
   "İl": "İzmir",
   "İlçe": "Karşıyaka",
-  "proje_ismi": "proje_temp_20260914_181913",
+  "proje_ismi": "proje_temp_20260915_082547",
   "katman_eslestirme": "/imar/python_kod/imar_analizi/katmanlar/katman_eslesme.csv",
   "CBS_abone": "CBS/ABONE.tab",
   "CBS_trafo": "CBS/OGAGTRF.tab",
@@ -97,7 +97,7 @@
     "kentsel_donusum_poligonu": "sonuclar/SLF Sonuçları/Kentsel Dönüşüm/Girdi/kentsel_donusum_poligonlar.xlsx",
     "YGA_poligonu": "sonuclar/SLF Sonuçları/YGA/Girdi/yga_poligonlar.xlsx",
     "YUK_poligonu": "sonuclar/SLF Sonuçları/Point Load/Girdi/point_load_poligonlar.xlsx",
-    "secilen_senaryo": "baz"
+    "secilen_senaryo": "minimum"
   },
   "Point_Load_Musaade": "Point Load Verileri/point_load_musaade.xlsx",
   "Yük_Yoğunluğu": {

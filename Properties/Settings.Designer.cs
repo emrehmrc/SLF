@@ -70,5 +70,17 @@ namespace SLF.Properties {
                 this["LastUsername"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastFileDialogDirectory {
+            get {
+                return ((string)(this["LastFileDialogDirectory"]));
+            }
+            set {
+                this["LastFileDialogDirectory"] = value;
+            }
+        }
     }
 }

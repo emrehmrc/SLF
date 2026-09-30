@@ -41,17 +41,15 @@ namespace SLF
             await Task.Delay(250);
             this.Cursor = Cursors.WaitCursor;
 
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            string selectedPath = SLF.Utilities.DialogHelpers.ShowOpenFileDialogSafe(
+                "KML dosyası seç", "KML Files (*.kml)|*.kml");
+            if (!string.IsNullOrEmpty(selectedPath))
             {
-                openFileDialog.Filter = "KML Files (*.kml)|*.kml";
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    KmlFilePath = openFileDialog.FileName;
+                    KmlFilePath = selectedPath;
                     string filename = KmlFilePath.Substring(KmlFilePath.LastIndexOf("\\") + 1);
 
                     label_imar_path.Text = filename;
                     label_imar_path.Visible= true;
-                }
             }
 
             this.Cursor= Cursors.Default;
@@ -625,18 +623,15 @@ namespace SLF
             this.Cursor = Cursors.WaitCursor;
             this.Refresh();
 
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            string selectedPath = SLF.Utilities.DialogHelpers.ShowOpenFileDialogSafe(
+                "KML dosyası seç", "KML Files (*.kml)|*.kml");
+            if (!string.IsNullOrEmpty(selectedPath))
             {
-                openFileDialog.Filter = "KML Files (*.kml)|*.kml";
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    KmlFilePath = openFileDialog.FileName;
+                    KmlFilePath = selectedPath;
                     string filename = KmlFilePath.Substring(KmlFilePath.LastIndexOf("\\") + 1);
 
                     label_imar_test.Text = filename;
                     label_imar_test.Visible = true;
-
-                }
             }
             this.Cursor = Cursors.Default;
             this.Refresh();

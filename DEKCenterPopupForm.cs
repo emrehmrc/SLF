@@ -48,8 +48,9 @@ namespace SLF
         {
             // Fill initial coordinates from veri object
             DEKCenterDataGridView.Rows.Add();
-            DEKCenterDataGridView.Rows[0].Cells["DEK_X_KOORDINAT"].Value = veri.Enlem;
-            DEKCenterDataGridView.Rows[0].Cells["DEK_Y_KOORDINAT"].Value = veri.Boylam;
+            // Konvansiyon: X = boylam (longitude), Y = enlem (latitude) - Abone/DTR/EA modulleriyle tutarli.
+            DEKCenterDataGridView.Rows[0].Cells["DEK_X_KOORDINAT"].Value = veri.Boylam;
+            DEKCenterDataGridView.Rows[0].Cells["DEK_Y_KOORDINAT"].Value = veri.Enlem;
 
             // Set the cell (grid) ID
             DEKCenterDataGridView.Rows[0].Cells["ID"].Value =
@@ -225,8 +226,9 @@ namespace SLF
                 string startYearStr = row.Cells["StartYear"]?.Value?.ToString();
                 string cellId = row.Cells["ID"]?.Value?.ToString();
                 string dekValueStr = row.Cells["DEK_KURULU_GUCU"]?.Value?.ToString();
-                object enlemValue = row.Cells["DEK_X_KOORDINAT"]?.Value;
-                object boylamValue = row.Cells["DEK_Y_KOORDINAT"]?.Value;
+                // Konvansiyon: X = boylam, Y = enlem (bkz. InitializeDataGridView)
+                object boylamValue = row.Cells["DEK_X_KOORDINAT"]?.Value;
+                object enlemValue = row.Cells["DEK_Y_KOORDINAT"]?.Value;
 
                 Console.WriteLine($"StartYear: {startYearStr ?? "null"}, ID: {cellId ?? "null"}, DEK_KURULU_GUCU: {dekValueStr ?? "null"}, " +
                                   $"DEK_X_KOORDINAT: {enlemValue?.ToString() ?? "null"}, DEK_Y_KOORDINAT: {boylamValue?.ToString() ?? "null"}");
@@ -249,13 +251,13 @@ namespace SLF
                     return;
                 }
 
-                if (enlemValue == null || !double.TryParse(enlemValue.ToString(), out double enlem))
+                if (boylamValue == null || !double.TryParse(boylamValue.ToString(), out double boylam))
                 {
                     MessageBox.Show("DEK Bilgileri Tablosu'nda DEK X Koordinatı(DEK_X_KOORDINAT) geçerli bir sayı olmalıdır.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                if (boylamValue == null || !double.TryParse(boylamValue.ToString(), out double boylam))
+                if (enlemValue == null || !double.TryParse(enlemValue.ToString(), out double enlem))
                 {
                     MessageBox.Show("DEK Bilgileri Tablosu'nda DEK Y Koordinatı(DEK_Y_KOORDINAT) geçerli bir sayı olmalıdır.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
@@ -314,8 +316,8 @@ namespace SLF
                             string existingId = excelRow.Cell("A").GetString();
                             if (existingId == cellId)
                             {
-                                excelRow.Cell("H").Value = enlem;
-                                excelRow.Cell("I").Value = boylam;
+                                excelRow.Cell("H").Value = boylam;
+                                excelRow.Cell("I").Value = enlem;
 
                                 double currentDekValue = excelRow.Cell("G").TryGetValue<double>(out double value) ? value : 0;
                                 excelRow.Cell("G").Value = currentDekValue + dekValue;
@@ -331,8 +333,8 @@ namespace SLF
                             var lastRow = worksheet.LastRowUsed() ?? worksheet.Row(1);
                             var newRow = worksheet.Row(lastRow.RowNumber() + 1);
                             newRow.Cell("A").Value = cellId;
-                            newRow.Cell("H").Value = enlem;
-                            newRow.Cell("I").Value = boylam;
+                            newRow.Cell("H").Value = boylam;
+                            newRow.Cell("I").Value = enlem;
                             newRow.Cell("G").Value = dekValue;
                         }
                     }

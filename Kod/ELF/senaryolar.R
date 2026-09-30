@@ -49,7 +49,7 @@ excel_file_path <- paste0(user_root_path,"/",
 d <- read_excel(excel_file_path,
                 sheet = 1,
                 col_names = TRUE,
-                col_types = rep("numeric", 43)) %>%
+                col_types = rep("numeric", 44)) %>%
   as.data.frame()
 
 

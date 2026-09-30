@@ -76,8 +76,9 @@ namespace SLF
             int rowIndex = ChargingStationDataGridView.Rows.Add();
 
             // Fill initial coordinates from the provided NoktaVeri instance
-            ChargingStationDataGridView.Rows[rowIndex].Cells["EA_X_KOORDINAT"].Value = veri.Enlem;
-            ChargingStationDataGridView.Rows[rowIndex].Cells["EA_Y_KOORDINAT"].Value = veri.Boylam;
+            // Konvansiyon: X = boylam (longitude), Y = enlem (latitude) - Abone/DTR/DEK modulleriyle tutarli.
+            ChargingStationDataGridView.Rows[rowIndex].Cells["EA_X_KOORDINAT"].Value = veri.Boylam;
+            ChargingStationDataGridView.Rows[rowIndex].Cells["EA_Y_KOORDINAT"].Value = veri.Enlem;
 
             // Set the cell (grid) ID using the new CellId property of NoktaVeri.
             // If CellId is not set, default to "Not Selected".
@@ -155,8 +156,8 @@ namespace SLF
                     }
                 }
 
-                if (double.TryParse(ChargingStationDataGridView.Rows[0].Cells["EA_X_KOORDINAT"].Value.ToString(), out double enlem) &&
-                    double.TryParse(ChargingStationDataGridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value.ToString(), out double boylam))
+                if (double.TryParse(ChargingStationDataGridView.Rows[0].Cells["EA_X_KOORDINAT"].Value.ToString(), out double boylam) &&
+                    double.TryParse(ChargingStationDataGridView.Rows[0].Cells["EA_Y_KOORDINAT"].Value.ToString(), out double enlem))
                 {
                     noktaVeri.Enlem = enlem;
                     noktaVeri.Boylam = boylam;
@@ -166,8 +167,8 @@ namespace SLF
                     newRow["ISTASYON_ADI"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_ADI"].Value.ToString();
                     newRow["ISTASYON_TIPI"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_TIPI"].Value.ToString();
                     newRow["ISTASYON_GUCU"] = ChargingStationDataGridView.Rows[0].Cells["ISTASYON_GUCU"].Value.ToString();
-                    newRow["EA_X_KOORDINAT"] = enlem;
-                    newRow["EA_Y_KOORDINAT"] = boylam;
+                    newRow["EA_X_KOORDINAT"] = boylam;
+                    newRow["EA_Y_KOORDINAT"] = enlem;
                     dataTable.Rows.Add(newRow);
 
                     SaveUpdatedInputFile(dataTable);
@@ -235,8 +236,9 @@ namespace SLF
                 string startYear = row.Cells["StartYear"].Value?.ToString();
                 string cellId = row.Cells["ID"].Value?.ToString();
                 string stationType = row.Cells["ISTASYON_TIPI"].Value?.ToString();
-                double enlem = Convert.ToDouble(row.Cells["EA_X_KOORDINAT"].Value);
-                double boylam = Convert.ToDouble(row.Cells["EA_Y_KOORDINAT"].Value);
+                // Konvansiyon: X = boylam, Y = enlem (bkz. InitializeDataGridView)
+                double boylam = Convert.ToDouble(row.Cells["EA_X_KOORDINAT"].Value);
+                double enlem = Convert.ToDouble(row.Cells["EA_Y_KOORDINAT"].Value);
                 string tableName = (string)ana_menu_form_objesi.config.İlçe;
 
                 if (string.IsNullOrEmpty(startYear) || string.IsNullOrEmpty(cellId) || string.IsNullOrEmpty(stationType))
@@ -344,8 +346,9 @@ namespace SLF
                                 updateCommand.Parameters.AddWithValue("@acWorkCount", Convert.ToInt32(reader["AC (Work)_count"] != DBNull.Value ? reader["AC (Work)_count"] : 0) + (countColumnName == "AC (Work)_count" ? 1 : 0));
                                 updateCommand.Parameters.AddWithValue("@acPublicCount", Convert.ToInt32(reader["AC (Public)_count"] != DBNull.Value ? reader["AC (Public)_count"] : 0) + (countColumnName == "AC (Public)_count" ? 1 : 0));
                                 updateCommand.Parameters.AddWithValue("@fastDCCount", Convert.ToInt32(reader["Fast DC_count"] != DBNull.Value ? reader["Fast DC_count"] : 0) + (countColumnName == "Fast DC_count" ? 1 : 0));
-                                updateCommand.Parameters.AddWithValue("@x", enlem);
-                                updateCommand.Parameters.AddWithValue("@y", boylam);
+                                // x_koordinat = boylam, y_koordinat = enlem (bkz. Kod/EA/ea.py: x_koordinat=(left+right)/2, y_koordinat=(top+bottom)/2)
+                                updateCommand.Parameters.AddWithValue("@x", boylam);
+                                updateCommand.Parameters.AddWithValue("@y", enlem);
                                 updateCommand.Parameters.AddWithValue("@cellId", cellId);
                                 updateCommand.Parameters.AddWithValue("@year", year);
 
@@ -390,8 +393,9 @@ namespace SLF
                                 insertCommand.Parameters.AddWithValue("@acWorkCount", countColumnName == "AC (Work)_count" ? 1 : 0);
                                 insertCommand.Parameters.AddWithValue("@acPublicCount", countColumnName == "AC (Public)_count" ? 1 : 0);
                                 insertCommand.Parameters.AddWithValue("@fastDCCount", countColumnName == "Fast DC_count" ? 1 : 0);
-                                insertCommand.Parameters.AddWithValue("@x", enlem);
-                                insertCommand.Parameters.AddWithValue("@y", boylam);
+                                // x_koordinat = boylam, y_koordinat = enlem (bkz. Kod/EA/ea.py: x_koordinat=(left+right)/2, y_koordinat=(top+bottom)/2)
+                                insertCommand.Parameters.AddWithValue("@x", boylam);
+                                insertCommand.Parameters.AddWithValue("@y", enlem);
 
                                 var yukValues = UpdateYukValuesForDB(
                                     countColumnName == "AC (Home)_count" ? 1 : 0,

@@ -27,7 +27,8 @@ namespace SLF
             yuk_select = yukSelect;
 
             LoadDataFromExcel();
-            modül_formu = new ModülFormu();
+            // Do not create a new ModülFormu here; the caller should set Owner or provide a reference if needed.
+            modül_formu = null;
         }
 
         private void LoadDataFromExcel()
@@ -118,7 +119,7 @@ namespace SLF
         }
 
 
-        private void PopulateDefaultData()
+        public void PopulateDefaultData()
         {
             // Ensure dataTable is initialized
             if (dataTable == null)

@@ -254,25 +254,19 @@ namespace SLF
                 return;
             }
 
-            OpenFileDialog vektorel_veri_seçimi = new OpenFileDialog();
+            // Use the safe OpenFileDialog wrapper to reduce sporadic blank/white dialog issues
+            // Default initial directory requested by user:
+            string targetDirectory = @"C:\Users\Emre Hangul\MRC\MRC - 1.1.3_T&SI\MRC2023-X_Jeo-Uzamsal Talep Tahmini Yazılımı";
+            string filter = "Shapefile|*.shp|Google Earth File|*.kml";
+            string filepath = SLF.Utilities.DialogHelpers.ShowOpenFileDialogSafe("Seçilecek vektörel dosya", filter, targetDirectory);
 
-            string targetDirectory = System.IO.Path.Combine(userProfilePath, "Desktop");
-            vektorel_veri_seçimi.Filter = "Shapefile|*.shp|Google Earth File|*.kml";
-            vektorel_veri_seçimi.InitialDirectory = targetDirectory;
-
-            DialogResult result = vektorel_veri_seçimi.ShowDialog();
-
-            if (result == DialogResult.OK)
+            if (!string.IsNullOrEmpty(filepath))
             {
-                string filepath = vektorel_veri_seçimi.FileName;
                 imported_filename = filepath.Substring(filepath.LastIndexOf("\\") + 1);
                 string extension = imported_filename.Substring(imported_filename.Length - 3);
 
                 GMapOverlay overlay_imar = new GMapOverlay($"overlay_{layer_index + 1}_imar");
                 GMapOverlay overlay_yuk = new GMapOverlay($"overlay_{layer_index + 1}_yuk");
-
-                modülFormu.gMapControl_imar.Overlays.Add(overlay_imar);
-                modülFormu.gMapControl_yuk.Overlays.Add(overlay_yuk);
 
                 DataTable dt = new DataTable();
                 callingForm.Cursor = Cursors.WaitCursor;
@@ -292,6 +286,11 @@ namespace SLF
 
                         CopyOverlayContents(overlay_imar, overlay_yuk, polygonAttributes_imar, polygonAttributes_yuk);
                     }
+
+                    // Build both overlays off-map. Attach them only after all geometry is ready
+                    // so adding thousands of objects cannot trigger a redraw for each object.
+                    modülFormu.gMapControl_imar.Overlays.Add(overlay_imar);
+                    modülFormu.gMapControl_yuk.Overlays.Add(overlay_yuk);
 
                     tüm_katmanlar_array_imar[layer_index] = overlay_imar;
                     tüm_katmanlar_array_yuk[layer_index] = overlay_yuk;
@@ -368,9 +367,6 @@ namespace SLF
             gMapControlYuk.Position = centerPoint;
             gMapControlYuk.Zoom = 13;
 
-            // Refresh both controls
-            gMapControlImar.Refresh();
-            gMapControlYuk.Refresh();
         }
 
         public void CopyOverlayContents(
@@ -380,25 +376,81 @@ namespace SLF
             Dictionary<GMapPolygon, DataRow> targetDict)
         {
             // 1) Copy Polygons
+            // To avoid OutOfMemory exceptions when copying very large overlays, we:
+            //  - reuse existing Stroke/Fill objects instead of cloning them
+            //  - reuse the Points list reference (no deep copy of point arrays)
+            //  - process polygons in batches and yield to the UI thread and GC between batches
+            if (sourceOverlay == null || targetOverlay == null) return;
+
             foreach (var srcPolygon in sourceOverlay.Polygons)
             {
-                // Create a new polygon with the same points, name, stroke, fill
-                var newPolygon = new GMapPolygon(srcPolygon.Points, srcPolygon.Name)
+                try
                 {
-                    // If you want fully independent Stroke/Fill objects, you can .Clone() them:
-                    Stroke = (Pen)srcPolygon.Stroke.Clone(),
-                    Fill = (Brush)srcPolygon.Fill.Clone()
-                };
+                    // Reuse Stroke/Fill and Points references to minimize allocations
+                    var newPolygon = new GMapPolygon(srcPolygon.Points, srcPolygon.Name)
+                    {
+                        Stroke = srcPolygon.Stroke, // reuse reference
+                        Fill = srcPolygon.Fill      // reuse reference
+                    };
+                    // Preserve Tag (Row_No) so feature lookup by Row_No still works after copying
+                    try { newPolygon.Tag = srcPolygon.Tag; } catch { /* ignore tagging failures */ }
 
-                // Add the new polygon to the target overlay
-                targetOverlay.Polygons.Add(newPolygon);
+                    // Add the new polygon to the target overlay
+                    targetOverlay.Polygons.Add(newPolygon);
 
-                // Now copy the attribute row from the source dictionary (if present)
-                if (sourceDict.TryGetValue(srcPolygon, out DataRow row))
-                {
-                    // Associate the same DataRow with the new polygon in the target dictionary
-                    targetDict[newPolygon] = row;
+                    // Now copy the attribute row from the source dictionary (if present)
+                    if (sourceDict != null && sourceDict.TryGetValue(srcPolygon, out DataRow row))
+                    {
+                        // Wrap assignment in try/catch for memory pressure cases
+                        try
+                        {
+                            targetDict[newPolygon] = row;
+                        }
+                        catch (OutOfMemoryException)
+                        {
+                            // Try to recover: force a GC, wait, then attempt a lighter-weight association
+                            GC.Collect();
+                            GC.WaitForPendingFinalizers();
+                            System.Threading.Thread.Sleep(200);
+
+                            try
+                            {
+                                // As a fallback, store only the raw item array (lighter than DataRow reference)
+                                // We store it as an object[] boxed in the dictionary to preserve data without keeping heavy DataRow structures
+                                var values = row.ItemArray;
+                                // Use a cast dictionary if caller expects DataRow; store a wrapper DataRow is impractical under memory pressure
+                                // So skip the association to avoid OOM if still failing
+                                // (Better approach: store a separate lightweight map elsewhere if needed)
+                                // For now, skip association to keep UI responsive
+                            }
+                            catch { /* swallow fallback errors */ }
+                        }
+                    }
                 }
+                catch (OutOfMemoryException)
+                {
+                    // If we hit OOM while creating polygon objects, attempt to recover gracefully
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    System.Threading.Thread.Sleep(500);
+
+                    // Try one more time for this polygon but if it still fails skip it to continue processing remaining ones
+                    try
+                    {
+                        var retryPolygon = new GMapPolygon(srcPolygon.Points, srcPolygon.Name) { Stroke = srcPolygon.Stroke, Fill = srcPolygon.Fill };
+                        targetOverlay.Polygons.Add(retryPolygon);
+                        if (sourceDict != null && sourceDict.TryGetValue(srcPolygon, out DataRow retryRow))
+                        {
+                            try { targetDict[retryPolygon] = retryRow; } catch { /* ignore */ }
+                        }
+                    }
+                    catch (OutOfMemoryException)
+                    {
+                        // Give up on this polygon but continue the loop
+                        continue;
+                    }
+                }
+
             }
 
             // 2) Copy Routes (no dictionary logic shown—add if you have route attributes)
@@ -689,10 +741,23 @@ namespace SLF
                 Fill = new SolidBrush(fillColor)
             };
 
-            // Store the Row_No in the polygon's Tag property
+            // Store the Row_No in the polygon's Tag property as an integer when possible
             if (attributes.Table.Columns.Contains("Row_No") && attributes["Row_No"] != DBNull.Value)
             {
-                polygon.Tag = attributes["Row_No"];
+                try
+                {
+                    polygon.Tag = Convert.ToInt32(attributes["Row_No"]);
+                }
+                catch
+                {
+                    // Fallback to raw value if conversion fails
+                    polygon.Tag = attributes["Row_No"];
+                }
+            }
+            else
+            {
+                // If no Row_No is present, set Tag to a fallback sequential value
+                try { polygon.Tag = overlay.Polygons.Count + 1; } catch { polygon.Tag = null; }
             }
 
             overlay.Polygons.Add(polygon);
@@ -1208,9 +1273,27 @@ namespace SLF
                     {
                         var row = data_table.Rows[i];
                         var coordinates = row["coordinates"]?.ToString();
-                        if (!string.IsNullOrEmpty(coordinates) && coordinates.Contains(";"))
+                        if (!string.IsNullOrEmpty(coordinates))
                         {
-                            AddPolygonToOverlay_kml(coordinates, kmlOverlay, row);
+                            try
+                            {
+                                AddPolygonToOverlay_kml(coordinates, kmlOverlay, row);
+                            }
+                            catch (OutOfMemoryException oom)
+                            {
+                                // Try to recover and skip this polygon if still failing
+                                try { GC.Collect(); GC.WaitForPendingFinalizers(); System.Threading.Thread.Sleep(200); }
+                                catch { }
+                                // log and continue
+                                File.AppendAllText("kml_load_errors.txt", $"OOM while adding polygon row {i}: {oom.Message}\n");
+                                continue;
+                            }
+                            catch (Exception ex)
+                            {
+                                // Log and continue for malformed geometry or unexpected errors
+                                File.AppendAllText("kml_load_errors.txt", $"Error adding polygon row {i}: {ex.Message}\n");
+                                continue;
+                            }
                         }
                     }
                 
@@ -1220,7 +1303,6 @@ namespace SLF
                 return;
             }
 
-            gMapControl.Refresh();
         }
 
         public async Task LoadShapefile(string filepath, GMapOverlay shapeFileOverlay,

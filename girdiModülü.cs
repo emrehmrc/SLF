@@ -717,32 +717,25 @@ namespace SLF
                     return;
                 }
 
-                using (var fileDialog1 = new OpenFileDialog { Title = FileDialogTitle })
+                if (seçilenVeriTipi == "İmar Verileri")
                 {
+                    return;
+                }
 
-                    if (seçilenVeriTipi == "İmar Verileri")
-                    {
-                        return;
-                    }
+                string filter = GetFileFilter(seçilenVeriTipi);
+                if (string.IsNullOrEmpty(filter))
+                {
+                    MessageBox.Show("Bu veri tipi için atanmış bir dosya veya veritabanı seçimi prosedürü henüz yok.",
+                        "Prosedür Bulunamadı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
-                    string filter = GetFileFilter(seçilenVeriTipi);
-                    if (string.IsNullOrEmpty(filter))
-                    {
-                        MessageBox.Show("Bu veri tipi için atanmış bir dosya veya veritabanı seçimi prosedürü henüz yok.",
-                            "Prosedür Bulunamadı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
-
-                    fileDialog1.Filter = filter;
-                    if (fileDialog1.ShowDialog() == DialogResult.OK)
-                    {
-                        await ProcessSelectedFile(fileDialog1.FileName, seçilenVeriTipi);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Dosya seçimi gerçekleştirilemedi.",
-                            "Dosya Seçim Hatası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
+                // Use the safe OpenFileDialog helper which retries and uses safe defaults
+                string initialDir = modülFormu?.ana_menu_form_objesi?.userRootPath ?? Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                string selectedPath = SLF.Utilities.DialogHelpers.ShowOpenFileDialogSafe(FileDialogTitle, filter, initialDir);
+                if (!string.IsNullOrEmpty(selectedPath))
+                {
+                    await ProcessSelectedFile(selectedPath, seçilenVeriTipi);
                 }
             }
             catch (Exception ex)

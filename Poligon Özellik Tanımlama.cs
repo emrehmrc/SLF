@@ -43,9 +43,23 @@ namespace SLF
         {
 
             InitializeComponent();
-            modül_formu = new ModülFormu();
-            cbsFormu = new CBS(modül_formu);
+            // Use the provided mainform instance instead of creating a new ModülFormu
+            // Creating a new ModülFormu here could initialize COM-based components unintentionally
             this.modül_formu = mainform;
+
+            try
+            {
+                cbsFormu = new CBS(this.modül_formu);
+            }
+            catch (System.Runtime.InteropServices.COMException comEx)
+            {
+                // Provide a clearer message and rethrow so caller can handle if necessary
+                MessageBox.Show($"COM component error initializing map/geometry services: {comEx.Message}\n\n" +
+                    "This usually means a native COM component (e.g., MapWinGIS) is not registered or the process bitness does not match the installed component.\n" +
+                    "Solution: install/register the native library or set the project Platform Target to x86 (or x64 to match your native install).",
+                    "COM Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                throw;
+            }
 
             // Set the flags before calling SetupDataGridView
             isSelecting_YUK = isSelectingYUK;
@@ -814,64 +828,114 @@ namespace SLF
         private void buton_poligon_ozellik_Click(object sender, EventArgs e)
         {
 
-            if (ValidatePolygonData())
+            try
             {
-                isKaydetClicked = true;
-                this.Close();
-            }
-            else
-            {
-                if (isSelecting_YGA || isSelecting_KentselDonusum)
+                if (ValidatePolygonData())
                 {
-                    MessageBox.Show("Hata: İmar tiplerinin toplamı 100(%) olmalıdır!\n\n" +
-                        "İlgili imar tipleri şunlardır:\n\n" +
-                        "1-2 KATLI MESKEN\n" +
-                        "3-4 KATLI MESKEN\n" +
-                        "5-7 KATLI MESKEN\n" +
-                        "8 USTU KATLI MESKEN\n" +
-                        "VILLA MESKEN\n" +
-                        "AYDINLATMA\n" +
-                        "KUCUK_SANAYI\n" +
-                        "KUCUK_TICARETHANE\n" +
-                        "ORTA_SANAYI\n" +
-                        "ORTA_TICARETHANE\n" +
-                        "TARIMSAL_SULAMA\n" +
-                        "Park, Yol, Kaldırım Oranı (%)", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    isKaydetClicked = true;
+                    this.Close();
                 }
+                else
+                {
+                    if (isSelecting_YGA || isSelecting_KentselDonusum)
+                    {
+                        MessageBox.Show("Hata: İmar tiplerinin toplamı 100(%) olmalıdır!\n\n" +
+                            "İlgili imar tipleri şunlardır:\n\n" +
+                            "1-2 KATLI MESKEN\n" +
+                            "3-4 KATLI MESKEN\n" +
+                            "5-7 KATLI MESKEN\n" +
+                            "8 USTU KATLI MESKEN\n" +
+                            "VILLA MESKEN\n" +
+                            "AYDINLATMA\n" +
+                            "KUCUK_SANAYI\n" +
+                            "KUCUK_TICARETHANE\n" +
+                            "ORTA_SANAYI\n" +
+                            "ORTA_TICARETHANE\n" +
+                            "TARIMSAL_SULAMA\n" +
+                            "Park, Yol, Kaldırım Oranı (%)", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+            catch (System.Runtime.InteropServices.COMException comEx)
+            {
+                // COM errors often mean a required native component is not registered or bitness mismatch (x86/x64)
+                MessageBox.Show($"A COM error occurred while saving the polygon: {comEx.Message}\n\n" +
+                    "Likely causes:\n" +
+                    " - A native COM component (for example MapWinGIS) is not installed or registered.\n" +
+                    " - The application is running as x64 but the COM component is 32-bit (or vice versa).\n\n" +
+                    "Fixes:\n" +
+                    " - Install/register the native COM library (use the MapWinGIS installer or regsvr32 as appropriate).\n" +
+                    " - Change project Platform Target to x86 in Project Properties -> Build and rebuild.\n\n" +
+                    "After applying a fix, restart the application.",
+                    "COM Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Beklenmeyen bir hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void buton_yük_tipleri_Click(object sender, EventArgs e)
         {
 
-            if (isSelecting_YUK)
+            try
             {
-                yük_bilgi_formu_objesi = new Nokta_Yuk_Bilgi_Formu(excelFilePath,true);
+                if (isSelecting_YUK)
+                {
+                    yük_bilgi_formu_objesi = new Nokta_Yuk_Bilgi_Formu(excelFilePath, true);
+                }
+
+                if (yük_bilgi_formu_objesi == null)
+                {
+                    MessageBox.Show("Yük bilgi formu başlatılamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Set owner and show dialog safely
+                yük_bilgi_formu_objesi.Owner = this;
+                try
+                {
+                    yük_bilgi_formu_objesi.ShowDialog();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Yük bilgi penceresi açılırken hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // attempt to recover by populating defaults
+                    yük_bilgi_formu_objesi.PopulateDefaultData();
+                }
+
+                try
+                {
+                    if (!yük_bilgi_formu_objesi.IsDisposed)
+                    {
+                        yük_bilgi_formu_objesi.BringToFront();
+                        yük_bilgi_formu_objesi.Focus();
+                    }
+                }
+                catch { }
+
+                // Reload Excel data and update dropdowns after dialog closes
+                LoadExcelData();
+                if (columnValues == null)
+                {
+                    MessageBox.Show("Excel dosyası okunamadı, dropdown listeleri doldurulamıyor. Lütfen Excel dosyasını kapatıp tekrar deneyin.",
+                        "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                SetupDropdownColumns(columnValues);
+
+                // Check if yukler or musaade changed after the dialog closes
+                if (yük_bilgi_formu_objesi.is_yukler_changed)
+                {
+                    yük_bilgi_formu_objesi.is_yukler_changed = false;
+                    yük_bilgi_formu_objesi.yuk_select = true;
+                }
             }
-
-
-            yük_bilgi_formu_objesi.Owner = this;
-            yük_bilgi_formu_objesi.ShowDialog();
-            yük_bilgi_formu_objesi.BringToFront();
-            yük_bilgi_formu_objesi.Focus();
-
-             // Reload Excel data and update dropdowns
-             LoadExcelData();
-             if (columnValues == null)
-             {
-                 MessageBox.Show("Excel dosyası okunamadı, dropdown listeleri doldurulamıyor. Lütfen Excel dosyasını kapatıp tekrar deneyin.",
-                     "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                 return;
-             }
-
-             SetupDropdownColumns(columnValues);
-
-             // Check if yukler or musaade changed after the dialog closes
-             if (yük_bilgi_formu_objesi.is_yukler_changed)
-             {
-                 yük_bilgi_formu_objesi.is_yukler_changed = false;
-                 yük_bilgi_formu_objesi.yuk_select = true;
-             }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Yük tipleri penceresi sırasında beklenmeyen hata: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
         }
 

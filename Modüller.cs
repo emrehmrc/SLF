@@ -798,7 +798,6 @@ namespace SLF
             {"EA Şarj Verileri", new EASarjModulu()},
             {"Ekonometrik Yük Tahmini Verileri", new EkonometrikYukTahminiModulu()},
             {"İmar Verileri", new GirdiModülü()},
-            {"Yeni Projelendirilmiş DTR Verileri", new YeniProjelendirilmisDTR()},
         };
 
         private async void SelectFolderButton_Click(object sender, EventArgs e)

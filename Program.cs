@@ -55,8 +55,24 @@ namespace SLF
         // Your generic exception handler
         private static void HandleException(Exception ex)
         {
-            // Example: show a message box and continue running
-            MessageBox.Show($"Bir hata oluştu!\n Hata mesajı:\n{ex.Message}", 
+            // Handle OutOfMemoryException specially to try to recover gracefully
+            if (ex is OutOfMemoryException)
+            {
+                try
+                {
+                    // Try to free memory
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                }
+                catch { }
+
+                MessageBox.Show("Bellek yetersizliği tespit edildi. Lütfen büyük veri yüklemelerini azaltın veya proje Platform Target ayarını x86/x64 olacak şekilde eşleştirin. Uygulama mümkün olduğunca kurtarmaya çalıştı.",
+                    "Bellek Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Default: show a message box and continue running
+            MessageBox.Show($"Bir hata oluştu!\n Hata mesajı:\n{ex.Message}",
                 "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             // Optionally: log the exception to a file, telemetry, etc.
